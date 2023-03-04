@@ -15,7 +15,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         }
         if(parseInt(d[obj.field]) < parseInt(d.config[obj.field])){
             //得到当前行数据，并拼接成自定义模板
-            return '<span style="color: #c00;">'+ d[obj.field] +'</span>'
+            return '<span style="width: 100%;display: block;background: rgba(255,0,0,.2)">'+ d[obj.field] +'</span>'
         }
         return '';
     }
@@ -31,7 +31,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 if(d.config){
                     if(parseInt(d[obj.field]) < parseInt(d.config[obj.field])){
                         //得到当前行数据，并拼接成自定义模板
-                        return '<span style="color: #c00;">'+ d[obj.field] +'</span>'
+                        return '<span style="width: 100%;display: block;background: rgba(255,0,0,.2)">'+ d[obj.field] +'</span>'
                     }
                 }
                 return d[obj.field];
@@ -42,41 +42,40 @@ define(["jquery", "easy-admin"], function ($, ea) {
             ea.table.render({
                 init: init,
                 event:false,
-                // height: 750,
+                height: 620,
+                limit: 1000,
+                limits:[100,200,500,1000],
                 // totalRow: true,
                 cols: [[
                     {type: "checkbox"},
-                    {field: '区域', width: 180, title: '区域',search: false},
-                    {field: '店铺名称', width: 180, title: '店铺名称',search: false
-
-
-
-                    },
-                    {field: '背包', width: 180, title: '背包',templet: function(d){
+                    {field: '省份', width: 134, title: '省份',search: 'select',searchKey:'province_list',setSearch:true},
+                    {field: '店铺名称', width: 134, title: '店铺名称',search: true},
+                    {field: '商品负责人', width: 134, title: '商品负责人',search: true},
+                    {field: '背包', width: 134, title: '背包',templet: function(d){
                         return isRed(d,this);
                       },searchValue:this.width,search:defaultOp},
-                    {field: '挎包', width: 180, title: '挎包',templet: function(d){
+                    {field: '挎包', width: 134, title: '挎包',templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '领带', width: 180, title: '领带',templet: function(d){
+                    {field: '领带', width: 134, title: '领带',templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '帽子', width: 180, title: '帽子',templet: function(d){
+                    {field: '帽子', width: 134, title: '帽子',templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '内裤', width: 180, title: '内裤',templet: function(d){
+                    {field: '内裤', width: 134, title: '内裤',templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '皮带', width: 180, title: '皮带',templet: function(d){
+                    {field: '皮带', width: 134, title: '皮带',templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '袜子', title: '袜子', width: 180,templet: function(d){
+                    {field: '袜子', title: '袜子', width: 134,templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '手包', title: '手包', width: 180,templet: function(d){
+                    {field: '手包', title: '手包', width: 134,templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
-                    {field: '胸包', title: '胸包', width: 180,templet: function(d){
+                    {field: '胸包', title: '胸包', width: 134,templet: function(d){
                         return isRed(d,this);
                       },search:defaultOp},
                     // {field: '配饰汇总', title: '配饰汇总', width: 122},
@@ -106,7 +105,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 }
             });
 
-
+            console.log(ea.table)
             ea.listen();
         },
         list: function () {
@@ -115,38 +114,42 @@ define(["jquery", "easy-admin"], function ($, ea) {
             defaultOp = 'lt';
             ea.table.render({
                 url: init.list_index,
-                search:false,
+                search:true,
+                height: 760,
+                limit: 1000,
+                limits:[100,200,500,1000],
                 cols: [[
                     {type: "checkbox"},
-                    {field: '区域', width: 180, title: '区域',search: false},
-                    {field: '店铺名称', width: 180, title: '店铺名称',search: false},
-                    {field: '背包', width: 180, title: '背包',templet: function(d){
+                    {field: '省份', width: 134, title: '省份',search: true},
+                    {field: '店铺名称', width: 134, title: '店铺名称',search: true},
+                    {field: '商品负责人', width: 134, title: '商品负责人',search: true},
+                    {field: '背包', width: 134, title: '背包',templet: function(d){
                         return isRed(d,this);
-                      },searchValue:this.width,search:defaultOp},
-                    {field: '挎包', width: 180, title: '挎包',templet: function(d){
+                      },searchValue:this.width,search:defaultOp,search: false},
+                    {field: '挎包', width: 134, title: '挎包',templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '领带', width: 180, title: '领带',templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '领带', width: 134, title: '领带',templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '帽子', width: 180, title: '帽子',templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '帽子', width: 134, title: '帽子',templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '内裤', width: 180, title: '内裤',templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '内裤', width: 134, title: '内裤',templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '皮带', width: 180, title: '皮带',templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '皮带', width: 134, title: '皮带',templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '袜子', title: '袜子', width: 180,templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '袜子', title: '袜子', width: 134,templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '手包', title: '手包', width: 180,templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '手包', title: '手包', width: 134,templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
-                    {field: '胸包', title: '胸包', width: 180,templet: function(d){
+                      },search:defaultOp,search: false},
+                    {field: '胸包', title: '胸包', width: 134,templet: function(d){
                         return isRed(d,this);
-                      },search:defaultOp},
+                      },search:defaultOp,search: false},
                 ]]
             });
 

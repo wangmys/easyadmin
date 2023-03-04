@@ -27,7 +27,7 @@ define(["jquery", "easy-admin", "echarts", "echarts-theme", "miniAdmin", "miniTa
             });
 
             // 连接websocket
-            this.linkWs();
+            // this.linkWs();
         },
         linkWs: function () {
 
@@ -51,7 +51,7 @@ define(["jquery", "easy-admin", "echarts", "echarts-theme", "miniAdmin", "miniTa
                    value:value
                }
               // 发送消息
-                ws.send(JSON.stringify(value));
+                ws.send(JSON.stringify(data));
                 console.log(elem.val(''))
             });
 

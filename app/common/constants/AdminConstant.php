@@ -25,4 +25,20 @@ class AdminConstant
      */
     const SUPER_ADMIN_ID = 1;
 
+    /**
+     * 库存筛选字段
+     */
+    const STOCK_FIELD = [
+        'knapsack' =>'背包',
+        'satchel' => '挎包',
+        'necktie' =>'领带',
+        'cap' =>'帽子',
+        'briefs' =>'内裤',
+        'belt' =>'皮带',
+        'socks' =>'袜子',
+        'handbag' =>'手包',
+        'chestpack' =>'胸包'
+    ];
+
+    const NOT_FIELD = '店铺名称&省份&商品负责人';
 }

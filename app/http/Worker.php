@@ -27,8 +27,6 @@ class Worker extends Server
 
     // 连接成功
     public function onConnect($connection){
-
-        $this->redis->set(1,5);
         // 执行一次
         $connection->send(json_encode("开始启动"));
         // 遍历当前进程所有的客户端连接，发送当前服务器的时间
@@ -36,7 +34,6 @@ class Worker extends Server
         {
             $connection->send(time());
         }
-        $connection->send($this->redis->get(1));
     }
 
 	public function onMessage($connection,$data)

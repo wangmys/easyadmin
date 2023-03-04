@@ -21,6 +21,8 @@
             VERSION: "{$version|default='1.0.0'}",
             CSRF_TOKEN: "{:token()}",
             ADMIN_ID: "{:$adminId}",
+            STOCK_WARN: JSON.parse(`{:$stock_warn}`),
+            SEARCH_WHERE: JSON.parse(`{:$serchWhere}`),
         };
     </script>
 

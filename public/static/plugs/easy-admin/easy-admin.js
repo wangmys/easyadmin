@@ -302,6 +302,18 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                     d.search = admin.parame(d.search, true);
                     d.searchTip = d.searchTip || (d.search === 'xmSelect' ? '请选择' : '请输入') + d.title || '';
                     d.searchValue = d.searchValue || '';
+
+                    if(d.setSearch){
+                        switch (d.searchKey){
+                            case 'province_list':
+                                console.log(d)
+                               d.selectList = CONFIG.SEARCH_WHERE[d.searchKey].data;
+                        }
+                    }
+                    if(CONFIG.STOCK_WARN[d.field]){
+                        d.searchValue = CONFIG.STOCK_WARN[d.field]
+                    }
+
                     d.searchOp = d.searchOp || '%*%';
                     d.timeType = d.timeType || 'datetime';
                     if (d.field !== false && d.search !== false) {
@@ -374,13 +386,22 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                                     '</div>\n' +
                                     '</div>';
                                 break;
+                            case 'lt':
+                                d.searchOp = '<';
+                                formHtml += '\t<div class="layui-form-item layui-inline">\n' +
+                                    '<label class="layui-form-label">' + d.title + '</label>\n' +
+                                    '<div class="layui-input-inline">\n' +
+                                    '<input id="c-' + d.fieldAlias + '" name="' + d.fieldAlias + '"  data-search-op="' + d.searchOp + '"  value="' + d.searchValue + '" placeholder="' + d.searchTip + '" class="layui-input">\n' +
+                                    '</div>\n' +
+                                    '</div>';
+                                break;
                         }
                         newCols.push(d);
                     }
                 });
                 if (formHtml !== '') {
 
-                    $(elem).before('<fieldset id="searchFieldset_' + tableId + '" class="table-search-fieldset layui-hide">\n' +
+                    $(elem).before('<fieldset id="searchFieldset_' + tableId + '" class="table-search-fieldset">\n' +
                         '<legend>条件搜索</legend>\n' +
                         '<form class="layui-form layui-form-pane form-search" lay-filter="' + tableId + '">\n' +
                         formHtml +

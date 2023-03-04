@@ -194,6 +194,9 @@ class AdminController extends BaseController
                 case 'in':
                     $where[] = [$key, 'IN', $val];
                     break;
+                case '<':
+                    $where[] = [$key, '<', $val];
+                    break;
                 default:
                     $where[] = [$key, $op, "%{$val}"];
             }
@@ -238,6 +241,7 @@ class AdminController extends BaseController
             'autoloadJs'           => $autoloadJs,
             'isSuperAdmin'         => $isSuperAdmin,
             'version'              => env('app_debug') ? time() : ConfigService::getVersion(),
+            'stock_warn'              => json_encode(sysconfig('stock_warn')),
         ];
 
         View::assign($data);
@@ -281,6 +285,7 @@ class AdminController extends BaseController
                 $this->error('演示环境下不允许修改');
             }
         }
+        $this->setSearchWhere();
         View::assign(['adminId' => $adminId]);
     }
 
@@ -291,6 +296,32 @@ class AdminController extends BaseController
         if (!$this->request->isPost()) {
             $this->error("当前请求不合法！");
         }
+    }
+
+
+    /**
+     * 设置搜索参数
+     */
+    public function setSearchWhere()
+    {
+        $search_where = [];
+        $fields = [
+             // 设置省份列表
+            'province_list' => '省份',
+            // 设置省份列表
+            'shop_list' => '店铺名称',
+            // 设置省份列表
+            'charge_list' => '商品负责人'
+        ];
+        $model = (new \app\admin\model\dress\Accessories);
+        foreach ($fields as $k => $v){
+            $list = $model->column($v);
+            $search_where[$k] = [
+                'field' => $v,
+                'data' => $list
+            ];
+        }
+        View::assign(['serchWhere' => json_encode($search_where)]);
     }
 
 }

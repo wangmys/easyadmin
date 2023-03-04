@@ -7,12 +7,14 @@ use app\admin\model\dress\Accessories as AccessoriesM;
 use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use think\App;
 
 
 /**
- * Class Admin
- * @package app\admin\controller\system
+ * Class Accessories
+ * @package app\admin\controller\system\dress
  * @ControllerAnnotation(title="配饰库存")
  */
 class Accessories extends AdminController
@@ -32,7 +34,7 @@ class Accessories extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="列表")
+     * @NodeAnotation(title="配饰总览")
      */
     public function index()
     {
@@ -42,20 +44,32 @@ class Accessories extends AdminController
             }
             list($page, $limit, $where) = $this->buildTableParames();
 
+            // 获取其他筛选
+            $other_where = $this->setWhere($where)[1];
+
             // 设置默认筛选结果
-            $this->setWhere($where);
+            $where = $this->setWhere($where)[0];
 
             $count = $this->model
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
                     }
+                })->whereNotIn('店铺名称&省份&商品负责人','合计');
 
-                })
-                ->count();
+            // 增加其他筛选
+            if(count($other_where) > 0){
+                $count->where(function ($q)use($other_where){
+                    foreach ($other_where as $k => $v){
+                        $q->where($v[0], $v[1], $v[2]);
+                    }
+                });
+            }
+
+            $count = $count->count();
 
             if(empty($where)){
-                $stock_warn = [];
+                $stock_warn = sysconfig('stock_warn');;
             }else{
                 $stock_warn = [];
                 foreach ($where as $k => $v){
@@ -64,13 +78,22 @@ class Accessories extends AdminController
             }
 
             $list = $this->model
-//                ->where($where)
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
                     }
-                })
-                ->page($page, $limit)
+                })->whereNotIn(AdminConstant::NOT_FIELD,'合计');
+
+            // 增加其他筛选
+            if(count($other_where) > 0){
+                $list->where(function ($q)use($other_where){
+                    foreach ($other_where as $k => $v){
+                        $q->where($v[0], $v[1], $v[2]);
+                    }
+                });
+            }
+
+            $list = $list->order('省份,店铺名称,商品负责人')->page($page, $limit)
                 ->select()->append(['config'])->withAttr('config',function ($data,$value) use($stock_warn){
                     return $stock_warn;
                 });
@@ -87,45 +110,72 @@ class Accessories extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="库存结果")
+     * @NodeAnotation(title="配饰结果")
      */
     public function list()
     {
+        // 条件
+        $this->searchWhere();
         if ($this->request->isAjax()) {
             if (input('selectFields')) {
                 return $this->selectList();
             }
             list($page, $limit, $where) = $this->buildTableParames();
 
-            // 计算条数
-            $count = $this->model
-                ->where(function ($q)use($where){
-                    foreach ($where as $k => $v){
-                        $q->whereOr($v[0], $v[1], $v[2]);
-                    }
-                })
-                ->count();
+            // 获取其他筛选
+            $other_where = $this->setWhere($where)[1];
 
+             // 设置默认筛选结果
+            $where = $this->setWhere($where)[0];
             if(empty($where)){
-                $stock_warn = sysconfig('stock_warn');
-            }else{
-                $stock_warn = [];
-                foreach ($where as $k => $v){
-                    $stock_warn[$v[0]] = $v[2]??0;
-                }
+                // 设置默认筛选
+                $where = $this->setWhere($where)[0];
             }
 
-            // 获取列表
-            $list = $this->model
+            // 计算条数
+            $count = $this->model
+                ->whereNotIn(AdminConstant::NOT_FIELD,'合计')
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
                     }
-                })
-                ->page($page, $limit)
-                ->select()->append(['config'])->withAttr('config',function ($data,$value) use($stock_warn){
+                });
+
+            // 增加其他筛选
+            if(count($other_where) > 0){
+                $count->where(function ($q)use($other_where){
+                    foreach ($other_where as $k => $v){
+                        $q->where($v[0], $v[1], $v[2]);
+                    }
+                });
+            }
+            // 计数
+            $count = $count->count();
+
+            // 配置
+            $stock_warn = sysconfig('stock_warn');
+
+            // 获取列表
+            $list = $this->model->whereNotIn('店铺名称&省份&商品负责人','合计')
+                ->where(function ($q)use($where){
+                    foreach ($where as $k => $v){
+                        $q->whereOr($v[0], $v[1], $v[2]);
+                    }
+                });
+
+            // 增加其他筛选
+            if(count($other_where) > 0){
+                $list->where(function ($q)use($other_where){
+                    foreach ($other_where as $k => $v){
+                        $q->where($v[0], $v[1], $v[2]);
+                    }
+                });
+            }
+
+            $list = $list->order('省份,店铺名称,商品负责人')->page($page, $limit)->select()->append(['config'])->withAttr('config',function ($data,$value) use($stock_warn){
                     return $stock_warn;
                 });
+
             $data = [
                 'code'  => 0,
                 'msg'   => '',
@@ -144,12 +194,22 @@ class Accessories extends AdminController
     public function setWhere($where)
     {
         $stock_warn = sysconfig('stock_warn');
+        $other_where = [];
+        $_where = [];
         if(empty($where)){
             foreach ($stock_warn as $k => $v){
-                $where[] = [];
+                $_where[] = [$k,'<',$v];
+            }
+        }else{
+            foreach ($where as $k => $v){
+                if($v[1] == '<'){
+                    $_where[] = [$v[0],$v[1],$v[2]];
+                }else{
+                    $other_where[] = [$v[0],$v[1],$v[2]];
+                }
             }
         }
-        return $where;
+        return [$_where,$other_where];
     }
 
     /**
@@ -255,5 +315,28 @@ class Accessories extends AdminController
         $this->success('保存成功');
     }
 
-
+    /**
+     * 初始化搜索条件
+     */
+    public function searchWhere()
+    {
+        $search_where = [];
+        $fields = [
+             // 设置省份列表
+            'province_list' => '省份',
+            // 设置省份列表
+            'shop_list' => '店铺名称',
+            // 设置省份列表
+            'charge_list' => '商品负责人'
+        ];
+        foreach ($fields as $k => $v){
+            $list = $this->model->column($v);
+            $search_where[$k] = [
+                'field' => $v,
+                'data' => $list
+            ];
+        }
+        // 设置搜索
+        $this->setSearchWhere($search_where);
+    }
 }

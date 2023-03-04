@@ -62,28 +62,28 @@ define(["jquery", "easy-admin", "echarts", "echarts-theme", "miniAdmin", "miniTa
                         console.log(444)
                     default:
                          layer.open({
-                    type: 1,
-                    title: '系统公告' + '<span style="float: right;right: 1px;font-size: 12px;color: #b1b3b9;margin-top: 1px">' + '</span>',
-                    offset: 'rb',
-                    shade: 0.8,
-                    id: 'layuimini-notice',
-                    btn: ['查看', '取消'],
-                    btnAlign: 'c',
-                    moveType: 1,
-                    content: `<div id="layuimini-notice" class="layui-layer-content"><div style="padding:15px 20px; text-align:justify; line-height: 22px;border-bottom:1px solid #e2e2e2;background-color: #2f4056;color: #ffffff">
-<div style="text-align: center;margin-bottom: 20px;font-weight: bold;border-bottom:1px solid #718fb5;padding-bottom: 5px"><h4 class="text-danger">新增treetable插件和菜单管理样式</h4></div>
-<div style="font-size: 12px">
-                                ` + msg + `
-                            </div>
-</div>
-</div>`,
-                    success: function (layero) {
-                        var btn = layero.find('.layui-layer-btn');
-                        btn.find('.layui-layer-btn0').attr({
-                            href: 'https://gitee.com/zhongshaofa/layuimini',
-                            target: '_blank'
-                        });
-                    }
+                            type: 1,
+                            title: '系统公告' + '<span style="float: right;right: 1px;font-size: 12px;color: #b1b3b9;margin-top: 1px">' + '</span>',
+                            offset: 'rb',
+                            shade: 0.8,
+                            id: 'layuimini-notice',
+                            btn: ['查看', '取消'],
+                            btnAlign: 'c',
+                            moveType: 1,
+                            content: `<div id="layuimini-notice" class="layui-layer-content"><div style="padding:15px 20px; text-align:justify; line-height: 22px;border-bottom:1px solid #e2e2e2;background-color: #2f4056;color: #ffffff">
+        <div style="text-align: center;margin-bottom: 20px;font-weight: bold;border-bottom:1px solid #718fb5;padding-bottom: 5px"><h4 class="text-danger">新增treetable插件和菜单管理样式</h4></div>
+        <div style="font-size: 12px">
+                                        ` + msg + `
+                                    </div>
+        </div>
+        </div>`,
+                            success: function (layero) {
+                                var btn = layero.find('.layui-layer-btn');
+                                btn.find('.layui-layer-btn0').attr({
+                                    href: 'https://gitee.com/zhongshaofa/layuimini',
+                                    target: '_blank'
+                                });
+                            }
                 });
                 }
             }
