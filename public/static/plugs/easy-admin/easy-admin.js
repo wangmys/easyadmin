@@ -306,7 +306,6 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                     if(d.setSearch){
                         switch (d.searchKey){
                             case 'province_list':
-                                console.log(d)
                                d.selectList = CONFIG.SEARCH_WHERE[d.searchKey].data;
                         }
                     }

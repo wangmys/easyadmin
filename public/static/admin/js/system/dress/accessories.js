@@ -45,6 +45,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 height: 620,
                 limit: 1000,
                 limits:[100,200,500,1000],
+                toolbar:[],
                 // totalRow: true,
                 cols: [[
                     {type: "checkbox"},
@@ -105,7 +106,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 }
             });
 
-            console.log(ea.table)
+
             ea.listen();
         },
         list: function () {
@@ -117,6 +118,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 search:true,
                 height: 760,
                 limit: 1000,
+                toolbar:[],
                 limits:[100,200,500,1000],
                 cols: [[
                     {type: "checkbox"},

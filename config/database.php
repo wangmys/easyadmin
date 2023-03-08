@@ -18,6 +18,26 @@ return [
 
     // 数据库连接配置信息
     'connections'     => [
+        'sqlsrv' => [
+            // 数据库类型
+            'type'              => Env::get('database3.type', 'sqlsrv'),
+            // 服务器地址
+            'hostname'          => Env::get('database3.hostname', '47.113.79.107'),
+            // 数据库名
+            'database'          => Env::get('database3.database', 'ff211'),
+            // 用户名
+            'username'          => Env::get('database3.username', 'reader'),
+            // 密码
+            'password'          => Env::get('database3.password', 'suoge@2023'),
+            // 端口
+            'hostport'          => Env::get('database3.hostport', '19122'),
+            // 数据库连接参数
+            'params'            => [],
+            // 数据库编码默认采用utf8
+            'charset'           => Env::get('database3.charset', 'utf8'),
+            // 数据库表前缀
+            'prefix'            => Env::get('database3.prefix', ''),
+        ],
         'mysql' => [
             // 数据库类型
             'type'              => Env::get('database.type', 'mysql'),
@@ -76,7 +96,7 @@ return [
             'charset'           => Env::get('database2.charset', 'utf8'),
             // 数据库表前缀
             'prefix'            => Env::get('database2.prefix', 'sp_'),
-        ],
+        ]
         // 更多的数据库配置信息
     ],
 ];
