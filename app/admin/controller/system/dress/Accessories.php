@@ -360,10 +360,6 @@ class Accessories extends AdminController
 
 
         $model = (new \app\http\logic\AddHistoryData);
-        $model->redis->rpush("task_queue",1);
-        echo '<pre>';
-        print_r($model->redis->lrange("task_queue",0,-1));
-        die;
         echo '<pre>';
 //        print_r(date('Y-m-d',strtotime('2022-01-01'."+313day")));
 //        $model->redis->rpush('finish_task',313);

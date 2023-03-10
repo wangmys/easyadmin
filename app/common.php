@@ -122,3 +122,34 @@ if (!function_exists('auth')) {
     }
 
 }
+
+
+function array_sort($data, $field, $sort){
+    $fields = array_column($data, $field);
+
+    array_multisort($fields, $sort, $data);
+    return $data;
+}
+
+function reform_keys($array){
+    if(!is_array($array)){
+        return $array;
+    }
+    $keys = implode('', array_keys($array));
+    if(is_numeric($keys)){
+        $array = array_values($array);
+    }
+    $array = array_map('reform_keys', $array);
+    return $array;
+};
+
+
+function getMillisecond(){
+
+    list($msec, $sec) = explode(' ', microtime());
+
+    $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+
+    return $msectimes = substr($msectime,0,13);
+
+}

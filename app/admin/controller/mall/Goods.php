@@ -34,9 +34,6 @@ class Goods extends AdminController
      */
     public function index()
     {
-        echo '<pre>';
-        print_r(45);
-        die;
         if ($this->request->isAjax()) {
             if (input('selectFields')) {
                 return $this->selectList();

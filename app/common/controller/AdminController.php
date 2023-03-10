@@ -324,4 +324,17 @@ class AdminController extends BaseController
         View::assign(['serchWhere' => json_encode($search_where)]);
     }
 
+    /**
+     * 获取搜索数据
+     */
+    public function getParms()
+    {
+        // get数据
+        $get = $this->request->get();
+        $filters = isset($get['filter']) && !empty($get['filter']) ? $get['filter'] : '{}';
+        // json转数组
+        $filters = json_decode(htmlspecialchars_decode($filters), true);
+        return $filters;
+    }
+
 }

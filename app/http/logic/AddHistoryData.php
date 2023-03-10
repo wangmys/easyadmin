@@ -14,7 +14,7 @@ use think\cache\driver\Redis;
 class AddHistoryData
 {
     public $worker;
-    public $list;
+    public $sqlsrv;
     public $redis;
 
     public function __construct()
@@ -23,6 +23,10 @@ class AddHistoryData
         $this->redis = new Redis();
         // 初始化任务
         $this->setTaskQueue();
+        // 初始化连接康雷数据库
+        $this->sqlsrv = Db::connect("sqlsrv");
+        // 初始化连接bi数据库
+        $this->mysql2 = Db::connect("mysql2");
     }
 
     // 设置任务队列
@@ -64,17 +68,18 @@ class AddHistoryData
                     // 查询数据
                     $data = Db::connect("sqlsrv")->Query($sql);
                     // 实例化
-                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year2');
+                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year_copy');
                     // 执行插入
                     $res = $table->insertAll($data);
-                    // 提交事务
-                    Db::commit();
                     // 执行完毕从任务列表,弹出这个任务
                     $this->redis->lpop('task_queue');
                     // 添加任务完成记录
                     $this->redis->rpush('finish_task',$d);
+                    // 提交事务
+                    Db::commit();
                     echo '<pre>';
                     print_r($res);
+                    $this->setData($res);
                     return $res;
                 }
             }catch (\Exception $e){
@@ -118,15 +123,15 @@ class AddHistoryData
     }
 
     // 写入数据文件
-    public function setData($fielname,$data)
+    public function setData($data = 0,$fielname = 'file')
     {
-        file_put_contents("data/{$fielname}.txt",$data);
+        file_put_contents("{$fielname}.txt",$data.'  '.date('Y/m/d H:i:s')."\r\n",FILE_APPEND);
     }
 
     // 写入错误日志
     public function setLog($msg)
     {
-        file_put_contents('log.txt',var_dump($msg),FILE_APPEND | LOCK_EX);
+        return file_put_contents('log.txt', var_export($msg,true).'  '.date('Y/m/d H:i:s')."\r\n",FILE_APPEND);
     }
 
     // 设置Sql语句
@@ -188,7 +193,11 @@ LEFT JOIN (SELECT
 							SUM(CASE WHEN EGPT.PriceName='成本价' THEN EGPT.UnitPrice ELSE NULL END) AS 成本价
 						FROM ErpGoodsPriceType EGPT
 						GROUP BY EGPT.GoodsId ) EGPT ON EG.GoodsId=EGPT.GoodsId
-LEFT JOIN (SELECT ERG.RetailID,ERG.GoodsId,ERG.DiscountPrice FROM ErpRetail ER LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)={$datetime}) ERG ON ECS.BillId=ERG.RetailID AND ECS.GoodsId=ERG.GoodsId
+LEFT JOIN (SELECT ERG.RetailID,ERG.GoodsId,AVG(ERG.DiscountPrice) AS DiscountPrice 
+						FROM ErpRetail ER 
+						LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+						WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)={$datetime}
+						GROUP BY ERG.RetailID,ERG.GoodsId) ERG ON ECS.BillId=ERG.RetailID AND ECS.GoodsId=ERG.GoodsId 
 WHERE EC.MathodId IN (4,7)
 	AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
 	AND CONVERT(VARCHAR(10),ECS.StockDate,23) <= {$datetime}
@@ -202,13 +211,9 @@ GROUP BY
 	EG.CategoryName,
 	EG.StyleCategoryName,
 	EG.StyleCategoryName1
-ORDER BY 
-	EC.State,
-	EG.TimeCategoryName2,
-	EG.StyleCategoryName,
-	EG.CategoryName1,
-	EG.CategoryName2,
-	EG.CategoryName";
+HAVING SUM(ECSD.Quantity) !=0 
+	OR -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23)={$datetime} THEN ECSD.Quantity ELSE 0 END) !=0
+";
         return $sql;
     }
 
