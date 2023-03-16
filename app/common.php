@@ -123,33 +123,39 @@ if (!function_exists('auth')) {
 
 }
 
+if (!function_exists('curl_post')) {
 
-function array_sort($data, $field, $sort){
-    $fields = array_column($data, $field);
-
-    array_multisort($fields, $sort, $data);
-    return $data;
+    /**
+     * post请求
+     * @param $url
+     * @param array $data
+     * @param string $cookiePath
+     * @return bool|string
+     */
+    function curl_post($url, $data = [], $cookiePath = '')
+    {
+        $ch = curl_init(); // 初始化
+        curl_setopt($ch, CURLOPT_URL, $url); // 抓取指定网页
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 要求结果为字符串且输出到屏幕上
+        curl_setopt($ch, CURLOPT_POST, 1); // POST提交方式
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data); // 请求参数
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath); // 连接结束后保存cookie信息的文件
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath); // 包含cookie信息的文件
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 禁用后cURL将终止从服务端进行验证
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // 检查服务器SSL证书中是否存在一个公用名
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
+            'Content-Length: ' . strlen($data)
+        ));
+        $res = curl_exec($ch); // 执行一个cURL会话
+        curl_close($ch); // 关闭一个cURL会话
+        return $res;
+    }
 }
 
-function reform_keys($array){
-    if(!is_array($array)){
-        return $array;
-    }
-    $keys = implode('', array_keys($array));
-    if(is_numeric($keys)){
-        $array = array_values($array);
-    }
-    $array = array_map('reform_keys', $array);
-    return $array;
-};
 
-
-function getMillisecond(){
-
-    list($msec, $sec) = explode(' ', microtime());
-
-    $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
-
-    return $msectimes = substr($msectime,0,13);
-
+function date_to_week($time)
+{
+    $weekarray = array("日", "一", "二", "三", "四", "五", "六");
+    return "周" . $weekarray[date("w", strtotime($time))];
 }

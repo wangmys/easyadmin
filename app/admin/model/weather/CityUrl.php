@@ -14,10 +14,4 @@ class CityUrl extends TimeModel
     // 表名
     protected $name = 'city_url';
 
-    public function getList()
-    {
-        // 实例化
-        $model = new self();
-    }
-
 }

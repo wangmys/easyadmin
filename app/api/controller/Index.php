@@ -21,17 +21,9 @@ class Index
         die;
     }
 
-    public function run()
-    {
-        $model = (new \app\http\logic\AddHistoryData);
-//        $res = $model->run();
-//        $model->showTaskInfo();
-//        $res = $model->clearTask();
-        echo '<pre>';
-//        print_r($res);
-        die;
-    }
-
+    /**
+     * 执行任务
+     */
     public function rund()
     {
         $redis = new Redis;
@@ -43,6 +35,7 @@ class Index
         print_r(22);
         die;
     }
+
     public function test()
     {
         $sql = 'show full columns from sp_customer_stock_sale_year';

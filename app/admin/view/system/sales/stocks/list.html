@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="__STATIC__/plugs/lay-module/treetable-lay/treetable.css?v={:time()}" media="all">
+<style>
+    .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {
+        height: 34px;
+        line-height: 34px;
+        padding: 0 8px;
+    }
+</style>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="currentTable" class="layui-table layui-hide"
+               data-auth-add="{:auth('system.admin/add')}"
+               data-auth-edit="{:auth('system.admin/edit')}"
+               data-auth-delete="{:auth('system.admin/delete')}"
+               data-auth-password="{:auth('system.admin/password')}"
+               lay-filter="currentTable">
+        </table>
+    </div>
+</div>
