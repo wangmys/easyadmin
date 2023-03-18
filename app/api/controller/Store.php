@@ -11,15 +11,21 @@ use app\api\service\DingdingService;
 class Store
 {
 
+    // 服务属性
+    protected $service = null;
+
+    public function __construct()
+    {
+        // 初始化
+        $this->service = new DingdingService();
+    }
+
     public function test111111()
     {
         // 类名
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $res = $model->send();
-        echo '<pre>';
-        print_r($res);
-        die;
     }
 
     /**
@@ -132,5 +138,16 @@ class Store
         // 生成图片
         $res = $model->create_image($params);
         $arr = $res;
+    }
+
+    /**
+     * 发送图片
+     */
+    public function sendPic()
+    {
+        $service = $this->service;
+        echo '<pre>';
+        print_r($service->send());
+        die;
     }
 }

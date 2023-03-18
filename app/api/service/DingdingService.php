@@ -35,10 +35,17 @@ class DingdingService
 
     ];
 
-    // 王氏家族,测试机器人
-    protected $hook_test_url = 'https://oapi.dingtalk.com/robot/send?access_token=f892dc03bdf32e94a7332d4a04c8d4328f940a8c6edd2140f3b3a33ab82589de';
-    // 索歌测试机器人
-    protected $sg_hook_url = '';
+    /**
+     * 关键字(机器人关键字)
+     * @var string[]
+     */
+    protected $keyword = [
+        'hook_test_url2' => 'milin'
+    ];
+
+    // 测试机器人
+    protected $hook_test_url = 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2';
+    protected $hook_test_url2 = 'https://oapi.dingtalk.com/robot/send?access_token=f892dc03bdf32e94a7332d4a04c8d4328f940a8c6edd2140f3b3a33ab82589de';
     protected $token = '';
 
     public static function getAccessToken()
@@ -77,18 +84,39 @@ class DingdingService
     /**
      * 推送
      */
-    public function send($title = '数据表格milin',$jpg_url = 'https://bx.babiboy.com/img/20230316/S038.jpg',$robot = '')
+    public function send($title = '数据表格',$jpg_url = 'https://bx.babiboy.com/img/20230316/S038.jpg',$robot = '')
     {
+        // 图片存储目录
+        $dir_path = './img/'.date('Ymd');
+        // 读取指定目录
+        $file_arr = scandir($dir_path);
+        // 图片数组
+        $pic_arr = [];
+        // 去除无效文件名
+        if($file_arr){
+            foreach ($file_arr as $k => $v){
+                if($v == '.' || $v == '..'){
+                    unset($file_arr[$k]);
+                }elseif(is_file($dir_path.'/'.$v)){
+                    $pic_arr[] = $dir_path.'/'.$v;
+                }
+            }
+        }
+        // 时间
         $time = date('Y-m-d H:i:s');
+        $keyword = $this->keyword['hook_test_url2'];
         $arr = [
             'msgtype' => 'markdown',
             'markdown' => [
-                'title' => [ "$title"],
+                'title' => [ "$title" . $keyword],
                 'text'=>"#### **$title** \n> \n> ![screenshot]($jpg_url)\n> ###### $time \n",
+                'at' => [
+                    'atMobiles' => '17775611493'
+                ]
             ]
         ];
         // 推送地址
-        if(empty($robot)) $robot = $this->hook_test_url;
+        if(empty($robot)) $robot = $this->hook_test_url2;
         $jsonStr = json_encode($arr); //转换为json格式
         $result = curl_post($robot, $jsonStr);
         return $json = json_decode($result, false);

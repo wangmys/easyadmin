@@ -42,13 +42,13 @@ return [
             // 数据库类型
             'type'              => Env::get('database.type', 'mysql'),
             // 服务器地址
-            'hostname'          => Env::get('database.hostname', '127.0.0.1'),
+            'hostname'          => Env::get('database.hostname', '42.193.181.241'),
             // 数据库名
-            'database'          => Env::get('database.database', 'easyadmin'),
+            'database'          => Env::get('database.database', 'easyadmin2'),
             // 用户名
-            'username'          => Env::get('database.username', 'root'),
+            'username'          => Env::get('database.username', 'easyadmin2'),
             // 密码
-            'password'          => Env::get('database.password', 'root'),
+            'password'          => Env::get('database.password', 'FwRrharKpKEm6ZJa'),
             // 端口
             'hostport'          => Env::get('database.hostport', '3306'),
             // 数据库连接参数

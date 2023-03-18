@@ -15,12 +15,15 @@ return [
     // 不需要验证登录的控制器
     'no_login_controller' => [
         'login',
+        'system.dress.inventory'
     ],
 
     // 不需要验证登录的节点
     'no_login_node'       => [
         'login/index',
         'login/out',
+        'system.dress.inventory/index',
+        'system.dress.inventory/test',
     ],
 
     // 不需要验证权限的控制器
@@ -28,11 +31,14 @@ return [
         'ajax',
         'login',
         'index',
+        'system.dress.inventory'
     ],
 
     // 不需要验证权限的节点
     'no_auth_node'        => [
         'login/index',
         'login/out',
+        'system.dress.inventory/index',
+        'system.dress.inventory/test',
     ],
 ];

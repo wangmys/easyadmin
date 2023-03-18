@@ -32,7 +32,8 @@
         "zhongshaofa/thinkphp-log-trace": "^1.0",
         "topthink/think-worker": "^3.0",
         "voku/simple_html_dom": "^4.8",
-        "voku/portable-utf8": "^6.0"
+        "voku/portable-utf8": "^6.0",
+        "alibabacloud/dingtalk": "^1.5"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",
