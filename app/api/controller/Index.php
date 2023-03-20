@@ -71,7 +71,7 @@ class Index
     {
         $model = (new \app\http\logic\AddHistoryData);
         $redis = new Redis;
-        $d = $redis->lindex('task_queue',-1);
+        $d = $redis->lindex('task_queue',0);
         echo '<pre>';
         print_r(date('Y-m-d',strtotime('2023-01-01'."+{$d}day")));
         $model->showTaskInfo();

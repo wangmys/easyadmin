@@ -68,7 +68,7 @@ class AddHistoryData
                     // 查询数据
                     $data = Db::connect("sqlsrv")->Query($sql);
                     // 实例化
-                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year_copy');
+                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year');
                     // 执行插入
                     $res = $table->insertAll($data);
                     // 执行完毕从任务列表,弹出这个任务

@@ -152,7 +152,12 @@ class Data extends AdminController
                 // 查询对应商品,库存低于标准的店铺数量
                 $count = $yinliu_model->where([
                     '商品负责人' => $v
-                ])->where($vv,'<',$standard)->count();
+                ])->where(function ($q)use($vv,$standard){
+                    if($standard > 0){
+                        $q->whereNull($vv);
+                    }
+                    $q->whereOr($vv,'<',$standard);
+                })->count();
                 $d[$vv] = $count;
             }
             $insert_d[] = $d;
