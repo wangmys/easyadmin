@@ -3,6 +3,7 @@
 *.log
 .env
 /public/upload
+/public/img
 /public/docs
 runtime/admin
 runtime/log
@@ -14,4 +15,4 @@ public/WowOss.exe
 app/index/controller/Test.php
 composer.phar
 app/test/
-vendor
+config/database.php

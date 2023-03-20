@@ -73,7 +73,7 @@ class Accessories extends AdminController
             $count = $count->count();
 
             if(empty($where)){
-                $stock_warn = sysconfig('stock_warn');;
+                $stock_warn = sysconfig('stock_warn');
             }else{
                 $stock_warn = [];
                 foreach ($where as $k => $v){
