@@ -28,7 +28,7 @@ class Index
     {
         $redis = new Redis;
         $model = (new \app\http\logic\AddHistoryData);
-        while ($redis->llen('finish_task') <= 365){
+        while ($redis->llen('finish_task') <= 31){
             $model->run();
         }
         echo '<pre>';
@@ -71,9 +71,9 @@ class Index
     {
         $model = (new \app\http\logic\AddHistoryData);
         $redis = new Redis;
-        $d = $redis->lindex('task_queue',0);
+        $d = $redis->lindex('task_queue',-1);
         echo '<pre>';
-        print_r(date('Y-m-d',strtotime('2022-01-01'."+{$d}day")));
+        print_r(date('Y-m-d',strtotime('2023-01-01'."+{$d}day")));
         $model->showTaskInfo();
         die;
     }

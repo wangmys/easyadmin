@@ -38,7 +38,7 @@ class AddHistoryData
         }
         if(empty($this->redis->lrange("finish_task",0,-1))){
             // 计算天数
-            $days = $this->daysbetweendates();
+            $days = $this->daysbetweendates('2023-01-01','2023-01-31');
             // 循环添加任务
             foreach($days as $k=>$v){
                 // 添加任务队列
@@ -58,7 +58,7 @@ class AddHistoryData
         Db::startTrans();
 
             try {
-                $datetime = '2022-01-01';
+                $datetime = '2023-01-01';
                 // 取队列第一个值
                 $d = $this->redis->lindex('task_queue',0);
                 $res = 0;
@@ -140,6 +140,7 @@ class AddHistoryData
         $sql = "SELECT 
 	{$datetime} AS Date,
 	EC.State AS State,
+	EC.CustomItem30 AS WenDai,
 	EC.CustomItem36 AS WenQu,
 	EG.TimeCategoryName1 AS TimeCategoryName1,
 	CASE WHEN EG.TimeCategoryName2 LIKE '%春%' THEN '春季'
@@ -203,6 +204,7 @@ WHERE EC.MathodId IN (4,7)
 	AND CONVERT(VARCHAR(10),ECS.StockDate,23) <= {$datetime}
 GROUP BY 
 	EC.State,
+	EC.CustomItem30,
 	EC.CustomItem36,
 	EG.TimeCategoryName1,
 	EG.TimeCategoryName2,
