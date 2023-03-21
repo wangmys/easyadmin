@@ -41,4 +41,19 @@ class AdminConstant
     ];
 
     const NOT_FIELD = '店铺名称&省份&商品负责人';
+
+    /**
+     * 配饰列表
+     */
+    const ACCESSORIES_LIST = [
+      '背包',
+      '挎包',
+      '领带',
+      '帽子',
+      '内裤',
+      '皮带',
+      '袜子',
+      '手包',
+      '胸包',
+    ];
 }
