@@ -140,24 +140,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '皮带', minWith: 134, title: '皮带'},
                     {field: '袜子', title: '袜子', minWith: 134},
                     {field: '手包', title: '手包', minWith: 134},
-                    {field: '胸包', title: '胸包', minWith: 134},
-                    {
-                        width: 120,
-                        title: '操作',
-                        templet: ea.table.tool,
-                        operat: [
-                            [{
-                                text: '查看详情',
-                                url: init.index_url,
-                                method: 'open',
-                                auth: '',
-                                class: 'layui-btn layui-btn-normal layui-btn-xs',
-                                field:'商品负责人',
-                                extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' "
-                            }],
-                        ],
-                        fixed: 'right'
-                    }
+                    {field: '胸包', title: '胸包', minWith: 134}
                 ]]
             });
 
