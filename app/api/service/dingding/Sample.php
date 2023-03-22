@@ -13,6 +13,7 @@ use AlibabaCloud\SDK\Dingtalk\Vrobot_1_0\Models\SetRobotPluginHeaders;
 use AlibabaCloud\SDK\Dingtalk\Vrobot_1_0\Models\SetRobotPluginRequest\pluginInfoList;
 use AlibabaCloud\SDK\Dingtalk\Vrobot_1_0\Models\SetRobotPluginRequest;
 use AlibabaCloud\Tea\Utils\Utils\RuntimeOptions;
+use app\common\constants\AdminConstant;
 
 
 class Sample
@@ -82,7 +83,7 @@ class Sample
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/finish_rate?start_date=2023-03-20&end_date=2023-03-21",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/question",
                     "picUrl"=>"@lALOACZwe2Rk",
                     "title"=>"配饰库存完成进度",
                     "text"=>"点击查看"
