@@ -55,7 +55,7 @@ class Customorstocksale7 extends AdminController
         select  IFNULL(`前七天库存数量`,0) as 前七天库存数量, `店铺名称` from sp_customer_stock_sale_7day where `店铺名称`='海口二店'
 
         流水占比：二级分类的销售金额/整个店的销售金额
-        库存占比：二级分类的库存成本金额 / 整个店的成本金额
+        库存占比：二级分类的库存成本金额 / 整个店的库存成本
         销存比：  流水占比/库存占比
         折率：销售金额/零售金额
         店均销：前七天销售数量
@@ -96,29 +96,29 @@ class Customorstocksale7 extends AdminController
                 $res1[$key]['总店前一天销售金额'] = $res2_1xsje;
                 $res1[$key]['总店近一周销售金额'] = $res2_1xsje + $res2_2xsje + $res2_3xsje + $res2_4xsje + $res2_5xsje + $res2_6xsje + $res2_7xsje;
 
-                // 总成本金额
-                $res2_7cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前七天成本金额');
-                $res2_6cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前六天成本金额');
-                $res2_5cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前五天成本金额');
-                $res2_4cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前四天成本金额');
-                $res2_3cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前三天成本金额');
-                $res2_2cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前二天成本金额');
-                $res2_1cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前一天成本金额');
-                $res1[$key]['总店前七天成本金额'] = $res2_7cbje;
-                $res1[$key]['总店前六天成本金额'] = $res2_6cbje;
-                $res1[$key]['总店前五天成本金额'] = $res2_5cbje;
-                $res1[$key]['总店前四天成本金额'] = $res2_4cbje;
-                $res1[$key]['总店前三天成本金额'] = $res2_3cbje;
-                $res1[$key]['总店前二天成本金额'] = $res2_2cbje;
-                $res1[$key]['总店前一天成本金额'] = $res2_1cbje;
-                $res1[$key]['总店近一周成本金额'] = $res2_1cbje + $res2_2cbje + $res2_3cbje + $res2_4cbje + $res2_5cbje + $res2_6cbje + $res2_7cbje;
+                // 总成本金额 前七天库存成本
+                $res2_7cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前七天库存成本');
+                $res2_6cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前六天库存成本');
+                $res2_5cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前五天库存成本');
+                $res2_4cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前四天库存成本');
+                $res2_3cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前三天库存成本');
+                $res2_2cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前二天库存成本');
+                $res2_1cbje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前一天库存成本');
+                $res1[$key]['总店前七天库存成本'] = $res2_7cbje;
+                $res1[$key]['总店前六天库存成本'] = $res2_6cbje;
+                $res1[$key]['总店前五天库存成本'] = $res2_5cbje;
+                $res1[$key]['总店前四天库存成本'] = $res2_4cbje;
+                $res1[$key]['总店前三天库存成本'] = $res2_3cbje;
+                $res1[$key]['总店前二天库存成本'] = $res2_2cbje;
+                $res1[$key]['总店前一天库存成本'] = $res2_1cbje;
+                $res1[$key]['总店近一周库存成本'] = $res2_1cbje + $res2_2cbje + $res2_3cbje + $res2_4cbje + $res2_5cbje + $res2_6cbje + $res2_7cbje;
             }
 
             $res3 = $this->model::where(
                 // $this->getParms()
                 $params
             )
-            ->field('省份,气温区域,风格,季节,经营模式,店铺名称,店铺等级,一级分类,二级分类,前七天销售数量 as 前七天店均销,前六天销售数量 as 前六天店均销,前五天销售数量 as 前五天店均销,前四天销售数量 as 前四天店均销,
+            ->field('省份,气温区域,风格,季节,分类,经营模式,店铺名称,店铺等级,一级分类,二级分类,前七天销售数量 as 前七天店均销,前六天销售数量 as 前六天店均销,前五天销售数量 as 前五天店均销,前四天销售数量 as 前四天店均销,
             前三天销售数量 as 前三天店均销,前二天销售数量 as 前二天店均销,前一天销售数量 as 前一天店均销, ((前一天库存数量 + 前二天库存数量 + 前三天库存数量 + 前四天库存数量 + 前五天库存数量 + 前六天库存数量 + 前七天库存数量)/7) as 近一周店均库存,
             ((前七天销售数量+前六天销售数量+前五天销售数量+前四天销售数量+前三天销售数量+前二天销售数量+前一天销售数量) / 7) as 近一周店均销,
             前七天库存数量 as 前七天店均库存,前六天库存数量 as 前六天店均库存,前五天库存数量 as 前五天店均库存,前四天库存数量 as 前四天店均库存,前三天库存数量 as 前三天店均库存,前二天库存数量 as 前二天店均库存,
@@ -155,14 +155,14 @@ class Customorstocksale7 extends AdminController
                 $res3[$key]['前一天流水占比'] = $this->zeroHandle($res3[$key]['前一天销售金额'], $res3[$key]['总店前一天销售金额']);
                 $res3[$key]['近一周流水占比'] = $this->zeroHandle($res3[$key]['前一天销售金额'] + $res3[$key]['前二天销售金额'] + $res3[$key]['前三天销售金额'] + $res3[$key]['前四天销售金额'] + $res3[$key]['前五天销售金额'] + $res3[$key]['前六天销售金额'] + $res3[$key]['前七天销售金额'], $res3[$key]['总店近一周销售金额']);
 
-                $res3[$key]['前七天库存占比'] = $this->zeroHandle($res3[$key]['前七天库存成本'], $res3[$key]['总店前七天成本金额']);
-                $res3[$key]['前六天库存占比'] = $this->zeroHandle($res3[$key]['前六天库存成本'], $res3[$key]['总店前六天成本金额']);
-                $res3[$key]['前五天库存占比'] = $this->zeroHandle($res3[$key]['前五天库存成本'], $res3[$key]['总店前五天成本金额']);
-                $res3[$key]['前四天库存占比'] = $this->zeroHandle($res3[$key]['前四天库存成本'], $res3[$key]['总店前四天成本金额']);
-                $res3[$key]['前三天库存占比'] = $this->zeroHandle($res3[$key]['前三天库存成本'], $res3[$key]['总店前三天成本金额']);
-                $res3[$key]['前二天库存占比'] = $this->zeroHandle($res3[$key]['前二天库存成本'], $res3[$key]['总店前二天成本金额']);
-                $res3[$key]['前一天库存占比'] = $this->zeroHandle($res3[$key]['前一天库存成本'], $res3[$key]['总店前一天成本金额']);
-                $res3[$key]['近一周库存占比'] = $this->zeroHandle($res3[$key]['前一天库存成本'] + $res3[$key]['前二天库存成本'] + $res3[$key]['前三天库存成本'] + $res3[$key]['前四天库存成本'] + $res3[$key]['前五天库存成本'] + $res3[$key]['前六天库存成本'] + $res3[$key]['前七天库存成本'], $res3[$key]['总店近一周成本金额']);
+                $res3[$key]['前七天库存占比'] = $this->zeroHandle($res3[$key]['前七天库存成本'], $res3[$key]['总店前七天库存成本']);
+                $res3[$key]['前六天库存占比'] = $this->zeroHandle($res3[$key]['前六天库存成本'], $res3[$key]['总店前六天库存成本']);
+                $res3[$key]['前五天库存占比'] = $this->zeroHandle($res3[$key]['前五天库存成本'], $res3[$key]['总店前五天库存成本']);
+                $res3[$key]['前四天库存占比'] = $this->zeroHandle($res3[$key]['前四天库存成本'], $res3[$key]['总店前四天库存成本']);
+                $res3[$key]['前三天库存占比'] = $this->zeroHandle($res3[$key]['前三天库存成本'], $res3[$key]['总店前三天库存成本']);
+                $res3[$key]['前二天库存占比'] = $this->zeroHandle($res3[$key]['前二天库存成本'], $res3[$key]['总店前二天库存成本']);
+                $res3[$key]['前一天库存占比'] = $this->zeroHandle($res3[$key]['前一天库存成本'], $res3[$key]['总店前一天库存成本']);
+                $res3[$key]['近一周库存占比'] = $this->zeroHandle($res3[$key]['前一天库存成本'] + $res3[$key]['前二天库存成本'] + $res3[$key]['前三天库存成本'] + $res3[$key]['前四天库存成本'] + $res3[$key]['前五天库存成本'] + $res3[$key]['前六天库存成本'] + $res3[$key]['前七天库存成本'], $res3[$key]['总店近一周库存成本']);
 
                 $res3[$key]['前七天销存占比'] = $this->zeroHandle($res3[$key]['前七天流水占比'], $res3[$key]['前七天库存占比']);
                 $res3[$key]['前六天销存占比'] = $this->zeroHandle($res3[$key]['前六天流水占比'], $res3[$key]['前六天库存占比']);
@@ -283,14 +283,14 @@ class Customorstocksale7 extends AdminController
                 $arr['总店前一天销售金额'] = $value['总店前一天销售金额'];
                 $arr['总店近一周销售金额'] = $value['总店近一周销售金额'];
 
-                $arr['总店前七天成本金额'] = $value['总店前七天成本金额'];
-                $arr['总店前六天成本金额'] = $value['总店前六天成本金额'];
-                $arr['总店前五天成本金额'] = $value['总店前五天成本金额'];
-                $arr['总店前四天成本金额'] = $value['总店前四天成本金额'];
-                $arr['总店前三天成本金额'] = $value['总店前三天成本金额'];
-                $arr['总店前二天成本金额'] = $value['总店前二天成本金额'];
-                $arr['总店前一天成本金额'] = $value['总店前一天成本金额'];
-                $arr['总店近一周成本金额'] = $value['总店前一天成本金额'];
+                $arr['总店前七天库存成本'] = $value['总店前七天库存成本'];
+                $arr['总店前六天库存成本'] = $value['总店前六天库存成本'];
+                $arr['总店前五天库存成本'] = $value['总店前五天库存成本'];
+                $arr['总店前四天库存成本'] = $value['总店前四天库存成本'];
+                $arr['总店前三天库存成本'] = $value['总店前三天库存成本'];
+                $arr['总店前二天库存成本'] = $value['总店前二天库存成本'];
+                $arr['总店前一天库存成本'] = $value['总店前一天库存成本'];
+                $arr['总店近一周库存成本'] = $value['总店前一天库存成本'];
                 break;
             } 
         }  
@@ -305,6 +305,13 @@ class Customorstocksale7 extends AdminController
             return $num1 / $num2;
         }
     } 
+
+    public function test() {
+        $sum = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天成本金额');
+        $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天库存成本');
+        dump($sum);
+        dump($sum2);
+    }
 
 
 }

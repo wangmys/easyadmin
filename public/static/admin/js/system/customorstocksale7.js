@@ -47,6 +47,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     { field: '店铺等级', width: 100, title: '店铺等级', fixed: 'left', search: 'xmSelect', selectList: grade_list, laySearch: true },
                     { field: '一级分类', width: 100, title: '一级分类', fixed: 'left', search: 'xmSelect', selectList: level1_list, laySearch: true },
                     { field: '二级分类', width: 100, title: '二级分类', fixed: 'left', search: 'xmSelect', selectList: level2_list, laySearch: true },
+                    { field: '分类', width: 100, title: '分类', fixed: 'left', search: false, selectList: {}, laySearch: true },
                     //   {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     //   {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
                     //   {field: 'SendGoodsGroup', width: 160, title: '温度带',fixed:'left'},
