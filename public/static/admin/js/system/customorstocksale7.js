@@ -66,11 +66,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
                 })
 
-                console.log('---------');
-                console.log(cols);
-                console.log('---------');
-
-
                 ea.table.render({
                     url: init.list_index,
                     search: true,
