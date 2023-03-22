@@ -205,9 +205,9 @@ class Inventory extends AdminController
     {
         $get = $this->request->get();
         if ($this->request->isAjax()) {
-            $default_date = date('Y-m-d',time() - (24 * 60 * 60 * 2));
-            $start_date = $get['start_date']??$default_date;
-            $end_date = $get['end_date']??date('Y-m-d',strtotime($start_date.'+1day'));
+            $default_date = getThisDayToStartDate();
+            $start_date = $get['start_date']??$default_date[0];
+            $end_date = $get['end_date']??$default_date[1];
              // 实例化逻辑类
             $logic = new DressLogic;
             // 获取完成率数据

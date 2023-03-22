@@ -83,7 +83,7 @@ class Sample
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/question",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/finish_rate",
                     "picUrl"=>"@lALOACZwe2Rk",
                     "title"=>"配饰库存完成进度 ",
                     "text"=>"点击查看"
