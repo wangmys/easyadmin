@@ -302,15 +302,72 @@ class Customorstocksale7 extends AdminController
         if ($num1 == 0 || $num2 == 0) {
             return 0;
         } else {
-            return $num1 / $num2;
+            $res = $num1 / $num2;
+            // $res = sprintf("%.3f", $res);
+            // $res = $this->precision_restore($num1, $num2, '除法');
+            return $res;
         }
     } 
 
+    /**
+     * 这里我用这种方法是发现内置方法在foreach里有问题,所以用了这种方法
+     * 思路就是将两个数乘以最大的那个小数位再根据运算符去除
+     * @param $one
+     * @param $two
+     * @param $type
+     * @return float|int|string
+     */
+    public function precision_restore($one, $two, $type){
+        $one = (double)$one;
+        $two = (double)$two;
+        $one_dec = $this->sum_length($one);
+        $two_dec = $this->sum_length($two);
+        $sum = '';
+        if($one_dec>$two_dec){
+            $dec = $one_dec;
+        }else{
+            $dec = $two_dec;
+        }
+        $ten = pow(10,$dec);
+        switch ($type) {
+            case '加法':
+                $sum = ($one*$ten + $two*$ten) / $ten;
+                break;
+            case '减法':
+                $sum = ($one*$ten - $two*$ten) / $ten;
+                break;
+            case '乘法':
+                $sum = (($one*$ten) * ($two*$ten)) / pow($ten,2);
+                break;
+            case '除法':
+                $sum = ($one*$ten) / ($two*$ten);
+                break;
+            default:
+                dd('参数错误');
+        }
+        return (string)$sum;
+    }
+
+    public function sum_length($num) {
+        $count = 0;
+        $temp = explode('.',$num);
+        if (sizeof($temp) > 1) {
+            $decimal = end($temp);
+            $count = strlen($decimal);
+        }
+        return $count;
+    }
+
+
     public function test() {
-        $sum = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天成本金额');
-        $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天库存成本');
-        dump($sum);
+        // $sum = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天成本金额'); // 错误
+        // $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天库存成本'); // 正确
+        $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前六天销售金额'); // 
+        // dump($sum);
         dump($sum2);
+
+        $res = sprintf("%.8f", 0.041930618401207);
+        dump($res);
     }
 
 
