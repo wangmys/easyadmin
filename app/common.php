@@ -153,9 +153,32 @@ if (!function_exists('curl_post')) {
     }
 }
 
-
+/**
+ * @param $time
+ * @return string
+ */
 function date_to_week($time)
 {
     $weekarray = array("日", "一", "二", "三", "四", "五", "六");
     return "周" . $weekarray[date("w", strtotime($time))];
+}
+
+/**
+ * 获取今日到周一的日期
+ */
+function getThisDayToStartDate()
+{
+    // 指定结束日期
+    $end_date = date('Y-m-d');
+    // 获取今日星期几
+    $week = date('w');
+    $subtractDay = 0;
+    if($week == 0){
+        $subtractDay = 7 - 1;
+    }else{
+        $subtractDay = $week - 1;
+    }
+    // 获得开始日期
+    $start_date = date('Y-m-d',strtotime(date('Y-m-d')."-{$subtractDay}day"));
+    return [$start_date,$end_date];
 }

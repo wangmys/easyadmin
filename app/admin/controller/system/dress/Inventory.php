@@ -207,11 +207,36 @@ class Inventory extends AdminController
         if ($this->request->isAjax()) {
             $default_date = date('Y-m-d',time() - (24 * 60 * 60 * 2));
             $start_date = $get['start_date']??$default_date;
-            $start_end = $get['end_date']??date('Y-m-d',strtotime($start_date.'+1day'));
+            $end_date = $get['end_date']??date('Y-m-d',strtotime($start_date.'+1day'));
              // 实例化逻辑类
             $logic = new DressLogic;
             // 获取完成率数据
-            $list = $logic->contrastYinliuFinishRate($start_date,$start_end);
+            $list = $logic->contrastYinliuFinishRate($start_date,$end_date);
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($list),
+                'data'  => $list,
+            ];
+            return json($data);
+        }
+        $this->assign([
+            'get' => json_encode($get)
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 统计单个人数据完成率
+     */
+    public function rate()
+    {
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+             // 实例化逻辑类
+            $logic = new DressLogic;
+            // 获取完成率数据
+            $list = $logic->getComparisonResult($get);
             $data = [
                 'code'  => 0,
                 'msg'   => '',

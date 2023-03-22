@@ -55,7 +55,7 @@ class Sample
                 "link"=>[
                     "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/index?商品负责人=曹太阳",
                     "picUrl"=>"@lALOACZwe2Rk",
-                    "title"=>"配饰库存预警提示 ",
+                    "title"=>"配饰库存预警提示",
                     "text"=>"点击查看"
                 ]
         ];
