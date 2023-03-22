@@ -4,10 +4,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
         table_render_id: 'currentTableRenderId',
         index_url: 'system.dress.inventory/index',
         question_index: '/admin/system.dress.inventory/question',
-        list_index: '/admin/system.dress.inventory/index',
+        list_url: '/admin/system.dress.inventory/index',
         finish_rate: '/admin/system.dress.inventory/finish_rate',
+        rate: '/system.dress.inventory/rate',
+        rate_url: '/admin/system.dress.inventory/rate',
     };
-
+    var table = layui.table
     function isRed(d,obj){
         if(d[obj.field] === null){
             d[obj.field] = 0;
@@ -31,7 +33,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             // 比较表达式
             defaultOp = 'lt';
             ea.table.render({
-                url: init.list_index,
+                url: init.list_url,
                 search:false,
                 where:{filter:$get},
                 height: 760,
@@ -86,22 +88,30 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar:[],
                 limits:[100,200,500,1000],
                 cols: [[
-                    {type: "checkbox"},
+                    // {type: "checkbox"},
                     {field: '商品负责人', minWith: 134, title: '商品负责人'},
-                    {field: '背包', minWith: 134, title: '背包'},
-                    {field: '挎包', minWith: 134, title: '挎包'},
-                    {field: '领带', minWith: 134, title: '领带'},
-                    {field: '帽子', minWith: 134, title: '帽子'},
-                    {field: '内裤', minWith: 134, title: '内裤'},
-                    {field: '皮带', minWith: 134, title: '皮带'},
-                    {field: '袜子', title: '袜子', minWith: 134},
-                    {field: '手包', title: '手包', minWith: 134},
-                    {field: '胸包', title: '胸包', minWith: 134},
+                    {field: '背包', minWith: 134, title: '背包(店铺数)',event:'pp'},
+                    {field: '挎包', minWith: 134, title: '挎包(店铺数)',event:this.field},
+                    {field: '领带', minWith: 134, title: '领带(店铺数)',event:this.field},
+                    {field: '帽子', minWith: 134, title: '帽子(店铺数)',event:this.field},
+                    {field: '内裤', minWith: 134, title: '内裤(店铺数)',event:this.field},
+                    {field: '皮带', minWith: 134, title: '皮带(店铺数)',event:this.field},
+                    {field: '袜子', title: '袜子(店铺数)', minWith: 134},
+                    {field: '手包', title: '手包(店铺数)', minWith: 134},
+                    {field: '胸包', title: '胸包(店铺数)', minWith: 134},
                     {
-                        width: 120,
                         title: '操作',
                         templet: ea.table.tool,
                         operat: [
+                            [{
+                                text: '查看对比',
+                                url: init.rate,
+                                method: 'open',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-xs',
+                                field:'商品负责人',
+                                extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' "
+                            }],
                             [{
                                 text: '查看详情',
                                 url: init.index_url,
@@ -116,13 +126,98 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     }
                 ]]
             });
-
+            table.on('tool(currentTableRenderId_LayFilter)', function(obj){
+                console.log(obj)
+            });
             ea.listen();
         },
         finish_rate: function () {
+            // 自定义模块
+          layui.config({
+            base: '/static/plugs/lay-module/soul-table/',   // 模块目录
+            version: 'v1.6.4'
+          }).extend({             // 模块别名
+            soulTable: 'soulTable'
+          });
+          var $get = $("#where").val();
+          layui.use(['form', 'table','soulTable'], function () {
+                var table = layui.table,
+                soulTable = layui.soulTable;
+                table.render({
+                    elem: '#currentTable'
+                    ,url: init.finish_rate
+                    ,where:JSON.parse($get)
+                    ,height: 700
+                    ,page: false
+                    ,cols: [
+                        [
+                            {field: '商品负责人', width: 200, title: '商品负责人', rowspan: 2,fixed:'left'},
+                            {title: '背包', colspan: 3},
+                            {title: '挎包', colspan: 3},
+                            {title: '领带', colspan: 3},
+                            {title: '帽子', colspan: 3},
+                            {title: '内裤', colspan: 3},
+                            {title: '皮带', colspan: 3},
+                            {title: '袜子', colspan: 3},
+                            {title: '手包', colspan: 3},
+                            {title: '胸包', colspan: 3}
+                        ],
+                        [
+                            {field: '背包', width:100, title: '问题店铺',event:'pp',border: {
+                        style: 'solid',
+                        color: '1E9FFF'
+                    }},
+                            {field: '背包_1', width:100, title: '已完成'},
+                            {field: '背包_2', width:150, title: '未完成店铺数'},
+                            {field: '挎包', width:100, title: '问题店铺'},
+                            {field: '挎包_1', width:100, title: '已完成'},
+                            {field: '挎包_2', width:150, title: '未完成店铺数'},
+                            {field: '领带', width:100, title: '问题店铺'},
+                            {field: '领带_1', width:100, title: '已完成'},
+                            {field: '领带_2', width:150, title: '未完成店铺数'},
+                            {field: '帽子', width:100, title: '问题店铺'},
+                            {field: '帽子_1', width:100, title: '已完成'},
+                            {field: '帽子_2', width:150, title: '未完成店铺数'},
+                            {field: '内裤', width:100, title: '问题店铺'},
+                            {field: '内裤_1', width:100, title: '已完成'},
+                            {field: '内裤_2', width:150, title: '未完成店铺数'},
+                            {field: '皮带', width:100, title: '问题店铺'},
+                            {field: '皮带_1', width:100, title: '已完成'},
+                            {field: '皮带_2', width:150, title: '未完成店铺数'},
+                            {field: '袜子', title: '问题店铺', width:100},
+                            {field: '袜子_1', title: '已完成', width:100},
+                            {field: '袜子_2', title: '未完成店铺数', width:150},
+                            {field: '手包', title: '问题店铺', width:100},
+                            {field: '手包_1', title: '已完成', width:100},
+                            {field: '手包_2', title: '未完成店铺数', width:150},
+                            {field: '胸包', title: '问题店铺', width:100},
+                            {field: '胸包_1', title: '已完成', width:100},
+                            {field: '胸包_2', title: '未完成店铺数', width:150}
+                        ]
+                    ]
+                    ,done: function () {
+                        soulTable.render(this)
+                        obj.tr.css({'background':'#5FB878','color':'white'}).siblings();
+                    }
+                    ,rowEvent: function (obj) {
+                        // obj.tr.css({'background':'#5FB878','color':'white'}).siblings().removeAttr('style') // 设置当前行颜色
+                        // console.log('[父表行单击事件] 当前行对象:', obj.tr) //得到当前行元素对象
+                        // console.log('[父表行单机事件] 当前行数据:', obj.data) //得到当前行数据
+                    }
+                    ,toolEvent: function (obj) {
+                        var layEvent = obj.event, // 获取 lay-event 对应的值
+                            tr = obj.tr, // 获取当前行 的 dom 对象（如果有的话）
+                            data = obj.data; // 当前行数据
+                        layer.msg('更新成功！')
+                    }
+                });
+            })
+          ea.listen();
+        },
+        rate: function () {
             var $get = $("#where").val();
             ea.table.render({
-                url: init.finish_rate,
+                url: init.rate_url,
                 where:JSON.parse($get),
                 search:false,
                 height: 760,
@@ -130,17 +225,11 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar:[],
                 limits:[100,200,500,1000],
                 cols: [[
-                    {type: "checkbox"},
                     {field: '商品负责人', minWith: 134, title: '商品负责人'},
-                    {field: '背包', minWith: 134, title: '背包'},
-                    {field: '挎包', minWith: 134, title: '挎包'},
-                    {field: '领带', minWith: 134, title: '领带'},
-                    {field: '帽子', minWith: 134, title: '帽子'},
-                    {field: '内裤', minWith: 134, title: '内裤'},
-                    {field: '皮带', minWith: 134, title: '皮带'},
-                    {field: '袜子', title: '袜子', minWith: 134},
-                    {field: '手包', title: '手包', minWith: 134},
-                    {field: '胸包', title: '胸包', minWith: 134}
+                    {field: '配饰', minWith: 134, title: '配饰'},
+                    {field: '问题店铺', minWith: 134, title: '问题店铺'},
+                    {field: '已处理', minWith: 134, title: '已处理'},
+                    {field: '剩余店铺', minWith: 134, title: '剩余店铺'}
                 ]]
             });
 
