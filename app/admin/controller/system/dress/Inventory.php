@@ -49,17 +49,17 @@ class Inventory extends AdminController
                 return $this->selectList();
             }
             list($page, $limit, $where) = $this->buildTableParames();
-            if(empty($where['商品负责人'])){
-                $_where = ['商品负责人','=',-99999];
-                foreach ($where as $k=>$v){
-                    if($v[0] == '商品负责人'){
-                        unset($_where);
-                        break;
-                    }
-                }
-                // 防止全部展示
-                if(isset($_where)) $where[] = $_where;
-            }
+//            if(empty($where['商品负责人'])){
+//                $_where = ['商品负责人','=',-99999];
+//                foreach ($where as $k=>$v){
+//                    if($v[0] == '商品负责人'){
+//                        unset($_where);
+//                        break;
+//                    }
+//                }
+//                // 防止全部展示
+//                if(isset($_where)) $where[] = $_where;
+//            }
             // 获取其他筛选
             $other_where = $this->setWhere($where)[1];
 
@@ -156,15 +156,19 @@ class Inventory extends AdminController
      */
     public function question()
     {
-
         $model_question = new YinliuQuestion;
+        $get = $this->request->get();
         if ($this->request->isAjax()) {
             if (input('selectFields')) {
                 return $this->selectList();
             }
-            list($page, $limit, $where) = $this->buildTableParames();
-            if(empty($where['Date'])){
+            list($page, $limit, $_where) = $this->buildTableParames();
+            // 条件
+            $parmas = $this->getParms();
+            if(empty($parmas['Date'])){
                $where['Date'] = date('Y-m-d');
+            }else{
+                $where = $parmas;
             }
             $count = $model_question
                 ->where($where)
@@ -188,7 +192,6 @@ class Inventory extends AdminController
             ];
             return json($data);
         }
-        $get = $this->request->get();
         $this->assign([
             'get' => json_encode($get)
         ]);
@@ -202,10 +205,12 @@ class Inventory extends AdminController
     {
         $get = $this->request->get();
         if ($this->request->isAjax()) {
-            $start_date = $get['start_date']??'';
-            $start_end = $get['end_date']??'';
+            $default_date = date('Y-m-d',time() - (24 * 60 * 60 * 2));
+            $start_date = $get['start_date']??$default_date;
+            $start_end = $get['end_date']??date('Y-m-d',strtotime($start_date.'+1day'));
              // 实例化逻辑类
             $logic = new DressLogic;
+            // 获取完成率数据
             $list = $logic->contrastYinliuFinishRate($start_date,$start_end);
             $data = [
                 'code'  => 0,

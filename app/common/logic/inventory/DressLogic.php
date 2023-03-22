@@ -51,7 +51,7 @@ class DressLogic
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public function contrastYinliuFinishRate($start_date = '2023-03-20' , $end_date = '2023-03-21')
+    public function contrastYinliuFinishRate($start_date = '' , $end_date = '')
     {
         if(empty($start_date) || empty($end_date)) return [];
         if(strtotime($end_date) > time()){
