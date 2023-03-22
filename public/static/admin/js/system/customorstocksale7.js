@@ -18,7 +18,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 url: url,
                 data: {}
             }, function (res) {
-                console.log(res);
+                // console.log(res);
                 // 省列表
                 var province_list = res.province_list;
                 // 气温区域
@@ -48,9 +48,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     { field: '一级分类', width: 100, title: '一级分类', fixed: 'left', search: 'xmSelect', selectList: level1_list, laySearch: true },
                     { field: '二级分类', width: 100, title: '二级分类', fixed: 'left', search: 'xmSelect', selectList: level2_list, laySearch: true },
                     { field: '分类', width: 100, title: '分类', fixed: 'left', search: false, selectList: {}, laySearch: true },
-                    //   {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
-                    //   {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
-                    //   {field: 'SendGoodsGroup', width: 160, title: '温度带',fixed:'left'},
                 ];
                 var data = res.data;
                 data.forEach(function (val, index) {
