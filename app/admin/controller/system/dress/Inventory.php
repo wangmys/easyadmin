@@ -4,14 +4,17 @@ namespace app\admin\controller\system\dress;
 
 use app\common\constants\AdminConstant;
 use app\admin\model\dress\Accessories;
+use app\admin\model\dress\YinliuQuestion;
 use app\common\controller\AdminController;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
 use think\facade\Db;
+use app\common\logic\inventory\DressLogic;
 
 
 /**
+ * 无需登录验证的页面
  * Class Inventory
  * @package app\admin\controller\system\dress
  * @ControllerAnnotation(title="商品负责人库存")
@@ -32,7 +35,13 @@ class Inventory extends AdminController
         $this->model = new Accessories();
     }
 
-
+    /**
+     * 展示配饰库存不足标准的数据
+     * @return mixed|\think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public function index()
     {
         if ($this->request->isAjax()) {
@@ -40,7 +49,17 @@ class Inventory extends AdminController
                 return $this->selectList();
             }
             list($page, $limit, $where) = $this->buildTableParames();
-
+            if(empty($where['商品负责人'])){
+                $_where = ['商品负责人','=',-99999];
+                foreach ($where as $k=>$v){
+                    if($v[0] == '商品负责人'){
+                        unset($_where);
+                        break;
+                    }
+                }
+                // 防止全部展示
+                if(isset($_where)) $where[] = $_where;
+            }
             // 获取其他筛选
             $other_where = $this->setWhere($where)[1];
 
@@ -131,4 +150,75 @@ class Inventory extends AdminController
         }
         return [$_where,$other_where];
     }
+
+    /**
+     * 展示配饰不合格的店铺总计
+     */
+    public function question()
+    {
+
+        $model_question = new YinliuQuestion;
+        if ($this->request->isAjax()) {
+            if (input('selectFields')) {
+                return $this->selectList();
+            }
+            list($page, $limit, $where) = $this->buildTableParames();
+            if(empty($where['Date'])){
+               $where['Date'] = date('Y-m-d');
+            }
+            $count = $model_question
+                ->where($where)
+                ->count();
+            $list = $model_question
+                ->where($where)
+                ->page($page, $limit)
+                ->select()->toArray();
+            foreach ($list as $k => &$v){
+                foreach ($v as $kk => $vv){
+                    if(empty($vv)){
+                        $v[$kk] = '';
+                    }
+                }
+            }
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => $count,
+                'data'  => $list,
+            ];
+            return json($data);
+        }
+        $get = $this->request->get();
+        $this->assign([
+            'get' => json_encode($get)
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 查看库存完成率
+     */
+    public function finish_rate()
+    {
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+            $start_date = $get['start_date']??'';
+            $start_end = $get['end_date']??'';
+             // 实例化逻辑类
+            $logic = new DressLogic;
+            $list = $logic->contrastYinliuFinishRate($start_date,$start_end);
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($list),
+                'data'  => $list,
+            ];
+            return json($data);
+        }
+        $this->assign([
+            'get' => json_encode($get)
+        ]);
+        return $this->fetch();
+    }
+
 }

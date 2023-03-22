@@ -52,7 +52,7 @@ class Sample
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/index?%E5%95%86%E5%93%81%E8%B4%9F%E8%B4%A3%E4%BA%BA=%E6%9B%B9%E5%A4%AA%E9%98%B3",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/index?商品负责人=曹太阳",
                     "picUrl"=>"@lALOACZwe2Rk",
                     "title"=>"配饰库存预警提示",
                     "text"=>"点击查看"
@@ -64,7 +64,36 @@ class Sample
             'userid_list' => '293746204229278162',
             "msg" => $msg
         ];
+        $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
+        $jsonStr = json_encode($arr); //转换为json格式
+        $result = curl_post($url, $jsonStr);
+        $json = json_decode($result, false);
+        return $json->errmsg;
+    }
 
+    /**
+     * 推送结果
+     * @param array $parms
+     * @return mixed
+     */
+    public function main($parms = [])
+    {
+        $token = $this->getToekn();
+        $msg = [
+                "msgtype" => "link",
+                "link"=>[
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/finish_rate?start_date=2023-03-20&end_date=2023-03-21",
+                    "picUrl"=>"@lALOACZwe2Rk",
+                    "title"=>"配饰库存完成进度",
+                    "text"=>"点击查看"
+                ]
+        ];
+        $arr = [
+            'agent_id'=> 2476262581,
+            'to_all_user'=>false,
+            'userid_list' => '293746204229278162',
+            "msg" => $msg
+        ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
         $jsonStr = json_encode($arr); //转换为json格式
         $result = curl_post($url, $jsonStr);
