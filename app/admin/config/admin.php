@@ -23,7 +23,8 @@ return [
         'login/index',
         'login/out',
         'system.dress.inventory/index',
-        'system.dress.inventory/test',
+        'system.dress.inventory/question',
+        'system.dress.inventory/finish_rate',
     ],
 
     // 不需要验证权限的控制器
@@ -39,6 +40,7 @@ return [
         'login/index',
         'login/out',
         'system.dress.inventory/index',
-        'system.dress.inventory/test',
+        'system.dress.inventory/question',
+        'system.dress.inventory/finish_rate',
     ],
 ];
