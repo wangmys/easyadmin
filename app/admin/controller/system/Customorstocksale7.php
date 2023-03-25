@@ -737,24 +737,27 @@ class Customorstocksale7 extends AdminController
 
     // 测试 
     public function test() {
-        list($page, $limit, $params) = $this->buildTableParames();
-        $seasion = $this->getSeasionHandle($params);
-        $res = $this->model::where(['店铺名称' => '西宁二店'])->where($seasion['map'][0], $seasion['map'][1], $seasion['map'][2])->sum('前七天销售金额');
-        // $sum = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天成本金额'); // 错误
-        // $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天库存成本'); // 正确
-        // $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前六天销售金额'); // 
-        // // dump($sum);
-        // dump($sum2);
+        // list($page, $limit, $params) = $this->buildTableParames();
+        // $seasion = $this->getSeasionHandle($params);
+        // $res = $this->model::where(['店铺名称' => '西宁二店'])->where($seasion['map'][0], $seasion['map'][1], $seasion['map'][2])->sum('前七天销售金额');
+        // // $sum = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天成本金额'); // 错误
+        // // $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前七天库存成本'); // 正确
+        // // $sum2 = $this->model::where(['店铺名称' => '西宁二店'])->sum('前六天销售金额'); // 
+        // // // dump($sum);
+        // // dump($sum2);
 
-        // $res = sprintf("%.8f", 0.041930618401207);
+        // // $res = sprintf("%.8f", 0.041930618401207);
+        // // dump($res);
+        // // dump($params);
+
+        // // $res2_7xsje = $this->model::where(['店铺名称' => '西宁二店'])->where($params)->sum('前七天销售金额');
+        // // $res2_7xsje = $this->model::where($params)->sum('前七天销售金额');
+
         // dump($res);
-        // dump($params);
+        // echo $this->model->getLastSql();
 
-        // $res2_7xsje = $this->model::where(['店铺名称' => '西宁二店'])->where($params)->sum('前七天销售金额');
-        // $res2_7xsje = $this->model::where($params)->sum('前七天销售金额');
-
-        dump($res);
-        echo $this->model->getLastSql();
+        $find = Db::connect('mysql2')->name('customer_stock_sale_7day')->where(1)->find();
+        dump($find);
     }
 
 
