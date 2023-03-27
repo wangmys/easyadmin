@@ -38,7 +38,7 @@ class AddHistoryData
         }
         if(empty($this->redis->lrange("finish_task",0,-1))){
             // 计算天数
-            $days = $this->daysbetweendates('2023-01-01','2023-01-31');
+            $days = $this->daysbetweendates('2022-01-01','2023-01-31');
             // 循环添加任务
             foreach($days as $k=>$v){
                 // 添加任务队列
@@ -58,7 +58,7 @@ class AddHistoryData
         Db::startTrans();
 
             try {
-                $datetime = '2023-01-01';
+                $datetime = '2022-01-01';
                 // 取队列第一个值
                 $d = $this->redis->lindex('task_queue',0);
                 $res = 0;
@@ -68,7 +68,7 @@ class AddHistoryData
                     // 查询数据
                     $data = Db::connect("sqlsrv")->Query($sql);
                     // 实例化
-                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year');
+                    $table = Db::connect("mysql2")->table('sp_customer_stock_sale_year_copy');
                     // 执行插入
                     $res = $table->insertAll($data);
                     // 执行完毕从任务列表,弹出这个任务
@@ -115,7 +115,7 @@ class AddHistoryData
         return date("z",strtotime($date))+1;
     }
     // 获取一年相差天数
-    public function daysbetweendates($date1 = '2022-01-01', $date2 = '2022-12-31'){
+    public function daysbetweendates($date1, $date2){
         $date1 = strtotime($date1);
         $date2 = strtotime($date2);
         $days = ceil(($date2 - $date1)/86400);

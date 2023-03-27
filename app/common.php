@@ -164,7 +164,7 @@ function date_to_week($time)
 }
 
 /**
- * 获取今日到周一的日期
+ * 获取周一到今日的时间区间
  */
 function getThisDayToStartDate()
 {
@@ -181,4 +181,14 @@ function getThisDayToStartDate()
     // 获得开始日期
     $start_date = date('Y-m-d',strtotime(date('Y-m-d')."-{$subtractDay}day"));
     return [$start_date,$end_date];
+}
+
+/**
+ * 获取周一到今日的时间区间
+ */
+function getIntervalDays()
+{
+    $datetime_start = new DateTime(getThisDayToStartDate()[0]);
+    $datetime_end = new DateTime(getThisDayToStartDate()[1]);
+    return $datetime_start->diff($datetime_end)->days;
 }

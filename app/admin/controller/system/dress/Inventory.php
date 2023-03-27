@@ -2,12 +2,15 @@
 
 namespace app\admin\controller\system\dress;
 
+use app\admin\model\dress\Store;
+use app\admin\model\dress\YinliuStore;
 use app\common\constants\AdminConstant;
 use app\admin\model\dress\Accessories;
 use app\admin\model\dress\YinliuQuestion;
 use app\common\controller\AdminController;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use think\App;
 use think\facade\Db;
 use app\common\logic\inventory\DressLogic;
@@ -45,9 +48,8 @@ class Inventory extends AdminController
     public function index()
     {
         if ($this->request->isAjax()) {
-            if (input('selectFields')) {
-                return $this->selectList();
-            }
+
+            $Date = date('Y-m-d');
             list($page, $limit, $where) = $this->buildTableParames();
 //            if(empty($where['商品负责人'])){
 //                $_where = ['商品负责人','=',-99999];
@@ -65,7 +67,7 @@ class Inventory extends AdminController
 
             // 设置默认筛选结果
             $where = $this->setWhere($where)[0];
-            $count = $this->model
+            $count = $this->model->where(['Date' => $Date])
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
@@ -92,7 +94,7 @@ class Inventory extends AdminController
                 }
             }
 
-            $list = $this->model
+            $list = $this->model->where(['Date' => $Date])
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
@@ -251,4 +253,117 @@ class Inventory extends AdminController
         return $this->fetch();
     }
 
+    /**
+     * 商品专员问题集合
+     */
+    public function gather()
+    {
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+            $name = $get['name']??'';
+            $Date = date('Y-m-d');
+            // 查询周一存在的问题
+            $question_total = Store::where([
+                '商品负责人' => $name,
+                'Date' => getThisDayToStartDate()[0]
+            ])->group('cate')->column('cate');
+            $total = count($question_total);
+
+            // 查询周一哪些问题未处理
+            $question_not_total = Store::where([
+                '商品负责人' => $name,
+                'Date' => getThisDayToStartDate()[0],
+                'is_qualified' => 0
+            ])->group('cate')->column('cate');
+            $not_total = count($question_not_total);
+
+            $data = [
+                [
+                    'order_num' => 1,
+                    '商品负责人' => $name,
+                    'name' => '配饰库存不足',
+                    // 问题总数
+                    'num' => $total,
+                    'untreate' => $not_total,
+                    'time' => $not_total>0?getIntervalDays():'',
+                ]
+            ];
+            $list = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($data),
+                'data'  => $data,
+            ];
+            return json($list);
+        }
+        $this->assign([
+            'get' => json_encode($get)
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 任务总览
+     */
+    public function task_overview()
+    {
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+            // 查询商品负责人
+            $charge = AdminConstant::CHARGE_LIST;
+            // 获取周一日期
+            $monday = getThisDayToStartDate()[0];
+            $thisDay = date('Y-m-d');
+            $data = [];
+
+            // 统计周一有哪些问题未完成
+            $yinliu_data = YinliuQuestion::where([
+                'Date' => $monday
+            ])->where(function ($q){
+                foreach (AdminConstant::ACCESSORIES_LIST as $k => $v){
+                    $q->whereOr($v,'>',0);
+                }
+            })->group('商品负责人')->column('count(*) as num','商品负责人');
+
+            // 配饰详情表
+            $store_data = Store::where([
+                'Date' => $monday
+            ])->where(['is_qualified' => 0])->group('商品负责人')->column('count(*) as num','商品负责人');
+
+            // 负责人循环
+            foreach ($charge as $k => $v){
+                $item = [
+                    '商品负责人' => $v,
+                    'num' => $k + 1,
+                    // 问题总计
+                    'total' => 0,
+                    // 已完成统计
+                    'ok_total' => 0,
+                    // 未完成统计
+                    'no_total' => 0,
+                ];
+                // 统计配饰表的问题数
+                if(isset($yinliu_data[$v])){
+                    $item['total'] += 1;
+                }
+                // 统计配饰未完成数
+                if(isset($store_data[$v]) && $store_data[$v] > 0){
+                    $item['no_total'] += 1;
+                }
+                // 查询不动销的问题
+
+                // 查询其他表的问题
+                $data[] = $item;
+            }
+
+            $list = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($data),
+                'data'  => $data,
+            ];
+            return json($list);
+        }
+        return $this->fetch();
+    }
 }

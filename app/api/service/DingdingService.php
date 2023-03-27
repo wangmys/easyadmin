@@ -139,8 +139,8 @@ class DingdingService
         ];
 
         $y1 = 36;
-        $x2 =1542;
-        $y2=65;
+        $x2 = 1542;
+        $y2 = 65;
         $font_west =  realpath('./static/plugs/font-awesome-4.7.0/fonts/SimHei.ttf');//字体文件路径
         $save_path = $base['file_path'] . $params['file_name'];
 

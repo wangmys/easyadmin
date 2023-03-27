@@ -62,7 +62,7 @@ class Sample
         $arr = [
             'agent_id'=> 2476262581,
             'to_all_user'=>false,
-            'userid_list' => AdminConstant::ID_WV,
+            'userid_list' => AdminConstant::ID_WMY,
             "msg" => $msg
         ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
@@ -85,14 +85,14 @@ class Sample
                 "link"=>[
                     "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/finish_rate",
                     "picUrl"=>"@lALOACZwe2Rk",
-                    "title"=>"配饰库存完成进度 ",
+                    "title"=>"配饰库存完成进度",
                     "text"=>"点击查看"
                 ]
         ];
         $arr = [
             'agent_id'=> 2476262581,
             'to_all_user'=>false,
-            'userid_list' => AdminConstant::ID_WV,
+            'userid_list' => AdminConstant::ID_WMY,
             "msg" => $msg
         ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
