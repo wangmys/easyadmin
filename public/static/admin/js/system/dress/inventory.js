@@ -13,7 +13,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
     var table = layui.table
     function isRed(d,obj){
         if(d[obj.field] === null){
-            d[obj.field] = 0;
+            d[obj.field] = '';
         }
         if(parseInt(d[obj.field]) < parseInt(d.config[obj.field])){
             str = '';
