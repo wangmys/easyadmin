@@ -260,7 +260,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 text: '查看详情',
                                 url: init.index_url,
                                 method: 'open',
-                                auth: '',
+                                auth: 'false',
                                 class: 'layui-btn layui-btn-normal layui-btn-xs',
                                 field:'商品负责人',
                                 extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' "
