@@ -43,7 +43,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 limits:[100,200,500,1000],
                 cols: [[
                     {type: "checkbox"},
-                    {field: '省份', minWith: 134, title: '省份',search: true},
+                    {field: 'Date', minWith: 134, title: '日期',search: true},
                     {field: '店铺名称', minWith: 134, title: '店铺名称',search: true},
                     {field: '商品负责人', minWith: 134, title: '商品负责人',search: true},
                     {field: '背包', minWith: 134, title: '背包',templet: function(d){
@@ -239,7 +239,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             var $get = $("#where").val();
             ea.table.render({
                 url: init.gather_url,
-                // where:JSON.parse($get),
+                where:JSON.parse($get),
                 search:false,
                 height: 760,
                 limit: 1000,
@@ -247,6 +247,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 limits:[100,200,500,1000],
                 cols: [[
                     {field: 'order_num', minWith: 134, title: '序号'},
+                    {field: '商品负责人', minWith: 134, title: '商品负责人'},
                     {field: 'name', minWith: 134, title: '检核列表'},
                     {field: 'num', minWith: 134, title: '问题个数'},
                     {field: 'untreate', minWith: 134, title: '未处理数'},
@@ -302,7 +303,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 ,page: false
                                 ,cols: [
                                     [
-                                        {field: '商品负责人', title: '商品负责人', minWidth: 80   },
+                                        // {field: '商品负责人', title: '商品负责人', minWidth: 80   },
                                         {field: 'name', title: '检核列表', minWidth: 80 },
                                         {field: 'num', minWidth: 80, title: '问题个数'},
                                         {field: 'untreate', minWidth: 80, title: '未处理数'},
