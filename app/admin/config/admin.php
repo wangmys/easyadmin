@@ -25,6 +25,8 @@ return [
         'system.dress.inventory/index',
         'system.dress.inventory/question',
         'system.dress.inventory/finish_rate',
+        'system.dress.inventory/gather',
+        'system.dress.inventory/task_overview',
     ],
 
     // 不需要验证权限的控制器
@@ -42,5 +44,7 @@ return [
         'system.dress.inventory/index',
         'system.dress.inventory/question',
         'system.dress.inventory/finish_rate',
+        'system.dress.inventory/gather',
+        'system.dress.inventory/task_overview',
     ],
 ];
