@@ -292,7 +292,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         [
                             {field: 'num', minWidth: 80, title: '序号'},
                             {field: '商品负责人', minWidth: 80, title: '商品负责人'},
-                            {title: '#', minWidth: 50,show: 1, lazy: true, children:[
+                            {title: '监控列表', minWidth: 50,show: 1, lazy: true, children:[
                             {
                                 title: '详情'
                                 ,url: function(row){
@@ -303,7 +303,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 ,page: false
                                 ,cols: [
                                     [
-                                        // {field: '商品负责人', title: '商品负责人', minWidth: 80   },
                                         {field: 'name', title: '检核列表', minWidth: 80 },
                                         {field: 'num', minWidth: 80, title: '问题个数'},
                                         {field: 'untreate', minWidth: 80, title: '未处理数'},
