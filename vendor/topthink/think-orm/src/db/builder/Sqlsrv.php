@@ -136,7 +136,7 @@ class Sqlsrv extends Builder
         }
 
         if ($strict && !preg_match('/^[\w\.\*]+$/', $key)) {
-            throw new Exception('not support data:' . $key);
+//            throw new Exception('not support data:' . $key);
         }
 
         if ('*' != $key && !preg_match('/[,\'\"\*\(\)\[.\s]/', $key)) {

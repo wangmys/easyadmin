@@ -294,16 +294,16 @@
         },
         {
             "name": "alibabacloud/dingtalk",
-            "version": "1.5.55",
+            "version": "1.5.58",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alibabacloud-sdk-php/dingtalk.git",
-                "reference": "555f9f80d801a4640706d1dd9d1cb2baebbdcd28"
+                "reference": "f835c0ffb0daea52d796d1cbd98211464b65cd89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alibabacloud-sdk-php/dingtalk/zipball/555f9f80d801a4640706d1dd9d1cb2baebbdcd28",
-                "reference": "555f9f80d801a4640706d1dd9d1cb2baebbdcd28",
+                "url": "https://api.github.com/repos/alibabacloud-sdk-php/dingtalk/zipball/f835c0ffb0daea52d796d1cbd98211464b65cd89",
+                "reference": "f835c0ffb0daea52d796d1cbd98211464b65cd89",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -326,6 +326,7 @@
                     "AlibabaCloud\\SDK\\Dingtalk\\Vim_2_0\\": "src/im_2_0/",
                     "AlibabaCloud\\SDK\\Dingtalk\\Vats_1_0\\": "src/ats_1_0/",
                     "AlibabaCloud\\SDK\\Dingtalk\\Vcrm_1_0\\": "src/crm_1_0/",
+                    "AlibabaCloud\\SDK\\Dingtalk\\Vcrm_2_0\\": "src/crm_2_0/",
                     "AlibabaCloud\\SDK\\Dingtalk\\Vdoc_1_0\\": "src/doc_1_0/",
                     "AlibabaCloud\\SDK\\Dingtalk\\Vdoc_2_0\\": "src/doc_2_0/",
                     "AlibabaCloud\\SDK\\Dingtalk\\Vedu_1_0\\": "src/edu_1_0/",
@@ -417,9 +418,9 @@
             ],
             "description": "Alibaba Cloud Dingtalk SDK Library for PHP",
             "support": {
-                "source": "https://github.com/alibabacloud-sdk-php/dingtalk/tree/1.5.55"
+                "source": "https://github.com/alibabacloud-sdk-php/dingtalk/tree/1.5.58"
             },
-            "time": "2023-03-15T06:49:06+00:00"
+            "time": "2023-03-21T02:52:16+00:00"
         },
         {
             "name": "alibabacloud/endpoint-util",
@@ -3934,16 +3935,16 @@
         },
         {
             "name": "topthink/think-orm",
-            "version": "v2.0.59",
+            "version": "v2.0.60",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/think-orm.git",
-                "reference": "ac0f18bc3063ca924ed5b4af6e405d74f44d2870"
+                "reference": "8bc34a4307fa27186c0e96a9b3de3cb23aa1ed46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/top-think/think-orm/zipball/ac0f18bc3063ca924ed5b4af6e405d74f44d2870",
-                "reference": "ac0f18bc3063ca924ed5b4af6e405d74f44d2870",
+                "url": "https://api.github.com/repos/top-think/think-orm/zipball/8bc34a4307fa27186c0e96a9b3de3cb23aa1ed46",
+                "reference": "8bc34a4307fa27186c0e96a9b3de3cb23aa1ed46",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -3989,9 +3990,9 @@
             ],
             "support": {
                 "issues": "https://github.com/top-think/think-orm/issues",
-                "source": "https://github.com/top-think/think-orm/tree/v2.0.59"
+                "source": "https://github.com/top-think/think-orm/tree/v2.0.60"
             },
-            "time": "2023-03-06T10:12:41+00:00"
+            "time": "2023-03-19T04:51:56+00:00"
         },
         {
             "name": "topthink/think-template",

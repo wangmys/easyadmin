@@ -1,4 +1,4 @@
-<?php /*a:2:{s:60:"C:\phpstudy_pro\WEB\easyadmin\app\shop\view\login\index.html";i:1677147721;s:63:"C:\phpstudy_pro\WEB\easyadmin\app\shop\view\layout\default.html";i:1677580655;}*/ ?>
+<?php /*a:2:{s:60:"C:\phpstudy_pro\WEB\easyadmin\app\shop\view\login\index.html";i:1677147721;s:63:"C:\phpstudy_pro\WEB\easyadmin\app\shop\view\layout\default.html";i:1677585498;}*/ ?>
 <!DOCTYPE html>
 <html>
 <head>

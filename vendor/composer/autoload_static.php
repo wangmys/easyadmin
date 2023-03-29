@@ -208,6 +208,7 @@ class ComposerStaticInit9d4894c473f25f2df7f1b77588a81db9
             'AlibabaCloud\\SDK\\Dingtalk\\Vdevicemng_1_0\\' => 41,
             'AlibabaCloud\\SDK\\Dingtalk\\Vdatacenter_1_0\\' => 42,
             'AlibabaCloud\\SDK\\Dingtalk\\Vcustomer_service_1_0\\' => 48,
+            'AlibabaCloud\\SDK\\Dingtalk\\Vcrm_2_0\\' => 35,
             'AlibabaCloud\\SDK\\Dingtalk\\Vcrm_1_0\\' => 35,
             'AlibabaCloud\\SDK\\Dingtalk\\Vconv_file_1_0\\' => 41,
             'AlibabaCloud\\SDK\\Dingtalk\\Vcontract_1_0\\' => 40,
@@ -266,8 +267,8 @@ class ComposerStaticInit9d4894c473f25f2df7f1b77588a81db9
         array (
             0 => __DIR__ . '/..' . '/topthink/framework/src/think',
             1 => __DIR__ . '/..' . '/topthink/think-helper/src',
-            2 => __DIR__ . '/..' . '/topthink/think-orm/src',
-            3 => __DIR__ . '/..' . '/topthink/think-template/src',
+            2 => __DIR__ . '/..' . '/topthink/think-template/src',
+            3 => __DIR__ . '/..' . '/topthink/think-orm/src',
         ),
         'jianyan\\excel\\' => 
         array (
@@ -710,6 +711,10 @@ class ComposerStaticInit9d4894c473f25f2df7f1b77588a81db9
         'AlibabaCloud\\SDK\\Dingtalk\\Vcustomer_service_1_0\\' => 
         array (
             0 => __DIR__ . '/..' . '/alibabacloud/dingtalk/src/customer_service_1_0',
+        ),
+        'AlibabaCloud\\SDK\\Dingtalk\\Vcrm_2_0\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/alibabacloud/dingtalk/src/crm_2_0',
         ),
         'AlibabaCloud\\SDK\\Dingtalk\\Vcrm_1_0\\' => 
         array (
