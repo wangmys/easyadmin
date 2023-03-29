@@ -73,11 +73,13 @@ class ReportFormsService
         $field_width[12] = 140;
         $field_width[13] = 160;
         $field_width[14] = 160;
+
         $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
         ];
         //参数
         $params = [
@@ -122,9 +124,13 @@ class ReportFormsService
         $field_width[9] = 140;
         $field_width[12] = 160;
         $field_width[14] = 160;
+
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
         ];
 
         //参数
@@ -171,9 +177,13 @@ class ReportFormsService
         $field_width[13] = 125;
         $field_width[15] = 160;
         $field_width[16] = 160;
+
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
         ];
 
         //参数
