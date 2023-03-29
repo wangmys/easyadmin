@@ -55,6 +55,7 @@ class Accessories extends AdminController
             $where = $this->setWhere($where)[0];
 
             $count = $this->model
+                ->where(['Date' => date('Y-m-d')])
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
@@ -82,6 +83,7 @@ class Accessories extends AdminController
             }
 
             $list = $this->model
+                ->where(['Date' => date('Y-m-d')])
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);
@@ -138,6 +140,7 @@ class Accessories extends AdminController
 
             // 计算条数
             $count = $this->model
+                ->where(['Date' => date('Y-m-d')])
                 ->whereNotIn(AdminConstant::NOT_FIELD,'合计')
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
@@ -161,6 +164,7 @@ class Accessories extends AdminController
 
             // 获取列表
             $list = $this->model->whereNotIn('店铺名称&省份&商品负责人','合计')
+                ->where(['Date' => date('Y-m-d')])
                 ->where(function ($q)use($where){
                     foreach ($where as $k => $v){
                         $q->whereOr($v[0], $v[1], $v[2]);

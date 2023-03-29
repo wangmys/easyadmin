@@ -47,15 +47,20 @@ class Sample
         return $access_token;
     }
 
+    /**
+     * 推送商品专员
+     * @param array $parms
+     * @return mixed
+     */
     public function send($parms = [])
     {
         $token = $this->getToekn();
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/index?商品负责人=周奇志",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/gather?name=曹太阳",
                     "picUrl"=>"@lALOACZwe2Rk",
-                    "title"=>"配饰库存预警提示",
+                    "title"=>"商品问题预警提示",
                     "text"=>"点击查看"
                 ]
         ];
@@ -73,7 +78,7 @@ class Sample
     }
 
     /**
-     * 推送结果
+     * 推送管理者
      * @param array $parms
      * @return mixed
      */
@@ -83,9 +88,9 @@ class Sample
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/finish_rate",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/task_overview",
                     "picUrl"=>"@lALOACZwe2Rk",
-                    "title"=>"配饰库存完成进度 ",
+                    "title"=>"商品问题完成进度",
                     "text"=>"点击查看"
                 ]
         ];

@@ -23,13 +23,6 @@ use think\cache\driver\Redis;
 class Data extends AdminController
 {
 
-    use \app\admin\traits\Curd;
-
-    protected $sort = [
-        'sort' => 'desc',
-        'id'   => 'desc',
-    ];
-
     public function __construct(App $app)
     {
         parent::__construct($app);
@@ -69,6 +62,7 @@ class Data extends AdminController
             $q->whereOr($_where);
         })->count();
         $toDayCount = $this->model->where(['Date' => date('Y-m-d')])->count();
+
         // 如果远程引流表的数据与本地库存表数据量一致则今日已取数据,不再重复获取
         if($count == $toDayCount || $toDayCount > 1){
             return json([

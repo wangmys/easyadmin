@@ -45,7 +45,7 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
             if (CONFIG.IS_SUPER_ADMIN) {
                 return true;
             }
-            if ($(elem).attr('data-auth-' + node) === '1') {
+            if ($(elem).attr('data-auth-' + node) === '1' || node=='false') {
                 return true;
             } else {
                 return false;

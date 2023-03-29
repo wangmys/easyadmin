@@ -43,9 +43,12 @@ class DingdingService
         'hook_test_url2' => 'milin'
     ];
 
-    // 测试机器人
+    // 测试群
     protected $hook_test_url = 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2';
+    // 自己的群
     protected $hook_test_url2 = 'https://oapi.dingtalk.com/robot/send?access_token=f892dc03bdf32e94a7332d4a04c8d4328f940a8c6edd2140f3b3a33ab82589de';
+    // 数据播报群
+    protected $hook_test_url3 = 'https://oapi.dingtalk.com/robot/send?access_token=889f8683bd1947670a9d755f6398a49a15abda994c2a975216f3d6a1384ab79d';
     protected $token = '';
 
     public static function getAccessToken()
@@ -84,24 +87,8 @@ class DingdingService
     /**
      * 推送
      */
-    public function send($title = '数据表格',$jpg_url = 'https://bx.babiboy.com/img/20230316/S038.jpg',$robot = '')
+    public function send($title = '数据表格',$jpg_url = '',$robot = '')
     {
-        // 图片存储目录
-        $dir_path = './img/'.date('Ymd');
-        // 读取指定目录
-        $file_arr = scandir($dir_path);
-        // 图片数组
-        $pic_arr = [];
-        // 去除无效文件名
-        if($file_arr){
-            foreach ($file_arr as $k => $v){
-                if($v == '.' || $v == '..'){
-                    unset($file_arr[$k]);
-                }elseif(is_file($dir_path.'/'.$v)){
-                    $pic_arr[] = $dir_path.'/'.$v;
-                }
-            }
-        }
         // 时间
         $time = date('Y-m-d H:i:s');
         $keyword = $this->keyword['hook_test_url2'];
@@ -109,10 +96,7 @@ class DingdingService
             'msgtype' => 'markdown',
             'markdown' => [
                 'title' => [ "$title" . $keyword],
-                'text'=>"#### **$title** \n> \n> ![screenshot]($jpg_url)\n> ###### $time \n",
-                'at' => [
-                    'atMobiles' => '17775611493'
-                ]
+                'text'=>"#### **$title** \n> \n> ![screenshot]($jpg_url)\n> ###### $time \n"
             ]
         ];
         // 推送地址
@@ -139,8 +123,8 @@ class DingdingService
         ];
 
         $y1 = 36;
-        $x2 =1542;
-        $y2=65;
+        $x2 = 1542;
+        $y2 = 65;
         $font_west =  realpath('./static/plugs/font-awesome-4.7.0/fonts/SimHei.ttf');//字体文件路径
         $save_path = $base['file_path'] . $params['file_name'];
 

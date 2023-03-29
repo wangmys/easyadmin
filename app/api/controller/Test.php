@@ -90,8 +90,8 @@ class Test
     {
         $model = new Sample();
         echo '<pre>';
+        print_r($model->send());
         print_r($model->main());
-//        print_r($model->main());
         die;
     }
 }
