@@ -39,14 +39,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 data.forEach(function (val,index){
                     if(index == 0){
                         cols.push({
-                            width: 140 , search:false , field: val, title: val
+                            width: 140 , search:false , field: val, title: val, title: val
                         })
                     }else{
                         cols.push({
-                            width: 100 , search:false , field: val, title: val
+                            width: 100 , search:false , field: val
                         })
                     }
-
                 })
 
                 cols.push({
@@ -78,6 +77,25 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
                 ea.listen();
 
+                var setColor = function(d,obj){
+                    var min_c = d[obj.field]['min_c'] ? d[obj.field]['min_c'] : '';
+                    var bgCol = '';
+                    var fontCol = '';
+                    if (min_c < 10) {
+                        bgCol = '#1a6bd7';   
+                        fontCol = '#ffffff';   
+                    }else if (min_c >= 10 && min_c < 18) {
+                        bgCol = '#68b8f5';   
+                        fontCol = '#ffffff';  
+                    } else if (min_c >= 18 && min_c < 22) {
+                        bgCol = '#faf1a4';   
+                        fontCol = '#000000';  
+                    } else if (min_c >= 22 && min_c < 26) {
+                        bgCol = '#fecc51';   
+                        fontCol = '#000000';  
+                    }
+                    return `<span style="width: 100%;display: block; background:${bgCol}; color:${fontCol}" >${d[obj.field]['min_c']} ~ ${d[obj.field]['max_c']} ℃</span>`
+                }
             },function (res) {
                 alert('失败')
             })

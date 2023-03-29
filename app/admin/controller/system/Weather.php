@@ -98,7 +98,28 @@ class Weather extends AdminController
                     foreach ($list as $k => $v){
                         if($vv['cid'] == $v['cid']){
                             $key = date('m-d',strtotime($vv['weather_time']));
-                            $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
+
+                            if ($vv['min_c'] < 10) {
+                                $bgCol = '#1a6bd7';   
+                                $fontCol = '#ffffff';   
+                            } else if ($vv['min_c'] >= 10 && $vv['min_c'] < 18) {
+                                $bgCol = '#68b8f5';   
+                                $fontCol = '#ffffff';  
+                            } else if ($vv['min_c'] >= 18 && $vv['min_c'] < 22) {
+                                $bgCol = '#faf1a4';   
+                                $fontCol = '#000000';  
+                            } else if ($vv['min_c'] >= 22 && $vv['min_c']  < 26) {
+                                $bgCol = '#fecc51';   
+                                $fontCol = '#000000';  
+                            }
+                            // $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
+                            $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].' ~ '.$vv['max_c'] . "℃</span>";
+
+                            
+                            // $list[$k][$key] = [
+                            //     'min_c' => $vv['min_c'],
+                            //     'max_c' => $vv['max_c']
+                            // ];
                         }
                     }
                 }

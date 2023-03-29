@@ -6,6 +6,7 @@ namespace app\admin\controller\system;
 use app\admin\model\weather\Weather as WeatherM;
 use app\admin\model\weather\Customers as CustomersM;
 use app\admin\model\Customorstocksale7 as Customorstocksale7M;
+use app\admin\model\Wwcustomer as WwcustomerM;
 use app\admin\model\weather\CityUrl;
 use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
@@ -40,7 +41,7 @@ class Customorstocksale7 extends AdminController
         $this->model = new Customorstocksale7M;
     }
 
-        /**
+    /**
      * @NodeAnotation(title="客户库存出货")
         流水占比：二级分类的销售金额/整个店的销售金额
         库存占比：二级分类的库存成本金额 / 整个店的库存成本
@@ -68,7 +69,7 @@ class Customorstocksale7 extends AdminController
                 $group = '店铺名称';
             }
             // 某省所有店铺
-            $res1 = $this->model::where(
+            $res1 = $this->model::with('yunChang')->where(
                 $params
             )->field('省份,店铺名称,季节')
             ->group($group)
@@ -297,12 +298,12 @@ class Customorstocksale7 extends AdminController
         折率：销售金额/零售金额
         店均销：前七天销售数量
         店均库量：前七天库存数量
-        金额周转天：库存成本金额 / 销售成本金额（前七天成本金额）
+        金额周转天：库存成本金额 / 销售成本金额（前七天成本金额 ，成本金额就是销售成本金额）
      */
     public function index2()
     {
         if ($this->request->isAjax()) {
-        // if (1) {
+        // if (1) { 
             list($page, $limit, $params) = $this->buildTableParames();
 
             // dump($params);
@@ -312,53 +313,60 @@ class Customorstocksale7 extends AdminController
 
             // dump($getSeasion); die;
             if ($getSeasion['status']) {
-                $group = '店铺名称,季节';
+                $group = '店铺名称,季节,风格';
             } else {
-                $group = '店铺名称';
+                $group = '店铺名称,风格';
             }
             // 某省所有店铺
-            $res1 = $this->model::where(
+            $res1 = $this->model::with('yunChang')->where(
                 $params
-            )->field('省份,店铺名称,季节')
+            )->field('省份,店铺名称,季节,风格')
             ->group($group)
+            ->order('店铺名称 asc, 风格 asc')
             ->select()
             ->toArray();
+
+            // echo '<pre>';
+            // print_r($res1);
+            // die;
 
             // 销售总金额 、库存总成本
             foreach($res1 as $key => $value) {
                 // 销售总金额
                 if ($getSeasion['status']) {
-                    $res2_7xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前七天销售金额');
-                    $res2_6xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前六天销售金额');
-                    $res2_5xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前五天销售金额');
-                    $res2_4xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前四天销售金额');
-                    $res2_3xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前三天销售金额');
-                    $res2_2xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前二天销售金额');
-                    $res2_1xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前一天销售金额');
+                    $res2_7xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前七天销售金额');
+                    $res2_6xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前六天销售金额');
+                    $res2_5xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前五天销售金额');
+                    $res2_4xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前四天销售金额');
+                    $res2_3xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前三天销售金额');
+                    $res2_2xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前二天销售金额');
+                    $res2_1xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前一天销售金额');
 
-                    $res2_7kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前七天库存成本');
-                    $res2_6kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前六天库存成本');
-                    $res2_5kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前五天库存成本');
-                    $res2_4kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前四天库存成本');
-                    $res2_3kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前三天库存成本');
-                    $res2_2kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前二天库存成本');
-                    $res2_1kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前一天库存成本');
+                    $res2_7kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前七天库存成本');
+                    $res2_6kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前六天库存成本');
+                    $res2_5kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前五天库存成本');
+                    $res2_4kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前四天库存成本');
+                    $res2_3kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前三天库存成本');
+                    $res2_2kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前二天库存成本');
+                    $res2_1kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->where($getSeasion['map'][0], $getSeasion['map'][1], $getSeasion['map'][2])->sum('前一天库存成本');
+                    // echo $this->model::getLastSql();
+                    // echo '<br>';
                 } else {
-                    $res2_7xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前七天销售金额');
-                    $res2_6xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前六天销售金额');
-                    $res2_5xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前五天销售金额');
-                    $res2_4xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前四天销售金额');
-                    $res2_3xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前三天销售金额');
-                    $res2_2xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前二天销售金额');
-                    $res2_1xsje = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前一天销售金额');
+                    $res2_7xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前七天销售金额');
+                    $res2_6xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前六天销售金额');
+                    $res2_5xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前五天销售金额');
+                    $res2_4xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前四天销售金额');
+                    $res2_3xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前三天销售金额');
+                    $res2_2xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前二天销售金额');
+                    $res2_1xsje = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前一天销售金额');
 
-                    $res2_7kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前七天库存成本');
-                    $res2_6kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前六天库存成本');
-                    $res2_5kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前五天库存成本');
-                    $res2_4kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前四天库存成本');
-                    $res2_3kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前三天库存成本');
-                    $res2_2kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前二天库存成本');
-                    $res2_1kccb = $this->model::where(['店铺名称' => $value['店铺名称']])->sum('前一天库存成本');
+                    $res2_7kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前七天库存成本');
+                    $res2_6kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前六天库存成本');
+                    $res2_5kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前五天库存成本');
+                    $res2_4kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前四天库存成本');
+                    $res2_3kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前三天库存成本');
+                    $res2_2kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前二天库存成本');
+                    $res2_1kccb = $this->model::where(['店铺名称' => $value['店铺名称'], '风格' => $value['风格']])->sum('前一天库存成本');
                 }
                 $res1[$key]['总店前七天销售金额'] = $res2_7xsje;
                 $res1[$key]['总店前六天销售金额'] = $res2_6xsje;
@@ -379,6 +387,7 @@ class Customorstocksale7 extends AdminController
                 $res1[$key]['总店近一周库存成本'] = $res2_1kccb + $res2_2kccb + $res2_3kccb + $res2_4kccb + $res2_5kccb + $res2_6kccb + $res2_7kccb;
             }
 
+            // die;
             // dump($res1); die;
 
             $res3 = $this->model::where(
@@ -386,66 +395,66 @@ class Customorstocksale7 extends AdminController
                 $params
             )
             ->field('省份,气温区域,风格,季节,温带,分类,经营模式,店铺名称,店铺等级,一级分类,二级分类,
-            ifnull(前七天销售数量, 0) as 前七天店均销,
-            ifnull(前六天销售数量, 0) as 前六天店均销,
-            ifnull(前五天销售数量, 0) as 前五天店均销,
-            ifnull(前四天销售数量, 0) as 前四天店均销,
-            ifnull(前三天销售数量, 0) as 前三天店均销,
-            ifnull(前二天销售数量, 0) as 前二天店均销,
-            ifnull(前一天销售数量, 0) as 前一天店均销,
-            ((ifnull(前一天库存数量, 0) + ifnull(前二天库存数量, 0) + ifnull(前三天库存数量, 0) + ifnull(前四天库存数量, 0) + ifnull(前五天库存数量, 0) + ifnull(前六天库存数量, 0) + ifnull(前七天库存数量, 0))/7) as 近一周店均库存,
-            ((ifnull(前七天销售数量, 0)+ifnull(前六天销售数量, 0)+ifnull(前五天销售数量, 0)+ifnull(前四天销售数量, 0)+ifnull(前三天销售数量, 0)+ifnull(前二天销售数量, 0)+ifnull(前一天销售数量, 0)) / 7) as 近一周店均销,
-            ifnull(前七天库存数量, 0) as 前七天店均库存,
-            ifnull(前六天库存数量, 0) as 前六天店均库存,
-            ifnull(前五天库存数量, 0) as 前五天店均库存,
-            ifnull(前四天库存数量, 0) as 前四天店均库存,
-            ifnull(前三天库存数量, 0) as 前三天店均库存,
-            ifnull(前二天库存数量, 0) as 前二天店均库存,
-            ifnull(前一天库存数量, 0) as 前一天店均库存,
-            ifnull(前七天库存成本, 0) as 前七天库存成本,
-            ifnull(前六天库存成本, 0) as 前六天库存成本,
-            ifnull(前五天库存成本, 0) as 前五天库存成本,
-            ifnull(前四天库存成本, 0) as 前四天库存成本,
-            ifnull(前三天库存成本, 0) as 前三天库存成本,
-            ifnull(前二天库存成本, 0) as 前二天库存成本,
-            ifnull(前一天库存成本, 0) as 前一天库存成本,
-            ifnull(前七天成本金额, 0) as 前七天成本金额,
-            ifnull(前六天成本金额, 0) as 前六天成本金额,
-            ifnull(前五天成本金额, 0) as 前五天成本金额,
-            ifnull(前四天成本金额, 0) as 前四天成本金额,
-            ifnull(前三天成本金额, 0) as 前三天成本金额,
-            ifnull(前二天成本金额, 0) as 前二天成本金额,
-            ifnull(前一天成本金额, 0) as 前一天成本金额,
-            ifnull(前七天销售金额, 0) as 前七天销售金额,
-            ifnull(前六天销售金额, 0) as 前六天销售金额,
-            ifnull(前五天销售金额, 0) as 前五天销售金额,
-            ifnull(前四天销售金额, 0) as 前四天销售金额,
-            ifnull(前三天销售金额, 0) as 前三天销售金额,
-            ifnull(前二天销售金额, 0) as 前二天销售金额,
-            ifnull(前一天销售金额, 0) as 前一天销售金额,
-            ifnull(前七天零售金额, 0) as 前七天零售金额,
-            ifnull(前六天零售金额, 0) as 前六天零售金额,
-            ifnull(前五天零售金额, 0) as 前五天零售金额,
-            ifnull(前四天零售金额, 0) as 前四天零售金额,
-            ifnull(前三天零售金额, 0) as 前三天零售金额,
-            ifnull(前二天零售金额, 0) as 前二天零售金额,
-            ifnull(前一天零售金额, 0) as 前一天零售金额,
-            ifnull((前七天库存成本/前七天成本金额), 0) as 前七天金额周转天,
-            ifnull((前六天库存成本/前六天成本金额), 0) as 前六天金额周转天,
-            ifnull((前五天库存成本/前五天成本金额), 0) as 前五天金额周转天,
-            ifnull((前四天库存成本/前四天成本金额), 0) as 前四天金额周转天,
-            ifnull((前三天库存成本/前三天成本金额), 0) as 前三天金额周转天,
-            ifnull((前二天库存成本/前二天成本金额), 0) as 前二天金额周转天,
-            ifnull((前一天库存成本/前一天成本金额), 0) as 前一天金额周转天,
-            ifnull(((前一天库存成本)/(前一天成本金额+前二天成本金额+前三天成本金额+前四天成本金额+前五天成本金额+前六天成本金额+前七天成本金额) * 7), 0) as 近一周金额周转天,
-            ifnull(预计库存, 0) as 昨日门店预计库存'
+            sum(ifnull(前七天销售数量, 0)) as 前七天店均销,
+            sum(ifnull(前六天销售数量, 0)) as 前六天店均销,
+            sum(ifnull(前五天销售数量, 0)) as 前五天店均销,
+            sum(ifnull(前四天销售数量, 0)) as 前四天店均销,
+            sum(ifnull(前三天销售数量, 0)) as 前三天店均销,
+            sum(ifnull(前二天销售数量, 0)) as 前二天店均销,
+            sum(ifnull(前一天销售数量, 0)) as 前一天店均销,
+            sum(ifnull(前七天库存数量, 0)) as 前七天店均库存,
+            sum(ifnull(前六天库存数量, 0)) as 前六天店均库存,
+            sum(ifnull(前五天库存数量, 0)) as 前五天店均库存,
+            sum(ifnull(前四天库存数量, 0)) as 前四天店均库存,
+            sum(ifnull(前三天库存数量, 0)) as 前三天店均库存,
+            sum(ifnull(前二天库存数量, 0)) as 前二天店均库存,
+            sum(ifnull(前一天库存数量, 0)) as 前一天店均库存,
+            sum(ifnull(前七天库存成本, 0)) as 前七天库存成本,
+            sum(ifnull(前六天库存成本, 0)) as 前六天库存成本,
+            sum(ifnull(前五天库存成本, 0)) as 前五天库存成本,
+            sum(ifnull(前四天库存成本, 0)) as 前四天库存成本,
+            sum(ifnull(前三天库存成本, 0)) as 前三天库存成本,
+            sum(ifnull(前二天库存成本, 0)) as 前二天库存成本,
+            sum(ifnull(前一天库存成本, 0)) as 前一天库存成本,
+            sum(ifnull(前七天成本金额, 0)) as 前七天成本金额,
+            sum(ifnull(前六天成本金额, 0)) as 前六天成本金额,
+            sum(ifnull(前五天成本金额, 0)) as 前五天成本金额,
+            sum(ifnull(前四天成本金额, 0)) as 前四天成本金额,
+            sum(ifnull(前三天成本金额, 0)) as 前三天成本金额,
+            sum(ifnull(前二天成本金额, 0)) as 前二天成本金额,
+            sum(ifnull(前一天成本金额, 0)) as 前一天成本金额,
+            sum(ifnull(前七天销售金额, 0)) as 前七天销售金额,
+            sum(ifnull(前六天销售金额, 0)) as 前六天销售金额,
+            sum(ifnull(前五天销售金额, 0)) as 前五天销售金额,
+            sum(ifnull(前四天销售金额, 0)) as 前四天销售金额,
+            sum(ifnull(前三天销售金额, 0)) as 前三天销售金额,
+            sum(ifnull(前二天销售金额, 0)) as 前二天销售金额,
+            sum(ifnull(前一天销售金额, 0)) as 前一天销售金额,
+            sum(ifnull(前六天零售金额, 0)) as 前六天零售金额,
+            sum(ifnull(前七天零售金额, 0)) as 前七天零售金额,
+            sum(ifnull(前五天零售金额, 0)) as 前五天零售金额,
+            sum(ifnull(前四天零售金额, 0)) as 前四天零售金额,
+            sum(ifnull(前三天零售金额, 0)) as 前三天零售金额,
+            sum(ifnull(前二天零售金额, 0)) as 前二天零售金额,
+            sum(ifnull(前一天零售金额, 0)) as 前一天零售金额,
 
+            sum((ifnull(前一天库存数量, 0) + ifnull(前二天库存数量, 0) + ifnull(前三天库存数量, 0) + ifnull(前四天库存数量, 0) + ifnull(前五天库存数量, 0) + ifnull(前六天库存数量, 0) + ifnull(前七天库存数量, 0))/7) as 近一周店均库存,
+            sum((ifnull(前七天销售数量, 0) + ifnull(前六天销售数量, 0) + ifnull(前五天销售数量, 0)+ifnull(前四天销售数量, 0)+ifnull(前三天销售数量, 0)+ifnull(前二天销售数量, 0)+ifnull(前一天销售数量, 0)) / 7) as 近一周店均销,
+            ifnull(sum(前七天库存成本)/sum(前七天成本金额), 0) as 前七天金额周转天,
+            ifnull(sum(前六天库存成本)/sum(前六天成本金额), 0) as 前六天金额周转天,
+            ifnull(sum(前五天库存成本)/sum(前五天成本金额), 0) as 前五天金额周转天,
+            ifnull(sum(前四天库存成本)/sum(前四天成本金额), 0) as 前四天金额周转天,
+            ifnull(sum(前三天库存成本)/sum(前三天成本金额), 0) as 前三天金额周转天,
+            ifnull(sum(前二天库存成本)/sum(前二天成本金额), 0) as 前二天金额周转天,
+            ifnull(sum(前一天库存成本)/sum(前一天成本金额), 0) as 前一天金额周转天,
+            ifnull((sum(前一天库存成本)/sum(前一天成本金额+前二天成本金额+前三天成本金额+前四天成本金额+前五天成本金额+前六天成本金额+前七天成本金额) * 7), 0) as 近一周金额周转天,
+            sum(ifnull(预计库存, 0)) as 昨日门店预计库存'
             )
             // ,sum(前二天零售金额) as 分组前二天零售,sum(前四天零售金额) as 分组前四天零售
             // ->limit(1000)
             ->page($page, $limit)
-            ->order('省份 ASC,店铺名称 ASC,季节 ASC,一级分类 ASC,二级分类 ASC')
-            // ->group('二级分类')
+            ->order('省份 ASC,店铺名称 ASC,季节 ASC,风格 ASC,一级分类 ASC,二级分类 ASC')
+            ->group('店铺名称,二级分类,风格')
             ->select()
             ->toArray();
             // ,sum(前四天零售金额) as 分组前四天零售'
@@ -458,19 +467,22 @@ class Customorstocksale7 extends AdminController
             $count = $this->model::where(
                 // $this->getParms()
                 $params
-            )->count();
+            )->group('店铺名称,二级分类,风格')
+            ->count();
 
             // 合并总店数据：库存成本，销售金额
             foreach($res3 as $key => $value) {
                 $map['店铺名称'] = $value['店铺名称'];
+                $map['风格'] = $value['风格'];
                 if ($getSeasion['status']) {
                     $map['季节'] = $value['季节'];
                 }
                 // dump($map);
-                $addArr = $this->pingRes1($res1, $map);
+                $addArr = $this->pingRes1_type2($res1, $map);
                 // 合并
                 $res3[$key] = array_merge($res3[$key], $addArr);
 
+                $res3[$key]['合并'] = $value['气温区域'] . $value['季节'];
                 // 计算
                 $res3[$key]['前七天流水占比'] = $this->zeroHandle($res3[$key]['前七天销售金额'], $res3[$key]['总店前七天销售金额']);
                 $res3[$key]['前六天流水占比'] = $this->zeroHandle($res3[$key]['前六天销售金额'], $res3[$key]['总店前六天销售金额']);
@@ -530,11 +542,12 @@ class Customorstocksale7 extends AdminController
                 'count' => $count,
                 'data'  => $res3
             ];
+            // dump($data);die;
             return json($data);
         }
 
-        // return $this->fetch('system/Customorstocksale7/index2.html');
-        return $this->fetch('');
+        // return $this->fetch('system/customorstocksale7/index1.html');
+        return $this->fetch();
     }
 
     // 获取展示字段
@@ -660,6 +673,9 @@ class Customorstocksale7 extends AdminController
             // dump($value);
             if (isset($map['季节'])) {
                 if ($value['店铺名称'] == $map['店铺名称'] && $map['季节'] == $value['季节']) {
+                    $arr['云仓'] = $value['yunChang']['云仓'];
+                    $arr['商品负责人'] = $value['yunChang']['商品负责人'];
+
                     $arr['总店前七天销售金额'] = $value['总店前七天销售金额'];
                     $arr['总店前六天销售金额'] = $value['总店前六天销售金额'];
                     $arr['总店前五天销售金额'] = $value['总店前五天销售金额'];
@@ -680,6 +696,9 @@ class Customorstocksale7 extends AdminController
                     break;
                 }
             } elseif ($value['店铺名称'] == $map['店铺名称']) {
+                $arr['云仓'] = $value['yunChang']['云仓'];
+                $arr['商品负责人'] = $value['yunChang']['商品负责人'];
+
                 $arr['总店前七天销售金额'] = $value['总店前七天销售金额'];
                 $arr['总店前六天销售金额'] = $value['总店前六天销售金额'];
                 $arr['总店前五天销售金额'] = $value['总店前五天销售金额'];
@@ -700,9 +719,67 @@ class Customorstocksale7 extends AdminController
                 break;
             }
         }
-
         return $arr;
     }
+
+        // 返回商店信息 需要带风格
+        private function pingRes1_type2($res1 = [], $map = []) {
+            // dump($res1);
+    
+            // die;
+            $arr = [];
+            foreach($res1 as $key => $value) {
+                // dump($value);
+                if (isset($map['季节'])) {
+                    if ($value['店铺名称'] == $map['店铺名称'] && $map['季节'] == $value['季节'] && $map['风格'] == $value['风格']) {
+                        $arr['云仓'] = $value['yunChang']['云仓'];
+                        $arr['商品负责人'] = $value['yunChang']['商品负责人'];
+
+                        $arr['总店前七天销售金额'] = $value['总店前七天销售金额'];
+                        $arr['总店前六天销售金额'] = $value['总店前六天销售金额'];
+                        $arr['总店前五天销售金额'] = $value['总店前五天销售金额'];
+                        $arr['总店前四天销售金额'] = $value['总店前四天销售金额'];
+                        $arr['总店前三天销售金额'] = $value['总店前三天销售金额'];
+                        $arr['总店前二天销售金额'] = $value['总店前二天销售金额'];
+                        $arr['总店前一天销售金额'] = $value['总店前一天销售金额'];
+                        $arr['总店近一周销售金额'] = $value['总店近一周销售金额'];
+    
+                        $arr['总店前七天库存成本'] = $value['总店前七天库存成本'];
+                        $arr['总店前六天库存成本'] = $value['总店前六天库存成本'];
+                        $arr['总店前五天库存成本'] = $value['总店前五天库存成本'];
+                        $arr['总店前四天库存成本'] = $value['总店前四天库存成本'];
+                        $arr['总店前三天库存成本'] = $value['总店前三天库存成本'];
+                        $arr['总店前二天库存成本'] = $value['总店前二天库存成本'];
+                        $arr['总店前一天库存成本'] = $value['总店前一天库存成本'];
+                        $arr['总店近一周库存成本'] = $value['总店近一周库存成本'];
+                        break;
+                    }
+                } elseif ($value['店铺名称'] == $map['店铺名称'] && $map['风格'] == $value['风格']) {
+                    $arr['云仓'] = $value['yunChang']['云仓'];
+                    $arr['商品负责人'] = $value['yunChang']['商品负责人'];
+
+                    $arr['总店前七天销售金额'] = $value['总店前七天销售金额'];
+                    $arr['总店前六天销售金额'] = $value['总店前六天销售金额'];
+                    $arr['总店前五天销售金额'] = $value['总店前五天销售金额'];
+                    $arr['总店前四天销售金额'] = $value['总店前四天销售金额'];
+                    $arr['总店前三天销售金额'] = $value['总店前三天销售金额'];
+                    $arr['总店前二天销售金额'] = $value['总店前二天销售金额'];
+                    $arr['总店前一天销售金额'] = $value['总店前一天销售金额'];
+                    $arr['总店近一周销售金额'] = $value['总店近一周销售金额'];
+    
+                    $arr['总店前七天库存成本'] = $value['总店前七天库存成本'];
+                    $arr['总店前六天库存成本'] = $value['总店前六天库存成本'];
+                    $arr['总店前五天库存成本'] = $value['总店前五天库存成本'];
+                    $arr['总店前四天库存成本'] = $value['总店前四天库存成本'];
+                    $arr['总店前三天库存成本'] = $value['总店前三天库存成本'];
+                    $arr['总店前二天库存成本'] = $value['总店前二天库存成本'];
+                    $arr['总店前一天库存成本'] = $value['总店前一天库存成本'];
+                    $arr['总店近一周库存成本'] = $value['总店近一周库存成本'];
+                    break;
+                }
+            }
+            return $arr;
+        }
 
     // 0除以任何数都得0
     private function zeroHandle($num1, $num2) {
