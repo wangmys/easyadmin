@@ -5,6 +5,7 @@ namespace app\api\controller\report;
 use app\api\constants\ApiConstant;
 use app\api\service\bi\report\ReportFormsService;
 use app\BaseController;
+use think\Request;
 
 class SendReport extends BaseController
 {
@@ -17,11 +18,12 @@ class SendReport extends BaseController
     protected $Date = '';
 
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         // 初始化日期
         $this->Date = date('Y-m-d');
         $this->service = new ReportFormsService;
+        $this->request = $request;
     }
 
     /**
@@ -40,15 +42,15 @@ class SendReport extends BaseController
         $send_data = [
             'S101' => [
                 'title' => 'S101',
-                'jpg_url' => ''
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
             ],
             'S102' => [
                 'title' => 'S102',
-                'jpg_url' => ''
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S101.jpg'
             ],
             'S103' => [
                 'title' => 'S103',
-                'jpg_url' => ''
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S101.jpg'
             ]
         ];
         $res = [];
