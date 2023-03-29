@@ -26,32 +26,37 @@ class SendReport extends BaseController
         $this->request = $request;
     }
 
-    /**
-     * 创建报表
-     */
-    public function create()
-    {
-        // 生成图片 s101
-        $this->service->create_table_s101();
-        $this->service->create_table_s102();
-        $this->service->create_table_s103();
-    }
+//    /**
+//     * 创建报表
+//     */
+//    public function create()
+//    {
+//        // 生成图片 s101
+//        $this->service->create_table_s101();
+//        $this->service->create_table_s101('s104');
+//        $this->service->create_table_s102();
+//        $this->service->create_table_s103();
+//    }
     
     public function send()
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-//            'S101' => [
-//                'title' => 'S101',
-//                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
-//            ],
-//            'S102' => [
-//                'title' => '加盟老店同比环比递增及完成率 表号:S102',
-//                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S102.jpg'
-//            ],
+            'S101' => [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
+            ],
+            'S104' => [
+                'title' => '直营老店同比环比递增及完成率 表号:S104',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S104.jpg'
+            ],
+            'S102' => [
+                'title' => '省份老店业绩同比 表号:S102',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S102.jpg'
+            ],
             'S103' => [
-                'title' => '加盟老店同比环比递增及完成率 表号:S103',
+                'title' => '省份老店业绩同比-分经营模式 表号:S103',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S103.jpg'
             ]
         ];
@@ -72,7 +77,12 @@ class SendReport extends BaseController
      */
     public function run()
     {
+        // 生成图片 s101
+        $this->service->create_table_s101();
+        $this->service->create_table_s101('s104');
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
         // 发送数据报表
-        $this->create_s101();
+        $this->send();
     }
 }

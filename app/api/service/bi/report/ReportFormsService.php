@@ -44,11 +44,21 @@ class ReportFormsService
         }
     }
 
-    public function create_table_s101()
+    public function create_table_s101($code = 'S101')
     {
-        $code = 'S101';
         $date = date('Y-m-d');
-        $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量,前年对比今年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 = '加盟'";
+
+        switch ($code){
+            case 'S101':
+                $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
+                $title = "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 加盟老店同比环比递增及完成率";
+                break;
+            case 'S104':
+            default:
+                $title = "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 直营老店同比环比递增及完成率";
+                $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+                break;
+        }
         $data = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
         $table_header = array_merge($table_header, array_keys($data[0]));
@@ -58,8 +68,9 @@ class ReportFormsService
         $field_width[0] = 60;
         $field_width[1] = 80;
         $field_width[2] = 160;
-        $field_width[7] = 220;
-        $field_width[12] = 220;
+        $field_width[4] = 120;
+        $field_width[7] = 130;
+        $field_width[12] = 140;
         $field_width[13] = 160;
         $field_width[14] = 160;
         $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
@@ -72,7 +83,7 @@ class ReportFormsService
         $params = [
             'row' => count($data),          //数据的行数
             'file_name' =>  $code .'.jpg',      //保存的文件名
-            'title' => "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）老店同比环比递增及完成率",
+            'title' => $title,
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data,
             'table_explain' => $table_explain,
@@ -89,7 +100,7 @@ class ReportFormsService
         // 编号
         $code = 'S102';
         $date = date('Y-m-d');
-        $sql = "select 店铺数,两年以上老店数,省份,前年同日,去年同日,昨天销量,前年对比今年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
+        $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
         $field_width = [];
@@ -113,7 +124,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code.'.jpg',   //保存的文件名
-            'title' => "直营店铺预计库存 - 数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）",
+            'title' => "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 省份老店业绩同比表号:S102",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -132,7 +143,7 @@ class ReportFormsService
         // 编号
         $code = 'S103';
         $date = date('Y-m-d');
-        $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
+        $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
         $field_width = [];
@@ -158,7 +169,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code.'.jpg',   //保存的文件名
-            'title' => "直营店铺预计库存 - 数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）",
+            'title' => "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."） - 省份老店业绩同比-分经营模式 表号:S103",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -171,6 +182,7 @@ class ReportFormsService
         // 生成图片
         return $this->create_image($params);
     }
+
 
     public function create_image($params)
     {
@@ -240,9 +252,6 @@ class ReportFormsService
         $sum = $base['border'];
 
         foreach($params['data'] as $key => $item){
-//            if(in_array('合计',$item) || in_array('总计',$item)){
-//                imagefilledrectangle($img, 0, $y1+30*($key+1), $x2+3000*($key+1), $y2+30*($key+1), $yellow);
-//            }
             if(isset($item['省份']) && $item['省份'] == '合计'){
                 imagefilledrectangle($img, 0, $y1+30*($key+1), $x2+3000*($key+1), $y2+30*($key+1), $yellow);
             }
@@ -258,14 +267,6 @@ class ReportFormsService
 
         //画表格横线
         foreach($params['data'] as $key => $item){
-//            if(empty($item['22店数'])){
-//                $item['22店数'] = '';
-//            }
-//
-//            if(empty($item['21店数'])){
-//                $item['21店数'] = '';
-//            }
-
             $border_top += $base['row_hight'];
             //画横线
             imageline($img, $base['border'], $border_top, $base['img_width'] - $base['border'], $border_top, $border_coler);
