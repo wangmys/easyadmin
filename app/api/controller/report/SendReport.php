@@ -29,14 +29,14 @@ class SendReport extends BaseController
 //    /**
 //     * 创建报表
 //     */
-//    public function create()
-//    {
-//        // 生成图片 s101
-//        $this->service->create_table_s101();
-//        $this->service->create_table_s101('s104');
-//        $this->service->create_table_s102();
-//        $this->service->create_table_s103();
-//    }
+    public function create()
+    {
+        // 生成图片 s101
+        $this->service->create_table_s101();
+        $this->service->create_table_s101('S104');
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
+    }
     
     public function send()
     {
@@ -79,7 +79,7 @@ class SendReport extends BaseController
     {
         // 生成图片 s101
         $this->service->create_table_s101();
-        $this->service->create_table_s101('s104');
+        $this->service->create_table_s101('S104');
         $this->service->create_table_s102();
         $this->service->create_table_s103();
         // 发送数据报表

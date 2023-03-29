@@ -92,6 +92,11 @@ class ReportFormsService
             'banben' => '图片报表编号: '.$code,
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
+        // 防止多次创建
+        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+        if(file_exists($file)){
+            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+        }
         $this->create_table($params);
     }
 
@@ -133,7 +138,11 @@ class ReportFormsService
             'banben' => '图片报表编号: '.$code,
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
-        $path = $params['file_path'].$params['file_name'];
+        // 防止多次创建
+        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+        if(file_exists($file)){
+            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+        }
         // 生成图片
         return $this->create_image($params);
     }
@@ -178,7 +187,11 @@ class ReportFormsService
             'banben' => '图片报表编号: '.$code,
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
-        $path = $params['file_path'].$params['file_name'];
+        // 防止多次创建
+        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+        if(file_exists($file)){
+            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+        }
         // 生成图片
         return $this->create_image($params);
     }
