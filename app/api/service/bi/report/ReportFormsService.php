@@ -93,10 +93,10 @@ class ReportFormsService
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
         // 防止多次创建
-        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
-        if(file_exists($file)){
-            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
-        }
+//        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+//        if(file_exists($file)){
+//            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+//        }
         $this->create_table($params);
     }
 
@@ -113,13 +113,15 @@ class ReportFormsService
         foreach ($table_header as $v => $k) {
             $field_width[] = 120;
         }
-        $field_width[3] = 140;
+        $field_width[0] = 60;
+        $field_width[1] = 80;
+        $field_width[2] = 80;
         $field_width[6] = 140;
-        $field_width[7] = 200;
+        $field_width[7] = 140;
         $field_width[8] = 140;
         $field_width[9] = 140;
-        $field_width[12] = 200;
-        $field_width[14] = 200;
+        $field_width[12] = 160;
+        $field_width[14] = 160;
         //图片左上角汇总说明数据，可为空
         $table_explain = [
 
@@ -139,10 +141,10 @@ class ReportFormsService
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
         // 防止多次创建
-        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
-        if(file_exists($file)){
-            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
-        }
+//        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+//        if(file_exists($file)){
+//            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+//        }
         // 生成图片
         return $this->create_image($params);
     }
@@ -188,10 +190,10 @@ class ReportFormsService
             'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
         ];
         // 防止多次创建
-        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
-        if(file_exists($file)){
-            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
-        }
+//        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
+//        if(file_exists($file)){
+//            echo "<img src='/{$params['file_path']}{$params['file_name']}' />";return;
+//        }
         // 生成图片
         return $this->create_image($params);
     }
