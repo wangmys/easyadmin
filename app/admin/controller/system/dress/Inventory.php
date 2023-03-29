@@ -51,17 +51,6 @@ class Inventory extends AdminController
 
             $Date = date('Y-m-d');
             list($page, $limit, $where) = $this->buildTableParames();
-//            if(empty($where['商品负责人'])){
-//                $_where = ['商品负责人','=',-99999];
-//                foreach ($where as $k=>$v){
-//                    if($v[0] == '商品负责人'){
-//                        unset($_where);
-//                        break;
-//                    }
-//                }
-//                // 防止全部展示
-//                if(isset($_where)) $where[] = $_where;
-//            }
             // 获取其他筛选
             $other_where = $this->setWhere($where)[1];
 
@@ -266,16 +255,14 @@ class Inventory extends AdminController
             $question_total = Store::where([
                 '商品负责人' => $name,
                 'Date' => getThisDayToStartDate()[0]
-            ])->group('cate')->column('cate');
-            $total = count($question_total);
+            ])->count();
 
             // 查询周一哪些问题未处理
             $question_not_total = Store::where([
                 '商品负责人' => $name,
                 'Date' => getThisDayToStartDate()[0],
                 'is_qualified' => 0
-            ])->group('cate')->column('cate');
-            $not_total = count($question_not_total);
+            ])->count();
 
             $data = [
                 [
@@ -283,9 +270,9 @@ class Inventory extends AdminController
                     '商品负责人' => $name,
                     'name' => '配饰库存不足',
                     // 问题总数
-                    'num' => $total,
-                    'untreate' => $not_total,
-                    'time' => $not_total>0?getIntervalDays():'',
+                    'num' => $question_total,
+                    'untreate' => $question_not_total,
+                    'time' => $question_not_total>0?getIntervalDays():'',
                 ]
             ];
             $list = [
@@ -313,22 +300,24 @@ class Inventory extends AdminController
             $charge = AdminConstant::CHARGE_LIST;
             // 获取周一日期
             $monday = getThisDayToStartDate()[0];
+            // 今日
             $thisDay = date('Y-m-d');
             $data = [];
 
-            // 统计周一有哪些问题未完成
-            $yinliu_data = YinliuQuestion::where([
+            // 统计周一总问题数
+            $yinliu_data = Store::where([
                 'Date' => $monday
-            ])->where(function ($q){
-                foreach (AdminConstant::ACCESSORIES_LIST as $k => $v){
-                    $q->whereOr($v,'>',0);
-                }
-            })->group('商品负责人')->column('count(*) as num','商品负责人');
+            ])->group('商品负责人')->column('count(*) as num','商品负责人');
 
-            // 配饰详情表
+            // 统计周一问题未完成问题
             $store_data = Store::where([
                 'Date' => $monday
             ])->where(['is_qualified' => 0])->group('商品负责人')->column('count(*) as num','商品负责人');
+
+            // 配饰问题完成数据
+            $store_finish_data = Store::where([
+                'Date' => $monday
+            ])->where(['is_qualified' => 1])->group('商品负责人')->column('count(*) as num','商品负责人');
 
             // 负责人循环
             foreach ($charge as $k => $v){
@@ -344,11 +333,15 @@ class Inventory extends AdminController
                 ];
                 // 统计配饰表的问题数
                 if(isset($yinliu_data[$v])){
-                    $item['total'] += 1;
+                    $item['total'] += $yinliu_data[$v];
                 }
                 // 统计配饰未完成数
                 if(isset($store_data[$v]) && $store_data[$v] > 0){
-                    $item['no_total'] += 1;
+                    $item['no_total'] += $store_data[$v];
+                }
+                // 统计配饰未完成数
+                if(isset($store_finish_data[$v]) && $store_finish_data[$v] > 0){
+                    $item['ok_total'] += $store_finish_data[$v];
                 }
                 // 查询不动销的问题
 

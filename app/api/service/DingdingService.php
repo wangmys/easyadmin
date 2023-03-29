@@ -84,24 +84,8 @@ class DingdingService
     /**
      * 推送
      */
-    public function send($title = '数据表格',$jpg_url = 'https://bx.babiboy.com/img/20230316/S038.jpg',$robot = '')
+    public function send($title = '数据表格',$jpg_url = '',$robot = '')
     {
-        // 图片存储目录
-        $dir_path = './img/'.date('Ymd');
-        // 读取指定目录
-        $file_arr = scandir($dir_path);
-        // 图片数组
-        $pic_arr = [];
-        // 去除无效文件名
-        if($file_arr){
-            foreach ($file_arr as $k => $v){
-                if($v == '.' || $v == '..'){
-                    unset($file_arr[$k]);
-                }elseif(is_file($dir_path.'/'.$v)){
-                    $pic_arr[] = $dir_path.'/'.$v;
-                }
-            }
-        }
         // 时间
         $time = date('Y-m-d H:i:s');
         $keyword = $this->keyword['hook_test_url2'];
@@ -109,10 +93,7 @@ class DingdingService
             'msgtype' => 'markdown',
             'markdown' => [
                 'title' => [ "$title" . $keyword],
-                'text'=>"#### **$title** \n> \n> ![screenshot]($jpg_url)\n> ###### $time \n",
-                'at' => [
-                    'atMobiles' => '17775611493'
-                ]
+                'text'=>"#### **$title** \n> \n> ![screenshot]($jpg_url)\n> ###### $time \n"
             ]
         ];
         // 推送地址

@@ -31,6 +31,21 @@ class Index
         die;
     }
 
+    /**
+     * 执行任务
+     */
+    public function run()
+    {
+        $redis = new Redis;
+        $model = (new \app\http\logic\AddHistoryData);
+        while ($redis->llen('finish_task') <= 145){
+            $model->run2();
+        }
+        echo '<pre>';
+        print_r(22);
+        die;
+    }
+
     public function test1()
     {
         $model = (new \app\http\logic\AddHistoryData);
@@ -42,9 +57,10 @@ class Index
         $d = $redis->lindex('task_queue',0);
         echo '<pre>';
         print_r($d);
-        die;
+//        die;
+
         echo '<pre>';
-        print_r(date('Y-m-d',strtotime('2022-01-01'."+{$d}day")));
+        print_r(date('Y-m-d',strtotime('2022-07-09'."+{$d}day")));
 //        $model->showTaskInfo();
         die;
     }
