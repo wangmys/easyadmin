@@ -130,7 +130,7 @@ class ReportFormsService
     public function create_table_s103()
     {
         // 编号
-        $code = 'S102';
+        $code = 'S103';
         $date = date('Y-m-d');
         $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
