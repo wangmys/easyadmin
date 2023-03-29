@@ -43,9 +43,9 @@ class DingdingService
         'hook_test_url2' => 'milin'
     ];
 
-    // 自己的群
-    protected $hook_test_url = 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2';
     // 测试群
+    protected $hook_test_url = 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2';
+    // 自己的群
     protected $hook_test_url2 = 'https://oapi.dingtalk.com/robot/send?access_token=f892dc03bdf32e94a7332d4a04c8d4328f940a8c6edd2140f3b3a33ab82589de';
     // 数据播报群
     protected $hook_test_url3 = 'https://oapi.dingtalk.com/robot/send?access_token=889f8683bd1947670a9d755f6398a49a15abda994c2a975216f3d6a1384ab79d';
@@ -100,7 +100,7 @@ class DingdingService
             ]
         ];
         // 推送地址
-        if(empty($robot)) $robot = $this->hook_test_url;
+        if(empty($robot)) $robot = $this->hook_test_url2;
         $jsonStr = json_encode($arr); //转换为json格式
         $result = curl_post($robot, $jsonStr);
         return $json = json_decode($result, false);
