@@ -12,17 +12,17 @@ define(["jquery", "easy-admin"], function ($, ea) {
     };
     var table = layui.table
     function isRed(d,obj){
-        if(d[obj.field] === null){
-            d[obj.field] = '';
-        }
-        if(parseInt(d[obj.field]) < parseInt(d.config[obj.field])){
+        if(Number(d[obj.field]) < Number(d.config[obj.field])){
             str = '';
             var key = obj.field + '_';
             if(d._data[key]){
                 // str = ' / ' + d._data[obj.field + '_'];
             }
             //得到当前行数据，并拼接成自定义模板
-            return '<span style="width: 100%;display: block;background: rgba(255,0,0,.2)">'+ d[obj.field] + str +'</span>'
+            return '<span style="width: 100%;display: block;background: rgba(255,0,0,.2)">'+ Number(d[obj.field]) + str +'</span>'
+        }
+        if(d[obj.field] === null){
+            d[obj.field] = '';
         }
         return d[obj.field];
     }
@@ -332,9 +332,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             }
                             }
                             ]},
-                            {field: 'total', minWidth: 80, title: '问题表数量'},
-                            // {field: 'ok_total', minWidth: 80, title: '已完成表数量'},
-                            {field: 'no_total', minWidth: 85, title: '未完成表数量'},
+                            {field: 'total', minWidth: 80, title: '问题数量'},
+                            {field: 'ok_total', minWidth: 80, title: '已完成数量'},
+                            {field: 'no_total', minWidth: 85, title: '未完成数量'},
                         ]
 
                     ]

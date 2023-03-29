@@ -27,36 +27,41 @@ class SendReport extends BaseController
     }
 
     /**
-     * 发送报表
+     * 创建报表
      */
-    public function send_s101()
+    public function create()
     {
-        // 生成图片
-        $this->service->create_table2();
+        // 生成图片 s101
+        $this->service->create_table_s101();
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
     }
     
-    public function test()
+    public function send()
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-            'S101' => [
-                'title' => 'S101',
-                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
-            ],
-            'S102' => [
-                'title' => 'S102',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S101.jpg'
-            ],
+//            'S101' => [
+//                'title' => 'S101',
+//                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
+//            ],
+//            'S102' => [
+//                'title' => '加盟老店同比环比递增及完成率 表号:S102',
+//                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S102.jpg'
+//            ],
             'S103' => [
-                'title' => 'S103',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S101.jpg'
+                'title' => '加盟老店同比环比递增及完成率 表号:S103',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S103.jpg'
             ]
         ];
         $res = [];
         foreach ($send_data as $k=>$v){
-            // 推送
-             $res[] = $model->send($v['title'],$v['jpg_url']);
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+            }
         }
         return json($res);
     }
