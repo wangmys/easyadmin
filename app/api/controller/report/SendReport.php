@@ -45,19 +45,19 @@ class SendReport extends BaseController
         $send_data = [
             'S101' => [
                 'title' => '加盟老店同比环比递增及完成率 表号:S101',
-                'jpg_url' => $this->request->domain()."./img/".date('Ymd').'/S101.jpg'
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S101.jpg'
             ],
             'S104' => [
                 'title' => '直营老店同比环比递增及完成率 表号:S104',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S104.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S104.jpg'
             ],
             'S102' => [
                 'title' => '省份老店业绩同比 表号:S102',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S102.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S102.jpg'
             ],
             'S103' => [
                 'title' => '省份老店业绩同比-分经营模式 表号:S103',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S103.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103.jpg'
             ]
         ];
         $res = [];

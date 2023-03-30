@@ -46,16 +46,16 @@ class ReportFormsService
 
     public function create_table_s101($code = 'S101')
     {
-        $date = date('Y-m-d');
+        $date = date('Y-m-d',strtotime('+1day'));
 
         switch ($code){
             case 'S101':
                 $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
-                $title = "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 加盟老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店同比环比递增及完成率";
                 break;
             case 'S104':
             default:
-                $title = "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 直营老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店同比环比递增及完成率";
                 $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
                 break;
         }
@@ -74,7 +74,7 @@ class ReportFormsService
         $field_width[13] = 160;
         $field_width[14] = 160;
 
-        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
         $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
         //图片左上角汇总说明数据，可为空
@@ -92,7 +92,7 @@ class ReportFormsService
             'table_header' => $table_header,
             'field_width' => $field_width,
             'banben' => '图片报表编号: '.$code,
-            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+            'file_path' => "./img/".date('Ymd',strtotime('+1day')).'/'  //文件保存路径
         ];
         // 防止多次创建
 //        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
@@ -106,7 +106,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S102';
-        $date = date('Y-m-d');
+        $date = date('Y-m-d',strtotime('+1day'));
         $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
@@ -144,7 +144,7 @@ class ReportFormsService
             'table_header' => $table_header,
             'field_width' => $field_width,
             'banben' => '图片报表编号: '.$code,
-            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+            'file_path' => "./img/".date('Ymd',strtotime('+1day')).'/'  //文件保存路径
         ];
         // 防止多次创建
 //        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];
@@ -159,7 +159,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S103';
-        $date = date('Y-m-d');
+        $date = date('Y-m-d',strtotime('+1day'));
         $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
@@ -197,7 +197,7 @@ class ReportFormsService
             'table_header' => $table_header,
             'field_width' => $field_width,
             'banben' => '图片报表编号: '.$code,
-            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+            'file_path' => "./img/".date('Ymd',strtotime('+1day')).'/'  //文件保存路径
         ];
         // 防止多次创建
 //        $file = app()->getRootPath().'public/'.$params['file_path'].$params['file_name'];

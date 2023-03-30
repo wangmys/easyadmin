@@ -33,9 +33,6 @@ class Weather
             ->field($field)
             ->where($where)
             ->select();
-        echo '<pre>';
-        print_r($result->toArray());
-        die;
         return $result;
 
     }

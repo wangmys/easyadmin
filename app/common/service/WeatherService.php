@@ -15,6 +15,8 @@ namespace app\common\service;
 use app\common\constants\AdminConstant;
 use EasyAdmin\tool\CommonTool;
 use think\facade\Db;
+use voku\helper\HtmlDomParser;
+use app\admin\model\weather\CityUrl;
 use app\admin\model\weather\Weather;
 use app\admin\model\weather\Customers;
 
@@ -147,6 +149,8 @@ class WeatherService
      */
     public function updateCityWeather($cid = 0)
     {
+        // 拉取近40天的天气
+        $arr = $this->getWeather40($cid);
         // 判断天气是否为空
         if(!empty($arr)){
             // 查询天气表,大于今天的天气记录
