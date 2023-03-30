@@ -100,7 +100,7 @@ class DingdingService
             ]
         ];
         // 推送地址
-        if(empty($robot)) $robot = $this->hook_test_url2;
+        if(empty($robot)) $robot = $this->hook_test_url3;
         $jsonStr = json_encode($arr); //转换为json格式
         $result = curl_post($robot, $jsonStr);
         return $json = json_decode($result, false);
