@@ -32,10 +32,10 @@ class SendReport extends BaseController
     public function create()
     {
         // 生成图片 s101
-        $this->service->create_table_s101();
-        $this->service->create_table_s101('S104');
-        $this->service->create_table_s102();
-        $this->service->create_table_s103();
+        $this->service->create_table_s101('S101',date('Y-m-d'));
+        $this->service->create_table_s101('S104',date('Y-m-d'));
+        $this->service->create_table_s102(date('Y-m-d'));
+        $this->service->create_table_s103(date('Y-m-d'));
     }
     
     public function send()

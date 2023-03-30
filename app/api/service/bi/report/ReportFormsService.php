@@ -44,9 +44,9 @@ class ReportFormsService
         }
     }
 
-    public function create_table_s101($code = 'S101')
+    public function create_table_s101($code = 'S101',$date = '')
     {
-        $date = date('Y-m-d',strtotime('+1day'));
+        $date = $date?:date('Y-m-d',strtotime('+1day'));
 
         switch ($code){
             case 'S101':
@@ -102,11 +102,11 @@ class ReportFormsService
         $this->create_table($params);
     }
 
-    public function create_table_s102()
+    public function create_table_s102($date = '')
     {
         // 编号
         $code = 'S102';
-        $date = date('Y-m-d',strtotime('+1day'));
+        $date = $date?:date('Y-m-d',strtotime('+1day'));
         $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
@@ -155,11 +155,11 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
-    public function create_table_s103()
+    public function create_table_s103($date = '')
     {
         // 编号
         $code = 'S103';
-        $date = date('Y-m-d',strtotime('+1day'));
+        $date = $date?:date('Y-m-d',strtotime('+1day'));
         $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
