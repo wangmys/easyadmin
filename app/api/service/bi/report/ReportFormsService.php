@@ -137,7 +137,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code.'.jpg',   //保存的文件名
-            'title' => "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."）- 省份老店业绩同比表号:S102",
+            'title' => "数据更新时间 （". date("Y-m-d") ."）- 省份老店业绩同比表号:S102",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -190,7 +190,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code.'.jpg',   //保存的文件名
-            'title' => "数据更新时间 （". date("Y-m-d", strtotime("-1 day")) ."） - 省份老店业绩同比-分经营模式 表号:S103",
+            'title' => "数据更新时间 （". date("Y-m-d") ."） - 省份老店业绩同比-分经营模式 表号:S103",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
