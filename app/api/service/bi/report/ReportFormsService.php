@@ -208,6 +208,80 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
+    // 配饰每日销售数量
+    public function create_table_s105($date = '')
+    {
+        // 编号
+        $code = 'S105';
+        $date = $date?:date('Y-m-d',strtotime('+1day'));
+        $to_1 = date('Y-m-d');
+        $to_2 = date('Y-m-d',strtotime('-1day'));
+        $to_3 = date('Y-m-d',strtotime('-2day'));
+        $to_4 = date('Y-m-d',strtotime('-3day'));
+        $to_5 = date('Y-m-d',strtotime('-4day'));
+        $to_6 = date('Y-m-d',strtotime('-5day'));
+        $to_7 = date('Y-m-d',strtotime('-6day'));
+        $sql = "
+            SELECT 
+                ISNULL(EG.CategoryName1,'总计') AS 一级分类,
+                ISNULL(EG.CategoryName2,'合计') AS 二级分类,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE(),23) THEN ERG.Quantity END ) AS '{$to_1}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ERG.Quantity END ) AS '{$to_2}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-2,23) THEN ERG.Quantity END ) AS '{$to_3}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-3,23) THEN ERG.Quantity END ) AS '{$to_4}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-4,23) THEN ERG.Quantity END ) AS '{$to_5}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-5,23) THEN ERG.Quantity END ) AS '{$to_6}',
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity END ) AS '{$to_7}'
+            FROM ErpCustomer EC 
+                LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
+                LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+                LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+                WHERE EC.MathodId IN (4,7)
+                AND EG.CategoryName1='配饰'
+                AND CONVERT(VARCHAR(10),ER.RetailDate,23)> CONVERT(VARCHAR(10),GETDATE()-7,23)
+                AND ER.CodingCodeText='已审结'
+                GROUP BY 
+                    EG.CategoryName1,
+                    EG.CategoryName2
+                WITH ROLLUP
+        ";
+        $list = Db::connect("sqlsrv")->query($sql);
+        // dump($list);die;
+
+        $table_header = ['行号'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 180;
+        }
+        $field_width[0] = 80;
+
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code.'.jpg',   //保存的文件名
+            'title' => "数据更新时间 （". date("Y-m-d") ."） - 配饰每日销售数量 表号:S105",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd',strtotime('+1day')).'/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
 
     public function create_image($params)
     {
@@ -280,7 +354,12 @@ class ReportFormsService
             if(isset($item['省份']) && $item['省份'] == '合计'){
                 imagefilledrectangle($img, 0, $y1+30*($key+1), $x2+3000*($key+1), $y2+30*($key+1), $yellow);
             }
-
+        }
+        // create_table_s105
+        if ($params['banben'] == '图片报表编号: S105') {
+            if(isset($item['一级分类']) && $item['一级分类'] == '总计'){
+                imagefilledrectangle($img, 0, $y1+30*($key+1), $x2+3000*($key+1), $y2+30*($key+1), $yellow);
+            }
         }
         foreach($base['column_x_arr'] as $key => $x){
             imageline($img, $x, $border_top, $x, $border_bottom,$border_coler);//画纵线

@@ -37,7 +37,13 @@ class SendReport extends BaseController
         $this->service->create_table_s102(date('Y-m-d'));
         $this->service->create_table_s103(date('Y-m-d'));
     }
-    
+
+    // 配饰每日销售数量
+    public function createS105()
+    {
+        $this->service->create_table_s105(date('Y-m-d'));
+    }
+
     public function send()
     {
         $name = '\app\api\service\DingdingService';
@@ -70,7 +76,32 @@ class SendReport extends BaseController
         }
         return json($res);
     }
-    
+
+    // 23:40推送
+    public function sendS105()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S105' => [
+                'title' => '配饰每日销售数量 表号:S105',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S105.jpg'
+            ]
+        ];
+        // dump($send_data);die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
+            }
+        }
+
+        return json($res);
+    }
+
     /**
      * 执行指定任务
      * @return \think\response\Json
