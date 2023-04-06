@@ -43,7 +43,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 limits:[100,200,500,1000],
                 cols: [[
                     // {type: "checkbox"},
-                    {field: 'Deadline', with: '10%', title: '数据截止日期',search: true},
+                    {field: 'Deadline', with: '10%', title: '截止日期',search: true},
                     {field: '店铺名称', minWith: 134, title: '店铺名称',search: true},
                     {field: '商品负责人', minWith: 134, title: '商品负责人',search: true},
                     {field: '背包', minWith: 134, title: '背包',templet: function(d){
