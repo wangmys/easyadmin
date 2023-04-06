@@ -68,7 +68,7 @@ class Sample
         $arr = [
             'agent_id'=> 2476262581,
             'to_all_user'=>false,
-            'userid_list' => AdminConstant::ID_WMY,
+            'userid_list' => $parms['userid'],
             "msg" => $msg
         ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
