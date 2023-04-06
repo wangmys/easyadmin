@@ -42,8 +42,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar:[],
                 limits:[100,200,500,1000],
                 cols: [[
-                    {type: "checkbox"},
-                    {field: 'Date', minWith: 134, title: '日期',search: true},
+                    // {type: "checkbox"},
+                    {field: 'Deadline', with: '10%', title: '数据截止日期',search: true},
                     {field: '店铺名称', minWith: 134, title: '店铺名称',search: true},
                     {field: '商品负责人', minWith: 134, title: '商品负责人',search: true},
                     {field: '背包', minWith: 134, title: '背包',templet: function(d){
@@ -74,6 +74,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         return isRed(d,this);
                       },search:defaultOp,search: false},
                 ]]
+            });
+
+            var table = layui.table;
+
+            //转换静态表格
+            table.init('list', {
+
             });
 
             ea.listen();
@@ -165,8 +172,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         ],
                         [
                             {field: '背包', width:100, title: '问题店铺',event:'pp',border: {
-                        style: 'solid',
-                        color: '1E9FFF'
+                            style: 'solid',
+                            color: '1E9FFF'
                     }},
                             {field: '背包_1', width:100, title: '已完成'},
                             {field: '背包_2', width:150, title: '未完成店铺数'},
@@ -249,11 +256,29 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: 'order_num', minWith: 134, title: '序号'},
                     {field: '商品负责人', minWith: 134, title: '商品负责人'},
                     {field: 'name', minWith: 134, title: '检核列表'},
-                    {field: 'num', minWith: 134, title: '问题个数'},
-                    {field: 'untreate', minWith: 134, title: '未处理数'},
+                    {field: 'num', minWith: 134, title: '周一问题个数'},
+                    {field: 'untreate', minWith: 134, title: '周一未处理数'},
                     {field: 'time', minWith: 134, title: '已逾期天数'},
+                    {field: 'this_num', minWith: 134, title: '今日所有问题数'},
+                    // {
+                    //     title: '周一完成度',
+                    //     templet: ea.table.tool,
+                    //     operat: [
+                    //         [{
+                    //             text: '查看详情',
+                    //             url: init.index_url,
+                    //             method: 'open',
+                    //             auth: 'false',
+                    //             class: 'layui-btn layui-btn-normal layui-btn-xs',
+                    //             field:'商品负责人',
+                    //             extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' ",
+                    //             title:"周一完成进度"
+                    //         }],
+                    //     ],
+                    //     fixed: 'right'
+                    // },
                     {
-                        title: '操作',
+                        title: '今日所有问题',
                         templet: ea.table.tool,
                         operat: [
                             [{
@@ -263,7 +288,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 auth: 'false',
                                 class: 'layui-btn layui-btn-normal layui-btn-xs',
                                 field:'商品负责人',
-                                extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' "
+                                extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' ",
+                                title:"今日所有问题"
                             }],
                         ],
                         fixed: 'right'
@@ -336,7 +362,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             {field: 'ok_total', minWidth: 80, title: '已完成数量'},
                             {field: 'no_total', minWidth: 85, title: '未完成数量'},
                         ]
-
                     ]
                     ,done: function () {
                         soulTable.render(this)

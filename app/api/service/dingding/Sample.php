@@ -55,10 +55,11 @@ class Sample
     public function send($parms = [])
     {
         $token = $this->getToekn();
+        $name = (!empty($parms['name'])?:'曹太阳');
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
-                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/gather?name=曹太阳",
+                    "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/gather?name=".$name,
                     "picUrl"=>"@lALOACZwe2Rk",
                     "title"=>"商品问题预警提示",
                     "text"=>"点击查看"
@@ -67,7 +68,7 @@ class Sample
         $arr = [
             'agent_id'=> 2476262581,
             'to_all_user'=>false,
-            'userid_list' => AdminConstant::ID_WV,
+            'userid_list' => AdminConstant::ID_WMY,
             "msg" => $msg
         ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;
@@ -97,7 +98,7 @@ class Sample
         $arr = [
             'agent_id'=> 2476262581,
             'to_all_user'=>false,
-            'userid_list' => AdminConstant::ID_WV,
+            'userid_list' => AdminConstant::ID_WMY,
             "msg" => $msg
         ];
         $url = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $token;

@@ -198,7 +198,7 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                 options.headers = admin.headers();
                 options.page = admin.parame(options.page, true);
                 options.search = admin.parame(options.search, true);
-                options.skin = options.skin || 'line';
+                options.skin = options.skin || '';
                 options.limit = options.limit || 15;
                 options.limits = options.limits || [10, 15, 20, 25, 50, 100];
                 options.cols = options.cols || [];
@@ -519,6 +519,8 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                     formatOperat.method = formatOperat.method !== '' ? 'data-open="' + formatOperat.url + '" data-title="' + formatOperat.title + '" ' : '';
                 } else if (operat.method === 'none'){ // 常用于与extend配合，自定义监听按钮
                     formatOperat.method = '';
+                }else if (operat.method === 'href'){ // 常用于与extend配合，自定义监听按钮
+                    return '<a ' + formatOperat.class + ' href="'+ admin.url(formatOperat.url) +'" target="_blank">'+ formatOperat.text +'</a>';
                 } else {
                     formatOperat.method = formatOperat.method !== '' ? 'data-request="' + formatOperat.url + '" data-title="' + formatOperat.title + '" ' : '';
                 }

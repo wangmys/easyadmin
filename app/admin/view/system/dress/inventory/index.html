@@ -9,6 +9,75 @@
 </style>
 <div class="layuimini-container">
     <div class="layuimini-main">
+<!--      <table class="layui-table">-->
+<!--        <colgroup>-->
+<!--          <col width="150">-->
+<!--          <col width="200">-->
+<!--          <col>-->
+<!--        </colgroup>-->
+<!--        <thead>-->
+<!--          <tr>-->
+<!--            <th>库存类型</th>-->
+<!--            <th>背包</th>-->
+<!--            <th>挎包</th>-->
+<!--            <th>领带</th>-->
+<!--            <th>帽子</th>-->
+<!--            <th>内裤</th>-->
+<!--            <th>皮带</th>-->
+<!--            <th>袜子</th>-->
+<!--            <th>手包</th>-->
+<!--            <th>胸包</th>-->
+<!--          </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--          <tr>-->
+<!--            <td>可用库存</td>-->
+<!--            <td>12</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--            <td>5</td>-->
+<!--          </tr>-->
+<!--          <tr>-->
+<!--            <td>在途库存</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--            <td>56</td>-->
+<!--          </tr>-->
+<!--        </tbody>-->
+<!--      </table>-->
+
+        <table class="layui-table layui-hide" lay-data="{height:120, url:'/admin/system.dress.inventory/stock',id:'list'}" lay-filter="list">
+        <thead>
+          <tr>
+            <th lay-data="{field:'Date', minWith: 134,align:'center'}">数据截至日期</th>
+            <th lay-data=""></th>
+            <th lay-data="{field:'type', minWith: 134,align:'center'}">库存类型</th>
+            <th lay-data="{field:'背包', minWith: 134,align:'center'}">背包</th>
+            <th lay-data="{field:'挎包', minWith: 134,align:'center'}">挎包</th>
+            <th lay-data="{field:'领带', minWith: 134,align:'center'}">领带</th>
+            <th lay-data="{field:'帽子', minWith: 134,align:'center'}">帽子</th>
+            <th lay-data="{field:'内裤', minWith: 134,align:'center'}">内裤</th>
+            <th lay-data="{field:'皮带', minWith: 134,align:'center'}">皮带</th>
+            <th lay-data="{field:'袜子', minWith: 134,align:'center'}">袜子</th>
+            <th lay-data="{field:'手包', minWith: 134,align:'center'}">手包</th>
+            <th lay-data="{field:'胸包', minWith: 134,align:'center'}">胸包</th>
+          </tr>
+        </thead>
+      </table>
+
+    </div>
+    <div class="layuimini-main">
         <table id="currentTable" class="layui-table layui-hide"
                data-auth-add="{:auth('system.admin/add')}"
                data-auth-edit="{:auth('system.admin/edit')}"

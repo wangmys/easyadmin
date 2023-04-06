@@ -27,13 +27,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 // 店铺
                 var store_list = res.store_list;
                 var cols = [
-                    {type: "checkbox"},
+                    // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
                     {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
                     {field: 'CustomerName', width: 100, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
-                    {field: 'SendGoodsGroup', width: 160, title: '温度带',fixed:'left'},
+                    {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
                 ];
                 var data = res.data;
                 data.forEach(function (val,index){
@@ -69,9 +69,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     url: init.list_index,
                     search:true,
                     height: 680,
-                    limit: 20,
+                    limit: 1000,
                     toolbar:[],
-                    limits:[20,100,200,500,1000],
+                    limits:[1000,2000,3000],
                     cols: [cols]
                 });
 

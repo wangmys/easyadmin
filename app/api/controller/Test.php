@@ -4,94 +4,79 @@ declare (strict_types = 1);
 namespace app\api\controller;
 use think\facade\Db;
 use app\api\service\dingding\Sample;
+use voku\helper\HtmlDomParser;
 
 class Test
 {
     public function run()
     {
 
-        //表格数据
-        $data = [
-            [
-                'name' => '张三',
-                'sexdesc' => '女',
-                'type1' => '说明',
-                'type2' => '2020-05-25 10:00~11:30',
-                'type3' => '2020-05-25',
-                'type4' => '2020-05-25',
-                'type5' => '2020-05-25',
-                'type6' => '2020-05-25',
-
-               ],
-
-        ];
-        //循环制造数据
-        for ($i=0; $i < 10; $i++) {
-            $data[] = [
-                'name' => '张三',
-                'sexdesc' => '女',
-                'type1' => '说明',
-                'type2' => '2020-05-25 10:00~11:30',
-                'type3' => '2020-05-25',
-                'type4' => '2020-05-25',
-                'type5' => '2020-05-25',
-                'type6' => '2020-05-25',
-
-               ];
+        // 设置目标URL
+        $url = "https://www.qweather.com/weather30d/shangrao-101110801.html";
+        $url2 = "http://www.tianqi.com/suining1/40/";
+        $html = HtmlDomParser::file_get_html($url);
+        $ret = $html->find('div[class="calendar__month d-flex flex-wrap"]');
+        $arr = [];
+        // 是否跨月
+        $isStep = 0;
+        foreach ($ret as $item){
+                foreach ($item->find('a[class="calendar__date jsWeather30CalendarItem"]') as $element){
+                    $temperature = trim($element->find('p')[0]->nodeValue);
+                    $weather_time = $element->find('span')[0]->nodeValue;
+                    $weather_info = explode('~',$temperature);
+                    $max_c = $weather_info[0];
+                    $min_c = $weather_info[1];
+                    if(!strpos($weather_time,'月') === false){
+                        $isStep = 1;
+                    }
+                    switch ($isStep){
+                        // 本月
+                        case 0:
+                             $Date = date("Y-m-{$weather_time}");
+                             break;
+                        // 下月一号
+                        case 1:
+                            $month = floor($weather_time);
+                            $weather_time = 1;
+                            $Date = date("Y-{$month}-1");
+                            $isStep = 2;
+                            break;
+                        // 下月
+                        case 2:
+                            $month = date('m',strtotime('+30day'));
+                            $Date = date("Y-{$month}-{$weather_time}");
+                            break;
+                    }
+                    $arr[] = [
+                        'weather_time' => $weather_time,
+                        'temperature' => $temperature,
+                        'max_c' => $max_c,
+                        'min_c' => $min_c,
+                        'date' => $Date
+                    ];
+                }
         }
-        //图片左上角汇总说明数据，可为空
-        $table_explain = [
-            0 => '[性别]：女100 男50 不详2',
-            1 => '[类型]：说明8 说明16 ',
-            2 => '[类型]：说明8 说明16 ',
-        ];
-        //表头信息
-        $table_header = [
-            0   =>  '序号',
-            1   =>  '表头1',
-            2   =>  '表头2',
-            3   =>  '表头3',
-            4   =>  '表头4',
-            5   =>  '表头5',
-            6   =>  '表头6',
-            7   =>  '表头7',
-            8   =>  '表头8'
-
-        ];
-        //每个格子的宽度，可根据数据长度自定义
-        $field_width = [
-            0   =>  '60',
-            1   =>  '80',
-            2   =>  '60',
-            3   =>  '80',
-            4   =>  '220',
-            5   =>  '300',
-            6   =>  '300',
-            7   =>  '100',
-            8   =>  '120'
-        ];
-        //参数
-        $params = [
-            'row' => count($data),          //数据的行数
-            'file_name' => '数据_'.date("Ymd" , strtotime("+1 day")).'.png',      //保存的文件名
-            'title' => date("Y-m-d")." 数据说明",
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $data,
-            'table_explain'    => $table_explain,
-            'table_header'    => $table_header,
-            'field_width'    => $field_width,
-            'file_path' =>  "./public/".date("Y-m-d")."/"  //文件保存路径
-        ];
-
-        $this->create_table($params);
-    }
-    
-    public function getToken()
-    {
-        $model = new Sample();
         echo '<pre>';
-        print_r($model->send());
-        print_r($model->main());
+        print_r($arr);
         die;
+    }
+
+    /**
+     * 获取天气
+     */
+    public function getWeather()
+    {
+        $url = "https://tianqi.2345.com/wea_forty/57516.htm";
+        $url = "http://www.weather.com.cn/weather40d/101280101.shtml";
+        $html = HtmlDomParser::file_get_html($url);
+        $el = $html->find('div[class="W_left"] table');
+        echo '<pre>';
+        print_r($el);
+        die;
+        foreach ($el as $k){
+            echo '<pre>';
+            print_r($el);
+            die;
+        }
     }
 }

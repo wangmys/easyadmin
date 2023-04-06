@@ -109,6 +109,7 @@ class Inventory extends AdminController
                             }
                             $value['_data'][$k.'_'] = $stock_warn[$k] - $v;
                         }
+                        $value['Deadline'] = date('Y-m-d',strtotime('-1day'));
                     }
                     return $stock_warn;
                 });
@@ -228,6 +229,9 @@ class Inventory extends AdminController
             $logic = new DressLogic;
             // 获取完成率数据
             $list = $logic->getComparisonResult($get);
+            if(empty($list)){
+                $list = [];
+            }
             $data = [
                 'code'  => 0,
                 'msg'   => '',
@@ -264,6 +268,13 @@ class Inventory extends AdminController
                 'is_qualified' => 0
             ])->count();
 
+            // 查询总共哪些问题未处理
+            $question_this_num = Store::where([
+                '商品负责人' => $name,
+                'Date' => getThisDayToStartDate()[1],
+                'is_qualified' => 0
+            ])->count();
+
             $data = [
                 [
                     'order_num' => 1,
@@ -272,6 +283,7 @@ class Inventory extends AdminController
                     // 问题总数
                     'num' => $question_total,
                     'untreate' => $question_not_total,
+                    'this_num' => $question_this_num,
                     'time' => $question_not_total>0?getIntervalDays():'',
                 ]
             ];
@@ -358,5 +370,32 @@ class Inventory extends AdminController
             return json($list);
         }
         return $this->fetch();
+    }
+
+    /*
+     * 库存信息
+     */
+    public function stock()
+    {
+        $sql = " select 可用库存Quantity as available_stock,采购在途库存Quantity as transit_stock,二级分类 as cate from accessories_warehouse_stock ";
+        $config = sysconfig('stock_warn');
+        // 查询表数据
+        $data = Db::connect("mysql2")->query($sql);
+        $res = ['available_stock' => [],'transit_stock' => []];
+        foreach ($res as $k => $v){
+            foreach ($data as $kk => $vv){
+                $temp_key = $vv['cate'];
+                $res[$k][$temp_key] = $vv[$k];
+                $res[$k]['Date'] = date('Y-m-d',strtotime('-1day'));
+                $res[$k]['type'] = $k=='available_stock'?'可用库存':'在途库存';
+            }
+        }
+        $list = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($res),
+                'data'  => $res,
+            ];
+        return json($list);
     }
 }
