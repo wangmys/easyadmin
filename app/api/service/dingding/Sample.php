@@ -55,13 +55,13 @@ class Sample
     public function send($parms = [])
     {
         $token = $this->getToekn();
-        $name = (!empty($parms['name'])?:'曹太阳');
+        $name = (!empty($parms['name'])?$parms['name']:'曹太阳');
         $msg = [
                 "msgtype" => "link",
                 "link"=>[
                     "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/gather?name=".$name,
-                    "picUrl"=>"@lALOACZwe2Rk",
-                    "title"=>"商品问题预警提示",
+                    "picUrl"=>"@lALOACZwe2Rk ",
+                    "title"=>"商品问题预警提示 ",
                     "text"=>"点击查看"
                 ]
         ];
@@ -90,7 +90,7 @@ class Sample
                 "msgtype" => "link",
                 "link"=>[
                     "messageUrl"=>"http://im.babiboy.com/admin/system.dress.inventory/task_overview",
-                    "picUrl"=>"@lALOACZwe2Rk",
+                    "picUrl"=>"@lALOACZwe2Rk ",
                     "title"=>"商品问题完成进度",
                     "text"=>"点击查看"
                 ]

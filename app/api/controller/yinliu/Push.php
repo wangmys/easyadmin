@@ -75,4 +75,15 @@ class Push extends BaseController
            $model->main($parms);
        }
    }
+
+    /**
+     * 执行推送(商品专员 + 管理层)
+     */
+   public function run()
+   {
+       // 推送总览
+       $this->pushToManage();
+       // 推送专员任务
+       $this->pushToSpecialist();
+   }
 }
