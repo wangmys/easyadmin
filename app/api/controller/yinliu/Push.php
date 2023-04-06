@@ -82,7 +82,7 @@ class Push extends BaseController
    public function run()
    {
        // 推送总览
-       $this->pushToManage();
+//       $this->pushToManage();
        // 推送专员任务
        $this->pushToSpecialist();
    }

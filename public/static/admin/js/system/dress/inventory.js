@@ -257,7 +257,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '商品负责人', minWith: 134, title: '商品负责人'},
                     {field: 'name', minWith: 134, title: '检核列表'},
                     {field: 'num', minWith: 134, title: '周一问题个数'},
-                    {field: 'untreate', minWith: 134, title: '周一未处理数'},
+                    {field: 'untreate', minWith: 134, title: '周一剩余问题数'},
                     {field: 'time', minWith: 134, title: '已逾期天数'},
                     {field: 'this_num', minWith: 134, title: '今日所有问题数'},
                     // {
@@ -330,10 +330,11 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 ,cols: [
                                     [
                                         {field: 'name', title: '检核列表', minWidth: 80 },
-                                        {field: 'num', minWidth: 80, title: '问题个数'},
-                                        {field: 'untreate', minWidth: 80, title: '未处理数'},
+                                        {field: 'num', minWidth: 80, title: '周一问题总个数'},
+                                        {field: 'untreate', minWidth: 80, title: '周一问题未处理个数(截至周四)'},
                                         {field: 'time', minWidth: 80, title: '已逾期天数'},
-                                        {title: '实时问题', width: 156, templet: '#toolbar'}
+                                        {field: 'this_num', minWidth: 80, title: '今日所有问题'},
+                                        {title: '查看问题详情', width: 156, templet: '#toolbar'}
                                     ]
                                 ]
                                 ,done: function () {
@@ -359,8 +360,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             }
                             ]},
                             {field: 'total', minWidth: 80, title: '问题数量'},
-                            {field: 'ok_total', minWidth: 80, title: '已完成数量'},
                             {field: 'no_total', minWidth: 85, title: '未完成数量'},
+                            {field: 'ok_total', minWidth: 80, title: '已完成数量'},
                         ]
                     ]
                     ,done: function () {

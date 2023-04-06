@@ -388,6 +388,7 @@ class Inventory extends AdminController
                 $res[$k][$temp_key] = $vv[$k];
                 $res[$k]['Date'] = date('Y-m-d',strtotime('-1day'));
                 $res[$k]['type'] = $k=='available_stock'?'可用库存':'在途库存';
+                $res[$k]['text'] = '配饰';
             }
         }
         $list = [
