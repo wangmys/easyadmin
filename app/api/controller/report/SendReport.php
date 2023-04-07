@@ -38,6 +38,19 @@ class SendReport extends BaseController
         $this->service->create_table_s103(date('Y-m-d'));
     }
 
+    public function create_test() {
+        $name = input('param.name') ? input('param.name') : 'S101';
+        if ($name =='S101') {
+            $this->service->create_table_s101('S101',date('Y-m-d'));
+        } elseif ($name =='S102') {
+            $this->service->create_table_s102(date('Y-m-d'));
+        } elseif ($name =='S103') {
+            $this->service->create_table_s103(date('Y-m-d'));
+        } elseif ($name =='S104') {
+            $this->service->create_table_s101('S104',date('Y-m-d'));
+        }        
+    }
+
     // 配饰每日销售数量
     public function createS105()
     {

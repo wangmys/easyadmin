@@ -33,13 +33,13 @@ class ReportFormsService
     {
         $this->model = new Yinliu();
     }
-    
+
     public function task($number)
     {
         switch ($number){
             case 100:
-                
-                
+
+
                 break;
         }
     }
@@ -49,14 +49,54 @@ class ReportFormsService
         $date = $date?:date('Y-m-d',strtotime('+1day'));
 
         switch ($code){
+            // case 'S101':
+            //     $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店同比环比递增及完成率";
+            //     $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
+            //     昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
+            //     累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
+            //     break;
             case 'S101':
-                $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
                 $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店同比环比递增及完成率";
-                break;
+                $sql = "
+                SELECT
+                    经营模式,省份,店铺名称,
+                    前年对比今年昨日递增率 AS 前年日增长,
+                    昨日递增率 AS 去年日增长,
+                    CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
+                    CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+                    首单日期,
+                    前年同日 as 前年同日销额,
+                    去年同日 as 去年同日销额,
+                    昨天销量 as 昨天销额,
+                    前年同月 as 前年同月销额,
+                    去年同月 as 去年同月销额,
+                    本月业绩 as 本月销额,
+                    前年累销递增金额差,
+                    累销递增金额差
+                    from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
+                break;    
             case 'S104':
             default:
                 $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店同比环比递增及完成率";
-                $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+                // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
+                // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
+                // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+                $sql = "select 
+                    经营模式,省份,店铺名称,
+                    CONCAT(ROUND(((昨天销量/前年同日) - 1 )* 100, 2), '%') AS 前年日增长,
+                    昨日递增率 AS 去年日增长,
+                    CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
+                    CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+                    `首单日期`,
+                    前年同日 as 前年同日销额,
+                    去年同日 as 去年同日销额,
+                    昨天销量 AS 昨天销额,
+                    前年同月 as 前年同月销额,
+                    去年同月 AS 去年同月销额,
+                    本月业绩 as 本月销额,
+                    前年累销递增金额差,
+                    累销递增金额差
+                    from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
                 break;
         }
         $data = Db::connect("mysql2")->query($sql);
@@ -107,7 +147,27 @@ class ReportFormsService
         // 编号
         $code = 'S102';
         $date = $date?:date('Y-m-d',strtotime('+1day'));
-        $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
+        // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,
+        // 昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,
+        // 去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,
+        // 累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
+        $sql = "select 
+            两年以上老店数 AS 前年店铺数,
+            店铺数 AS 去年店铺数,
+            省份,
+            CONCAT(ROUND(((昨天销量/前年同日) - 1 )* 100, 2), '%') AS 前年日增长,
+            昨日递增率 AS 去年日增长,
+            CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
+            CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+            前年同日 as 前年同日销额,
+            去年同日 as 去年同日销额,
+            昨天销量 AS 昨天销额,
+            前年同月 as 前年同月销额,
+            去年同月 AS 去年同月销额,
+            本月业绩 as 本月销额,
+            前年累销递增金额差,
+            累销递增金额差 
+            from old_customer_state_2 where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
         $field_width = [];
@@ -160,7 +220,25 @@ class ReportFormsService
         // 编号
         $code = 'S103';
         $date = $date?:date('Y-m-d',strtotime('+1day'));
-        $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
+        // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
+        $sql = "select 
+            店铺数 AS 前年店铺数,
+            两年以上老店数 AS 去年店铺数,
+            经营模式,
+            省份,
+            前年对比今年昨日递增率 AS 前年日增长,
+            昨日递增率 AS 去年日增长,
+            CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
+            CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+            前年同日 as 前年同日销额,
+            去年同日 as 去年同日销额,
+            昨天销量 AS 昨天销额,
+            前年同月 as 前年同月销额,
+            去年同月 AS 去年同月销额,
+            本月业绩 as 本月销额,
+            前年累销递增金额差,
+            累销递增金额差 
+            from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         $table_header = ['行号'];
         $field_width = [];
@@ -169,8 +247,8 @@ class ReportFormsService
             $field_width[] = 120;
         }
         $field_width[0] = 80;
-        $field_width[1] = 80;
-        $field_width[2] = 80;
+        $field_width[1] = 90;
+        $field_width[2] = 90;
         $field_width[3] = 80;
         $field_width[6] = 140;
         $field_width[8] = 120;
@@ -222,7 +300,7 @@ class ReportFormsService
         $to_6 = date('Y-m-d',strtotime('-5day'));
         $to_7 = date('Y-m-d',strtotime('-6day'));
         $sql = "
-            SELECT 
+            SELECT
                 ISNULL(EG.CategoryName1,'总计') AS 一级分类,
                 ISNULL(EG.CategoryName2,'合计') AS 二级分类,
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE(),23) THEN ERG.Quantity END ) AS '{$to_1}',
@@ -232,7 +310,7 @@ class ReportFormsService
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-4,23) THEN ERG.Quantity END ) AS '{$to_5}',
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-5,23) THEN ERG.Quantity END ) AS '{$to_6}',
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity END ) AS '{$to_7}'
-            FROM ErpCustomer EC 
+            FROM ErpCustomer EC
                 LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
                 LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
                 LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
@@ -240,7 +318,7 @@ class ReportFormsService
                 AND EG.CategoryName1='配饰'
                 AND CONVERT(VARCHAR(10),ER.RetailDate,23)> CONVERT(VARCHAR(10),GETDATE()-7,23)
                 AND ER.CodingCodeText='已审结'
-                GROUP BY 
+                GROUP BY
                     EG.CategoryName1,
                     EG.CategoryName2
                 WITH ROLLUP
