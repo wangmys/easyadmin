@@ -65,7 +65,6 @@ class ReportFormsService
                     昨日递增率 AS 去年日增长,
                     CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
                     CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
-                    首单日期,
                     前年同日 as 前年同日销额,
                     去年同日 as 去年同日销额,
                     昨天销量 as 昨天销额,
@@ -73,7 +72,8 @@ class ReportFormsService
                     去年同月 as 去年同月销额,
                     本月业绩 as 本月销额,
                     前年累销递增金额差,
-                    累销递增金额差
+                    累销递增金额差,
+                    首单日期
                     from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
                 break;    
             case 'S104':
@@ -88,7 +88,6 @@ class ReportFormsService
                     昨日递增率 AS 去年日增长,
                     CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
                     CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
-                    `首单日期`,
                     前年同日 as 前年同日销额,
                     去年同日 as 去年同日销额,
                     昨天销量 AS 昨天销额,
@@ -96,7 +95,8 @@ class ReportFormsService
                     去年同月 AS 去年同月销额,
                     本月业绩 as 本月销额,
                     前年累销递增金额差,
-                    累销递增金额差
+                    累销递增金额差,
+                    `首单日期`
                     from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
                 break;
         }
