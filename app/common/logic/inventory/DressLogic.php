@@ -92,7 +92,6 @@ class DressLogic
                     // 计算当前配饰店铺未完成率 = 结束店铺数量 / 开始店铺数量
                     $store_count = count($store_list);
                     $f_count = count($not_list) - $store_count;
-//                    $info[$vv] = count($not_list).'  &nbsp;&nbsp;&nbsp;   / &nbsp;&nbsp;&nbsp;    '.$f_count . ' &nbsp;&nbsp;&nbsp;    / &nbsp;&nbsp;&nbsp;    '.$store_count;
                     $info[$vv] = count($not_list);
                     $info["{$vv}_1"] = $f_count;
                     $info["{$vv}_2"] = $store_count;

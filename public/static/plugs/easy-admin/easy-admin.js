@@ -1184,8 +1184,16 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                         formatOp[key] = op;
                     }
                 });
+                var $get = $("#where").val();
+                var where = '';
+                if($get){
+                    str = JSON.parse($get);
+                    for (let key  in str){
+                        where += "&" + key + "=" + str[key]
+                    }
+                }
                 var index = admin.msg.confirm('根据查询进行导出，确定导出？', function () {
-                    window.location = url + (url.indexOf('?') !== -1 ? '&' : '?') + 'filter=' + JSON.stringify(formatFilter) + '&op=' + JSON.stringify(formatOp);
+                    window.location = url + (url.indexOf('?') !== -1 ? '&' : '?') + 'filter=' + JSON.stringify(formatFilter) + '&op=' + JSON.stringify(formatOp) + where;
                     layer.close(index);
                 });
             });

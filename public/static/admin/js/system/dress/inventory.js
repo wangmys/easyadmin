@@ -9,6 +9,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         rate: '/system.dress.inventory/rate',
         rate_url: '/admin/system.dress.inventory/rate',
         gather_url: '/admin/system.dress.inventory/gather',
+        export_url: 'system.dress.inventory/index_export',
     };
     var table = layui.table
     function isRed(d,obj){
@@ -34,12 +35,19 @@ define(["jquery", "easy-admin"], function ($, ea) {
             // 比较表达式
             defaultOp = 'lt';
             ea.table.render({
-                url: init.list_url,
+                init:{
+                   table_elem: '#currentTable',
+                   table_render_id: 'currentTableRenderId',
+                   index_url: 'system.dress.inventory/index',
+                   export_url: 'system.dress.inventory/index_export'
+                },
                 search:false,
                 where:{filter:$get},
                 height: 760,
                 limit: 1000,
-                toolbar:[],
+                toolbar:[
+                    'export'
+                ],
                 limits:[100,200,500,1000],
                 cols: [[
                     // {type: "checkbox"},
@@ -75,9 +83,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                       },search:defaultOp,search: false},
                 ]]
             });
-
             var table = layui.table;
-
             //转换静态表格
             table.init('list', {
 

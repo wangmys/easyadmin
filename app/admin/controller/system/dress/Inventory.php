@@ -3,6 +3,7 @@
 namespace app\admin\controller\system\dress;
 
 use app\admin\model\dress\Store;
+use app\admin\model\dress\Yinliu;
 use app\admin\model\dress\YinliuStore;
 use app\common\constants\AdminConstant;
 use app\admin\model\dress\Accessories;
@@ -14,6 +15,8 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use think\App;
 use think\facade\Db;
 use app\common\logic\inventory\DressLogic;
+use EasyAdmin\tool\CommonTool;
+use jianyan\excel\Excel;
 
 
 /**
@@ -372,8 +375,9 @@ class Inventory extends AdminController
         return $this->fetch();
     }
 
-    /*
-     * 库存信息
+    /**
+     * 配饰的可用库存与在途库存
+     * @return \think\response\Json
      */
     public function stock()
     {
@@ -398,5 +402,32 @@ class Inventory extends AdminController
                 'data'  => $res,
             ];
         return json($list);
+    }
+
+    /**
+     * 导出
+     */
+    public function index_export()
+    {
+        $get = $this->request->get();
+        // 获取今日日期
+        $Date = date('Y-m-d');
+        // 指定查询字段
+        $field = array_merge(['省份','店铺名称','商品负责人'],AdminConstant::ACCESSORIES_LIST);
+        $where = [
+            'Date' => $Date
+        ];
+        if(!empty($get['商品负责人'])){
+            $where['商品负责人'] = $get['商品负责人'];
+        }
+        // 查询指定
+        $list = Yinliu::field($field)->where($where)->order('省份,店铺名称,商品负责人')->select()->toArray();
+        // 设置标题头
+        $header = [];
+        if($list){
+            $header = array_map(function($v){ return [$v,$v]; }, $field);
+        }
+        $fileName = time();
+        return Excel::exportData($list, $header, $fileName, 'xlsx');
     }
 }

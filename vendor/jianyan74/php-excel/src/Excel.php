@@ -77,7 +77,7 @@ class Excel
                     $realData = self::formatting($header[$key], trim(self::formattingField($row, $value[1])), $row);
                     // 写入excel
                     $rowR = Coordinate::stringFromColumnIndex($span);
-                    $sheet->getColumnDimension($rowR)->setWidth(20);
+                    $sheet->getColumnDimension($rowR)->setWidth(10);
                     if (in_array($span, $image) || in_array($rowR, $image)) { // 如果这一列应该是图片
                         if (file_exists($realData)) { // 本地文件
                             $drawing = new Drawing();
@@ -125,6 +125,8 @@ class Excel
                         }
                     } else {
                         // $sheet->setCellValue($rowR . $column, $realData);
+                        // 设置颜色
+                        self::setColor($sheet,Coordinate::stringFromColumnIndex($span) . $column,$value[1],$realData);
                         // 写入excel
                         $sheet->setCellValueExplicit(Coordinate::stringFromColumnIndex($span) . $column, $realData, DataType::TYPE_STRING);
                     }
@@ -195,6 +197,25 @@ class Excel
         }
 
         return true;
+    }
+
+    /**
+     * 设置单元格背景颜色
+     * @param $sheet
+     * @param $key
+     * @param $val
+     */
+    public static function setColor($sheet,$index,$key,&$val)
+    {
+        $config = sysconfig('stock_warn');
+        if(isset($config[$key]) && $config[$key] > intval($val)){
+            $val = intval($val);
+            $sheet->getStyle($index)
+            ->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFC0CB');
+        }
+        return false;
     }
 
     /**
