@@ -57,7 +57,7 @@ class ReportFormsService
             //     break;
             case 'S101':
                 // $sql = "select 经营模式,省份,店铺名称,首单日期 as 开店日期,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
-                $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店业绩同比";
                 $sql = "
                 SELECT
                     经营模式,省份,店铺名称,
@@ -78,7 +78,7 @@ class ReportFormsService
                 break;    
             case 'S104':
             default:
-                $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店业绩同比";
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
                 // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
@@ -86,7 +86,7 @@ class ReportFormsService
                     经营模式,省份,店铺名称,
                     前年对比今年昨日递增率 AS 前年日增长,
                     昨日递增率 AS 去年日增长,
-                    前年对比今年累销递增率 AS 前年月增长,
+                    前年对比今年累销递增率 AS 前年月增长,   
                     累销递增率 AS 去年月增长,
                     前年同日 as 前年同日销额,
                     去年同日 as 去年同日销额,
