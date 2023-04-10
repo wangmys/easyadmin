@@ -57,14 +57,14 @@ class ReportFormsService
             //     break;
             case 'S101':
                 // $sql = "select 经营模式,省份,店铺名称,首单日期 as 开店日期,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
-                $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 加盟老店业绩同比";
                 $sql = "
                 SELECT
                     经营模式,省份,店铺名称,
                     前年对比今年昨日递增率 AS 前年日增长,
                     昨日递增率 AS 去年日增长,
-                    CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
-                    CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+                    前年对比今年累销递增率 AS 前年月增长,
+                    累销递增率 AS 去年月增长,
                     前年同日 as 前年同日销额,
                     去年同日 as 去年同日销额,
                     昨天销量 as 昨天销额,
@@ -78,16 +78,16 @@ class ReportFormsService
                 break;    
             case 'S104':
             default:
-                $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店同比环比递增及完成率";
+                $title = "数据更新时间 （". date("Y-m-d") ."）- 直营老店业绩同比";
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
                 // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
                 $sql = "select 
                     经营模式,省份,店铺名称,
-                    CONCAT(ROUND(((昨天销量/前年同日) - 1 )* 100, 2), '%') AS 前年日增长,
+                    前年对比今年昨日递增率 AS 前年日增长,
                     昨日递增率 AS 去年日增长,
-                    CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
-                    CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+                    前年对比今年累销递增率 AS 前年月增长,   
+                    累销递增率 AS 去年月增长,
                     前年同日 as 前年同日销额,
                     去年同日 as 去年同日销额,
                     昨天销量 AS 昨天销额,
@@ -115,12 +115,16 @@ class ReportFormsService
         $field_width[13] = 160;
         $field_width[14] = 160;
 
-        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -0 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日:".$week. "  .  去年今日:".$last_year_week_today."  .  前年今日:".$the_year_week_today,
         ];
         //参数
         $params = [
@@ -156,10 +160,10 @@ class ReportFormsService
             两年以上老店数 AS 前年店铺数,
             店铺数 AS 去年店铺数,
             省份,
-            CONCAT(ROUND(((昨天销量/前年同日) - 1 )* 100, 2), '%') AS 前年日增长,
+            前年对比今年昨日递增率 AS 前年日增长,
             昨日递增率 AS 去年日增长,
-            CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
-            CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+            前年对比今年累销递增率 AS 前年月增长,
+            累销递增率 AS 去年月增长,
             前年同日 as 前年同日销额,
             去年同日 as 去年同日销额,
             昨天销量 AS 昨天销额,
@@ -186,12 +190,16 @@ class ReportFormsService
         $field_width[12] = 160;
         $field_width[14] = 160;
 
-        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -0 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日:".$week. "  .  去年今日:".$last_year_week_today."  .  前年今日:".$the_year_week_today,
         ];
 
         //参数
@@ -223,14 +231,14 @@ class ReportFormsService
         $date = $date?:date('Y-m-d',strtotime('+1day'));
         // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $sql = "select 
-            店铺数 AS 前年店铺数,
-            两年以上老店数 AS 去年店铺数,
+            两年以上老店数 AS 前年店铺数,
+            店铺数 AS 去年店铺数,
             经营模式,
             省份,
             前年对比今年昨日递增率 AS 前年日增长,
             昨日递增率 AS 去年日增长,
-            CONCAT(ROUND(((本月业绩/前年同月) - 1 )* 100, 2), '%') AS 前年月增长,
-            CONCAT(ROUND(((本月业绩/去年同月) - 1 )* 100, 2), '%') AS 去年月增长,
+            前年对比今年累销递增率 AS 前年月增长,
+            累销递增率 AS 去年月增长,
             前年同日 as 前年同日销额,
             去年同日 as 去年同日销额,
             昨天销量 AS 昨天销额,
@@ -257,12 +265,16 @@ class ReportFormsService
         $field_width[15] = 160;
         $field_width[16] = 160;
 
-        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -0 day")));
         //图片左上角汇总说明数据，可为空
         $table_explain = [
-            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日:".$week. "  .  去年今日:".$last_year_week_today."  .  前年今日:".$the_year_week_today,
         ];
 
         //参数
