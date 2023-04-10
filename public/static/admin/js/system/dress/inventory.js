@@ -46,7 +46,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 height: 760,
                 limit: 1000,
                 toolbar:[
-                    'export'
+                    'custom_export'
                 ],
                 limits:[100,200,500,1000],
                 cols: [[
