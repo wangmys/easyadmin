@@ -40,6 +40,36 @@ class AdminConstant
         'chestpack' =>'胸包'
     ];
 
+    /**
+     * 引流服装字段筛选
+     */
+    const YINLIU_COLUMN = [
+        [
+            'name' =>  '冬季内搭',
+            'value' =>  '冬季内搭'
+        ],
+        [
+            'name' =>  '冬季下装',
+            'value' =>  '冬季下装'
+        ],
+        [
+            'name' =>  '春秋内搭',
+            'value' =>  '春秋内搭'
+        ],
+        [
+            'name' =>  '春秋下装',
+            'value' =>  '春秋下装'
+        ],
+        [
+            'name' =>  '夏季内搭',
+            'value' =>  '夏季内搭'
+        ],
+        [
+            'name' =>  '夏季下装',
+            'value' =>  '夏季下装'
+        ]
+    ];
+
     const NOT_FIELD = '店铺名称&省份&商品负责人';
 
     /**

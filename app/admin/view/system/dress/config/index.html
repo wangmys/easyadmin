@@ -3,19 +3,15 @@
 
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
             <ul class="layui-tab-title">
-                <li class="layui-this">引流配置</li>
-                <li>筛选设置</li>
-                <li>上传配置</li>
+                <li class="layui-this">表头配置</li>
+                <li>库存预警配置</li>
             </ul>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show">
-                    {include file="system/config/yinliu" /}
+                    {include file="system/dress/config/head" /}
                 </div>
                 <div class="layui-tab-item">
-                    {include file="system/config/site" /}
-                </div>
-                <div class="layui-tab-item">
-                    {include file="system/config/upload" /}
+                    {include file="system/dress/config/stock" /}
                 </div>
             </div>
         </div>

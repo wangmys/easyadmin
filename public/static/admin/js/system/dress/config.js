@@ -6,17 +6,65 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
     var Controller = {
         index: function () {
 
-            var app = new Vue({
-                el: '#app',
-                data: {
-                    upload_type: upload_type
-                }
-            });
-            form.on("radio(upload_type)", function (data) {
-                    app.upload_type = this.value;
+             // 请求省,字段数据
+             url = ea.url('/system.dress.dress/config');
+             $.get({
+                url:url,
+                data:{}
+            },function (res) {
+                 field_data = res.field;
+                $('.add').on('click', function(){
+                    var element = $([
+                        '<tr>',
+                            '<td data-edit="text"><input type="text" name="input" lay-verify="required" placeholder="请输入内容" class="layui-input"></td>',
+                            '<td class="field"></td>',
+                            '<td class="handler">',
+                                '<button type="button" class="layui-btn layui-btn-normal get">保存</button>',
+                                '<button type="button" class="layui-btn layui-btn-danger del">删除</button>',
+                            '</td>',
+                        '</tr>',
+                    ].join(''))
+                    var field = field_data;
+                    var gender = element.find('.field')[0];
+                    var genderSelect = xmSelect.render({
+                        el: gender,
+                        data: function(){
+                            return field
+                        }
+                    })
+
+                    element.find('.get').on('click', function(){
+                         var _url = ea.url('/system.dress.config/saveConfig');
+                         var _field = this.getValue('valueStr');
+                         var _name = element.find('input[name=input]').val();
+                         $.post({
+                            url:_url,
+                            data:{
+                                field:_field,
+                                name:_name
+                            }
+                        },function (res) {
+                            layer.confirm('是否请求成功')
+                         });
+                    }.bind(genderSelect))
+
+                    element.find('.del').on('click', function(){
+                        var _this = $(this);
+                        layer.confirm('是否删除该组合',{},function () {
+                            _this.parents('tr').remove();
+                            layer.closeAll()
+                        })
+                    })
+
+                    $('#form-create tbody').append(element);
                 });
 
 
+             });
+            ea.listen();
+
+        },
+        index_copy:function (){
              // 请求省,字段数据
              url = ea.url('/system.dress.dress/config');
              $.get({
@@ -57,12 +105,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                             return res.provinceList
                         },
                         on: function(data){
-                            // var changeItem = data.change[0];
-                            // if(data.isAdd && changeItem.value == 3){
-                            //     this.update({ disabled: true })
-                            // }else{
-                            //     this.update({ disabled: false })
-                            // }
+
                         }.bind(field),
                     })
 
@@ -77,9 +120,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
                     $('#form-create tbody').append(element);
                 });
-             });
 
-            ea.listen();
+                ea.listen();
+             });
         }
     };
     return Controller;

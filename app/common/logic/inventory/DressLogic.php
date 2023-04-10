@@ -12,12 +12,14 @@
 
 namespace app\common\logic\inventory;
 
+use AlibabaCloud\SDK\Dingtalk\Vlink_1_0\Models\GetFollowerAuthInfoResponseBody\result\authInfo\mobile;
 use app\common\constants\AdminConstant;
 use EasyAdmin\tool\CommonTool;
 use think\facade\Db;
 use app\admin\model\dress\Yinliu;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\YinliuStore;
+use app\admin\model\dress\Accessories;
 
 /**
  * 逻辑层
@@ -173,5 +175,21 @@ class DressLogic
             }
             return $arr1;
         }
+    }
+
+    /**
+     * 获取所有省份
+     */
+    public function getProvince()
+    {
+        $provinceName = Accessories::whereNotIn('省份', ['合计'])->group('省份')->column('省份');
+        $provinceList = [];
+        foreach ($provinceName as $k => $v){
+            $provinceList[] = [
+                'name' => $v,
+                'value' => $v
+            ];
+        }
+        return $provinceList;
     }
 }
