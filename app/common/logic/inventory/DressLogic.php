@@ -20,6 +20,7 @@ use app\admin\model\dress\Yinliu;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\YinliuStore;
 use app\admin\model\dress\Accessories;
+use app\admin\model\dress\DressHead;
 
 /**
  * 逻辑层
@@ -42,6 +43,7 @@ class DressLogic
         $this->yinliu = new Yinliu;
         $this->question = new YinliuQuestion;
         $this->yinliuStore = new YinliuStore;
+        $this->dressHead = new DressHead;
     }
 
     /**
@@ -191,5 +193,27 @@ class DressLogic
             ];
         }
         return $provinceList;
+    }
+
+    /**
+     * 获取表头字段
+     * @return array
+     */
+    public function getHead()
+    {
+        $head = $model = $this->dressHead::where(['state' => 1])->column('name,field','id');
+        // 固定字段
+        $column = AdminConstant::YINLIU_COLUMN;
+        $head_list = [];
+        foreach ($head as $k => $v){
+            $v['field'] = array_map(function($val)use($v){
+               $item = explode(',',$v['field']);
+               if(in_array($val['name'],$item)) $val['selected'] = true;
+               return $val;
+            }, $column);
+//            htmlentities()
+            $head_list[] = $v;
+        }
+        return $head_list;
     }
 }

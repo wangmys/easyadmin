@@ -53,6 +53,12 @@ class Config extends AdminController
             ];
             return json($data);
         }
+
+        // 查询表头
+        $head = $this->logic->getHead();
+        $this->assign([
+            'field' => $head
+        ]);
         return $this->fetch();
     }
 

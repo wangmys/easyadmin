@@ -103,5 +103,4 @@ class Config extends AdminController
         }
         $this->success('保存成功');
     }
-
 }

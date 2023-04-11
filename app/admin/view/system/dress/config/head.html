@@ -1,4 +1,4 @@
-<form id="app-form" class="layui-form layuimini-form">
+<form id="app-form" class="layui-form layuimini-form layui-hide">
 
     <table id="form-create" class="layui-table">
         <thead>
@@ -19,6 +19,16 @@
                     </div>
                 </td>
             </tr>
+            {foreach $field as $vo}
+            <tr class="php-select" lay-data="{:htmlspecialchars(json_encode($vo['field']))}">
+                <td data-edit="text"><input type="text" name="input" lay-verify="required" placeholder="请输入标题" value="{:$vo['name']|''}" class="layui-input"></td>
+                <td class="field"></td>
+                <td class="handler">
+                    <button type="button" class="layui-btn layui-btn-normal get">保存</button>
+                    <button type="button" class="layui-btn layui-btn-danger del">删除</button>
+                </td>
+            </tr>
+            {/foreach}
         </tbody>
     </table>
 </form>

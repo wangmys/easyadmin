@@ -395,6 +395,13 @@ class Inventory extends AdminController
                 $res[$k]['text'] = '配饰';
             }
         }
+        if($res){
+            $first = array_merge($res['available_stock'],$config);
+            $first['text'] = '配饰配置';
+            $first['type'] = '配饰库存标准';
+            // 增加配饰库存标准
+            $res['config'] = $first;
+        }
         $list = [
                 'code'  => 0,
                 'msg'   => '',
