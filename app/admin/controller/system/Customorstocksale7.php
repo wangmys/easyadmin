@@ -559,7 +559,10 @@ class Customorstocksale7 extends AdminController
         店均销：前七天销售数量
         店均库量：前七天库存数量
         金额周转天：库存成本金额 / 销售成本金额（前七天成本金额 ，成本金额就是销售成本金额）
-     */
+        http://im.babiboy.com/admin/system.Customorstocksale7/index3?page=1&limit=20000&filter=%7B%22%E7%9C%81%E4%BB%BD%22%3A%22%E4%BA%91%E5%8D%97%E7%9C%81%22%2C%22%E5%AD%A3%E8%8A%82%22%3A%22%E5%88%9D%E6%98%A5%2C%E6%98%A5%E5%AD%A3%2C%E6%AD%A3%E6%98%A5%22%7D&op=%7B%22%E7%9C%81%E4%BB%BD%22%3A%22in%22%2C%22%E5%AD%A3%E8%8A%82%22%3A%22in%22%7D
+     
+        http://www.easyadmin1.com/admin/system.Customorstocksale7/index3?page=1&limit=20000&filter=%7B%22%E7%9C%81%E4%BB%BD%22%3A%22%E4%BA%91%E5%8D%97%E7%9C%81%22%2C%22%E5%AD%A3%E8%8A%82%22%3A%22%E5%88%9D%E6%98%A5%2C%E6%98%A5%E5%AD%A3%2C%E6%AD%A3%E6%98%A5%22%7D&op=%7B%22%E7%9C%81%E4%BB%BD%22%3A%22in%22%2C%22%E5%AD%A3%E8%8A%82%22%3A%22in%22%7D
+        */
     public function index3()
     {
         // if ($this->request->isAjax()) {
