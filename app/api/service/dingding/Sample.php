@@ -99,15 +99,16 @@ class Sample
     {
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getToekn();
         $SendToUser_data = [
-            'userid_list' => 350364576037719254,
+            // 'userid_list' => 350364576037719254,
             // 'userid_list' => 293746204229278162,
+            'userid_list' => $userid,
             'agent_id' => 2476262581,
             "msg" => [
                 "msgtype" => 'image',
                 'image' => [
                     // 'media_id' => '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn'
-                    'media_id' => '@lAjPDfmVbpdNBFvOLM0YvM5Sx48A'
-                    // 'media_id' => $media_id
+                    // 'media_id' => '@lAjPDfmVbpdNBFvOLM0YvM5Sx48A'
+                    'media_id' => $media_id
                 ]
             ]
         ];
