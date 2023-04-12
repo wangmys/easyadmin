@@ -6,6 +6,8 @@ use app\api\constants\ApiConstant;
 use app\BaseController;
 use app\api\service\bi\yinliu\YinliuDataService;
 use app\api\service\dingding\Sample;
+use app\api\service\bi\report\ReportFormsService;
+use think\Request;
 
 /**
  * 引流数据推送
@@ -26,11 +28,12 @@ class Push extends BaseController
      * 初始化参数
      * Push constructor.
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
         // 初始化日期
         $this->Date = date('Y-m-d');
         $this->service = new YinliuDataService;
+        $this->request = $request;
     }
 
     /**
@@ -46,14 +49,55 @@ class Push extends BaseController
        $model = new Sample;
        // 循环推送
        foreach ($list as $key => $val){
-           $parms = [
+            $parms = [
                'name' => $val['商品负责人'],
                'tel' => $val['tel'],
                'userid' => $val['userid']
-           ];
-           $model->send($parms);
+            ];
+            $model->send($parms);
        }
    }
+
+    /**
+     * 提送每日业绩至老板、王威
+     *
+     */
+    public function pushYeji()
+    {
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            [
+                'name' => '王梦圆',
+                'tel' => '13066166636',
+                'userid' => '293746204229278162'
+            ],
+            [
+                'name' => '王威',
+                'tel' => '15880012590',
+                'userid' => '0812473564939990'
+            ]
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        $date = date('Y-m-d');
+        // 创建图
+        $reportFormsService->create_table_s106($date);
+        $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S106.jpg';
+
+        // 上传图 
+        echo $media_id = $model->uploadDingFile($path, "每日业绩{$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_id);
+            dump($res);
+        }  
+    }
 
     /**
      * 推送消息至至管理者
