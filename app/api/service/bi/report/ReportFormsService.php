@@ -406,9 +406,9 @@ class ReportFormsService
 
         $newList = [];
         foreach ($list as $key => $val) {
-            $newList[$key]['日期'] =  date('m-d', strtotime($val['日期']));
-            $newList[$key]['直营每天流水'] =  round($val['直营每天流水'], 2);
-            $newList[$key]['加盟每天流水'] =  round($val['加盟每天流水'], 2);
+            $newList[$key]['日期'] =  date('m-d', strtotime($val['日期'])) .' ' . date_to_week($val['日期']);
+            $newList[$key]['直营天流水'] =  round($val['直营每天流水'], 2);
+            $newList[$key]['加盟天流水'] =  round($val['加盟每天流水'], 2);
             $newList[$key]['每日合计']     =  round($val['每日合计'], 2);
             $newList[$key]['直营累计流水'] =  round($val['直营累计流水'], 2);
             $newList[$key]['加盟累计流水'] =  round($val['加盟累计流水'], 2);
@@ -417,14 +417,17 @@ class ReportFormsService
 
         // dump($list);die;
 
-        $table_header = ['行号'];
+        $table_header = ['行'];
         $field_width = [];
         $table_header = array_merge($table_header, array_keys($newList[0]));
         foreach ($table_header as $v => $k) {
             $field_width[] = 100;
         }
-        $field_width[0] = 40;
-        $field_width[1] = 50;
+        $field_width[0] = 30;
+        $field_width[1] = 90;
+        $field_width[2] = 80;
+        $field_width[3] = 80;
+        $field_width[4] = 70;
 
 
         // dump($table_header);
@@ -537,7 +540,7 @@ class ReportFormsService
         }
         // s106
         if ($params['banben'] == '图片报表编号: S106') {
-            imagefilledrectangle($img, 390, $y1  , $x2 + 3000 , $y2, $yellow);
+            imagefilledrectangle($img, 350, $y1  , $x2 + 3000 , $y2, $yellow);
         }
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
