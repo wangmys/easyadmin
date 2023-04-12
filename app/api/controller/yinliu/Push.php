@@ -60,7 +60,7 @@ class Push extends BaseController
 
     /**
      * 提送每日业绩至老板、王威
-     *
+     * 131255621326201188
      */
     public function pushYeji()
     {
@@ -71,11 +71,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '王梦圆',
-                'tel' => '13066166636',
-                'userid' => '293746204229278162'
-            ],
+            // [
+            //     'name' => '杨岳敏',
+            //     'tel' => '13362067222',
+            //     'userid' => '131255621326201188'
+            // ],
             [
                 'name' => '王威',
                 'tel' => '15880012590',

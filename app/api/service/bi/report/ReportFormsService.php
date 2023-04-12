@@ -383,7 +383,7 @@ class ReportFormsService
                 T.[直营每天流水],
                 T.[加盟每天流水],
                 T.[每日合计],
-                ROUND(SUM(T.[直营每天流水]) OVER (ORDER BY T.[日期]), 2) AS 直营累计流水,
+                SUM(T.[直营每天流水]) OVER (ORDER BY T.[日期]) AS 直营累计流水,
                 SUM(T.[加盟每天流水]) OVER (ORDER BY T.[日期]) AS 加盟累计流水,
                 SUM(T.[每日合计]) OVER (ORDER BY T.[日期]) AS 合计累计流水
             FROM 
@@ -409,6 +409,7 @@ class ReportFormsService
             $newList[$key]['日期'] =  date('m-d', strtotime($val['日期']));
             $newList[$key]['直营每天流水'] =  round($val['直营每天流水'], 2);
             $newList[$key]['加盟每天流水'] =  round($val['加盟每天流水'], 2);
+            $newList[$key]['每日合计']     =  round($val['每日合计'], 2);
             $newList[$key]['直营累计流水'] =  round($val['直营累计流水'], 2);
             $newList[$key]['加盟累计流水'] =  round($val['加盟累计流水'], 2);
             $newList[$key]['合计累计流水'] =  round($val['合计累计流水'], 2);
@@ -533,6 +534,10 @@ class ReportFormsService
             if (isset($item['一级分类']) && $item['一级分类'] == '总计') {
                 imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
             }
+        }
+        // s106
+        if ($params['banben'] == '图片报表编号: S106') {
+            imagefilledrectangle($img, 390, $y1  , $x2 + 3000 , $y2, $yellow);
         }
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
