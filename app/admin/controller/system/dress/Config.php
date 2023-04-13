@@ -63,12 +63,53 @@ class Config extends AdminController
     }
 
     /**
-     * 
+     * 保存配置
      */
     public function saveConfig()
     {
-        echo '<pre>';
-        print_r($this->request->post());
-        die;
+        // 获取提交数据
+        $post = $this->request->post();
+        $check_list = ['id','field'];
+        foreach ($post as $k=>$v){
+            if(empty($v) && in_array($k,$check_list)){
+                return $this->error('参数不能为空');
+            }
+            if($k == 'stock' && $v==''){
+                return $this->error('请填写库存值');
+            }
+            if($k == 'name' && $v==''){
+                $post[$k] = str_replace(',','_',$post['field']);
+            }
+        }
+        try {
+            if(!empty($post['id'])){
+                $model = $this->logic->dressHead->find($post['id']);
+                $model->save($post);
+                $res_id = $model->id;
+            }else{
+                $res_id = $this->logic->saveHead($post);
+            }
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
+        return $this->success('成功',['id' => $res_id]);
+    }
+
+    /**
+     * 删除配置
+     */
+    public function delConfig()
+    {
+        // ID
+        $id = $this->request->get('id');
+        if(empty($id)){
+            return $this->error('ID为空');
+        }
+         try {
+            $this->logic->dressHead->where('id',$id)->delete();
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
+        return $this->success('删除成功');
     }
 }

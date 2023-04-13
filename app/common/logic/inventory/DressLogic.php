@@ -201,7 +201,7 @@ class DressLogic
      */
     public function getHead()
     {
-        $head = $model = $this->dressHead::where(['state' => 1])->column('name,field','id');
+        $head = $model = $this->dressHead::where(['state' => 1])->column('name,field,stock','id');
         // 固定字段
         $column = AdminConstant::YINLIU_COLUMN;
         $head_list = [];
@@ -211,9 +211,19 @@ class DressLogic
                if(in_array($val['name'],$item)) $val['selected'] = true;
                return $val;
             }, $column);
-//            htmlentities()
             $head_list[] = $v;
         }
         return $head_list;
+    }
+
+    /**
+     * 保存表头数
+     * @param $data
+     * @return bool
+     */
+    public function saveHead($data)
+    {
+        $this->dressHead->save($data);
+        return $this->dressHead->id;
     }
 }
