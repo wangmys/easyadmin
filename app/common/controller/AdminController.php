@@ -315,7 +315,7 @@ class AdminController extends BaseController
         ];
         $model = (new \app\admin\model\dress\Accessories);
         foreach ($fields as $k => $v){
-            $list = $model->column($v);
+            $list = $model->group($v)->whereNotIn($v,'合计')->column($v);
             $search_where[$k] = [
                 'field' => $v,
                 'data' => $list

@@ -5,12 +5,13 @@
             <tr>
                 <th style="width: 250px;">字段名称</th>
                 <th>选项组合</th>
+                <th style="width: 250px;">库存值</th>
                 <th style="width: 150px;">操作</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td colspan="2">
+                <td colspan="3">
                     <span>添加操作</span>
                 </td>
                 <td colspan="1">
@@ -20,9 +21,12 @@
                 </td>
             </tr>
             {foreach $field as $vo}
-            <tr class="php-select" lay-data="{:htmlspecialchars(json_encode($vo['field']))}">
-                <td data-edit="text"><input type="text" name="input" lay-verify="required" placeholder="请输入标题" value="{:$vo['name']|''}" class="layui-input"></td>
+            <tr class="php-select" lay-data="{:htmlspecialchars(json_encode($vo['field']))}" lay-id="{$vo['id']}">
+                <td class="name">
+                    <input type="text" name="name" lay-verify="required" placeholder="请输入标题" value="{:$vo['name']|''}" class="layui-input">
+                </td>
                 <td class="field"></td>
+                <td class="stock"><input type="text" name="stock" lay-verify="required" placeholder="请输入库存"  value="{:$vo['stock']|'0'}" class="layui-input"></td>
                 <td class="handler">
                     <button type="button" class="layui-btn layui-btn-normal get">保存</button>
                     <button type="button" class="layui-btn layui-btn-danger del">删除</button>

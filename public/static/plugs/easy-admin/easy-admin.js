@@ -367,6 +367,8 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                                     tips: d.searchTip,
                                     filterable: d.laySearch === true,
                                     size: 'small',
+                                    radio: d.radio||false,
+                                    clickClose: d.radio||false
                                 })
                                 break;
                             case 'range':

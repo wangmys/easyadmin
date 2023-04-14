@@ -41,7 +41,8 @@ class Excel
         $filename = '',
         $suffix = 'xlsx',
         $path = '',
-        $image = []
+        $image = [],
+        $_from = 'default'
     ) {
         if (!is_array($list) || !is_array($header)) {
             return false;
@@ -126,7 +127,7 @@ class Excel
                     } else {
                         // $sheet->setCellValue($rowR . $column, $realData);
                         // 设置颜色
-                        self::setColor($sheet,Coordinate::stringFromColumnIndex($span) . $column,$value[1],$realData);
+                        self::setColor($sheet,Coordinate::stringFromColumnIndex($span) . $column,$value[1],$realData, $row, $_from);
                         // 写入excel
                         $sheet->setCellValueExplicit(Coordinate::stringFromColumnIndex($span) . $column, $realData, DataType::TYPE_STRING);
                     }
@@ -205,15 +206,28 @@ class Excel
      * @param $key
      * @param $val
      */
-    public static function setColor($sheet,$index,$key,&$val)
+    public static function setColor($sheet,$index,$key,&$val,$row,$_from = 'default')
     {
-        $config = sysconfig('stock_warn');
-        if(isset($config[$key]) && $config[$key] > intval($val)){
-            $val = intval($val);
-            $sheet->getStyle($index)
-            ->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFC0CB');
+        switch ($_from){
+            case 'dress':
+                if(isset($row['_'.$key]) && $row['_'.$key] === true){
+                    $val = intval($val);
+                    $sheet->getStyle($index)
+                    ->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFC0CB');
+                }
+                break;
+            default:
+                $config = sysconfig('stock_warn');
+                if(isset($config[$key]) && $config[$key] > intval($val)){
+                    $val = intval($val);
+                    $sheet->getStyle($index)
+                    ->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFC0CB');
+                }
+                break;
         }
         return false;
     }
