@@ -1,0 +1,86 @@
+.layui-define-tcs-div{
+    position: absolute;
+    margin:0;
+    background-color: #fff;
+    font-size: 14px;
+    border: 1px solid #d2d2d2;
+    max-height: 320px;
+    z-index: 19910908;
+}
+
+.layui-define-tcs-div-one{
+    background-color: #ffffff;
+    padding: 5px 0;
+    overflow-y: auto;
+}
+
+.layui-define-tcs-div-more{
+    margin:0;
+    background-color: #93f3ff;
+    border: 1px solid #d2d2d2;
+    max-height: 290px;
+    overflow-y: auto;
+}
+
+.layui-define-tcs-dd{
+    padding: 0 10px;
+    line-height: 36px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.layui-define-tcs-div dd:hover {
+    background-color: #44aedb;
+    -webkit-transition: .5s all;
+    transition: .5s all;
+}
+
+.layui-define-tcs-edge{
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    margin-top: -15px;
+    cursor: pointer;
+    border-width: 6px;
+    -webkit-transition: all .3s;
+    border-style: dashed;
+    border-color: transparent;
+}
+
+.layui-define-tcs-edgeTransform{
+    transform:rotate(180deg);
+    transition: all .3s;
+}
+
+.layui-define-tcs-input{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 14px 1px;
+    border-radius: 0;
+    box-shadow: 1px 1px 20px rgba(0,0,0,.15)
+}
+
+.layui-define-tcs-input:focus{
+    border-color: #5FB878!important;
+}
+/* 复选框 */
+.layui-define-tcs-checkbox{position: relative;display: inline-block;vertical-align: middle;height: 30px;line-height: 30px;padding-left: 5px;cursor: pointer;font-size: 0;-webkit-transition: .1s linear;transition: .1s linear;box-sizing: border-box;min-width: 100%;}
+.layui-define-tcs-checkbox:hover{}
+.layui-define-tcs-checkbox *{display: inline-block;vertical-align: middle;}
+.layui-define-tcs-checkbox span{padding: 0 10px;height: 100%;font-size: 14px;border-radius: 2px 0 0 2px;background-color: #d2d2d2;color: #fff;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
+.layui-define-tcs-checkbox:hover span{background-color: #fffff;}
+.layui-define-tcs-checkbox i{position: absolute; right: 0; top: 0; width: 30px; height: 28px; border: 1px solid #d2d2d2; border-left: none; border-radius: 0 2px 2px 0; color: #fff; font-size: 20px; text-align: center;}
+.layui-define-tcs-checkbox:hover i{border-color: #c2c2c2; color: #c2c2c2;}
+.layui-define-tcs-checkbox[lay-skin="primary"]{height: auto!important; line-height: normal!important; min-width: 18px; min-height: 18px; border: none!important; margin-right: 0; padding-left: 28px; padding-right: 0; background: none;}
+.layui-define-tcs-checkbox[lay-skin="primary"] span{padding-left: 0; padding-right: 15px; line-height: 18px; background: none; color: #666;}
+.layui-define-tcs-checkbox[lay-skin="primary"] i{right: auto; left: 0; width: 16px; height: 16px; line-height: 16px; border: 1px solid #d2d2d2; font-size: 12px; border-radius: 2px; background-color: #fff; -webkit-transition: .1s linear; transition: .1s linear;}
+.layui-define-tcs-checkbox[lay-skin="primary"]:hover i{border-color: #5FB878; color: #fff;}
+.layui-define-tcs-ul{overflow: auto;}
+.layui-define-tcs-ul li{height: 32px; line-height: 32px;}
+.layui-define-tcs-ul li:hover{background-color: #1E9FFF; transition: .5s all;}
+
+
