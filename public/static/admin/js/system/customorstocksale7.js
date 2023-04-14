@@ -112,12 +112,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     { field: '云仓', width: 100, title: '云仓', fixed: 'left', search: false, selectList: {}, laySearch: true },
                     { field: '商品负责人', width: 100, title: '商品负责人', fixed: 'left', search: false, selectList: {}, laySearch: true },
                     { field: '省份', width: 100, title: '省份', fixed: 'left', search: 'xmSelect', selectList: province_list, laySearch: true },
-                    { field: '风格', width: 100, title: '风格', fixed: 'left', hide:true, search: false, selectList: style_list, laySearch: true },
+                    { field: '风格', width: 100, title: '风格', fixed: 'left', hide:false, search: false, selectList: style_list, laySearch: true },
                     { field: '季节', width: 100, title: '季节', fixed: 'left', hide:true, search: 'xmSelect', selectList: season_list, laySearch: true },
-                    { field: '温带', width: 100, title: '温带', fixed: 'left', hide:true, search: false, selectList: season_list, laySearch: true },
-                    { field: '气温区域', width: 100, title: '气温区域', hide:true, fixed: 'left', search: false, selectList: air_temperature_list, laySearch: true },
-                    { field: '经营模式', width: 100, title: '经营模式', hide:true, fixed: 'left', search: false, selectList: management_model_list, laySearch: true },
-                    { field: '店铺等级', width: 100, title: '店铺等级', hide: true, fixed: 'left', search: false, selectList: grade_list, laySearch: true },
+                    { field: '温带', width: 100, title: '温带', fixed: 'left', hide:false, search: false, selectList: season_list, laySearch: true },
+                    { field: '气温区域', width: 100, title: '气温区域', hide:false, fixed: 'left', search: false, selectList: air_temperature_list, laySearch: true },
+                    { field: '经营模式', width: 100, title: '经营模式', hide:false, fixed: 'left', search: false, selectList: management_model_list, laySearch: true },
+                    { field: '店铺等级', width: 100, title: '店铺等级', hide: false, fixed: 'left', search: false, selectList: grade_list, laySearch: true },
                     { field: '店铺名称', width: 100, title: '店铺名称', fixed: 'left', search: 'xmSelect', selectList: store_list, laySearch: true },         
                     { field: '一级分类', width: 100, title: '一级分类', fixed: 'left', search: false, selectList: level1_list, laySearch: true },
                     { field: '二级分类', width: 100, title: '二级分类', fixed: 'left', search: false, selectList: level2_list, laySearch: true },
@@ -143,7 +143,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     height: 680,
                     limit: 200,
                     toolbar: [],
-                    limits: [50, 200, 500, 1000, 5000, 6000],
+                    limits: [1, 1000, 3000, 4000, 5000, 6000],
                     cols: [cols]
                 });
 
