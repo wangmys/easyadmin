@@ -11,7 +11,9 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
 use think\facade\Db;
+use app\admin\model\SystemConfig;
 use app\common\logic\inventory\DressLogic;
+use think\facade\Cache;
 
 
 /**
@@ -42,9 +44,9 @@ class Config extends AdminController
      */
     public function index()
     {
+        // 查询所有的省份
+        $provinceList = $this->logic->getProvince();
         if ($this->request->isAjax()) {
-            // 查询所有的省份
-            $provinceList = $this->logic->getProvince();
             // 字段
             $field = AdminConstant::YINLIU_COLUMN;
             $data = [
@@ -56,8 +58,34 @@ class Config extends AdminController
 
         // 查询表头
         $head = $this->logic->getHead();
+        // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
+        $getSelectList = $this->logic->getSelectList()['省份'];
+        $d_field = sysconfig('site','dress_field');
+        $d_field = json_decode($d_field,true);
+
+
+
+        $d_field2 = [];
+        foreach ($provinceList as $kk => $vv){
+            $_kk = $vv['name'];
+            $d_field2[$_kk]['省份'] = $_kk;
+            // 已保存数值
+            $item = $d_field[$_kk]??[];
+            // 获取省份
+            foreach ($head as $k=>$v){
+                $v_key = $v['name'];
+                if(isset($item[$v_key])){
+                    $d_field2[$_kk][$v['name']] = $item[$v_key];
+                }else{
+                    $d_field2[$_kk][$v['name']] = $v['stock'];
+                }
+            }
+        }
+        
         $this->assign([
-            'field' => $head
+            'field' => $head,
+            '_field' => array_column($head,'name'),
+            'd_field' => $d_field2,
         ]);
         return $this->fetch();
     }
@@ -111,5 +139,31 @@ class Config extends AdminController
             return $this->error($e->getMessage());
         }
         return $this->success('删除成功');
+    }
+    
+    public function save()
+    {
+        // 数据
+        $post = $this->request->post();
+        $data = [];
+        $model  = new SystemConfig();
+        foreach ($post['省份'] as $k => $v){
+            foreach ($post as $kk => $vv){
+                $item[$kk] = $vv[$k];
+            }
+            $data[$v] = $item;
+        }
+        $save_data = [
+            'name' => 'dress_field',
+            'value' => json_encode($data),
+            'group' => 'site'
+        ];
+        if(sysconfig('site','dress_field')){
+            $model->where(['name' => 'dress_field'])->save($save_data);
+        }else{
+            $model->save($save_data);
+        }
+        Cache::clear();
+        return $this->success('成功');
     }
 }

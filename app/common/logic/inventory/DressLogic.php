@@ -226,4 +226,26 @@ class DressLogic
         $this->dressHead->save($data);
         return $this->dressHead->id;
     }
+
+    /**
+     * 获取条件列表
+     */
+    public function getSelectList()
+    {
+        $default_select = [];
+        $fields = [
+             // 设置省份列表
+            'province_list' => '省份',
+            // 设置省份列表
+            'shop_list' => '店铺名称',
+            // 设置省份列表
+            'charge_list' => '商品负责人'
+        ];
+        $model = (new \app\admin\model\dress\Accessories);
+        foreach ($fields as $k => $v){
+            $list = $model->group($v)->whereNotIn($v,'合计')->column($v);
+            $default_select[$v] =  array_combine($list,$list);
+        }
+        return $default_select;
+    }
 }

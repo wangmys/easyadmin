@@ -18,7 +18,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
              // 请求省,字段数据
-             url = ea.url('/system.dress.dress/config');
+             url = ea.url('/system.dress.config/index');
              $.get({
                 url:url,
                 data:{}

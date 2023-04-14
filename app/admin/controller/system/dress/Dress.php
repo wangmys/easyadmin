@@ -71,6 +71,10 @@ class Dress extends AdminController
             $field = trim($field,',');
             $having = "(".trim($having,'or ').")";
 
+
+            // 省查询
+
+
             // 查询数据
             $list = $this->model->field($field)->where([
                 'Date' => $Date
@@ -85,6 +89,11 @@ class Dress extends AdminController
                    $q->whereIn('商品负责人',$filters['商品负责人']);
                 }
             })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+
+
+
+
+
             // 提取库存筛选条件
             $config = $this->config($head);
             // 根据筛选条件,设置颜色是否标红
@@ -108,7 +117,7 @@ class Dress extends AdminController
             $length = substr_count($v,'_');
             $item = [
                 'field' => $v,
-                'minWidth' => 134,
+                'width' => 134,
                 'search' => false,
                 'title' => $v,
                 'align' => 'center',
@@ -247,10 +256,15 @@ class Dress extends AdminController
      */
     public function setStyle(&$list,$config)
     {
+        
+        $d_field = sysconfig('site','dress_field');
+        $d_field = json_decode($d_field,true);
         if(empty($list)) return $list;
         foreach ($list as $k => $v){
             foreach ($v as $kk => $vv){
-                if(isset($config[$kk])){
+                $config = $d_field[$v['省份']];
+                if(isset($config[$kk]) && !empty($config[$kk])){
+                    $vv = intval($vv);
                     if($vv < $config[$kk]){
                         $list[$k]["_{$kk}"] = true;
                     }
