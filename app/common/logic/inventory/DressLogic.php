@@ -21,6 +21,7 @@ use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\YinliuStore;
 use app\admin\model\dress\Accessories;
 use app\admin\model\dress\DressHead;
+use app\admin\model\dress\DressWarStock;
 
 /**
  * 逻辑层
@@ -44,6 +45,7 @@ class DressLogic
         $this->question = new YinliuQuestion;
         $this->yinliuStore = new YinliuStore;
         $this->dressHead = new DressHead;
+        $this->warStock = new DressWarStock;
     }
 
     /**
@@ -196,6 +198,20 @@ class DressLogic
     }
 
     /**
+     * 设置默认省份选中
+     */
+    public function setProvince($province_str,$province_list)
+    {
+        $list = explode(',',$province_str);
+        foreach ($province_list as $key => &$v){
+            if(in_array($v['name'],$list)){
+                $v['selected'] = true;
+            }
+        }
+        return $province_list;
+    }
+
+    /**
      * 获取表头字段
      * @return array
      */
@@ -247,5 +263,48 @@ class DressLogic
             $default_select[$v] =  array_combine($list,$list);
         }
         return $default_select;
+    }
+
+    /**
+     * 获取预警库存配置
+     */
+    public function warStockItem()
+    {
+        // 配置列表
+        $config_list = $this->warStock->column('province,content');
+        $province_config_list = [];
+        foreach ($config_list as $k => $v){
+            $province_list = explode(',',$v['province']);
+            $config_item = json_decode($v['content'],true);
+            if(isset($config_item['省份'])) unset($config_item['省份']);
+            $province_config_list[] = [
+                '省份' => $province_list,
+                '_data' => $config_item
+            ];
+        }
+        return $province_config_list;
+    }
+
+    /**
+     * 保存预警库存配置
+     */
+    public function saveWarStock($data)
+    {
+        // 启动事务
+        Db::startTrans();
+        // 保存数据前,删除所有数据
+        try {
+            // 清空所有数据
+            $this->warStock->where('id','>',0)->delete(true);
+            $this->warStock->saveAll($data);
+            // 提交事务
+            Db::commit();
+            return true;
+        }catch (\Exception $e){
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
+        return false;
     }
 }

@@ -39,9 +39,105 @@ class Dress extends AdminController
     }
 
     /**
-     * 数据筛选
+     * 按照自定义省份进行筛选
+     * @return mixed|\think\response\Json
      */
     public function index()
+    {
+        // 动态表头字段
+        $head = $this->logic->dressHead->column('name,field,stock','id');
+        $Date = date('Y-m-d');
+        // 固定字段
+        $_field_default = ['省份','店铺名称','商品负责人'];
+        // 合并字段成完整表头
+        $_field = array_merge($_field_default,array_column($head,'name'));
+        if ($this->request->isAjax()) {
+            $get = $this->request->get('', null, null);
+            // 筛选
+            $filters = isset($get['filter']) && !empty($get['filter']) ? $get['filter'] : '{}';
+            $filters = json_decode($filters, true);
+            // 查询字段
+            $field = implode(',',$_field_default);
+
+            foreach ($head as $k=>$v){
+                // 计算字段合并,多字段相加
+                $field_str = str_replace(',',' + ',$v['field']);
+                // 拼接查询字段
+                $field .= ",( $field_str ) as {$v['name']}";
+            }
+            // 清空多余字符串
+            $field = trim($field,',');
+
+
+            // 数据集
+            $list_all = [];
+
+            // 省查询
+            $warStockItem = $this->logic->warStockItem();
+
+            foreach($warStockItem as $kk => $vv){
+                // 查询条件
+                $having = '';
+                foreach ($vv['_data'] as $k=>$v){
+                    // 拼接过滤条件
+                    $having .= " {$k} < {$v} or ";
+                }
+                $having = "(".trim($having,'or ').")";
+                // 查询数据
+                $list = $this->model->field($field)->where([
+                    'Date' => $Date
+                ])->where(function ($q)use($vv){
+                    if(!empty($vv['省份'])){
+                       $q->whereIn('省份',$vv['省份']);
+                    }
+                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+                // 根据筛选条件,设置颜色是否标红
+                $this->setStyle($list,$vv['_data']);
+                $list_all = array_merge($list_all,$list);
+            }
+            // 返回数据
+            $data = [
+                    'code'  => 0,
+                    'msg'   => '',
+                    'count' => count($list_all),
+                    'data'  => $list_all
+                ];
+            return json($data);
+        }
+        // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
+        $getSelectList = $this->getSelectList();
+        // 前端表格数据
+        $cols = [];
+        // 根据数据,渲染前端表格表头
+        foreach ($_field as $k=>$v){
+            $length = substr_count($v,'_');
+            $item = [
+                'field' => $v,
+                'width' => 134,
+                'search' => false,
+                'title' => $v,
+                'align' => 'center',
+            ];
+            // 固定字段可筛选
+            if(in_array($v,$_field_default)){
+                $item['fixed'] = 'left';
+                if($v == '省份'){
+                    $item['search'] = 'xmSelect';
+                }
+                // 设置条件下拉列表数据(省份/店铺名称/商品负责人)
+                $item['selectList'] = $getSelectList[$v];
+            };
+            $cols[] = $item;
+        }
+        return $this->fetch('',['cols' => $cols,'_field' => $_field,'config' => $this->config($head)]);
+    }
+
+
+    /**
+     * 按照固定省份进行筛选
+     * @return mixed|\think\response\Json
+     */
+    public function index2()
     {
         // 动态表头字段
         $head = $this->logic->dressHead->column('name,field,stock','id');
@@ -155,7 +251,7 @@ class Dress extends AdminController
     }
 
     /**
-     * 导出
+     * 引流服饰导出
      */
     public function index_export()
     {
@@ -219,6 +315,7 @@ class Dress extends AdminController
 
     /**
      * 获取条件列表
+     * @return array
      */
     public function getSelectList()
     {
@@ -256,7 +353,26 @@ class Dress extends AdminController
      */
     public function setStyle(&$list,$config)
     {
-        
+        if(empty($list)) return $list;
+        foreach ($list as $k => $v){
+            foreach ($v as $kk => $vv){
+                if(isset($config[$kk]) && !empty($config[$kk])){
+                    $vv = intval($vv);
+                    if($vv < $config[$kk]){
+                        $list[$k]["_{$kk}"] = true;
+                    }
+                }
+            }
+        }
+        return $list;
+    }
+
+    /**
+     * 根据引流配置,判断库存是否标红
+     */
+    public function setStyle2(&$list,$config)
+    {
+
         $d_field = sysconfig('site','dress_field');
         $d_field = json_decode($d_field,true);
         if(empty($list)) return $list;

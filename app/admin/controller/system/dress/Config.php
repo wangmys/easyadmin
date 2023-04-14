@@ -40,6 +40,85 @@ class Config extends AdminController
     }
 
     /**
+     * 库存预警配置
+     * @return mixed
+     */
+    public function waring_stock()
+    {
+        // 查询表头
+        $head = $this->logic->getHead();
+        $head_field = array_column($head,'name');
+        $data = $this->logic->warStock->select()->toArray();
+        $list = [];
+        $province = $this->logic->getProvince();
+        foreach ($data as $k => $v){
+            $item = json_decode($v['content'],true);
+            foreach ($head_field as $kk => $vv){
+                if(!isset($item[$vv])) $item[$vv] = 0;
+            }
+            $item['_province'] = $this->logic->setProvince($item['省份'],$province);
+            $list[] = $item;
+        }
+        // 传值
+        $this->assign([
+            'head_field' => $head_field,
+            'province' => $this->logic->getProvince(),
+            'list' => $list
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 保存库存预警配置
+     */
+    public function waring_stock_save()
+    {
+        $provinceAll = [];
+        $post = $this->request->post();
+        $provinceList = $post['省份'];
+        $item_all = [];
+        foreach ($provinceList as $k => $v){
+            $province_item = explode(',',$v);
+            if($k>0){
+                if($this->checkProvince($provinceAll,$province_item)){
+                    return $this->error('省份重复,请重新选择');
+                }
+            }
+            $provinceAll = array_merge($provinceAll,$province_item);
+
+            foreach ($post as $kk => $vv){
+                $new[$kk] = $vv[$k];
+            }
+            $_province = $new['省份'];
+            $item_all[] = [
+                'province' => $_province,
+                'content' => json_encode($new)
+            ];
+        }
+        $rs = $this->logic->saveWarStock($item_all);
+        if($rs){
+            return $this->success('成功');
+        }
+        return $this->error('失败');
+    }
+
+    /**
+     * 检测有没有重复省
+     * @param $all
+     * @param $check_arr
+     * @return bool
+     */
+    public function checkProvince($all,$check_arr)
+    {
+        foreach ($check_arr as $k => $v){
+            if(in_array($v,$all)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 数据筛选配置
      */
     public function index()
@@ -81,7 +160,7 @@ class Config extends AdminController
                 }
             }
         }
-        
+
         $this->assign([
             'field' => $head,
             '_field' => array_column($head,'name'),
@@ -91,7 +170,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存配置
+     * 保存引流表头配置
      */
     public function saveConfig()
     {
@@ -140,7 +219,10 @@ class Config extends AdminController
         }
         return $this->success('删除成功');
     }
-    
+
+    /**
+     * 保存配置
+     */
     public function save()
     {
         // 数据
