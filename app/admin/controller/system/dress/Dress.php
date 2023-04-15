@@ -47,18 +47,16 @@ class Dress extends AdminController
         // 动态表头字段
         $head = $this->logic->dressHead->column('name,field,stock','id');
         $Date = date('Y-m-d');
-        // 固定字段
-        $_field_default = ['省份','店铺名称','商品负责人'];
+        // 定义固定字段
+        $defaultFields  = ['省份','店铺名称','商品负责人'];
+        $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
-        $_field = array_merge($_field_default,array_column($head,'name'));
+        $_field = array_merge($defaultFields,$dynamic_head);
         if ($this->request->isAjax()) {
-            $get = $this->request->get('', null, null);
             // 筛选
-            $filters = isset($get['filter']) && !empty($get['filter']) ? $get['filter'] : '{}';
-            $filters = json_decode($filters, true);
-            // 查询字段
-            $field = implode(',',$_field_default);
-
+            $filters = json_decode($this->request->get('filter', '{}',null), true);
+            // 固定字段
+            $field = implode(',',$defaultFields);
             foreach ($head as $k=>$v){
                 // 计算字段合并,多字段相加
                 $field_str = str_replace(',',' + ',$v['field']);
@@ -67,28 +65,31 @@ class Dress extends AdminController
             }
             // 清空多余字符串
             $field = trim($field,',');
-
-
             // 数据集
             $list_all = [];
-
             // 省查询
             $warStockItem = $this->logic->warStockItem();
-
+            // 根据每个省份设置的筛选查询
             foreach($warStockItem as $kk => $vv){
                 // 查询条件
                 $having = '';
                 foreach ($vv['_data'] as $k=>$v){
-                    // 拼接过滤条件
-                    $having .= " {$k} < {$v} or ";
+                    // 表头有的字段才能筛选
+                    if(in_array($k,$dynamic_head)){
+                        // 拼接过滤条件
+                        $having .= " {$k} < {$v} or ";
+                    }
                 }
                 $having = "(".trim($having,'or ').")";
                 // 查询数据
                 $list = $this->model->field($field)->where([
                     'Date' => $Date
-                ])->where(function ($q)use($vv){
+                ])->where(function ($q)use($vv,$filters){
                     if(!empty($vv['省份'])){
                        $q->whereIn('省份',$vv['省份']);
+                    }
+                    if(!empty($filters['省份'])){
+                       $q->whereIn('省份',$filters['省份']);
                     }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
                 // 根据筛选条件,设置颜色是否标红
@@ -119,7 +120,7 @@ class Dress extends AdminController
                 'align' => 'center',
             ];
             // 固定字段可筛选
-            if(in_array($v,$_field_default)){
+            if(in_array($v,$defaultFields)){
                 $item['fixed'] = 'left';
                 if($v == '省份'){
                     $item['search'] = 'xmSelect';
@@ -255,62 +256,62 @@ class Dress extends AdminController
      */
     public function index_export()
     {
-        $get = $this->request->get('', null, null);
         // 筛选
-        $filters = isset($get['filter']) && !empty($get['filter']) ? $get['filter'] : '{}';
-        $filters = json_decode($filters, true);
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
         // 获取今日日期
         $Date = date('Y-m-d');
         // 动态表头字段
         $head = $this->logic->dressHead->column('name,field,stock','id');
         // 固定字段
-        $_field_default = ['省份','店铺名称','商品负责人'];
-        // 合并字段成完整表头
-        $_field = array_merge($_field_default,array_column($head,'name'));
-        $where = [
-            'Date' => $Date
-        ];
-        // 查询字段
-        $field = implode(',',$_field_default);
-        // 查询条件
-        $having = '';
+        $defaultFields = ['省份','店铺名称','商品负责人'];
+        // 固定字段
+        $field = implode(',',$defaultFields);
         foreach ($head as $k=>$v){
             // 计算字段合并,多字段相加
             $field_str = str_replace(',',' + ',$v['field']);
             // 拼接查询字段
             $field .= ",( $field_str ) as {$v['name']}";
-            // 拼接过滤条件
-            $having .= " {$v['name']} < {$v['stock']} or ";
         }
-        // 清空多余字符串
-        $field = trim($field,',');
-        $having = "(".trim($having,'or ').")";
-
-        // 查询数据
-        $list = $this->model->field($field)->where([
-            'Date' => $Date
-        ])->where(function ($q)use($filters){
-            if(!empty($filters['省份'])){
-               $q->whereIn('省份',$filters['省份']);
+        // 数据集
+        $list_all = [];
+        // 省查询
+        $warStockItem = $this->logic->warStockItem();
+        // 导出表头
+        $table_head = [];
+        // 根据每个省份设置的筛选查询
+        foreach($warStockItem as $kk => $vv){
+            // 查询条件
+            $having = '';
+            foreach ($vv['_data'] as $k=>$v){
+                // 拼接过滤条件
+                $having .= " {$k} < {$v} or ";
             }
-            if(!empty($filters['店铺名称'])){
-               $q->whereIn('店铺名称',$filters['店铺名称']);
+            $having = "(".trim($having,'or ').")";
+            // 查询数据
+            $list = $this->model->field($field)->where([
+                'Date' => $Date
+            ])->where(function ($q)use($vv,$filters){
+                if(!empty($vv['省份'])){
+                   $q->whereIn('省份',$vv['省份']);
+                }
+                if(!empty($filters['省份'])){
+                   $q->whereIn('省份',$filters['省份']);
+                }
+            })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+            if(!empty($list) && empty($table_head)){
+                $table_head = array_keys($list[0]);
             }
-            if(!empty($filters['商品负责人'])){
-               $q->whereIn('商品负责人',$filters['商品负责人']);
-            }
-        })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+            // 根据筛选条件,设置颜色是否标红
+            $this->setStyle($list,$vv['_data']);
+            $list_all = array_merge($list_all,$list);
+        }
         // 设置标题头
         $header = [];
-        if($list){
-            $header = array_map(function($v){ return [$v,$v]; }, array_keys($list[0]));
+        if($list_all){
+            $header = array_map(function($v){ return [$v,$v]; },$table_head);
         }
-        // 提取库存筛选条件
-        $config = $this->config($head);
-        // 根据筛选条件,设置颜色是否标红
-        $this->setStyle($list,$config);
         $fileName = time();
-        return Excel::exportData($list, $header, $fileName, 'xlsx','',[],'dress');
+        return Excel::exportData($list_all, $header, $fileName, 'xlsx','',[],'dress');
     }
 
     /**
@@ -372,7 +373,6 @@ class Dress extends AdminController
      */
     public function setStyle2(&$list,$config)
     {
-
         $d_field = sysconfig('site','dress_field');
         $d_field = json_decode($d_field,true);
         if(empty($list)) return $list;

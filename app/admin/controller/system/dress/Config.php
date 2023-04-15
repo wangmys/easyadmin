@@ -40,6 +40,75 @@ class Config extends AdminController
     }
 
     /**
+     * 数据筛选配置
+     */
+    public function index()
+    {
+        // 查询所有的省份
+        $provinceList = $this->logic->getProvince();
+        if ($this->request->isAjax()) {
+            // 字段
+            $field = AdminConstant::YINLIU_COLUMN;
+            $data = [
+                'provinceList' => $provinceList,
+                'field' => $field
+            ];
+            return json($data);
+        }
+
+        // 查询表头
+        $head = $this->logic->getHead();
+        // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
+        $getSelectList = $this->logic->getSelectList()['省份'];
+        $d_field = sysconfig('site','dress_field');
+        $d_field = json_decode($d_field,true);
+
+        $d_field2 = [];
+        foreach ($provinceList as $kk => $vv){
+            $_kk = $vv['name'];
+            $d_field2[$_kk]['省份'] = $_kk;
+            // 已保存数值
+            $item = $d_field[$_kk]??[];
+            // 获取省份
+            foreach ($head as $k=>$v){
+                $v_key = $v['name'];
+                if(isset($item[$v_key])){
+                    $d_field2[$_kk][$v['name']] = $item[$v_key];
+                }else{
+                    $d_field2[$_kk][$v['name']] = $v['stock'];
+                }
+            }
+        }
+
+        $head_field = array_column($head,'name');
+        $data = $this->logic->warStock->select()->toArray();
+        $list = [];
+        $province = $this->logic->getProvince();
+        foreach ($data as $k => $v){
+            $item = json_decode($v['content'],true);
+            $new_item = ['省份' => $item['省份']];
+            foreach ($head_field as $j => $jv){
+                $new_item[$jv] = $item[$jv]??0;
+            }
+            $new_item['_province'] = $this->logic->setProvince($new_item['省份'],$province);
+            $list[] = $new_item;
+        }
+        // 传值
+        $this->assign([
+            'head_field' => $head_field,
+            'province' => $this->logic->getProvince(),
+            'list' => $list
+        ]);
+
+        $this->assign([
+            'field' => $head,
+            '_field' => array_column($head,'name'),
+            'd_field' => $d_field2,
+        ]);
+        return $this->fetch();
+    }
+
+     /**
      * 库存预警配置
      * @return mixed
      */
@@ -53,11 +122,12 @@ class Config extends AdminController
         $province = $this->logic->getProvince();
         foreach ($data as $k => $v){
             $item = json_decode($v['content'],true);
-            foreach ($head_field as $kk => $vv){
-                if(!isset($item[$vv])) $item[$vv] = 0;
+            $new_item = ['省份' => $item['省份']];
+            foreach ($head_field as $j => $jv){
+                $new_item[$jv] = $item[$jv]??0;
             }
-            $item['_province'] = $this->logic->setProvince($item['省份'],$province);
-            $list[] = $item;
+            $new_item['_province'] = $this->logic->setProvince($new_item['省份'],$province);
+            $list[] = $new_item;
         }
         // 传值
         $this->assign([
@@ -116,57 +186,6 @@ class Config extends AdminController
             }
         }
         return false;
-    }
-
-    /**
-     * 数据筛选配置
-     */
-    public function index()
-    {
-        // 查询所有的省份
-        $provinceList = $this->logic->getProvince();
-        if ($this->request->isAjax()) {
-            // 字段
-            $field = AdminConstant::YINLIU_COLUMN;
-            $data = [
-                'provinceList' => $provinceList,
-                'field' => $field
-            ];
-            return json($data);
-        }
-
-        // 查询表头
-        $head = $this->logic->getHead();
-        // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
-        $getSelectList = $this->logic->getSelectList()['省份'];
-        $d_field = sysconfig('site','dress_field');
-        $d_field = json_decode($d_field,true);
-
-
-
-        $d_field2 = [];
-        foreach ($provinceList as $kk => $vv){
-            $_kk = $vv['name'];
-            $d_field2[$_kk]['省份'] = $_kk;
-            // 已保存数值
-            $item = $d_field[$_kk]??[];
-            // 获取省份
-            foreach ($head as $k=>$v){
-                $v_key = $v['name'];
-                if(isset($item[$v_key])){
-                    $d_field2[$_kk][$v['name']] = $item[$v_key];
-                }else{
-                    $d_field2[$_kk][$v['name']] = $v['stock'];
-                }
-            }
-        }
-
-        $this->assign([
-            'field' => $head,
-            '_field' => array_column($head,'name'),
-            'd_field' => $d_field2,
-        ]);
-        return $this->fetch();
     }
 
     /**
