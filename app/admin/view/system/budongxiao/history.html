@@ -25,9 +25,8 @@
         }
 
         .layui-form-item {
-            margin-bottom: 5px;
-            height: 32px;
-            line-height: 7px;
+            margin-bottom: 0px;
+            height: 30px;
         }
 
         .layui-input,
@@ -65,20 +64,29 @@
 
         .layui-colorpicker {
             width: 30px;
-            height: 30px;
+            height: 10px;
             line-height: 30px;
             padding: 0px;
         }
+        
 
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
         /* .layui-unselect .layui-form-select {
             width: 80px !important;
         }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
         .layui-form-label {
             width: 120px !important;
         }
 
         .layui-input-inline {
-            width: 12 0px;
+            width: 40px;
         }
     </style>
 </head>
@@ -98,8 +106,8 @@
                         </select>
                     </div> -->
 
-                    <label class="layui-form-label">查询日期</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">查询日期</label>
+                    <div class="layui-input-inline" style="width: 180px !important; ">
                         <select name="create_time" lay-verify="required" lay-filter="select_date" id='select_date'>
                             <option value="">请选择</option>
                             {foreach $select_map as $key=>$vo}
@@ -201,7 +209,7 @@
                 , method: 'post'
                 , toolbar: true
                 , limit: 0
-                , height: 800
+                , height: 620
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '商品负责人', title: '商品负责人', fixed: 'left' ,width: 100 }
