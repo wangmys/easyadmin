@@ -25,9 +25,8 @@
         }
 
         .layui-form-item {
-            margin-bottom: 5px;
-            height: 32px;
-            line-height: 7px;
+            margin-bottom: 0px;
+            height: 30px;
         }
 
         .layui-input,
@@ -65,32 +64,40 @@
 
         .layui-colorpicker {
             width: 30px;
-            height: 30px;
+            height: 10px;
             line-height: 30px;
             padding: 0px;
         }
+        
 
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
         /* .layui-unselect .layui-form-select {
             width: 80px !important;
         }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
         .layui-form-label {
             width: 120px !important;
         }
 
         .layui-input-inline {
-            width: 12 0px;
+            width: 40px;
         }
     </style>
 </head>
 
-<body class="">
-    <div class="layui-col-md12 layui-col-space8" style="display:block;">
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
         <form class="layui-form layui-form-pane ok-form layui-col-space8">
             <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                 <div class="layui-form-item">
-
-                    <label class="layui-form-label">季节归集</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">季节归集</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
                         <select name="季节归集" lay-verify="required">
                             <option value="春季">春季</option>
                             <option value="夏季">夏季</option>
@@ -99,8 +106,8 @@
                         </select>
                     </div>
 
-                    <label class="layui-form-label">省份</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">省份</label>
+                    <div class="layui-input-inline" style="width: 110px !important; ">
                         <select name="省份" lay-verify="">
                             <option value="">所有省份</option>
                             {foreach $province as $key=>$vo}
@@ -109,8 +116,8 @@
                         </select>
                     </div>
 
-                    <label class="layui-form-label">商品负责人</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow:visible;">商品负责人</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
                         <select name="商品负责人" lay-verify="">
                             <option value="">所有负责人</option>
                             {foreach $people as $key=>$vo}
@@ -119,8 +126,8 @@
                         </select>
                     </div>
 
-                    <label class="layui-form-label">经营模式</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">经营模式</label>
+                    <div class="layui-input-inline" style="width: 110px !important; ">
                         <select name="经营模式" lay-verify="">
                             <option value="">所有模式</option>
                             <option value="加盟">加盟</option>
@@ -128,9 +135,9 @@
                         </select>
                     </div>
 
-                    <label class="layui-form-label">考核区间</label>
-                    <div class="layui-input-inline">
-                        <select name="khkey" lay-verify="required">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">考核区间</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
+                        <select name="考核区间" lay-verify="required">
                             <option value="30天以上">30天以上</option>
                             <option value="20-30天">20-30天</option>
                             <option value="15-20天">15-20天</option>
@@ -138,37 +145,36 @@
                             <option value="5-10天">5-10天</option>
                         </select>
                     </div>
+
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市时间</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
+                        <input type="text" name="上市时间" class="layui-input" id="shangshiriqi" placeholder="yyyy-MM-dd">
+                    </div>
+
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市天数>=</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
+                        <input type="number" name='上市天数' autocomplete="off" value="30" maxlength="3"
+                            class="layui-input" lay-verify="required">
+                    </div>
                 </div>
 
 
                 <div class="layui-form-item">
-
-                    <label class="layui-form-label">上市天数>=</label>
-                    <div class="layui-input-inline">
-                        <input type="number" name='上市天数' autocomplete="off" value="30" maxlength="3"
-                            class="layui-input" lay-verify="required">
-                    </div>
-
-                    <label class="layui-form-label">上市时间</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="上市时间" class="layui-input" id="shangshiriqi" placeholder="yyyy-MM-dd">
-                    </div>
-
-                    <label class="layui-form-label">查询记录数</label>
-                    <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">查询记录数</label>
+                    <div class="layui-input-inline" style="width: 110px !important;">
                         <select name="limit" lay-verify="required">
-                            <option value="50">50条</option>
-                            <option value="100">100条</option>
-                            <option value="200">200条</option>
-                            <option value="300">300条</option>
                             <option value="10000">所有记录</option>
+                            <option value="500">500条</option>
+                            <option value="300">300条</option>
+                            <option value="100">100条</option>
+                            <option value="50">50条</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- <hr> -->
                 {foreach $typeQima as $key=>$vo}
-                <div class="layui-col-md2">
+                <div class="layui-col-md1">
                     <label class="layui-form-label">{$key}齐码</label>
                     <div class="layui-input-inline">
                         <input type="number" name='{$key}' autocomplete="off" value="{$vo}" maxlength="1"

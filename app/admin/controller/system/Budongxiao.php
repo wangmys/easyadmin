@@ -145,7 +145,8 @@ class Budongxiao
             $day15_20 = 0;
             $day20_30 = 0;
             $day30 = 0;
-
+            // 考核标准才插入历史记录
+            $insert_history_data = [];
             foreach ($res_all_new as $key => $val) {
                 // 30天以上
                 if (empty($val['累销量'])) {
@@ -172,18 +173,54 @@ class Budongxiao
                 }
 
                 $res_all_new[$key]['不动销区间修订'] = $this->checkQiMa($res_all_new[$key]);
-                $res_all_new[$key]['考核标准'] = input('param.khkey') ? input('param.khkey') : '30天以上';
+                $res_all_new[$key]['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
                 $res_all_new[$key]['create_time'] = $this->create_time;
                 $res_all_new[$key]['rand_code'] = $this->rand_code;
+                
+                // 判断是否需要加入到历史记录
+                // if ($this->params['考核区间'] == $res_all_new[$key]['不动销区间']) {
+                //     $insert_history_data[] = $res_all_new[$key];
+                // }
 
-                // die;
+                if ($this->params['考核区间'] == '30天以上') {
+                    if ($res_all_new[$key]['不动销区间'] == '30天以上') {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                    
+                } elseif ($this->params['考核区间'] == '20-30天') {
+                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天') {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                } elseif ($this->params['考核区间'] == '15-20天') {
+                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天') {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                } elseif ($this->params['考核区间'] == '10-15天') {
+                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
+                    || $res_all_new[$key]['不动销区间'] == '10-15天') {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                } elseif ($this->params['考核区间'] == '5-10天') {
+                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
+                    || $res_all_new[$key]['不动销区间'] == '10-15天' || $res_all_new[$key]['不动销区间'] == '5-10天') {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                }
+                
             }
+
+            // echo '<pre>';
+            // dump($res_all_new);
+            // dump($insert_history_data);
+            // die;
+
             // 预计skc数
             $yujiSkc = count($res_all_new);
 
             // dump($res_all_new);
             $this->db_easyA->startTrans();
-            $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($res_all_new);
+            // $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($res_all_new);
+            $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
             if ($insert_history) {
                 $this->db_easyA->commit();
             } else {
@@ -202,8 +239,9 @@ class Budongxiao
             $res_end['15-20天'] = $day15_20;
             $res_end['20-30天'] = $day20_30;
             $res_end['30天以上'] = $day30;
-            $res_end['【考核标准】键'] = input('param.khkey') ? input('param.khkey') : '30天以上';
+            $res_end['【考核标准】键'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
             $res_end['【考核标准】值'] = round($this->zeroHandle($res_end[$res_end['【考核标准】键']], $res_end['预计SKC数'])  * 100, 2);
+            $res_end['合格率10%以下'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
             $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
 
             return $res_end;
@@ -242,7 +280,7 @@ class Budongxiao
             // '下装' => [
                 '休闲长裤' => 6,
                 '松紧短裤' => 6,
-                '松紧长裤' => 6,
+                '松紧长裤' => 5,
                 '牛仔长裤' => 6,
                 '牛仔短裤' => 6,
                 '西裤' => 6,
@@ -362,8 +400,9 @@ class Budongxiao
         // 中山三店 乐从一店 上市天数不足30
         $map = [
             '省份' => '广东省',
-            // '商品负责人' => '周奇志',
+            '商品负责人' => '周奇志',
             '季节归集' => '春季',
+            '考核区间' => '20-30天',
             // '店铺名称' => '大石二店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
@@ -384,7 +423,7 @@ class Budongxiao
 
         $data = [];
         $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
-        // print_r($storeArr);
+        // dump($storeArr);
         foreach($storeArr as $key => $val) {
             $res = $this->store($val['店铺名称']);
             if ($res) {
