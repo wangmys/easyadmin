@@ -28,6 +28,8 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                  $('#app-form').removeClass("layui-hide");
                  ea.listen();
              });
+             // 调用
+             this.waring_stock();
         },
         // 添加行
         add_tr:function (field_data) {
@@ -150,65 +152,85 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 ea.msg.success(res.msg);
             })
         },
-        index_copy:function (){
-             // 请求省,字段数据
-             url = ea.url('/system.dress.dress/config');
-             $.get({
-                url:url,
-                data:{}
-            },function (res) {
-                $('.add').on('click', function(){
-                    var element = $([
-                        '<tr>',
-                            '<td data-edit="text"><input type="text" name="input1" lay-verify="required" placeholder="请输入内容" class="layui-input"></td>',
-                            '<td class="province"></td>',
-                            '<td class="field"></td>',
-                            '<td class="stock"><input type="text" name="input1" lay-verify="required" placeholder="请输入内容" class="layui-input"></td>',
-                            '<td class="handler">',
-                                '<button type="button" class="layui-btn layui-btn-normal get">保存</button>',
-                                '<button type="button" class="layui-btn layui-btn-danger del">删除</button>',
-                            '</td>',
-                        '</tr>',
-                    ].join(''))
-
-                    // 字段组合
-                    var field = element.find('.field')[0];
-                    var field = xmSelect.render({
-                        el: field,
-                        data: function(){
-                            return res.field
-                        }
+        // 预警库存
+        waring_stock:function (){
+             var head_field = $("#head_field").val();
+             var head = JSON.parse(head_field);
+             var province_str = $("#province_list").val();
+             var province_list= JSON.parse(province_str);
+             var html = '<td class="province"></td>';
+             var that = this;
+             head.forEach(function (i,value) {
+                 if(i !== '省份'){
+                    html += '<td class="field_'+ value +'_'+ i +'"><input type="text" name="' + i + '[]" lay-verify="required" value="0" placeholder="请输入数值" class="layui-input"></td>'
+                 }else{
+                    html += '<td class="province"></td>';
+                 }
+            })
+             $('.addstock').on('click', function(){
+                var element = $([
+                    '<tr>',
+                        ,html,
+                        '<td class="handler">',
+                            '<button type="button" class="layui-btn layui-btn-danger del">删除</button>',
+                        '</td>',
+                    '</tr>',
+                ].join(''))
+                 console.log(html)
+                // 获取新数据
+                that.getNewData(province_list);
+                var _province_list = province_list;
+                // 字段组合
+                var _province = element.find('.province')[0];
+                var province = xmSelect.render({
+                    el: _province,
+                    data: function(){
+                        return _province_list
+                    },
+                    name:'省份[]'
+                })
+                element.find('.del').on('click', function(){
+                    var _this = $(this);
+                    layer.confirm('是否删除该组合',{},function () {
+                        $(_this).parents('tr').remove();
+                        layer.closeAll()
                     })
+                })
+                $('#form-create-config tbody').append(element);
+            });
 
-                    // 省
-                    var province = element.find('.province')[0];
-                    xmSelect.render({
-                        el: province,
-                        radio: true,
-                        clickClose: true,
-                        model: { label: { type: 'text' } },
-                        data: function(){
-                            return res.provinceList
-                        },
-                        on: function(data){
+             // 获取渲染后端渲染的数据,重新绑定事件
+             $.each($('.province-select'), function (key, element) {
+                var ele = $(element).find('.province')[0];
+                var _province_data = JSON.parse($(element).attr('lay-data'));
+                var province = xmSelect.render({
+                    el: ele,
+                    data: function(){
+                        return _province_data
+                    },
+                    name:'省份[]'
+                })
 
-                        }.bind(field),
+                $(element).find('.del').on('click', function(){
+                    var _this = $(this);
+                    layer.confirm('是否删除该组合',{},function () {
+                        $(_this).parents('tr').remove();
+                        layer.closeAll()
                     })
+                })
+            });
 
-                    element.find('.get').on('click', function(){
-                        console.log(this)
-                        alert('valueStr: ' + this.getValue('valueStr'));
-                    }.bind(field))
-
-                    element.find('.del').on('click', function(){
-                        $(this).parents('tr').remove();
-                    })
-
-                    $('#form-create tbody').append(element);
-                });
-
-                ea.listen();
-             });
+            ea.listen();
+        },
+        // 获取新城市数据
+        getNewData:function (data) {
+            if(!data) return data;
+            var new_data = [];
+            data.forEach(function (value,i) {
+               value.selected = false;
+               new_data[i] = value;
+            })
+            return new_data;
         }
     };
     return Controller;
