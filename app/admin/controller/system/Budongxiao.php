@@ -1,19 +1,11 @@
 <?php
 namespace app\admin\controller\system;
 
-use app\admin\service\TriggerService;
-use app\common\constants\AdminConstant;
-use app\common\controller\AdminController;
-use app\common\service\WeatherService;
-use EasyAdmin\annotation\ControllerAnnotation;
-use EasyAdmin\annotation\NodeAnotation;
-use think\App;
 use think\facade\Db;
-use voku\helper\HtmlDomParser;
 use think\cache\driver\Redis;
-use app\admin\model\weather\Region;
 use app\admin\model\bi\SpWwBudongxiaoDetail;
 use app\admin\model\bi\SpXwBudongxiaoYuncangkeyong;
+use think\db\Raw;
 
 // class Budongxiao extends BaseController
 class Budongxiao
@@ -27,9 +19,6 @@ class Budongxiao
     // 创建时间
     protected $create_time = '';
 
-    // protected $request;
-
-    // public function __construct(Request $request)
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
@@ -76,7 +65,9 @@ class Budongxiao
             // 省份
             $province = SpWwBudongxiaoDetail::getProvince();
             // 商品负责人
-            $people = SpWwBudongxiaoDetail::getPeople();
+            $people = SpWwBudongxiaoDetail::getPeople([
+                ['商品负责人', 'exp', new Raw('IS NOT NULL')]
+            ]);
             return View('index',[
                 'typeQima' => $typeQima,
                 'province' => $province,
@@ -95,14 +86,13 @@ class Budongxiao
             ['店铺名称', '=', $store],
             ['季节归集', '=', $this->params['季节归集']],
             ['大类' , '<>', '配饰'],
-            // ['中类' , '=', $this->params['中类']],
-
-            ['店铺库存数量' , '>=', 1],
+            ['店铺库存数量' , '>', 1],
         ];
 
         // 没有上市日期就直接使用上市天数
         if (empty($this->params['上市时间'])) {
             $map[] = ['上市天数' , '>=', $this->params['上市天数']];
+            $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
             $res_all_new = [];
             // 赋值 上市时间修正 上市天数修正
@@ -151,23 +141,23 @@ class Budongxiao
                 // 30天以上
                 if (empty($val['累销量'])) {
                     $res_all_new[$key]['不动销区间'] = '30天以上';
-                    $day30 ++;
+                    
                 // 20-30天
                 } elseif (!empty($val['累销量']) && empty($val['二十天销量'])) {
                     $res_all_new[$key]['不动销区间'] = '20-30天';
-                    $day20_30 ++;
+                    
                 // 15-20天
                 } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && empty($val['十五天销量'])) {
                     $res_all_new[$key]['不动销区间'] = '15-20天';
-                    $day15_20 ++;
+                    
                 // 10-15天
                 } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && empty($val['十天销量'])) {
                     $res_all_new[$key]['不动销区间'] = '10-15天';
-                    $day10_15 ++;
+                    
                 // 5-10天
                 } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && !empty($val['十天销量']) && !empty($val['十天销量']) && empty($val['五天销量'])) {
                     $res_all_new[$key]['不动销区间'] = '5-10天';
-                    $day5_10 ++;
+                    
                 } else {
                     $res_all_new[$key]['不动销区间'] = '';
                 }
@@ -176,11 +166,19 @@ class Budongxiao
                 $res_all_new[$key]['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
                 $res_all_new[$key]['create_time'] = $this->create_time;
                 $res_all_new[$key]['rand_code'] = $this->rand_code;
-                
-                // 判断是否需要加入到历史记录
-                // if ($this->params['考核区间'] == $res_all_new[$key]['不动销区间']) {
-                //     $insert_history_data[] = $res_all_new[$key];
-                // }
+
+                // 累销天数计算 
+                if ($res_all_new[$key]['不动销区间修订'] == '30天以上') {
+                    $day30 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '20-30天') {
+                    $day20_30 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '15-20天') {
+                    $day15_20 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '10-15天') {
+                    $day10_15 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '5-10天') {
+                    $day5_10 ++;
+                }
 
                 if ($this->params['考核区间'] == '30天以上') {
                     if ($res_all_new[$key]['不动销区间'] == '30天以上') {
@@ -210,7 +208,7 @@ class Budongxiao
             }
 
             // echo '<pre>';
-            // dump($res_all_new);
+            // print_r($res_all_new);
             // dump($insert_history_data);
             // die;
 
@@ -276,6 +274,15 @@ class Budongxiao
 
     // 齐码默认值
     public function getTypeQiMa() {
+        $map = [
+            
+        ];
+        $res = SpWwBudongxiaoDetail::getTypeQiMa([
+            // ['季节归集', '=', '春季'],
+            ['大类', '<>', '配饰'],
+        ]);
+        // echo '<pre>';
+        // print_r($res);
         $type = [
             // '下装' => [
                 '休闲长裤' => 6,
@@ -310,7 +317,6 @@ class Budongxiao
                 '正统皮鞋' => 4,
             // ],
         ];
-
         return $type;
     }
 
@@ -399,11 +405,11 @@ class Budongxiao
     public function test() {
         // 中山三店 乐从一店 上市天数不足30
         $map = [
-            '省份' => '广东省',
-            '商品负责人' => '周奇志',
+            // '省份' => '广东省',
+            // '商品负责人' => '周奇志',
             '季节归集' => '春季',
-            '考核区间' => '20-30天',
-            // '店铺名称' => '大石二店',
+            '考核区间' => '30天以上',
+            '店铺名称' => '巴马一店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
             '上市天数' => 30,
@@ -457,7 +463,7 @@ class Budongxiao
     }
 
     public function test3() {
-        echo 222;
+        SpWwBudongxiaoDetail::getTypeQiMa();
         // $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
         // dump($select_map);
     }

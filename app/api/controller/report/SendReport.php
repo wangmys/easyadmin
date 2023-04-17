@@ -50,7 +50,9 @@ class SendReport extends BaseController
             $this->service->create_table_s101('S104',date('Y-m-d'));
         } elseif ($name =='S106') {
             $this->service->create_table_s106(date('Y-m-d'));
-        }        
+        }  elseif ($name =='S107') {
+            $this->service->create_table_s107(date('Y-m-d'));
+        }         
     }
 
     // 配饰每日销售数量
@@ -92,7 +94,7 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 23:40推送
+    // 23:40推送 个人
     public function sendS105()
     {
         $name = '\app\api\service\DingdingService';
@@ -111,6 +113,30 @@ class SendReport extends BaseController
                 // 推送
                 $res[] = $model->send($v['title'],$v['jpg_url']);
                 // $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
+            }
+        }
+
+        return json($res);
+    }
+
+    // 鞋履报表 0:31:00
+    public function sendS107() {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S107' => [
+                'title' => '鞋履报表 表号:S107',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S107.jpg'
+            ]
+        ];
+        // dump($send_data);die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
             }
         }
 

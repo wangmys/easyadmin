@@ -78,6 +78,9 @@
         /* .layui-unselect .layui-form-select {
             width: 80px !important;
         }  */
+        .test {
+            border: 1px solid red !important;
+        }
         .layui-col-md1 {
             width: 11.333% !important;
         }
@@ -183,14 +186,17 @@
                 </div>
                 {/foreach}
                 <!-- <hr>    -->
-                <div class="layui-col-md1 layui-col-sm11"
+                <div class="layui-col-md2 layui-col-sm11"
                     style="border:0px solid red; float: right; text-align: right;">
-                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="formDemo"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff">数据筛选
+                    <button lay-submit class="layui-btn layui-btn-xs" lay-filter="formDemo"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">数据筛选
                     </button>
-                    <button type="reset" class="layui-btn layui-btn-sm"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff">重置
+                    <button type="reset" class="layui-btn layui-btn-xs"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">重置筛选
                     </button>
+                    <button type="reset" class="layui-btn layui-btn-xs"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">保存筛选
+                </button>
                 </div>
             </div>
         </form>
