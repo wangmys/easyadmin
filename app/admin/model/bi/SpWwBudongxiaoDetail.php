@@ -1,6 +1,6 @@
 <?php
 namespace app\admin\model\bi;
-
+use think\db\Raw;
 use app\common\model\TimeModel;
 
 /**
@@ -26,7 +26,9 @@ class SpWwBudongxiaoDetail extends TimeModel
 
     // 获取店铺名称
     public static function getStore($map) {
-        $where = [];
+        $where = [
+            ['商品负责人', 'exp', new Raw('IS NOT NULL')],
+        ];
         $limit = 100;
         if (!empty($map['省份'])) {
             $where['省份'] = $map['省份'];
@@ -43,11 +45,22 @@ class SpWwBudongxiaoDetail extends TimeModel
         if (!empty($map['limit'])) {
             $limit = intval($map['limit']);
         }
-        $res = self::whereNotNull('商品负责人')
-        ->where($where)
+        $res = self::where($where)
         ->field('店铺名称')
         ->group('商品负责人,店铺名称')  
         ->limit($limit)  
+        ->select()
+        ->toArray();
+        // echo self::getLastSql();
+        // die;
+        return $res;
+    } 
+
+    // 获取店铺名称
+    public static function getTypeQiMa($map = []) {
+        $res = self::where($map)
+        ->field('大类,中类,季节归集')
+        ->group('季节归集,大类,中类')
         ->select()
         ->toArray();
         // echo self::getLastSql();
@@ -56,13 +69,7 @@ class SpWwBudongxiaoDetail extends TimeModel
 
     // 获取商品负责人
     public static function getPeople($map = []) {
-        // if (!empty($map['商品负责人'])) {
-        //     $where = ['商品负责人' => $map['商品负责人']];
-        // } else {
-        //     $where = 1;  
-        // }
-        $res = self::whereNotNull('商品负责人')
-        // ->where($where)
+        $res = self::where($map)
         ->field('商品负责人')
         ->group('商品负责人')  
         ->select()
@@ -80,116 +87,17 @@ class SpWwBudongxiaoDetail extends TimeModel
     }
 
     // 连接云仓
-    public static function joinYuncang_30($map)
-    {
-        $res = self::alias('d')
-        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        ->field(self::$fields)
-        ->where($map)
-        ->whereNotNull('商品负责人')
-        ->whereNull('累销量')
-        ->select()
-        ->toArray();
-        // echo self::getLastSql();
-        return $res;
-    }
-
-    public static function joinYuncang_20_30($map)
-    {
-        $res = self::alias('d')
-        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        ->field(self::$fields)
-        ->where($map)
-        ->whereNotNull('商品负责人')
-        ->whereNotNull('累销量')
-        ->whereNull('二十天销量')
-        ->whereNull('十五天销量')
-        ->whereNull('十天销量')
-        ->whereNull('五天销量')
-        ->select()
-        ->toArray();
-        // echo self::getLastSql();
-        // if (!$res) {
-        //     $res = self::alias('d')
-        //     ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        //     ->field(self::$fields)
-        //     ->where($map)
-        //     ->whereNotNull('商品负责人')
-        //     ->whereNotNull('累销量')
-        //     ->whereNull('二十天销量')
-        //     ->whereNull('十五天销量')
-        //     ->whereNull('十天销量')
-        //     ->whereNull('五天销量')
-        //     ->find()
-        //     ->toArray();
-        // }
-        return $res;
-    }
-
-    public static function joinYuncang_15_20($map)
-    {
-        $res = self::alias('d')
-        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        ->field(self::$fields)
-        ->where($map)
-        ->whereNotNull('商品负责人')
-        ->whereNotNull('累销量')
-        ->whereNotNull('二十天销量')
-        ->whereNull('十五天销量')
-        ->whereNull('十天销量')
-        ->whereNull('五天销量')
-        ->select()
-        ->toArray();
-        // echo self::getLastSql();
-        return $res;
-    }
-
-    public static function joinYuncang_10_15($map)
-    {
-        $res = self::alias('d')
-        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        ->field(self::$fields)
-        ->where($map)
-        ->whereNotNull('商品负责人')
-        ->whereNotNull('累销量')
-        ->whereNotNull('二十天销量')
-        ->whereNotNull('十五天销量')
-        ->whereNull('十天销量')
-        ->whereNull('五天销量')
-        ->select()
-        ->toArray();
-        // echo self::getLastSql();
-        return $res;
-    }
-
-    public static function joinYuncang_5_10($map)
-    {
-        $res = self::alias('d')
-        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
-        ->field(self::$fields)
-        ->where($map)
-        ->whereNotNull('商品负责人')
-        ->whereNotNull('累销量')
-        ->whereNotNull('二十天销量')
-        ->whereNotNull('十五天销量')
-        ->whereNotNull('十天销量')
-        ->whereNull('五天销量')
-        ->select()
-        ->toArray();
-        // echo self::getLastSql();
-        return $res;
-    }
-
     public static function joinYuncang_all($map)
     {
         $res = self::alias('d')
         ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
         ->field(self::$fields)
         ->where($map)
-        ->whereNotNull('商品负责人')
+        // ->whereNotNull('商品负责人')
         ->select()
         ->toArray();
         // echo self::getLastSql();
+        // die;
         return $res;
     }
 }
