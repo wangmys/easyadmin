@@ -3,8 +3,9 @@ namespace app\admin\controller\system;
 
 use think\facade\Db;
 use think\cache\driver\Redis;
-use app\admin\model\bi\SpWwBudongxiaoDetail;
-use app\admin\model\bi\SpXwBudongxiaoYuncangkeyong;
+use app\admin\model\budongxiao\SpWwBudongxiaoDetail;
+use app\admin\model\budongxiao\SpXwBudongxiaoYuncangkeyong;
+use app\admin\model\budongxiao\CwlBudongxiaoStatistics;
 use think\db\Raw;
 
 // class Budongxiao extends BaseController
@@ -216,14 +217,15 @@ class Budongxiao
             $yujiSkc = count($res_all_new);
 
             // dump($res_all_new);
-            $this->db_easyA->startTrans();
-            // $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($res_all_new);
-            $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
-            if ($insert_history) {
-                $this->db_easyA->commit();
-            } else {
-                $this->db_easyA->rollback();
-            }
+            // die;
+
+            // $this->db_easyA->startTrans();
+            // $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
+            // if ($insert_history) {
+            //     $this->db_easyA->commit();
+            // } else {
+            //     $this->db_easyA->rollback();
+            // }
 
 
             $res_end['商品负责人'] = !empty($res_all_new[0]['商品负责人']) ? $res_all_new[0]['商品负责人'] : '';
@@ -231,6 +233,7 @@ class Budongxiao
             $res_end['云仓简称'] = !empty($res_all_new[0]['云仓']) ? $res_all_new[0]['云仓'] : 0;
             $res_end['店铺简称'] = !empty($res_all_new[0]['店铺名称']) ? $res_all_new[0]['店铺名称'] : 0;
             $res_end['经营性质'] = !empty($res_all_new[0]['经营模式']) ? $res_all_new[0]['经营模式'] : 0;
+            $res_end['季节归集'] = $this->params['季节归集'];
             $res_end['预计SKC数'] = $yujiSkc;
             $res_end['5-10天'] = $day5_10;
             $res_end['10-15天'] = $day10_15;
@@ -239,9 +242,20 @@ class Budongxiao
             $res_end['30天以上'] = $day30;
             $res_end['【考核标准】键'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
             $res_end['【考核标准】值'] = round($this->zeroHandle($res_end[$res_end['【考核标准】键']], $res_end['预计SKC数'])  * 100, 2);
+            $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
             $res_end['合格率10%以下'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
             $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
+            $res_end['create_time'] = $this->create_time;
+            $res_end['rand_code'] = $this->rand_code;
 
+            $addPeople = CwlBudongxiaoStatistics::addStatic($res_end);
+
+
+            // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
+            // $addPeople = $cwlBudongxiaoStatistics
+            // ->allowField(['商品负责人', '省份', '云仓简称', '店铺简称', '经营性质', '季节归集', '考核结果', 'rand_code', 'create_time']) 
+            // ->save($res_end);
+            // dump($res_end);
             return $res_end;
         } else {
             return false;
@@ -406,14 +420,14 @@ class Budongxiao
         // 中山三店 乐从一店 上市天数不足30
         $map = [
             // '省份' => '广东省',
-            // '商品负责人' => '周奇志',
+            // '商品负责人' => '曹太阳',
             '季节归集' => '春季',
             '考核区间' => '30天以上',
-            '店铺名称' => '巴马一店',
+            // '店铺名称' => '巴马一店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
             '上市天数' => 30,
-            'limit' => 10,
+            'limit' => 1000,
         ];
         // dump($map);
         $this->params = $map;
@@ -429,14 +443,31 @@ class Budongxiao
 
         $data = [];
         $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
-        // dump($storeArr);
+        // $people = SpWwBudongxiaoDetail::getPeople(); 
+        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
+        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
+
+
+        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
+        // $addPeople = $cwlBudongxiaoStatistics->allowField(['商品负责人'])->saveAll($people);
+        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
+        // echo $cwlBudongxiaoStatistics->getLastSql();
+
+        // $addPeople = CwlBudongxiaoStatistics::addPeople($people);
+
+        // $addPeople = $this->db_easyA->table('cwl_budongxiao_statistics')->insertAll($people);
+        // dump($people);
+        // dump($addPeople);
+        // die;
         foreach($storeArr as $key => $val) {
             $res = $this->store($val['店铺名称']);
             if ($res) {
                 $data[] = $res;
             }
+            die;
         }
 
+        dump($data);
         die;
         $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
             'rand_code' => $this->rand_code,
@@ -462,9 +493,51 @@ class Budongxiao
         ])->count();
     }
 
-    public function test3() {
-        SpWwBudongxiaoDetail::getTypeQiMa();
-        // $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
-        // dump($select_map);
+    // 单店不动销 详情
+    public function single_statistics() {
+        $create_time = '2023-04-18 19:46:49';
+        // $create_time = $this->create_time;
+        $sql = "    
+            SELECT
+                *,
+                @counter := @counter + 1 AS 排名 
+            FROM
+                (
+                SELECT
+                    a.商品负责人,
+                    COUNT( 'a.店铺简称' ) AS 总家数,
+                    b.合格家数,
+                    IFNULL( c.不合格家数, 0 ) AS 不合格家数,
+                    b.合格家数 / COUNT( 'a.店铺简称' ) AS 合格率,
+                    d.直营总家数,
+                    e.`直营合格家数`,
+                    IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
+                    e.`直营合格家数` / d.直营总家数 AS 直营合格率,
+                    IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
+                    IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
+                    IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
+                    IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                FROM
+                    cwl_budongxiao_statistics a
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND create_time = '{$create_time}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                WHERE a.create_time = '{$create_time}'    
+                GROUP BY
+                    a.商品负责人 
+                ) AS aa 
+            ORDER BY
+                aa.合格率 DESC 
+        ";
+
+        Db::connect('mysql')->query('SET @counter = 0;');
+        $res = Db::connect('mysql')->query($sql);
+        // dump($res);die;            
+        return $res;
     }
 }

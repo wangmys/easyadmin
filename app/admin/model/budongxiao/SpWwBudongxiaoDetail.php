@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\model\bi;
+namespace app\admin\model\budongxiao;
 use think\db\Raw;
 use app\common\model\TimeModel;
 

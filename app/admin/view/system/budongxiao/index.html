@@ -81,6 +81,11 @@
         .test {
             border: 1px solid red !important;
         }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
         .layui-col-md1 {
             width: 11.333% !important;
         }
@@ -100,7 +105,7 @@
             <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                 <div class="layui-form-item">
                     <label class="layui-form-label" style="width: 90px !important; text-align: center;">季节归集</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
+                    <div class="layui-input-inline" style="width: 150px !important;">
                         <select name="季节归集" lay-verify="required">
                             <option value="春季">春季</option>
                             <option value="夏季">夏季</option>
@@ -110,7 +115,7 @@
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center;">省份</label>
-                    <div class="layui-input-inline" style="width: 110px !important; ">
+                    <div class="layui-input-inline" style="width: 150px !important; ">
                         <select name="省份" lay-verify="">
                             <option value="">所有省份</option>
                             {foreach $province as $key=>$vo}
@@ -120,7 +125,7 @@
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow:visible;">商品负责人</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
+                    <div class="layui-input-inline" style="width: 150px !important;">
                         <select name="商品负责人" lay-verify="">
                             <option value="">所有负责人</option>
                             {foreach $people as $key=>$vo}
@@ -130,7 +135,7 @@
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center;">经营模式</label>
-                    <div class="layui-input-inline" style="width: 110px !important; ">
+                    <div class="layui-input-inline" style="width: 150px !important; ">
                         <select name="经营模式" lay-verify="">
                             <option value="">所有模式</option>
                             <option value="加盟">加盟</option>
@@ -139,7 +144,7 @@
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center;">考核区间</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
+                    <div class="layui-input-inline" style="width: 150px !important;">
                         <select name="考核区间" lay-verify="required">
                             <option value="30天以上">30天以上</option>
                             <option value="20-30天">20-30天</option>
@@ -150,21 +155,26 @@
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市时间</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
+                    <div class="layui-input-inline" style="width: 150px !important;">
                         <input type="text" name="上市时间" class="layui-input" id="shangshiriqi" placeholder="yyyy-MM-dd">
-                    </div>
-
-                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市天数>=</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
-                        <input type="number" name='上市天数' autocomplete="off" value="30" maxlength="3"
-                            class="layui-input" lay-verify="required">
                     </div>
                 </div>
 
 
                 <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市天数>=</label>
+                    <div class="layui-input-inline" style="width: 150px !important;">
+                        <input type="number" name='上市天数' autocomplete="off" value="30" maxlength="3"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">不考核门店</label>
+                    <div class="layui-input-inline" style="width: 150px !important;">
+                        <div id="xm-nostore" class="xm-select-demo"></div>
+                    </div>
+
                     <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">查询记录数</label>
-                    <div class="layui-input-inline" style="width: 110px !important;">
+                    <div class="layui-input-inline" style="width: 150px !important;">
                         <select name="limit" lay-verify="required">
                             <option value="10000">所有记录</option>
                             <option value="500">500条</option>
@@ -207,8 +217,8 @@
 </body>
 
 </html>
-<script src="__STATIC__/ok/lib/layui/layui.js"></script>
-
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
@@ -228,9 +238,28 @@
             elem: '#shangshiriqi'
         });
 
+        var xm_no_store = xmSelect.render({
+            el: '#xm-nostore', 
+            filterable: true,
+            // showCount: 1,
+            data: [
+                {name: '张三1', value: 1},
+                {name: '李四1', value: 2},
+                {name: '王五1', value: 3},
+                {name: '赵六1', value: 4},
+                {name: '苹果2', value: 5},
+                {name: '香蕉2', value: 6},
+                {name: '凤梨2', value: 7},
+                {name: '葡萄2', value: 8},
+                {name: '樱桃3', value: 9},
+                {name: '车厘子3', value: 10},
+                {name: '火龙果3', value: 11},
+            ]
+        })
+
         //监听提交
         form.on('submit(formDemo)', function (data) {
-            // console.log(data.field);
+            console.log(data.field);
             // layer.msg(JSON.stringify(data.field));
             data.field.isAjax = true
 
@@ -272,6 +301,45 @@
                     , { field: '合格率10%以下', title: '合格率10%以下' }
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
+                ,done: function (res, curr, count) {
+                    layer.alert("加载完成");
+                    console.log(res);
+                }
+            });
+        }
+
+        // 单店不动销数据统计 
+        function startTable2() {
+            table.render({
+                elem: '#table'
+                // ,url: url1
+                , loading: false
+                , method: 'post'
+                , toolbar: true
+                , page: false
+                , limit: 0
+                , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '商品负责人', title: '商品负责人' }
+                    , { field: '省份', title: '省份' }
+                    , { field: '云仓简称', title: '云仓简称' }
+                    , { field: '店铺简称', title: '店铺简称' }
+                    , { field: '经营性质', title: '经营属性' }
+                    , { field: '预计SKC数', title: '预计SKC数' }
+                    , { field: '5-10天', title: '5-10天' }
+                    , { field: '10-15天', title: '10-15天' }
+                    , { field: '15-20天', title: '15-20天' }
+                    , { field: '20-30天', title: '20-30天' }
+                    , { field: '30天以上', title: '30天以上' }
+                    , { field: '【考核标准】键', title: '【考核标准】键' }
+                    , { field: '【考核标准】值', title: '【考核标准】值' }
+                    , { field: '合格率10%以下', title: '合格率10%以下' }
+                    , { field: '需要调整SKC数', title: '需要调整SKC数' }
+                ]]
+                ,done: function (res, curr, count) {
+                    layer.alert("加载完成");
+                    console.log(res);
+                }
             });
         }
     });
