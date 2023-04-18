@@ -5,6 +5,7 @@ namespace app\api\controller\yinliu;
 use app\api\constants\ApiConstant;
 use app\BaseController;
 use app\api\service\bi\yinliu\YinliuDataService;
+use app\api\service\bi\fatory\CreateFactory;
 
 class Data extends BaseController
 {
@@ -34,10 +35,11 @@ class Data extends BaseController
     public function pullYinliuData()
     {
         $Date = $this->Date;
-        $code = $this->service->save($Date);
+        $model = $this->service;
+        $code = $model->save($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
@@ -47,10 +49,11 @@ class Data extends BaseController
     public function createYinliuTotal()
     {
         $Date = $this->Date;
-        $code = $this->service->create($Date);
+        $model = $this->service;
+        $code = $model->create($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
@@ -60,10 +63,11 @@ class Data extends BaseController
     public function updateYinliuState()
     {
         $Date = $this->Date;
-        $code = $this->service->checkMondayComplete($Date);
+        $model = $this->service;
+        $code = $model->checkMondayComplete($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
@@ -79,5 +83,18 @@ class Data extends BaseController
         $this->createYinliuTotal();
         // 更新周一问题状态
         return $this->updateYinliuState();
+    }
+
+    /**
+     * 拉取引流款问题数据
+     */
+    public function pullDressData()
+    {
+        $model = CreateFactory::createService('yinliu');
+        $code = $model->pullYinliuData();
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
     }
 }

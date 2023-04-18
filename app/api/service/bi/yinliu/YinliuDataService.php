@@ -7,17 +7,19 @@ use app\admin\model\dress\Yinliu;
 use app\admin\model\dress\Accessories;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\YinliuStore;
+use app\common\logic\inventory\DressLogic;
 use app\admin\model\dress\Store;
 use app\api\constants\ApiConstant;
 use app\common\constants\AdminConstant;
 use think\App;
 use think\facade\Db;
 use think\cache\driver\Redis;
+use app\admin\model\dress\YinliuProblemLog;
 
 /**
  * 引流配饰数据拉取服务
  * Class AuthService
- * @package app\common\service
+ * @package app\api\service\bi\yinliu
  */
 class YinliuDataService
 {
@@ -39,6 +41,10 @@ class YinliuDataService
         $this->accessories = new Accessories();
         $this->yinliuStore = new YinliuStore();
         $this->store = new Store();
+        // 实例化逻辑类
+        $this->logic = new DressLogic;
+        $this->yinliuProblemLog = new YinliuProblemLog;
+        $this->Date = date('Y-m-d');
     }
 
     /**
@@ -58,7 +64,7 @@ class YinliuDataService
         // 查询本地今日数据量
         $toDayCount = $this->model->where(['Date' => $Date])->count();
         // 如果远程引流表的数据与本地库存表数据量一致则今日已取数据,不再重复获取
-        if($count == $toDayCount || $toDayCount > 1){
+        if($count == $toDayCount || $toDayCount > 0){
             return ApiConstant::ERROR_CODE_1;
         }
         // 查询不合格数据
@@ -250,10 +256,112 @@ class YinliuDataService
     }
 
     /**
+     * 拉取引流款库存不合格记录
+     */
+    public function pullYinliuData()
+    {
+        // 获取今日日期
+        $Date = $this->Date;
+        // 查询本地今日数据量
+        $toDayCount =  $this->yinliuProblemLog->where(['Date' => $Date])->count();
+        // 如果远程引流表的数据与本地库存表数据量一致则今日已取数据,不再重复获取
+        if($toDayCount > 0){
+            return ApiConstant::ERROR_CODE_1;
+        }
+        // 动态表头字段
+        $head = $this->logic->dressHead->column('name,field,stock','name');
+        // 固定字段
+        $defaultFields = ['省份','店铺名称','商品负责人'];
+        // 固定字段
+        $field = implode(',',$defaultFields);
+        foreach ($head as $k=>$v){
+            // 计算字段合并,多字段相加
+            $field_str = str_replace(',',' + ',$v['field']);
+            // 拼接查询字段
+            $field .= ",( $field_str ) as {$v['name']}";
+        }
+        // 数据集
+        $list_all = [];
+        // 启动事务
+        Db::startTrans();
+        // 省查询
+        $warStockItem = $this->logic->warStockItem();
+        try{
+            // 根据每个省份设置的筛选查询
+            foreach($warStockItem as $kk => $vv){
+                // 查询条件
+                $having = '';
+                foreach ($vv['_data'] as $k=>$v){
+                    // 拼接过滤条件
+                    $having .= " {$k} < {$v} or ";
+                }
+                $having = "(".trim($having,'or ').")";
+                // 查询数据
+                $list = $this->accessories->field($field)->where([
+                    'Date' => $Date
+                ])->where(function ($q)use($vv){
+                    if(!empty($vv['省份'])){
+                       $q->whereIn('省份',$vv['省份']);
+                    }
+                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+                // 保存筛选出来的问题记录
+                $item_data = $this->saveDressData($list,$vv['_data'],$head);
+                $list_all = array_merge($list_all,$item_data);
+            }
+            // 保存问题数据
+            YinliuProblemLog::selfSaveData($list_all);
+            // 提交事务
+            Db::commit();
+        }catch (\Exception $e){
+            file_put_contents("./pull_dress_log.txt",var_export($e->getMessage(),true).'  '.date('Y/m/d H:i:s')."\r\n",FILE_APPEND);
+            // 回滚事务
+            Db::rollback();
+            $this->msg = $e->getMessage();
+            return ApiConstant::ERROR_CODE;
+        }
+        return ApiConstant::SUCCESS_CODE;
+    }
+
+    /**
+     * 保存引流款数据
+     */
+    public function saveDressData($data,$filter,$head)
+    {
+        if(empty($data) || empty($filter) || empty($head)){
+            return [];
+        }
+        // 定义不达标数据集合
+        $save_data = [];
+        foreach ($data as $k => $v){
+            foreach ($v as $kk => $vv){
+                if(isset($filter[$kk]) && !empty($filter[$kk])){
+                    $vv = intval($vv);
+                    if($vv < $filter[$kk]){
+                        $save_data[] = [
+                            'Date' => $this->Date,
+                            'field_str' => $head[$kk]['field'],
+                            'head_name' => $kk,
+                            '省份' => $v['省份'],
+                            '商品负责人' => $v['商品负责人'],
+                            '店铺名称' => $v['店铺名称'],
+                            'stocks' => $v[$kk],
+                            'qualified_num' => $filter[$kk],
+                            'is_qualified' => 1,
+                            'week' => date('w'),
+                            'is_monday' => date('w')==1?1:0
+                        ];
+                    }
+                }
+            }
+        }
+        return  $save_data;
+    }
+
+    /**
      * 获取错误提示
      */
     public function getError($code = 0)
     {
-        return $this->msg?:ApiConstant::ERROR_CODE_LIST[$code];
+        return !empty($this->msg)?$this->msg:ApiConstant::ERROR_CODE_LIST[$code];
     }
 }

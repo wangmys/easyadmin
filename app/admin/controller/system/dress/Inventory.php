@@ -28,8 +28,6 @@ use jianyan\excel\Excel;
 class Inventory extends AdminController
 {
 
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
@@ -43,6 +41,7 @@ class Inventory extends AdminController
 
     /**
      * 展示配饰库存不足标准的数据
+     * @NodeAnotation(title="列表")
      * @return mixed|\think\response\Json
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -148,6 +147,7 @@ class Inventory extends AdminController
 
     /**
      * 展示配饰不合格的店铺总计
+     * @NodeAnotation(title="配饰不合格统计")
      */
     public function question()
     {
@@ -251,36 +251,42 @@ class Inventory extends AdminController
 
     /**
      * 商品专员问题集合
+     * @NodeAnotation(title="问题总览")
      */
     public function gather()
     {
         $get = $this->request->get();
         if ($this->request->isAjax()) {
-            $name = $get['name']??'';
+            $nameList = $get['name']??'';
+            if(empty($nameList)){
+                $nameList = AdminConstant::CHARGE_LIST;
+            }else{
+                $nameList = [$nameList];
+            }
+            $data = [];
             $Date = date('Y-m-d');
-            // 查询周一存在的问题
-            $question_total = Store::where([
-                '商品负责人' => $name,
-                'Date' => getThisDayToStartDate()[0]
-            ])->count();
+            foreach ($nameList as $key => $name){
+                // 查询周一存在的问题
+                $question_total = Store::where([
+                    '商品负责人' => $name,
+                    'Date' => getThisDayToStartDate()[0]
+                ])->count();
 
-            // 查询周一哪些问题未处理
-            $question_not_total = Store::where([
-                '商品负责人' => $name,
-                'Date' => getThisDayToStartDate()[0],
-                'is_qualified' => 0
-            ])->count();
+                // 查询周一哪些问题未处理
+                $question_not_total = Store::where([
+                    '商品负责人' => $name,
+                    'Date' => getThisDayToStartDate()[0],
+                    'is_qualified' => 0
+                ])->count();
 
-            // 查询总共哪些问题未处理
-            $question_this_num = Store::where([
-                '商品负责人' => $name,
-                'Date' => getThisDayToStartDate()[1],
-                'is_qualified' => 0
-            ])->count();
-
-            $data = [
-                [
-                    'order_num' => 1,
+                // 查询总共哪些问题未处理
+                $question_this_num = Store::where([
+                    '商品负责人' => $name,
+                    'Date' => getThisDayToStartDate()[1],
+                    'is_qualified' => 0
+                ])->count();
+                $item = [
+                    'order_num' => ($key + 1),
                     '商品负责人' => $name,
                     'name' => '配饰库存不足',
                     // 问题总数
@@ -288,8 +294,9 @@ class Inventory extends AdminController
                     'untreate' => $question_not_total,
                     'this_num' => $question_this_num,
                     'time' => $question_not_total>0?getIntervalDays():'',
-                ]
-            ];
+                ];
+                $data[] = $item;
+            }
             $list = [
                 'code'  => 0,
                 'msg'   => '',
@@ -306,6 +313,7 @@ class Inventory extends AdminController
 
     /**
      * 任务总览
+     * @NodeAnotation(title="任务总览")
      */
     public function task_overview()
     {

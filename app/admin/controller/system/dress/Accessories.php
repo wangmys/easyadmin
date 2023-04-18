@@ -24,8 +24,6 @@ use think\cache\driver\Redis;
 class Accessories extends AdminController
 {
 
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
@@ -71,6 +69,9 @@ class Accessories extends AdminController
                 });
             }
 
+            // 设置门店筛选
+            $count = $this->setStoreFilter($count);
+            // 查询数量
             $count = $count->count();
 
             if(empty($where)){
@@ -98,7 +99,8 @@ class Accessories extends AdminController
                     }
                 });
             }
-
+            // 设置门店筛选
+            $list = $this->setStoreFilter($list);
             $list = $list->order('省份,店铺名称,商品负责人')->page($page, $limit)
                 ->select()->append(['config'])->withAttr('config',function ($data,$value) use($stock_warn){
                     return $stock_warn;
@@ -156,6 +158,8 @@ class Accessories extends AdminController
                     }
                 });
             }
+             // 设置门店筛选
+            $count = $this->setStoreFilter($count);
             // 计数
             $count = $count->count();
 
@@ -179,7 +183,8 @@ class Accessories extends AdminController
                     }
                 });
             }
-
+            // 设置门店筛选
+            $list = $this->setStoreFilter($list);
             $list = $list->order('省份,店铺名称,商品负责人')->page($page, $limit)->select()->append(['config'])->withAttr('config',function ($data,$value) use($stock_warn){
                     return $stock_warn;
                 });
@@ -221,106 +226,14 @@ class Accessories extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="添加")
+     * 设置门店筛选
      */
-    public function add()
+    public function setStoreFilter($model)
     {
-        if ($this->request->isPost()) {
-            $post = $this->request->post();
-            $authIds = $this->request->post('auth_ids', []);
-            $post['auth_ids'] = implode(',', array_keys($authIds));
-            $rule = [];
-            $this->validate($post, $rule);
-            try {
-                $save = $this->model->save($post);
-            } catch (\Exception $e) {
-                $this->error('保存失败');
-            }
-            $save ? $this->success('保存成功') : $this->error('保存失败');
-        }
-        return $this->fetch();
-    }
-
-    /**
-     * @NodeAnotation(title="编辑")
-     */
-    public function edit($id)
-    {
-        $row = $this->model->find($id);
-        empty($row) && $this->error('数据不存在');
-        if ($this->request->isPost()) {
-            $post = $this->request->post();
-            $authIds = $this->request->post('auth_ids', []);
-            $post['auth_ids'] = implode(',', array_keys($authIds));
-            $rule = [];
-            $this->validate($post, $rule);
-            if (isset($row['password'])) {
-                unset($row['password']);
-            }
-            try {
-                $save = $row->save($post);
-                TriggerService::updateMenu($id);
-            } catch (\Exception $e) {
-                $this->error('保存失败');
-            }
-            $save ? $this->success('保存成功') : $this->error('保存失败');
-        }
-        $row->auth_ids = explode(',', $row->auth_ids);
-        $this->assign('row', $row);
-        return $this->fetch();
-    }
-
-    /**
-     * @NodeAnotation(title="删除")
-     */
-    public function delete($id)
-    {
-        $this->checkPostRequest();
-        $row = $this->model->whereIn('id', $id)->select();
-        $row->isEmpty() && $this->error('数据不存在');
-        $id == AdminConstant::SUPER_ADMIN_ID && $this->error('超级管理员不允许修改');
-        if (is_array($id)){
-            if (in_array(AdminConstant::SUPER_ADMIN_ID, $id)){
-                $this->error('超级管理员不允许修改');
-            }
-        }
-        try {
-            $save = $row->delete();
-        } catch (\Exception $e) {
-            $this->error('删除失败');
-        }
-        $save ? $this->success('删除成功') : $this->error('删除失败');
-    }
-
-    /**
-     * @NodeAnotation(title="属性修改")
-     */
-    public function modify()
-    {
-        $this->checkPostRequest();
-        $post = $this->request->post();
-        $rule = [
-            'id|ID'    => 'require',
-            'field|字段' => 'require',
-            'value|值'  => 'require',
-        ];
-        $this->validate($post, $rule);
-        if (!in_array($post['field'], $this->allowModifyFields)) {
-            $this->error('该字段不允许修改：' . $post['field']);
-        }
-        if ($post['id'] == AdminConstant::SUPER_ADMIN_ID && $post['field'] == 'status') {
-            $this->error('超级管理员状态不允许修改');
-        }
-        $row = $this->model->find($post['id']);
-        empty($row) && $this->error('数据不存在');
-        try {
-            $row->save([
-                $post['field'] => $post['value'],
-            ]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
-        $this->success('保存成功');
+        // 获取配饰门店排除列表
+        $storeList = sysconfig('site','accessories_store_list');
+        if(empty($storeList) || empty($model)) return $model;
+        return $model->whereNotIn('店铺名称',$storeList);
     }
 
     /**

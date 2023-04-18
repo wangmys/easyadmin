@@ -27,9 +27,6 @@ use app\admin\model\weather\Region;
  */
 class Customorstocksale7 extends AdminController
 {
-
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',

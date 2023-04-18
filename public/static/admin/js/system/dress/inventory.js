@@ -87,18 +87,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
             //转换静态表格
             var list_table = table.init('list', {
                 done: function (res, curr, count) {
-
-                    console.log(res.data)
-                    var that = this.elem.next();
-                    for(res.data in item){
-                        var tr = that.find("[data-index=" + index + "]").children();
-                            tr.each(function (i,value) {
-                                $(this).css("background-color", "rgba(255,0,0,.2)");//单元格背景颜色
-                            })
-                    }
-
-
-                    console.log(key)
+                    // var that = this.elem.next();
+                    // for(res.data in item){
+                    //     var tr = that.find("[data-index=" + index + "]").children();
+                    //         tr.each(function (i,value) {
+                    //             $(this).css("background-color", "rgba(255,0,0,.2)");//单元格背景颜色
+                    //         })
+                    // }
                     // $('#list_table').find('tr').css({'background':'#5FB878','color':'white'}).siblings().removeAttr('style')
                 }
             });

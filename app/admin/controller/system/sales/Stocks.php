@@ -19,9 +19,6 @@ use think\facade\Db;
  */
 class Stocks extends AdminController
 {
-
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
