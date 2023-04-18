@@ -30,13 +30,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 limits:[1000,2000]
             });
 
-            // var $_field = $("#_field").val();
-            // var _field = JSON.parse($_field);
-            // console.log(_field)
-            // var list_table = table.init('list', {
-            //     url:'/admin/system.dress.dress/stock',
-            //     cols: [_field],
-            // });
+            var list_table = table.init('standard_table', {
+
+            });
 
             ea.listen();
         },

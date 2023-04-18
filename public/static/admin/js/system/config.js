@@ -6,16 +6,21 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
     var Controller = {
         index: function () {
 
-            var app = new Vue({
-                el: '#app',
-                data: {
-                    upload_type: upload_type
-                }
-            });
-            form.on("radio(upload_type)", function (data) {
-                    app.upload_type = this.value;
-                });
+            // var app = new Vue({
+            //     el: '#app',
+            //     data: {
+            //         upload_type: upload_type
+            //     }
+            // });
+            // form.on("radio(upload_type)", function (data) {
+            //     app.upload_type = this.value;
+            // });
 
+            // 渲染配饰排除门店
+            this.exclude_store();
+
+            // 渲染引流款排除门店
+            this.exclude_yinliu_store();
 
              // 请求省,字段数据
              url = ea.url('/system.dress.config/index');
@@ -80,6 +85,38 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
              });
 
             ea.listen();
+        },
+        // 排除的门店
+        exclude_store:function () {
+            var $get = $("#store_list").val();
+            var cols = JSON.parse($get);
+            var el = $('#exclude_store')[0];
+            var field = xmSelect.render({
+                autoRow: true,
+		        toolbar: { show: true },
+                el: el,
+                data: function(){
+                    return cols
+                },
+                name:'accessories_store_list',
+                filterable:true
+            })
+        },
+        // 排除引流款的门店
+        exclude_yinliu_store:function () {
+            var _get = $("#yinliu_store_list").val();
+            var cols = JSON.parse(_get);
+            var el = $('#exclude_yinliu_store')[0];
+            var yinliu = xmSelect.render({
+                autoRow: true,
+		        toolbar: { show: true },
+                el: el,
+                data: function(){
+                    return cols
+                },
+                name:'yinliu_store_list',
+                filterable:true
+            })
         }
     };
     return Controller;
