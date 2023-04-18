@@ -23,7 +23,7 @@ class Budongxiao
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
-        $this->rand_code = $this->rand_code(4);
+        $this->rand_code = $this->rand_code(10);
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
@@ -59,7 +59,7 @@ class Budongxiao
                     'map' => json_encode($this->params),
                 ]);
             }
-            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data]);
+            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code]);
         } else {
             // 齐码
             $typeQima = $this->getTypeQiMa();
@@ -205,7 +205,6 @@ class Budongxiao
                         $insert_history_data[] = $res_all_new[$key];
                     }
                 }
-                
             }
 
             // echo '<pre>';
@@ -219,14 +218,13 @@ class Budongxiao
             // dump($res_all_new);
             // die;
 
-            // $this->db_easyA->startTrans();
-            // $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
-            // if ($insert_history) {
-            //     $this->db_easyA->commit();
-            // } else {
-            //     $this->db_easyA->rollback();
-            // }
-
+            $this->db_easyA->startTrans();
+            $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
+            if ($insert_history) {
+                $this->db_easyA->commit();
+            } else {
+                $this->db_easyA->rollback();
+            }
 
             $res_end['商品负责人'] = !empty($res_all_new[0]['商品负责人']) ? $res_all_new[0]['商品负责人'] : '';
             $res_end['省份'] = !empty($res_all_new[0]['省份']) ? $res_all_new[0]['省份'] : 0;
@@ -248,14 +246,9 @@ class Budongxiao
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
 
+            // 统计插入
             $addPeople = CwlBudongxiaoStatistics::addStatic($res_end);
 
-
-            // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
-            // $addPeople = $cwlBudongxiaoStatistics
-            // ->allowField(['商品负责人', '省份', '云仓简称', '店铺简称', '经营性质', '季节归集', '考核结果', 'rand_code', 'create_time']) 
-            // ->save($res_end);
-            // dump($res_end);
             return $res_end;
         } else {
             return false;
@@ -495,8 +488,10 @@ class Budongxiao
 
     // 单店不动销 详情
     public function single_statistics() {
-        $create_time = '2023-04-18 19:46:49';
+        // $create_time = '2023-04-18 19:46:49';
         // $create_time = $this->create_time;
+        $rand_code = input('rand_code');
+
         $sql = "    
             SELECT
                 *,
@@ -508,26 +503,26 @@ class Budongxiao
                     COUNT( 'a.店铺简称' ) AS 总家数,
                     b.合格家数,
                     IFNULL( c.不合格家数, 0 ) AS 不合格家数,
-                    b.合格家数 / COUNT( 'a.店铺简称' ) AS 合格率,
-                    d.直营总家数,
-                    e.`直营合格家数`,
+                    IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                    IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
+                    IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
                     IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
-                    e.`直营合格家数` / d.直营总家数 AS 直营合格率,
+                    IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
                     IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
                     IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
                     IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
                     IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
                 FROM
                     cwl_budongxiao_statistics a
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND create_time = '{$create_time}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND create_time = '{$create_time}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
-                WHERE a.create_time = '{$create_time}'    
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                WHERE a.rand_code = '{$rand_code}'    
                 GROUP BY
                     a.商品负责人 
                 ) AS aa 
@@ -538,6 +533,7 @@ class Budongxiao
         Db::connect('mysql')->query('SET @counter = 0;');
         $res = Db::connect('mysql')->query($sql);
         // dump($res);die;            
-        return $res;
+        // return $res;
+        return json(["code" => "0", "msg" => "",  "data" => $res]);
     }
 }

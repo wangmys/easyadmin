@@ -25,28 +25,4 @@ class CwlBudongxiaoStatistics extends TimeModel
         return $res;
     } 
 
-    // 查找负责人
-    public static function getPeople($map = []) {
-        // dump($data);die;
-        // $res = self::where($map)
-        // ->field('商品负责人, count(*) as 总家数')
-        // ->group('商品负责人')
-        // ->select()
-        // ->toArray();
-        // return $res;
-
-        $res = self::alias('a')
-        ->leftJoin(['cwl_budongxiao_statistics' => 'b'], 'a.商品负责人 = b.商品负责人')
-        
-        ->where([
-            ['b.考核结果', '=', '合格']
-        ])
-        ->field('a.商品负责人, count(*) as 总家数')
-        ->group('商品负责人')
-        ->select()
-        ->toArray();
-        echo self::getLastSql();
-        return $res;
-    } 
-
 }
