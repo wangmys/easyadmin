@@ -19,6 +19,7 @@ use app\common\controller\AdminController;
 use app\common\constants\AdminConstant;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
+use app\common\logic\inventory\DressLogic;
 use think\App;
 
 /**
@@ -33,6 +34,8 @@ class Config extends AdminController
     {
         parent::__construct($app);
         $this->model = new SystemConfig();
+        // 实例化逻辑类
+        $this->logic = new DressLogic;
     }
 
     /**
@@ -42,8 +45,40 @@ class Config extends AdminController
     {
         // 字段
         $field = AdminConstant::STOCK_FIELD;
+        // 门店列表
+        $store_list = $yinliu_store_list = $this->logic->getStore();
+        // 已保存门店
+        $save_store = sysconfig('site','accessories_store_list');
+        if($save_store){
+            $save_store_arr = explode(',',$save_store);
+            foreach ($save_store_arr as $k => $v){
+                $val_list = array_column($store_list,'name');
+                $rs_key = array_search($v,$val_list);
+                if($rs_key !== false){
+                    if($store_list[$rs_key]){
+                        $store_list[$rs_key]['selected'] = true;
+                    }
+                }
+            }
+        }
+        // 已保存门店
+        $yinliu_store = sysconfig('site','yinliu_store_list');
+        if($yinliu_store){
+            $save_yinliu_store = explode(',',$yinliu_store);
+            foreach ($save_yinliu_store as $k => $v){
+                $val_list = array_column($yinliu_store_list,'name');
+                $rs_key = array_search($v,$val_list);
+                if($rs_key !== false){
+                    if($yinliu_store_list[$rs_key]){
+                        $yinliu_store_list[$rs_key]['selected'] = true;
+                    }
+                }
+            }
+        }
         $this->assign([
-            'field' => $field
+            'field' => $field,
+            'store_list' => $store_list,
+            'yinliu_store_list' => $yinliu_store_list
         ]);
         return $this->fetch();
     }
@@ -69,6 +104,9 @@ class Config extends AdminController
                     'value' => $val,
                     'group' => $group
                 ];
+                if(in_array($key,['accessories_store_list','yinliu_store_list'])){
+                    $d['group'] = 'site';
+                }
                 if($id){
                     $d['id'] = $id;
                 }
@@ -82,7 +120,6 @@ class Config extends AdminController
         }
         $this->success('保存成功');
     }
-
 
     public function save_copy()
     {

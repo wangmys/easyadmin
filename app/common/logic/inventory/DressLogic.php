@@ -266,6 +266,22 @@ class DressLogic
     }
 
     /**
+     * 获取所有门店
+     */
+    public function getStore()
+    {
+        $storeName = Accessories::whereNotIn('店铺名称', ['合计'])->group('店铺名称')->column('店铺名称');
+        $storeList = [];
+        foreach ($storeName as $k => $v){
+            $storeList[] = [
+                'name' => $v,
+                'value' => $v
+            ];
+        }
+        return $storeList;
+    }
+
+    /**
      * 获取预警库存配置
      */
     public function warStockItem()

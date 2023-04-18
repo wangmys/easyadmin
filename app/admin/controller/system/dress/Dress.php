@@ -52,6 +52,8 @@ class Dress extends AdminController
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
+         // 获取预警库存查询条件
+        $warStockItem = $this->logic->warStockItem();
         if ($this->request->isAjax()) {
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
@@ -67,8 +69,6 @@ class Dress extends AdminController
             $field = trim($field,',');
             // 数据集
             $list_all = [];
-            // 省查询
-            $warStockItem = $this->logic->warStockItem();
             // 根据每个省份设置的筛选查询
             foreach($warStockItem as $kk => $vv){
                 // 查询条件
@@ -114,7 +114,7 @@ class Dress extends AdminController
             $length = substr_count($v,'_');
             $item = [
                 'field' => $v,
-                'width' => 134,
+                'minWidth' => 134,
                 'search' => false,
                 'title' => $v,
                 'align' => 'center',
@@ -130,7 +130,21 @@ class Dress extends AdminController
             };
             $cols[] = $item;
         }
-        return $this->fetch('',['cols' => $cols,'_field' => $_field,'config' => $this->config($head)]);
+        // 标准
+        $standard = [];
+        foreach ($warStockItem as $key => $v){
+            $num = count($v['省份']);
+            if($num > 2){
+                $item = $v['省份'];
+                $standard[$key]['省份'] = implode(',',[$item[0],$item[1]]).'...';
+            }else{
+                $standard[$key]['省份'] = implode(',',$v['省份']);
+            }
+            $standard[$key]['省份数量'] = $num;
+            $standard[$key]['描述'] = '库存标准';
+            $standard[$key] = array_merge($standard[$key],$v['_data']);
+        }
+        return $this->fetch('',['cols' => $cols,'_field' => $standard]);
     }
 
 
