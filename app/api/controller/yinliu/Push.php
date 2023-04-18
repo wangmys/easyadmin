@@ -61,6 +61,7 @@ class Push extends BaseController
     /**
      * 提送每日业绩至老板、王威
      * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
      */
     public function pushYeji()
     {
@@ -80,6 +81,11 @@ class Push extends BaseController
                 'name' => '王威',
                 'tel' => '15880012590',
                 'userid' => '0812473564939990'
+            ],
+            [
+                'name' => '杨剑',
+                'tel' => '15200838578',
+                'userid' => '1369166106841705'
             ]
         ];
 
