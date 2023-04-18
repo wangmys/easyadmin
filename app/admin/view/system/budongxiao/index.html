@@ -212,10 +212,14 @@
         </form>
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
-        <table class="layui-hide" id="table" ></table>
+        <table class="layui-hide" id="table2" >
+            <div class="title_text2" style="text-align: center; display: none; color:#0051ff;">不动销汇总</div>
+        </table>
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
-        <table class="layui-hide" id="table2" ></table>
+        <table class="layui-hide" id="table" >
+            <div class="title_text1" style="text-align: center; color:#0051ff;">单店不动销合格情况</div>
+        </table>
     </div>
 </body>
 
@@ -263,6 +267,8 @@
 
         //监听提交
         form.on('submit(formDemo)', function (data) {
+            $('#table2').css('display', 'none');
+            $("[lay-id='table2']").css('display', 'none');
             console.log(data.field);
             // layer.msg(JSON.stringify(data.field));
             data.field.isAjax = true
@@ -308,6 +314,7 @@
                 ,done: function (res, curr, count) {
                     layer.alert("加载完成");
                     console.log(res);
+                    $('.title_text2').css('display', 'block');
                     startTable2(res.rand_code);
                 }
             });
@@ -340,8 +347,6 @@
                     , { field: '加盟合格家数', title: '加盟合格家数' }
                     , { field: '加盟不合格家数', title: '加盟不合格家数' }
                     , { field: '加盟合格率', title: '加盟合格率' }
-                    , { field: '合格率10%以下', title: '合格率10%以下' }
-                    , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
