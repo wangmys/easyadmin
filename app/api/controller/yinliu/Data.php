@@ -30,7 +30,7 @@ class Data extends BaseController
     }
 
     /**
-     *  拉取问题数据并储存
+     *  拉取配饰问题数据并储存
      */
     public function pullYinliuData()
     {
@@ -58,12 +58,13 @@ class Data extends BaseController
     }
 
     /**
-     *  生成问题统计
+     *  更新周一问题状态
      */
     public function updateYinliuState()
     {
         $Date = $this->Date;
         $model = $this->service;
+        // 检测周一任务完成度
         $code = $model->checkMondayComplete($Date);
         return json([
             'code' => $code,
@@ -91,7 +92,25 @@ class Data extends BaseController
     public function pullDressData()
     {
         $model = CreateFactory::createService('yinliu');
-        $code = $model->pullYinliuData();
+        $Date = $this->Date;
+        // 拉取引流款库存不达标数据
+        $code = $model->pullYinliuData($Date);
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
+    }
+
+    /**
+     * 执行引流款问题数据任务
+     */
+    public function executeDeessTask()
+    {
+        $Date = $this->Date;
+        $model = CreateFactory::createService('yinliu');
+        // 拉取引流款库存不达标数据
+        $model->pullYinliuData($Date);
+        $code = $model->updateMondayTaskStatue($Date);
         return json([
             'code' => $code,
             'msg' => $model->getError($code)

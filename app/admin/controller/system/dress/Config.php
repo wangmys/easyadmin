@@ -38,7 +38,7 @@ class Config extends AdminController
     }
 
     /**
-     * * @NodeAnotation(title="引流总览")
+     * * @NodeAnotation(title="引流配置")
      * 数据筛选配置
      */
     public function index()
