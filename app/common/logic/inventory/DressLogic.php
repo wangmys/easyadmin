@@ -182,6 +182,27 @@ class DressLogic
     }
 
     /**
+     * 获取表头字段
+     * @return array
+     */
+    public function getHead()
+    {
+        $head = $model = $this->dressHead::where(['state' => 1])->column('name,field,stock','id');
+        // 固定字段
+        $column = AdminConstant::YINLIU_COLUMN;
+        $head_list = [];
+        foreach ($head as $k => $v){
+            $v['field'] = array_map(function($val)use($v){
+                $item = explode(',',$v['field']);
+                if(in_array($val['name'],$item)) $val['selected'] = true;
+                return $val;
+            }, $column);
+            $head_list[] = $v;
+        }
+        return $head_list;
+    }
+
+    /**
      * 获取所有省份
      */
     public function getProvince()
@@ -211,25 +232,19 @@ class DressLogic
         return $province_list;
     }
 
-    /**
-     * 获取表头字段
-     * @return array
-     */
-    public function getHead()
+     // 拼接查询字段 SQL 语句
+    public function getFieldSQL()
     {
-        $head = $model = $this->dressHead::where(['state' => 1])->column('name,field,stock','id');
-        // 固定字段
-        $column = AdminConstant::YINLIU_COLUMN;
-        $head_list = [];
-        foreach ($head as $k => $v){
-            $v['field'] = array_map(function($val)use($v){
-               $item = explode(',',$v['field']);
-               if(in_array($val['name'],$item)) $val['selected'] = true;
-               return $val;
-            }, $column);
-            $head_list[] = $v;
+        $head = $this->dressHead->column('name,field,stock', 'id');
+        $_field_default = ['省份','店铺名称','商品负责人'];
+        $_field = array_merge($_field_default, array_column($head, 'name'));
+        $field = implode(',', $_field_default);
+        foreach ($head as $k => $v) {
+            $field_str = str_replace(',', ' + ', $v['field']);
+            $field .= ",( $field_str ) as {$v['name']}";
         }
-        return $head_list;
+        $field = trim($field, ',');
+        return $field;
     }
 
     /**

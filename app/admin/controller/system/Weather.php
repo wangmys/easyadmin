@@ -25,9 +25,6 @@ use app\admin\model\weather\Region;
  */
 class Weather extends AdminController
 {
-
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',

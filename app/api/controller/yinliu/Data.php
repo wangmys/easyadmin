@@ -5,6 +5,7 @@ namespace app\api\controller\yinliu;
 use app\api\constants\ApiConstant;
 use app\BaseController;
 use app\api\service\bi\yinliu\YinliuDataService;
+use app\api\service\bi\fatory\CreateFactory;
 
 class Data extends BaseController
 {
@@ -29,15 +30,16 @@ class Data extends BaseController
     }
 
     /**
-     *  拉取问题数据并储存
+     *  拉取配饰问题数据并储存
      */
     public function pullYinliuData()
     {
         $Date = $this->Date;
-        $code = $this->service->save($Date);
+        $model = $this->service;
+        $code = $model->save($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
@@ -47,23 +49,26 @@ class Data extends BaseController
     public function createYinliuTotal()
     {
         $Date = $this->Date;
-        $code = $this->service->create($Date);
+        $model = $this->service;
+        $code = $model->create($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
     /**
-     *  生成问题统计
+     *  更新周一问题状态
      */
     public function updateYinliuState()
     {
         $Date = $this->Date;
-        $code = $this->service->checkMondayComplete($Date);
+        $model = $this->service;
+        // 检测周一任务完成度
+        $code = $model->checkMondayComplete($Date);
         return json([
             'code' => $code,
-            'msg' => $this->service->getError($code)
+            'msg' => $model->getError($code)
         ]);
     }
 
@@ -79,5 +84,36 @@ class Data extends BaseController
         $this->createYinliuTotal();
         // 更新周一问题状态
         return $this->updateYinliuState();
+    }
+
+    /**
+     * 拉取引流款问题数据
+     */
+    public function pullDressData()
+    {
+        $model = CreateFactory::createService('yinliu');
+        $Date = $this->Date;
+        // 拉取引流款库存不达标数据
+        $code = $model->pullYinliuData($Date);
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
+    }
+
+    /**
+     * 执行引流款问题数据任务
+     */
+    public function executeDeessTask()
+    {
+        $Date = $this->Date;
+        $model = CreateFactory::createService('yinliu');
+        // 拉取引流款库存不达标数据
+        $model->pullYinliuData($Date);
+        $code = $model->updateMondayTaskStatue($Date);
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
     }
 }

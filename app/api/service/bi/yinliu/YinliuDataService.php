@@ -5,19 +5,22 @@ namespace app\api\service\bi\yinliu;
 
 use app\admin\model\dress\Yinliu;
 use app\admin\model\dress\Accessories;
+use app\admin\model\dress\YinliuProblemDetail;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\YinliuStore;
+use app\common\logic\inventory\DressLogic;
 use app\admin\model\dress\Store;
 use app\api\constants\ApiConstant;
 use app\common\constants\AdminConstant;
 use think\App;
 use think\facade\Db;
 use think\cache\driver\Redis;
+use app\admin\model\dress\YinliuProblemLog;
 
 /**
  * 引流配饰数据拉取服务
  * Class AuthService
- * @package app\common\service
+ * @package app\api\service\bi\yinliu
  */
 class YinliuDataService
 {
@@ -39,6 +42,9 @@ class YinliuDataService
         $this->accessories = new Accessories();
         $this->yinliuStore = new YinliuStore();
         $this->store = new Store();
+        // 实例化逻辑类
+        $this->logic = new DressLogic;
+        $this->yinliuProblemLog = new YinliuProblemLog;
     }
 
     /**
@@ -58,7 +64,7 @@ class YinliuDataService
         // 查询本地今日数据量
         $toDayCount = $this->model->where(['Date' => $Date])->count();
         // 如果远程引流表的数据与本地库存表数据量一致则今日已取数据,不再重复获取
-        if($count == $toDayCount || $toDayCount > 1){
+        if($count == $toDayCount || $toDayCount > 0){
             return ApiConstant::ERROR_CODE_1;
         }
         // 查询不合格数据
@@ -195,31 +201,29 @@ class YinliuDataService
      */
     public function checkMondayComplete($Date = '')
     {
-        // 一周日期
+        // 周一日期
         $monday = getThisDayToStartDate()[0];
         // 当前日期
         $thisDay = $Date?:date('Y-m-d');
-        // 查询当前周周一的问题数据
-        if(date('w',strtotime($Date)) != 1){// 一周不检测
+        // 查询当前周,周一的问题数据
+        if(date('w',strtotime($Date)) != 1){// 周一不检测
             // 启动事务
             Db::startTrans();
             try {
-                // 问题数据列表
+                // 查询周一未合格数据
                 $list = Store::where([
                     'Date' => $monday,
                     'is_qualified' => 0
                 ])->select();
-                // 定义修改数据的集合
+                // 定义修改状态的数据集合
                 $save_data = [];
+                // 遍历判断问题是否存在
                 foreach ($list as $k => $v){
                     $item = [
                         'id' => $v['id'],
-                        'is_qualified' => 1,
-                        '商品负责人' => $v['商品负责人'],
-                        '店铺名称' => $v['店铺名称'],
-                        'cate' => $v['cate']
+                        'is_qualified' => 1
                     ];
-                    // 检测此问题在今日是否已处理
+                    // 检测此问题在今日是否存在(存在则未处理,不存在则已处理)
                     $is_ext = Store::where([
                         'Date' => $thisDay,
                         '商品负责人' => $v['商品负责人'],
@@ -250,10 +254,202 @@ class YinliuDataService
     }
 
     /**
+     * 拉取引流款库存不合格记录
+     */
+    public function pullYinliuData($Date = '')
+    {
+        // 获取今日日期
+        $Date = $Date?:date('Y-m-d');
+        // 查询本地今日数据量
+        $toDayCount =  $this->yinliuProblemLog->where(['Date' => $Date])->count();
+        // 如果今日已存在不合格数据,不再重复获取
+        if($toDayCount > 0){
+            return ApiConstant::ERROR_CODE_1;
+        }
+        // 固定字段
+        $defaultFields = ['Date','省份','店铺名称','商品负责人'];
+        // 动态表头字段
+        $head = $this->logic->dressHead->column('name,field,stock','name');
+        // 固定表头
+        $field = implode(',',$defaultFields);
+        foreach ($head as $k=>$v){
+            // 计算字段合并,多字段相加
+            $field_str = str_replace(',',' + ',$v['field']);
+            // 拼接查询字段
+            $field .= ",( $field_str ) as {$v['name']}";
+        }
+        // 数据集
+        $list_all = [];
+        // 引流款多项数据集
+        $list_detail = [];
+        // 启动事务
+        Db::startTrans();
+        // 省条件查询
+        $warStockItem = $this->logic->warStockItem();
+        try{
+            // 根据每个省份设置的筛选查询
+            foreach($warStockItem as $kk => $vv){
+                // 查询条件
+                $having = '';
+                foreach ($vv['_data'] as $k=>$v){
+                    // 拼接过滤条件
+                    $having .= " {$k} < {$v} or ";
+                }
+                $having = "(".trim($having,'or ').")";
+                // 查询数据
+                $list = $this->accessories->field($field)->where([
+                    'Date' => $Date
+                ])->where(function ($q)use($vv){
+                    if(!empty($vv['省份'])){
+                       $q->whereIn('省份',$vv['省份']);
+                    }
+                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->select()->toArray();
+                // 组装单项数据
+                $item_data = $this->assembleDressData($list,$vv['_data'],$head);
+                $list_all = array_merge($list_all,$item_data);
+                 // 组装多项数据
+                $item_detail = $this->assembleDressDetail($list,$defaultFields,$vv['_data']);
+                $list_detail = array_merge($list_detail,$item_detail);
+            }
+            // 保存问题数据
+            YinliuProblemLog::selfSaveData($list_all);
+            // 保存问题详情数据
+            YinliuProblemDetail::selfSaveData($list_detail);
+            // 提交事务
+            Db::commit();
+        }catch (\Exception $e){
+            file_put_contents("./pull_dress_log.txt",var_export($e->getMessage(),true).'  '.date('Y/m/d H:i:s')."\r\n",FILE_APPEND);
+            // 回滚事务
+            Db::rollback();
+            $this->msg = $e->getMessage();
+            return ApiConstant::ERROR_CODE;
+        }
+        return ApiConstant::SUCCESS_CODE;
+    }
+
+    /**
+     * 组合引流款单项问题数据
+     */
+    public function assembleDressData($data,$filter,$head)
+    {
+        if(empty($data) || empty($filter) || empty($head)){
+            return [];
+        }
+        // 定义不达标数据集合
+        $save_data = [];
+        foreach ($data as $k => $v){
+            foreach ($v as $kk => $vv){
+                if(isset($filter[$kk]) && !empty($filter[$kk])){
+                    $vv = intval($vv);
+                    if($vv < $filter[$kk]){
+                        $save_data[] = [
+                            'Date' => $v['Date'],
+                            'field_str' => $head[$kk]['field'],
+                            'head_name' => $kk,
+                            '省份' => $v['省份'],
+                            '商品负责人' => $v['商品负责人'],
+                            '店铺名称' => $v['店铺名称'],
+                            'stocks' => $v[$kk],
+                            'qualified_num' => $filter[$kk],
+                            'is_qualified' => 0,
+                            'week' => date('w',strtotime($v['Date'])),
+                            'is_monday' => date('w',strtotime($v['Date']))==1?1:0
+                        ];
+                    }
+                }
+            }
+        }
+        return  $save_data;
+    }
+
+    /**
+     * 组合引流款多维问题数据
+     */
+    public function assembleDressDetail($data,$defaultFields,$_data)
+    {
+        if(empty($data) || empty($defaultFields) || empty($_data)){
+            return [];
+        }
+        // 定义不达标数据集合
+        $detail_data = [];
+        foreach ($data as $k => $v){
+            $detail_data[] = [
+                'Date' => $v['Date'],
+                '省份' => $v['省份'],
+                '商品负责人' => $v['商品负责人'],
+                '店铺名称' => $v['店铺名称'],
+                'content' => json_encode($_data),
+                'week' => date('w',strtotime($v['Date']))
+            ];
+        }
+        return  $detail_data;
+    }
+
+    /**
+     * 更新周一任务状态
+     */
+    public function updateMondayTaskStatue($Date = '')
+    {
+        // 周一日期
+        $monday = getThisDayToStartDate()[0];
+        // 当前日期
+        $thisDay = $Date?:date('Y-m-d');
+        // 查询当前周,周一的问题数据
+        if(date('w',strtotime($Date)) != 1){// 周一不检测
+            // 启动事务
+            Db::startTrans();
+            try {
+                // 查询周一未合格数据
+                $list = YinliuProblemLog::where([
+                    'Date' => $monday,
+                    'is_qualified' => 0
+                ])->select();
+                // 定义修改状态的数据集合
+                $save_data = [];
+                // 遍历判断问题是否存在
+                foreach ($list as $k => $v){
+                    // 定义已处理问题修改状态
+                    $item = [
+                        'id' => $v['id'],
+                        'is_qualified' => 1,
+                        'finish_time' => time()
+                    ];
+                    // 检测此问题在今日是否存在(存在则标记未处理,不存在则标记已处理)
+                    $is_ext = YinliuProblemLog::where([
+                        'Date' => $thisDay,
+                        '商品负责人' => $v['商品负责人'],
+                        '店铺名称' => $v['店铺名称'],
+                        'head_name' => $v['head_name'],
+                        '省份' => $v['省份']
+                    ])->count();
+                    // 如果问题在今日不存在,则修改当前问题状态为已处理
+                    if($is_ext < 1){
+                        $save_data[] = $item;
+                    }
+                }
+                if($save_data) {
+                    // 批量更新问题状态
+                    $res = YinliuProblemLog::selfSaveData($save_data);
+                    // 提交事务
+                    Db::commit();
+                    return ApiConstant::SUCCESS_CODE;
+                }
+                return ApiConstant::ERROR_CODE;
+            }catch (\Exception $e){
+                // 回滚事务
+                Db::rollback();
+                $this->msg = $e->getMessage();
+                return ApiConstant::ERROR_CODE;
+            }
+        }
+        return ApiConstant::SUCCESS_CODE;
+    }
+
+    /**
      * 获取错误提示
      */
     public function getError($code = 0)
     {
-        return $this->msg?:ApiConstant::ERROR_CODE_LIST[$code];
+        return !empty($this->msg)?$this->msg:ApiConstant::ERROR_CODE_LIST[$code];
     }
 }

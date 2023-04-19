@@ -24,8 +24,6 @@ use think\facade\Cache;
 class Config extends AdminController
 {
 
-    use \app\admin\traits\Curd;
-
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
@@ -40,6 +38,7 @@ class Config extends AdminController
     }
 
     /**
+     * * @NodeAnotation(title="引流配置")
      * 数据筛选配置
      */
     public function index()

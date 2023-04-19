@@ -18,12 +18,10 @@ use jianyan\excel\Excel;
 /**
  * Class Dress
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="配饰库存")
+ * @ControllerAnnotation(title="引流库存")
  */
 class Dress extends AdminController
 {
-
-    use \app\admin\traits\Curd;
 
     protected $sort = [
         'sort' => 'desc',
@@ -39,6 +37,7 @@ class Dress extends AdminController
     }
 
     /**
+     * @NodeAnotation(title="引流总览")
      * 按照自定义省份进行筛选
      * @return mixed|\think\response\Json
      */
@@ -81,8 +80,11 @@ class Dress extends AdminController
                     }
                 }
                 $having = "(".trim($having,'or ').")";
+
+                // 筛选门店
+                $list = $this->setStoreFilter($this->model);
                 // 查询数据
-                $list = $this->model->field($field)->where([
+                $list = $list->field($field)->where([
                     'Date' => $Date
                 ])->where(function ($q)use($vv,$filters){
                     if(!empty($vv['省份'])){
@@ -124,6 +126,7 @@ class Dress extends AdminController
                 $item['fixed'] = 'left';
                 if($v == '省份'){
                     $item['search'] = 'xmSelect';
+                    $item['laySearch'] = true;
                 }
                 // 设置条件下拉列表数据(省份/店铺名称/商品负责人)
                 $item['selectList'] = $getSelectList[$v];
@@ -141,7 +144,7 @@ class Dress extends AdminController
                 $standard[$key]['省份'] = implode(',',$v['省份']);
             }
             $standard[$key]['省份数量'] = $num;
-            $standard[$key]['描述'] = '库存标准';
+            $standard[$key]['描述'] = '省份库存标准';
             $standard[$key] = array_merge($standard[$key],$v['_data']);
         }
         return $this->fetch('',['cols' => $cols,'_field' => $standard]);
@@ -361,6 +364,17 @@ class Dress extends AdminController
         $key = array_column($data,'name');
         $val = array_column($data,'stock');
         return array_combine($key,$val);
+    }
+
+    /**
+     * 设置门店筛选
+     */
+    public function setStoreFilter($model)
+    {
+        // 获取配饰门店排除列表
+        $storeList = sysconfig('site','yinliu_store_list');
+        if(empty($storeList) || empty($model)) return $model;
+        return $model->whereNotIn('店铺名称',$storeList);
     }
 
     /**
