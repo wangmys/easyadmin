@@ -82,7 +82,7 @@
             width: 11.333% !important;
         }
         .layui-form-label {
-            width: 120px !important;
+            width: 130px !important;
         }
 
         .layui-input-inline {
@@ -115,6 +115,26 @@
                             {/foreach} 
                         </select>
                     </div>
+
+             
+                    <label class="layui-form-label">上柜率(%) >=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='上柜率' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
+                    <label class="layui-form-label" style="overflow:visible;">省份售罄率(%) >=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='省份售罄' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
+                    <label class="layui-form-label" style="overflow:visible;">排名率(%) >=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='排名率' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+                    
                 </div>
 
                 <div class="">
@@ -137,11 +157,12 @@
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" >
-            <div style="text-align: center; color:#0051ff;">单店不动销明细</div>
+            <div style="text-align: center; color:#0051ff;">区域不动销明细</div>
         </table>
         <div id="page"></div>
     </div>
 </body>
+
 </html>
 <script src="__STATIC__/ok/lib/layui/layui.js"></script>
 
@@ -155,8 +176,8 @@
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
-            , url1 = "{:url('admin/system.Budongxiao/history')}"
-            , url_map_1 = "{:url('admin/system.Budongxiao/history_map')}"
+            ,url1 = "{:url('admin/system.Budongxiao/history_area')}" // 区域不动销
+            ,url_map_1 = "{:url('admin/system.Budongxiao/history_map')}"
 
         startTable();
 
@@ -175,7 +196,7 @@
                 , url: url1
                 , loading: true
                 , page: true
-                , limit: 5000
+                , limit: 100
                 , limits: [100, 1000, 5000, 10000, 20000]
             })
             return false;
@@ -211,17 +232,25 @@
                 , toolbar: true
                 , limit: 0
                 , height: 620
-                , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cellMinWidth: 75 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '商品负责人', title: '商品负责人', fixed: 'left'}
                     , { field: '省份', title: '省份', fixed: 'left' }
                     , { field: '季节归集', title: '季节归集', fixed: 'left' }
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left' }
+                    , { field: '经营模式', title: '经营模式', fixed: 'left' }
                     , { field: '云仓', title: '云仓', fixed: 'left' }
                     , { field: '货号', title: '货号', fixed: 'left' }
+                    , { field: '相同货号数', title: '相同货号数', fixed: 'left' }
                     , { field: '大类', title: '大类', fixed: 'left' }
                     , { field: '中类', title: '中类', fixed: 'left' }
                     , { field: '小类', title: '小类', fixed: 'left' }
+                    , { field: '上架店数', title: '上架店数' }
+                    , { field: '总店数', title: '总店数' }
+                    , { field: '上柜率', title: '上柜率' }
+                    , { field: '省份售罄', title: '省份售罄' }
+                    , { field: '品类排名', title: '品类排名' }
+                    , { field: '排名率', title: '排名率' }
                     , { field: '累销量', title: '累销量' }
                     , { field: '月销量', title: '月销量' }
                     , { field: '五天销量', title: '五天销量' }
@@ -230,8 +259,6 @@
                     , { field: '二十天销量', title: '二十天销量' }
                     , { field: '三十天销量', title: '三十天销量' }
                     , { field: '上架店数', title: '上架店数' }
-                    , { field: '总店数', title: '总店数' }
-                    , { field: '上柜率', title: '上柜率' }
                     , { field: '店铺库存数量', title: '店铺库存数量' }
                     , { field: '可用库存Quantity', title: '云仓可用库存' }
                     , { field: '齐码情况', title: '齐码情况' }
@@ -242,7 +269,7 @@
                     , { field: '考核标准', title: '考核标准' }
                     , { field: '不动销区间', title: '不动销区间' }
                     , { field: '不动销区间修订', title: '不动销区间修订' }
-                    , { field: '经营模式', title: '经营模式' }
+                    
                     , { field: 'create_time', title: '生成时间' }
                 ]]
             });

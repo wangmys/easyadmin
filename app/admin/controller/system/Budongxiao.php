@@ -59,7 +59,7 @@ class Budongxiao
                     'map' => json_encode($this->params),
                 ]);
             }
-            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code]);
+            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code, 'create_time' => $this->create_time]);
         } else {
             // 齐码
             $typeQima = $this->getTypeQiMa();
@@ -69,10 +69,12 @@ class Budongxiao
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
+            $storeArr = SpWwBudongxiaoDetail::getStore([]);
             return View('index',[
                 'typeQima' => $typeQima,
                 'province' => $province,
                 'people' => $people,
+                'storeArr' => json($storeArr),
             ]);
         }
     }
@@ -279,6 +281,57 @@ class Budongxiao
         return $res;
     }
 
+    // 单店不动销 详情
+    public function single_statistics() {
+        // $create_time = '2023-04-18 19:46:49';
+        // $create_time = $this->create_time;
+        $rand_code = input('rand_code');
+
+        $sql = "    
+            SELECT
+                *,
+                @counter := @counter + 1 AS 排名 
+            FROM
+                (
+                SELECT
+                    a.商品负责人,
+                    COUNT( 'a.店铺简称' ) AS 总家数,
+                    b.合格家数,
+                    IFNULL( c.不合格家数, 0 ) AS 不合格家数,
+                    IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                    IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
+                    IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
+                    IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
+                    IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
+                    IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
+                    IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
+                    IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
+                    IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                FROM
+                    cwl_budongxiao_statistics a
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                WHERE a.rand_code = '{$rand_code}'    
+                GROUP BY
+                    a.商品负责人 
+                ) AS aa 
+            ORDER BY
+                aa.合格率 DESC 
+        ";
+
+        Db::connect('mysql')->query('SET @counter = 0;');
+        $res = Db::connect('mysql')->query($sql);
+        // dump($res);die;            
+        // return $res;
+        return json(["code" => "0", "msg" => "",  "data" => $res]);
+    }
+
     // 齐码默认值
     public function getTypeQiMa() {
         $map = [
@@ -362,7 +415,7 @@ class Budongxiao
         return $tokenvalue;
     }
 
-    // 历史记录展示
+    // 单店不动销 历史记录展示
     public function history() {
         if (request()->isAjax()) {
         // if (1) {
@@ -390,6 +443,7 @@ class Budongxiao
         }
     }
 
+    // 单店不动销 筛选项
     public function history_map() {
         $map = input();
         // dump($map);
@@ -407,6 +461,98 @@ class Budongxiao
             $str .= $key . ':' . $val . ' | ';
         }
         return json(['str' => $str]);
+    }
+
+    // 区域动销 历史记录展示
+    // 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
+    public function history_area() {
+        if (request()->isAjax()) {
+        // if (1) {
+            $map_input = input();
+            // 删除空参数
+            foreach ($map_input as $key => $val) {
+                if (empty($val)) {
+                    unset($map_input[$key]);
+                }
+            }
+
+            $map1 = " a.create_time='{$map_input['create_time']}' ";
+            if (!empty($map_input['上柜率'])) {
+                $map2 = " AND a.上柜率>='{$map_input['上柜率']}' ";
+            } else {
+                $map2 = " ";
+            }
+            if (!empty($map_input['省份售罄'])) {
+                $map3 = " AND a.省份售罄>='{$map_input['省份售罄']}' ";
+            } else {
+                $map3 = " ";
+            }
+            if (!empty($map_input['排名率'])) {
+                $map4 = " having 排名率 >={$map_input['排名率']} ";
+            } else {
+                $map4 = " ";
+            }
+
+            $pageParams1 = ($map_input['page'] - 1) * $map_input['limit'];
+            $pageParams2 =  $map_input['limit'];
+
+            $sql = "
+                SELECT
+                    a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
+                FROM
+                    `cwl_budongxiao_history` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4 . "
+                ORDER BY
+                    a.商品负责人 ASC
+                limit {$pageParams1}, {$pageParams2}    
+            ";    
+
+            $sql2 = "
+                SELECT
+                    count(*) as tatalCount
+                FROM
+                    `cwl_budongxiao_history` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4 . "
+                ORDER BY
+                    a.商品负责人 ASC
+            "; 
+            
+
+            $select_history_area = Db::connect('mysql')->query($sql);
+            $count = Db::connect('mysql')->query($sql2); 
+
+            // print_r( $count);
+            // die;
+            return json(["code" => "0", "msg" => '', "count" => $count[0]['tatalCount'], "data" => $select_history_area]);
+        } else {
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
+
+            return View('history_area', [
+                'select_map' => $select_map,
+            ]);
+        }
     }
 
     public function test() {
@@ -470,70 +616,28 @@ class Budongxiao
     }
 
     public function test2() {
-        $map_input['page'] = 1;
-        $map_input['limit'] = 100;
-        $map_input['create_time'] = '2023-04-14 14:03:23';
+        $sql = "
+        SELECT
+        count(*) as totalA
+    FROM
+        `cwl_budongxiao_history` AS a
+        LEFT JOIN (
+        SELECT
+            商品负责人,省份,货号,品类排名, 
+            count(*) AS 相同货号数
+        FROM
+            cwl_budongxiao_history 
+        GROUP BY
+        商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+        AND a.省份 = b.省份 
+        AND a.货号 = b.货号 
 
-        $select_history = $this->db_easyA->table('cwl_budongxiao_history')->where([
-            'create_time' => $map_input['create_time']
-        ])->page($map_input['page'], $map_input['limit'])->select()->toArray();
+    ORDER BY
+        a.商品负责人 ASC
 
-        echo $this->db_easyA->getLastSql();
-        dump($select_history);
-
-        echo $total = $this->db_easyA->table('cwl_budongxiao_history')->where([
-            'create_time' => $map_input['create_time']
-        ])->count();
-    }
-
-    // 单店不动销 详情
-    public function single_statistics() {
-        // $create_time = '2023-04-18 19:46:49';
-        // $create_time = $this->create_time;
-        $rand_code = input('rand_code');
-
-        $sql = "    
-            SELECT
-                *,
-                @counter := @counter + 1 AS 排名 
-            FROM
-                (
-                SELECT
-                    a.商品负责人,
-                    COUNT( 'a.店铺简称' ) AS 总家数,
-                    b.合格家数,
-                    IFNULL( c.不合格家数, 0 ) AS 不合格家数,
-                    IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
-                    IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
-                    IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
-                    IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
-                    IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
-                    IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
-                    IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
-                    IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
-                    IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
-                FROM
-                    cwl_budongxiao_statistics a
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
-                WHERE a.rand_code = '{$rand_code}'    
-                GROUP BY
-                    a.商品负责人 
-                ) AS aa 
-            ORDER BY
-                aa.合格率 DESC 
         ";
+        $count = Db::connect('mysql')->query($sql); 
 
-        Db::connect('mysql')->query('SET @counter = 0;');
-        $res = Db::connect('mysql')->query($sql);
-        // dump($res);die;            
-        // return $res;
-        return json(["code" => "0", "msg" => "",  "data" => $res]);
+        dump($count[0]['totalA']);
     }
 }

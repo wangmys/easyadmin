@@ -268,7 +268,9 @@
         //监听提交
         form.on('submit(formDemo)', function (data) {
             $('#table2').css('display', 'none');
+            // 因此表格
             $("[lay-id='table2']").css('display', 'none');
+            $('.title_text2').css('display', 'none');
             console.log(data.field);
             // layer.msg(JSON.stringify(data.field));
             data.field.isAjax = true
@@ -312,8 +314,9 @@
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {
-                    layer.alert("加载完成");
-                    console.log(res);
+                    layer.alert(`【${res.create_time}】数据加载完毕`);
+                    // console.log(res);
+                    // 
                     $('.title_text2').css('display', 'block');
                     startTable2(res.rand_code);
                 }
