@@ -3,6 +3,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         table_elem: '#currentTable',
         table_render_id: 'currentTableRenderId',
         index_url: 'system.dress.inventory/index',
+        dress_url: 'system.dress.dress/index',
         question_index: '/admin/system.dress.inventory/question',
         list_url: '/admin/system.dress.inventory/index',
         finish_rate: '/admin/system.dress.inventory/finish_rate',
@@ -258,6 +259,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
         },
         gather:function () {
             var $get = $("#where").val();
+            // 重写方法
+            ea.table.toolSpliceUrl = this.toolSpliceUrl;
             ea.table.render({
                 url: init.gather_url,
                 where:JSON.parse($get),
@@ -270,8 +273,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: 'order_num', minWith: 134, title: '序号'},
                     {field: '商品负责人', minWith: 134, title: '商品负责人'},
                     {field: 'name', minWith: 134, title: '检核列表'},
-                    {field: 'num', minWith: 134, title: '周一问题个数'},
-                    {field: 'untreate', minWith: 134, title: '周一剩余问题数'},
+                    {field: 'total', minWith: 134, title: '周一问题个数'},
+                    {field: 'not_total', minWith: 134, title: '周一剩余问题数'},
                     {field: 'time', minWith: 134, title: '已逾期天数'},
                     {field: 'this_num', minWith: 134, title: '今日所有问题数'},
                     // {
@@ -344,8 +347,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 ,cols: [
                                     [
                                         {field: 'name', title: '检核列表', minWidth: 80 },
-                                        {field: 'num', minWidth: 80, title: '周一问题总个数'},
-                                        {field: 'untreate', minWidth: 80, title: '周一问题未处理个数(截至周四)'},
+                                        {field: 'total', minWidth: 80, title: '周一问题总个数'},
+                                        {field: 'not_total', minWidth: 80, title: '周一问题未处理个数(截至周四)'},
                                         {field: 'time', minWidth: 80, title: '已逾期天数'},
                                         {field: 'this_num', minWidth: 80, title: '今日所有问题'},
                                         {title: '查看问题详情', width: 156, templet: '#toolbar'}
@@ -358,13 +361,27 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                     var childId = this.id; // 通过 this 对象获取当前子表的id
                                     if (obj.event === 'childDel') {
                                         data = obj.data;
-                                        console.log(ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'])
-                                        ea.open(
-                                            $(this).attr('data-title'),
-                                            ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'],
-                                            '1400px',
-                                            '900px'
-                                        );
+                                        console.log(data)
+                                        switch (data.type) {
+                                            case 'yinliu':
+                                                var params = "商品负责人=" + data['商品负责人']
+                                                ea.open(
+                                                    $(this).attr('data-title'),
+                                                    ea.url(init.dress_url)+'?' + params,
+                                                    '1400px',
+                                                    '800px'
+                                                );
+                                                break;
+                                            case 'accessories':
+                                                ea.open(
+                                                    $(this).attr('data-title'),
+                                                    ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'],
+                                                    '1400px',
+                                                    '900px'
+                                                );
+                                                break;
+                                        }
+
                                     }
                             }
                             ,childOpen: function(obj) {
@@ -374,7 +391,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             }
                             ]},
                             {field: 'total', minWidth: 80, title: '问题数量'},
-                            {field: 'no_total', minWidth: 85, title: '未完成数量'},
+                            {field: 'not_total', minWidth: 85, title: '未完成数量'},
                             {field: 'ok_total', minWidth: 80, title: '已完成数量'},
                         ]
                     ]
@@ -385,6 +402,20 @@ define(["jquery", "easy-admin"], function ($, ea) {
             })
 
             ea.listen();
+        },
+        toolSpliceUrl(url, field, data) {
+            if(data.type !== undefined){
+                switch (data.type){
+                    case 'yinliu':
+                        url = init.dress_url;
+                        break;
+                    case 'accessories':
+                        url = init.index_url;
+                        break;
+                }
+            }
+            url = url.indexOf("?") !== -1 ? url + '&' + field + '=' + data[field] : url + '?' + field + '=' + data[field];
+            return url;
         }
     };
     return Controller;

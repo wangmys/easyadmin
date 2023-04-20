@@ -12,7 +12,6 @@
 
 namespace app\common\logic\inventory;
 
-use AlibabaCloud\SDK\Dingtalk\Vlink_1_0\Models\GetFollowerAuthInfoResponseBody\result\authInfo\mobile;
 use app\common\constants\AdminConstant;
 use EasyAdmin\tool\CommonTool;
 use think\facade\Db;

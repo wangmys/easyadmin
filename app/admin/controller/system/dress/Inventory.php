@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use think\App;
 use think\facade\Db;
 use app\common\logic\inventory\DressLogic;
+use app\common\logic\inventory\InventoryLogic;
 use EasyAdmin\tool\CommonTool;
 use jianyan\excel\Excel;
 
@@ -37,6 +38,7 @@ class Inventory extends AdminController
     {
         parent::__construct($app);
         $this->model = new Accessories();
+        $this->logic = new InventoryLogic();
     }
 
     /**
@@ -265,7 +267,11 @@ class Inventory extends AdminController
             }
             $data = [];
             $Date = date('Y-m-d');
+            $sort_num = 1;
+            // 统计引流款问题
+            $item_2 = $this->logic->yinliuProblemTotal($nameList);
             foreach ($nameList as $key => $name){
+
                 // 查询周一存在的问题
                 $question_total = Store::where([
                     '商品负责人' => $name,
@@ -285,17 +291,34 @@ class Inventory extends AdminController
                     'Date' => getThisDayToStartDate()[1],
                     'is_qualified' => 0
                 ])->count();
+
                 $item = [
-                    'order_num' => ($key + 1),
+                    'order_num' => $sort_num++,
                     '商品负责人' => $name,
                     'name' => '配饰库存不足',
                     // 问题总数
-                    'num' => $question_total,
-                    'untreate' => $question_not_total,
+                    'total' => $question_total,
+                    'not_total' => $question_not_total,
                     'this_num' => $question_this_num,
                     'time' => $question_not_total>0?getIntervalDays():'',
+                    'type' => 'accessories'
                 ];
+
+                // 引流款问题
+                $item2 = [
+                    'order_num' => $sort_num++,
+                    '商品负责人' => $name,
+                    'name' => '引流款库存不足',
+                    // 问题总数
+                    'total' => $item_2['total'][$name]??0,
+                    'not_total' => $item_2['not_total'][$name]??0,
+                    'this_num' => $item_2['this_num'][$name]??0,
+                    'time' => $item['time'],
+                    'type' => 'yinliu'
+                ];
+
                 $data[] = $item;
+                $data[] = $item2;
             }
             $list = [
                 'code'  => 0,
@@ -342,6 +365,9 @@ class Inventory extends AdminController
                 'Date' => $monday
             ])->where(['is_qualified' => 1])->group('商品负责人')->column('count(*) as num','商品负责人');
 
+            // 查询引流款的问题
+            $dress_data = $this->logic->yinliuProblemTotal($charge);
+
             // 负责人循环
             foreach ($charge as $k => $v){
                 $item = [
@@ -352,7 +378,7 @@ class Inventory extends AdminController
                     // 已完成统计
                     'ok_total' => 0,
                     // 未完成统计
-                    'no_total' => 0,
+                    'not_total' => 0,
                 ];
                 // 统计配饰表的问题数
                 if(isset($yinliu_data[$v])){
@@ -360,13 +386,16 @@ class Inventory extends AdminController
                 }
                 // 统计配饰未完成数
                 if(isset($store_data[$v]) && $store_data[$v] > 0){
-                    $item['no_total'] += $store_data[$v];
+                    $item['not_total'] += $store_data[$v];
                 }
                 // 统计配饰未完成数
                 if(isset($store_finish_data[$v]) && $store_finish_data[$v] > 0){
                     $item['ok_total'] += $store_finish_data[$v];
                 }
-                // 查询不动销的问题
+
+                $item['total'] += $dress_data['total'][$v]??0;
+                $item['not_total'] += $dress_data['not_total'][$v]??0;
+                $item['ok_total'] += $dress_data['ok_total'][$v]??0;
 
                 // 查询其他表的问题
                 $data[] = $item;

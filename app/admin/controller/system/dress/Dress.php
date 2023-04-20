@@ -53,6 +53,8 @@ class Dress extends AdminController
         $_field = array_merge($defaultFields,$dynamic_head);
          // 获取预警库存查询条件
         $warStockItem = $this->logic->warStockItem();
+        // 获取参数
+        $where = $this->request->get();
         if ($this->request->isAjax()) {
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
@@ -86,12 +88,15 @@ class Dress extends AdminController
                 // 查询数据
                 $list = $list->field($field)->where([
                     'Date' => $Date
-                ])->where(function ($q)use($vv,$filters){
+                ])->where(function ($q)use($vv,$filters,$where){
                     if(!empty($vv['省份'])){
                        $q->whereIn('省份',$vv['省份']);
                     }
                     if(!empty($filters['省份'])){
                        $q->whereIn('省份',$filters['省份']);
+                    }
+                    if(!empty($where['商品负责人'])){
+                       $q->whereIn('商品负责人',$where['商品负责人']);
                     }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
                 // 根据筛选条件,设置颜色是否标红
@@ -147,7 +152,7 @@ class Dress extends AdminController
             $standard[$key]['描述'] = '省份库存标准';
             $standard[$key] = array_merge($standard[$key],$v['_data']);
         }
-        return $this->fetch('',['cols' => $cols,'_field' => $standard]);
+        return $this->fetch('',['cols' => $cols,'_field' => $standard,'where' => $where]);
     }
 
 
@@ -273,6 +278,8 @@ class Dress extends AdminController
      */
     public function index_export()
     {
+        // 获取参数
+        $where = $this->request->get();
         // 筛选
         $filters = json_decode($this->request->get('filter', '{}',null), true);
         // 获取今日日期
@@ -307,12 +314,15 @@ class Dress extends AdminController
             // 查询数据
             $list = $this->model->field($field)->where([
                 'Date' => $Date
-            ])->where(function ($q)use($vv,$filters){
+            ])->where(function ($q)use($vv,$filters,$where){
                 if(!empty($vv['省份'])){
                    $q->whereIn('省份',$vv['省份']);
                 }
                 if(!empty($filters['省份'])){
                    $q->whereIn('省份',$filters['省份']);
+                }
+                if(!empty($where['商品负责人'])){
+                   $q->whereIn('商品负责人',$where['商品负责人']);
                 }
             })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
             if(!empty($list) && empty($table_head)){

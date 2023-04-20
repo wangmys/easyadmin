@@ -110,6 +110,7 @@ class Data extends BaseController
         $model = CreateFactory::createService('yinliu');
         // 拉取引流款库存不达标数据
         $model->pullYinliuData($Date);
+        // 更新周一任务状态
         $code = $model->updateMondayTaskStatue($Date);
         return json([
             'code' => $code,

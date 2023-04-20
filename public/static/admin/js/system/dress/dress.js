@@ -9,9 +9,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
     var Controller = {
         index: function () {
-            var $get = $("#cols").val();
-            var cols = JSON.parse($get);
-
+            var $cols = $("#cols").val();
+            var cols = JSON.parse($("#cols").val());
+            var where = JSON.parse($("#where").val())
             cols.forEach(function (i,value) {
                 i.templet = function(d){
                     return that.templet(d,this)
@@ -20,6 +20,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             var that = this;
             ea.table.render({
                 init:init,
+                where:where,
                 search:true,
                 height: 760,
                 limit:1000,

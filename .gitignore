@@ -17,3 +17,4 @@ composer.phar
 app/test/
 config/database.php
 /vendor/
+/public/pull_dress_log.txt
