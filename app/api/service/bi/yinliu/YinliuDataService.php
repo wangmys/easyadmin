@@ -73,7 +73,10 @@ class YinliuDataService
             ->where(['Date' => $Date])
             ->where(function ($q)use($_where){
             $q->whereOr($_where);
-        })->whereNotIn(AdminConstant::NOT_FIELD,'合计')->select()->chunk(1000,true);
+        });
+        // 设置门店筛选
+        $list = $this->logic->setStoreFilter($list,'accessories_store_list');
+        $list = $list->whereNotIn(AdminConstant::NOT_FIELD,'合计')->select()->chunk(1000,true);
         if($list){
           Db::startTrans();
           try {
@@ -296,8 +299,10 @@ class YinliuDataService
                     $having .= " {$k} < {$v} or ";
                 }
                 $having = "(".trim($having,'or ').")";
+                // 增加排除门店筛选
+                $list = $this->logic->setStoreFilter($this->accessories);
                 // 查询数据
-                $list = $this->accessories->field($field)->where([
+                $list = $list->field($field)->where([
                     'Date' => $Date
                 ])->where(function ($q)use($vv){
                     if(!empty($vv['省份'])){
