@@ -63,28 +63,28 @@ class Budongxiao
         } else {
             // 齐码
             $typeQima = $this->getTypeQiMa();
-            // 省份
-            $province = SpWwBudongxiaoDetail::getProvince();
             // 商品负责人
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
             
-
             return View('index',[
                 'typeQima' => $typeQima,
-                'province' => $province,
+                // 'province' => $province,
                 'people' => $people,
                 // 'storeArr' => json_encode($storeArr),
             ]);
         }
     }
 
-    // 获取所有店铺
-    public function getStoreAll() {
-        $storeArr = SpWwBudongxiaoDetail::getMapStore();
-        // dump($storeArr);die;
-        return json(["code" => "0", "msg" => "", "data" => $storeArr]);
+    // 获取筛选栏多选参数
+    public function getXmMapSelect() {
+        // 省份
+        $provinceAll = SpWwBudongxiaoDetail::getMapProvince();
+        // 门店
+        $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
     }
 
     // 单店不动销
@@ -568,12 +568,13 @@ class Budongxiao
         // 中山三店 乐从一店 上市天数不足30
         $map = [
             // '省份' => '广东省',
-            // '商品负责人' => '曹太阳',
+            '商品负责人' => '于燕华',
             '季节归集' => '春季',
             '考核区间' => '30天以上',
             // '店铺名称' => '巴马一店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
+            '不考核门店' => '万年一店,万年二店',
             '上市天数' => 30,
             'limit' => 10000,
         ];
@@ -581,32 +582,11 @@ class Budongxiao
         $this->params = $map;
         // dump($storeArr);
 
-        // die;
-
-        // $res = $this->store('中山三店');
-        // $res = $this->store('中山三店');
-        // dump($res);
-
         // echo $this->diffDay('2023-03-23', '2023-04-12');
 
         $data = [];
         $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
-        // $people = SpWwBudongxiaoDetail::getPeople(); 
-        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
-        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
 
-
-        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
-        // $addPeople = $cwlBudongxiaoStatistics->allowField(['商品负责人'])->saveAll($people);
-        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
-        // echo $cwlBudongxiaoStatistics->getLastSql();
-
-        // $addPeople = CwlBudongxiaoStatistics::addPeople($people);
-
-        // $addPeople = $this->db_easyA->table('cwl_budongxiao_statistics')->insertAll($people);
-        // dump($people);
-        // dump($addPeople);
-        // die;
         foreach($storeArr as $key => $val) {
             $res = $this->store($val['店铺名称']);
             if ($res) {
@@ -625,28 +605,35 @@ class Budongxiao
     }
 
     public function test2() {
-        $sql = "
-        SELECT
-        count(*) as totalA
-    FROM
-        `cwl_budongxiao_history` AS a
-        LEFT JOIN (
-        SELECT
-            商品负责人,省份,货号,品类排名, 
-            count(*) AS 相同货号数
-        FROM
-            cwl_budongxiao_history 
-        GROUP BY
-        商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-        AND a.省份 = b.省份 
-        AND a.货号 = b.货号 
-
-    ORDER BY
-        a.商品负责人 ASC
-
-        ";
-        $count = Db::connect('mysql')->query($sql); 
-
-        dump($count[0]['totalA']);
+        $map = [
+            // '省份' => '广东省',
+            '商品负责人' => '于燕华',
+            '季节归集' => '春季',
+            '考核区间' => '30天以上',
+            // '店铺名称' => '巴马一店',
+            // '上市时间' => '2023-04-01',
+            // '中类' => '长T',
+            '不考核门店' => '万年一店,万年二店',
+            '上市天数' => 30,
+            'limit' => 10000,
+        ];
+        $hello = explode(',',$map['不考核门店']);
+        echo $str = $this->arrToStr($hello);
+        dump($hello);
     }
+
+    public function arrToStr($arr) {
+        $str = '';
+        $len = count($arr);
+        foreach ($arr as $key => $val) {
+            if ($key < $len -1 ) {
+                $str .= "'{$val}'" . ",";
+            } else {
+                $str .= "'{$val}'";
+            }
+            
+        }
+        return $str;
+    }
+    
 }

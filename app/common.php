@@ -192,3 +192,26 @@ function getIntervalDays()
     $datetime_end = new DateTime(getThisDayToStartDate()[1]);
     return $datetime_start->diff($datetime_end)->days;
 }
+
+/**
+ * 一维数组转字符串
+ *  [
+        ["万年一店"]
+        ["万年二店"]
+    ]
+     
+    str ='万年一店','万年二店'
+ */
+function arrToStr($arr) {
+    $str = '';
+    $len = count($arr);
+    foreach ($arr as $key => $val) {
+        if ($key < $len -1 ) {
+            $str .= "'{$val}'" . ",";
+        } else {
+            $str .= "'{$val}'";
+        }
+        
+    }
+    return $str;
+}

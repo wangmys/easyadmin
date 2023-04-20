@@ -26,12 +26,17 @@ class SpWwBudongxiaoDetail extends TimeModel
 
     // 获取店铺名称
     public static function getStore($map) {
+        // dump($map);
         $where = [
-            ['商品负责人', 'exp', new Raw('IS NOT NULL')],
+            // ['商品负责人', 'exp', new Raw('IS NOT NULL')],
         ];
+        $where[] = ['商品负责人', 'exp', new Raw('IS NOT NULL')];
+        // $where['商品负责人'] = ['exp', new Raw('IS NOT NULL')];
         $limit = 10000;
         if (!empty($map['省份'])) {
-            $where['省份'] = $map['省份'];
+            // $where['省份'] = $map['省份'];
+            $mapArr = arrToStr(explode(',', $map['省份']));
+            $where[] = ['省份', 'exp', new Raw("IN ({$mapArr})")]; 
         } 
         if (!empty($map['商品负责人'])) {
             $where['商品负责人'] = $map['商品负责人'];
@@ -45,6 +50,12 @@ class SpWwBudongxiaoDetail extends TimeModel
         if (!empty($map['limit'])) {
             $limit = intval($map['limit']);
         }
+        if (!empty($map['不考核门店'])) {
+            $mapArr = arrToStr(explode(',', $map['不考核门店']));
+            $where[] = ['店铺名称', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+        }
+        // echo '<pre>';    
+        // print_r($where);die;
         $res = self::where($where)
         ->field('商品负责人,店铺名称')
         ->group('商品负责人,店铺名称')  
@@ -90,6 +101,15 @@ class SpWwBudongxiaoDetail extends TimeModel
     // 获取城市
     public static function getProvince() {
         $res = self::field('省份')
+        ->group('省份')  
+        ->select()
+        ->toArray();
+        return $res;
+    }
+
+    // 获取城市
+    public static function getMapProvince() {
+        $res = self::field('省份 as name, 省份 as value')
         ->group('省份')  
         ->select()
         ->toArray();
