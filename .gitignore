@@ -17,3 +17,5 @@ composer.phar
 app/test/
 config/database.php
 /vendor/
+vendor
+/vendor
