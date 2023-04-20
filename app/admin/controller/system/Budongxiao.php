@@ -69,14 +69,21 @@ class Budongxiao
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
-            $storeArr = SpWwBudongxiaoDetail::getStore([]);
+            
+
             return View('index',[
                 'typeQima' => $typeQima,
                 'province' => $province,
                 'people' => $people,
-                'storeArr' => json($storeArr),
+                // 'storeArr' => json_encode($storeArr),
             ]);
         }
+    }
+
+    // 获取所有店铺
+    public function getStoreAll() {
+        $storeArr = SpWwBudongxiaoDetail::getStore([]);
+        return json(["code" => "0", "msg" => "", "data" => $storeArr]);
     }
 
     // 单店不动销
@@ -483,7 +490,7 @@ class Budongxiao
                 $map2 = " ";
             }
             if (!empty($map_input['省份售罄'])) {
-                $map3 = " AND a.省份售罄>='{$map_input['省份售罄']}' ";
+                $map3 = " AND a.省份售罄<='{$map_input['省份售罄']}' ";
             } else {
                 $map3 = " ";
             }
