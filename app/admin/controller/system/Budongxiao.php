@@ -59,22 +59,32 @@ class Budongxiao
                     'map' => json_encode($this->params),
                 ]);
             }
-            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code]);
+            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code, 'create_time' => $this->create_time]);
         } else {
             // 齐码
             $typeQima = $this->getTypeQiMa();
-            // 省份
-            $province = SpWwBudongxiaoDetail::getProvince();
             // 商品负责人
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
+            
             return View('index',[
                 'typeQima' => $typeQima,
-                'province' => $province,
+                // 'province' => $province,
                 'people' => $people,
+                // 'storeArr' => json_encode($storeArr),
             ]);
         }
+    }
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect() {
+        // 省份
+        $provinceAll = SpWwBudongxiaoDetail::getMapProvince();
+        // 门店
+        $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
     }
 
     // 单店不动销
@@ -279,213 +289,6 @@ class Budongxiao
         return $res;
     }
 
-    // 齐码默认值
-    public function getTypeQiMa() {
-        $map = [
-            
-        ];
-        $res = SpWwBudongxiaoDetail::getTypeQiMa([
-            // ['季节归集', '=', '春季'],
-            ['大类', '<>', '配饰'],
-        ]);
-        // echo '<pre>';
-        // print_r($res);
-        $type = [
-            // '下装' => [
-                '休闲长裤' => 6,
-                '松紧短裤' => 6,
-                '松紧长裤' => 5,
-                '牛仔长裤' => 6,
-                '牛仔短裤' => 6,
-                '西裤' => 6,
-            // ],
-            // '内搭' => [
-                '休闲短衬' => 4,
-                '休闲长衬' => 4,
-                '卫衣' => 4,
-                '正统短衬' => 4,
-                '正统长衬' => 4,
-                '短T' => 4,
-                '针织衫' => 4,
-                '长T' => 4,
-            // ],
-            // '外套' => [
-                '单西' => 4,
-                '夹克' => 4,
-                '套装' => 4,
-                '套西' => 4,
-                '套西裤' => 4,
-                '牛仔衣' => 4,
-                '皮衣' => 4,
-            // ],
-            // '鞋履' => [
-                '休闲鞋' => 4,
-                '凉鞋' => 4,
-                '正统皮鞋' => 4,
-            // ],
-        ];
-        return $type;
-    }
-
-    // 0除以任何数都得0
-    public function zeroHandle($num1, $num2) {
-        if ($num1 == 0 || $num2 == 0) {
-            return 0;
-        } else {
-            $res = $num1 / $num2;
-            // $res = sprintf("%.3f", $res);
-            // $res = $this->precision_restore($num1, $num2, '除法');
-            return $res;
-        }
-    }
-
-    // time1开始时间 time2结束时间 $this->diffDay('2023-03-23', '2023-04-12');
-    public function diffDay($time1, $time2) {
-        $time1 = strtotime($time1);
-        $time2 = strtotime($time2);
-        $diff_seconds = $time2 - $time1;
-        $diff_days = $diff_seconds / 86400;
-
-        // echo($diff_days . "天");
-        return $diff_days;
-    }
-
-    function rand_code($randLength=6,$chars="0123456789"){
-        $randStr = '';
-        $strLen = strlen($chars);
-        // 循环输出没一个随机字符
-        for($i=0;$i<$randLength;$i++){
-            $randStr .= $chars[rand(0,$strLen-1)];
-        }
-        // tokenvalue=随机字符串+时间戳
-        $tokenvalue = $randStr;
-        return $tokenvalue;
-    }
-
-    // 历史记录展示
-    public function history() {
-        if (request()->isAjax()) {
-        // if (1) {
-            $map_input = input();
-
-            // $map_input['page'] = 1;
-            // $map_input['limit'] = 100;
-            // $map_input['create_time'] = '2023-04-14 16:31:54';
-
-            $select_history = $this->db_easyA->table('cwl_budongxiao_history')->where([
-                'create_time' => $map_input['create_time']
-            ])->page($map_input['page'], $map_input['limit'])->select()->toArray();
-
-            $total = $this->db_easyA->table('cwl_budongxiao_history')->where([
-                'create_time' => $map_input['create_time']
-            ])->count();
-
-            return json(["code" => "0", "msg" => "", "count" => $total, "data" => $select_history]);
-        } else {
-            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
-
-            return View('history', [
-                'select_map' => $select_map,
-            ]);
-        }
-    }
-
-    public function history_map() {
-        $map = input();
-        // dump($map);
-        // $map['type'] = 2;
-        // $map['create_time'] = '2023-04-14 11:35:52';
-        if ($map['type'] == 1) {
-            $find_map = $this->db_easyA->table('cwl_budongxiao_history_map')->field('map')->where(['rand_code' => $map['rand_code']])->find();
-        } elseif ($map['type'] == 2) {
-            $find_map = $this->db_easyA->table('cwl_budongxiao_history_map')->field('map')->where(['create_time' => $map['create_time']])->find();
-        }
-
-        $find_map = json_decode($find_map['map'], true);
-        $str = '';
-        foreach ($find_map as $key => $val) {
-            $str .= $key . ':' . $val . ' | ';
-        }
-        return json(['str' => $str]);
-    }
-
-    public function test() {
-        // 中山三店 乐从一店 上市天数不足30
-        $map = [
-            // '省份' => '广东省',
-            // '商品负责人' => '曹太阳',
-            '季节归集' => '春季',
-            '考核区间' => '30天以上',
-            // '店铺名称' => '巴马一店',
-            // '上市时间' => '2023-04-01',
-            // '中类' => '长T',
-            '上市天数' => 30,
-            'limit' => 1000,
-        ];
-        // dump($map);
-        $this->params = $map;
-        // dump($storeArr);
-
-        // die;
-
-        // $res = $this->store('中山三店');
-        // $res = $this->store('中山三店');
-        // dump($res);
-
-        // echo $this->diffDay('2023-03-23', '2023-04-12');
-
-        $data = [];
-        $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
-        // $people = SpWwBudongxiaoDetail::getPeople(); 
-        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
-        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
-
-
-        // $cwlBudongxiaoStatistics = new CwlBudongxiaoStatistics();
-        // $addPeople = $cwlBudongxiaoStatistics->allowField(['商品负责人'])->saveAll($people);
-        // $addPeople = $cwlBudongxiaoStatistics->saveAll($people);
-        // echo $cwlBudongxiaoStatistics->getLastSql();
-
-        // $addPeople = CwlBudongxiaoStatistics::addPeople($people);
-
-        // $addPeople = $this->db_easyA->table('cwl_budongxiao_statistics')->insertAll($people);
-        // dump($people);
-        // dump($addPeople);
-        // die;
-        foreach($storeArr as $key => $val) {
-            $res = $this->store($val['店铺名称']);
-            if ($res) {
-                $data[] = $res;
-            }
-            die;
-        }
-
-        dump($data);
-        die;
-        $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
-            'rand_code' => $this->rand_code,
-            'create_time' => $this->create_time,
-            'map' => json_encode($this->params),
-        ]);
-    }
-
-    public function test2() {
-        $map_input['page'] = 1;
-        $map_input['limit'] = 100;
-        $map_input['create_time'] = '2023-04-14 14:03:23';
-
-        $select_history = $this->db_easyA->table('cwl_budongxiao_history')->where([
-            'create_time' => $map_input['create_time']
-        ])->page($map_input['page'], $map_input['limit'])->select()->toArray();
-
-        echo $this->db_easyA->getLastSql();
-        dump($select_history);
-
-        echo $total = $this->db_easyA->table('cwl_budongxiao_history')->where([
-            'create_time' => $map_input['create_time']
-        ])->count();
-    }
-
     // 单店不动销 详情
     public function single_statistics() {
         // $create_time = '2023-04-18 19:46:49';
@@ -536,4 +339,301 @@ class Budongxiao
         // return $res;
         return json(["code" => "0", "msg" => "",  "data" => $res]);
     }
+
+    // 齐码默认值
+    public function getTypeQiMa() {
+        $map = [
+            
+        ];
+        $res = SpWwBudongxiaoDetail::getTypeQiMa([
+            // ['季节归集', '=', '春季'],
+            ['大类', '<>', '配饰'],
+        ]);
+        // echo '<pre>';
+        // print_r($res);
+        $type = [
+            // '下装' => [
+                '休闲长裤' => 6,
+                '松紧短裤' => 6,
+                '松紧长裤' => 5,
+                '牛仔长裤' => 6,
+                '牛仔短裤' => 6,
+                '西裤' => 6,
+            // ],
+            // '内搭' => [
+                '休闲短衬' => 4,
+                '休闲长衬' => 4,
+                '卫衣' => 4,
+                '正统短衬' => 4,
+                '正统长衬' => 4,
+                '短T' => 4,
+                '针织衫' => 4,
+                '长T' => 4,
+            // ],
+            // '外套' => [
+                '单西' => 4,
+                '夹克' => 4,
+                '套装' => 4,
+                '套西' => 4,
+                '套西裤' => 4,
+                '牛仔衣' => 4,
+                '皮衣' => 4,
+            // ],
+            // '鞋履' => [
+                '休闲鞋' => 4,
+                '凉鞋' => 4,
+                '正统皮鞋' => 4,
+                '运动鞋' => 4,
+            // ],
+        ];
+        return $type;
+    }
+
+    // 0除以任何数都得0
+    public function zeroHandle($num1, $num2) {
+        if ($num1 == 0 || $num2 == 0) {
+            return 0;
+        } else {
+            $res = $num1 / $num2;
+            // $res = sprintf("%.3f", $res);
+            // $res = $this->precision_restore($num1, $num2, '除法');
+            return $res;
+        }
+    }
+
+    // time1开始时间 time2结束时间 $this->diffDay('2023-03-23', '2023-04-12');
+    public function diffDay($time1, $time2) {
+        $time1 = strtotime($time1);
+        $time2 = strtotime($time2);
+        $diff_seconds = $time2 - $time1;
+        $diff_days = $diff_seconds / 86400;
+
+        // echo($diff_days . "天");
+        return $diff_days;
+    }
+
+    function rand_code($randLength=6,$chars="0123456789"){
+        $randStr = '';
+        $strLen = strlen($chars);
+        // 循环输出没一个随机字符
+        for($i=0;$i<$randLength;$i++){
+            $randStr .= $chars[rand(0,$strLen-1)];
+        }
+        // tokenvalue=随机字符串+时间戳
+        $tokenvalue = $randStr;
+        return $tokenvalue;
+    }
+
+    // 单店不动销 历史记录展示
+    public function history() {
+        if (request()->isAjax()) {
+        // if (1) {
+            $map_input = input();
+
+            // $map_input['page'] = 1;
+            // $map_input['limit'] = 100;
+            // $map_input['create_time'] = '2023-04-14 16:31:54';
+
+            $select_history = $this->db_easyA->table('cwl_budongxiao_history')->where([
+                'create_time' => $map_input['create_time']
+            ])->page($map_input['page'], $map_input['limit'])->select()->toArray();
+
+            $total = $this->db_easyA->table('cwl_budongxiao_history')->where([
+                'create_time' => $map_input['create_time']
+            ])->count();
+
+            return json(["code" => "0", "msg" => "", "count" => $total, "data" => $select_history]);
+        } else {
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
+
+            return View('history', [
+                'select_map' => $select_map,
+            ]);
+        }
+    }
+
+    // 单店不动销 筛选项
+    public function history_map() {
+        $map = input();
+        // dump($map);
+        // $map['type'] = 2;
+        // $map['create_time'] = '2023-04-14 11:35:52';
+        if ($map['type'] == 1) {
+            $find_map = $this->db_easyA->table('cwl_budongxiao_history_map')->field('map')->where(['rand_code' => $map['rand_code']])->find();
+        } elseif ($map['type'] == 2) {
+            $find_map = $this->db_easyA->table('cwl_budongxiao_history_map')->field('map')->where(['create_time' => $map['create_time']])->find();
+        }
+
+        $find_map = json_decode($find_map['map'], true);
+        $str = '';
+        foreach ($find_map as $key => $val) {
+            $str .= $key . ':' . $val . ' | ';
+        }
+        return json(['str' => $str]);
+    }
+
+    // 区域动销 历史记录展示
+    // 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
+    public function history_area() {
+        if (request()->isAjax()) {
+        // if (1) {
+            $map_input = input();
+            // 删除空参数
+            foreach ($map_input as $key => $val) {
+                if (empty($val)) {
+                    unset($map_input[$key]);
+                }
+            }
+
+            $map1 = " a.create_time='{$map_input['create_time']}' ";
+            if (!empty($map_input['上柜率'])) {
+                $map2 = " AND a.上柜率>='{$map_input['上柜率']}' ";
+            } else {
+                $map2 = " ";
+            }
+            if (!empty($map_input['省份售罄'])) {
+                $map3 = " AND a.省份售罄<='{$map_input['省份售罄']}' ";
+            } else {
+                $map3 = " ";
+            }
+            if (!empty($map_input['排名率'])) {
+                $map4 = " having 排名率 >={$map_input['排名率']} ";
+            } else {
+                $map4 = " ";
+            }
+
+            $pageParams1 = ($map_input['page'] - 1) * $map_input['limit'];
+            $pageParams2 =  $map_input['limit'];
+
+            $sql = "
+                SELECT
+                    a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
+                FROM
+                    `cwl_budongxiao_history` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4 . "
+                ORDER BY
+                    a.商品负责人 ASC
+                limit {$pageParams1}, {$pageParams2}    
+            ";    
+
+            $sql2 = "
+                SELECT
+                    count(*) as tatalCount
+                FROM
+                    `cwl_budongxiao_history` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4 . "
+                ORDER BY
+                    a.商品负责人 ASC
+            "; 
+            
+
+            $select_history_area = Db::connect('mysql')->query($sql);
+            $count = Db::connect('mysql')->query($sql2); 
+
+            // print_r( $count);
+            // die;
+            return json(["code" => "0", "msg" => '', "count" => $count[0]['tatalCount'], "data" => $select_history_area]);
+        } else {
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
+
+            return View('history_area', [
+                'select_map' => $select_map,
+            ]);
+        }
+    }
+
+    public function test() {
+        // 中山三店 乐从一店 上市天数不足30
+        $map = [
+            // '省份' => '广东省',
+            '商品负责人' => '于燕华',
+            '季节归集' => '春季',
+            '考核区间' => '30天以上',
+            // '店铺名称' => '巴马一店',
+            // '上市时间' => '2023-04-01',
+            // '中类' => '长T',
+            '不考核门店' => '万年一店,万年二店',
+            '上市天数' => 30,
+            'limit' => 10000,
+        ];
+        // dump($map);
+        $this->params = $map;
+        // dump($storeArr);
+
+        // echo $this->diffDay('2023-03-23', '2023-04-12');
+
+        $data = [];
+        $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
+
+        foreach($storeArr as $key => $val) {
+            $res = $this->store($val['店铺名称']);
+            if ($res) {
+                $data[] = $res;
+            }
+            
+        }
+
+        // dump($data);
+        // die;
+        // $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
+        //     'rand_code' => $this->rand_code,
+        //     'create_time' => $this->create_time,
+        //     'map' => json_encode($this->params),
+        // ]);
+    }
+
+    public function test2() {
+        $map = [
+            // '省份' => '广东省',
+            '商品负责人' => '于燕华',
+            '季节归集' => '春季',
+            '考核区间' => '30天以上',
+            // '店铺名称' => '巴马一店',
+            // '上市时间' => '2023-04-01',
+            // '中类' => '长T',
+            '不考核门店' => '万年一店,万年二店',
+            '上市天数' => 30,
+            'limit' => 10000,
+        ];
+        $hello = explode(',',$map['不考核门店']);
+        echo $str = $this->arrToStr($hello);
+        dump($hello);
+    }
+
+    public function arrToStr($arr) {
+        $str = '';
+        $len = count($arr);
+        foreach ($arr as $key => $val) {
+            if ($key < $len -1 ) {
+                $str .= "'{$val}'" . ",";
+            } else {
+                $str .= "'{$val}'";
+            }
+            
+        }
+        return $str;
+    }
+    
 }

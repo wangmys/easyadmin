@@ -113,15 +113,9 @@
                             <option value="冬季">冬季</option>
                         </select>
                     </div>
-
-                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">省份</label>
-                    <div class="layui-input-inline" style="width: 150px !important; ">
-                        <select name="省份" lay-verify="">
-                            <option value="">所有省份</option>
-                            {foreach $province as $key=>$vo}
-                            <option value="{$vo['省份']}">{$vo['省份']}</option>
-                            {/foreach}
-                        </select>
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">省份</label>
+                    <div class="layui-input-inline" style="width: 150px !important;">
+                        <div id="xm-province" class="xm-select-demo"></div>
                     </div>
 
                     <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow:visible;">商品负责人</label>
@@ -236,9 +230,13 @@
             , table = layui.table
             , laydate = layui.laydate
             , url1 = "{:url('admin/system.Budongxiao/index')}"
-            , url2 = "{:url('admin/system.Budongxiao/single_statistics')}";
-        // let url1 = ea.url('/system.Budongxiao/index');
+            , url2 = "{:url('admin/system.Budongxiao/single_statistics')}"
+            , url_getXmMapSelect = "{:url('admin/system.Budongxiao/getXmMapSelect')}";  
 
+        // 数据初始化
+        initFn(); 
+
+        // 表1初始化
         startTable();
 
         // 日期选择器
@@ -246,29 +244,25 @@
             elem: '#shangshiriqi'
         });
 
-        var xm_no_store = xmSelect.render({
+        xmSelect.render({
             el: '#xm-nostore', 
             filterable: true,
             // showCount: 1,
-            data: [
-                {name: '张三1', value: 1},
-                {name: '李四1', value: 2},
-                {name: '王五1', value: 3},
-                {name: '赵六1', value: 4},
-                {name: '苹果2', value: 5},
-                {name: '香蕉2', value: 6},
-                {name: '凤梨2', value: 7},
-                {name: '葡萄2', value: 8},
-                {name: '樱桃3', value: 9},
-                {name: '车厘子3', value: 10},
-                {name: '火龙果3', value: 11},
-            ]
+            data: []
+        })
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            // showCount: 1,
+            data: []
         })
 
         //监听提交
         form.on('submit(formDemo)', function (data) {
             $('#table2').css('display', 'none');
+            // 因此表格
             $("[lay-id='table2']").css('display', 'none');
+            $('.title_text2').css('display', 'none');
             console.log(data.field);
             // layer.msg(JSON.stringify(data.field));
             data.field.isAjax = true
@@ -283,6 +277,39 @@
             })
             return false;
         });
+
+        function initFn() {
+            
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                storeData = res.data.storeAll
+                provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-nostore', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'不考核门店',
+                    data: storeData
+                })
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: provinceData
+                })
+            }, 'json')
+        }
 
         function startTable() {
             table.render({
@@ -312,8 +339,9 @@
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {
-                    layer.alert("加载完成");
-                    console.log(res);
+                    layer.alert(`【${res.create_time}】数据加载完毕`);
+                    // console.log(res);
+                    // 
                     $('.title_text2').css('display', 'block');
                     startTable2(res.rand_code);
                 }
