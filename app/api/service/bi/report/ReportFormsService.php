@@ -465,326 +465,321 @@ class ReportFormsService
         // 编号
         $code = 'S107';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
-        $sql = "
+
+        $sql2 = "
         WITH T1 AS 
-        (
-        SELECT  
-            ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ID,
-            ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
-            ISNULL(EG.CategoryName2,'合计') AS 二级分类,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-7,23) THEN ERG.Quantity END) AS 前七天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity END) AS 前六天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-5,23) THEN ERG.Quantity END) AS 前五天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-4,23) THEN ERG.Quantity END) AS 前四天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-3,23) THEN ERG.Quantity END) AS 前三天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-2,23) THEN ERG.Quantity END) AS 前二天,
-            SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ERG.Quantity END) AS 前一天,
-            SUM(ERG.Quantity) AS 周销,
-            SUM(ERG.Quantity*ERG.DiscountPrice) AS 周销额,
-            SUM(ERG.Quantity*ERG.DiscountPrice)/(SELECT 
-                                                                                        SUM(ERG.Quantity*ERG.DiscountPrice)
-                                                                                    FROM ErpCustomer EC 
-                                                                                    LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
-                                                                                    LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
-                                                                                    LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
-                                                                                    WHERE EC.MathodId IN (4,7)
-                                                                                    AND EG.CategoryName1 IN ('鞋履','内搭','外套','下装','配饰')
-                                                                                    AND ER.CodingCodeText='已审结'
-                                                                                    AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23) AND CONVERT(VARCHAR(10),GETDATE()-1,23))*100 AS 占比
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
-        LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
-        LEFT JOIN (SELECT 
-                                    GoodsId,
-                                    CASE WHEN TimeCategoryName1=2023 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
-                                    CategoryName1,
-                                    CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
-                                FROM ErpGoods EG) EG ON ERG.GoodsId=EG.GoodsId
-        WHERE EC.MathodId IN (4,7)
-            AND EG.CategoryName1 IN ('鞋履')
-            AND ER.CodingCodeText='已审结'
-            AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23) AND CONVERT(VARCHAR(10),GETDATE()-1,23)
-        GROUP BY
-            EG.TimeCategoryName1,
-            EG.CategoryName2
-        WITH  ROLLUP
-        ),
-        
-        
-        
-        
-        T2 AS 
-        (
-        SELECT  
-            ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
-            ISNULL(EG.CategoryName2,'合计') AS 二级分类,
-            SUM(ERG.Quantity) AS 周销,
-            SUM(ERG.Quantity*ERG.DiscountPrice) AS 周销额,
-            SUM(ERG.Quantity*ERG.DiscountPrice)/(SELECT 
-                                                                                        SUM(ERG.Quantity*ERG.DiscountPrice)
-                                                                                    FROM ErpCustomer EC 
-                                                                                    LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
-                                                                                    LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
-                                                                                    LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
-                                                                                    WHERE EC.MathodId IN (4,7)
-                                                                                    AND EG.CategoryName1 IN ('鞋履','内搭','外套','下装','配饰')
-                                                                                    AND ER.CodingCodeText='已审结'
-                                                                                    AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-372,23) AND CONVERT(VARCHAR(10),GETDATE()-366,23))*100 AS 占比
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
-        LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
-        LEFT JOIN (SELECT 
-                                    GoodsId,
-                                    CASE WHEN TimeCategoryName1=2022 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
-                                    CategoryName1,
-                                    CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
-                                FROM ErpGoods EG) EG ON ERG.GoodsId=EG.GoodsId
-        WHERE EC.MathodId IN (4,7)
-            AND EG.CategoryName1 IN ('鞋履')
-            AND ER.CodingCodeText='已审结'
-            AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-372,23) AND CONVERT(VARCHAR(10),GETDATE()-366,23)
-        GROUP BY
-            EG.TimeCategoryName1,
-            EG.CategoryName2
-        WITH  ROLLUP
-        ),
-        
-        T3 AS 
-        (
-        SELECT 
-            ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
-            ISNULL(EG.CategoryName2,'合计') AS 二级分类,
-            COUNT(DISTINCT CASE WHEN T.Quantity>0 THEN T.GoodsNo END) SKC,
-            SUM(T.Quantity) Quantity
-        FROM 
-        (
-        SELECT
-            EG.GoodsNo,
-            SUM(EWS.Quantity) AS Quantity
-        FROM ErpWarehouseStock EWS
-        LEFT JOIN ErpGoods EG ON EWS.GoodsId= EG.GoodsId
-        WHERE EG.CategoryName1 IN ('鞋履')
-        AND EWS.WarehouseId NOT IN ('K391000003','K391000016','K391000036','K391000053')
-        GROUP BY 
-            EG.GoodsNo
-        HAVING SUM(EWS.Quantity)!=0
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(ERG.Quantity) AS 收仓在途
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpReturn ER ON EC.CustomerId=ER.CustomerId
-        LEFT JOIN ErpReturnGoods  ERG ON ER.ReturnID=ERG.ReturnID
-        LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
+            (
+            SELECT  
+                ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ID,
+                ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
+                ISNULL(EG.CategoryName2,'合计') AS 二级分类,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-7,23) THEN ERG.Quantity END) AS 前七天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity END) AS 前六天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-5,23) THEN ERG.Quantity END) AS 前五天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-4,23) THEN ERG.Quantity END) AS 前四天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-3,23) THEN ERG.Quantity END) AS 前三天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-2,23) THEN ERG.Quantity END) AS 前二天,
+                SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ERG.Quantity END) AS 前一天,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-1,23) THEN ERG.Quantity END) AS 月销,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-1,23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 月销额,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-1,23) THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/(SELECT 
+                                                                                            SUM(ERG.Quantity*ERG.DiscountPrice)
+                                                                                        FROM ErpCustomer EC 
+                                                                                        LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
+                                                                                        LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
+                                                                                        LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+                                                                                        WHERE EC.MathodId IN (4,7)
+                                                                                        AND EG.CategoryName1 IN ('鞋履','内搭','外套','下装','配饰')
+                                                                                        AND ER.CodingCodeText='已审结'
+                                                                                        AND CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-1,23))*100 AS 占比
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
+            LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN (SELECT 
+                                        GoodsId,
+                                        CASE WHEN TimeCategoryName1=2023 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
+                                        CategoryName1,
+                                        CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
+                                    FROM ErpGoods EG) EG ON ERG.GoodsId=EG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+                AND EG.CategoryName1 IN ('鞋履')
+                AND ER.CodingCodeText='已审结'
+                AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-31,23) AND CONVERT(VARCHAR(10),GETDATE()-1,23)
+            GROUP BY
+                EG.TimeCategoryName1,
+                EG.CategoryName2
+            WITH  ROLLUP
+            ),
+
+
+
+
+            T2 AS 
+            (
+            SELECT  
+                ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
+                ISNULL(EG.CategoryName2,'合计') AS 二级分类,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23) THEN ERG.Quantity END) AS 月销,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 月销额,
+                SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23) THEN ERG.Quantity*ERG.DiscountPrice END)/(SELECT 
+                                                                                            SUM(ERG.Quantity*ERG.DiscountPrice)
+                                                                                        FROM ErpCustomer EC 
+                                                                                        LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
+                                                                                        LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
+                                                                                        LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+                                                                                        WHERE EC.MathodId IN (4,7)
+                                                                                        AND EG.CategoryName1 IN ('鞋履','内搭','外套','下装','配饰')
+                                                                                        AND ER.CodingCodeText='已审结'
+                                                                                        AND CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23))*100 AS 占比
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
+            LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN (SELECT 
+                                        GoodsId,
+                                        CASE WHEN TimeCategoryName1=2022 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
+                                        CategoryName1,
+                                        CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
+                                    FROM ErpGoods EG) EG ON ERG.GoodsId=EG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+                AND EG.CategoryName1 IN ('鞋履')
+                AND ER.CodingCodeText='已审结'
+                AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-397,23) AND CONVERT(VARCHAR(10),GETDATE()-366,23)
+            GROUP BY
+                EG.TimeCategoryName1,
+                EG.CategoryName2
+            WITH  ROLLUP
+            ),
+
+            T3 AS 
+            (
+            SELECT 
+                ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
+                ISNULL(EG.CategoryName2,'合计') AS 二级分类,
+                COUNT(DISTINCT CASE WHEN T.Quantity>0 THEN T.GoodsNo END) SKC,
+                SUM(T.Quantity) Quantity
+            FROM 
+            (
+            SELECT
+                EG.GoodsNo,
+                SUM(EWS.Quantity) AS Quantity
+            FROM ErpWarehouseStock EWS
+            LEFT JOIN ErpGoods EG ON EWS.GoodsId= EG.GoodsId
+            WHERE EG.CategoryName1 IN ('鞋履')
+            AND EWS.WarehouseId NOT IN ('K391000003','K391000016','K391000036','K391000053')
+            GROUP BY 
+                EG.GoodsNo
+            HAVING SUM(EWS.Quantity)!=0
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(ERG.Quantity) AS 收仓在途
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpReturn ER ON EC.CustomerId=ER.CustomerId
+            LEFT JOIN ErpReturnGoods  ERG ON ER.ReturnID=ERG.ReturnID
+            LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                    AND EC.ShutOut=0
+                    AND ER.CodingCode='EndNode2'
+                    AND ER.IsCompleted IS NULL
+                    AND EG.CategoryName1 IN ('鞋履')
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(EDG.Quantity) AS Quantity
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpDelivery ED ON EC.CustomerId=ED.CustomerId
+            LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+            LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+                AND ED.CodingCode='EndNode2'
+                AND ED.IsCompleted=0
+                AND ED.DeliveryID NOT IN (SELECT DeliveryId FROM ErpCustReceipt WHERE CodingCodeText='已审结' AND DeliveryId IS NOT NULL )	
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(EIG.Quantity) AS Quantity
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustOutbound EI ON EI.InCustomerId=EC.CustomerId
+            LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+            LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+                AND EI.CodingCodeText='已审结'
+                AND EI.IsCompleted=0
+                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )	
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(ECS.Quantity) AS 店库存数量
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+            GROUP BY 
+                EG.GoodsNo
+            HAVING SUM(ECS.Quantity)!=0
+            ) T
+            LEFT JOIN (SELECT 
+                                        GoodsId,
+                                        GoodsNo,
+                                        CASE WHEN TimeCategoryName1=2023 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
+                                        CategoryName1,
+                                        CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
+                                    FROM ErpGoods EG) EG ON T.GoodsNo=EG.GoodsNo
+            GROUP BY 
+                EG.TimeCategoryName1,
+                EG.CategoryName2
+            WITH ROLLUP 
+            ),
+
+
+
+            T4 AS 
+            (
+            SELECT 
+                ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
+                ISNULL(EG.CategoryName2,'合计') AS 二级分类,
+                SUM(T.Quantity) Quantity
+            FROM 
+            (
+            SELECT
+                EG.GoodsNo,
+                SUM(EWS.Quantity) AS Quantity
+            FROM ErpWarehouseStock EWS
+            LEFT JOIN ErpGoods EG ON EWS.GoodsId= EG.GoodsId
+            WHERE EG.CategoryName1 IN ('鞋履')
+                AND CONVERT(VARCHAR(10),EWS.StockDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
+                AND EWS.WarehouseId NOT IN ('K391000003','K391000016','K391000036','K391000053')
+            GROUP BY 
+                EG.GoodsNo
+            HAVING SUM(EWS.Quantity)!=0
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(ERG.Quantity) AS 收仓在途
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpReturn ER ON EC.CustomerId=ER.CustomerId
+            LEFT JOIN ErpReturnGoods  ERG ON ER.ReturnID=ERG.ReturnID
+            LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
                 AND EC.ShutOut=0
                 AND ER.CodingCode='EndNode2'
                 AND ER.IsCompleted IS NULL
                 AND EG.CategoryName1 IN ('鞋履')
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(EDG.Quantity) AS Quantity
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpDelivery ED ON EC.CustomerId=ED.CustomerId
-        LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
-        LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-            AND ED.CodingCode='EndNode2'
-            AND ED.IsCompleted=0
-            AND ED.DeliveryID NOT IN (SELECT DeliveryId FROM ErpCustReceipt WHERE CodingCodeText='已审结' AND DeliveryId IS NOT NULL )	
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(EIG.Quantity) AS Quantity
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpCustOutbound EI ON EI.InCustomerId=EC.CustomerId
-        LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
-        LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7)
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-            AND EI.CodingCodeText='已审结'
-            AND EI.IsCompleted=0
-            AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )	
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(ECS.Quantity) AS 店库存数量
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
-        LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-        GROUP BY 
-            EG.GoodsNo
-        HAVING SUM(ECS.Quantity)!=0
-        ) T
-        LEFT JOIN (SELECT 
-                                    GoodsId,
-                                    GoodsNo,
-                                    CASE WHEN TimeCategoryName1=2023 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
-                                    CategoryName1,
-                                    CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
-                                FROM ErpGoods EG) EG ON T.GoodsNo=EG.GoodsNo
-        GROUP BY 
-            EG.TimeCategoryName1,
-            EG.CategoryName2
-        WITH ROLLUP 
-        ),
-        
-        
-        
-        T4 AS 
-        (
-        SELECT 
-            ISNULL(EG.TimeCategoryName1,'总计') AS 新老品,
-            ISNULL(EG.CategoryName2,'合计') AS 二级分类,
-            SUM(T.Quantity) Quantity
-        FROM 
-        (
-        SELECT
-            EG.GoodsNo,
-            SUM(EWS.Quantity) AS Quantity
-        FROM ErpWarehouseStock EWS
-        LEFT JOIN ErpGoods EG ON EWS.GoodsId= EG.GoodsId
-        WHERE EG.CategoryName1 IN ('鞋履')
-            AND CONVERT(VARCHAR(10),EWS.StockDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
-            AND EWS.WarehouseId NOT IN ('K391000003','K391000016','K391000036','K391000053')
-        GROUP BY 
-            EG.GoodsNo
-        HAVING SUM(EWS.Quantity)!=0
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(ERG.Quantity) AS 收仓在途
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpReturn ER ON EC.CustomerId=ER.CustomerId
-        LEFT JOIN ErpReturnGoods  ERG ON ER.ReturnID=ERG.ReturnID
-        LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
-            AND EC.ShutOut=0
-            AND ER.CodingCode='EndNode2'
-            AND ER.IsCompleted IS NULL
-            AND EG.CategoryName1 IN ('鞋履')
-            AND CONVERT(VARCHAR(10),ER.ReturnDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(EDG.Quantity) AS Quantity
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpDelivery ED ON EC.CustomerId=ED.CustomerId
-        LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
-        LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-            AND ED.CodingCode='EndNode2'
-            AND ED.DeliveryID NOT IN (SELECT DeliveryId FROM ErpCustReceipt WHERE CodingCodeText='已审结' AND DeliveryId IS NOT NULL AND CONVERT(VARCHAR(10),ReceiptDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23) )
-            AND CONVERT(VARCHAR(10),ED.DeliveryDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(EIG.Quantity) AS Quantity
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpCustOutbound EI ON EI.InCustomerId=EC.CustomerId
-        LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
-        LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7)
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-            AND EI.CodingCodeText='已审结'
-            AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' AND CONVERT(VARCHAR(10),ReceiptDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23) GROUP BY ERG.CustOutboundId )
-            AND CONVERT(VARCHAR(10),EI.CustOutboundDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
-        GROUP BY
-            EG.GoodsNo
-        
-        UNION ALL 
-        SELECT 
-            EG.GoodsNo,
-            SUM(ECS.Quantity) AS 店库存数量
-        FROM ErpCustomer EC 
-        LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
-        LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
-        WHERE EC.MathodId IN (4,7) 
-            AND EC.ShutOut=0
-            AND EG.CategoryName1 IN ('鞋履')
-            AND CONVERT(VARCHAR(10),ECS.StockDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
-        GROUP BY 
-            EG.GoodsNo
-        HAVING SUM(ECS.Quantity)!=0
-        ) T
-        LEFT JOIN (SELECT 
-                                    GoodsId,
-                                    GoodsNo,
-                                    CASE WHEN TimeCategoryName1=2022 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
-                                    CategoryName1,
-                                    CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
-                                FROM ErpGoods EG) EG ON T.GoodsNo=EG.GoodsNo
-        GROUP BY 
-            EG.TimeCategoryName1,
-            EG.CategoryName2
-        WITH ROLLUP
-        )
-        
-        SELECT 
-            T1.新老品,
-            T1.二级分类,
-            T3.SKC,
-            T3.Quantity AS 库存数,
-            ISNULL(T3.Quantity,0) - ISNULL(T4.Quantity,0) AS 同比量差,
-            CONCAT(CONVERT(DECIMAL(10,2),T1.占比),'%') AS 周流水占比,
-            CONCAT(CONVERT(DECIMAL(10,2),T2.占比),'%') AS 同期流水占比,
-            CONCAT(CONVERT(DECIMAL(10,2),T1.占比 - T2.占比),'%') AS 同比差,
-            T1.周销 - T2.周销 AS 同比销量差,
-            T1.前一天,
-            T1.前二天,
-            T1.前三天,
-            T1.前四天,
-            T1.前五天,
-            T1.前六天,
-            T1.前七天,
-            T4.Quantity AS 同期库存量,
-            T1.周销 AS 今年周销,
-            T2.周销 AS 同期周销,
-            T2.周销额 AS 同期销额,
-            T1.周销额,
-            T1.周销额 - T2.周销额 AS 流水差额
-        FROM T1 
-        LEFT JOIN T2 ON T1.新老品=T2.新老品 AND T1.二级分类=T2.二级分类
-        LEFT JOIN T3 ON T1.新老品=T3.新老品 AND T1.二级分类=T3.二级分类
-        LEFT JOIN T4 ON T1.新老品=T4.新老品 AND T1.二级分类=T4.二级分类
-        ORDER BY T1.ID;        
+                AND CONVERT(VARCHAR(10),ER.ReturnDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(EDG.Quantity) AS Quantity
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpDelivery ED ON EC.CustomerId=ED.CustomerId
+            LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+            LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+                AND ED.CodingCode='EndNode2'
+                AND ED.DeliveryID NOT IN (SELECT DeliveryId FROM ErpCustReceipt WHERE CodingCodeText='已审结' AND DeliveryId IS NOT NULL AND CONVERT(VARCHAR(10),ReceiptDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23) )
+                AND CONVERT(VARCHAR(10),ED.DeliveryDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(EIG.Quantity) AS Quantity
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustOutbound EI ON EI.InCustomerId=EC.CustomerId
+            LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+            LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+                AND EI.CodingCodeText='已审结'
+                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' AND CONVERT(VARCHAR(10),ReceiptDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23) GROUP BY ERG.CustOutboundId )
+                AND CONVERT(VARCHAR(10),EI.CustOutboundDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
+            GROUP BY
+                EG.GoodsNo
+
+            UNION ALL 
+            SELECT 
+                EG.GoodsNo,
+                SUM(ECS.Quantity) AS 店库存数量
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.CategoryName1 IN ('鞋履')
+                AND CONVERT(VARCHAR(10),ECS.StockDate,23)<CONVERT(VARCHAR(10),GETDATE()-365,23)
+            GROUP BY 
+                EG.GoodsNo
+            HAVING SUM(ECS.Quantity)!=0
+            ) T
+            LEFT JOIN (SELECT 
+                                        GoodsId,
+                                        GoodsNo,
+                                        CASE WHEN TimeCategoryName1=2022 THEN '新品' ELSE '老品' END AS TimeCategoryName1,
+                                        CategoryName1,
+                                        CASE WHEN CategoryName1='鞋履' AND CategoryName2 NOT IN ('凉鞋','正统皮鞋') THEN '休闲鞋' ELSE CategoryName2 END AS CategoryName2
+                                    FROM ErpGoods EG) EG ON T.GoodsNo=EG.GoodsNo
+            GROUP BY 
+                EG.TimeCategoryName1,
+                EG.CategoryName2
+            WITH ROLLUP
+            )
+
+            SELECT 
+                T1.新老品,
+                T1.二级分类,
+                T3.SKC,
+                T3.Quantity AS 库存量,
+                CONCAT(CONVERT(DECIMAL(10,2),T1.占比),'%') AS 本月流水占比,
+                CONCAT(CONVERT(DECIMAL(10,2),T2.占比),'%') AS 同期流水占比,
+                CONCAT(CONVERT(DECIMAL(10,2),T1.占比 - T2.占比),'%') AS 占比同比,
+                T1.月销,
+                T1.前一天,
+                T1.前二天,
+                T1.前三天,
+                T1.前四天,
+                T1.前五天,
+                T1.前六天,
+                T1.前七天
+            FROM T1 
+            LEFT JOIN T2 ON T1.新老品=T2.新老品 AND T1.二级分类=T2.二级分类
+            LEFT JOIN T3 ON T1.新老品=T3.新老品 AND T1.二级分类=T3.二级分类
+            LEFT JOIN T4 ON T1.新老品=T4.新老品 AND T1.二级分类=T4.二级分类
+            ORDER BY T1.ID
+            ;
         ";
-        $list = Db::connect("sqlsrv")->query($sql);
+        // $list = Db::connect("sqlsrv")->query($sql2);
 
         // cache('cache_xielv', null);
-        // if (!cache('cache_xielv')) {
-        //     $list = Db::connect("sqlsrv")->query($sql);
-        //     cache('cache_xielv', $list, 3600);
-        // }
+        if (!cache('cache_xielv')) {
+            $list = Db::connect("sqlsrv")->query($sql2);
+            cache('cache_xielv', $list, 3600);
+        }
 
-        // $list = cache('cache_xielv');
+        $list = cache('cache_xielv');
 
         $table_header = ['ID'];
         $field_width = [];
@@ -797,21 +792,17 @@ class ReportFormsService
         $field_width[2] = 80;
         $field_width[3] = 40;
         $field_width[4] = 60;
-        $field_width[5] = 70;
-        $field_width[6] = 90;
-        $field_width[7] = 100;
-        $field_width[8] = 65;
-        $field_width[9] = 90;
+        $field_width[5] = 105;
+        $field_width[6] = 105;
+        $field_width[7] = 70;
+        $field_width[8] = 60;
+        $field_width[9] = 60;
         $field_width[10] = 60;
         $field_width[11] = 60;
         $field_width[12] = 60;
         $field_width[13] = 60;
         $field_width[14] = 60;
         $field_width[15] = 60;
-        $field_width[16] = 60;
-        $field_width[18] = 70;
-        $field_width[19] = 70;
-
 
         // dump($table_header);
         // dump($newList);die;
@@ -829,6 +820,207 @@ class ReportFormsService
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "数据更新时间 （" . date("Y-m-d") . "） - 鞋履报表 表号:S107",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
+    // s108
+    public function create_table_s108($date = '')
+    {
+        // 编号
+        $code = 'S108';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+
+        $sql2 = "
+        select * from (
+            SELECT  
+            IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
+            IFNULL(SCL.`督导`,'合计') AS 督导,
+            IFNULL(SCL.`省份`,'合计') AS 省份,
+            SUM(SCM.`今日目标`) AS 今日目标,
+            SUM(SCL.`今天流水`) AS 今天流水,
+            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+            SUM(SCM.`本月目标`) 本月目标,
+            SUM(SCL.`本月流水`) 本月流水,
+            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
+            SUM(SCL.`近七天日均`) AS 近七天日均,
+            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+            FROM sp_customer_liushui SCL
+            LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+            GROUP BY
+            SCL.`经营模式`,
+            SCL.`督导`,
+            SCL.`省份`
+            WITH ROLLUP
+        ) as aa order by 经营模式 desc    
+        ";
+        $list = Db::connect("mysql2")->query($sql2);
+
+        $new_list = [];
+        $key_zongji = '';
+        // $key_zongji = 0;
+        foreach ($list as $key => $val) {
+            if ($val['经营模式'] == '总计') {
+                $key_zongji = $list[$key]; 
+            } else {
+                $new_list[] = $list[$key]; 
+            }
+        }
+        
+        // print_r($key_zongji);
+        $new_list[] = $key_zongji;
+        // print_r($new_list);
+        // die;
+
+        // dump($list); die;
+
+        // cache('cache_xielv', null);
+        // if (!cache('cache_xielv')) {
+        //     $list = Db::connect("sqlsrv")->query($sql2);
+        //     cache('cache_xielv', $list, 3600);
+        // }
+
+        // $list = cache('cache_xielv');
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($new_list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 110;
+        $field_width[3] = 120;
+        $field_width[4] = 100;
+        $field_width[5] = 100;
+        $field_width[6] = 100;
+        $field_width[7] = 100;
+        $field_width[8] = 100;
+        $field_width[9] = 100;
+        $field_width[10] = 100;
+        $field_width[11] = 100;
+        // $field_width[12] = 60;
+        // $field_width[13] = 60;
+        // $field_width[14] = 60;
+        // $field_width[15] = 60;
+
+        // dump($table_header);
+        // dump($newList);die;
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($new_list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 督导挑战目标 表号:S108",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $new_list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
+    // s108
+    public function create_table_s109($date = '')
+    {
+        // 编号
+        $code = 'S109';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+
+        $sql2 = "
+            SELECT  
+            IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
+            IFNULL(SCL.`省份`,'合计') AS 省份,
+            COUNT(DISTINCT SCL.`店铺名称`) AS 销售店铺数,
+            SUM(SCM.`今日目标`) AS 今日目标,
+            SUM(SCL.`今天流水`) AS 今天流水,
+            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+            SUM(SCM.`本月目标`) 本月目标,
+            SUM(SCL.`本月流水`) 本月流水,
+            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
+            SUM(SCL.`近七天日均`) AS 近七天日均,
+            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+            FROM sp_customer_liushui SCL
+            LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+            GROUP BY
+            SCL.`经营模式`,
+            SCL.`省份`
+            WITH ROLLUP
+        ";
+        $list = Db::connect("mysql2")->query($sql2);
+
+        // dump($list); die;
+
+        // cache('cache_xielv', null);
+        // if (!cache('cache_xielv')) {
+        //     $list = Db::connect("sqlsrv")->query($sql2);
+        //     cache('cache_xielv', $list, 3600);
+        // }
+
+        // $list = cache('cache_xielv');
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 110;
+        $field_width[3] = 90;
+        $field_width[4] = 90;
+        $field_width[5] = 90;
+        $field_width[6] = 90;
+        $field_width[7] = 90;
+        $field_width[8] = 90;
+        $field_width[9] = 90;
+        $field_width[10] = 90;
+        $field_width[11] = 100;
+        // $field_width[12] = 60;
+        // $field_width[13] = 60;
+        // $field_width[14] = 60;
+        // $field_width[15] = 60;
+
+        // dump($table_header);
+        // dump($newList);die;
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 各省挑战目标完成情况 表号:S109",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,

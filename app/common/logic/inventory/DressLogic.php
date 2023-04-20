@@ -247,6 +247,17 @@ class DressLogic
     }
 
     /**
+     * 设置引流款门店筛选
+     */
+    public function setStoreFilter($model,$name = 'yinliu_store_list')
+    {
+        // 获取配饰门店排除列表
+        $storeList = sysconfig('site',$name);
+        if(empty($storeList) || empty($model)) return $model;
+        return $model->whereNotIn('店铺名称',$storeList);
+    }
+
+    /**
      * 保存表头数
      * @param $data
      * @return bool

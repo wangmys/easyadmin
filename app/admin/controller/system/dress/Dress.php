@@ -84,7 +84,7 @@ class Dress extends AdminController
                 $having = "(".trim($having,'or ').")";
 
                 // 筛选门店
-                $list = $this->setStoreFilter($this->model);
+                $list = $this->logic->setStoreFilter($this->model);
                 // 查询数据
                 $list = $list->field($field)->where([
                     'Date' => $Date
@@ -157,105 +157,6 @@ class Dress extends AdminController
 
 
     /**
-     * 按照固定省份进行筛选
-     * @return mixed|\think\response\Json
-     */
-    public function index2()
-    {
-        // 动态表头字段
-        $head = $this->logic->dressHead->column('name,field,stock','id');
-        $Date = date('Y-m-d');
-        // 固定字段
-        $_field_default = ['省份','店铺名称','商品负责人'];
-        // 合并字段成完整表头
-        $_field = array_merge($_field_default,array_column($head,'name'));
-        if ($this->request->isAjax()) {
-            $get = $this->request->get('', null, null);
-            // 筛选
-            $filters = isset($get['filter']) && !empty($get['filter']) ? $get['filter'] : '{}';
-            $filters = json_decode($filters, true);
-            // 查询字段
-            $field = implode(',',$_field_default);
-            // 查询条件
-            $having = '';
-            foreach ($head as $k=>$v){
-                // 计算字段合并,多字段相加
-                $field_str = str_replace(',',' + ',$v['field']);
-                // 拼接查询字段
-                $field .= ",( $field_str ) as {$v['name']}";
-                // 拼接过滤条件
-                $having .= " {$v['name']} < {$v['stock']} or ";
-            }
-            // 清空多余字符串
-            $field = trim($field,',');
-            $having = "(".trim($having,'or ').")";
-
-
-            // 省查询
-
-
-            // 查询数据
-            $list = $this->model->field($field)->where([
-                'Date' => $Date
-            ])->where(function ($q)use($filters){
-                if(!empty($filters['省份'])){
-                   $q->whereIn('省份',$filters['省份']);
-                }
-                if(!empty($filters['店铺名称'])){
-                   $q->whereIn('店铺名称',$filters['店铺名称']);
-                }
-                if(!empty($filters['商品负责人'])){
-                   $q->whereIn('商品负责人',$filters['商品负责人']);
-                }
-            })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
-
-
-
-
-
-            // 提取库存筛选条件
-            $config = $this->config($head);
-            // 根据筛选条件,设置颜色是否标红
-            $this->setStyle($list,$config);
-            // 返回数据
-            $data = [
-                    'code'  => 0,
-                    'msg'   => '',
-                    'count' => count($list),
-                    'data'  => $list,
-                    'config' => $config
-                ];
-            return json($data);
-        }
-        // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
-        $getSelectList = $this->getSelectList();
-        // 前端表格数据
-        $cols = [];
-        // 根据数据,渲染前端表格表头
-        foreach ($_field as $k=>$v){
-            $length = substr_count($v,'_');
-            $item = [
-                'field' => $v,
-                'width' => 134,
-                'search' => false,
-                'title' => $v,
-                'align' => 'center',
-            ];
-            // 固定字段可筛选
-            if(in_array($v,$_field_default)){
-                $item['fixed'] = 'left';
-                if($v == '省份'){
-                    $item['search'] = 'xmSelect';
-                }
-                // 设置条件下拉列表数据(省份/店铺名称/商品负责人)
-                $item['selectList'] = $getSelectList[$v];
-            };
-            $cols[] = $item;
-        }
-        return $this->fetch('',['cols' => $cols,'_field' => $_field,'config' => $this->config($head)]);
-    }
-
-    /**
      * 引流服饰的可用库存与在途库存
      * @return \think\response\Json
      */
@@ -311,8 +212,10 @@ class Dress extends AdminController
                 $having .= " {$k} < {$v} or ";
             }
             $having = "(".trim($having,'or ').")";
+            // 增加排除门店筛选
+            $list = $this->logic->setStoreFilter($this->model);
             // 查询数据
-            $list = $this->model->field($field)->where([
+            $list = $list->field($field)->where([
                 'Date' => $Date
             ])->where(function ($q)use($vv,$filters,$where){
                 if(!empty($vv['省份'])){
@@ -375,18 +278,7 @@ class Dress extends AdminController
         $val = array_column($data,'stock');
         return array_combine($key,$val);
     }
-
-    /**
-     * 设置门店筛选
-     */
-    public function setStoreFilter($model)
-    {
-        // 获取配饰门店排除列表
-        $storeList = sysconfig('site','yinliu_store_list');
-        if(empty($storeList) || empty($model)) return $model;
-        return $model->whereNotIn('店铺名称',$storeList);
-    }
-
+    
     /**
      * 根据引流配置,判断库存是否标红
      */

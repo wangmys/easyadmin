@@ -39,6 +39,7 @@ class Inventory extends AdminController
         parent::__construct($app);
         $this->model = new Accessories();
         $this->logic = new InventoryLogic();
+        $this->logic2 = new DressLogic();
     }
 
     /**
@@ -76,6 +77,8 @@ class Inventory extends AdminController
                 });
             }
 
+            // 设置门店筛选
+            $count = $this->logic2->setStoreFilter($count,'accessories_store_list');
             $count = $count->count();
 
             if(empty($where)){
@@ -103,6 +106,7 @@ class Inventory extends AdminController
                 });
             }
 
+            $list = $this->logic2->setStoreFilter($list,'accessories_store_list');
             $list = $list->order('省份,店铺名称,商品负责人')->page($page, $limit)
                 ->select()->append(['config'])->withAttr('config',function ($data,&$value) use($stock_warn){
                     $value['_data'] = [];
@@ -465,7 +469,9 @@ class Inventory extends AdminController
             $where['商品负责人'] = $get['商品负责人'];
         }
         // 查询指定
-        $list = Yinliu::field($field)->where($where)->order('省份,店铺名称,商品负责人')->select()->toArray();
+        $list = Yinliu::field($field)->where($where);
+        $list = $this->logic2->setStoreFilter($list,'accessories_store_list');
+        $list = $list->order('省份,店铺名称,商品负责人')->select()->toArray();
         // 设置标题头
         $header = [];
         if($list){
