@@ -236,9 +236,15 @@
             , table = layui.table
             , laydate = layui.laydate
             , url1 = "{:url('admin/system.Budongxiao/index')}"
-            , url2 = "{:url('admin/system.Budongxiao/single_statistics')}";
-        // let url1 = ea.url('/system.Budongxiao/index');
+            , url2 = "{:url('admin/system.Budongxiao/single_statistics')}"
+            , url_getStore = "{:url('admin/system.Budongxiao/getStoreAll')}";
+        
+        let storeData = [];    
 
+        // 数据初始化
+        initFn(); 
+
+        // 表1初始化
         startTable();
 
         // 日期选择器
@@ -246,23 +252,24 @@
             elem: '#shangshiriqi'
         });
 
-        var xm_no_store = xmSelect.render({
+        xmSelect.render({
             el: '#xm-nostore', 
             filterable: true,
             // showCount: 1,
-            data: [
-                {name: '张三1', value: 1},
-                {name: '李四1', value: 2},
-                {name: '王五1', value: 3},
-                {name: '赵六1', value: 4},
-                {name: '苹果2', value: 5},
-                {name: '香蕉2', value: 6},
-                {name: '凤梨2', value: 7},
-                {name: '葡萄2', value: 8},
-                {name: '樱桃3', value: 9},
-                {name: '车厘子3', value: 10},
-                {name: '火龙果3', value: 11},
-            ]
+            data: storeData
+            // data: [
+            //     {name: '张三1', value: 1},
+            //     {name: '李四1', value: 2},
+            //     {name: '王五1', value: 3},
+            //     {name: '赵六1', value: 4},
+            //     {name: '苹果2', value: 5},
+            //     {name: '香蕉2', value: 6},
+            //     {name: '凤梨2', value: 7},
+            //     {name: '葡萄2', value: 8},
+            //     {name: '樱桃3', value: 9},
+            //     {name: '车厘子3', value: 10},
+            //     {name: '火龙果3', value: 11},
+            // ]
         })
 
         //监听提交
@@ -285,6 +292,20 @@
             })
             return false;
         });
+
+        function initFn() {
+            // 获取所有店铺
+            $.get(url_getStore, {}, function(res) {
+                console.log(res);
+                storeData = res.data
+                xmSelect.render({
+                    el: '#xm-nostore', 
+                    filterable: true,
+                    // showCount: 1,
+                    data: storeData
+                })
+            }, 'json')
+        }
 
         function startTable() {
             table.render({

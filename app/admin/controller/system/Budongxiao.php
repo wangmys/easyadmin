@@ -82,7 +82,8 @@ class Budongxiao
 
     // 获取所有店铺
     public function getStoreAll() {
-        $storeArr = SpWwBudongxiaoDetail::getStore([]);
+        $storeArr = SpWwBudongxiaoDetail::getMapStore();
+        // dump($storeArr);die;
         return json(["code" => "0", "msg" => "", "data" => $storeArr]);
     }
 
@@ -382,6 +383,7 @@ class Budongxiao
                 '休闲鞋' => 4,
                 '凉鞋' => 4,
                 '正统皮鞋' => 4,
+                '运动鞋' => 4,
             // ],
         ];
         return $type;
@@ -573,7 +575,7 @@ class Budongxiao
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
             '上市天数' => 30,
-            'limit' => 1000,
+            'limit' => 10000,
         ];
         // dump($map);
         $this->params = $map;
@@ -610,16 +612,16 @@ class Budongxiao
             if ($res) {
                 $data[] = $res;
             }
-            die;
+            
         }
 
-        dump($data);
-        die;
-        $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
-            'rand_code' => $this->rand_code,
-            'create_time' => $this->create_time,
-            'map' => json_encode($this->params),
-        ]);
+        // dump($data);
+        // die;
+        // $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
+        //     'rand_code' => $this->rand_code,
+        //     'create_time' => $this->create_time,
+        //     'map' => json_encode($this->params),
+        // ]);
     }
 
     public function test2() {

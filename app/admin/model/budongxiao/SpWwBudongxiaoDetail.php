@@ -56,6 +56,16 @@ class SpWwBudongxiaoDetail extends TimeModel
         return $res;
     } 
 
+    // 获取接口所需所有门店 
+    public static function getMapStore() {
+        $res = self::where(1)
+        ->field('店铺名称 as name, 店铺名称 as value')
+        ->group('店铺名称')  
+        ->select()
+        ->toArray();
+        return $res;
+    }
+
     // 获取码数，没写好的
     public static function getTypeQiMa($map = []) {
         $res = self::where($map)
