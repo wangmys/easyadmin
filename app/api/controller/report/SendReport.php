@@ -27,7 +27,7 @@ class SendReport extends BaseController
     }
 
 //    /**
-//     * 创建报表6
+//     * 创建报表666
 //     */
     public function create()
     {
