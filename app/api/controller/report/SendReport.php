@@ -52,11 +52,17 @@ class SendReport extends BaseController
             $this->service->create_table_s106(date('Y-m-d'));
         } elseif ($name =='S107') {
             $this->service->create_table_s107(date('Y-m-d'));
-        } elseif ($name =='S108') {
-            $this->service->create_table_s108(date('Y-m-d'));
+        } elseif ($name =='S108A') {
+            $this->service->create_table_s108A(date('Y-m-d'));
+        } elseif ($name =='S108B') {
+            $this->service->create_table_s108B(date('Y-m-d'));
         } elseif ($name =='S109') {
             $this->service->create_table_s109(date('Y-m-d'));
-        }          
+        } elseif ($name =='S110A') {
+            $this->service->create_table_s110A(date('Y-m-d'));
+        }  elseif ($name =='S110B') {
+            $this->service->create_table_s110B(date('Y-m-d'));
+        }           
     }
 
     // 配饰每日销售数量
