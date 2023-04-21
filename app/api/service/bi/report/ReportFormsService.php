@@ -771,15 +771,15 @@ class ReportFormsService
             ORDER BY T1.ID
             ;
         ";
-        // $list = Db::connect("sqlsrv")->query($sql2);
+        $list = Db::connect("sqlsrv")->query($sql2);
 
         // cache('cache_xielv', null);
-        if (!cache('cache_xielv')) {
-            $list = Db::connect("sqlsrv")->query($sql2);
-            cache('cache_xielv', $list, 3600);
-        }
+        // if (!cache('cache_xielv')) {
+        //     $list = Db::connect("sqlsrv")->query($sql2);
+        //     cache('cache_xielv', $list, 3600);
+        // }
 
-        $list = cache('cache_xielv');
+        // $list = cache('cache_xielv');
 
         $table_header = ['ID'];
         $field_width = [];
@@ -833,11 +833,11 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
-    // s108
-    public function create_table_s108($date = '')
+    // s108 督导挑战目标
+    public function create_table_s108A($date = '')
     {
         // 编号
-        $code = 'S108';
+        $code = 'S108A';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
 
         $sql2 = "
@@ -852,7 +852,7 @@ class ReportFormsService
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
             CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
-            SUM(SCL.`近七天日均`) AS 近七天日均,
+            SUM(SCL.`近七天日均`) AS 近七天日均流水,
             ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
             LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
@@ -863,37 +863,110 @@ class ReportFormsService
             WITH ROLLUP
         ) as aa order by 经营模式 desc    
         ";
-        $list = Db::connect("mysql2")->query($sql2);
 
-        $new_list = [];
-        $key_zongji = '';
-        // $key_zongji = 0;
-        foreach ($list as $key => $val) {
-            if ($val['经营模式'] == '总计') {
-                $key_zongji = $list[$key]; 
-            } else {
-                $new_list[] = $list[$key]; 
-            }
-        }
-        
-        // print_r($key_zongji);
-        $new_list[] = $key_zongji;
-        // print_r($new_list);
-        // die;
+        $sql3 = "
 
-        // dump($list); die;
-
-        // cache('cache_xielv', null);
-        // if (!cache('cache_xielv')) {
-        //     $list = Db::connect("sqlsrv")->query($sql2);
-        //     cache('cache_xielv', $list, 3600);
-        // }
-
-        // $list = cache('cache_xielv');
+                SELECT  
+                IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
+                IFNULL(SCL.`督导`,'合计') AS 督导,
+                IFNULL(SCL.`省份`,'合计') AS 省份,
+                SUM(SCM.`今日目标`) AS 今日目标,
+                SUM(SCL.`今天流水`) AS 今天流水,
+                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+                SUM(SCM.`本月目标`) 本月目标,
+                SUM(SCL.`本月流水`) 本月流水,
+                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
+                SUM(SCL.`近七天日均`) AS 近七天日均流水,
+                ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+                FROM sp_customer_liushui SCL
+                LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+                where SCL.`经营模式`='直营'
+                GROUP BY
+                
+                SCL.`督导`,
+                SCL.`省份`
+                WITH ROLLUP
+        ";
+        $list = Db::connect("mysql2")->query($sql3);
 
         $table_header = ['ID'];
         $field_width = [];
-        $table_header = array_merge($table_header, array_keys($new_list[0]));
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 100;
+        $field_width[3] = 120;
+        $field_width[4] = 100;
+        $field_width[5] = 100;
+        $field_width[6] = 100;
+        $field_width[7] = 100;
+        $field_width[8] = 100;
+        $field_width[9] = 100;
+        $field_width[10] = 125;
+        $field_width[11] = 100;
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数 
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 督导挑战目标完成率 表号:S108A",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
+    // s108 督导挑战目标
+    public function create_table_s108B($date = '')
+    {
+        // 编号
+        $code = 'S108B';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $sql3 = "
+                SELECT  
+                IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
+                IFNULL(SCL.`省份`,'合计') AS 省份,
+                SUM(SCM.`今日目标`) AS 今日目标,
+                SUM(SCL.`今天流水`) AS 今天流水,
+                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+                SUM(SCM.`本月目标`) 本月目标,
+                SUM(SCL.`本月流水`) 本月流水,
+                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
+                SUM(SCL.`近七天日均`) AS 近七天日均流水,
+                ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+                FROM sp_customer_liushui SCL
+                LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+                where SCL.`经营模式`='加盟'
+                GROUP BY
+                SCL.`督导`,
+                SCL.`省份`
+                WITH ROLLUP
+        ";
+        $list = Db::connect("mysql2")->query($sql3);
+
+        array_pop($list);
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
         foreach ($table_header as $v => $k) {
             $field_width[] = 80;
         }
@@ -906,16 +979,8 @@ class ReportFormsService
         $field_width[6] = 100;
         $field_width[7] = 100;
         $field_width[8] = 100;
-        $field_width[9] = 100;
+        $field_width[9] = 125;
         $field_width[10] = 100;
-        $field_width[11] = 100;
-        // $field_width[12] = 60;
-        // $field_width[13] = 60;
-        // $field_width[14] = 60;
-        // $field_width[15] = 60;
-
-        // dump($table_header);
-        // dump($newList);die;
 
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
@@ -925,13 +990,13 @@ class ReportFormsService
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
         ];
 
-        //参数
+        //参数 
         $params = [
-            'row' => count($new_list),          //数据的行数
+            'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 督导挑战目标 表号:S108",
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 区域挑战目标完成率 表号:S108B",
             'table_time' => date("Y-m-d H:i:s"),
-            'data' => $new_list,
+            'data' => $list,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,
@@ -943,7 +1008,7 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
-    // s108
+    // s109 各省挑战目标完成情况
     public function create_table_s109($date = '')
     {
         // 编号
@@ -1034,6 +1099,209 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
+    // s110 单店目标达成情况
+    public function create_table_s110A($date = '')
+    {
+        // 编号
+        $code = 'S110A';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+
+        // $sql2 = "
+        //     SELECT  
+        //     SCL.`经营模式`,
+        //     SCL.`省份`,
+        //     SCL.`督导`,
+        //     SCL.`店铺名称`,
+        //     SCM.`今日目标`,
+        //     SCL.`今天流水`,
+        //     CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+        //     SCM.`本月目标`,
+        //     SCL.`本月流水`,
+        //     CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
+        //     SCL.`近七天日均`,
+        //     ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+        //     FROM sp_customer_liushui SCL
+        //     LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+        //     ORDER BY
+        //     SCL.`经营模式`,
+        //     SCL.`省份`,
+        //     SCL.`督导`,
+        //     SCL.`店铺名称`
+        //     ;
+        // ";
+
+        $sql3 = "
+            SELECT  
+            SCL.`经营模式`,
+            SCL.`省份`,
+            SCL.`督导`,
+            SCL.`店铺名称`,
+            SCM.`今日目标`,
+            SCL.`今天流水`,
+            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+            SCM.`本月目标`,
+            SCL.`本月流水`,
+            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
+            SCL.`近七天日均`,
+            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+            FROM sp_customer_liushui SCL
+            LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+            WHERE SCL.`经营模式`='直营'
+            ORDER BY
+            SCL.`省份`,
+            SCL.`督导`,
+            SCL.`店铺名称`
+            ;
+        ";
+        $list = Db::connect("mysql2")->query($sql3);
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 110;
+        $field_width[3] = 90;
+        $field_width[4] = 90;
+        $field_width[5] = 90;
+        $field_width[6] = 90;
+        $field_width[7] = 90;
+        $field_width[8] = 90;
+        $field_width[9] = 90;
+        $field_width[10] = 90;
+        $field_width[11] = 100;
+        $field_width[12] = 110;
+
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 直营单店目标达成情况 表号:S110A",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
+    // s110 单店目标达成情况
+    public function create_table_s110B($date = '')
+    {
+        // 编号
+        $code = 'S110B';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+
+        // $sql2 = "
+        //     SELECT  
+        //     SCL.`经营模式`,
+        //     SCL.`省份`,
+        //     SCL.`督导`,
+        //     SCL.`店铺名称`,
+        //     SCM.`今日目标`,
+        //     SCL.`今天流水`,
+        //     CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+        //     SCM.`本月目标`,
+        //     SCL.`本月流水`,
+        //     CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
+        //     SCL.`近七天日均`,
+        //     ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+        //     FROM sp_customer_liushui SCL
+        //     LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+        //     ORDER BY
+        //     SCL.`经营模式`,
+        //     SCL.`省份`,
+        //     SCL.`督导`,
+        //     SCL.`店铺名称`
+        //     ;
+        // ";
+
+        $sql3 = "
+            SELECT  
+            SCL.`经营模式`,
+            SCL.`省份`,
+            SCL.`店铺名称`,
+            SCM.`今日目标`,
+            SCL.`今天流水`,
+            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+            SCM.`本月目标`,
+            SCL.`本月流水`,
+            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
+            SCL.`近七天日均`,
+            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
+            FROM sp_customer_liushui SCL
+            LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+            WHERE SCL.`经营模式`='加盟'
+            ORDER BY
+            SCL.`省份`,
+            SCL.`督导`,
+            SCL.`店铺名称`
+            ;
+        ";
+        $list = Db::connect("mysql2")->query($sql3);
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 110;
+        $field_width[3] = 90;
+        $field_width[4] = 90;
+        $field_width[5] = 90;
+        $field_width[6] = 90;
+        $field_width[7] = 90;
+        $field_width[8] = 90;
+        $field_width[9] = 90;
+        $field_width[10] = 90;
+        $field_width[11] = 110;
+
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 加盟单店目标达成情况 表号:S110B",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
 
     public function create_image($params)
     {
