@@ -174,52 +174,6 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 鞋履报表 23:30:00
-    public function sendS108() {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S107' => [
-                'title' => '督导挑战目标 表号:S108',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108.jpg'
-            ]
-        ];
-        // dump($send_data);die;
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
-            }
-        }
-        return json($res);
-    }
-
-    // 鞋履报表 23:30:00
-    public function sendS109() {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S107' => [
-                'title' => '各省挑战目标完成情况 表号:S109',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
-            ]
-        ];
-        // dump($send_data);die;
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
-            }
-        }
-        return json($res);
-    }
-
     /**
      * 执行指定任务
      * @return \think\response\Json
