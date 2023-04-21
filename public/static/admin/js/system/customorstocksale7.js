@@ -14,6 +14,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         // 一级分类 
         index1: function () {
             url = ea.url('/system.Customorstocksale7/getField2');
+            var isFirst = 'first';
             ea.request.get({
                 url: url,
                 data: {}
@@ -68,12 +69,16 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
                 ea.table.render({
                     url: init.list_index1,
+                    where: {isFirst: isFirst},
                     search: true,
                     height: 680,
                     limit: 200,
                     toolbar: [],
                     limits: [50, 200, 500, 1000, 2000, 3000, 5000],
-                    cols: [cols]
+                    cols: [cols],
+                    done: function (res, curr, count) {
+                        table_obj.config.where.isFirst = 'noFirst'
+                    }
                 });
 
                 ea.listen();
@@ -85,6 +90,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         // 二级分类 
         index2: function () {
             url = ea.url('/system.Customorstocksale7/getField2');
+            var isFirst = 'first';
             ea.request.get({
                 url: url,
                 data: {}
@@ -137,15 +143,21 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
                 })
 
-                ea.table.render({
+                var table_obj = ea.table.render({
                     url: init.list_index2,
+                    where: {isFirst: isFirst},
                     search: true,
                     height: 680,
                     limit: 200,
                     toolbar: [],
                     limits: [1, 1000, 3000, 4000, 5000, 6000],
-                    cols: [cols]
+                    cols: [cols],
+                    done: function (res, curr, count) {
+                        table_obj.config.where.isFirst = 'noFirst'
+                    }
                 });
+
+                console.log(table_obj)
 
                 ea.listen();
 

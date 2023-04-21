@@ -91,7 +91,27 @@ class SendReport extends BaseController
             'S103' => [
                 'title' => '省份老店业绩同比-分经营模式 表号:S103',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103.jpg'
-            ]
+            ],
+            'S108A' => [
+                'title' => '督导挑战目标完成率 表号:S108A',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108A.jpg'
+            ],
+            'S108B' => [
+                'title' => '区域挑战目标完成率 表号:S108B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108B.jpg'
+            ],
+            'S109' => [
+                'title' => '各省挑战目标完成情况 表号:S109',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
+            ],
+            'S110A' => [
+                'title' => '直营单店目标达成情况 表号:S110A',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110A.jpg'
+            ],
+            'S110B' => [
+                'title' => '加盟单店目标达成情况 表号:S110B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110B.jpg'
+            ],
         ];
         $res = [];
         foreach ($send_data as $k=>$v){
@@ -99,6 +119,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
                 $res[] = $model->send($v['title'],$v['jpg_url']);
+                // echo $v['title'];
+                // echo '<br>';
             }
         }
         return json($res);
@@ -152,52 +174,6 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 鞋履报表 23:30:00
-    public function sendS108() {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S107' => [
-                'title' => '督导挑战目标 表号:S108',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108.jpg'
-            ]
-        ];
-        // dump($send_data);die;
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
-            }
-        }
-        return json($res);
-    }
-
-    // 鞋履报表 23:30:00
-    public function sendS109() {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S107' => [
-                'title' => '各省挑战目标完成情况 表号:S109',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
-            ]
-        ];
-        // dump($send_data);die;
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
-            }
-        }
-        return json($res);
-    }
-
     /**
      * 执行指定任务
      * @return \think\response\Json
@@ -205,10 +181,17 @@ class SendReport extends BaseController
     public function run()
     {
         // 生成图片 s101
-        $this->service->create_table_s101();
-        $this->service->create_table_s101('S104');
-        $this->service->create_table_s102();
-        $this->service->create_table_s103();
+        $this->service->create_table_s101('S101',date('Y-m-d'));
+        $this->service->create_table_s101('S104',date('Y-m-d'));
+        $this->service->create_table_s102(date('Y-m-d'));
+        $this->service->create_table_s103(date('Y-m-d'));
+
+        // 108-110
+        $this->service->create_table_s108A(date('Y-m-d'));
+        $this->service->create_table_s108B(date('Y-m-d'));
+        $this->service->create_table_s109(date('Y-m-d'));
+        $this->service->create_table_s110A(date('Y-m-d'));
+        $this->service->create_table_s110B(date('Y-m-d'));
         // 发送数据报表
         $this->send();
     }
