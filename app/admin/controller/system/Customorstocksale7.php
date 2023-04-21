@@ -284,7 +284,10 @@ class Customorstocksale7 extends AdminController
         }
 
         // return $this->fetch('system/customorstocksale7/index1.html');
-        return $this->fetch();
+        // return $this->fetch();
+        return View('system/Customorstocksale7/index1', [
+
+        ]);
     }
 
     /**
@@ -544,7 +547,10 @@ class Customorstocksale7 extends AdminController
         }
 
         // return $this->fetch('system/customorstocksale7/index1.html');
-        return $this->fetch();
+        // return $this->fetch();
+        return View('system/Customorstocksale7/index2', [
+
+        ]);
     }
 
 /**
