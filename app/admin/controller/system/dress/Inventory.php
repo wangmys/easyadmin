@@ -24,7 +24,7 @@ use jianyan\excel\Excel;
  * 无需登录验证的页面
  * Class Inventory
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="商品负责人库存")
+ * @ControllerAnnotation(title="配饰问题统计")
  */
 class Inventory extends AdminController
 {
@@ -44,7 +44,7 @@ class Inventory extends AdminController
 
     /**
      * 展示配饰库存不足标准的数据
-     * @NodeAnotation(title="列表")
+     * @NodeAnotation(title="配饰库存不合格展示")
      * @return mixed|\think\response\Json
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -153,7 +153,6 @@ class Inventory extends AdminController
 
     /**
      * 展示配饰不合格的店铺总计
-     * @NodeAnotation(title="配饰不合格统计")
      */
     public function question()
     {
@@ -256,16 +255,21 @@ class Inventory extends AdminController
     }
 
     /**
-     * 商品专员问题集合
-     * @NodeAnotation(title="问题总览")
+     * 负责人问题总览
+     * @NodeAnotation(title="负责人问题总览")
      */
     public function gather()
     {
         $get = $this->request->get();
         if ($this->request->isAjax()) {
             $nameList = $get['name']??'';
+            // 是否超级管理员
             if(empty($nameList)){
-                $nameList = AdminConstant::CHARGE_LIST;
+                if(checkAdmin()){
+                    $nameList = AdminConstant::CHARGE_LIST;
+                }else{
+                    $nameList = [session('admin.name')];
+                }
             }else{
                 $nameList = [$nameList];
             }
@@ -340,7 +344,7 @@ class Inventory extends AdminController
 
     /**
      * 任务总览
-     * @NodeAnotation(title="任务总览")
+     * @NodeAnotation(title="商品专员任务总览")
      */
     public function task_overview()
     {
@@ -453,7 +457,7 @@ class Inventory extends AdminController
     }
 
     /**
-     * 导出
+     * 配饰问题导出
      */
     public function index_export()
     {

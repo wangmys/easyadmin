@@ -18,7 +18,7 @@ use jianyan\excel\Excel;
 /**
  * Class Dress
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="引流库存")
+ * @ControllerAnnotation(title="引流库存预警")
  */
 class Dress extends AdminController
 {

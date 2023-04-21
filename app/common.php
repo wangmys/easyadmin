@@ -123,6 +123,24 @@ if (!function_exists('auth')) {
 
 }
 
+if (!function_exists('checkAdmin')) {
+
+    /**
+     * 检测当前登录用户是否未超级管理员
+     * @param $id
+     * @return bool
+     */
+    function checkAdmin()
+    {
+        $adminId = session('admin.id');
+        if($adminId == \app\common\constants\AdminConstant::SUPER_ADMIN_ID){
+            return true;
+        }
+        return false;
+    }
+
+}
+
 if (!function_exists('curl_post')) {
 
     /**

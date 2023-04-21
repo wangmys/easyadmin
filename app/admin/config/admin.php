@@ -41,7 +41,8 @@ return [
         'login',
         'index',
         'system.dress.inventory',
-        'system.dress.dress'
+        'system.dress.dress',
+        'system.weather'
     ],
 
     // 不需要验证权限的节点
@@ -57,5 +58,6 @@ return [
         'system.dress.inventory/index_export',
         'system.dress.dress/index',
         'system.dress.dress/index_export',
+        'system.weather/getWeatherField'
     ],
 ];
