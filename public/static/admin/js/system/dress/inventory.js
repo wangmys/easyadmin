@@ -369,7 +369,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                     $(this).attr('data-title'),
                                                     ea.url(init.dress_url)+'?' + params,
                                                     '1400px',
-                                                    '800px'
+                                                    '700px'
                                                 );
                                                 break;
                                             case 'accessories':
@@ -377,7 +377,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                     $(this).attr('data-title'),
                                                     ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'],
                                                     '1400px',
-                                                    '900px'
+                                                    '700px'
                                                 );
                                                 break;
                                         }
