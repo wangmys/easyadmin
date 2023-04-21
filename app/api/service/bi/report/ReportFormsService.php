@@ -1044,7 +1044,6 @@ class ReportFormsService
         //     $list = Db::connect("sqlsrv")->query($sql2);
         //     cache('cache_xielv', $list, 3600);
         // }
-
         // $list = cache('cache_xielv');
 
         $table_header = ['ID'];
@@ -1065,13 +1064,6 @@ class ReportFormsService
         $field_width[9] = 90;
         $field_width[10] = 90;
         $field_width[11] = 100;
-        // $field_width[12] = 60;
-        // $field_width[13] = 60;
-        // $field_width[14] = 60;
-        // $field_width[15] = 60;
-
-        // dump($table_header);
-        // dump($newList);die;
 
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
@@ -1105,30 +1097,6 @@ class ReportFormsService
         // 编号
         $code = 'S110A';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
-
-        // $sql2 = "
-        //     SELECT  
-        //     SCL.`经营模式`,
-        //     SCL.`省份`,
-        //     SCL.`督导`,
-        //     SCL.`店铺名称`,
-        //     SCM.`今日目标`,
-        //     SCL.`今天流水`,
-        //     CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
-        //     SCM.`本月目标`,
-        //     SCL.`本月流水`,
-        //     CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
-        //     SCL.`近七天日均`,
-        //     ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
-        //     FROM sp_customer_liushui SCL
-        //     LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
-        //     ORDER BY
-        //     SCL.`经营模式`,
-        //     SCL.`省份`,
-        //     SCL.`督导`,
-        //     SCL.`店铺名称`
-        //     ;
-        // ";
 
         $sql3 = "
             SELECT  
@@ -1208,30 +1176,6 @@ class ReportFormsService
         // 编号
         $code = 'S110B';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
-
-        // $sql2 = "
-        //     SELECT  
-        //     SCL.`经营模式`,
-        //     SCL.`省份`,
-        //     SCL.`督导`,
-        //     SCL.`店铺名称`,
-        //     SCM.`今日目标`,
-        //     SCL.`今天流水`,
-        //     CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
-        //     SCM.`本月目标`,
-        //     SCL.`本月流水`,
-        //     CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
-        //     SCL.`近七天日均`,
-        //     ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
-        //     FROM sp_customer_liushui SCL
-        //     LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
-        //     ORDER BY
-        //     SCL.`经营模式`,
-        //     SCL.`省份`,
-        //     SCL.`督导`,
-        //     SCL.`店铺名称`
-        //     ;
-        // ";
 
         $sql3 = "
             SELECT  
