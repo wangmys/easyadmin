@@ -6,7 +6,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
         list_index: '/admin/system.dress.accessories/list',
         add_url: 'system.dress.accessories/add',
         edit_url: 'system.dress.accessories/edit',
-        delete_url: 'system.dress.accessories/delete'
+        delete_url: 'system.dress.accessories/delete',
+        export_url : 'system.dress.accessories/index_export'
     };
 
     function isRed(d,obj){
@@ -29,10 +30,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
             ea.table.render({
                 init: init,
                 event:false,
+                search:false,
                 height: 620,
                 limit: 1000,
                 limits:[100,200,500,1000],
-                toolbar:[],
+                toolbar:[
+                    'custom_export'
+                ],
                 cols: [[
                     // {type: "checkbox"},
                     {field: '省份', width: 134, title: '省份',search: 'select',searchKey:'province_list',setSearch:true},
@@ -76,6 +80,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 }
             });
 
+            var table = layui.table;
+            //转换静态表格
+            var list_table = table.init('list', {
+            });
 
             ea.listen();
         },
