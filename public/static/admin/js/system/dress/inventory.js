@@ -305,7 +305,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 auth: 'false',
                                 class: 'layui-btn layui-btn-normal layui-btn-xs',
                                 field:'商品负责人',
-                                extend:"data-width = '1600px' data-height = '800px' data-title = '配置库存详情' ",
+                                extend:"data-full='true' data-title = '配置库存详情' ",
                                 title:"今日所有问题"
                             }],
                         ],
@@ -361,23 +361,18 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                     var childId = this.id; // 通过 this 对象获取当前子表的id
                                     if (obj.event === 'childDel') {
                                         data = obj.data;
-                                        console.log(data)
                                         switch (data.type) {
                                             case 'yinliu':
                                                 var params = "商品负责人=" + data['商品负责人']
                                                 ea.open(
                                                     $(this).attr('data-title'),
                                                     ea.url(init.dress_url)+'?' + params,
-                                                    '1600px',
-                                                    '800px'
                                                 );
                                                 break;
                                             case 'accessories':
                                                 ea.open(
                                                     $(this).attr('data-title'),
-                                                    ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'],
-                                                    '1600px',
-                                                    '800px'
+                                                    ea.url(init.index_url)+'?商品负责人=' + data['商品负责人']
                                                 );
                                                 break;
                                         }

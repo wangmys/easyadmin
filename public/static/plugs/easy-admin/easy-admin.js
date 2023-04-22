@@ -304,17 +304,6 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                     d.search = admin.parame(d.search, true);
                     d.searchTip = d.searchTip || (d.search === 'xmSelect' ? '请选择' : '请输入') + d.title || '';
                     d.searchValue = d.searchValue || '';
-
-                    if(d.setSearch){
-                        switch (d.searchKey){
-                            case 'province_list':
-                               d.selectList = CONFIG.SEARCH_WHERE[d.searchKey].data;
-                        }
-                    }
-                    if(CONFIG.STOCK_WARN[d.field]){
-                        d.searchValue = CONFIG.STOCK_WARN[d.field]
-                    }
-
                     d.searchOp = d.searchOp || '%*%';
                     d.timeType = d.timeType || 'datetime';
                     if (d.field !== false && d.search !== false) {

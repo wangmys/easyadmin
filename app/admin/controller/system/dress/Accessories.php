@@ -12,8 +12,11 @@ use EasyAdmin\annotation\NodeAnotation;
 use PhpOffice\PhpSpreadsheet\Calculation\Database\DVar;
 use think\App;
 use think\facade\Db;
-use function GuzzleHttp\Psr7\str;
+use app\common\logic\inventory\DressLogic;
+use GuzzleHttp\Psr7\str;
+use app\admin\model\dress\Yinliu;
 use think\cache\driver\Redis;
+use jianyan\excel\Excel;
 
 
 /**
@@ -33,6 +36,7 @@ class Accessories extends AdminController
     {
         parent::__construct($app);
         $this->model = new AccessoriesM();
+        $this->logic = new DressLogic();
     }
 
     /**
@@ -55,9 +59,9 @@ class Accessories extends AdminController
             $count = $this->model
                 ->where(['Date' => date('Y-m-d')])
                 ->where(function ($q)use($where){
-                    foreach ($where as $k => $v){
-                        $q->whereOr($v[0], $v[1], $v[2]);
-                    }
+//                    foreach ($where as $k => $v){
+//                        $q->whereOr($v[0], $v[1], $v[2]);
+//                    }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计');
 
             // 增加其他筛选
@@ -86,9 +90,9 @@ class Accessories extends AdminController
             $list = $this->model
                 ->where(['Date' => date('Y-m-d')])
                 ->where(function ($q)use($where){
-                    foreach ($where as $k => $v){
-                        $q->whereOr($v[0], $v[1], $v[2]);
-                    }
+//                    foreach ($where as $k => $v){
+//                        $q->whereOr($v[0], $v[1], $v[2]);
+//                    }
                 })->whereNotIn(AdminConstant::NOT_FIELD,'合计');
 
             // 增加其他筛选
@@ -115,6 +119,35 @@ class Accessories extends AdminController
             return json($data);
         }
         return $this->fetch();
+    }
+
+    /**
+     * 配饰问题导出
+     */
+    public function index_export()
+    {
+        $get = $this->request->get();
+        // 获取今日日期
+        $Date = date('Y-m-d');
+        // 指定查询字段
+        $field = array_merge(['省份','店铺名称','商品负责人'],AdminConstant::ACCESSORIES_LIST);
+        $where = [
+            'Date' => $Date
+        ];
+        if(!empty($get['商品负责人'])){
+            $where['商品负责人'] = $get['商品负责人'];
+        }
+        // 查询指定
+        $list = $this->model->field($field)->where($where)->whereNotIn('店铺名称&省份&商品负责人','合计');
+        $list = $this->logic->setStoreFilter($list,'accessories_store_list');
+        $list = $list->order('省份,店铺名称,商品负责人')->select()->toArray();
+        // 设置标题头
+        $header = [];
+        if($list){
+            $header = array_map(function($v){ return [$v,$v]; }, $field);
+        }
+        $fileName = time();
+        return Excel::exportData($list, $header, $fileName, 'xlsx');
     }
 
     /**
