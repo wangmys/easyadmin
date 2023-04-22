@@ -305,7 +305,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                 auth: 'false',
                                 class: 'layui-btn layui-btn-normal layui-btn-xs',
                                 field:'商品负责人',
-                                extend:"data-width = '1500px' data-height = '900px' data-title = '配置库存详情' ",
+                                extend:"data-width = '1600px' data-height = '800px' data-title = '配置库存详情' ",
                                 title:"今日所有问题"
                             }],
                         ],
@@ -368,7 +368,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                 ea.open(
                                                     $(this).attr('data-title'),
                                                     ea.url(init.dress_url)+'?' + params,
-                                                    '1400px',
+                                                    '1600px',
                                                     '800px'
                                                 );
                                                 break;
@@ -376,8 +376,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                 ea.open(
                                                     $(this).attr('data-title'),
                                                     ea.url(init.index_url)+'?商品负责人=' + data['商品负责人'],
-                                                    '1400px',
-                                                    '900px'
+                                                    '1600px',
+                                                    '800px'
                                                 );
                                                 break;
                                         }
