@@ -7,9 +7,16 @@ use app\admin\model\budongxiao\SpWwBudongxiaoDetail;
 use app\admin\model\budongxiao\SpXwBudongxiaoYuncangkeyong;
 use app\admin\model\budongxiao\CwlBudongxiaoStatistics;
 use think\db\Raw;
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
+use app\common\controller\AdminController;
 
-// class Budongxiao extends BaseController
-class Budongxiao
+/**
+ * Class Budongxiao
+ * @package app\admin\controller\system
+ * @ControllerAnnotation(title="不动销")
+ */
+class Budongxiao extends AdminController
 {
     // 接收筛选参数
     public $params = [];
@@ -27,6 +34,9 @@ class Budongxiao
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
+    /**
+     * @NodeAnotation(title="单店不动销计算")
+     */
     public function index() {
         if (request()->isAjax()) {
             // 筛选条件
@@ -425,6 +435,9 @@ class Budongxiao
     }
 
     // 单店不动销 历史记录展示
+    /**
+     * @NodeAnotation(title="单店不动销明细")
+     */
     public function history() {
         if (request()->isAjax()) {
         // if (1) {
@@ -452,7 +465,6 @@ class Budongxiao
         }
     }
 
-    // 单店不动销 筛选项
     public function history_map() {
         $map = input();
         // dump($map);
@@ -472,8 +484,12 @@ class Budongxiao
         return json(['str' => $str]);
     }
 
-    // 区域动销 历史记录展示
-    // 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
+
+    /**
+    * 单店不动销 筛选项
+    * 区域动销 历史记录展示
+    * 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
+    */
     public function history_area() {
         if (request()->isAjax()) {
         // if (1) {
