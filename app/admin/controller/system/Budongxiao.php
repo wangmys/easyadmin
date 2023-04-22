@@ -34,14 +34,25 @@ class Budongxiao extends AdminController
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
+    // 更新周推条件
+    protected function updateWeekpushMap() {
+        $this->db_easyA->table('cwl_budongxiao_weekpush_map')->insert([
+            'create_time' => date('Y-m-d H:i:s', time()),
+            'update_time' => date('Y-m-d H:i:s', time()),
+            'map' => json_encode($this->params),
+        ]); 
+    }
+
     /**
      * @NodeAnotation(title="单店不动销计算")
      */
     public function index() {
+        
         if (request()->isAjax()) {
             // 筛选条件
 
             $params = input();
+
             // 删除空参数
             foreach ($params as $key => $val) {
                 if (empty($val)) {
@@ -49,6 +60,9 @@ class Budongxiao extends AdminController
                 }
             }
             $this->params = $params;
+
+            // $this->updateWeekpushMap();
+            // die;
 
             $data = [];
             $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
@@ -434,8 +448,9 @@ class Budongxiao extends AdminController
         return $tokenvalue;
     }
 
-    // 单店不动销 历史记录展示
+
     /**
+     * 单店不动销 历史记录展示
      * @NodeAnotation(title="单店不动销明细")
      */
     public function history() {
@@ -489,6 +504,7 @@ class Budongxiao extends AdminController
     * 单店不动销 筛选项
     * 区域动销 历史记录展示
     * 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
+    * @NodeAnotation(title="区域不动销明细")
     */
     public function history_area() {
         if (request()->isAjax()) {
@@ -636,6 +652,12 @@ class Budongxiao extends AdminController
         $hello = explode(',',$map['不考核门店']);
         echo $str = $this->arrToStr($hello);
         dump($hello);
+    }
+
+    public function test3() {
+        $auth = checkAdmin();
+        dump($auth);
+        dump(session('admin.id'));
     }
 
     public function arrToStr($arr) {

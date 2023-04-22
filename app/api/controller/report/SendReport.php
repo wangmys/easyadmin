@@ -182,6 +182,28 @@ class SendReport extends BaseController
     {
         // 生成图片 s101
         $this->service->create_table_s101('S101',date('Y-m-d'));
+        $this->service->create_table_s102(date('Y-m-d'));
+        $this->service->create_table_s103(date('Y-m-d'));
+        $this->service->create_table_s101('S104',date('Y-m-d'));
+
+        // 108-110
+        $this->service->create_table_s108A(date('Y-m-d'));
+        $this->service->create_table_s108B(date('Y-m-d'));
+        $this->service->create_table_s109(date('Y-m-d'));
+        $this->service->create_table_s110A(date('Y-m-d'));
+        $this->service->create_table_s110B(date('Y-m-d'));
+        // 发送数据报表
+        $this->send();
+    }
+
+    /**
+     * 执行指定任务 只创建不发送
+     * @return \think\response\Json
+     */
+    public function run2()
+    {
+        // 生成图片 s101
+        $this->service->create_table_s101('S101',date('Y-m-d'));
         $this->service->create_table_s101('S104',date('Y-m-d'));
         $this->service->create_table_s102(date('Y-m-d'));
         $this->service->create_table_s103(date('Y-m-d'));
@@ -192,7 +214,6 @@ class SendReport extends BaseController
         $this->service->create_table_s109(date('Y-m-d'));
         $this->service->create_table_s110A(date('Y-m-d'));
         $this->service->create_table_s110B(date('Y-m-d'));
-        // 发送数据报表
-        $this->send();
+
     }
 }
