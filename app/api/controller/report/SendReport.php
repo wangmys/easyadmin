@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace app\api\controller\report;
 use app\api\constants\ApiConstant;
 use app\api\service\bi\report\ReportFormsService;
+use app\api\service\bi\report\ReportFormsServiceJiameng;
 use app\BaseController;
 use think\Request;
 
@@ -14,6 +15,7 @@ class SendReport extends BaseController
      * @var ReportFormsService|null
      */
     protected $service = null;
+    protected $service_jiameng = null;
     // 日期
     protected $Date = '';
 
@@ -126,6 +128,43 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    public function send2()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S101' => [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S101.jpg'
+            ],
+            'S103B' => [
+                'title' => '省份老店业绩同比-加盟 表号:S103B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103B.jpg'
+            ],
+            'S108B' => [
+                'title' => '区域挑战目标完成率 表号:S108B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108B.jpg'
+            ],
+            'S109B' => [
+                'title' => '各省挑战目标完成情况-加盟 表号:S109B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
+            ],
+            'S110B' => [
+                'title' => '加盟单店目标达成情况 表号:S110B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110B.jpg'
+            ],
+        ];
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+            }
+        }
+        return json($res);
+    }
+
     // 23:40推送 个人
     public function sendS105()
     {
@@ -203,17 +242,10 @@ class SendReport extends BaseController
     public function run2()
     {
         // 生成图片 s101
-        $this->service->create_table_s101('S101',date('Y-m-d'));
-        $this->service->create_table_s101('S104',date('Y-m-d'));
-        $this->service->create_table_s102(date('Y-m-d'));
-        $this->service->create_table_s103(date('Y-m-d'));
+        $this->service->create_table_s103B(date('Y-m-d'));
 
         // 108-110
-        $this->service->create_table_s108A(date('Y-m-d'));
-        $this->service->create_table_s108B(date('Y-m-d'));
-        $this->service->create_table_s109(date('Y-m-d'));
-        $this->service->create_table_s110A(date('Y-m-d'));
-        $this->service->create_table_s110B(date('Y-m-d'));
-
+        $this->service->create_table_s109B(date('Y-m-d'));
+        // https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754
     }
 }
