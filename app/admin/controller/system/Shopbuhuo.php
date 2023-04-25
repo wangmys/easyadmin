@@ -97,6 +97,7 @@ class Shopbuhuo extends AdminController
 
     /**
      * @NodeAnotation(title="出货指令单")
+     * 仓库给店铺补货 7天内调空
      */
     public function chuhuozhiling() {
         
@@ -104,40 +105,18 @@ class Shopbuhuo extends AdminController
             // 筛选条件
 
         } else {
-            echo '出货指令单';
             //获取表单上传文件 例如上传了a.xslx
             // $file = Request::file('file');
             //生成保存文件名（generate_password 方法生成随机数，getOriginalExtension 方法获取上传文件的扩展名）
             // $new_name = generate_password(18) . '.' . $file->getOriginalExtension();
             // $save_path = '../runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
-            // $info = $file->move($save_path,$new_name);
-
-            $file = app()->getRootPath() . 'runtime\upload\shopbuhuo\20230424\出货指令单.xlsx';
-            
-            // die;
-            if($file) {
-                //成功上传后 获取上传的数据
-                //要获取的数据字段
-                $read_column = [
-                    'A' => 'real_name',
-                    'B' => 'sex',
-                    'C' => 'grade',
-                    'D' => 'class',
-                    'E' => 'roll_number',
-                    'F' => 'mobile',
-                    'G' => 'id_card',
-                    'H' => 'user_name',
-                    'I' => 'passwd',
-                ];
-                //读取数据
-                $data = $this->readExcel($file, $read_column);
-                dump($data);
-            }
+            // $info = $file->move($save_path,$new_name);   
         }
     }  
 
     /**
      * @NodeAnotation(title="渠道调拨")
+     * 店铺给店铺调拨
      */
     public function qudaodiaobo() {
         
@@ -257,7 +236,6 @@ class Shopbuhuo extends AdminController
                 EG.GoodsNo ,
                 SUM(ECS.Quantity) AS actual_quantity
             FROM ErpCustomerStock ECS 
-            LEFT JOIN ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
             LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
             WHERE  EC.ShutOut=0
@@ -271,6 +249,46 @@ class Shopbuhuo extends AdminController
         ";
         $kucun = $this->db_sqlsrv->query($sql);
         return $kucun;
+    }
+
+    // 康雷7天
+    public function day7() {
+        $sql = "
+            SELECT
+                T.CustomItem17 商品专员,
+                T.CustomerName 店铺名称,
+                T.GoodsNo 货号,
+                T.[单据类型],
+                T.BillId 调出单号,
+                T.Quantity 调出数量,
+                T.[库存数量],
+                T.[清空时间]
+            FROM
+            (
+            SELECT
+                EC.CustomerName,
+                EC.CustomItem17,
+                ECS.StockId,
+                ECS.BillId,
+                CASE WHEN ECS.BillType='ErpCustOutbound' THEN '店铺调出单' WHEN ECS.BillType='ErpCustReceipt' THEN '店铺收货单' WHEN ECS.BillType='ErpRetail' THEN '零售核销单' ELSE '其他' END AS 单据类型,
+                ECS.GoodsId,
+                EG.GoodsNo,
+                ECS.Quantity,
+                SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime) AS 库存数量,
+                ECS.CreateTime,
+                CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2 THEN '调出清空' END AS 清空操作,
+                CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2
+                                                THEN ECS.CreateTime END AS 清空时间
+            FROM ErpCustomer EC
+            LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+            WHERE EC.CustomItem17='张洋涛'-- EC.CustomerName='大石二店'
+            AND EG.TimeCategoryName1=2023
+            ) T
+            WHERE T.[清空时间] > GETDATE()-7
+        ";
+        $day7 = $this->db_sqlsrv->query($sql);
+        return $day7;
     }
 
     // qudaodiaobo康雷数据合并 相同货号 统计数量累加
@@ -383,10 +401,11 @@ class Shopbuhuo extends AdminController
         }
     }
 
+    // 测试渠道调拨
     public function test3() {
-        $auth = checkAdmin();
+        // $auth = checkAdmin();
         // dump($auth);
-        $data = cache('testdata');
+        // $data = cache('testdata');
         // dump($data);
 
         // $this->db_easyA->table('cwl_qudaodiaobo')->where([
@@ -432,8 +451,55 @@ class Shopbuhuo extends AdminController
             }
         } 
 
-        
         dump($wrongData);
-        
     }
+
+    public function test4() {
+        $select_zhilingdan = $this->db_easyA->query("
+            SELECT
+                a.*,
+                DATE_FORMAT(NOW(), '%Y-%m-%d %h:%i:%s') as create_time,
+                b.CustomerName as 店铺名称
+            FROM
+                cwl_chuhuozhilingdan AS a
+                LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode
+            WHERE a.aid='{$this->authInfo["id"]}'
+        ");
+        // dump($select_zhilingdan);
+        // die;
+
+        $this->db_easyA->startTrans();
+        // 删除当前用户所有记录
+        $delete_data = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+            ['aid', '=', $this->authInfo["id"]]
+        ])->delete();
+
+        $insert_date = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($select_zhilingdan);
+        if ($delete_data && $insert_date) {
+            $this->db_easyA->commit();
+        } else {
+            $this->db_easyA->rollback();
+        }
+    }
+
+    public function test5() {
+        $day7 = $this->day7();
+
+        echo '<pre>';
+        print_r($day7);die;
+
+        foreach ($day7 as $key => $val) {
+            $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                ['aid', '=', $this->authInfo["id"]],
+                ['店铺名称', '=', $val['店铺名称']],
+                ['货号', '=', $val['货号']],
+            ])->update([
+                '清空时间' => $val['清空时间'],
+            ]);
+        }
+
+        // dump($select_zhilingdan);
+        // print_r($wrongData);
+    }
+
 }
