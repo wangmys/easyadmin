@@ -160,7 +160,7 @@ class Shopbuhuo extends AdminController
 
     // 康雷在途
     public function qudaodiaobo_zaitu() {
-        $sql1 = "
+        $sql = "
         SELECT
             T.CustomItem17 商品专员,
             T.CustomerName 店铺名称,
@@ -243,10 +243,35 @@ class Shopbuhuo extends AdminController
             T.GoodsNo;
         ";
         // 在途 调出店铺是不能有在途的，这样没意义
-        $zaitukucun = $this->db_sqlsrv->query($sql1);
-        return $zaitukucun;
+        $zaitu = $this->db_sqlsrv->query($sql);
+        return $zaitu;
     }
 
+    // 康雷库存
+    public function qudaodiaobo_kucun() {
+        // 店铺库存
+        $sql = "
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerName ,
+                EG.GoodsNo ,
+                SUM(ECS.Quantity) AS actual_quantity
+            FROM ErpCustomerStock ECS 
+            LEFT JOIN ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
+            LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+            WHERE  EC.ShutOut=0
+                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
+                AND EG.TimeCategoryName1=2023
+            GROUP BY 
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.GoodsNo 
+            HAVING SUM(ECS.Quantity)!=0
+        ";
+        $kucun = $this->db_sqlsrv->query($sql);
+        return $kucun;
+    }
 
     // qudaodiaobo康雷数据合并 相同货号 统计数量累加
     public function qudaodiaobo_group() {
@@ -254,20 +279,39 @@ class Shopbuhuo extends AdminController
                 select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
                 SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
                 WHERE a.aid='{$this->authInfo["id"]}'
+
                 GROUP BY 调出店铺编号,货号
                 ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
                 left join customer as c on aa.调入店铺编号=c.CustomerCode
             ");
         
-        //  
-        $zaitu = $this->qudaodiaobo_zaitu($select_qudaodiaobo);
+            
+        //  调出不能有在途！！！
+        $zaitu = $this->qudaodiaobo_zaitu();
+        // 调空不能有在途！！！
+        $kucun = $this->qudaodiaobo_kucun();
 
         $wrongData = [];
         foreach ($select_qudaodiaobo as $key => $val) {
+
+            //  调出不能有在途
+            // 1 调出在途
             foreach ($zaitu as $key2 => $val2) {
-                if ($val['调入店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                    $select_qudaodiaobo[$key]['信息反馈'] = "在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
+                    $select_qudaodiaobo[$key]['信息反馈'] = "【调出在途】 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
                     $wrongData[] = $select_qudaodiaobo[$key];
+                    break;
+                }
+            }
+            //2 调空在途
+            foreach ($kucun as $key3 => $val3) {
+                if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                    // 库存 - 调出 <= 0
+                    if ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                        // $select_qudaodiaobo[$key]['剩余库存'] = $val3['actual_quantity'];
+                        $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                    }
                     break;
                 }
             }
@@ -349,20 +393,47 @@ class Shopbuhuo extends AdminController
         //     ['aid', '=', $this->authInfo['id']]
         //  ])->delete();
 
-        $num = 45036;
-        $column = 1;
-        $data_origin[$column] = 45036;
-        // $t1 = intval(($num- 25569) * 3600 * 24); //转换成1970年以来的秒数
-        // echo $main['open_time'] = gmdate('Y/m/d',$t1);
+        // AND a.调出店铺编号='Y0878'    
+        $select_qudaodiaobo = $this->db_easyA->query("
+            select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
+            SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
+            GROUP BY 调出店铺编号,货号
+            ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
+            left join customer as c on aa.调入店铺编号=c.CustomerCode
+        ");
 
-        // if (is_numeric($data_origin[$column])) {
-            // $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24);  //转换成1970年以来的秒数
-            // $data_origin[$column] = gmdate('Y/m/d',$t1);
-        // } else {
-        //     $data_origin[$column] = $data_origin[$column];
-        // }
-        $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
-       echo  $data_origin[$column] = gmdate('Y/m/d',$t1);
+        //  
+        $zaitu = $this->qudaodiaobo_zaitu();
+        $kucun = $this->qudaodiaobo_kucun();
+
+        // dump($kucun);
+
+        $wrongData = [];
+        foreach ($select_qudaodiaobo as $key => $val) {
+            // 1 调出在途
+            foreach ($zaitu as $key2 => $val2) {
+                if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
+                    $select_qudaodiaobo[$key]['信息反馈'] = "【调出在途】 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    break;
+                }
+            }
+            //2 调空在途
+            foreach ($kucun as $key3 => $val3) {
+                if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                    // 库存 - 调出 <= 0
+                    if ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                        // $select_qudaodiaobo[$key]['剩余库存'] = $val3['actual_quantity'];
+                        $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                    }
+                    break;
+                }
+            }
+        } 
+
+        
+        dump($wrongData);
         
     }
 }
