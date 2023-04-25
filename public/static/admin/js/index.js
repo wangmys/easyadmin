@@ -120,9 +120,11 @@ define(["jquery", "easy-admin", "echarts", "echarts-theme", "miniAdmin", "miniTa
                 tooltip: {
                     trigger: 'axis'
                 },
+                // 分类
                 legend: {
                     data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
                 },
+                // 图表间距
                 grid: {
                     left: '3%',
                     right: '4%',

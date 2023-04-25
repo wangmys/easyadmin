@@ -8,12 +8,19 @@ use think\cache\driver\Redis;
 use think\facade\Db;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\Yinliu;
+use voku\helper\HtmlDomParser;
 
 class Index
 {
     public function index()
     {
-        return '您好！这是一个[api]示例应用';
+        $url = "http://www.weather.com.cn/weather40d/101280101.shtml";
+        $url = "https://tianqi.2345.com/wea_forty/57516.htm";
+        $html = HtmlDomParser::file_get_html($url);
+        $el = $html->find('ul[class="weeks-names"] li');
+        echo '<pre>';
+        print_r($el);
+        die;
     }
 
     /**

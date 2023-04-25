@@ -19,6 +19,7 @@ use voku\helper\HtmlDomParser;
 use app\admin\model\weather\CityUrl;
 use app\admin\model\weather\Weather;
 use app\admin\model\weather\Customers;
+use app\admin\model\weather\Capital;
 
 /**
  * 天气信息服务
@@ -36,8 +37,6 @@ class WeatherService
 
     ];
 
-
-
     /***
      * 构造方法
      * WeatherService constructor.
@@ -51,6 +50,8 @@ class WeatherService
         $this->weather = new Weather;
         // 店铺模型
         $this->customers = new Customers;
+        // 省会天气数据
+        $this->capital = new Capital;
         return $this;
     }
 
@@ -79,7 +80,7 @@ class WeatherService
                             $nowYear = date('Y')+1;
                         }
                     }
-                    $weather_time = $nowYear.'-'.$element->find('span[class=fl]', 0)->innertext.' 00:00:00';
+                    $weather_time = $nowYear.'-'.$element->find('span[class=fl]', 0)->innertext;
                     $ave_c = (intval($element->find('div[class=weaul_z]', 1)->children(0)->text) + intval($element->find('div[class=weaul_z]', 1)->children(2)->text)) /2;
                     $arr[] = [
                         'cid' => $cid,
@@ -169,5 +170,40 @@ class WeatherService
             }
         }
         return false;
+    }
+
+    /**
+     * 获取省会城市列表
+     */
+    public function getCapitalList()
+    {
+        // 实例化城市列表模型
+        $cityModel = new CityUrl;
+        // 查询省会城市
+        return $cityModel->field('*,LEFT(province,2) as province_name')->group('province')->order('cid','asc')->select()->toArray();
+    }
+
+    /**
+     * 设置省会城市
+     * @return array
+     */
+    public function setCapitalProvince()
+    {
+        // 省会列表
+        $list = $this->getCapitalList();
+        foreach ($list as $k => $v){
+            $res[] = $v->where(['cid' => $v['cid']])->update([
+                'is_capital' => 1
+            ]);
+        }
+        return $res;
+    }
+
+    /**
+     * 保存省会城市天气数据
+     */
+    public function saveWeatherData($data)
+    {
+        return $this->capital->saveAll($data);
     }
 }
