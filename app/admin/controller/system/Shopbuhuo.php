@@ -50,7 +50,58 @@ class Shopbuhuo extends AdminController
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function readExcel($file_path = '/', $read_column = array())
+    public function readExcel1($file_path = '/', $read_column = array())
+    {
+        $reader = IOFactory::createReader('Xlsx');
+    
+        $reader->setReadDataOnly(TRUE);
+    
+        //载入excel表格
+        $spreadsheet = $reader->load($file_path);
+    
+        // 读取第一個工作表
+        $sheet = $spreadsheet->getSheet(0);
+    
+        // 取得总行数
+        $highest_row = $sheet->getHighestRow();
+    
+        // 取得总列数
+        $highest_column = $sheet->getHighestColumn();
+    
+        //读取内容
+        $data_origin = array();
+        $data = array();
+        for ($row = 2; $row <= $highest_row; $row++) { //行号从2开始
+            for ($column = 'A'; $column <= $highest_column; $column++) { //列数是以A列开始
+                $str = $sheet->getCell($column . $row)->getValue();
+                //保存该行的所有列
+                $data_origin[$column] = $str;
+                if ($column == "C" || $column == "D") {
+                    if (is_numeric($data_origin[$column])) {
+                        $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
+                        $data_origin[$column] = gmdate('Y/m/d',$t1);
+                    } else {
+                        $data_origin[$column] = $data_origin[$column];
+                    }
+                }
+            }
+            //取出指定的数据
+            foreach ($read_column as $key => $val) {
+                $data[$row - 2][$val] = $data_origin[$key];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 读取excel里面的内容保存为数组
+     * @param string $file_path  导入文件的路径
+     * @param array $read_column  要返回的字段
+     * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public function readExcel2($file_path = '/', $read_column = array())
     {
         $reader = IOFactory::createReader('Xlsx');
     
@@ -91,8 +142,6 @@ class Shopbuhuo extends AdminController
             }
         }
         return $data;
-        // echo '<pre>';
-        // print_r($data);
     }
 
     /**
@@ -103,14 +152,21 @@ class Shopbuhuo extends AdminController
         
         if (request()->isAjax()) {
             // 筛选条件
-
+            $find_chuhuozhiling = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                ['aid', '=', $this->authInfo['id']],
+                ['清空时间', 'exp', new Raw('IS NOT NULL')]
+            ])->order('create_time DESC')
+            ->select();
+            return json(["code" => "0", "msg" => "", "data" => $find_chuhuozhiling, 'create_time' => $this->create_time]);
         } else {
-            //获取表单上传文件 例如上传了a.xslx
-            // $file = Request::file('file');
-            //生成保存文件名（generate_password 方法生成随机数，getOriginalExtension 方法获取上传文件的扩展名）
-            // $new_name = generate_password(18) . '.' . $file->getOriginalExtension();
-            // $save_path = '../runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
-            // $info = $file->move($save_path,$new_name);   
+            $find_chuhuozhiling = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                ['aid', '=', $this->authInfo['id']]
+            ])->field('create_time')
+            ->order('create_time DESC')
+            ->find();
+            return View('chuhuozhiling',[
+                'create_time' => $find_chuhuozhiling ? $find_chuhuozhiling['create_time'] : '无记录'
+            ]);
         }
     }  
 
@@ -282,7 +338,7 @@ class Shopbuhuo extends AdminController
             FROM ErpCustomer EC
             LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
-            WHERE EC.CustomItem17='张洋涛'-- EC.CustomerName='大石二店'
+            WHERE EC.CustomItem17='{$this->authInfo["name"]}'-- EC.CustomerName='大石二店'
             AND EG.TimeCategoryName1=2023
             ) T
             WHERE T.[清空时间] > GETDATE()-7
@@ -373,14 +429,16 @@ class Shopbuhuo extends AdminController
                     'N' => '备注',
                 ];
                 //读取数据
-                $data = $this->readExcel($info, $read_column);
-                // $data['aname'] = $this->authInfo['name'];
-                // $data['aid'] = $this->authInfo['id'];
-                // $data['create_time'] = date('Y-m-d H:i:S');
+                $data = $this->readExcel2($info, $read_column);
+
                 foreach ($data as $key => $val) {
-                    $data[$key]['aname'] = $this->authInfo['name'];
-                    $data[$key]['aid'] = $this->authInfo['id'];
-                    $data[$key]['create_time'] = $this->create_time;
+                    if ( empty($val['调出店铺编号']) || empty($val['货号']) ) {
+                        unset($data[$key]);
+                    } else {
+                        $data[$key]['aname'] = $this->authInfo['name'];
+                        $data[$key]['aid'] = $this->authInfo['id'];
+                        $data[$key]['create_time'] = $this->create_time;
+                    }
                 }
                 // dump($data); die;
         
@@ -400,6 +458,92 @@ class Shopbuhuo extends AdminController
             } 
         }
     }
+
+    // 上传excel
+    public function uploadExcel_buhuo() {
+        if (request()->isAjax()) {
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $new_name = rand(100, 999) . time() . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+
+            if($info) {
+                //成功上传后 获取上传的数据
+                //要获取的数据字段
+                $read_column = [
+                    'A' => '原单编号',
+                    'B' => '手工单号',
+                    'C' => '单据日期',
+                    'D' => '审结日期',
+                    'E' => '仓库编号',
+                    'F' => '店铺编号',
+                    'G' => '订货类型',
+                    'H' => '订单编号',
+                    'I' => '货号',
+                    'J' => '颜色编号',
+                    'K' => '规格',
+                    'L' => '尺码',
+                    'M' => '数量',
+                    'N' => '订货价格',
+                    'O' => '是否完成',
+                    'P' => '备注',
+                ];
+                //读取数据
+                $data = $this->readExcel1($info, $read_column);
+                // print_r($data);die;
+
+                // $data = array_filter($data);
+                foreach ($data as $key => $val) {
+                    if ( empty($val['店铺编号']) || empty($val['货号']) ) {
+                        unset($data[$key]);
+                    } else {
+                        $data[$key]['aname'] = $this->authInfo['name'];
+                        $data[$key]['aid'] = $this->authInfo['id'];
+                        $data[$key]['create_time'] = $this->create_time;
+                    }
+                }
+        
+                $day7 = $this->day7();
+                $this->db_easyA->startTrans();
+                $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                    ['aid', '=', $this->authInfo['id']]
+                    ])->delete();
+                $insertAll_data = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
+                $update_data = $this->db_easyA->execute("
+                    UPDATE cwl_chuhuozhilingdan AS a
+                    LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 
+                    SET 店铺名称 = b.CustomerName 
+                    WHERE
+                        a.aid = '{$this->authInfo["id"]}'
+                ");
+                
+
+                // echo '<pre>';
+                // print_r($day7);die;
+        
+                foreach ($day7 as $key => $val) {
+                    $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                        ['aid', '=', $this->authInfo["id"]],
+                        ['店铺名称', '=', $val['店铺名称']],
+                        ['货号', '=', $val['货号']],
+                    ])->update([
+                        '清空时间' => $val['清空时间'],
+                        '调出数量' => $val['调出数量'],
+                        '库存数量' => $val['库存数量'],
+                    ]);
+                }
+                if ($insertAll_data && $update_data) {
+                    
+                    $this->db_easyA->commit();
+                    return json(['code' => 0, 'msg' => '上传成功']);
+                } else {
+                    $this->db_easyA->rollback();
+                    return json(['code' => 0, 'msg' => '上传失败']);
+                }
+            } 
+        }
+    }
+
 
     // 测试渠道调拨
     public function test3() {
@@ -485,8 +629,8 @@ class Shopbuhuo extends AdminController
     public function test5() {
         $day7 = $this->day7();
 
-        echo '<pre>';
-        print_r($day7);die;
+        // echo '<pre>';
+        // print_r($day7);die;
 
         foreach ($day7 as $key => $val) {
             $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
