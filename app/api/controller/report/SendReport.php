@@ -128,6 +128,7 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    // 推送到加盟群
     public function send2()
     {
         $name = '\app\api\service\DingdingService';
@@ -247,5 +248,8 @@ class SendReport extends BaseController
         // 108-110
         $this->service->create_table_s109B(date('Y-m-d'));
         // https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754
+
+        // 发送数据报表
+        $this->send2();
     }
 }
