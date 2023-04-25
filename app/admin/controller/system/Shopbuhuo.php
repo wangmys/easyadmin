@@ -26,9 +26,9 @@ class Shopbuhuo extends AdminController
     protected $db_easyA = '';
     protected $db_sqlsrv = '';
     protected $db_bi = '';
-    // 随机数
-    protected $rand_code = '';
-    // 创建时间
+    // 用户信息
+    protected $authInfo = '';
+    
     protected $create_time = '';
 
     public function __construct()
@@ -36,8 +36,10 @@ class Shopbuhuo extends AdminController
         $this->db_easyA = Db::connect('mysql');
         $this->db_sqlsrv = Db::connect('sqlsrv');
         $this->db_bi = Db::connect('mysql2');
+
+        $this->authInfo = session('admin');
         // $this->rand_code = $this->rand_code(10);
-        // $this->create_time = date('Y-m-d H:i:s', time());
+        $this->create_time = date('Y-m-d H:i:s', time());
     }
 
     /**
@@ -74,15 +76,23 @@ class Shopbuhuo extends AdminController
                 $str = $sheet->getCell($column . $row)->getValue();
                 //保存该行的所有列
                 $data_origin[$column] = $str;
+                if ($column == "B" || $column == "C") {
+                    if (is_numeric($data_origin[$column])) {
+                        $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
+                        $data_origin[$column] = gmdate('Y/m/d',$t1);
+                    } else {
+                        $data_origin[$column] = $data_origin[$column];
+                    }
+                }
             }
             //取出指定的数据
             foreach ($read_column as $key => $val) {
                 $data[$row - 2][$val] = $data_origin[$key];
             }
         }
-        // return $data;
-        echo '<pre>';
-        print_r($data);
+        return $data;
+        // echo '<pre>';
+        // print_r($data);
     }
 
     /**
@@ -133,13 +143,18 @@ class Shopbuhuo extends AdminController
         
         if (request()->isAjax()) {
             // 筛选条件
-
+            $data = $this->qudaodiaobo_group();
+            return json(["code" => "0", "msg" => "", "data" => $data, 'create_time' => $this->create_time]);
 
         } else {
+            $find_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->where([
+                ['aid', '=', $this->authInfo['id']]
+            ])->field('create_time')
+            ->order('create_time DESC')
+            ->find();
             return View('qudaodiaobo',[
-            
+                'create_time' => $find_qudaodiaobo ? $find_qudaodiaobo['create_time'] : '无记录'
             ]);
-            
         }
     }  
 
@@ -181,7 +196,7 @@ class Shopbuhuo extends AdminController
                 GROUP BY
                     ERG.DeliveryId 
                 ) 
-                AND EC.CustomItem17 = '张洋涛' 
+                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
             GROUP BY
                 EC.CustomItem17,
                 EC.CustomerId,
@@ -214,7 +229,7 @@ class Shopbuhuo extends AdminController
                 GROUP BY
                     ERG.CustOutboundId 
                 ) 
-                AND EC.CustomItem17 = '张洋涛' 
+                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
                 AND EC.ShutOut= 0 
             GROUP BY
                 EC.CustomItem17,
@@ -237,7 +252,8 @@ class Shopbuhuo extends AdminController
     public function qudaodiaobo_group() {
         $select_qudaodiaobo = $this->db_easyA->query("
                 select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
-                SELECT a.*,sum(a.数量) as `汇总数量` FROM `cwl_qudaodiaobo` as a
+                SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
+                WHERE a.aid='{$this->authInfo["id"]}'
                 GROUP BY 调出店铺编号,货号
                 ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
                 left join customer as c on aa.调入店铺编号=c.CustomerCode
@@ -246,57 +262,107 @@ class Shopbuhuo extends AdminController
         //  
         $zaitu = $this->qudaodiaobo_zaitu($select_qudaodiaobo);
 
+        $wrongData = [];
         foreach ($select_qudaodiaobo as $key => $val) {
             foreach ($zaitu as $key2 => $val2) {
                 if ($val['调入店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                    $select_qudaodiaobo[$key]['备注'] = "在途数量：" . $val2['在途数量']; 
+                    $select_qudaodiaobo[$key]['信息反馈'] = "在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
                     break;
                 }
             }
         }
 
-        foreach ($select_qudaodiaobo as $key => $val) {
-            if ($val['备注'] != '') {
-                dump($select_qudaodiaobo[$key]);
-            }
-        }
+        // return $select_qudaodiaobo;
+        return $wrongData;
 
-        // dump($select_qudaodiaobo);
-        // dump($zaitu);
+        // foreach ($select_qudaodiaobo as $key => $val) {
+        //     if ($val['信息反馈'] != '') {
+        //         dump($select_qudaodiaobo[$key]);
+        //     }
+        // }
     }
 
-    public function uploadExcel() {
-        // header('Content-Type: application/json; charset=utf-8');
-        // error_reporting(E_ALL);
-        $file = request()->file('file');  //这里‘file’是你提交时的name
-        echo $new_name = rand(100, 999) . time() . '.' . $file->getOriginalExtension();
-        echo "<br>";
-        echo $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
-        echo "<br>";
-        $info = $file->move($save_path, $new_name);
-        // dump($info);die;
+    // 上传excel
+    public function uploadExcel_diaobo() {
+        if (request()->isAjax()) {
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $new_name = rand(100, 999) . time() . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
 
-        if($info) {
-            //成功上传后 获取上传的数据
-            //要获取的数据字段
-            $read_column = [
-                'A' => 'real_name',
-                'B' => 'sex',
-                'C' => 'grade',
-                'D' => 'class',
-                'E' => 'roll_number',
-                'F' => 'mobile',
-                'G' => 'id_card',
-                'H' => 'user_name',
-                'I' => 'passwd',
-            ];
-            //读取数据
-            $data = $this->readExcel($info, $read_column);
-            dump($data);
+            if($info) {
+                //成功上传后 获取上传的数据
+                //要获取的数据字段
+                $read_column = [
+                    'A' => '原单编号',
+                    'B' => '单据日期',
+                    'C' => '审结日期',
+                    'D' => '调出店铺编号',
+                    'E' => '调入店铺编号',
+                    'F' => '调出价格类型',
+                    'G' => '调入价格类型',
+                    'H' => '货号',
+                    'I' => '颜色编号',
+                    'J' => '规格',
+                    'K' => '尺码',
+                    'L' => '数量',
+                    'M' => '规格',
+                    'N' => '备注',
+                ];
+                //读取数据
+                $data = $this->readExcel($info, $read_column);
+                // $data['aname'] = $this->authInfo['name'];
+                // $data['aid'] = $this->authInfo['id'];
+                // $data['create_time'] = date('Y-m-d H:i:S');
+                foreach ($data as $key => $val) {
+                    $data[$key]['aname'] = $this->authInfo['name'];
+                    $data[$key]['aid'] = $this->authInfo['id'];
+                    $data[$key]['create_time'] = $this->create_time;
+                }
+                // dump($data); die;
+        
+                $this->db_easyA->startTrans();
+                $this->db_easyA->table('cwl_qudaodiaobo')->where([
+                    ['aid', '=', $this->authInfo['id']]
+                 ])->delete();
+                $insertAll_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($data);
+                if ($insertAll_qudaodiaobo) {
+                    
+                    $this->db_easyA->commit();
+                    return json(['code' => 0, 'msg' => '上传成功']);
+                } else {
+                    $this->db_easyA->rollback();
+                    return json(['code' => 0, 'msg' => '上传失败']);
+                }
+            } 
         }
+    }
 
-        // return json($file);
-        // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
-        // dump($file);
+    public function test3() {
+        $auth = checkAdmin();
+        // dump($auth);
+        $data = cache('testdata');
+        // dump($data);
+
+        // $this->db_easyA->table('cwl_qudaodiaobo')->where([
+        //     ['aid', '=', $this->authInfo['id']]
+        //  ])->delete();
+
+        $num = 45036;
+        $column = 1;
+        $data_origin[$column] = 45036;
+        // $t1 = intval(($num- 25569) * 3600 * 24); //转换成1970年以来的秒数
+        // echo $main['open_time'] = gmdate('Y/m/d',$t1);
+
+        // if (is_numeric($data_origin[$column])) {
+            // $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24);  //转换成1970年以来的秒数
+            // $data_origin[$column] = gmdate('Y/m/d',$t1);
+        // } else {
+        //     $data_origin[$column] = $data_origin[$column];
+        // }
+        $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
+       echo  $data_origin[$column] = gmdate('Y/m/d',$t1);
+        
     }
 }
