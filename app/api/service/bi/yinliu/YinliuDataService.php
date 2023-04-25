@@ -273,6 +273,7 @@ class YinliuDataService
         $defaultFields = ['Date','省份','店铺名称','商品负责人'];
         // 动态表头字段
         $head = $this->logic->dressHead->column('name,field,stock','name');
+        $dynamic_head = array_column($head,'name');
         // 固定表头
         $field = implode(',',$defaultFields);
         foreach ($head as $k=>$v){
@@ -295,8 +296,11 @@ class YinliuDataService
                 // 查询条件
                 $having = '';
                 foreach ($vv['_data'] as $k=>$v){
-                    // 拼接过滤条件
-                    $having .= " {$k} < {$v} or ";
+                    // 表头有的字段才能筛选
+                    if(in_array($k,$dynamic_head)){
+                        // 拼接过滤条件
+                        $having .= " {$k} < {$v} or ";
+                    }
                 }
                 $having = "(".trim($having,'or ').")";
                 // 增加排除门店筛选
