@@ -23,11 +23,4 @@ class Weather extends TimeModel
 
     // 表名
     protected $name = 'weather';
-
-    public function getList()
-    {
-        // 实例化
-        $model = new self();
-    }
-
 }
