@@ -482,9 +482,11 @@ class Budongxiao extends AdminController
 
     public function history_map() {
         $map = input();
+
         // dump($map);
         // $map['type'] = 2;
         // $map['create_time'] = '2023-04-14 11:35:52';
+        // if ($map['type'] == 1) {
         if ($map['type'] == 1) {
             $find_map = $this->db_easyA->table('cwl_budongxiao_history_map')->field('map')->where(['rand_code' => $map['rand_code']])->find();
         } elseif ($map['type'] == 2) {
@@ -496,6 +498,7 @@ class Budongxiao extends AdminController
         foreach ($find_map as $key => $val) {
             $str .= $key . ':' . $val . ' | ';
         }
+        // return json(['str' => str]);
         return json(['str' => $str]);
     }
 

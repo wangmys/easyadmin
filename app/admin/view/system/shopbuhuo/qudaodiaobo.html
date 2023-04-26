@@ -155,14 +155,21 @@
                     })
                 })
             }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
             ,done: function(res) {
                 // layer.msg(res.msg);
                 //上传成功结束加载效果
                 layui.use('layer', function () {
-                    layui.layer.closeAll();
                     setTimeout(function () {
                         layui.layer.closeAll();
-                    }, 1000);
+                    }, 2000);
                 });
                 table.reload('table', {
                     // where: data.field
