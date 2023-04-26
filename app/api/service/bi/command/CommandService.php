@@ -52,6 +52,7 @@ class CommandService
         $result_log = [];
         // 循环判断
         foreach ($log as $k => $v){
+            $log[$k]['is_error']??$log[$k]['is_error'] = 0;
             // 是否符合异常指令判断第一层
             if($v['单据类型'] == '店铺调出单' && $v['清空操作']=='调出清空'){
                 // 异常指令判断第二层(下一条指令是否为[店铺收货单],且库存数量大于0)
@@ -65,16 +66,15 @@ class CommandService
                     $result_log[] = $v;
                     $item['type'] = 1;
                     $result_log[] = $item;
+                    $log[$k+1]['is_error'] = 1;
                 }else{
                     continue;
                 }
             }else{
                 continue;
             }
+            $log[$k]['is_error']??$log[$k]['is_error'] = 0;
         }
-        echo '<pre>';
-        print_r($result);
-        die;
         $result_process = $this->processData($result);
         // 提交事务
         Db::startTrans();

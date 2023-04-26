@@ -29,11 +29,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
-                    {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
+                    // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
+                    {field: 'CustomItem30', width: 100, title: '温带',fixed:'left',search: false},
+                    {field: 'CustomItem36', width: 100, title: '气温区域',fixed:'left',search: false},
                     {field: 'CustomerName', width: 100, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
-                    {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
+                    // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
-                    {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
+                    // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
                 ];
                 var data = res.data;
                 data.forEach(function (val,index){

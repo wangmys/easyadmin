@@ -56,15 +56,13 @@ class Weather extends AdminController
                 if (!empty($where['CustomerName'])) $query->where('c.CustomerName','in', $where['CustomerName']);
                 if (!empty($where['State'])) $query->where('c.State', $where['State']);
                 if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
-                if (!empty($where['SendGoodsGroup'])) $query->where('c.SendGoodsGroup', $where['SendGoodsGroup']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
-                if (!empty($where['liable'])) $query->where('c.liable', $where['liable']);
                 $query->where(1);
             })
             ->where('c.RegionId','<>',55)->count();
 
             $list = $this->customers
-            ->field('c.CustomerId,c.CustomerName,c.State,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid')
+            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid')
             ->field(['cu.City'=>'BdCity'])
             ->alias('c')
             ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
@@ -112,7 +110,7 @@ class Weather extends AdminController
                             // $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
                             $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].' ~ '.$vv['max_c'] . "℃</span>";
 
-                            
+
                             // $list[$k][$key] = [
                             //     'min_c' => $vv['min_c'],
                             //     'max_c' => $vv['max_c']

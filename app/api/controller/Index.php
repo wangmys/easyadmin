@@ -9,6 +9,7 @@ use think\facade\Db;
 use app\admin\model\dress\YinliuQuestion;
 use app\admin\model\dress\Yinliu;
 use voku\helper\HtmlDomParser;
+use app\admin\model\weather\Customers;
 
 class Index
 {
@@ -70,5 +71,44 @@ class Index
         print_r(date('Y-m-d',strtotime('2022-07-09'."+{$d}day")));
 //        $model->showTaskInfo();
         die;
+    }
+
+    /**
+     * 更新天气温带+气温区域
+     */
+    public function updateWeatherInfo()
+    {
+        // 查询所有门店ID
+        $ids = Customers::column('CustomerId');
+        // 根据所有门店ID查询所属温带 + 气温区域
+        $data = Db::connect("sqlsrv")->table('ErpCustomer')->whereIn('CustomerId',$ids)->column('CustomItem30,CustomItem36','CustomerId');
+        $update_data = [];
+        foreach ($data as $k => $v){
+            $update_data[$v['CustomerId']] = [
+                'CustomItem30' => $v['CustomItem30'],
+                'CustomItem36' => $v['CustomItem36'],
+            ];
+        }
+        Db::startTrans();
+        $result = [];
+        try {
+            foreach ($update_data as $kk=>$vv){
+                $result[$kk] =  Customers::where([
+                    'CustomerId' => $kk
+                ])->update($vv);
+            }
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollback();
+            return json([
+                'msg' => $e->getMessage(),
+                'code' => 0
+            ]);
+        }
+        return json([
+            'msg' => '成功',
+            'code' => 1,
+            'data' => $result
+        ]);
     }
 }
