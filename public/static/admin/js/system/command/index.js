@@ -53,7 +53,18 @@ define(["jquery", "easy-admin"], function ($, ea) {
         total: function () {
            var $get = $("#where").val();
            var $manager = $("#manager").val();
-           var $searchValue = $("#searchValue").val();
+           var field = JSON.parse($("#field").val());
+           var cols = [{field: '商品负责人', minWith: '10%', title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)}];
+           // 完善动态字段列表
+           for (index in field) {
+                var val = field[index];
+                cols.push({
+                   field: ''+val+'',
+                   title:''+val+'',
+                   minWith: 134,
+                   search:false
+               });
+            }
             ea.table.render({
                 init:{
                    table_elem: '#currentTable',
@@ -69,12 +80,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar:[],
                 limit:10000,
                 limits:[10000],
-                cols: [[
-                    {field: '商品负责人', minWith: '10%', title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)},
-                    {field: 'year', minWith: 134, title: '年',search:false},
-                    {field: 'month', minWith: 134, title: '月',search:false},
-                    {field: 'num', minWith: 134, title: '错误次数',search:false}
-                ]]
+                cols: [cols]
             });
             ea.listen();
         },
