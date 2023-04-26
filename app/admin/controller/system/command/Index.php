@@ -50,6 +50,8 @@ class Index extends AdminController
             $list = $this->logModel->where(function ($q)use($filters,$manager){
                 if(!empty($filters['商品负责人'])){
                      $q->whereIn('商品负责人',$filters['商品负责人']);
+                }else{
+                     $q->whereIn('商品负责人',reset($manager));
                 }
             })->select();
             // 返回数据

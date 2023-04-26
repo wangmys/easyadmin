@@ -24,14 +24,18 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var area_list = res.area_list;
                 // 地级市
                 var city_list = res.city_list;
+                // 气温区域
+                var wenqu_list = res.wenqu_list;
+                // 温带
+                var wendai_list = res.wendai_list;
                 // 店铺
                 var store_list = res.store_list;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
-                    {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
+                    {field: 'State', width: 180, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
-                    {field: 'CustomItem30', width: 100, title: '温带',fixed:'left',search: false},
-                    {field: 'CustomItem36', width: 100, title: '气温区域',fixed:'left',search: false},
+                    {field: 'CustomItem30', width: 100, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
+                    {field: 'CustomItem36', width: 100, title: '气温区域',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 100, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
@@ -74,7 +78,20 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     limit: 1000,
                     toolbar:[],
                     limits:[1000,2000,3000],
-                    cols: [cols]
+                    cols: [cols],
+                    done:function (res, curr, count) {
+                        // var that = this.elem.next();
+                        // var config = res.data[0].config;
+                        // res.data.forEach(function (item,index) {
+                        //     var tr = that.find("[data-index=" + index + "]").children();
+                        //         tr.each(function (i,value) {
+                        //             var key = $(value).data('field');
+                        //             if(item['_'+key]){
+                        //                 $(this).css("background-color", item['_'+key]);//单元格背景颜色
+                        //             }
+                        //         })
+                        // })
+                    }
                 });
 
                 ea.listen();
