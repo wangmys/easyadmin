@@ -145,7 +145,7 @@ class Shopbuhuo extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="出货指令单")
+     * @NodeAnotation(title="补货检验表")
      * 仓库给店铺补货 7天内调空
      */
     public function chuhuozhiling() {
@@ -171,7 +171,7 @@ class Shopbuhuo extends AdminController
     }  
 
     /**
-     * @NodeAnotation(title="渠道调拨")
+     * @NodeAnotation(title="调拨检验表")
      * 店铺给店铺调拨
      */
     public function qudaodiaobo() {
