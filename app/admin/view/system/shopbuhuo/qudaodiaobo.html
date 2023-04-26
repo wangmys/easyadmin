@@ -143,9 +143,27 @@
             elem: '#test3'
             ,url: url_upload //此处配置你自己的上传接口即可
             ,accept: 'file' //普通文件
+            ,before: function () {
+            //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
             ,done: function(res) {
-                layer.msg(res.msg);
-                console.log(res);
+                // layer.msg(res.msg);
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    layui.layer.closeAll();
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 1000);
+                });
                 table.reload('table', {
                     // where: data.field
                     method: 'post'
@@ -155,6 +173,9 @@
                     , limit: 5000
                     , done: function (res, curr, count) {
                         $('.lasttime').text('上次查询时间：' + res.create_time);
+                        if (res.count == 0) {
+                            layer.msg('恭喜，没有异常情况');
+                        }
                     }
                 })
             }

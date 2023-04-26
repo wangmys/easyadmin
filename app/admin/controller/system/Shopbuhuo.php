@@ -157,7 +157,7 @@ class Shopbuhuo extends AdminController
                 ['清空时间', 'exp', new Raw('IS NOT NULL')]
             ])->order('create_time DESC')
             ->select();
-            return json(["code" => "0", "msg" => "", "data" => $find_chuhuozhiling, 'create_time' => $this->create_time]);
+            return json(["code" => "0", "msg" => "", "data" => $find_chuhuozhiling, "count" => count($find_chuhuozhiling), 'create_time' => $this->create_time]);
         } else {
             $find_chuhuozhiling = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
                 ['aid', '=', $this->authInfo['id']]
@@ -179,7 +179,7 @@ class Shopbuhuo extends AdminController
         if (request()->isAjax()) {
             // 筛选条件
             $data = $this->qudaodiaobo_group();
-            return json(["code" => "0", "msg" => "", "data" => $data, 'create_time' => $this->create_time]);
+            return json(["code" => "0", "msg" => "", "data" => $data, "count" => count($data), 'create_time' => $this->create_time]);
 
         } else {
             $find_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->where([
@@ -344,6 +344,11 @@ class Shopbuhuo extends AdminController
             WHERE T.[清空时间] > GETDATE()-7
         ";
         $day7 = $this->db_sqlsrv->query($sql);
+        foreach ($day7 as $key => $val) {
+            $day7[$key]['aname'] = $this->authInfo['name'];
+            $day7[$key]['aid'] = $this->authInfo['id'];
+            $day7[$key]['create_time'] = $this->create_time;
+        }
         return $day7;
     }
 
@@ -442,19 +447,20 @@ class Shopbuhuo extends AdminController
                 }
                 // dump($data); die;
         
-                $this->db_easyA->startTrans();
+                // $this->db_easyA->startTrans();
                 $this->db_easyA->table('cwl_qudaodiaobo')->where([
                     ['aid', '=', $this->authInfo['id']]
                  ])->delete();
                 $insertAll_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($data);
-                if ($insertAll_qudaodiaobo) {
+                // if ($insertAll_qudaodiaobo) {
                     
-                    $this->db_easyA->commit();
-                    return json(['code' => 0, 'msg' => '上传成功']);
-                } else {
-                    $this->db_easyA->rollback();
-                    return json(['code' => 0, 'msg' => '上传失败']);
-                }
+                //     $this->db_easyA->commit();
+                //     return json(['code' => 0, 'msg' => '上传成功']);
+                // } else {
+                //     $this->db_easyA->rollback();
+                //     return json(['code' => 0, 'msg' => '上传失败']);
+                // }
+                return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
     }
@@ -503,47 +509,61 @@ class Shopbuhuo extends AdminController
                     }
                 }
         
+                // 7天清空库存数据 
                 $day7 = $this->day7();
-                $this->db_easyA->startTrans();
-                $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                // $this->db_easyA->startTrans();
+                $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
                     ['aid', '=', $this->authInfo['id']]
-                    ])->delete();
-                $insertAll_data = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
-                $update_data = $this->db_easyA->execute("
+                ])->delete();
+                $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean')->where([
+                    ['aid', '=', $this->authInfo['id']]
+                ])->delete();    
+
+                $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
+                $update_chuhuozhilingdan = $this->db_easyA->execute("
                     UPDATE cwl_chuhuozhilingdan AS a
                     LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 
                     SET 店铺名称 = b.CustomerName 
                     WHERE
                         a.aid = '{$this->authInfo["id"]}'
                 ");
-                
 
-                // echo '<pre>';
-                // print_r($day7);die;
+                $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean')->insertAll($day7);
+                $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
+                    UPDATE cwl_chuhuozhilingdan_7dayclean AS a
+                    LEFT JOIN cwl_chuhuozhilingdan AS b ON a.店铺名称 = b.店铺名称 
+                    AND a.货号 = b.货号 
+                    AND b.aid = '{$this->authInfo["id"]}'
+                    SET b.清空时间 = a.清空时间,
+                        b.调出数量 = a.调出数量,
+                        b.库存数量 = a.库存数量 
+                    WHERE
+                        a.aid = '{$this->authInfo["id"]}'
+                ");
         
-                foreach ($day7 as $key => $val) {
-                    $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
-                        ['aid', '=', $this->authInfo["id"]],
-                        ['店铺名称', '=', $val['店铺名称']],
-                        ['货号', '=', $val['货号']],
-                    ])->update([
-                        '清空时间' => $val['清空时间'],
-                        '调出数量' => $val['调出数量'],
-                        '库存数量' => $val['库存数量'],
-                    ]);
-                }
-                if ($insertAll_data && $update_data) {
-                    
-                    $this->db_easyA->commit();
-                    return json(['code' => 0, 'msg' => '上传成功']);
-                } else {
-                    $this->db_easyA->rollback();
-                    return json(['code' => 0, 'msg' => '上传失败']);
-                }
+                // foreach ($day7 as $key => $val) {
+                //     $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+                //         ['aid', '=', $this->authInfo["id"]],
+                //         ['店铺名称', '=', $val['店铺名称']],
+                //         ['货号', '=', $val['货号']],
+                //     ])->update([
+                //         '清空时间' => $val['清空时间'],
+                //         '调出数量' => $val['调出数量'],
+                //         '库存数量' => $val['库存数量'],
+                //     ]);
+                // }
+                
+                // if ($insertAll_chuhuozhilingdan && $update_chuhuozhilingdan && $insertAll_7dayclean) {
+                //     $this->db_easyA->commit();
+                //     return json(['code' => 0, 'msg' => '上传成功']);
+                // } else {
+                //     $this->db_easyA->rollback();
+                //     return json(['code' => 0, 'msg' => '上传失败']);
+                // }
+                return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
     }
-
 
     // 测试渠道调拨
     public function test3() {
