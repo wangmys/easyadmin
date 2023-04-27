@@ -8,15 +8,17 @@ use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
 use jianyan\excel\Excel;
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\admin\model\command\CommandErrorTotal;
 use app\admin\model\command\CommandLog;
 use app\admin\model\command\CommandErrorLog;
 
 
 /**
- * Class Accessories
+ * Class Index
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="配饰库存")
+ * @ControllerAnnotation(title="调拨指令记录")
  */
 class Index extends AdminController
 {
@@ -50,6 +52,8 @@ class Index extends AdminController
             $list = $this->logModel->where(function ($q)use($filters,$manager){
                 if(!empty($filters['商品负责人'])){
                      $q->whereIn('商品负责人',$filters['商品负责人']);
+                }else{
+                     $q->whereIn('商品负责人',reset($manager));
                 }
             })->select();
             // 返回数据
@@ -76,7 +80,9 @@ class Index extends AdminController
         // 筛选
         $filters = json_decode($this->request->get('filter', '{}',null), true);
          // 商品负责人列表
-        $manager = $this->totalModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
+        $manager = $this->totalModel->group('商品负责人')->where([
+            'year' => date('Y')
+        ])->order('id','asc')->column('商品负责人','商品负责人');
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {
@@ -86,18 +92,26 @@ class Index extends AdminController
                      $q->whereIn('商品负责人',$filters['商品负责人']);
                 }
             })->order('商品负责人,year desc,month asc')->select();
+
+            // 数据集重组
+            $new = [];
+            foreach ($list as $k => $v){
+                $new[$v['商品负责人']]['商品负责人'] = $v['商品负责人'];
+                $new[$v['商品负责人']][$v['date_str']] = $v['num'];
+            }
             // 返回数据
             $data = [
                     'code'  => 0,
                     'msg'   => '',
-                    'count' => count($list),
-                    'data'  => $list
+                    'count' => count($new),
+                    'data'  => $new
                 ];
             return json($data);
         }
-
+        $field = $this->totalModel->group('date_str')->column('date_str');
         return $this->fetch('',[
-            'manager' => $manager
+            'manager' => $manager,
+            'field' => $field
         ]);
     }
 

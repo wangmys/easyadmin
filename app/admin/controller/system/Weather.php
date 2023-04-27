@@ -56,6 +56,8 @@ class Weather extends AdminController
                 if (!empty($where['CustomerName'])) $query->where('c.CustomerName','in', $where['CustomerName']);
                 if (!empty($where['State'])) $query->where('c.State', $where['State']);
                 if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
+                if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
+                if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 $query->where(1);
             })
@@ -71,7 +73,8 @@ class Weather extends AdminController
                 if (!empty($where['CustomerName'])) $query->where('c.CustomerName','in', $where['CustomerName']);
                 if (!empty($where['State'])) $query->where('c.State', $where['State']);
                 if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
-                if (!empty($where['SendGoodsGroup'])) $query->where('c.SendGoodsGroup', $where['SendGoodsGroup']);
+                if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
+                if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 if (!empty($where['liable'])) $query->where('c.liable', $where['liable']);
                 $query->where(1);
@@ -107,7 +110,8 @@ class Weather extends AdminController
                                 $bgCol = '#fecc51';   
                                 $fontCol = '#000000';  
                             }
-                            // $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
+//                             $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
+//                             $list[$k]['_'.$key] = $bgCol;
                             $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].' ~ '.$vv['max_c'] . "℃</span>";
 
 
@@ -158,7 +162,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('RegionId','<>',55)->column('State,City,CustomerName,RegionId');
+        $info_list = $this->customers->where('RegionId','<>',55)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -177,6 +181,12 @@ class Weather extends AdminController
             $city_list = array_combine($city_list_temp,$city_list_temp);
             $store_list_temp = array_unique(array_column($info_list,'CustomerName'));
             $store_list = array_combine($store_list_temp,$store_list_temp);
+            // 温带
+            $wendai_list_temp = array_unique(array_column($info_list,'CustomItem30'));
+            $wendai_list = array_combine($wendai_list_temp,$wendai_list_temp);
+            // 气温区域
+            $wenqu_list_temp = array_unique(array_column($info_list,'CustomItem36'));
+            $wenqu_list = array_combine($wenqu_list_temp,$wenqu_list_temp);
         }
         // 省列表
         // 区域列表
@@ -184,9 +194,11 @@ class Weather extends AdminController
                 'code'  => 1,
                 'msg'   => '',
                 'province_list'  => $province_list,
-                'area_list'  => $area_list,
+//                'area_list'  => $area_list,
                 'store_list'  => $store_list,
-                'city_list'  => $city_list,
+//                'city_list'  => $city_list,
+                'wendai_list'  => $wendai_list,
+                'wenqu_list'  => $wenqu_list,
                 'data'  => $list
             ];
         return json($data);
