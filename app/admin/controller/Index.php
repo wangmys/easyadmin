@@ -23,6 +23,13 @@ class Index extends AdminController
             'admin' => session('admin'),
         ]);
     }
+    
+    public function index2()
+    {
+        return $this->fetch('', [
+            'admin' => session('admin'),
+        ]);
+    }
 
     /**
      * 后台欢迎页
