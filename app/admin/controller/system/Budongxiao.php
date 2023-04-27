@@ -124,12 +124,17 @@ class Budongxiao extends AdminController
             ['店铺库存数量' , '>', 1],
         ];
 
+        // dump($map); die;
+
         // 没有上市日期就直接使用上市天数
         if (empty($this->params['上市时间'])) {
             $map[] = ['上市天数' , '>=', $this->params['上市天数']];
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
             $res_all_new = [];
+
+            // echo SpWwBudongxiaoDetail::getLastSql(); die;
+            
             // 赋值 上市时间修正 上市天数修正
             foreach($res_all as $key => $val) {
                 $res_all[$key]['上市时间修正'] = $val['上市时间'];
@@ -249,9 +254,10 @@ class Budongxiao extends AdminController
             // 预计skc数
             $yujiSkc = count($res_all_new);
 
-            // dump($res_all_new);
-            // die;
+           
 
+
+            // die;
             $this->db_easyA->startTrans();
             $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
             if ($insert_history) {
@@ -274,8 +280,10 @@ class Budongxiao extends AdminController
             $res_end['30天以上'] = $day30;
             $res_end['【考核标准】键'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
             $res_end['【考核标准】值'] = round($this->zeroHandle($res_end[$res_end['【考核标准】键']], $res_end['预计SKC数'])  * 100, 2);
-            $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
-            $res_end['合格率10%以下'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
+            // $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
+            $res_end['考核结果'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? '不合格' : '合格';
+            // $res_end['合格率'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
+            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不及格</span>" : '';
             $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
@@ -305,7 +313,7 @@ class Budongxiao extends AdminController
         $res = '';
         // 齐码率
         $qimalu = $typeQiMa[$data['中类']];
-        if ($data['齐码情况'] >= $qimalu && $data['可用库存Quantity'] >= 100) {
+        if ($data['齐码情况'] >= $qimalu || $data['可用库存Quantity'] >= 100) {
             $res = ''; // 店铺合格
         } else {
             $res = $data['不动销区间']; // 店铺不合格
@@ -603,14 +611,14 @@ class Budongxiao extends AdminController
         // 中山三店 乐从一店 上市天数不足30
         $map = [
             // '省份' => '广东省',
-            '商品负责人' => '于燕华',
-            '季节归集' => '春季',
+            '商品负责人' => '任文秀',
+            '季节归集' => '夏季',
             '考核区间' => '30天以上',
             // '店铺名称' => '巴马一店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
-            '不考核门店' => '万年一店,万年二店',
-            '上市天数' => 30,
+            // '不考核门店' => '万年一店,万年二店',
+            '上市天数' => 1,
             'limit' => 10000,
         ];
         // dump($map);
@@ -622,15 +630,17 @@ class Budongxiao extends AdminController
         $data = [];
         $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
 
-        foreach($storeArr as $key => $val) {
-            $res = $this->store($val['店铺名称']);
-            if ($res) {
-                $data[] = $res;
-            }
+        // foreach($storeArr as $key => $val) {
+        //     $res = $this->store($val['店铺名称']);
+        //     if ($res) {
+        //         $data[] = $res;
+        //     }
             
-        }
+        // }
 
         // dump($data);
+
+        $res = $this->store('云梦一店');
         // die;
         // $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
         //     'rand_code' => $this->rand_code,

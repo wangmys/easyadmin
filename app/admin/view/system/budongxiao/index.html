@@ -167,6 +167,12 @@
                         <div id="xm-nostore" class="xm-select-demo"></div>
                     </div>
 
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">合格率%<</label>
+                    <div class="layui-input-inline" style="width: 150px !important;">
+                        <input type="number" name='合格率' autocomplete="off" value="10" maxlength="3"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
                     <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">查询记录数</label>
                     <div class="layui-input-inline" style="width: 150px !important;">
                         <select name="limit" lay-verify="required">
@@ -335,7 +341,7 @@
                     , { field: '30天以上', title: '30天以上' }
                     , { field: '【考核标准】键', title: '【考核标准】键' }
                     , { field: '【考核标准】值', title: '【考核标准】值' }
-                    , { field: '合格率10%以下', title: '合格率10%以下' }
+                    , { field: '合格率', title: '考核结果' }
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {

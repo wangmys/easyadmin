@@ -355,14 +355,14 @@ class Shopbuhuo extends AdminController
     // qudaodiaobo康雷数据合并 相同货号 统计数量累加
     public function qudaodiaobo_group() {
         $select_qudaodiaobo = $this->db_easyA->query("
-                select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
-                SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
-                WHERE a.aid='{$this->authInfo["id"]}'
+            select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
+            SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
+            WHERE a.aid='{$this->authInfo["id"]}'
 
-                GROUP BY 调出店铺编号,货号
-                ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
-                left join customer as c on aa.调入店铺编号=c.CustomerCode
-            ");
+            GROUP BY 调出店铺编号,货号
+            ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
+            left join customer as c on aa.调入店铺编号=c.CustomerCode
+        ");
         
             
         //  调出不能有在途！！！
@@ -664,6 +664,77 @@ class Shopbuhuo extends AdminController
 
         // dump($select_zhilingdan);
         // print_r($wrongData);
+    }
+
+    public function test6() {
+        $select_qudaodiaobo = $this->db_easyA->query("
+            select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
+            SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
+            WHERE a.aid='{$this->authInfo["id"]}'
+
+            GROUP BY 调出店铺编号,货号
+            ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
+            left join customer as c on aa.调入店铺编号=c.CustomerCode
+        ");
+        
+            
+        //  调出不能有在途！！！
+        $zaitu = $this->qudaodiaobo_zaitu();
+        dump($select_qudaodiaobo);   
+        
+        die;
+
+
+        // // 调空不能有在途！！！
+        // $kucun = $this->qudaodiaobo_kucun();
+        // 店铺库存
+        $sql = "
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerName ,
+                EG.GoodsNo ,
+                SUM(ECS.Quantity) AS actual_quantity
+            FROM ErpCustomerStock ECS 
+            LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+            WHERE  EC.ShutOut=0
+                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
+                AND EG.TimeCategoryName1=2023
+            GROUP BY 
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.GoodsNo 
+            HAVING SUM(ECS.Quantity)!=0
+        ";
+        $kucun = $this->db_sqlsrv->query($sql);
+
+        $wrongData = [];
+        foreach ($select_qudaodiaobo as $key => $val) {
+
+            //  调出不能有在途
+            foreach ($zaitu as $key2 => $val2) {
+                if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
+                    $select_qudaodiaobo[$key]['信息反馈'] = "【调出在途】 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    break;
+                }
+            }
+            
+            //2 调空在途
+            foreach ($kucun as $key3 => $val3) {
+                if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                    // 库存 - 调出 <= 0
+                    if ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                        // $select_qudaodiaobo[$key]['剩余库存'] = $val3['actual_quantity'];
+                        $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                    }
+                    break;
+                }
+            }
+
+
+        }
     }
 
 }

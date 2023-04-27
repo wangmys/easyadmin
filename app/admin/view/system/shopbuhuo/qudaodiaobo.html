@@ -211,8 +211,7 @@
                 , height: 800
                 , cellMinWidth: 50 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '原单编号', title: '原单编号', fixed: 'left'}
-                    , { field: '单据日期', title: '单据日期', fixed: 'left' }
+                    { field: '单据日期', title: '单据日期', fixed: 'left' }
                     , { field: '审结日期', title: '审结日期' , fixed: 'left'}
                     , { field: '调出店铺编号', title: '调出店铺编号', fixed: 'left' }
                     , { field: '调出店铺名称', title: '调出店铺名称' , fixed: 'left'}
@@ -220,8 +219,9 @@
                     , { field: '调入店铺名称', title: '调入店铺名称' , fixed: 'left'}
                     , { field: '货号', title: '货号' }
                     , { field: '调出店铺该货号数据合计', title: '调出店铺该货号数据合计' }
+                    , { field: '未完成', title: '未完成' }
+                    , { field: '上市天数', title: '上市天数' }
                     , { field: '信息反馈', title: '信息反馈' }
-                    , { field: '备注', title: '备注' }
                 ]]
                 ,done: function (res, curr, count) {
                     // $('.title_text2').css('display', 'block');
