@@ -489,8 +489,8 @@ class Shopbuhuo extends AdminController
                 // 1 调出不能有在途
                 foreach ($zaitu as $key2 => $val2) {
                     if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                        // $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
                         $select_qudaodiaobo[$key]['调出店在途量'] = $val2['在途数量']; 
+                        // $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
                         $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
                         $wrongData[] = $select_qudaodiaobo[$key];
                         $end1 = true;
@@ -502,7 +502,7 @@ class Shopbuhuo extends AdminController
                 // 3 单店单品上市天数<=7
                 foreach ($elt7day as $key4 => $val4) {
                     if ($val['调出店铺名称'] == $val4['店铺名称'] && $val['货号'] == $val4['货号']) {
-                        $select_qudaodiaobo[$key]['信息反馈']  = "上市天数不足8天"; 
+                        $select_qudaodiaobo[$key]['信息反馈']  = "调出店上市不足7天"; 
                         // $select_qudaodiaobo[$key]['信息反馈'] = "上市天数不足8天"; 
                         $wrongData[] = $select_qudaodiaobo[$key];
                         $end3 = true;
@@ -516,23 +516,37 @@ class Shopbuhuo extends AdminController
                     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
                         // 未完成
                         if (empty($val3['是否完成'])) {
+                            // 调空并且有在途
                             if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
-                                $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                                $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调入数量'];
-                                // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途0】调入未完成 店铺库存：{$val3['actual_quantity']} 调入未完成数量：{$val3['调入数量']} 调出总数：{$val['调出店铺该货号数据合计']}"; 
-                                $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                                $wrongData[] = $select_qudaodiaobo[$key];
-                                $end2 = true;
-                                break;
+                                // 是否有在途
+                                foreach ($zaitu as $key3_1 => $val3_1) {
+                                    if ($val['调出店铺名称'] == $val3_1['店铺名称'] && $val['货号'] == $val3_1['货号']) {
+                                        $select_qudaodiaobo[$key]['在途数量'] =  $val3_1['在途数量']; 
+                                        $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                                        $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调入数量'];
+                                        $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                                        // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                                        $wrongData[] = $select_qudaodiaobo[$key];
+                                        $end1 = true;
+                                        break 2;
+                                    }
+                                }
                             }
                         } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-                            $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
-                            // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
-                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途";
-                            $wrongData[] = $select_qudaodiaobo[$key];
-                            $end2 = true;
-                            break;
+                            // 是否有在途
+                            foreach ($zaitu as $key3_1 => $val3_2) {
+                                if ($val['调出店铺名称'] == $val3_2['店铺名称'] && $val['货号'] == $val3_2['货号']) {
+                                    $select_qudaodiaobo[$key]['在途数量'] =  $val3_2['在途数量']; 
+                                    $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                                    $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                                    // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                                    $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                                    // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                                    $wrongData[] = $select_qudaodiaobo[$key];
+                                    $end1 = true;
+                                    break 2;
+                                }
+                            }
                         }
                     }
                 }
