@@ -261,7 +261,7 @@ class Dress extends AdminController
                     // 表头有的字段才能筛选
                     if(in_array($k,$dynamic_head)){
                         // 拼接过滤条件
-                        $having .= " {$k} < {$v} or ";
+                        $having .= " ({$k} < {$v} or $k is null) or ";
                     }
                 }
                 $having = "(".trim($having,'or ').")";
@@ -392,7 +392,7 @@ class Dress extends AdminController
             $having = '';
             foreach ($vv['_data'] as $k=>$v){
                 // 拼接过滤条件
-                $having .= " {$k} < {$v} or ";
+                $having .= " ({$k} < {$v} or $k is null) or ";
             }
             $having = "(".trim($having,'or ').")";
             // 增加排除门店筛选
