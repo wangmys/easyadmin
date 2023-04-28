@@ -193,7 +193,7 @@ class Shopbuhuo extends AdminController
         }
     }  
 
-    // 康雷在途
+    // 康雷在途 给区域调拨用
     public function qudaodiaobo_zaitu() {
         $sql = "
         SELECT
@@ -282,7 +282,7 @@ class Shopbuhuo extends AdminController
         return $zaitu;
     }
 
-    // 康雷库存
+    // 康雷库存 给区域调拨用
     public function qudaodiaobo_kucun() {
         // 店铺库存
         $sql = "
@@ -312,7 +312,7 @@ class Shopbuhuo extends AdminController
                 EG.GoodsNo ,
                 SUM ( ECS.Quantity ) AS actual_quantity,
                 EIA.IsCompleted AS '是否完成',
-                EIAG.Quantity AS '未完成数量' 
+                EIAG.Quantity AS '调入数量' 
             FROM
                 ErpCustomerStock ECS
                 LEFT JOIN ErpCustomer EC ON ECS.CustomerId= EC.CustomerId
@@ -337,7 +337,22 @@ class Shopbuhuo extends AdminController
         return $kucun;
     }
 
-    // 康雷7天
+    // bi 商品上市天数 <=7
+    public function qudaodiaobo_elt7day() {
+        $elt7day = $this->db_bi->query("
+            SELECT
+                店铺名称,货号,上市天数 
+            FROM
+                sp_ww_budongxiao_detail 
+            WHERE
+                `上市天数` <= 7 
+                AND `商品负责人` = '{$this->authInfo["name"]}' 
+                AND 大类 <> '配饰'
+        ");  
+        return $elt7day;
+    }
+
+    // 康雷7天 近七天做了调出清空的数据
     public function day7() {
         $sql = "
             SELECT
@@ -382,6 +397,8 @@ class Shopbuhuo extends AdminController
         return $day7;
     }
 
+
+
     // qudaodiaobo康雷数据合并 相同货号 统计数量累加
     public function qudaodiaobo_group() {
         $select_qudaodiaobo = $this->db_easyA->query("
@@ -394,66 +411,127 @@ class Shopbuhuo extends AdminController
             left join customer as c on aa.调入店铺编号=c.CustomerCode
         ");
         
-            
-        //  调出不能有在途！！！
-        $zaitu = $this->qudaodiaobo_zaitu();
-        // 调空不能有在途！！！
-        $kucun = $this->qudaodiaobo_kucun();
+        if (! empty($select_qudaodiaobo)) {
+            //  调出不能有在途！！！
+            $zaitu = $this->qudaodiaobo_zaitu();
+            // 调空不能有在途！！！
+            $kucun = $this->qudaodiaobo_kucun();
+            // 单店单品上市天数<=7
+            $elt7day = $this->qudaodiaobo_elt7day();
 
-        $wrongData = [];
-        foreach ($select_qudaodiaobo as $key => $val) {
-            //  调出不能有在途
-            // 1 调出在途
-            foreach ($zaitu as $key2 => $val2) {
-                if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                    $select_qudaodiaobo[$key]['信息反馈'] = "【调出在途】 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-                    $wrongData[] = $select_qudaodiaobo[$key];
-                    break;
-                }
+            $store_in_map = "";
+            // 组合调入店铺的条件
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $store_in_map .= "'" . $val['调入店铺名称']. "'"  . ','; 
             }
-            //2 调空在途
-            // foreach ($kucun as $key3 => $val3) {
-            //     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
-            //         // 库存 - 调出 <= 0
-            //         if ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-            //             // $select_qudaodiaobo[$key]['剩余库存'] = $val3['actual_quantity'];
-            //             $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-            //             $wrongData[] = $select_qudaodiaobo[$key];
-            //         }
-            //         break;
-            //     }
-            // }
+    
+            $store_in_map = substr($store_in_map, 0, -1);
 
-            //2 调空在途
-            foreach ($kucun as $key3 => $val3) {
-                if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
-                    // 未完成
-                    if (empty($val3['是否完成'])) {
-                        if ($val3['actual_quantity'] - $val3['未完成数量'] - $val['调出店铺该货号数据合计'] <= 0) {
-                            $select_qudaodiaobo[$key]['是否完成'] = $val3['是否完成'];
-                            $select_qudaodiaobo[$key]['未完成数量'] = $val3['未完成数量'];
-                            $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 未完成数量：{$val3['未完成数量']} 调出总数：{$val['调出店铺该货号数据合计']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-                            $wrongData[] = $select_qudaodiaobo[$key];
-                        }
-                    } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-                        $select_qudaodiaobo[$key]['是否完成'] = $val3['是否完成'];
-                        $select_qudaodiaobo[$key]['未完成数量'] = $val3['未完成数量'];
-                        $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
+            $store_in_data = $this->db_sqlsrv->query("
+                SELECT
+                    T.CustomItem17 商品专员,
+                    T.CustomerName 店铺名称,
+                    T.GoodsNo 货号,
+                    T.[单据类型],
+                    T.BillId 调出单号,
+                    T.Quantity 调出数量,
+                    T.[库存数量],
+                    T.[清空时间]
+                FROM
+                (
+                SELECT
+                    EC.CustomerName,
+                    EC.CustomItem17,
+                    ECS.StockId,
+                    ECS.BillId,
+                    CASE WHEN ECS.BillType='ErpCustOutbound' THEN '店铺调出单' WHEN ECS.BillType='ErpCustReceipt' THEN '店铺收货单' WHEN ECS.BillType='ErpRetail' THEN '零售核销单' ELSE '其他' END AS 单据类型,
+                    ECS.GoodsId,
+                    EG.GoodsNo,
+                    ECS.Quantity,
+                    SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime) AS 库存数量,
+                    ECS.CreateTime,
+                    CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2 THEN '调出清空' END AS 清空操作,
+                    CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2
+                                                    THEN ECS.CreateTime END AS 清空时间
+                    FROM ErpCustomer EC
+                    LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+                    LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                WHERE EC.CustomerName in ({$store_in_map})
+                    AND EG.TimeCategoryName1=2023
+                    ) T
+                    WHERE T.[清空时间] > GETDATE()-7
+            ");
 
-                        $wrongData[] = $select_qudaodiaobo[$key];
+            // 组合调入店铺 清空时间
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $select_qudaodiaobo[$key]['清空时间'] = '';
+                foreach ($store_in_data as $key1 => $val1) {
+                    if ($val1['店铺名称'] == $val['调入店铺名称'] && $val1['货号'] == $val['货号']) {
+                        $select_qudaodiaobo[$key]['清空时间'] = $val1['清空时间'];
                     }
-                    break;
                 }
             }
+
+            $wrongData = [];
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $end1 = false;
+                $end2 = false;
+                $end3 = false;
+
+                // 0 调入店铺7天内清空过
+                if (!empty($val['清空时间'])) {
+                    $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    continue;
+                }
+
+                // 1 调出不能有在途
+                foreach ($zaitu as $key2 => $val2) {
+                    if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
+                        $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                        $end1 = true;
+                        break;
+                    }
+                }
+                if ($end1 == true) continue;
+
+                // 3 单店单品上市天数<=7
+                foreach ($elt7day as $key4 => $val4) {
+                    if ($val['调出店铺名称'] == $val4['店铺名称'] && $val['货号'] == $val4['货号']) {
+                        $select_qudaodiaobo[$key]['反馈信息'] = "【上市天数不足8天】 上市天数：{$val4['上市天数']}"; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                        $end3 = true;
+                        break;
+                    }
+                }
+                if ($end3 == true) continue;
+
+                // 2 调空 7天内别调入
+                foreach ($kucun as $key3 => $val3) {
+                    if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                        // 未完成
+                        if (empty($val3['是否完成'])) {
+                            if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {    
+                                $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途0】调入未完成 剩余库存：{$val3['actual_quantity']} 调入未完成数量：{$val3['调入数量']} 调出总数：{$val['调出店铺该货号数据合计']}"; 
+                                $wrongData[] = $select_qudaodiaobo[$key];
+                                $end2 = true;
+                                break;
+                            }
+                        } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                            $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 剩余库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            $end2 = true;
+                            break;
+                        }
+                    }
+                }
+                if ($end2 == true) continue; 
+            }
+            return $wrongData;
+        } else {
+            return [];
         }
-
-        return $wrongData;
-
-        // foreach ($select_qudaodiaobo as $key => $val) {
-        //     if ($val['信息反馈'] != '') {
-        //         dump($select_qudaodiaobo[$key]);
-        //     }
-        // }
     }
 
     // 上传excel
@@ -502,14 +580,7 @@ class Shopbuhuo extends AdminController
                     ['aid', '=', $this->authInfo['id']]
                  ])->delete();
                 $insertAll_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($data);
-                // if ($insertAll_qudaodiaobo) {
-                    
-                //     $this->db_easyA->commit();
-                //     return json(['code' => 0, 'msg' => '上传成功']);
-                // } else {
-                //     $this->db_easyA->rollback();
-                //     return json(['code' => 0, 'msg' => '上传失败']);
-                // }
+
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
@@ -590,50 +661,11 @@ class Shopbuhuo extends AdminController
                     WHERE
                         a.aid = '{$this->authInfo["id"]}'
                 ");
-        
-                // foreach ($day7 as $key => $val) {
-                //     $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
-                //         ['aid', '=', $this->authInfo["id"]],
-                //         ['店铺名称', '=', $val['店铺名称']],
-                //         ['货号', '=', $val['货号']],
-                //     ])->update([
-                //         '清空时间' => $val['清空时间'],
-                //         '调出数量' => $val['调出数量'],
-                //         '库存数量' => $val['库存数量'],
-                //     ]);
-                // }
-                
-                // if ($insertAll_chuhuozhilingdan && $update_chuhuozhilingdan && $insertAll_7dayclean) {
-                //     $this->db_easyA->commit();
-                //     return json(['code' => 0, 'msg' => '上传成功']);
-                // } else {
-                //     $this->db_easyA->rollback();
-                //     return json(['code' => 0, 'msg' => '上传失败']);
-                // }
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
     }
 
-    public function test5() {
-        $day7 = $this->day7();
-
-        // echo '<pre>';
-        // print_r($day7);die;
-
-        foreach ($day7 as $key => $val) {
-            $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
-                ['aid', '=', $this->authInfo["id"]],
-                ['店铺名称', '=', $val['店铺名称']],
-                ['货号', '=', $val['货号']],
-            ])->update([
-                '清空时间' => $val['清空时间'],
-            ]);
-        }
-
-        // dump($select_zhilingdan);
-        // print_r($wrongData);
-    }
 
     public function test6() {
         $select_qudaodiaobo = $this->db_easyA->query("
@@ -645,96 +677,146 @@ class Shopbuhuo extends AdminController
             ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
             left join customer as c on aa.调入店铺编号=c.CustomerCode
         ");
-        
-            
-        //  调出不能有在途！！！
-        $zaitu = $this->qudaodiaobo_zaitu();
+        // cache('select_qudaodiaobo', null);
+        // if (!cache('select_qudaodiaobo')) {
+        //     $select_qudaodiaobo = $this->db_easyA->query("
+        //     select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
+        //     SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo` as a
+        //     WHERE a.aid='{$this->authInfo["id"]}'
 
-        // // 调空不能有在途！！！
-        // $kucun = $this->qudaodiaobo_kucun();
-        // 店铺库存
-        $sql = "
-            SELECT
-                EC.CustomItem17,
-                EC.CustomerName ,
-                EG.GoodsNo ,
-                SUM ( ECS.Quantity ) AS actual_quantity,
-                EIA.IsCompleted AS '是否完成',
-                EIAG.Quantity AS '未完成数量' 
-            FROM
-                ErpCustomerStock ECS
-                LEFT JOIN ErpCustomer EC ON ECS.CustomerId= EC.CustomerId
-                LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
-                LEFT JOIN ErpInstructionApplyGoods EIAG ON ECS.GoodsId= EIAG.GoodsId
-                LEFT JOIN ErpInstructionApply EIA ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
-            WHERE
-                EC.ShutOut= 0 
-                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
-                AND EG.TimeCategoryName1= 2023 
-            GROUP BY
-                EC.CustomItem17,
-                EC.CustomerName,
-                EG.GoodsNo,
-                EIA.IsCompleted,
-                EIAG.Quantity 
-            HAVING
-            SUM ( ECS.Quantity ) !=0
-        ";
-        $kucun = $this->db_sqlsrv->query($sql);
+        //     GROUP BY 调出店铺编号,货号
+        //     ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
+        //     left join customer as c on aa.调入店铺编号=c.CustomerCode
+        // ");
+        //     cache('select_qudaodiaobo', $select_qudaodiaobo, 7200);
+        // } else {
+        //     $select_qudaodiaobo = cache('select_qudaodiaobo');
+        // }
 
-        // echo '<pre>';
-        // print_r($kucun);die;
+        // print_r($select_qudaodiaobo);
+        // die;        
+        if (! empty($select_qudaodiaobo)) {
+            //  调出不能有在途！！！
+            $zaitu = $this->qudaodiaobo_zaitu();
+            // 调空不能有在途！！！
+            $kucun = $this->qudaodiaobo_kucun();
+            // 单店单品上市天数<=7
+            $elt7day = $this->qudaodiaobo_elt7day();
 
-        $wrongData = [];
-
-
-        $huohao = "";
-        $store = "";        
-        
-        foreach ($select_qudaodiaobo as $key => $val) {
-            $huohao .= $val['货号'] . ",";
-            $store .= $val['调出店铺名称'] . ",";
-
-            //  调出不能有在途
-            // foreach ($zaitu as $key2 => $val2) {
-            //     if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-            //         $select_qudaodiaobo[$key]['信息反馈'] = "【调出在途】 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-            //         $wrongData[] = $select_qudaodiaobo[$key];
-            //         break;
-            //     }
-            // }
-            
-            //2 调空在途
-            // foreach ($kucun as $key3 => $val3) {
-            //     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
-            //         // 未完成
-            //         if (empty($val3['是否完成'])) {
-            //             if ($val3['actual_quantity'] - $val3['未完成数量'] - $val['调出店铺该货号数据合计'] <= 0) {
-            //                 $select_qudaodiaobo[$key]['是否完成'] = $val3['是否完成'];
-            //                 $select_qudaodiaobo[$key]['未完成数量'] = $val3['未完成数量'];
-            //                 $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 未完成数量：{$val3['未完成数量']} 调出总数：{$val['调出店铺该货号数据合计']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-            //                 $wrongData[] = $select_qudaodiaobo[$key];
-            //             }
-            //         } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-            //             $select_qudaodiaobo[$key]['是否完成'] = $val3['是否完成'];
-            //             $select_qudaodiaobo[$key]['未完成数量'] = $val3['未完成数量'];
-            //             $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途】 剩余库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']} 在途数量：" . $val2['在途数量'] . ' 商品专员：' . $val2['商品专员']; 
-
-            //             $wrongData[] = $select_qudaodiaobo[$key];
-            //         }
-            //         break;
-            //     }
-            // }
+            $store_in_map = "";
+            // 组合调入店铺的条件
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $store_in_map .= "'" . $val['调入店铺名称']. "'"  . ','; 
+            }
     
+            $store_in_map = substr($store_in_map, 0, -1);
+    
+            $store_in_data = $this->db_sqlsrv->query("
+                SELECT
+                    T.CustomItem17 商品专员,
+                    T.CustomerName 店铺名称,
+                    T.GoodsNo 货号,
+                    T.[单据类型],
+                    T.BillId 调出单号,
+                    T.Quantity 调出数量,
+                    T.[库存数量],
+                    T.[清空时间]
+                FROM
+                (
+                SELECT
+                    EC.CustomerName,
+                    EC.CustomItem17,
+                    ECS.StockId,
+                    ECS.BillId,
+                    CASE WHEN ECS.BillType='ErpCustOutbound' THEN '店铺调出单' WHEN ECS.BillType='ErpCustReceipt' THEN '店铺收货单' WHEN ECS.BillType='ErpRetail' THEN '零售核销单' ELSE '其他' END AS 单据类型,
+                    ECS.GoodsId,
+                    EG.GoodsNo,
+                    ECS.Quantity,
+                    SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime) AS 库存数量,
+                    ECS.CreateTime,
+                    CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2 THEN '调出清空' END AS 清空操作,
+                    CASE WHEN SUM(ECS.Quantity) OVER (PARTITION BY EC.CustomerId,ECS.GoodsId ORDER BY ECS.CreateTime)<=0 AND ECS.BillType= 'ErpCustOutbound' AND ECS.Quantity<=-2
+                                                    THEN ECS.CreateTime END AS 清空时间
+                    FROM ErpCustomer EC
+                    LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+                    LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                WHERE EC.CustomerName in ({$store_in_map})
+                    AND EG.TimeCategoryName1=2023
+                    ) T
+                    WHERE T.[清空时间] > GETDATE()-7
+            ");
+
+            // 组合调入店铺 清空时间
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $select_qudaodiaobo[$key]['清空时间'] = '';
+                foreach ($store_in_data as $key1 => $val1) {
+                    if ($val1['店铺名称'] == $val['调入店铺名称'] && $val1['货号'] == $val['货号']) {
+                        $select_qudaodiaobo[$key]['清空时间'] = $val1['清空时间'];
+                    }
+                }
+            }
+
+            $wrongData = [];
+            
+            foreach ($select_qudaodiaobo as $key => $val) {
+                $end1 = false;
+                $end2 = false;
+                $end3 = false;
+
+                if (!empty($val['清空时间'])) {
+                    $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    continue;
+                }
+
+                // 1 调出不能有在途
+                foreach ($zaitu as $key2 => $val2) {
+                    if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
+                        $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                        $end1 = true;
+                        break;
+                    }
+                }
+                if ($end1 == true) continue;
+
+                // 2 调空 7天内别调入
+                foreach ($kucun as $key3 => $val3) {
+                    if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                        // 未完成
+                        if (empty($val3['是否完成'])) {
+                            if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
+                                $select_qudaodiaobo[$key]['信息反馈'] = "【】调入未完成 剩余库存：{$val3['actual_quantity']} 调入未完成数量：{$val3['调入数量']} 调出总数：{$val['调出店铺该货号数据合计']}"; 
+                                $wrongData[] = $select_qudaodiaobo[$key];
+                                $end2 = true;
+                                break;
+                            }
+                        } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                            $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 剩余库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            $end2 = true;
+                            break;
+                        }
+                    }
+                }
+                if ($end2 == true) continue; 
+
+                // 3 单店单品上市天数<=7
+                foreach ($elt7day as $key4 => $val4) {
+                    if ($val['调出店铺名称'] == $val4['店铺名称'] && $val['货号'] == $val4['货号']) {
+                        $select_qudaodiaobo[$key]['反馈信息'] = "【上市天数不足8天】 上市天数：{$val4['上市天数']}"; 
+                        $wrongData[] = $select_qudaodiaobo[$key];
+                        $end3 = true;
+                        break;
+                    }
+                }
+                if ($end3 == true) continue;
+            }
+            // return $wrongData;
+            dump($wrongData);
+        } else {
+            return [];
         }
-
-        
-        echo substr($huohao, 0, -1);
-        echo substr($store, 0, -1);
-
-
-
-        // dump($wrongData);
     }
 
 }
