@@ -467,7 +467,7 @@ class Shopbuhuo extends AdminController
                 $select_qudaodiaobo[$key]['清空时间'] = '';
                 foreach ($store_in_data as $key1 => $val1) {
                     if ($val1['店铺名称'] == $val['调入店铺名称'] && $val1['货号'] == $val['货号']) {
-                        $select_qudaodiaobo[$key]['清空时间'] = $val1['清空时间'];
+                        $select_qudaodiaobo[$key]['清空时间'] = date('Y-m-d H:i:s', strtotime($val1['清空时间']));
                     }
                 }
             }
@@ -480,7 +480,8 @@ class Shopbuhuo extends AdminController
 
                 // 0 调入店铺7天内清空过
                 if (!empty($val['清空时间'])) {
-                    $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
+                    // $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
+                    $select_qudaodiaobo[$key]['信息反馈'] = "调入店7天内清空过"; 
                     $wrongData[] = $select_qudaodiaobo[$key];
                     continue;
                 }
@@ -488,7 +489,9 @@ class Shopbuhuo extends AdminController
                 // 1 调出不能有在途
                 foreach ($zaitu as $key2 => $val2) {
                     if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                        $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
+                        // $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
+                        $select_qudaodiaobo[$key]['调出店在途量'] = $val2['在途数量']; 
+                        $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
                         $wrongData[] = $select_qudaodiaobo[$key];
                         $end1 = true;
                         break;
@@ -499,7 +502,8 @@ class Shopbuhuo extends AdminController
                 // 3 单店单品上市天数<=7
                 foreach ($elt7day as $key4 => $val4) {
                     if ($val['调出店铺名称'] == $val4['店铺名称'] && $val['货号'] == $val4['货号']) {
-                        $select_qudaodiaobo[$key]['反馈信息'] = "【上市天数不足8天】 上市天数：{$val4['上市天数']}"; 
+                        $select_qudaodiaobo[$key]['信息反馈']  = "上市天数不足8天"; 
+                        // $select_qudaodiaobo[$key]['信息反馈'] = "上市天数不足8天"; 
                         $wrongData[] = $select_qudaodiaobo[$key];
                         $end3 = true;
                         break;
@@ -512,14 +516,20 @@ class Shopbuhuo extends AdminController
                     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
                         // 未完成
                         if (empty($val3['是否完成'])) {
-                            if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {    
-                                $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途0】调入未完成 剩余库存：{$val3['actual_quantity']} 调入未完成数量：{$val3['调入数量']} 调出总数：{$val['调出店铺该货号数据合计']}"; 
+                            if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
+                                $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                                $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调入数量'];
+                                // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途0】调入未完成 店铺库存：{$val3['actual_quantity']} 调入未完成数量：{$val3['调入数量']} 调出总数：{$val['调出店铺该货号数据合计']}"; 
+                                $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
                                 $wrongData[] = $select_qudaodiaobo[$key];
                                 $end2 = true;
                                 break;
                             }
                         } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-                            $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 剩余库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                            $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途";
                             $wrongData[] = $select_qudaodiaobo[$key];
                             $end2 = true;
                             break;
@@ -693,8 +703,9 @@ class Shopbuhuo extends AdminController
         //     $select_qudaodiaobo = cache('select_qudaodiaobo');
         // }
 
-        // print_r($select_qudaodiaobo);
-        // die;        
+        echo '<pre>';
+        print_r($select_qudaodiaobo);
+        die;        
         if (! empty($select_qudaodiaobo)) {
             //  调出不能有在途！！！
             $zaitu = $this->qudaodiaobo_zaitu();

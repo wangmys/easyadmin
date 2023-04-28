@@ -211,18 +211,23 @@
                 , height: 800
                 , cellMinWidth: 50 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '单据日期', title: '单据日期', fixed: 'left', width:80 }
-                    , { field: '审结日期', title: '审结日期' , fixed: 'left', width:80 }
-                    , { field: '调出店铺编号', title: '调出店铺编号', fixed: 'left', width:80 }
-                    , { field: '调出店铺名称', title: '调出店铺名称' , fixed: 'left', width:80 }
-                    , { field: '调入店铺编号', title: '调入店铺编号' , fixed: 'left', width:80}
-                    , { field: '调入店铺名称', title: '调入店铺名称' , fixed: 'left', width:80}
-                    , { field: '货号', title: '货号', width:70 }
-                    , { field: '调出店铺该货号数据合计', title: '调出店铺该货号数据合计', width:150 }
+                    { field: '原单编号', title: '原单编号', fixed: 'left' }
+                    , { field: '单据日期', title: '单据日期', fixed: 'left' }
+                    , { field: '审结日期', title: '审结日期' , fixed: 'left' }
+                    , { field: '调出店铺编号', title: '调出店铺编号', fixed: 'left' }
+                    , { field: '调出店铺名称', title: '调出店铺名称' , fixed: 'left' }
+                    , { field: '调入店铺编号', title: '调入店铺编号' , fixed: 'left'}
+                    , { field: '调入店铺名称', title: '调入店铺名称' }
+                    , { field: '货号', title: '货号'}
+                    , { field: '店铺库存', title: '店铺库存'}
+                    , { field: '未完成调拨量', title: '未完成调拨量' }
+                    , { field: '调出店在途量', title: '调出店在途量'} // 库存
+                    , { field: '调出店铺该货号数据合计', title: '本次调拨量'} // 库存
+                    , { field: '清空时间', title: '调入店清空时间' } // 库存
+                    // , { field: '调出店铺该货号数据合计', title: '调出店铺该货号数据合计', width:150 }
                     // , { field: '是否完成', title: '是否完成' }
                     // , { field: '调入数量', title: '调入数量' }
                     // , { field: '上市天数', title: '上市天数' }
-                    , { field: '清空时间', title: '调入店铺近七调空时间', width:150 }
                     , { field: '信息反馈', title: '信息反馈' }
                 ]]
                 ,done: function (res, curr, count) {
