@@ -62,7 +62,14 @@ class Dress extends AdminController
             $field = implode(',',$defaultFields);
             foreach ($head as $k=>$v){
                 // 计算字段合并,多字段相加
-                $field_str = str_replace(',',' + ',$v['field']);
+                // $field_str = str_replace(',',' + ',$v['field']);
+                $field_arr = explode(',',$v['field']);
+                $field_str = '';
+                foreach ($field_arr as $fk =>$fv){
+                    $field_str .= " IFNULL($fv,0) +";
+                }
+                // 清空多余字符串
+                $field_str = trim($field_str,'+');
                 // 拼接查询字段
                 $field .= ",( $field_str ) as {$v['name']}";
             }
@@ -174,7 +181,14 @@ class Dress extends AdminController
         $field = implode(',',$defaultFields);
         foreach ($head as $k=>$v){
             // 计算字段合并,多字段相加
-            $field_str = str_replace(',',' + ',$v['field']);
+//          $field_str = str_replace(',',' + ',$v['field']);
+            $field_arr = explode(',',$v['field']);
+            $field_str = '';
+            foreach ($field_arr as $fk =>$fv){
+                $field_str .= " IFNULL($fv,0) +";
+            }
+            // 清空多余字符串
+            $field_str = trim($field_str,'+');
             // 拼接查询字段
             $field .= ",( $field_str ) as {$v['name']}";
         }
@@ -245,7 +259,15 @@ class Dress extends AdminController
             $field = implode(',',$defaultFields);
             foreach ($head as $k=>$v){
                 // 计算字段合并,多字段相加
-                $field_str = str_replace(',',' + ',$v['field']);
+//                $field_str = str_replace(',',' + ',$v['field']);
+                // 计算字段合并,多字段相加
+                $field_arr = explode(',',$v['field']);
+                $field_str = '';
+                foreach ($field_arr as $fk =>$fv){
+                    $field_str .= " IFNULL($fv,0) +";
+                }
+                // 清空多余字符串
+                $field_str = trim($field_str,'+');
                 // 拼接查询字段
                 $field .= ",( $field_str ) as {$v['name']}";
             }
@@ -376,7 +398,14 @@ class Dress extends AdminController
         $field = implode(',',$defaultFields);
         foreach ($head as $k=>$v){
             // 计算字段合并,多字段相加
-            $field_str = str_replace(',',' + ',$v['field']);
+            // $field_str = str_replace(',',' + ',$v['field']);
+            $field_arr = explode(',',$v['field']);
+            $field_str = '';
+            foreach ($field_arr as $fk =>$fv){
+                $field_str .= " IFNULL($fv,0) +";
+            }
+            // 清空多余字符串
+            $field_str = trim($field_str,'+');
             // 拼接查询字段
             $field .= ",( $field_str ) as {$v['name']}";
         }
