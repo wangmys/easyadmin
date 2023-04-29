@@ -32,24 +32,24 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var store_list = res.store_list;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
-                    {field: 'State', width: 180, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
+                    {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
-                    {field: 'CustomItem30', width: 100, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
-                    {field: 'CustomItem36', width: 100, title: '气温区域',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
-                    {field: 'CustomerName', width: 100, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
+                    {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
+                    {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
+                    {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
-                    {field: 'BdCity', width: 100, title: '绑定的城市',fixed:'left',search: false},
+                    {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
                 ];
                 var data = res.data;
                 data.forEach(function (val,index){
                     if(index == 0){
                         cols.push({
-                            width: 140 , search:false , field: val, title: val, title: val
+                            width: 90 , search:false , field: val, title: val, title: val
                         })
                     }else{
                         cols.push({
-                            width: 100 , search:false , field: val
+                            width: 80 , search:false , field: val
                         })
                     }
                 })
@@ -74,7 +74,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 ea.table.render({
                     url: init.list_index,
                     search:true,
-                    height: 680,
+                    height: 1000,
                     limit: 1000,
                     toolbar:[],
                     limits:[1000,2000,3000],
