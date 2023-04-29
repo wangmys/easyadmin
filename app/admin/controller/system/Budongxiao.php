@@ -704,14 +704,30 @@ class Budongxiao extends AdminController
 
     // 更新不动销齐码数据
     public function update_db_quma() {
-        $select_qima =  $this->db_bi->query("
-            SELECT 大类 as 类别 FROM `sp_ww_budongxiao_detail` GROUP BY 大类
-        ");
+        // $select_qima =  $this->db_bi->query("
+        //     SELECT 大类 as 类别 FROM `sp_ww_budongxiao_detail` where 大类<>'配饰' GROUP BY 大类
+        // ");
 
-        $insert_all_qima = $this->db_easyA->table('cwl_budongxiao_qima')->insertAll($select_qima);
-
+        // $insert_all_qima = $this->db_easyA->table('cwl_budongxiao_qima')->insertAll($select_qima);
+        // dump($insert_all_qima);
+        $select_qima = $this->db_easyA->table('cwl_budongxiao_qima')
+            ->where([
+                ['pid', '=', 0],
+            ])
+            ->field("id as pid, 类别")
+            ->select()->toArray();
+        
         dump($select_qima);
-        dump($insert_all_qima);
+
+        foreach($select_qima as $key => $val) {
+            $select_qima_2 = $this->db_bi->table('sp_ww_budongxiao_detail')->where([
+                ['大类', '=', $val['类别']]
+            ])->field('中类')
+            ->group('大类,中类')
+            ->select()->toArray();
+            dump($select_qima_2);
+        }
+        
     }
     
 }

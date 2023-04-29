@@ -62,9 +62,17 @@ class SendReport extends BaseController
             $this->service->create_table_s109(date('Y-m-d'));
         } elseif ($name =='S110A') {
             $this->service->create_table_s110A(date('Y-m-d'));
-        }  elseif ($name =='S110B') {
+        } elseif ($name =='S110B') {
             $this->service->create_table_s110B(date('Y-m-d'));
-        }           
+        } elseif ($name =='S101C') {
+            $this->service->create_table_s101C('S101C', date('Y-m-d'));
+        } elseif ($name =='S104C') {
+            $this->service->create_table_s101C('S104C', date('Y-m-d'));
+        } elseif ($name =='S102C') {
+            $this->service->create_table_s102C(date('Y-m-d'));
+        }   elseif ($name =='S103C') {
+            $this->service->create_table_s103C(date('Y-m-d'));
+        }      
     }
 
     // 配饰每日销售数量
@@ -166,6 +174,43 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    // 推送到加盟群
+    public function send3()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S101C' => [
+                'title' => '加盟老店【五一假期】业绩同比 表号:S101C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S101C.jpg'
+            ],
+            'S102C' => [
+                'title' => '直营老店【五一假期】业绩同比 表号:S104C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S104C.jpg'
+            ],
+            'S103C' => [
+                'title' => '省份老店【五一假期】业绩同比表号 表号:S102C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S102C.jpg'
+            ],
+            'S104C' => [
+                'title' => '省份老店【五一假期】业绩同比-分经营模式 表号:S103C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103C.jpg'
+            ],
+        ];
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // echo $v['jpg_url'];
+                // echo '<br>';
+            
+            }
+        }
+        return json($res);
+    }
+
     // 23:40推送 个人
     public function sendS105()
     {
@@ -251,5 +296,29 @@ class SendReport extends BaseController
 
         // 发送数据报表
         $this->send2();
+    }
+
+    // 51 推送 11：46
+    public function run3()
+    {
+        $this->service->create_table_s101C('S101C', date('Y-m-d')); 
+        $this->service->create_table_s101C('S104C', date('Y-m-d')); 
+        $this->service->create_table_s102C(date('Y-m-d')); 
+        $this->service->create_table_s103C(date('Y-m-d'));
+
+        // 发送数据报表
+        $this->send3();
+    }
+
+    // 51 推送 11：46
+    public function create51()
+    {
+        $this->service->create_table_s101C('S101C', date('Y-m-d')); 
+        $this->service->create_table_s101C('S104C', date('Y-m-d')); 
+        $this->service->create_table_s102C(date('Y-m-d')); 
+        $this->service->create_table_s103C(date('Y-m-d'));
+
+        // 发送数据报表
+        // $this->send3();
     }
 }

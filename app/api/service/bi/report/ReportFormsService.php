@@ -1397,6 +1397,236 @@ class ReportFormsService
         return $this->create_image($params);
     }
 
+    // s101C 51假期4表
+    public function create_table_s101C($code = 'S101C', $date = '')
+    {
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+
+        if ($code == 'S101C') {
+            $title = "数据更新时间 （" . date("Y-m-d") . "）- 加盟老店【五一假期】业绩同比";
+            $map = ['经营模式', '=', '加盟'];
+        } else {
+            $title = "数据更新时间 （" . date("Y-m-d") . "）- 直营老店【五一假期】业绩同比";
+            $map = ['经营模式', '=', '直营'];
+        }
+        
+        $data = Db::connect("mysql2")->table('old_customer_state_detail_jiaqi')
+            ->field("
+                经营模式,
+                省份,
+                店铺名称,
+                同比前年假期同日递增率 AS 前年日增长,
+                同比去年假期同日递增率 AS 去年日增长,
+                同比前年假期累销递增率 AS 前年月增长,
+                同比去年假期累销递增率 AS 去年月增长,
+                前年假期同日,
+                去年假期同日,
+                今日假期销量 as 今日销额,
+                前年假期累计 as 前年假期累销额,
+                去年假期累计 as 去年假期累销额,
+                今年假期累计 as 今年假期累销额,
+                前年累销递增金额差,
+                累销递增金额差,
+                首单日期
+            ")->where([
+                $map
+            ])
+            ->select()->toArray();
+
+
+        // echo '<pre>';
+        // print_r($data);die;
+        $table_header = ['行号'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 130;
+        }
+        $field_width[0] = 60;
+        $field_width[1] = 80;
+        $field_width[2] = 160;
+        $field_width[4] = 120;
+        $field_width[7] = 130;
+        $field_width[12] = 140;
+        $field_width[13] = 160;
+        $field_width[14] = 160;
+
+        // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日：" . $week . "     去年今日：" . $last_year_week_today . "     前年今日：" . $the_year_week_today,
+        ];
+        //参数
+        $params = [
+            'row' => count($data),          //数据的行数
+            'file_name' =>  $code . '.jpg',      //保存的文件名
+            'title' => $title,
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        $this->create_table($params);
+    }
+
+    public function create_table_s102C($date = '')
+    {
+        // 编号
+        $code = 'S102C';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $list = Db::connect("mysql2")->table('old_customer_state_2_jiaqi')->field("
+            两年以上老店数 AS 前年店铺数,
+            店铺数 AS 去年店铺数,
+            省份,
+            同比前年假期同日递增率 AS 前年日增长,
+            同比去年假期同日递增率 AS 去年日增长,
+            同比前年假期累销递增率 AS 前年累计增长,
+            同比去年假期累销递增率 AS 去年累计增长,
+            前年假期同日 as 前年同日销额,
+            去年假期同日 as 去年同日销额,
+            今日假期销量 AS 今日销额,
+            前年假期累计 as 前年累计销额,
+            去年假期累计 AS 去年累计销额,
+            今年假期累计 as 今年累计销额,
+            前年累销递增金额差,
+            累销递增金额差 
+        ")->select()->toArray();
+
+        // dump($list);die;
+        $table_header = ['行号'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 120;
+        }
+        $field_width[0] = 60;
+        $field_width[1] = 90;
+        $field_width[2] = 100;
+        $field_width[6] = 120;
+        $field_width[7] = 120;
+        $field_width[8] = 120;
+        $field_width[9] = 120;
+        $field_width[12] = 120;
+        $field_width[13] = 120;
+        $field_width[14] = 160;
+        // $field_width[15] = 120;
+        // $field_width[16] = 160;
+
+        // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "）- 省份老店【五一假期】业绩同比表号:S102C",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
+    // 加盟
+    public function create_table_s103C($date = '')
+    {
+        // 编号
+        $code = 'S103C';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $list = Db::connect("mysql2")->table('old_customer_state_jiaqi')->field("
+            两年以上老店数 AS 前年店铺数,
+            店铺数 AS 去年店铺数,
+            经营模式,
+            省份,
+            同比前年假期同日递增率 AS 前年日增长,
+            同比去年假期同日递增率 AS 去年日增长,
+            同比前年假期累销递增率 AS 前年累计增长,
+            同比去年假期累销递增率 AS 去年累计增长,
+            前年假期同日 as 前年同日销额,
+            去年假期同日 as 去年同日销额,
+            今日假期销量 AS 今日销额,
+
+            前年假期累计 as 前年累计销额,
+            去年假期累计 AS 去年累计销额,
+            今年假期累计 as 本月累计销额,
+            前年累销递增金额差,
+            累销递增金额差 
+        ")->select()->toArray();
+
+        // dump($list);die;
+        $table_header = ['行号'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 120;
+        }
+        $field_width[0] = 60;
+        $field_width[1] = 90;
+        $field_width[2] = 100;
+        $field_width[3] = 80;
+        $field_width[5] = 100;
+        $field_width[6] = 100;
+    
+        $field_width[7] = 120;
+        $field_width[8] = 120;
+        $field_width[13] = 125;
+        $field_width[15] = 160;
+        $field_width[16] = 160;
+
+        // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => "今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 省份老店【五一假期】业绩同比-分经营模式 表号:S103C",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
     public function create_image($params)
     {
         $base = [
