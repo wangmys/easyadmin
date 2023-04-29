@@ -32,6 +32,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var field = field_data;
             // 获取新数据
             that.getNewData(field);
+            console.log(field)
             var gender = element.find('.field')[0];
             var genderSelect = xmSelect.render({
                 el: gender,
