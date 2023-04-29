@@ -22,6 +22,7 @@ class Budongxiao extends AdminController
     public $params = [];
     // 数据库
     protected $db_easyA = '';
+    protected $db_bi = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -30,6 +31,7 @@ class Budongxiao extends AdminController
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
         $this->rand_code = $this->rand_code(10);
         $this->create_time = date('Y-m-d H:i:s', time());
     }
@@ -85,19 +87,25 @@ class Budongxiao extends AdminController
             }
             return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code, 'create_time' => $this->create_time]);
         } else {
+            $index = input('type') ? 'index2' : 'index';
             // 齐码
             $typeQima = $this->getTypeQiMa();
+            $typeQima2 = $this->getTypeQiMa2();
             // 商品负责人
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
             
-            return View('index',[
+            return View($index, [
                 'typeQima' => $typeQima,
-                // 'province' => $province,
+                'typeQima2' => $typeQima2,
                 'people' => $people,
-                // 'storeArr' => json_encode($storeArr),
             ]);
+
+            // return View('index',[
+            //     'typeQima' => $typeQima,
+            //     'people' => $people,
+            // ]);
         }
     }
 
@@ -374,13 +382,6 @@ class Budongxiao extends AdminController
 
     // 齐码默认值
     public function getTypeQiMa() {
-        $map = [
-            
-        ];
-        $res = SpWwBudongxiaoDetail::getTypeQiMa([
-            // ['季节归集', '=', '春季'],
-            ['大类', '<>', '配饰'],
-        ]);
         // echo '<pre>';
         // print_r($res);
         $type = [
@@ -420,6 +421,21 @@ class Budongxiao extends AdminController
         ];
         return $type;
     }
+
+        // 齐码默认值
+        public function getTypeQiMa2() {
+            // echo '<pre>';
+            // print_r($res);
+            $type = [
+                '下装' => 4, // 大类
+                '内搭' => 4, // 大类
+                '外套' => 4, // 大类
+                '鞋履' => 4, // 大类
+                '松紧长裤' => 4,  // 中类
+                '松紧短裤' => 4,  // 中类
+            ];
+            return $type;
+        }
 
     // 0除以任何数都得0
     public function zeroHandle($num1, $num2) {
@@ -682,9 +698,20 @@ class Budongxiao extends AdminController
             } else {
                 $str .= "'{$val}'";
             }
-            
         }
         return $str;
+    }
+
+    // 更新不动销齐码数据
+    public function update_db_quma() {
+        $select_qima =  $this->db_bi->query("
+            SELECT 大类 as 类别 FROM `sp_ww_budongxiao_detail` GROUP BY 大类
+        ");
+
+        $insert_all_qima = $this->db_easyA->table('cwl_budongxiao_qima')->insertAll($select_qima);
+
+        dump($select_qima);
+        dump($insert_all_qima);
     }
     
 }

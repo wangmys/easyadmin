@@ -99,10 +99,10 @@ class Weather extends AdminController
 
                             if ($vv['min_c'] < 10) {
                                 $bgCol = '#1a6bd7';   
-                                $fontCol = '#ffffff';   
+                                $fontCol = '#000000';
                             } else if ($vv['min_c'] >= 10 && $vv['min_c'] < 18) {
                                 $bgCol = '#68b8f5';   
-                                $fontCol = '#ffffff';  
+                                $fontCol = '#000000';
                             } else if ($vv['min_c'] >= 18 && $vv['min_c'] < 22) {
                                 $bgCol = '#faf1a4';   
                                 $fontCol = '#000000';  
@@ -112,7 +112,7 @@ class Weather extends AdminController
                             }
 //                             $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
 //                             $list[$k]['_'.$key] = $bgCol;
-                            $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].' ~ '.$vv['max_c'] . "℃</span>";
+                            $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].'~'.$vv['max_c'] . "</span>";
 
 
                             // $list[$k][$key] = [
