@@ -2,13 +2,63 @@ define(["jquery", "easy-admin"], function ($, ea) {
     var init = {
         table_elem: '#currentTable',
         table_render_id: 'currentTableRenderId',
-        index_url: 'system.dress.inventory/index',
+        index_url: 'system.dress.index/index',
         finish_rate: '/admin/system.dress.inventory/finish_rate',
         export_url: 'system.dress.inventory/index_export',
     };
     var Controller = {
 
         index: function () {
+
+
+            var $get = $("#where").val();
+            var $cols= $("#cols").val();
+            var cols = JSON.parse($cols);
+            ea.table.render({
+                url: ea.url(init.index_url),
+                search:false,
+                where:JSON.parse($get),
+                height: 760,
+                limit: 1000,
+                toolbar:[],
+                limits:[100,200,500,1000],
+                cols: cols
+            });
+
+          // // 自定义模块
+          // layui.config({
+          //   base: '/static/plugs/lay-module/soul-table/',   // 模块目录
+          //   version: 'v1.6.4'
+          // }).extend({             // 模块别名
+          //   soulTable: 'soulTable'
+          // });
+          // var $get = $("#where").val();
+          // var $cols= $("#cols").val();
+          // var cols = JSON.parse($cols);
+          // layui.use(['form', 'table','soulTable'], function () {
+          //       var table = layui.table,
+          //       soulTable = layui.soulTable;
+          //       table.render({
+          //           elem: '#currentTable'
+          //           ,url: ea.url(init.index_url)
+          //           ,where:JSON.parse($get)
+          //           ,height: 800
+          //           ,page: false
+          //           ,cols: cols
+          //           ,done: function () {
+          //               soulTable.render(this)
+          //           }
+          //           ,rowEvent: function (obj) {
+          //
+          //           }
+          //           ,toolEvent: function (obj) {
+          //
+          //           }
+          //       });
+          //   })
+          ea.listen();
+        },
+        list: function () {
           // 自定义模块
           layui.config({
             base: '/static/plugs/lay-module/soul-table/',   // 模块目录
