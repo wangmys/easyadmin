@@ -936,19 +936,18 @@ class ReportFormsService
                 IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
                 IFNULL(SCL.`督导`,'合计') AS 督导,
                 IFNULL(SCL.`省份`,'合计') AS 省份,
+                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
                 SUM(SCM.`今日目标`) AS 今日目标,
                 SUM(SCL.`今天流水`) AS 今天流水,
-                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
                 SUM(SCM.`本月目标`) 本月目标,
                 SUM(SCL.`本月流水`) 本月流水,
-                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
                 SUM(SCL.`近七天日均`) AS 近七天日均流水,
                 ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
                 FROM sp_customer_liushui SCL
                 LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
                 where SCL.`经营模式`='直营'
                 GROUP BY
-                
                 SCL.`督导`,
                 SCL.`省份`
                 WITH ROLLUP
@@ -964,7 +963,7 @@ class ReportFormsService
         $field_width[0] = 30;
         $field_width[1] = 70;
         $field_width[2] = 100;
-        $field_width[3] = 120;
+        $field_width[3] = 130;
         $field_width[4] = 100;
         $field_width[5] = 100;
         $field_width[6] = 100;
@@ -1010,12 +1009,12 @@ class ReportFormsService
                 SELECT  
                 IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
                 IFNULL(SCL.`省份`,'合计') AS 省份,
+                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
                 SUM(SCM.`今日目标`) AS 今日目标,
                 SUM(SCL.`今天流水`) AS 今天流水,
-                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
                 SUM(SCM.`本月目标`) 本月目标,
                 SUM(SCL.`本月流水`) 本月流水,
-                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
                 SUM(SCL.`近七天日均`) AS 近七天日均流水,
                 ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
                 FROM sp_customer_liushui SCL
@@ -1038,8 +1037,8 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 70;
-        $field_width[2] = 110;
-        $field_width[3] = 120;
+        $field_width[2] = 130;
+        $field_width[3] = 100;
         $field_width[4] = 100;
         $field_width[5] = 100;
         $field_width[6] = 100;
@@ -1085,13 +1084,13 @@ class ReportFormsService
             SELECT  
             IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
             IFNULL(SCL.`省份`,'合计') AS 省份,
+            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
             COUNT(DISTINCT SCL.`店铺名称`) AS 销售店铺数,
             SUM(SCM.`今日目标`) AS 今日目标,
             SUM(SCL.`今天流水`) AS 今天流水,
-            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
-            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
             SUM(SCL.`近七天日均`) AS 近七天日均,
             ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
@@ -1120,7 +1119,7 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 70;
-        $field_width[2] = 110;
+        $field_width[2] = 130;
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 90;
@@ -1168,20 +1167,19 @@ class ReportFormsService
             SELECT  
             IFNULL(SCL.`经营模式`,'总计') AS 经营模式,
             IFNULL(SCL.`省份`,'合计') AS 省份,
+            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
             COUNT(DISTINCT SCL.`店铺名称`) AS 销售店铺数,
             SUM(SCM.`今日目标`) AS 今日目标,
             SUM(SCL.`今天流水`) AS 今天流水,
-            CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
-            CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
             SUM(SCL.`近七天日均`) AS 近七天日均,
             ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
             LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             where 经营模式='加盟'
             GROUP BY
- 
             SCL.`省份`
             WITH ROLLUP
         ";
@@ -1204,7 +1202,7 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 70;
-        $field_width[2] = 110;
+        $field_width[2] = 130;
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 90;
@@ -1254,12 +1252,12 @@ class ReportFormsService
             SCL.`省份`,
             SCL.`督导`,
             SCL.`店铺名称`,
+            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
             SCM.`今日目标`,
             SCL.`今天流水`,
-            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
             SCM.`本月目标`,
             SCL.`本月流水`,
-            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
             SCL.`近七天日均`,
             ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
@@ -1281,7 +1279,7 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 70;
-        $field_width[2] = 110;
+        $field_width[2] = 130;
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 90;
@@ -1332,12 +1330,12 @@ class ReportFormsService
             SCL.`经营模式`,
             SCL.`省份`,
             SCL.`店铺名称`,
+            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
             SCM.`今日目标`,
             SCL.`今天流水`,
-            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
             SCM.`本月目标`,
             SCL.`本月流水`,
-            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
             SCL.`近七天日均`,
             ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
@@ -1359,7 +1357,7 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 70;
-        $field_width[2] = 110;
+        $field_width[2] = 130;
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 90;
