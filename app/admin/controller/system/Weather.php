@@ -29,6 +29,7 @@ class Weather extends AdminController
         'sort' => 'desc',
         'id'   => 'desc',
     ];
+    const ProductMemberAuth = 7;
 
     public function __construct(App $app)
     {
@@ -89,6 +90,8 @@ class Weather extends AdminController
             $dateList = $this->getDateList(1);
             $list = $list->toArray();
             if(!empty($list)){
+                foreach ($list as &$v_list) $v_list['State'] = str_replace('省', '', $v_list['State']);
+
                 $cid_list = array_column($list,'cid');
                 // 查询天气
                 $weather_list = $this->model->field('cid,id,min_c,max_c,weather_time,temperature')->whereIn('cid',$cid_list)->where('weather_time','in',array_values($dateList))->select();
@@ -188,6 +191,16 @@ class Weather extends AdminController
             $wenqu_list_temp = array_unique(array_column($info_list,'CustomItem36'));
             $wenqu_list = array_combine($wenqu_list_temp,$wenqu_list_temp);
         }
+
+        //获取 绑定城市 字段权限
+        $current_admin_id = session()['admin']['id'] ?? 0;
+        $auth_ids = session()['admin']['auth_ids'] ?? 0;
+        $auth_ids = $auth_ids ? explode(',', $auth_ids) : [];
+        $if_can_see = 1;
+        if (($current_admin_id != AdminConstant::SUPER_ADMIN_ID) && in_array(self::ProductMemberAuth, $auth_ids)) {
+            $if_can_see = 0;
+        }
+
         // 省列表
         // 区域列表
         $data = [
@@ -199,6 +212,7 @@ class Weather extends AdminController
 //                'city_list'  => $city_list,
                 'wendai_list'  => $wendai_list,
                 'wenqu_list'  => $wenqu_list,
+                'if_can_see'  => $if_can_see,
                 'data'  => $list
             ];
         return json($data);
