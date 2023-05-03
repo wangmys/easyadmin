@@ -49,7 +49,7 @@ class ReportFormsService
         switch ($code) {
             case 'S101':
                 // $sql = "select 经营模式,省份,店铺名称,首单日期 as 开店日期,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
-                $title = "数据更新时间 （" . date("Y-m-d") . "）- 加盟老店业绩同比";
+                $title = "加盟老店业绩同比 " . date("Y-m-d");
                 $jingyingmoshi = '【加盟】';
                 $sql = "
                 SELECT
@@ -63,14 +63,11 @@ class ReportFormsService
                     昨天销量 as 昨天销额,
                     前年同月 as 前年同月销额,
                     去年同月 as 去年同月销额,
-                    本月业绩 as 本月销额,
-                    前年累销递增金额差,
-                    累销递增金额差,
-                    首单日期
+                    本月业绩 as 本月销额
                     from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
                 break;
             default:
-                $title = "数据更新时间 （" . date("Y-m-d") . "）- 直营老店业绩同比";
+                $title = "直营老店业绩同比 " . date("Y-m-d");
                 $jingyingmoshi = '【直营】';
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
@@ -86,10 +83,7 @@ class ReportFormsService
                     昨天销量 AS 昨天销额,
                     前年同月 as 前年同月销额,
                     去年同月 AS 去年同月销额,
-                    本月业绩 as 本月销额,
-                    前年累销递增金额差,
-                    累销递增金额差,
-                    `首单日期`
+                    本月业绩 as 本月销额
                     from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
                 break;
         }
@@ -104,6 +98,7 @@ class ReportFormsService
         foreach ($table_header as $v => $k) {
             $field_width[$v] = 130;
         }
+        
         $field_width[0] = 35;
         $field_width[1] = 45;
         $field_width[2] = 90;
@@ -117,9 +112,9 @@ class ReportFormsService
         $field_width[10] = 100;
         $field_width[11] = 100;
         $field_width[12] = 90;
-        $field_width[13] = 150;
-        $field_width[14] = 120;
-        $field_width[15] = 90;
+        // $field_width[13] = 150;
+        // $field_width[14] = 120;
+        // $field_width[15] = 90;
 
         // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
@@ -131,7 +126,7 @@ class ReportFormsService
 
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "{$jingyingmoshi}    今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+            0 => "{$jingyingmoshi} 今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
         //参数
         $params = [
@@ -165,9 +160,6 @@ class ReportFormsService
         // 累销递增金额差 from old_customer_state_2 where 更新时间 = '$date'";
         $sql = "select 
             省份,
-            两年以上老店数 AS 前年店数,
-            店铺数 AS 去年铺数,
-            
             前年对比今年昨日递增率 AS 前年日增长,
             昨日递增率 AS 去年日增长,
             前年对比今年累销递增率 AS 前年月增长,
@@ -177,9 +169,7 @@ class ReportFormsService
             昨天销量 AS 昨天销额,
             前年同月 as 前年同月销额,
             去年同月 AS 去年同月销额,
-            本月业绩 as 本月销额,
-            前年累销递增金额差,
-            累销递增金额差 
+            本月业绩 as 本月销额
             from old_customer_state_2 where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         foreach ($list as $key => $val) {
@@ -193,15 +183,12 @@ class ReportFormsService
         }
         $field_width[0] = 35;
         $field_width[1] = 45;
-        $field_width[2] = 75;
-        $field_width[3] = 75;
         
-        $field_width[8] = 100;
+        $field_width[6] = 100;
+        $field_width[7] = 100;
         $field_width[9] = 100;
-        $field_width[11] = 100;
-        $field_width[12] = 100;
-        $field_width[14] = 150;
-        $field_width[15] = 120;
+        $field_width[10] = 100;
+
 
         // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
@@ -212,14 +199,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+            0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
 
         //参数
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "）- 省份老店业绩同比表号:S102",
+            'title' =>  "省份老店业绩同比 " . date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -246,8 +233,6 @@ class ReportFormsService
         $sql = "select 
             经营模式 as 经营,
             省份,
-            两年以上老店数 AS 前年店数,
-            店铺数 AS 去年店数,
 
             前年对比今年昨日递增率 AS 前年日增长,
             昨日递增率 AS 去年日增长,
@@ -258,9 +243,8 @@ class ReportFormsService
             昨天销量 AS 昨天销额,
             前年同月 as 前年同月销额,
             去年同月 AS 去年同月销额,
-            本月业绩 as 本月销额,
-            前年累销递增金额差,
-            累销递增金额差 
+            本月业绩 as 本月销额
+
             from old_customer_state  where 更新时间 = '$date'";
         $list = Db::connect("mysql2")->query($sql);
         foreach ($list as $key => $val) {
@@ -275,16 +259,12 @@ class ReportFormsService
         $field_width[0] = 35;
         $field_width[1] = 45;
         $field_width[2] = 45;
-        $field_width[3] = 75;
-        $field_width[4] = 75;
-        $field_width[9] = 100;
-        $field_width[10] = 100;
+        $field_width[7] = 100;
+        $field_width[8] = 100;
         
 
-        $field_width[12] = 100;
-        $field_width[13] = 100;
-        $field_width[15] = 150;
-        $field_width[16] = 120;
+        $field_width[10] = 100;
+        $field_width[11] = 100;
 
         // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
@@ -295,14 +275,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+            0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
 
         //参数
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 省份老店业绩同比-分经营模式 表号:S103",
+            'title' => "省份老店业绩同比-分经营模式 " . date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1350,7 +1330,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 直营单店目标达成情况 表号:S110A",
+            'title' => "直营单店目标达成情况 " . date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1429,13 +1409,13 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 加盟单店目标达成情况 表号:S110B",
+            'title' => "加盟单店目标达成情况 " . date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,
-            'banben' => '',
+            'banben' => '图片报表编号: ' . $code,
             'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
         ];
 
@@ -1454,7 +1434,7 @@ class ReportFormsService
             $map = ['经营模式', '=', '加盟'];
         } else {
             $jingyingmoshi = '【直营】';
-            $title = "数据更新时间 （" . date("Y-m-d") . "）- 直营老店【五一假期】业绩同比";
+            $title = "直营老店【五一假期】业绩同比 " . date("Y-m-d");
             $map = ['经营模式', '=', '直营'];
         }
         
@@ -1471,10 +1451,7 @@ class ReportFormsService
                 今日假期销量 as 今日销额,
                 前年假期累计 as 前年假期累销额,
                 去年假期累计 as 去年假期累销额,
-                今年假期累计 as 今年假期累销额,
-                前年累销递增金额差,
-                累销递增金额差,
-                首单日期
+                今年假期累计 as 今年假期累销额
             ")->where([
                 $map,
                 ['更新时间', '=', $date]
@@ -1504,9 +1481,6 @@ class ReportFormsService
         $field_width[10] = 120;
         $field_width[11] = 120;
         $field_width[12] = 120;
-        $field_width[13] = 150;
-        $field_width[14] = 120;
-        $field_width[15] = 90;
 
         // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
@@ -1517,7 +1491,7 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "{$jingyingmoshi}    今日：" . $week . "     去年今日：" . $last_year_week_today . "     前年今日：" . $the_year_week_today,
+            0 => "{$jingyingmoshi} 今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
         //参数
         $params = [
@@ -1543,8 +1517,6 @@ class ReportFormsService
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
         $list = Db::connect("mysql2")->table('old_customer_state_2_jiaqi')->field("
             省份,
-            两年以上老店数 AS 前年店数,
-            店铺数 AS 去年店数,
             同比前年假期同日递增率 AS 前年日增长,
             同比去年假期同日递增率 AS 去年日增长,
             同比前年假期累销递增率 AS 前年累计增长,
@@ -1554,9 +1526,7 @@ class ReportFormsService
             今日假期销量 AS 今日销额,
             前年假期累计 as 前年累计销额,
             去年假期累计 AS 去年累计销额,
-            今年假期累计 as 今年累计销额,
-            前年累销递增金额差,
-            累销递增金额差 
+            今年假期累计 as 今年累计销额
         ")->where(['更新时间' => $date])->select()->toArray();
 
         foreach ($list as $key => $val) {
@@ -1570,19 +1540,17 @@ class ReportFormsService
             $field_width[] = 90;
         }
         $field_width[0] = 35;
-        $field_width[1] = 45;
-        $field_width[2] = 75;
-        $field_width[3] = 75;
+        $field_width[1] = 75;
         
+        $field_width[4] = 100;
+        $field_width[5] = 100;
         $field_width[6] = 100;
         $field_width[7] = 100;
-        $field_width[8] = 100;
         $field_width[9] = 100;
+        $field_width[10] = 100;
         $field_width[11] = 100;
-        $field_width[12] = 100;
-        $field_width[13] = 100;
-        $field_width[14] = 150;
-        $field_width[15] = 120;
+        // $field_width[14] = 150;
+        // $field_width[15] = 120;
         // $field_width[15] = 120;
         // $field_width[16] = 160;
 
@@ -1595,14 +1563,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "今日:" . $week . "   去年今日:" . $last_year_week_today . "   前年今日:" . $the_year_week_today,
+            0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
 
         //参数
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "）- 省份老店【五一假期】业绩同比表号:S102C",
+            'title' => "省份老店【五一假期】业绩同比 " .date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1625,8 +1593,6 @@ class ReportFormsService
         $list = Db::connect("mysql2")->table('old_customer_state_jiaqi')->field("
             经营模式 as 经营,
             省份,
-            两年以上老店数 AS 前年店数,
-            店铺数 AS 去年店数,
             同比前年假期同日递增率 AS 前年日增长,
             同比去年假期同日递增率 AS 去年日增长,
             同比前年假期累销递增率 AS 前年累计增长,
@@ -1637,9 +1603,7 @@ class ReportFormsService
 
             前年假期累计 as 前年累计销额,
             去年假期累计 AS 去年累计销额,
-            今年假期累计 as 今年累计销额,
-            前年累销递增金额差,
-            累销递增金额差 
+            今年假期累计 as 今年累计销额
         ")->where(['更新时间' => $date])->select()->toArray();
         foreach ($list as $key => $val) {
             $list[$key]['省份'] = province2zi($val['省份']);
@@ -1654,19 +1618,17 @@ class ReportFormsService
         $field_width[0] = 35;
         $field_width[1] = 45;
         $field_width[2] = 45;
-        $field_width[3] = 75;
-        $field_width[4] = 75;
 
     
+        $field_width[5] = 110;
+        $field_width[6] = 110;
         $field_width[7] = 110;
         $field_width[8] = 110;
-        $field_width[9] = 110;
         $field_width[10] = 110;
+        $field_width[11] = 110;
         $field_width[12] = 110;
-        $field_width[13] = 110;
-        $field_width[14] = 110;
-        $field_width[15] = 150;
-        $field_width[16] = 130;
+        // $field_width[15] = 150;
+        // $field_width[16] = 130;
 
         // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
@@ -1677,14 +1639,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "今日:" . $week . "  .  去年今日:" . $last_year_week_today . "  .  前年今日:" . $the_year_week_today,
+            0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
         ];
 
         //参数
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 省份老店【五一假期】业绩同比-分经营模式 表号:S103C",
+            'title' => "省份老店【五一假期】业绩同比-分经营模式 " . date("Y-m-d") ,
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
