@@ -1429,7 +1429,8 @@ class ReportFormsService
                 累销递增金额差,
                 首单日期
             ")->where([
-                $map
+                $map,
+                ['更新时间', '=', $date]
             ])
             ->select()->toArray();
 
@@ -1499,7 +1500,7 @@ class ReportFormsService
             今年假期累计 as 今年累计销额,
             前年累销递增金额差,
             累销递增金额差 
-        ")->select()->toArray();
+        ")->where(['更新时间' => $date])->select()->toArray();
 
         // dump($list);die;
         $table_header = ['行号'];
@@ -1572,10 +1573,10 @@ class ReportFormsService
 
             前年假期累计 as 前年累计销额,
             去年假期累计 AS 去年累计销额,
-            今年假期累计 as 本月累计销额,
+            今年假期累计 as 今年累计销额,
             前年累销递增金额差,
             累销递增金额差 
-        ")->select()->toArray();
+        ")->where(['更新时间' => $date])->select()->toArray();
 
         // dump($list);die;
         $table_header = ['行号'];

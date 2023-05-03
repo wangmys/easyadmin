@@ -43,35 +43,35 @@ class SendReport extends BaseController
     public function create_test() {
         $name = input('param.name') ? input('param.name') : 'S101';
         if ($name =='S101') {
-            $this->service->create_table_s101('S101',date('Y-m-d'));
+            $this->service->create_table_s101('S101');
         } elseif ($name =='S102') {
-            $this->service->create_table_s102(date('Y-m-d'));
+            $this->service->create_table_s102();
         } elseif ($name =='S103') {
-            $this->service->create_table_s103(date('Y-m-d'));
+            $this->service->create_table_s103();
         } elseif ($name =='S104') {
-            $this->service->create_table_s101('S104',date('Y-m-d'));
+            $this->service->create_table_s101('S104');
         } elseif ($name =='S106') {
-            $this->service->create_table_s106(date('Y-m-d'));
+            $this->service->create_table_s106();
         } elseif ($name =='S107') {
-            $this->service->create_table_s107(date('Y-m-d'));
+            $this->service->create_table_s107();
         } elseif ($name =='S108A') {
-            $this->service->create_table_s108A(date('Y-m-d'));
+            $this->service->create_table_s108A();
         } elseif ($name =='S108B') {
-            $this->service->create_table_s108B(date('Y-m-d'));
+            $this->service->create_table_s108B();
         } elseif ($name =='S109') {
-            $this->service->create_table_s109(date('Y-m-d'));
+            $this->service->create_table_s109();
         } elseif ($name =='S110A') {
-            $this->service->create_table_s110A(date('Y-m-d'));
+            $this->service->create_table_s110A();
         } elseif ($name =='S110B') {
-            $this->service->create_table_s110B(date('Y-m-d'));
+            $this->service->create_table_s110B();
         } elseif ($name =='S101C') {
-            $this->service->create_table_s101C('S101C', date('Y-m-d'));
+            $this->service->create_table_s101C('S101C');
         } elseif ($name =='S104C') {
-            $this->service->create_table_s101C('S104C', date('Y-m-d'));
+            $this->service->create_table_s101C('S104C');
         } elseif ($name =='S102C') {
-            $this->service->create_table_s102C(date('Y-m-d'));
+            $this->service->create_table_s102C();
         }   elseif ($name =='S103C') {
-            $this->service->create_table_s103C(date('Y-m-d'));
+            $this->service->create_table_s103C();
         }      
     }
 
@@ -156,7 +156,7 @@ class SendReport extends BaseController
             ],
             'S109B' => [
                 'title' => '各省挑战目标完成情况-加盟 表号:S109B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109B.jpg'
             ],
             'S110B' => [
                 'title' => '加盟单店目标达成情况 表号:S110B',
@@ -266,17 +266,17 @@ class SendReport extends BaseController
     public function run()
     {
         // 生成图片 s101
-        $this->service->create_table_s101('S101',date('Y-m-d'));
-        $this->service->create_table_s102(date('Y-m-d'));
-        $this->service->create_table_s103(date('Y-m-d'));
-        $this->service->create_table_s101('S104',date('Y-m-d'));
+        $this->service->create_table_s101('S101');
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
+        $this->service->create_table_s101('S104');
 
         // 108-110
-        $this->service->create_table_s108A(date('Y-m-d'));
-        $this->service->create_table_s108B(date('Y-m-d'));
-        $this->service->create_table_s109(date('Y-m-d'));
-        $this->service->create_table_s110A(date('Y-m-d'));
-        $this->service->create_table_s110B(date('Y-m-d'));
+        $this->service->create_table_s108A();
+        $this->service->create_table_s108B();
+        $this->service->create_table_s109();
+        $this->service->create_table_s110A();
+        $this->service->create_table_s110B();
         // 发送数据报表
         $this->send();
     }
@@ -288,10 +288,10 @@ class SendReport extends BaseController
     public function run2()
     {
         // 生成图片 s101
-        $this->service->create_table_s103B(date('Y-m-d'));
+        $this->service->create_table_s103B();
 
         // 108-110
-        $this->service->create_table_s109B(date('Y-m-d'));
+        $this->service->create_table_s109B();
         // https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754
 
         // 发送数据报表
@@ -301,10 +301,10 @@ class SendReport extends BaseController
     // 51 推送 11：46
     public function run3()
     {
-        $this->service->create_table_s101C('S101C', date('Y-m-d')); 
-        $this->service->create_table_s101C('S104C', date('Y-m-d')); 
-        $this->service->create_table_s102C(date('Y-m-d')); 
-        $this->service->create_table_s103C(date('Y-m-d'));
+        $this->service->create_table_s101C('S101C'); 
+        $this->service->create_table_s101C('S104C'); 
+        $this->service->create_table_s102C(); 
+        $this->service->create_table_s103C();
 
         // 发送数据报表
         $this->send3();
@@ -313,10 +313,10 @@ class SendReport extends BaseController
     // 51 推送 11：46
     public function create51()
     {
-        $this->service->create_table_s101C('S101C', date('Y-m-d')); 
-        $this->service->create_table_s101C('S104C', date('Y-m-d')); 
-        $this->service->create_table_s102C(date('Y-m-d')); 
-        $this->service->create_table_s103C(date('Y-m-d'));
+        $this->service->create_table_s101C('S101C'); 
+        $this->service->create_table_s101C('S104C'); 
+        $this->service->create_table_s102C(); 
+        $this->service->create_table_s103C();
 
         // 发送数据报表
         // $this->send3();
