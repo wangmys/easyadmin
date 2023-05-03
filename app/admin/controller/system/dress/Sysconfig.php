@@ -36,7 +36,15 @@ class Sysconfig extends AdminController
     {
         // 查询所有的店铺等级
         $levelList = $this->logic->getLevel();
-
+        if ($this->request->isAjax()) {
+            // 字段
+            $field = $this->logic->getTableRow();
+            $data = [
+                'provinceList' => $levelList,
+                'field' => $field
+            ];
+            return json($data);
+        }
         // 查询表头
         $head = $this->logic->getHead();
         // 查询已保存数据

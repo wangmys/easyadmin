@@ -1,0 +1,16 @@
+<style>
+    .table-header-fixed {
+        top: 0;
+        position: fixed;
+        z-index: 999;
+    }
+    th.layui-table-patch{padding: 0 !important;}
+    .layui-card .layui-card-body .layui-table td { max-width: 100%;}
+</style>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
+        </table>
+    </div>
+</div>
+<input type="text" id="where" class="layui-hide" value="{$get}">
