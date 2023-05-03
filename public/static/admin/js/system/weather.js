@@ -32,7 +32,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var store_list = res.store_list;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
-                    {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
+                    {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
@@ -45,11 +45,11 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 data.forEach(function (val,index){
                     if(index == 0){
                         cols.push({
-                            width: 90 , search:false , field: val, title: val, title: val
+                            width: 60 , search:false , field: val, title: val, title: val
                         })
                     }else{
                         cols.push({
-                            width: 80 , search:false , field: val
+                            width: 60 , search:false , field: val
                         })
                     }
                 })

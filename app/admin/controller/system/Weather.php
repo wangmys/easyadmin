@@ -89,6 +89,8 @@ class Weather extends AdminController
             $dateList = $this->getDateList(1);
             $list = $list->toArray();
             if(!empty($list)){
+                foreach ($list as &$v_list) $v_list['State'] = str_replace('省', '', $v_list['State']);
+
                 $cid_list = array_column($list,'cid');
                 // 查询天气
                 $weather_list = $this->model->field('cid,id,min_c,max_c,weather_time,temperature')->whereIn('cid',$cid_list)->where('weather_time','in',array_values($dateList))->select();
