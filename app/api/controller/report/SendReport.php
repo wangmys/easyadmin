@@ -43,15 +43,15 @@ class SendReport extends BaseController
     public function create_test() {
         $name = input('param.name') ? input('param.name') : 'S101';
         if ($name =='S101') {
-            $this->service->create_table_s101('S101');
+            $this->service->create_table_s101('S101', '2023-05-04');
         } elseif ($name =='S102') {
-            $this->service->create_table_s102("");
+            $this->service->create_table_s102('2023-05-04');
         } elseif ($name =='S103') {
-            $this->service->create_table_s103('');
+            $this->service->create_table_s103('2023-05-04');
         } elseif ($name =='S103B') {
             $this->service->create_table_s103B();
         } elseif ($name =='S104') {
-            $this->service->create_table_s101('S104');
+            $this->service->create_table_s101('S104', '2023-05-04');
         } elseif ($name =='S106') {
             $this->service->create_table_s106();
         } elseif ($name =='S107') {
@@ -64,6 +64,8 @@ class SendReport extends BaseController
             $this->service->create_table_s109();
         } elseif ($name =='S109B') {
             $this->service->create_table_s109B();
+        } elseif ($name =='S109test') {
+            $this->service->create_table_s109_test();
         } elseif ($name =='S110A') {
             $this->service->create_table_s110A();
         } elseif ($name =='S110B') {
@@ -76,7 +78,15 @@ class SendReport extends BaseController
             $this->service->create_table_s102C();
         } elseif ($name =='S103C') {
             $this->service->create_table_s103C();
-        }      
+        }  elseif ($name =='S025') {
+            $this->service->create_table_s025();
+        }  elseif ($name =='S030') {
+            $this->service->create_table_s030();
+        } elseif ($name =='S031') {
+            $this->service->create_table_s031();
+        } elseif ($name =='S043') {
+            $this->service->create_table_s043();
+        }
     }
 
     // 配饰每日销售数量
@@ -178,38 +188,36 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 推送到加盟群
-    public function send3()
+    // 推送到打群 0：45
+    public function send4()
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-            'S101C' => [
-                'title' => '加盟老店【五一假期】业绩同比 表号:S101C',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S101C.jpg'
+            'S025' => [
+                'title' => '商品部-各季节销售占比 表号:S025',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S025.jpg'
             ],
-            'S102C' => [
-                'title' => '直营老店【五一假期】业绩同比 表号:S104C',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S104C.jpg'
+            'S030' => [
+                'title' => '昨天各省各季节销售占比 表号:S030',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S030.jpg'
             ],
-            'S103C' => [
-                'title' => '省份老店【五一假期】业绩同比表号 表号:S102C',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S102C.jpg'
+            'S031' => [
+                'title' => '近三天各省各季节销售占比 表号:S031',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S031.jpg'
             ],
-            'S104C' => [
-                'title' => '省份老店【五一假期】业绩同比-分经营模式 表号:S103C',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103C.jpg'
+            'S043' => [
+                'title' => '各省7天季节占比（粤/桂/贵/鄂/湘/赣） 表号:S043',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S043.jpg'
             ],
         ];
         $res = [];
+
         foreach ($send_data as $k=>$v){
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                $res[] = $model->send($v['title'],$v['jpg_url']);
-                // echo $v['jpg_url'];
-                // echo '<br>';
-            
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
             }
         }
         return json($res);
@@ -303,26 +311,39 @@ class SendReport extends BaseController
     }
 
     // 51 推送 11：46
-    public function run3()
+    public function run3_close()
     {
-        $this->service->create_table_s101C('S101C'); 
-        $this->service->create_table_s101C('S104C'); 
-        $this->service->create_table_s102C(); 
-        $this->service->create_table_s103C();
+        // $this->service->create_table_s101C('S101C');
+        // $this->service->create_table_s101C('S104C');
+        // $this->service->create_table_s102C();
+        // $this->service->create_table_s103C();
 
         // 发送数据报表
-        $this->send3();
+        // $this->send3();
+    }
+
+    // 00:45
+    public function run4()
+    {
+        $this->service->create_table_s025();
+        $this->service->create_table_s030();
+        $this->service->create_table_s031();
+        $this->service->create_table_s043();
+
+        // 发送数据报表
+        $this->send4();
     }
 
     // 51 推送 11：46
     public function create51()
     {
-        $this->service->create_table_s101C('S101C'); 
-        $this->service->create_table_s101C('S104C'); 
-        $this->service->create_table_s102C(); 
-        $this->service->create_table_s103C();
+        // $this->service->create_table_s101C('S101C');
+        // $this->service->create_table_s101C('S104C');
+        // $this->service->create_table_s102C();
+        // $this->service->create_table_s103C();
 
         // 发送数据报表
         // $this->send3();
     }
+
 }
