@@ -1,4 +1,4 @@
-define(["jquery", "easy-admin"], function ($, ea) {
+define(["jquery", "easy-admin2"], function ($, ea) {
     var init = {
         table_elem: '#currentTable',
         table_render_id: 'currentTableRenderId',

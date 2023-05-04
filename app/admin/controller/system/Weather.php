@@ -289,5 +289,18 @@ class Weather extends AdminController
         return $this->fetch();
     }
 
+    /**
+     * 根据温带获取温区
+     * @return void
+     */
+    public function get_wenqu() {
+
+        $wendai = input('wendai');
+        $sql = "select distinct CustomItem36 from customers where CustomItem30='{$wendai}'";
+        $res = Db::connect('tianqi')->query($sql);
+        return json(["code" => "0", "msg" => "",  "data" => $res]);
+
+    }
+
 
 }

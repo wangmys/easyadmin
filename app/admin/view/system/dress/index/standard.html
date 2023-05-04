@@ -1,0 +1,56 @@
+<style>
+    .table-header-fixed {
+        top: 0;
+        position: fixed;
+        z-index: 999;
+    }
+    th.layui-table-patch{padding: 0 !important;}
+    .layui-card .layui-card-body .layui-table td { max-width: 100%;}
+    .class-1{
+        background: #f5dad2;
+    }
+    .class-2{
+        background: #c3d2e5;
+    }
+    .center{
+        text-align: center;
+    }
+    .layui-table th{
+        text-align: center;
+    }
+    .layui-table th{
+        text-align: center;
+        /*border-top: 5px solid black*/
+    }
+</style>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="form-create-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th>店铺等级</th>
+                    {foreach $_field as $key=>$val}
+                    <th>{$val}</th>
+                    {/foreach}
+                </tr>
+            </thead>
+            <tbody>
+            {foreach $d_field as $key=>$val}
+                <tr class="center">
+                    {foreach $val as $kk=>$vv}
+                    {if ( strpos($val['店铺等级'],'库存') === false )}
+                    <td class="class-1" {if $kk=='店铺等级'}width="100"{/if}>
+                        {$vv}
+                    </td>
+                    {else}
+                    <td class="class-2" {if $kk=='店铺等级'}width="100"{/if}>
+                        {$vv}
+                    </td>
+                    {/if}
+                    {/foreach}
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>

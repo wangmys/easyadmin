@@ -1,6 +1,13 @@
+<style>
+    .class-1{
+        background: #f5dad2;
+    }
+    .class-2{
+        background: #c3d2e5;
+    }
+</style>
 <form id="app-form" class="layui-form layuimini-form">
 <table class="layui-table">
-
     <table id="form-create-config" class="layui-table">
         <thead>
             <tr>
@@ -15,12 +22,12 @@
             <tr>
                 {foreach $val as $kk=>$vv}
                 {if $kk=='店铺等级'}
-                <td width="100">
+                <td width="100" {if (strpos($val['店铺等级'],'库存') !== false )}class="class-2"{else}class="class-1"{/if}>
                     <input type="text" name="{$kk}[]" placeholder="请输入内容" value="{$vv}" class="layui-input layui-hide">
                     <span >{$vv}</span>
                 </td>
                 {else}
-                <td><input type="text" name="{$kk}[]" lay-verify="required" placeholder="请输入内容" value="{$vv}" class="layui-input"></td>
+                <td {if (strpos($val['店铺等级'],'库存') === false )}class="class-1"{else}class="class-2"{/if}><input type="text" name="{$kk}[]" lay-verify="required" placeholder="请输入内容" value="{$vv}" class="layui-input"></td>
                 {/if}
                 {/foreach}
             </tr>
