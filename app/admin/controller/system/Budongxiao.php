@@ -46,6 +46,16 @@ class Budongxiao extends AdminController
     }
 
     /**
+     * @NodeAnotation(title="不动销配置")
+     */
+    public function config() {
+        return View('config', [
+            // 'typeQima' => $typeQima,
+            // 'people' => $people,
+        ]); 
+    }
+
+    /**
      * @NodeAnotation(title="单店不动销计算")
      */
     public function index() {
@@ -62,9 +72,6 @@ class Budongxiao extends AdminController
                 }
             }
             $this->params = $params;
-
-            // $this->updateWeekpushMap();
-            // die;
 
             $data = [];
             $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
@@ -88,17 +95,27 @@ class Budongxiao extends AdminController
             return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code, 'create_time' => $this->create_time]);
         } else {
             $index = input('type') ? 'index2' : 'index';
+
             // 齐码
-            $typeQima = $this->getTypeQiMa();
-            $typeQima2 = $this->getTypeQiMa2();
+            // if ($index == 'index2') {
+            //     // $typeQima = $this->db_easyA->table('cwl_budongxiao_qima')->whereIn('类别', '下装,内搭,外套,鞋履,松紧长裤,松紧短裤')->select()->toArray();
+            //     $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
+            // } else {
+            //     // $typeQima = $this->db_easyA->table('cwl_budongxiao_qima')->whereNotIn('类别', '下装,内搭,外套,鞋履')->select()->toArray();
+            //     $typeQima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+            // }
+            $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
+
+            // dump($typeQima);
+            // die;
+            
             // 商品负责人
             $people = SpWwBudongxiaoDetail::getPeople([
                 ['商品负责人', 'exp', new Raw('IS NOT NULL')]
             ]);
             
-            return View($index, [
+            return View('index', [
                 'typeQima' => $typeQima,
-                'typeQima2' => $typeQima2,
                 'people' => $people,
             ]);
 
@@ -107,6 +124,16 @@ class Budongxiao extends AdminController
             //     'people' => $people,
             // ]);
         }
+    }
+
+    // 二维数组转一维数组
+    public function arr2to1($arr, $key, $val) {
+        $newArr = [];
+        foreach ($arr as $key2 => $val2) {
+            $newArr[$val2['类别']] = $val2['齐码数'];
+        }
+
+        return $newArr;
     }
 
     // 获取筛选栏多选参数
@@ -173,8 +200,7 @@ class Budongxiao extends AdminController
         }
 
         // echo '<pre>';
-        // print_r($res_all_new);
-        // die;
+        // print_r($res_all_new);die;
 
         if ($res_all_new) {
             // 货号累计不动销天数
@@ -232,7 +258,7 @@ class Budongxiao extends AdminController
                     if ($res_all_new[$key]['不动销区间'] == '30天以上') {
                         $insert_history_data[] = $res_all_new[$key];
                     }
-                    
+
                 } elseif ($this->params['考核区间'] == '20-30天') {
                     if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天') {
                         $insert_history_data[] = $res_all_new[$key];
@@ -261,9 +287,6 @@ class Budongxiao extends AdminController
 
             // 预计skc数
             $yujiSkc = count($res_all_new);
-
-           
-
 
             // die;
             $this->db_easyA->startTrans();
@@ -308,23 +331,23 @@ class Budongxiao extends AdminController
 
     // 判断云仓不动销状态，齐码数，库存
     public function checkQiMa($data) {
-        // 齐码率数组
-        if (!empty($this->params['isAjax'])) {
-            // dump($this->params);
-            $typeQiMa = $this->params;
-
+        // 设置缓存 1小时
+        if (!cache('static_qima')) {
+            $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+            cache('static_qima', $static_qima, 3600);
         } else {
-            $typeQiMa = $this->getTypeQiMa();
+            $static_qima = cache('static_qima');
         }
-
+        
         // 结果
         $res = '';
         // 齐码率
-        $qimalu = $typeQiMa[$data['中类']];
-        if ($data['齐码情况'] >= $qimalu || $data['可用库存Quantity'] >= 100) {
-            $res = ''; // 店铺合格
+        $qimalv = $static_qima[$data['中类']];
+        // 改成或了 要么齐码 要么 大余等于 100
+        if ($data['齐码情况'] >= $qimalv || $data['可用库存Quantity'] >= 100) {
+            $res = '【及格】'; // 店铺合格
         } else {
-            $res = $data['不动销区间']; // 店铺不合格
+            $res = "【不及格】". $data['不动销区间']; // 店铺不合格
         }
         return $res;
     }
@@ -381,61 +404,45 @@ class Budongxiao extends AdminController
     }
 
     // 齐码默认值
-    public function getTypeQiMa() {
-        // echo '<pre>';
-        // print_r($res);
-        $type = [
-            // '下装' => [
-                '休闲长裤' => 6,
-                '松紧短裤' => 6,
-                '松紧长裤' => 4,
-                '牛仔长裤' => 6,
-                '牛仔短裤' => 6,
-                '西裤' => 6,
-            // ],
-            // '内搭' => [
-                '休闲短衬' => 4,
-                '休闲长衬' => 4,
-                '卫衣' => 4,
-                '正统短衬' => 4,
-                '正统长衬' => 4,
-                '短T' => 4,
-                '针织衫' => 4,
-                '长T' => 4,
-            // ],
-            // '外套' => [
-                '单西' => 4,
-                '夹克' => 4,
-                '套装' => 4,
-                '套西' => 4,
-                '套西裤' => 4,
-                '牛仔衣' => 4,
-                '皮衣' => 4,
-            // ],
-            // '鞋履' => [
-                '休闲鞋' => 4,
-                '凉鞋' => 4,
-                '正统皮鞋' => 4,
-                '运动鞋' => 4,
-            // ],
-        ];
-        return $type;
-    }
+    public function getTypeQiMa($exp = '') {
+        $typeQima = $this->db_easyA->table('cwl_budongxiao_qima')
+        // ->whereIn('类别', '下装,内搭,外套,鞋履,松紧长裤,松紧短裤')
+        ->where('类别', 'exp', new Raw($exp))
+        ->select()->toArray();
+        // echo $this->db_easyA->getLastSql();die;
+        // $type = [
+        //     '休闲长裤' => 6,
+        //     '松紧短裤' => 6,
+        //     '松紧长裤' => 4,
+        //     '牛仔长裤' => 6,
+        //     '牛仔短裤' => 6,
+        //     '西裤' => 6,
+        //     '休闲短衬' => 4,
+        //     '休闲长衬' => 4,
+        //     '卫衣' => 4,
+        //     '正统短衬' => 4,
+        //     '正统长衬' => 4,
+        //     '短T' => 4,
+        //     '针织衫' => 4,
+        //     '长T' => 4,
+        //     '单西' => 4,
+        //     '夹克' => 4,
+        //     '套装' => 4,
+        //     '套西' => 4,
+        //     '套西裤' => 4,
+        //     '牛仔衣' => 4,
+        //     '皮衣' => 4,
+        //     '休闲鞋' => 4,
+        //     '凉鞋' => 4,
+        //     '正统皮鞋' => 4,
+        //     '运动鞋' => 4,
+        // ];
 
-        // 齐码默认值
-        public function getTypeQiMa2() {
-            // echo '<pre>';
-            // print_r($res);
-            $type = [
-                '下装' => 4, // 大类
-                '内搭' => 4, // 大类
-                '外套' => 4, // 大类
-                '鞋履' => 4, // 大类
-                '松紧长裤' => 4,  // 中类
-                '松紧短裤' => 4,  // 中类
-            ];
-            return $type;
-        }
+        
+        // 二维转一维
+        $typeQima = $this->arr2to1($typeQima, '类别', '尺码数');
+        return $typeQima;
+    }
 
     // 0除以任何数都得0
     public function zeroHandle($num1, $num2) {
@@ -623,6 +630,62 @@ class Budongxiao extends AdminController
         }
     }
 
+    public function saveMap() {
+        if (request()->isAjax() && checkAdmin()) {
+            $qima_xiazhuang = $this->db_easyA->table('cwl_budongxiao_qima')->field('id')->where('类别', '=', '下装')->find();
+            $qima_neida = $this->db_easyA->table('cwl_budongxiao_qima')->field('id')->where('类别', '=', '内搭')->find();
+            $qima_waitao = $this->db_easyA->table('cwl_budongxiao_qima')->field('id')->where('类别', '=', '外套')->find();
+            $qima_xielv = $this->db_easyA->table('cwl_budongxiao_qima')->field('id')->where('类别', '=', '鞋履')->find();
+            $params = input();
+            $qimaArr = [];
+
+            $qimaArr = [];
+            $qimaArr['aid'] = session('admin.id');
+            $qimaArr['aname'] = session('admin.name');
+            $qimaArr['update_time'] = date('Y-m-d H:i:s');
+            // 删除空参数
+            foreach ($params as $key => $val) {
+                if (empty($val)) {
+                    unset($params[$key]);
+                }
+                $qimaArr['齐码数'] = $val;
+                switch ($key) {
+                    case '下装':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '下装')->update($qimaArr);
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('pid', '=', $qima_xiazhuang['id'])
+                        // ->whereNotIn('类别', '休闲短裤,休闲长裤')
+                        ->update($qimaArr);
+                        break;
+                    case '内搭':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '内搭')->update($qimaArr);
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('pid', '=', $qima_neida['id'])->update($qimaArr);
+                        break;
+                    case '外套':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '外套')->update($qimaArr);
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('pid', '=', $qima_waitao['id'])->update($qimaArr);
+                        break; 
+                    case '鞋履':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '鞋履')->update($qimaArr);
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('pid', '=', $qima_xielv['id'])->update($qimaArr);
+                        break;
+                    case '松紧长裤':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '松紧长裤')->update($qimaArr); 
+                        break;
+                    case '松紧短裤':
+                        $this->db_easyA->table('cwl_budongxiao_qima')->where('类别', '=', '松紧短裤')->update($qimaArr);     
+                        break;    
+                    default:
+                        break;                                                                               
+                }
+            }
+            // 保存map，清空缓存
+            cache('static_qima', null);
+            return json(['status' => 1, 'msg' => '操作成功']);
+        } else {
+            return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
+        }   
+    }
+
     public function test() {
         // 中山三店 乐从一店 上市天数不足30
         $map = [
@@ -726,6 +789,7 @@ class Budongxiao extends AdminController
             ->group('大类,中类')
             ->select()->toArray();
             dump($select_qima_2);
+            
         }
         
     }

@@ -45,9 +45,11 @@ class SendReport extends BaseController
         if ($name =='S101') {
             $this->service->create_table_s101('S101');
         } elseif ($name =='S102') {
-            $this->service->create_table_s102();
+            $this->service->create_table_s102("");
         } elseif ($name =='S103') {
-            $this->service->create_table_s103();
+            $this->service->create_table_s103('');
+        } elseif ($name =='S103B') {
+            $this->service->create_table_s103B();
         } elseif ($name =='S104') {
             $this->service->create_table_s101('S104');
         } elseif ($name =='S106') {
@@ -72,7 +74,7 @@ class SendReport extends BaseController
             $this->service->create_table_s101C('S104C');
         } elseif ($name =='S102C') {
             $this->service->create_table_s102C();
-        }   elseif ($name =='S103C') {
+        } elseif ($name =='S103C') {
             $this->service->create_table_s103C();
         }      
     }

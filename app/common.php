@@ -233,3 +233,16 @@ function arrToStr($arr) {
     }
     return $str;
 }
+
+/**
+ * 省份留2字
+ */
+function province2zi($province)
+{
+    if ($province != "合计" && $province != "总计" ) {
+        // $len = strlen($province);
+        return mb_strcut($province,0,6,'UTF8');
+    }
+
+    return $province;
+}
