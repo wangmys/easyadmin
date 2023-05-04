@@ -37,3 +37,50 @@
         </table>
     </div>
 </div>
+
+<script>
+
+    layui.use(['form', 'jquery', 'layer'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , url1 = "{:url('admin/system.Weather/get_wenqu')}"
+        ;
+
+        //监听温带下拉
+        form.on('select(CustomItem30)', function (data) {
+
+            var wendai = data.value;
+            $.ajax({
+                type: "POST",
+                url: url1,
+                data: {'wendai':wendai},
+                dataType: 'json',
+                success: function (res) {
+
+                    $('#c-CustomItem36').empty();
+                    $('#c-CustomItem36').next().empty();
+
+                    var append_str = '<option value="">- 全部 -</option>';
+                    var dd_append_str = '<div class="layui-unselect layui-form-select">';
+                    dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+                    dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+                    dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+                    $.each(res.data, function(key, val){
+                        append_str += '<option value="'+val.CustomItem36+'">'+val.CustomItem36+'</option>';
+                        dd_append_str += '<dd lay-value="'+val.CustomItem36+'" class="">'+val.CustomItem36+'</dd>';
+                    });
+                    dd_append_str += '</dl></div>';
+                    $('#c-CustomItem36').append(append_str);
+                    $('#c-CustomItem36').next().append(dd_append_str);
+                    form.render('select');
+
+                }
+            });
+
+        });
+
+    });
+
+</script>
