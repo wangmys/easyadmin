@@ -217,9 +217,7 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
-            } else {
-                echo 222;
+                $res[] = $model->send($v['title'],$v['jpg_url']);
             }
         }
         return json($res);
