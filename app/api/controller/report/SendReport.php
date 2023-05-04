@@ -196,19 +196,19 @@ class SendReport extends BaseController
         $send_data = [
             'S025' => [
                 'title' => '商品部-各季节销售占比 表号:S025',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S025.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S025.jpg'
             ],
             'S030' => [
                 'title' => '昨天各省各季节销售占比 表号:S030',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S030.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S030.jpg'
             ],
             'S031' => [
                 'title' => '近三天各省各季节销售占比 表号:S031',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S031.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S031.jpg'
             ],
             'S043' => [
                 'title' => '各省7天季节占比（粤/桂/贵/鄂/湘/赣） 表号:S043',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S043.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S043.jpg'
             ],
         ];
         $res = [];
@@ -218,6 +218,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
                 $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
+            } else {
+                echo 222;
             }
         }
         return json($res);
