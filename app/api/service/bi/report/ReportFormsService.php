@@ -420,10 +420,10 @@ class ReportFormsService
             // 生成图片
             return $this->create_image_bgcolor($params,
              [
-                '前年日增长' => 3,
-                '去年日增长' => 4,
-                '前年月增长' => 5,
-                '去年月增长' => 6,
+                // '前年日增长' => 3,
+                // '去年日增长' => 4,
+                // '前年月增长' => 5,
+                // '去年月增长' => 6,
             ]
         );
     }
@@ -501,10 +501,10 @@ class ReportFormsService
         //        }
         // 生成图片
         return $this->create_image_bgcolor($params, [
-            '前年日增长' => 2,
-            '去年日增长' => 3,
-            '前年月增长' => 4,
-            '去年月增长' => 5,
+            // '前年日增长' => 2,
+            // '去年日增长' => 3,
+            // '前年月增长' => 4,
+            // '去年月增长' => 5,
         ]);
     }
 
@@ -582,10 +582,10 @@ class ReportFormsService
         //        }
         // 生成图片
         return $this->create_image_bgcolor($params, [
-            '前年日增长' => 3,
-            '去年日增长' => 4,
-            '前年月增长' => 5,
-            '去年月增长' => 6,
+            // '前年日增长' => 3,
+            // '去年日增长' => 4,
+            // '前年月增长' => 5,
+            // '去年月增长' => 6,
         ]);
     }
 
@@ -2383,10 +2383,11 @@ class ReportFormsService
         $yellow2 = imagecolorallocate($img, 250, 233, 84); //设定图片背景色
         $yellow3 = imagecolorallocate($img, 230, 244, 0); //设定图片背景色
         $green = imagecolorallocate($img, 24, 98, 0); //设定图片背景色
-        $green2 = imagecolorallocate($img, 75, 244, 0); //设定图片背景色
+        $green2 = imagecolorallocate($img, 75, 234, 32); //设定图片背景色
         $chengse = imagecolorallocate($img, 255, 72, 22); //设定图片背景色
         $blue = imagecolorallocate($img, 0, 42, 212); //设定图片背景色
-        $littleblue = imagecolorallocate($img, 22, 119, 210); //设定图片背景色
+        $gray = imagecolorallocate($img, 37, 240, 240); //设定图片背景色
+        $littleblue = imagecolorallocate($img, 22, 172, 176); //设定图片背景色
 
         imagefill($img, 0, 0, $bg_color); //填充图片背景色
 
@@ -2452,11 +2453,11 @@ class ReportFormsService
             foreach ($params['data'] as $key => $item) {
                 foreach ($set_bgcolor as $key2 => $val2) {
                     if (!empty($item[$key2]) && $item[$key2] <= 60) {
-                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $gray);
                     } elseif (!empty($item[$key2]) && ($item[$key2] > 60 && $item[$key2] <= 99)) {
-                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $yellow2);
-                    } elseif (!empty($item[$key2]) && $item[$key2] > 99) { 
                         imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $green2);
+                    } elseif (!empty($item[$key2]) && $item[$key2] > 99) { 
+                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
                     }
                 }
             }
