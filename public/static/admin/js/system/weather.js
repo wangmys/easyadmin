@@ -30,26 +30,34 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var wendai_list = res.wendai_list;
                 // 店铺
                 var store_list = res.store_list;
+                //绑定城市 字段权限
+                var if_can_see = res.if_can_see;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
-                    {field: 'State', width: 100, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
+                    {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
-                    {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
+                    // {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
                 ];
+
+                //判断商品专员是否可以查看该字段
+                if (if_can_see == 1) {
+                    cols.push({field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false})
+                }
+
                 var data = res.data;
                 data.forEach(function (val,index){
                     if(index == 0){
                         cols.push({
-                            width: 90 , search:false , field: val, title: val, title: val
+                            width: 60 , search:false , field: val, title: val, title: val
                         })
                     }else{
                         cols.push({
-                            width: 80 , search:false , field: val
+                            width: 60 , search:false , field: val
                         })
                     }
                 })
