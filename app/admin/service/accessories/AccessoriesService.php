@@ -93,8 +93,8 @@ class AccessoriesService
     {
         $fix_field = [
             '店铺ID' => 'CustomerId',
-            '店铺名称' =>'CustomerName',
             '商品负责人' =>'CustomItem17',
+            '店铺名称' =>'CustomerName',
             '店铺等级' => 'CustomerGrade',
             '省份' =>'State',
             '运营模式' =>'Mathod'
@@ -131,7 +131,7 @@ class AccessoriesService
         // 固定字段
         $fix_field = $this->getFixField('c');
         // 组合完整字段
-        $field = $fix_field.$trends_field;
+        $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
         // 查询库存数据
         $stock_list = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
             'ShutOut' => 0
@@ -162,7 +162,7 @@ class AccessoriesService
                }
             }
             // 根据筛选条件,设置颜色是否标红
-            $this->setStyle($v,$sysconfig);
+//            $this->setStyle($v,$sysconfig);
         }
         return $stock_list;
     }

@@ -36,11 +36,27 @@ class Index extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="数据总览")
+     * @NodeAnotation(title="配饰总览2.0")
      */
     public function index()
     {
         $get = $this->request->get();
+        // 请求
+        if ($this->request->isAjax()) {
+            // 筛选
+            $filters = json_decode($this->request->get('filter', '{}',null), true);
+            // 查询数据
+            $table_data = $this->service->getTableBody();
+            // 返回数据
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($table_data),
+                'data'  => $table_data
+            ];
+            return json($data);
+        }
+
         // 一级表头
         $table_head_1 = [];
         // 二级表头
@@ -61,11 +77,12 @@ class Index extends AdminController
                     'title' => $k,
                     'rowspan' => 2,
                     'fixed' => 'left',
-                    'width' => 95,
+                    'width' => 110,
                     'align' => 'center'
                 ];
                 if($k=='店铺ID'){
                     $item['width'] = 115;
+                    continue;
                 }
             }
             $table_head_1[] = $item;
@@ -85,72 +102,59 @@ class Index extends AdminController
                 'align' => 'center',
             ];;
         }
-
-        if ($this->request->isAjax()) {
-            // 筛选
-            $filters = json_decode($this->request->get('filter', '{}',null), true);
-            // 查询数据
-            $table_data = $this->service->getTableBody();
-            // 返回数据
-            $data = [
-                'code'  => 0,
-                'msg'   => '',
-                'count' => count($table_data),
-                'data'  => $table_data
-            ];
-            return json($data);
-        }
-        
         $cols = [
             $table_head_1,
             $table_head_2
         ];
 
-        $data = "[
-            {field: '商品负责人', width: 200, title: '商品负责人', rowspan: 2,fixed:'left'},
-            {title: '背包', colspan: 3},
-            {title: '挎包', colspan: 3},
-            {title: '领带', colspan: 3},
-            {title: '帽子', colspan: 3},
-            {title: '内裤', colspan: 3},
-            {title: '皮带', colspan: 3},
-            {title: '袜子', colspan: 3},
-            {title: '手包', colspan: 3},
-            {title: '胸包', colspan: 3}
-        ],
-        [
-            {field: '背包', width:100, title: '问题店铺',event:'pp',border: {style: 'solid',color: '1E9FFF'}},
-            {field: '背包_1', width:100, title: '已完成'},
-            {field: '背包_2', width:150, title: '未完成店铺数'},
-            {field: '挎包', width:100, title: '问题店铺'},
-            {field: '挎包_1', width:100, title: '已完成'},
-            {field: '挎包_2', width:150, title: '未完成店铺数'},
-            {field: '领带', width:100, title: '问题店铺'},
-            {field: '领带_1', width:100, title: '已完成'},
-            {field: '领带_2', width:150, title: '未完成店铺数'},
-            {field: '帽子', width:100, title: '问题店铺'},
-            {field: '帽子_1', width:100, title: '已完成'},
-            {field: '帽子_2', width:150, title: '未完成店铺数'},
-            {field: '内裤', width:100, title: '问题店铺'},
-            {field: '内裤_1', width:100, title: '已完成'},
-            {field: '内裤_2', width:150, title: '未完成店铺数'},
-            {field: '皮带', width:100, title: '问题店铺'},
-            {field: '皮带_1', width:100, title: '已完成'},
-            {field: '皮带_2', width:150, title: '未完成店铺数'},
-            {field: '袜子', title: '问题店铺', width:100},
-            {field: '袜子_1', title: '已完成', width:100},
-            {field: '袜子_2', title: '未完成店铺数', width:150},
-            {field: '手包', title: '问题店铺', width:100},
-            {field: '手包_1', title: '已完成', width:100},
-            {field: '手包_2', title: '未完成店铺数', width:150},
-            {field: '胸包', title: '问题店铺', width:100},
-            {field: '胸包_1', title: '已完成', width:100},
-            {field: '胸包_2', title: '未完成店铺数', width:150}
-        ]";
-
         $this->assign([
             'get' => json_encode($get),
             'cols' => json_encode($cols)
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 展示配饰标准
+     */
+    public function standard()
+    {
+        // 查询所有的店铺等级
+        $levelList = $this->logic->getLevel();
+        if ($this->request->isAjax()) {
+            // 字段
+            $field = $this->logic->getTableRow();
+            $data = [
+                'provinceList' => $levelList,
+                'field' => $field
+            ];
+            return json($data);
+        }
+        // 查询配置项表头
+        $head = $this->logic->getSysHead();
+        // 查询已保存数据
+        $data = $this->logic->warStock->column('id,level,content','level');
+        $d_field = [];
+        foreach ($levelList as $kk => $vv){
+            $_kk = $vv['name'];
+            $d_field[$_kk]['店铺等级'] = $_kk;
+            // 已保存数值
+            $item = !empty($data[$_kk])?json_decode($data[$_kk]['content'],true):[];
+            // 获取省份
+            foreach ($head as $k=>$v){
+                $v_key = $v['name'];
+                if(isset($item[$v_key])){
+                    $d_field[$_kk][$v['name']] = $item[$v_key];
+                }else{
+                    $d_field[$_kk][$v['name']] = $v['stock']??0;
+                }
+            }
+        }
+
+        $this->assign([
+            'field' => $head,
+            '_field' => array_column($head,'name'),
+            'd_field' => $d_field,
         ]);
         return $this->fetch();
     }
