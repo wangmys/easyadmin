@@ -45,8 +45,8 @@ class Sysconfig extends AdminController
             ];
             return json($data);
         }
-        // 查询表头
-        $head = $this->logic->getHead();
+        // 查询配置项表头
+        $head = $this->logic->getSysHead();
         // 查询已保存数据
         $data = $this->logic->warStock->column('id,level,content','level');
         $d_field = [];

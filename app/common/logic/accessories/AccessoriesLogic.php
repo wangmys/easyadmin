@@ -32,13 +32,13 @@ class AccessoriesLogic
     }
 
     /**
-     * 获取表头字段
+     * 获取配置项表头字段
      * @return array
      */
-    public function getHead()
+    public function getSysHead()
     {
-        $head = $model = $this->accessoriesHead::where(['state' => 1])->column('name,field','id');
-        // 固定字段
+        $head = $this->accessoriesHead::where(['state' => 1])->column('name,field','id');
+        // 查询所有分类名
         $column = $this->getTableRow();
         $head_list = [];
         foreach ($head as $k => $v){
@@ -51,6 +51,8 @@ class AccessoriesLogic
         }
         return $head_list;
     }
+
+
 
     /**
      * 获取所有店铺等级
@@ -82,7 +84,7 @@ class AccessoriesLogic
     }
 
     /**
-     * 获取表格行头
+     * 查询所有分类名
      */
     public function getTableRow()
     {
@@ -91,7 +93,9 @@ class AccessoriesLogic
             $sql = "SELECT CategoryName,CategoryId from ErpBaseGoodsCategory where  ParentId in (
     SELECT CategoryId from ErpBaseGoodsCategory where  ParentId =
     (SELECT CategoryId FROM ErpBaseGoodsCategory where CategoryName = '配饰'))";
-            $levelName = Db::connect('sqlsrv')->query($sql);
+            $levelName = Db::connect('mysql2')->query($sql);
+//            $sql = "";
+//            $levelName = "selet * from sp_customer_yinliu_sale limit 1";
             Cache::set('AccessoriesField',$levelName);
         }
         $new_field = [];
@@ -129,11 +133,11 @@ class AccessoriesLogic
         $config_list = $this->warStock->column('level,content');
         $level_config_list = [];
         foreach ($config_list as $k => $v){
-            $level_list = explode(',',$v['level']);
+            $level_key = $v['level'];
             $config_item = json_decode($v['content'],true);
             if(isset($config_item['店铺等级'])) unset($config_item['店铺等级']);
-            $level_config_list[] = [
-                '店铺等级' => $level_list,
+            $level_config_list[$level_key] = [
+                '店铺等级' => $level_key,
                 '_data' => $config_item
             ];
         }
