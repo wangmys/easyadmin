@@ -6,6 +6,7 @@ use app\admin\model\accessories\AccessoriesStock;
 use app\admin\model\accessories\AccessoriesSale;
 use app\admin\model\accessories\AccessoriesHead;
 use app\admin\model\accessories\AccessoriesWarStock;
+use app\common\constants\AdminConstant;
 use app\common\logic\accessories\AccessoriesLogic;
 
 class AccessoriesService
@@ -132,14 +133,30 @@ class AccessoriesService
         $fix_field = $this->getFixField('c');
         // 组合完整字段
         $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
+
+        // 当前登录信息
+        $user = session('admin');
+        // 超级管理员ID
+        $admin_id = AdminConstant::SUPER_ADMIN_ID;
+
         // 查询库存数据
-        $stock_list = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
-            'ShutOut' => 0
-        ])->select()->toArray();
+        $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
+            'ShutOut' => 0,
+            'Date' => $Date
+        ]);
+        // 如果用户不为超管,则进行商品负责人筛选
+        if($user['id'] != $admin_id){
+            $model->where([
+                'CustomItem17' => $user['name']
+            ]);
+        }
+        $stock_list = $model->order('CustomItem17 desc,State')->where('Region','<>','闭店区')->select()->toArray();
         // 获取库存预警配置
         $sysconfig = $this->logic->warStockItem();
         // 查询销量数据
-        $sale_list = $this->sale->column($this->getTrendsField(),'CustomerId');
+        $sale_list = $this->sale->where([
+            'Date' => $Date
+        ])->column($this->getTrendsField(),'CustomerId');
         // 循环计算库存数据的周转数
         foreach ($stock_list as $k => &$v){
             // 根据店铺ID,获取销量数据
@@ -152,17 +169,26 @@ class AccessoriesService
                 foreach ($saleItem as $kk => $vv){
                     // 库存
                     $stockValue = $v[$kk];
-                    // 库存或销量其中一项为0,周转则为0
-                    if(empty($vv) || empty($stockValue)){
+                    // 库存为0,周转则为0
+                    if(empty($stockValue)){
                         $v['_'.$kk] = 0;
+                    }else if(empty($vv)){
+                        // 销量为0,则周转为库存
+                        $v['_'.$kk]  = $stockValue;
                     }else{
                         // 计算周转( 库存 / 一周销量 )
                         $v['_'.$kk] = bcadd($stockValue / $vv,0,2);
                     }
                }
+            }else{
+                $saleItem_data = reset($sysconfig);
+                $saleItem = $saleItem_data['_data'];
+                foreach ($saleItem as $kk => $vv){
+                    $v['_'.$kk] = $v[$kk];
+                }
             }
             // 根据筛选条件,设置颜色是否标红
-//            $this->setStyle($v,$sysconfig);
+            $this->setStyle($v,$sysconfig);
         }
         return $stock_list;
     }

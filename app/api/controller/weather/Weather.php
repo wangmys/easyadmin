@@ -33,7 +33,7 @@ class Weather
     {
         // 获取店铺数据
         $where = [['ShutOut','=','0'],['RegionId','not in','0,8,84,85,40']];
-        $field = 'CustomerId,CustomerCode,CustomerName,RegionId,State,City,SendGoodsGroup,CustomItem17,CustomItem18';
+        $field = 'CustomerId,CustomerCode,CustomerName,RegionId,State,City,SendGoodsGroup,CustomItem17,CustomItem18,CustomItem16,ShutOut';
         $result = Db::connect("sqlsrv")->table('ErpCustomer')
             ->field($field)
             ->where($where)
