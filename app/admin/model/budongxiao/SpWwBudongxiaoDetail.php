@@ -70,7 +70,7 @@ class SpWwBudongxiaoDetail extends TimeModel
     // 获取接口所需所有门店 
     public static function getMapStore() {
         $res = self::where(1)
-        ->field('店铺名称 as name, 店铺名称 as value')
+        ->field('店铺名称 as name, 店铺名称 as value, "" as selected')
         ->group('店铺名称')  
         ->select()
         ->toArray();
@@ -109,7 +109,7 @@ class SpWwBudongxiaoDetail extends TimeModel
 
     // 获取城市
     public static function getMapProvince() {
-        $res = self::field('省份 as name, 省份 as value')
+        $res = self::field('省份 as name, 省份 as value, "" as selected')
         ->group('省份')  
         ->select()
         ->toArray();
