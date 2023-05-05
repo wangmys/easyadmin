@@ -80,7 +80,7 @@ class Index extends AdminController
                     'width' => 90,
                     'align' => 'center'
                 ];
-                if(in_array($k,['CustomItem17'])){
+                if(in_array($k,['店铺ID'])){
                     $item['width'] = 115;
                     continue;
                 }
@@ -112,6 +112,42 @@ class Index extends AdminController
             'cols' => json_encode($cols)
         ]);
         return $this->fetch();
+    }
+
+    /**
+     * 配饰的可用库存与在途库存
+     * @return \think\response\Json
+     */
+    public function stock()
+    {
+        $sql = " select 可用库存Quantity as available_stock,采购在途库存Quantity as transit_stock,二级分类 as cate from accessories_warehouse_stock ";
+        $config = sysconfig('stock_warn');
+        // 查询表数据
+        $data = Db::connect("mysql2")->query($sql);
+        $res = ['available_stock' => [],'transit_stock' => []];
+        foreach ($res as $k => $v){
+            foreach ($data as $kk => $vv){
+                $temp_key = $vv['cate'];
+                $res[$k][$temp_key] = $vv[$k];
+                $res[$k]['Date'] = date('Y-m-d',strtotime('-1day'));
+                $res[$k]['type'] = $k=='available_stock'?'可用库存':'在途库存';
+                $res[$k]['text'] = '配饰';
+            }
+        }
+        if($res){
+            $first = array_merge($res['available_stock'],$config);
+            $first['text'] = '配饰配置';
+            $first['type'] = '配饰库存标准';
+            // 增加配饰库存标准
+            $res['config'] = $first;
+        }
+        $list = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($res),
+                'data'  => $res,
+            ];
+        return json($list);
     }
 
     /**

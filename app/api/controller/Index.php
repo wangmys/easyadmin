@@ -79,7 +79,7 @@ class Index
     public function updateWeatherInfo()
     {
         // 查询所有门店ID
-        $ids = Customers::column('CustomerId');
+        $ids = Customers::where('CustomItem30','=','')->column('CustomerId');
         // 根据所有门店ID查询所属温带 + 气温区域
         $data = Db::connect("sqlsrv")->table('ErpCustomer')->whereIn('CustomerId',$ids)->column('CustomItem30,CustomItem36','CustomerId');
         $update_data = [];
