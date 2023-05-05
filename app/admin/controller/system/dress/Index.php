@@ -18,7 +18,7 @@ use jianyan\excel\Excel;
 /**
  * Class Accessories
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="配饰库存/周转预警")
+ * @ControllerAnnotation(title="配饰2.0预警")
  */
 class Index extends AdminController
 {
@@ -77,10 +77,10 @@ class Index extends AdminController
                     'title' => $k,
                     'rowspan' => 2,
                     'fixed' => 'left',
-                    'width' => 110,
+                    'width' => 90,
                     'align' => 'center'
                 ];
-                if($k=='店铺ID'){
+                if(in_array($k,['CustomItem17'])){
                     $item['width'] = 115;
                     continue;
                 }

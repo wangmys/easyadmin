@@ -93,7 +93,7 @@ class AccessoriesLogic
             $sql = "SELECT CategoryName,CategoryId from ErpBaseGoodsCategory where  ParentId in (
     SELECT CategoryId from ErpBaseGoodsCategory where  ParentId =
     (SELECT CategoryId FROM ErpBaseGoodsCategory where CategoryName = '配饰'))";
-            $levelName = Db::connect('mysql2')->query($sql);
+            $levelName = Db::connect('sqlsrv')->query($sql);
 //            $sql = "";
 //            $levelName = "selet * from sp_customer_yinliu_sale limit 1";
             Cache::set('AccessoriesField',$levelName);
