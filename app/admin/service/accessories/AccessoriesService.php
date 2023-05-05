@@ -6,6 +6,7 @@ use app\admin\model\accessories\AccessoriesStock;
 use app\admin\model\accessories\AccessoriesSale;
 use app\admin\model\accessories\AccessoriesHead;
 use app\admin\model\accessories\AccessoriesWarStock;
+use app\common\constants\AdminConstant;
 use app\common\logic\accessories\AccessoriesLogic;
 
 class AccessoriesService
@@ -132,11 +133,24 @@ class AccessoriesService
         $fix_field = $this->getFixField('c');
         // 组合完整字段
         $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
+
+        // 当前登录信息
+        $user = session('admin');
+        // 超级管理员ID
+        $admin_id = AdminConstant::SUPER_ADMIN_ID;
+
         // 查询库存数据
-        $stock_list = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
+        $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
             'ShutOut' => 0,
             'Date' => $Date
-        ])->where('Region','<>','闭店区')->select()->toArray();
+        ]);
+        // 如果用户不为超管,则进行商品负责人筛选
+        if($user['id'] != $admin_id){
+            $model->where([
+                'CustomItem17' => $user['name']
+            ]);
+        }
+        $stock_list = $model->order('CustomItem17 desc,State')->where('Region','<>','闭店区')->select()->toArray();
         // 获取库存预警配置
         $sysconfig = $this->logic->warStockItem();
         // 查询销量数据

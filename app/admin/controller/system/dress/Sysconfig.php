@@ -16,7 +16,7 @@ use app\common\logic\accessories\AccessoriesLogic;
 /**
  * Class Sysconfig
  * @package app\admin\controller\system\dress
- * @ControllerAnnotation(title="配饰配置")
+ * @ControllerAnnotation(title="配饰2.0配置")
  */
 class Sysconfig extends AdminController
 {
@@ -30,7 +30,7 @@ class Sysconfig extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="配饰自定义设置")
+     * @NodeAnotation(title="配饰2.0配置")
      */
     public function index()
     {
