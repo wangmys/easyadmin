@@ -87,7 +87,6 @@ class Autosend extends BaseController
 
     }
 
-
     // 二维数组转一维数组
     public function arr2to1($arr, $key, $val) {
         $newArr = [];

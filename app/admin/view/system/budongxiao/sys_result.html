@@ -102,12 +102,12 @@
 <body class="" style="background-color: #ffffff;">
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table2" lay-filter="table2">
-            <div class="title_text2" style="text-align: center; display: none; color:#0051ff;">不动销汇总</div>
+            <div class="title_text2" style="text-align: center; display: none; color:#0051ff;">不动销汇总  <a class="dateStr"></a></div>
         </table>
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div class="title_text1" style="text-align: center; color:#0051ff;">单店不动销合格情况</div>
+            <div class="title_text1" style="text-align: center; color:#0051ff;">单店不动销合格情况  <a class="dateStr"></a></div>
         </table>
     </div>
 </body>
@@ -119,11 +119,11 @@
 <!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-      <button class="layui-btn layui-btn-xs" lay-event="download">导出单店明细</button>
+      <button class="layui-btn layui-btn-xs" lay-event="download">导出所有单店明细</button>
       <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
       <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
     </div>
-  </script>
+</script>
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
     layui.use(['form', 'jquery', 'layer', 'table', 'laydate'], function () {
@@ -134,7 +134,7 @@
             , laydate = layui.laydate
             , url1 = "{:url('admin/system.Budongxiaosystem/sysResult')}"
             , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}" 
-            , url_download_history = "{:url('admin/system.Budongxiaosystem/history_detail')}" 
+            , url_download_history = "{:url('admin/system.Budongxiaosystem/excel_history_detail')}" 
 
 
         // 表1初始化
@@ -189,10 +189,10 @@
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {
-                    layer.alert(`数据加载完毕`);
+                    // layer.alert(`数据加载完毕`);
                     // console.log(res);
-                    // 
                     $('.title_text2').css('display', 'block');
+                    $('.dateStr').text(res.create_time);
                     startTable2(res.rand_code);
                 }
             });

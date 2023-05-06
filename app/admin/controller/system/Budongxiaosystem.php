@@ -68,7 +68,7 @@ class Budongxiaosystem extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="不动销配置系统推送结果")
+     * @NodeAnotation(title="单店不动销系统推送结果")
      */
     public function sysResult() {
         if (request()->isAjax()) {
@@ -94,26 +94,199 @@ class Budongxiaosystem extends AdminController
     }
 
     /**
-     * 不动销计算明细
+     * @NodeAnotation(title="区域不动销系统推送结果")
      */
-    public function history_detail() {
-        $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->select()->toArray();
+    public function sysAreaResult() {
+        if (request()->isAjax()) {
 
-
-        dump($select_result[0]);
-
+            $input = input();
+             
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+            $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+            $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+            $params = array_merge($select_config, $static_qima);
+            // dump($select_config);
+            // dump($static_qima);
+            
+            // 删除空参数
+            foreach ($params as $key => $val) {
+                if (empty($val)) {
+                    unset($params[$key]);
+                }
+            }
+            $this->params = $params;
+    
+            $map1 = " a.create_time='{$select_map['create_time']}' ";
+            if (!empty($this->params['上柜率'])) {
+                $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
+            } else {
+                $map2 = " ";
+            }
+            if (!empty($this->params['省份售罄'])) {
+                $map3 = " AND a.省份售罄<='{$this->params['省份售罄']}' ";
+            } else {
+                $map3 = " ";
+            }
+            if (!checkAdmin()) {
+                $name = session('admin.name');
+                $map4 = " AND a.商品负责人 = '{$name}'";
+            } else {
+                $map4 = " ";
+            }
+            if (!empty($map_input['排名率'])) {
+                $map5 = " having 排名率 >={$map_input['排名率']} ";
+            } else {
+                $map5 = " ";
+            }
+    
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = $this->params['limit'];
+    
+            $sql = "
+                SELECT
+                    a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
+                FROM
+                    `cwl_budongxiao_history_sys` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history_sys 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4. $map5 . "
+                ORDER BY
+                    a.商品负责人 ASC
+                limit {$pageParams1}, {$pageParams2}    
+            "; 
+    
+            $sql2 = "
+                SELECT
+                    count(*) as tatalCount
+                FROM
+                    `cwl_budongxiao_history_sys` AS a
+                    LEFT JOIN (
+                    SELECT
+                        商品负责人,省份,货号,品类排名, 
+                        count(*) AS 相同货号数
+                    FROM
+                        cwl_budongxiao_history_sys 
+                    GROUP BY
+                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                    AND a.省份 = b.省份 
+                    AND a.货号 = b.货号 
+                WHERE 
+                    " . $map1 . $map2 . $map3 . $map4 . $map5 ."
+                ORDER BY
+                    a.商品负责人 ASC
+            "; 
+            
+            $select_history_area = Db::connect('mysql')->query($sql);
+            $count = Db::connect('mysql')->query($sql2); 
+    
+            // print_r( $count);
+            // die;
+            return json(["code" => "0", "msg" => '', "count" => $count[0]['tatalCount'], "data" => $select_history_area, 'create_time' => $select_map['create_time']]);
+        } else {
+            return View('system/budongxiao/sys_area_result', [
+                // 'config' => $select_config,
+                // 'typeQima' => $typeQima,
+                // 'people' => $people,
+            ]);
+        }
+    }
+    /**
+     * 单店不动销计算明细 导出
+     */
+    public function excel_history_detail() {
+        if (checkAdmin()) {
+            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->select()->toArray();
+        } else {
+            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where([
+                ['商品负责人', '=', session('admin.name')]
+            ])->select()->toArray();
+        }
+        
         $header = [];
         foreach($select_result[0] as $key => $val) {
             $header[] = [$key, $key];
         }
-
-        // dump($header);
-        // if($select_result){
-        //     $header = array_map(function($v){ return [$v,$v]; }, $select_result);
-        // }
-        // $fileName = time();
-        // dump($header);die;
         return Excel::exportData($select_result, $header, '单店不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+    }
+
+    /**
+     * 区域不动销计算明细 导出
+     */
+    public function excel_history_detail_area() {
+        $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+        $params = array_merge($select_config, $static_qima);
+        // dump($select_config);
+        // dump($static_qima);
+        
+        // 删除空参数
+        foreach ($params as $key => $val) {
+            if (empty($val)) {
+                unset($params[$key]);
+            }
+        }
+        $this->params = $params;
+
+        $map1 = " a.create_time='{$select_map['create_time']}' ";
+        if (!empty($this->params['上柜率'])) {
+            $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
+        } else {
+            $map2 = " ";
+        }
+        if (!empty($this->params['省份售罄'])) {
+            $map3 = " AND a.省份售罄<='{$this->params['省份售罄']}' ";
+        } else {
+            $map3 = " ";
+        }
+        if (!checkAdmin()) {
+            $name = session('admin.name');
+            $map4 = " AND a.商品负责人 = '{$name}'";
+        } else {
+            $map4 = " ";
+        }
+        if (!empty($map_input['排名率'])) {
+            $map5 = " having 排名率 >={$map_input['排名率']} ";
+        } else {
+            $map5 = " ";
+        }
+
+        $sql = "
+            SELECT
+                a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
+            FROM
+                `cwl_budongxiao_history_sys` AS a
+                LEFT JOIN (
+                SELECT
+                    商品负责人,省份,货号,品类排名, 
+                    count(*) AS 相同货号数
+                FROM
+                    cwl_budongxiao_history_sys 
+                GROUP BY
+                商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
+                AND a.省份 = b.省份 
+                AND a.货号 = b.货号 
+            WHERE 
+                " . $map1 . $map2 . $map3 . $map4. $map5 . "
+            ORDER BY
+                a.商品负责人 ASC 
+        "; 
+        $select_history_area = Db::connect('mysql')->query($sql);
+
+        $header = [];
+        foreach($select_history_area[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select_history_area, $header, '区域不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 二维数组转一维数组
@@ -450,9 +623,6 @@ class Budongxiaosystem extends AdminController
             ";
         }
 
-
-        
-
         Db::connect('mysql')->query('SET @counter = 0;');
         $res = Db::connect('mysql')->query($sql);
         // dump($res);die;            
@@ -620,34 +790,16 @@ class Budongxiaosystem extends AdminController
         }   
     }
 
-
     public function saveMap2() {
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
-            // echo '<pre>';
-            // print_r($params);
-
-            // $insertArr['aid'] = session('admin.id');
-            // $insertArr['aname'] = session('admin.name');
-            // $insertArr['update_time'] = date('Y-m-d H:i:s');
-            // 删除空参数
-            // foreach ($params as $key => $val) {
-            //     if (empty($val)) {
-            //         unset($params[$key]);
-            //     }
-            // }
 
             $update_config = $this->db_easyA->table('cwl_budongxiao_config')->where(['id' => 1])->update([
                 '上柜率' => $params['上柜率'],
-                '省份售罄率' => $params['省份售罄率'],
+                '省份售罄' => $params['省份售罄'],
                 '排名率' => $params['排名率'],
             ]);
-            // echo $this->db_easyA->getLastSql();
-            // if ($update_config) {
-            //     return json(['status' => 1, 'msg' => '操作成功']);
-            // } else {
-            //     return json(['status' => 2, 'msg' => '服务器繁忙，请稍后再试']);
-            // }
+
             return json(['status' => 1, 'msg' => '操作成功']);
             // 保存map，清空缓存
             // cache('static_qima', null);

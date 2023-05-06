@@ -181,7 +181,7 @@
                     , done: function (res, curr, count) {
                         $('.lasttime').text('上次查询时间：' + res.create_time);
                         if (res.count == 0) {
-                            layer.msg('恭喜，没有异常情况');
+                            alert('恭喜，没有异常情况');
                         }
                     }
                 })
