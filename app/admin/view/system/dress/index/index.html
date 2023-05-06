@@ -26,6 +26,20 @@
     }
 </style>
 <div class="layuimini-container">
+
+    <table class="layui-table layui-hide" lay-data="{height:100, url:'/admin/system.dress.index/stock',id:'list'}" lay-filter="list" id="list_table">
+      <thead>
+        <tr>
+          <th lay-data="{field:'Date', minWith: 134,align:'center'}">截止日期</th>
+          <th lay-data="{field:'text', minWith: 134,align:'center'}">商品类型</th>
+          <th lay-data="{field:'type', minWith: 134,align:'center'}">描述</th>
+          {foreach $head_field_2 as $k => $v}
+          <th lay-data="{field:'{$v['name']}', minWith: 134,align:'center'}">{$v['name']}</th>
+          {/foreach}
+        </tr>
+      </thead>
+    </table>
+
     <div class="layuimini-main">
         <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
         </table>

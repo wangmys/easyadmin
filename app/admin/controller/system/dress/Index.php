@@ -109,7 +109,8 @@ class Index extends AdminController
 
         $this->assign([
             'get' => json_encode($get),
-            'cols' => json_encode($cols)
+            'cols' => json_encode($cols),
+            'head_field_2' => $head_field_2
         ]);
         return $this->fetch();
     }
@@ -120,26 +121,41 @@ class Index extends AdminController
      */
     public function stock()
     {
-        $sql = " select 可用库存Quantity as available_stock,采购在途库存Quantity as transit_stock,二级分类 as cate from accessories_warehouse_stock ";
-        $config = sysconfig('stock_warn');
+        // 表头数据
+        $header = $this->service->getTableField();
+        $head = array_column($header,'name');
+        $order = '';
+        foreach ($head as $key => $val){
+            $order .= "'$val',";
+        }
+        $order = trim($order,',');
+        $Date = date('Y-m-d');
         // 查询表数据
-        $data = Db::connect("mysql2")->query($sql);
+        $data = Db::connect("mysql2")
+            ->table('accessories_warehouse_stock_2')
+            ->where([
+                'Date' => $Date
+            ])->column("可用库存Quantity as available_stock,采购在途库存Quantity as transit_stock,分类 as cate",'分类');
         $res = ['available_stock' => [],'transit_stock' => []];
         foreach ($res as $k => $v){
-            foreach ($data as $kk => $vv){
-                $temp_key = $vv['cate'];
-                $res[$k][$temp_key] = $vv[$k];
+            foreach ($header as $key => $val){
+                $key_arr = explode(',',$val['field']);
+                $sum_total = 0;
+                foreach ($key_arr as $kk => $vv){
+                    if(empty($data[$vv])){
+                        $data[$vv] = [
+                            'available_stock' => 0,
+                            'transit_stock' => 0
+                        ];
+                    }
+                    $sum_total += $data[$vv][$k];
+                }
+
                 $res[$k]['Date'] = date('Y-m-d',strtotime('-1day'));
-                $res[$k]['type'] = $k=='available_stock'?'可用库存':'在途库存';
+                $res[$k]['type'] = $k=='available_stock'?'仓库可用库存':'仓库在途库存';
                 $res[$k]['text'] = '配饰';
+                $res[$k][$val['name']] = $sum_total;
             }
-        }
-        if($res){
-            $first = array_merge($res['available_stock'],$config);
-            $first['text'] = '配饰配置';
-            $first['type'] = '配饰库存标准';
-            // 增加配饰库存标准
-            $res['config'] = $first;
         }
         $list = [
                 'code'  => 0,
