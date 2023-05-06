@@ -390,10 +390,7 @@
                     },
                     // showCount: 1,
                     name:'不考核门店',
-                    data: storeData,
-                    done: function() {
-                        console.log(1111111111111);
-                    }
+                    data: storeData
                 })
                 // 渲染所有省份
                 xmSelect.render({
@@ -419,7 +416,7 @@
             $("#season_id").val("{$config['季节归集']}");
             $("#people_id").val("{$config['商品负责人']}");
             $("#jingyingmoshi_id").val("{$config['经营模式']}");
-            $("#kaohequjian_id").val("10-15天");
+            $("#kaohequjian_id").val("{$config['考核区间']}");
             $("#chaxunjilushu_id").val("{$config['limit']}");
             form.render();
         }

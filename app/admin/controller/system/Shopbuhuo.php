@@ -610,14 +610,76 @@ class Shopbuhuo extends AdminController
         }
     }
 
-    // 上传excel
+    public function redExcel_test() {
+       
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/9851683357737.xlsx';   //文件保存路径
+
+        $read_column = [
+            'A' => '原单编号',
+            'B' => '手工单号',
+            'C' => '单据日期',
+            'D' => '审结日期',
+            'E' => '仓库编号',
+            'F' => '店铺编号',
+            'G' => '订货类型',
+            'H' => '订单编号',
+            'I' => '货号',
+            'J' => '颜色编号',
+            'K' => '规格',
+            'L' => '尺码',
+            'M' => '数量',
+            'N' => '订货价格',
+            'O' => '是否完成',
+            'P' => '备注',
+        ];
+
+        if (! cache('test_date')) {
+            $data = $this->readExcel1($save_path, $read_column);
+            cache('test_date', $data, 3600);
+        } else {
+            $data = cache('test_date'); 
+        }
+
+        // $data = $this->readExcel1($save_path, $read_column);
+        foreach ($data as $key => $val) {
+            if ( empty($val['店铺编号']) || empty($val['货号']) ) {
+                unset($data[$key]);
+            } else {
+                $data[$key]['aname'] = $this->authInfo['name'];
+                $data[$key]['aid'] = $this->authInfo['id'];
+                $data[$key]['create_time'] = $this->create_time;
+            }
+        }
+
+        // 7天清空库存数据 
+        $day7 = $this->day7();
+        $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
+            ['aid', '=', $this->authInfo['id']]
+        ])->delete();
+        $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean')->where([
+            ['aid', '=', $this->authInfo['id']]
+        ])->delete(); 
+
+        // echo '<pre>';    
+        // print_r($data);
+
+
+        // foreach() {}
+        // die;
+        
+        $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
+        // print_r($data);
+        dump($insertAll_chuhuozhilingdan);
+    }
+
+    // 上传excel 店铺补货
     public function uploadExcel_buhuo() {
         if (request()->isAjax()) {
             $file = request()->file('file');  //这里‘file’是你提交时的name
             $new_name = rand(100, 999) . time() . '.' . $file->getOriginalExtension();
             $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
             $info = $file->move($save_path, $new_name);
-
+            // dump($info);die;
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
@@ -641,6 +703,7 @@ class Shopbuhuo extends AdminController
                 ];
                 //读取数据
                 $data = $this->readExcel1($info, $read_column);
+                // echo '<pre>';
                 // print_r($data);die;
 
                 // $data = array_filter($data);
@@ -664,7 +727,16 @@ class Shopbuhuo extends AdminController
                     ['aid', '=', $this->authInfo['id']]
                 ])->delete();    
 
+                // return json(['code' => 0, 'msg' => '上传成功']);
+                // echo 111;
+
+
+
                 $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
+                // echo $this->db_easyA->table('cwl_chuhuozhilingdan')->getLastSql();
+                // dump($insertAll_chuhuozhilingdan);    
+                // echo 111;
+                // die;
                 $update_chuhuozhilingdan = $this->db_easyA->execute("
                     UPDATE cwl_chuhuozhilingdan AS a
                     LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 

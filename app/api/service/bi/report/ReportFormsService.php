@@ -1242,7 +1242,7 @@ class ReportFormsService
             SUM(SCL.`今天流水`) AS 今天流水,
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
-            SUM(SCL.`近七天日均`) AS 近七天日均流水,
+            SUM(SCL.`近七天日均`) AS 近七天日均,
             ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
             FROM sp_customer_liushui SCL
             LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
@@ -1269,10 +1269,10 @@ class ReportFormsService
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 80;
-        $field_width[6] = 80;
-        $field_width[7] = 80;
-        $field_width[8] = 85;
-        $field_width[9] = 120;
+        $field_width[6] = 90;
+        $field_width[7] = 90;
+        $field_width[8] = 95;
+        $field_width[9] = 95;
         $field_width[10] = 100;
 
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
@@ -1320,7 +1320,7 @@ class ReportFormsService
                 SUM(SCL.`今天流水`) AS 今天流水,
                 SUM(SCM.`本月目标`) 本月目标,
                 SUM(SCL.`本月流水`) 本月流水,
-                SUM(SCL.`近七天日均`) AS 近七天日均流水,
+                SUM(SCL.`近七天日均`) AS 近七天日均,
                 ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均
                 FROM sp_customer_liushui SCL
                 LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
@@ -1348,10 +1348,10 @@ class ReportFormsService
         $field_width[2] = 90;
         $field_width[3] = 90;
         $field_width[4] = 80;
-        $field_width[5] = 80;
-        $field_width[6] = 80;
-        $field_width[7] = 80;
-        $field_width[8] = 120;
+        $field_width[5] = 90;
+        $field_width[6] = 90;
+        $field_width[7] = 95;
+        $field_width[8] = 95;
         $field_width[9] = 110;
 
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));

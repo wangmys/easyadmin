@@ -5,16 +5,17 @@ use think\facade\Db;
 use think\cache\driver\Redis;
 use app\admin\model\budongxiao\SpWwBudongxiaoDetail;
 use app\admin\model\budongxiao\SpXwBudongxiaoYuncangkeyong;
-use app\admin\model\budongxiao\CwlBudongxiaoStatistics;
+use app\admin\model\budongxiao\CwlBudongxiaoStatisticsSys;
 use think\db\Raw;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
+use jianyan\excel\Excel;
 
 /**
  * Class Budongxiao
  * @package app\admin\controller\system
- * @ControllerAnnotation(title="不动销")
+ * @ControllerAnnotation(title="不动销系统推送")
  */
 class Budongxiaosystem extends AdminController
 {
@@ -46,7 +47,7 @@ class Budongxiaosystem extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="不动销配置")
+     * @NodeAnotation(title="不动销系统配置")
      */
     public function config() {
         $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
@@ -67,74 +68,52 @@ class Budongxiaosystem extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="单店不动销计算")
+     * @NodeAnotation(title="不动销配置系统推送结果")
      */
-    public function index() {
-        
+    public function sysResult() {
         if (request()->isAjax()) {
-            // 筛选条件
-
-            $params = input();
-
-            // 删除空参数
-            foreach ($params as $key => $val) {
-                if (empty($val)) {
-                    unset($params[$key]);
-                }
+            // 超管
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+            if (checkAdmin()) {
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where(1)->select()->toArray();
+            } else {
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where([
+                    ['商品负责人', '=', session('admin.name')]
+                ])->select()->toArray();
             }
-            $this->params = $params;
-
-            $data = [];
-            $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
-
-            foreach($storeArr as $key => $val) {
-                $res = $this->store($val['店铺名称']);
-                if ($res) {
-                    $data[] = $res;
-                }
-            }
-            // $data[] = $this->store();
-
-            // 插入map记录
-            if ($data) {
-                $this->db_easyA->table('cwl_budongxiao_history_map')->insert([
-                    'rand_code' => $this->rand_code,
-                    'create_time' => $this->create_time,
-                    'map' => json_encode($this->params),
-                ]);
-            }
-            return json(["code" => "0", "msg" => "", "count" => count($data), "data" => $data, 'rand_code' => $this->rand_code, 'create_time' => $this->create_time]);
+             
+            // $select_static = $this->single_statistics($select_map['rand_code']);
+            return json(["code" => "0", "msg" => "", "count" => count($select_result), "data" => $select_result, 'rand_code' => $select_map['rand_code'], 'create_time' => $select_map['create_time']]);
         } else {
-            $index = input('type') ? 'index2' : 'index';
-
-            // 齐码
-            // if ($index == 'index2') {
-            //     // $typeQima = $this->db_easyA->table('cwl_budongxiao_qima')->whereIn('类别', '下装,内搭,外套,鞋履,松紧长裤,松紧短裤')->select()->toArray();
-            //     $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
-            // } else {
-            //     // $typeQima = $this->db_easyA->table('cwl_budongxiao_qima')->whereNotIn('类别', '下装,内搭,外套,鞋履')->select()->toArray();
-            //     $typeQima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
-            // }
-            $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
-
-            // dump($typeQima);
-            // die;
-            
-            // 商品负责人
-            $people = SpWwBudongxiaoDetail::getPeople([
-                ['商品负责人', 'exp', new Raw('IS NOT NULL')]
+            return View('system/budongxiao/sys_result', [
+                // 'config' => $select_config,
+                // 'typeQima' => $typeQima,
+                // 'people' => $people,
             ]);
-            
-            return View('index', [
-                'typeQima' => $typeQima,
-                'people' => $people,
-            ]);
-
-            // return View('index',[
-            //     'typeQima' => $typeQima,
-            //     'people' => $people,
-            // ]);
         }
+    }
+
+    /**
+     * 不动销计算明细
+     */
+    public function history_detail() {
+        $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->select()->toArray();
+
+
+        dump($select_result[0]);
+
+        $header = [];
+        foreach($select_result[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+
+        // dump($header);
+        // if($select_result){
+        //     $header = array_map(function($v){ return [$v,$v]; }, $select_result);
+        // }
+        // $fileName = time();
+        // dump($header);die;
+        return Excel::exportData($select_result, $header, '单店不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 二维数组转一维数组
@@ -155,8 +134,6 @@ class Budongxiaosystem extends AdminController
         $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
         $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店')->where('id=1')->find();
-
-
 
 
         $select_nostore = explode(',', $select_config['不考核门店']);
@@ -180,7 +157,6 @@ class Budongxiaosystem extends AdminController
                 }
             } 
         }
-
 
         return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
     }
@@ -329,7 +305,7 @@ class Budongxiaosystem extends AdminController
 
             // die;
             $this->db_easyA->startTrans();
-            $insert_history = $this->db_easyA->table('cwl_budongxiao_history')->insertAll($insert_history_data);
+            $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys')->insertAll($insert_history_data);
             if ($insert_history) {
                 $this->db_easyA->commit();
             } else {
@@ -359,7 +335,7 @@ class Budongxiaosystem extends AdminController
             $res_end['rand_code'] = $this->rand_code;
 
             // 统计插入
-            $addPeople = CwlBudongxiaoStatistics::addStatic($res_end);
+            $addPeople = CwlBudongxiaoStatisticsSys::addStatic($res_end);
 
             return $res_end;
         } else {
@@ -371,11 +347,11 @@ class Budongxiaosystem extends AdminController
     // 判断云仓不动销状态，齐码数，库存
     public function checkQiMa($data) {
         // 设置缓存 1小时
-        if (!cache('static_qima')) {
+        if (!cache('static_qima_sys')) {
             $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
-            cache('static_qima', $static_qima, 3600);
+            cache('static_qima_sys', $static_qima, 3600);
         } else {
-            $static_qima = cache('static_qima');
+            $static_qima = cache('static_qima_sys');
         }
         
         // 结果
@@ -392,52 +368,95 @@ class Budongxiaosystem extends AdminController
     }
 
     // 单店不动销 详情
-    public function single_statistics() {
-        // $create_time = '2023-04-18 19:46:49';
-        // $create_time = $this->create_time;
+    public function single_statistics($rand_code) {
         $rand_code = input('rand_code');
-
-        $sql = "    
-            SELECT
-                *,
-                @counter := @counter + 1 AS 排名 
-            FROM
-                (
+        if (checkAdmin()) {
+            $sql = "    
                 SELECT
-                    a.商品负责人,
-                    COUNT( 'a.店铺简称' ) AS 总家数,
-                    b.合格家数,
-                    IFNULL( c.不合格家数, 0 ) AS 不合格家数,
-                    IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
-                    IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
-                    IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
-                    IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
-                    IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
-                    IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
-                    IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
-                    IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
-                    IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                    *,
+                    @counter := @counter + 1 AS 排名 
                 FROM
-                    cwl_budongxiao_statistics a
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
-                WHERE a.rand_code = '{$rand_code}'    
-                GROUP BY
-                    a.商品负责人 
-                ) AS aa 
-            ORDER BY
-                aa.合格率 DESC 
-        ";
+                    (
+                    SELECT
+                        a.商品负责人,
+                        COUNT( 'a.店铺简称' ) AS 总家数,
+                        b.合格家数,
+                        IFNULL( c.不合格家数, 0 ) AS 不合格家数,
+                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                        IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
+                        IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
+                        IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
+                        IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
+                        IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
+                        IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
+                        IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
+                        IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                    FROM
+                        cwl_budongxiao_statistics_sys a
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                    WHERE a.rand_code = '{$rand_code}'    
+                    GROUP BY
+                        a.商品负责人 
+                    ) AS aa 
+                ORDER BY
+                    aa.合格率 DESC 
+            ";
+        } else {
+            $name = session('admin.name');
+            $sql = "    
+                SELECT
+                    *,
+                    @counter := @counter + 1 AS 排名 
+                FROM
+                    (
+                    SELECT
+                        a.商品负责人,
+                        COUNT( 'a.店铺简称' ) AS 总家数,
+                        b.合格家数,
+                        IFNULL( c.不合格家数, 0 ) AS 不合格家数,
+                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                        IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
+                        IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
+                        IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
+                        IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
+                        IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
+                        IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
+                        IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
+                        IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                    FROM
+                        cwl_budongxiao_statistics_sys a
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                    WHERE a.rand_code = '{$rand_code}' 
+                        AND a.商品负责人 = '{$name}'
+                    GROUP BY
+                        a.商品负责人 
+                    ) AS aa 
+                ORDER BY
+                    aa.合格率 DESC 
+            ";
+        }
+
+
+        
 
         Db::connect('mysql')->query('SET @counter = 0;');
         $res = Db::connect('mysql')->query($sql);
         // dump($res);die;            
+        // return $res;
         // return $res;
         return json(["code" => "0", "msg" => "",  "data" => $res]);
     }
@@ -518,38 +537,6 @@ class Budongxiaosystem extends AdminController
         return $tokenvalue;
     }
 
-
-    /**
-     * 单店不动销 历史记录展示
-     * @NodeAnotation(title="单店不动销明细")
-     */
-    public function history() {
-        if (request()->isAjax()) {
-        // if (1) {
-            $map_input = input();
-
-            // $map_input['page'] = 1;
-            // $map_input['limit'] = 100;
-            // $map_input['create_time'] = '2023-04-14 16:31:54';
-
-            $select_history = $this->db_easyA->table('cwl_budongxiao_history')->where([
-                'create_time' => $map_input['create_time']
-            ])->page($map_input['page'], $map_input['limit'])->select()->toArray();
-
-            $total = $this->db_easyA->table('cwl_budongxiao_history')->where([
-                'create_time' => $map_input['create_time']
-            ])->count();
-
-            return json(["code" => "0", "msg" => "", "count" => $total, "data" => $select_history]);
-        } else {
-            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
-
-            return View('history', [
-                'select_map' => $select_map,
-            ]);
-        }
-    }
-
     public function history_map() {
         $map = input();
 
@@ -570,103 +557,6 @@ class Budongxiaosystem extends AdminController
         }
         // return json(['str' => str]);
         return json(['str' => $str]);
-    }
-
-
-    /**
-    * 单店不动销 筛选项
-    * 区域动销 历史记录展示
-    * 区域动销排名：商品负责人+省份+货号的排名/负责人+省份+中类的排名
-    * @NodeAnotation(title="区域不动销明细")
-    */
-    public function history_area() {
-        if (request()->isAjax()) {
-        // if (1) {
-            $map_input = input();
-            // 删除空参数
-            foreach ($map_input as $key => $val) {
-                if (empty($val)) {
-                    unset($map_input[$key]);
-                }
-            }
-
-            $map1 = " a.create_time='{$map_input['create_time']}' ";
-            if (!empty($map_input['上柜率'])) {
-                $map2 = " AND a.上柜率>='{$map_input['上柜率']}' ";
-            } else {
-                $map2 = " ";
-            }
-            if (!empty($map_input['省份售罄'])) {
-                $map3 = " AND a.省份售罄<='{$map_input['省份售罄']}' ";
-            } else {
-                $map3 = " ";
-            }
-            if (!empty($map_input['排名率'])) {
-                $map4 = " having 排名率 >={$map_input['排名率']} ";
-            } else {
-                $map4 = " ";
-            }
-
-            $pageParams1 = ($map_input['page'] - 1) * $map_input['limit'];
-            $pageParams2 =  $map_input['limit'];
-
-            $sql = "
-                SELECT
-                    a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
-                FROM
-                    `cwl_budongxiao_history` AS a
-                    LEFT JOIN (
-                    SELECT
-                        商品负责人,省份,货号,品类排名, 
-                        count(*) AS 相同货号数
-                    FROM
-                        cwl_budongxiao_history 
-                    GROUP BY
-                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-                    AND a.省份 = b.省份 
-                    AND a.货号 = b.货号 
-                WHERE 
-                    " . $map1 . $map2 . $map3 . $map4 . "
-                ORDER BY
-                    a.商品负责人 ASC
-                limit {$pageParams1}, {$pageParams2}    
-            ";    
-
-            $sql2 = "
-                SELECT
-                    count(*) as tatalCount
-                FROM
-                    `cwl_budongxiao_history` AS a
-                    LEFT JOIN (
-                    SELECT
-                        商品负责人,省份,货号,品类排名, 
-                        count(*) AS 相同货号数
-                    FROM
-                        cwl_budongxiao_history 
-                    GROUP BY
-                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-                    AND a.省份 = b.省份 
-                    AND a.货号 = b.货号 
-                WHERE 
-                    " . $map1 . $map2 . $map3 . $map4 . "
-                ORDER BY
-                    a.商品负责人 ASC
-            "; 
-            
-
-            $select_history_area = Db::connect('mysql')->query($sql);
-            $count = Db::connect('mysql')->query($sql2); 
-
-            // print_r( $count);
-            // die;
-            return json(["code" => "0", "msg" => '', "count" => $count[0]['tatalCount'], "data" => $select_history_area]);
-        } else {
-            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map')->order('id DESC')->select()->toArray();
-
-            return View('history_area', [
-                'select_map' => $select_map,
-            ]);
-        }
     }
 
     public function saveMap() {
@@ -723,7 +613,7 @@ class Budongxiaosystem extends AdminController
             $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->strict(false)->update($params);     
 
             // 保存map，清空缓存
-            cache('static_qima', null);
+            cache('static_qima_sys', null);
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {
             return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
