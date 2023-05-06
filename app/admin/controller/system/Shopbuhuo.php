@@ -603,7 +603,11 @@ class Shopbuhuo extends AdminController
                 $this->db_easyA->table('cwl_qudaodiaobo')->where([
                     ['aid', '=', $this->authInfo['id']]
                  ])->delete();
-                $insertAll_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($data);
+                // $insertAll_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($data);
+                $chunk_list = array_chunk($data, 1000);
+                foreach($chunk_list as $key => $val) {
+                    $this->db_easyA->table('cwl_qudaodiaobo')->insertAll($val);
+                }
 
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
@@ -651,6 +655,8 @@ class Shopbuhuo extends AdminController
             }
         }
 
+        
+
         // 7天清空库存数据 
         $day7 = $this->day7();
         $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan')->where([
@@ -660,16 +666,13 @@ class Shopbuhuo extends AdminController
             ['aid', '=', $this->authInfo['id']]
         ])->delete(); 
 
-        // echo '<pre>';    
-        // print_r($data);
 
-
-        // foreach() {}
-        // die;
+        // 批量插入切割 
+        $chunk_list = array_chunk($data, 1000);
+        foreach($chunk_list as $key => $val) {
+            $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($val);
+        }
         
-        $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
-        // print_r($data);
-        dump($insertAll_chuhuozhilingdan);
     }
 
     // 上传excel 店铺补货
@@ -732,11 +735,14 @@ class Shopbuhuo extends AdminController
 
 
 
-                $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
-                // echo $this->db_easyA->table('cwl_chuhuozhilingdan')->getLastSql();
-                // dump($insertAll_chuhuozhilingdan);    
-                // echo 111;
-                // die;
+                // $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($data);
+
+                // 批量插入切割
+                $chunk_list = array_chunk($data, 1000);
+                foreach($chunk_list as $key => $val) {
+                    $this->db_easyA->table('cwl_chuhuozhilingdan')->insertAll($val);
+                }
+
                 $update_chuhuozhilingdan = $this->db_easyA->execute("
                     UPDATE cwl_chuhuozhilingdan AS a
                     LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 
