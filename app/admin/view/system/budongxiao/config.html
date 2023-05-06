@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>不动销配置</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+       
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+    <!-- <div class="layui-tab layui-tab-card" lay-filter="docDemoTabBrief"> -->
+    <ul class="layui-tab-title">
+        <li class="layui-this">单店不动销设置</li>
+        <li>区域不动销设置</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <div style="height:3px; width:100%;"></div>
+        <div class="layui-tab-item layui-show">
+            <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+                <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                    <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <select id="season_id" name="季节归集" lay-verify="required">
+                                    <option value="春季">春季</option>
+                                    <option value="夏季">夏季</option>
+                                    <option value="秋季">秋季</option>
+                                    <option value="冬季">冬季</option>
+                                </select>
+                            </div>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow:visible;">商品负责人</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <select name="商品负责人" lay-verify="" id="people_id">
+                                    <option value="">所有负责人</option>
+                                    {foreach $people as $key=>$vo}
+                                    <option value="{$vo['商品负责人']}">{$vo['商品负责人']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">经营模式</label>
+                            <div class="layui-input-inline" style="width: 250px !important; ">
+                                <select name="经营模式" lay-verify="" id="jingyingmoshi_id">
+                                    <option value="">所有模式</option>
+                                    <option value="加盟">加盟</option>
+                                    <option value="直营">直营</option>
+                                </select>
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">考核区间</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <select name="考核区间" lay-verify="required" id="kaohequjian_id">
+                                    <option value="30天以上">30天以上</option>
+                                    <option value="20-30天">20-30天</option>
+                                    <option value="15-20天">15-20天</option>
+                                    <option value="10-15天">10-15天</option>
+                                    <option value="5-10天">5-10天</option>
+                                </select>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">上市时间</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="text" name="上市时间" class="layui-input" id="shangshiriqi" value="{$config['上市时间']}" placeholder="yyyy-MM-dd">
+                            </div>
+                        </div>    
+        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">上市天数>=</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='上市天数' autocomplete="off" value="{$config['上市天数']}" maxlength="3"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">不考核门店</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <div id="xm-nostore" class="xm-select-demo"></div>
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">合格率%<</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='合格率' autocomplete="off" value="10" maxlength="3"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">查询记录数</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <select name="limit" lay-verify="required" id="chaxunjilushu_id">
+                                    <option value="10000">所有记录</option>
+                                    <option value="500">500条</option>
+                                    <option value="300">300条</option>
+                                    <option value="100">100条</option>
+                                    <option value="50">50条</option>
+                                </select>
+                            </div>
+                        </div>
+        
+                        <!-- <hr> -->
+                        {foreach $typeQima as $key=>$vo}
+                        <div class="layui-col-md1">
+                            <label class="layui-form-label">{$key}齐码</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name='{$key}' autocomplete="off" value="{$vo}" maxlength="1"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+                        </div>
+                        {/foreach}
+                        <!-- <hr>    -->
+    
+                        <div style="margin-top:50px;width: 100%; height:30px; text-align: center; display:inline-block;" class="">
+                            <div class="layui-col-md5 layui-col-sm11"
+                                style=" float: left; text-align: right;">
+                                <button type="reset" class="layui-btn layui-btn-xs"
+                                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">重置筛选
+                                </button>
+                                <button lay-submit class="layui-btn layui-btn-xs" lay-filter="saveMap"
+                                style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">保存筛选
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- 区域不动销 -->
+        <div class="layui-tab-item">
+            <div class="layui-col-md12 layui-col-space8" style="display:block;">
+                <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                    <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                        <div class="layui-form-item">
+    
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">上柜率(%) >=</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='上柜率' autocomplete="off" value="{$config['上柜率']}" maxlength="1"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">省份售罄率(%) <=</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='省份售罄率' autocomplete="off" value="{$config['省份售罄率']}" maxlength="1"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+        
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">排名率(%) >=</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='排名率' autocomplete="off" value="{$config['排名率']}" maxlength="1"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                        </div>
+        
+                        <!-- <hr>    -->
+                        <div style="margin-top:50px;width: 100%; height:30px; text-align: center; display:inline-block;" class="">
+                            <div class="layui-col-md5 layui-col-sm11"
+                                style="border:0px solid red; float: left; text-align: right;">
+                                <button type="reset" class="layui-btn layui-btn-xs"
+                                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff">重置
+                                </button>
+                                <button lay-submit class="layui-btn layui-btn-xs" lay-filter="saveMap2"
+                                style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">保存筛选
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    </div> 
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'element'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , url1 = "{:url('admin/system.Budongxiaosystem/index')}"
+            , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}"
+            , url_getXmMapSelect = "{:url('admin/system.Budongxiaosystem/getXmMapSelect')}"
+            , url_saveMap = "{:url('admin/system.Budongxiaosystem/saveMap')}"  
+            , url_saveMap2 = "{:url('admin/system.Budongxiaosystem/saveMap2')}";  
+
+        // 数据初始化
+        initFn(); 
+
+      
+        // var demo5 = xmSelect.render({
+        //     el: '#demo1', 
+        //     initValue: [4],
+        //     data: [
+        //         {name: '水果', value: 1, selected: true, disabled: true},
+        //         {name: '蔬菜', value: 2, selected: true},
+        //         {name: '桌子', value: 3, disabled: true},
+        //         {name: '北京', value: 4},
+        //     ]
+        // })
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        // 不选店铺
+        xmSelect.render({
+            el: '#xm-nostore', 
+            filterable: true,
+            // showCount: 1,
+            data: []
+        })
+        // 选择省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            // showCount: 1,
+            data: []
+        })
+
+        // tab菜单
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            $('#table2').css('display', 'none');
+            // 因此表格
+            $("[lay-id='table2']").css('display', 'none');
+            $('.title_text2').css('display', 'none');
+            console.log(data.field);
+            // layer.msg(JSON.stringify(data.field));
+            data.field.isAjax = true
+
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: false
+                , limit: data.field.limit
+            })
+            return false;
+        });
+
+        //监听保存
+        form.on('submit(saveMap)', function (res) {
+            $.post(url_saveMap, res.field, function(res) {
+                if (res.status) {
+                    layer.msg(res.msg, {time: 2000, icon:1});
+                } else {
+                    layer.msg(res.msg, {time: 2000, icon:2});
+                }
+            }, 'json');
+            return false;
+        });
+
+        form.on('submit(saveMap2)', function (res) {
+            $.post(url_saveMap2, res.field, function(res) {
+                if (res.status) {
+                    layer.msg(res.msg, {time: 2000, icon:1});
+                } else {
+                    layer.msg(res.msg, {time: 2000, icon:2});
+                }
+            }, 'json');
+            return false;
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                storeData = res.data.storeAll
+                provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-nostore', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'不考核门店',
+                    data: storeData,
+                    done: function() {
+                        console.log(1111111111111);
+                    }
+                })
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: provinceData
+                })
+                // xmSelect.render({
+                //     el: '#xm-nostore', 
+                //     data: [
+                //         {name: '万年一店', value: '万年一店', selected: true},
+                //         {name: '万年二店', value: '万年二店', selected: true},
+                //     ]
+                // })
+            }, 'json')
+
+            $("#season_id").val("{$config['季节归集']}");
+            $("#people_id").val("{$config['商品负责人']}");
+            $("#jingyingmoshi_id").val("{$config['经营模式']}");
+            $("#kaohequjian_id").val("10-15天");
+            $("#chaxunjilushu_id").val("{$config['limit']}");
+            form.render();
+        }
+
+    });
+
+</script>

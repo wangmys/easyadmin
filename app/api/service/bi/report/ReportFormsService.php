@@ -786,7 +786,7 @@ class ReportFormsService
 
         // dump($list);die;
 
-        $table_header = ['行'];
+        $table_header = ['ID'];
         $field_width = [];
         $table_header = array_merge($table_header, array_keys($newList[0]));
         foreach ($table_header as $v => $k) {
@@ -794,8 +794,8 @@ class ReportFormsService
         }
         $field_width[0] = 30;
         $field_width[1] = 90;
-        $field_width[2] = 80;
-        $field_width[3] = 80;
+        $field_width[2] = 90;
+        $field_width[3] = 90;
         $field_width[4] = 70;
 
 
@@ -808,13 +808,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => ''
         ];
 
         //参数
         $params = [
             'row' => count($newList),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 每日业绩 表号:S106",
+            'title' => "每日业绩 [" . date("Y-m-d") . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $newList,
             'table_explain' => $table_explain,
@@ -836,7 +837,7 @@ class ReportFormsService
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
 
         $sql2 = "
-        WITH T1 AS
+            WITH T1 AS
             (
             SELECT
                 ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ID,
@@ -879,10 +880,6 @@ class ReportFormsService
                 EG.CategoryName2
             WITH  ROLLUP
             ),
-
-
-
-
             T2 AS
             (
             SELECT
@@ -899,7 +896,8 @@ class ReportFormsService
                                                                                         WHERE EC.MathodId IN (4,7)
                                                                                         AND EG.CategoryName1 IN ('鞋履','内搭','外套','下装','配饰')
                                                                                         AND ER.CodingCodeText='已审结'
-                                                                                        AND CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23))*100 AS 占比
+                                                                                        AND CONVERT(VARCHAR(7),ER.RetailDate,23) = CONVERT(VARCHAR(7),GETDATE()-366,23)
+                                                                                                                                                                                AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-397,23) AND CONVERT(VARCHAR(10),GETDATE()-366,23) )*100 AS 占比
             FROM ErpCustomer EC
             LEFT JOIN ErpRetail ER ON EC.CustomerId = ER.CustomerId
             LEFT JOIN ErpRetailGoods ERG ON ER.RetailID = ERG.RetailID
@@ -1182,13 +1180,14 @@ class ReportFormsService
         //图片左上角汇总说明数据，可为空
         $table_explain = [
             // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => ' '
         ];
 
         //参数
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "数据更新时间 （" . date("Y-m-d") . "） - 鞋履报表 表号:S107",
+            'title' => "鞋履报表 [" . date("Y-m-d") . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -2057,7 +2056,7 @@ class ReportFormsService
         }
         // s106
         if ($params['banben'] == '图片报表编号: S106') {
-            imagefilledrectangle($img, 350, $y1, $x2 + 3000, $y2, $yellow);
+            imagefilledrectangle($img, 370, $y1, $x2 + 3000, $y2, $yellow);
         }
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线

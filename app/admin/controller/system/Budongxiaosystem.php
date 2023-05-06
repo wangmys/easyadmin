@@ -16,7 +16,7 @@ use app\common\controller\AdminController;
  * @package app\admin\controller\system
  * @ControllerAnnotation(title="不动销")
  */
-class Budongxiao extends AdminController
+class Budongxiaosystem extends AdminController
 {
     // 接收筛选参数
     public $params = [];
@@ -49,10 +49,21 @@ class Budongxiao extends AdminController
      * @NodeAnotation(title="不动销配置")
      */
     public function config() {
-        return View('config', [
-            // 'typeQima' => $typeQima,
-            // 'people' => $people,
-        ]); 
+        $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
+        
+        // 商品负责人
+        $people = SpWwBudongxiaoDetail::getPeople([
+            ['商品负责人', 'exp', new Raw('IS NOT NULL')]
+        ]);
+
+        // 
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        
+        return View('system/budongxiao/config', [
+            'config' => $select_config,
+            'typeQima' => $typeQima,
+            'people' => $people,
+        ]);
     }
 
     /**
@@ -142,6 +153,34 @@ class Budongxiao extends AdminController
         $provinceAll = SpWwBudongxiaoDetail::getMapProvince();
         // 门店
         $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店')->where('id=1')->find();
+
+
+
+
+        $select_nostore = explode(',', $select_config['不考核门店']);
+        $select_province = explode(',', $select_config['省份']);
+        // dump($select_province);
+
+        // 省份选中
+        foreach ($select_province as $key => $val) {
+            foreach ($provinceAll as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $provinceAll[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        // 不考核门店选中
+        foreach ($select_nostore as $key => $val) {
+            foreach ($storeAll as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $storeAll[$key2]['selected'] = true;
+                }
+            } 
+        }
+
 
         return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
     }
@@ -645,9 +684,11 @@ class Budongxiao extends AdminController
             $qimaArr['update_time'] = date('Y-m-d H:i:s');
             // 删除空参数
             foreach ($params as $key => $val) {
-                if (empty($val)) {
-                    unset($params[$key]);
-                }
+                // if (empty($val)) {
+                //     unset($params[$key]);
+                // }
+
+                // 齐码处理
                 $qimaArr['齐码数'] = $val;
                 switch ($key) {
                     case '下装':
@@ -678,9 +719,49 @@ class Budongxiao extends AdminController
                         break;                                                                               
                 }
             }
+
+            $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->strict(false)->update($params);     
+
             // 保存map，清空缓存
             cache('static_qima', null);
             return json(['status' => 1, 'msg' => '操作成功']);
+        } else {
+            return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
+        }   
+    }
+
+
+    public function saveMap2() {
+        if (request()->isAjax() && checkAdmin()) {
+            $params = input();
+            // echo '<pre>';
+            // print_r($params);
+
+            // $insertArr['aid'] = session('admin.id');
+            // $insertArr['aname'] = session('admin.name');
+            // $insertArr['update_time'] = date('Y-m-d H:i:s');
+            // 删除空参数
+            // foreach ($params as $key => $val) {
+            //     if (empty($val)) {
+            //         unset($params[$key]);
+            //     }
+            // }
+
+            $update_config = $this->db_easyA->table('cwl_budongxiao_config')->where(['id' => 1])->update([
+                '上柜率' => $params['上柜率'],
+                '省份售罄率' => $params['省份售罄率'],
+                '排名率' => $params['排名率'],
+            ]);
+            // echo $this->db_easyA->getLastSql();
+            // if ($update_config) {
+            //     return json(['status' => 1, 'msg' => '操作成功']);
+            // } else {
+            //     return json(['status' => 2, 'msg' => '服务器繁忙，请稍后再试']);
+            // }
+            return json(['status' => 1, 'msg' => '操作成功']);
+            // 保存map，清空缓存
+            // cache('static_qima', null);
+            
         } else {
             return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
         }   
