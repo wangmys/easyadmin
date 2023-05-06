@@ -80,7 +80,7 @@ class Index extends AdminController
                     'width' => 90,
                     'align' => 'center'
                 ];
-                if(in_array($k,['CustomItem17'])){
+                if(in_array($k,['店铺ID'])){
                     $item['width'] = 115;
                     continue;
                 }
@@ -109,13 +109,65 @@ class Index extends AdminController
 
         $this->assign([
             'get' => json_encode($get),
-            'cols' => json_encode($cols)
+            'cols' => json_encode($cols),
+            'head_field_2' => $head_field_2
         ]);
         return $this->fetch();
     }
 
     /**
-     * 展示配饰标准
+     * 配饰的可用库存与在途库存
+     * @return \think\response\Json
+     */
+    public function stock()
+    {
+        // 表头数据
+        $header = $this->service->getTableField();
+        $head = array_column($header,'name');
+        $order = '';
+        foreach ($head as $key => $val){
+            $order .= "'$val',";
+        }
+        $order = trim($order,',');
+        $Date = date('Y-m-d');
+        // 查询表数据
+        $data = Db::connect("mysql2")
+            ->table('accessories_warehouse_stock_2')
+            ->where([
+                'Date' => $Date
+            ])->column("可用库存Quantity as available_stock,采购在途库存Quantity as transit_stock,分类 as cate",'分类');
+        $res = ['available_stock' => [],'transit_stock' => []];
+        foreach ($res as $k => $v){
+            foreach ($header as $key => $val){
+                $key_arr = explode(',',$val['field']);
+                $sum_total = 0;
+                foreach ($key_arr as $kk => $vv){
+                    if(empty($data[$vv])){
+                        $data[$vv] = [
+                            'available_stock' => 0,
+                            'transit_stock' => 0
+                        ];
+                    }
+                    $sum_total += $data[$vv][$k];
+                }
+
+                $res[$k]['Date'] = date('Y-m-d',strtotime('-1day'));
+                $res[$k]['type'] = $k=='available_stock'?'仓库可用库存':'仓库在途库存';
+                $res[$k]['text'] = '配饰';
+                $res[$k][$val['name']] = $sum_total;
+            }
+        }
+        $list = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($res),
+                'data'  => $res,
+            ];
+        return json($list);
+    }
+
+    /**
+     * @NodeAnotation(title="配饰2.0预警标准")
      */
     public function standard()
     {

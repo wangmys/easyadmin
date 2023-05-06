@@ -25,6 +25,21 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 cols: cols
             });
 
+            var table = layui.table;
+            //转换静态表格
+            var list_table = table.init('list', {
+                done: function (res, curr, count) {
+                    // var that = this.elem.next();
+                    // for(res.data in item){
+                    //     var tr = that.find("[data-index=" + index + "]").children();
+                    //         tr.each(function (i,value) {
+                    //             $(this).css("background-color", "rgba(255,0,0,.2)");//单元格背景颜色
+                    //         })
+                    // }
+                    // $('#list_table').find('tr').css({'background':'#5FB878','color':'white'}).siblings().removeAttr('style')
+                }
+            });
+
           // // 自定义模块
           // layui.config({
           //   base: '/static/plugs/lay-module/soul-table/',   // 模块目录
