@@ -167,7 +167,7 @@ class Index extends AdminController
     }
 
     /**
-     * 展示配饰标准
+     * @NodeAnotation(title="配饰2.0预警标准")
      */
     public function standard()
     {
