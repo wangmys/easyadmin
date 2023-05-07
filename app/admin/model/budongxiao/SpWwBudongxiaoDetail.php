@@ -130,4 +130,16 @@ class SpWwBudongxiaoDetail extends TimeModel
         // die;
         return $res;
     }
+
+    // 统计skc数
+    public static function joinYuncang_all_count($map)
+    {
+        $res = self::alias('d')
+        ->leftJoin(['sp_ww_budongxiao_yuncangkeyong' => 'y'], 'd.云仓 = y.仓库名称 AND d.货号 = y.货号')
+        ->field(self::$fields)
+        ->where($map)
+        // ->whereNotNull('商品负责人')
+        ->count();
+        return $res;
+    }
 }

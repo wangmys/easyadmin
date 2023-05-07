@@ -11,6 +11,7 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use jianyan\excel\Excel;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 /**
  * Class Budongxiao
@@ -65,6 +66,27 @@ class Budongxiaosystem extends AdminController
             'typeQima' => $typeQima,
             'people' => $people,
         ]);
+    }
+
+    public function testMap() {
+        $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+        $select_qima = $this->db_easyA->table('cwl_budongxiao_qima')->where(1)->select()->toArray();
+
+                // 二维转一维
+                // $typeQima = $this->arr2to1($typeQima, '类别', '尺码数');
+
+        $select_qima = $this->arr2to1($select_qima, '类别', '尺码数');
+        $map = json_decode($select_map['map'], true);
+        
+        dump($select_qima);
+        $qima_str = '';
+        foreach ($map as $key => $val) {
+            foreach ($select_qima as $key2 => $val2) {
+                if ($key == $key2) {
+                    // $qima_str
+                }
+            }
+        }
     }
 
     /**
@@ -343,7 +365,7 @@ class Budongxiaosystem extends AdminController
     }
 
     // 单店不动销
-    public function store($store) {
+    public function store22222222222($store) {
         // 1. 预计库存大于1SKC   改规则，店铺库存数量>1并且上市天数满足的货号算一个skc
         // $yujiSkc = SpCustomerStockSkc::getSkc($store, $this->params);
 
