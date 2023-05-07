@@ -303,7 +303,7 @@ class Inventory extends AdminController
                 $item = [
                     'order_num' => $sort_num++,
                     '商品负责人' => $name,
-                    'name' => '配饰库存不足',
+                    'name' => '配饰库存不足1.0',
                     // 问题总数
                     'total' => $question_total,
                     'not_total' => $question_not_total,
@@ -316,7 +316,7 @@ class Inventory extends AdminController
                 $item2 = [
                     'order_num' => $sort_num++,
                     '商品负责人' => $name,
-                    'name' => '引流库存不足1.0',
+                    'name' => '引流库存不足',
                     // 问题总数
                     'total' => $item_2['total'][$name]??0,
                     'not_total' => $item_2['not_total'][$name]??0,
