@@ -122,11 +122,13 @@ class AccessoriesService
 
     /**
      * 查询配饰库存
+     * @param string $Date     筛选日期
+     * @param int $is_result   是否展示结果
      * @return array
      */
-    public function getTableBody()
+    public function getTableBody($Date = '',$is_result = 0)
     {
-        $Date = date('Y-m-d');
+        $Date = $Date?$Date:date('Y-m-d');
         // 获取动态组合字段
         $trends_field = $this->getTrendsField('s');
         // 固定字段
@@ -150,6 +152,7 @@ class AccessoriesService
                 'CustomItem17' => $user['name']
             ]);
         }
+        // 查询库存数据
         $stock_list = $model->order('CustomItem17 desc,State')->where('Region','<>','闭店区')->select()->toArray();
         // 获取库存预警配置
         $sysconfig = $this->logic->warStockItem();
@@ -157,6 +160,7 @@ class AccessoriesService
         $sale_list = $this->sale->where([
             'Date' => $Date
         ])->column($this->getTrendsField(),'CustomerId');
+        $new_list = [];
         // 循环计算库存数据的周转数
         foreach ($stock_list as $k => &$v){
             // 根据店铺ID,获取销量数据
@@ -174,21 +178,24 @@ class AccessoriesService
                         $v['_'.$kk] = 0;
                     }else if(empty($vv)){
                         // 销量为0,则周转为库存
-                        $v['_'.$kk]  = $stockValue;
+                        $v['_'.$kk]  = 0;
                     }else{
                         // 计算周转( 库存 / 一周销量 )
-                        $v['_'.$kk] = bcadd($stockValue / $vv,0,2);
+                        $v['_'.$kk] = bcadd($stockValue / $vv,0,1);
                     }
                }
             }else{
                 $saleItem_data = reset($sysconfig);
                 $saleItem = $saleItem_data['_data'];
                 foreach ($saleItem as $kk => $vv){
-                    $v['_'.$kk] = $v[$kk];
+                    $v['_'.$kk] = 0;
                 }
             }
             // 根据筛选条件,设置颜色是否标红
-            $this->setStyle($v,$sysconfig);
+            $this->setStyle($v,$sysconfig,$new_list);
+        }
+        if($is_result){
+            return  $new_list;
         }
         return $stock_list;
     }
@@ -199,9 +206,10 @@ class AccessoriesService
      * @param $config
      * @return array|mixed
      */
-    public function setStyle(&$list,$config)
+    public function setStyle(&$list,$config,&$new_list)
     {
         if(empty($list) || empty($list['CustomerGrade'])) return $list;
+        $isWarning = 0;
         foreach ($list as $k => $v){
             if((strpos($k,'_') === false)){
                 // 等级配置
@@ -211,7 +219,8 @@ class AccessoriesService
                 if(isset($_data[$k]) && !empty($_data[$k])){
                     $vv = intval($v);
                     if($vv < $_data[$k]){
-                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";;
+                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";
+                        $isWarning = 1;
                     }
                 }
             }else{
@@ -220,7 +229,7 @@ class AccessoriesService
                 $key = str_replace('_','',$k);
                 // 具体配置
                 $_data = $item['_data'];
-                if(isset($_data[$key]) && !empty($_data[$key])){
+                if(isset($_data[$key]) && !empty($_data[$key]) && !empty($v)){
                     $vv = intval($v);
                     if($vv < $_data[$key]){
                         $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";;
@@ -228,6 +237,7 @@ class AccessoriesService
                 }
             }
         }
+        if($isWarning) $new_list[] = $list;
         return $list;
     }
 }

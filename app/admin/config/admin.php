@@ -59,6 +59,8 @@ return [
         'system.dress.dress/index',
         'system.dress.dress/index_export',
         'system.weather/getWeatherField',
-        'system.dress.index/stock'
+        'system.dress.index/stock',
+        'system.dress.index/index_export',
+        'system.dress.index/list_export',
     ],
 ];

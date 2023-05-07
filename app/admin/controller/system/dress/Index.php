@@ -13,6 +13,7 @@ use think\facade\Db;
 use app\admin\service\accessories\AccessoriesService;
 use app\common\logic\accessories\AccessoriesLogic;
 use jianyan\excel\Excel;
+use app\common\logic\execl\PHPExecl;
 
 
 /**
@@ -46,7 +47,7 @@ class Index extends AdminController
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
             // 查询数据
-            $table_data = $this->service->getTableBody();
+            $table_data = $this->service->getTableBody(date('Y-m-06'));
             // 返回数据
             $data = [
                 'code'  => 0,
@@ -116,6 +117,108 @@ class Index extends AdminController
     }
 
     /**
+    * @NodeAnotation(title="配饰结果2.0")
+    */
+    public function list()
+    {
+        $get = $this->request->get();
+        // 请求
+        if ($this->request->isAjax()) {
+            // 筛选
+            $filters = json_decode($this->request->get('filter', '{}',null), true);
+            // 查询数据
+            $table_data = $this->service->getTableBody(date('Y-m-06'),1);
+            // 返回数据
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($table_data),
+                'data'  => $table_data
+            ];
+            return json($data);
+        }
+
+        // 一级表头
+        $table_head_1 = [];
+        // 二级表头
+        $table_head_2 = [];
+        $head_field_1 = $this->service->getFixField('',1);
+        $head_field_2 = $this->service->getTableField();
+        $head_field = array_merge($head_field_1,$head_field_2);
+        foreach ($head_field as $k => $v){
+            if(is_array($v)){
+                $item = [
+                    'title' => $v['name'],
+                    'colspan' => 2,
+                    'align' => 'center'
+                ];
+            }else{
+                $item = [
+                    'field' => $v,
+                    'title' => $k,
+                    'rowspan' => 2,
+                    'fixed' => 'left',
+                    'width' => 90,
+                    'align' => 'center'
+                ];
+                if(in_array($k,['店铺ID'])){
+                    $item['width'] = 115;
+                    continue;
+                }
+            }
+            $table_head_1[] = $item;
+        }
+
+        foreach ($head_field_2 as $key => $val){
+            $table_head_2[] = [
+                'field' => $val['name'],
+                'title' => '库存',
+                'width' => 80,
+                'align' => 'center'
+            ];
+            $table_head_2[] = [
+                'field' => '_'.$val['name'],
+                'title' => '周转',
+                'width' => 80,
+                'align' => 'center',
+            ];;
+        }
+        $cols = [
+            $table_head_1,
+            $table_head_2
+        ];
+
+        $this->assign([
+            'get' => json_encode($get),
+            'cols' => json_encode($cols),
+            'head_field_2' => $head_field_2
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 配饰结果2.0导出
+     */
+    public function list_export()
+    {
+        // 查询数据
+        $list = $this->service->getTableBody(date('Y-m-06'),1);
+        // 固定表头
+        $column_1 = $this->service->getFixField('',1);
+        // 动态表头
+        $column_2 = array_column($this->service->getTableField(),'name');
+        // 设置标题头
+        $header = [
+            'column_1' => $column_1,
+            'column_2' => $column_2
+        ];
+        $exec = new PHPExecl();
+        // 导出
+        $exec->export($header,$list);
+        exit();
+    }
+
+    /**
      * 配饰的可用库存与在途库存
      * @return \think\response\Json
      */
@@ -129,7 +232,7 @@ class Index extends AdminController
             $order .= "'$val',";
         }
         $order = trim($order,',');
-        $Date = date('Y-m-d');
+        $Date = date('Y-m-06');
         // 查询表数据
         $data = Db::connect("mysql2")
             ->table('accessories_warehouse_stock_2')
@@ -167,7 +270,7 @@ class Index extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="配饰2.0预警标准")
+     * @NodeAnotation(title="配饰预警2.0标准")
      */
     public function standard()
     {
@@ -212,31 +315,24 @@ class Index extends AdminController
     }
 
     /**
-     * 配饰问题导出
+     * 配饰总览2.0导出
      */
     public function index_export()
     {
-        $get = $this->request->get();
-        // 获取今日日期
-        $Date = date('Y-m-d');
-        // 指定查询字段
-        $field = array_merge(['省份','店铺名称','商品负责人'],AdminConstant::ACCESSORIES_LIST);
-        $where = [
-            'Date' => $Date
-        ];
-        if(!empty($get['商品负责人'])){
-            $where['商品负责人'] = $get['商品负责人'];
-        }
-        // 查询指定
-        $list = $this->model->field($field)->where($where)->whereNotIn('店铺名称&省份&商品负责人','合计');
-        $list = $this->logic->setStoreFilter($list,'accessories_store_list');
-        $list = $list->order('省份,店铺名称,商品负责人')->select()->toArray();
+        // 查询数据
+        $list = $this->service->getTableBody(date('Y-m-06'));
+        // 固定表头
+        $column_1 = $this->service->getFixField('',1);
+        // 动态表头
+        $column_2 = array_column($this->service->getTableField(),'name');
         // 设置标题头
-        $header = [];
-        if($list){
-            $header = array_map(function($v){ return [$v,$v]; }, $field);
-        }
-        $fileName = time();
-        return Excel::exportData($list, $header, $fileName, 'xlsx');
+        $header = [
+            'column_1' => $column_1,
+            'column_2' => $column_2
+        ];
+        $exec = new PHPExecl();
+        // 导出
+        $exec->export($header,$list);
+        exit();
     }
 }
