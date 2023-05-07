@@ -72,13 +72,22 @@ class Budongxiaosystem extends AdminController
      */
     public function sysResult() {
         if (request()->isAjax()) {
+            // 考核结果
+            $kaohejieguo = input('kaohejieguo') ? input('kaohejieguo') : '不合格';
+            if ($kaohejieguo == '所有') {
+                $map = 1;
+            } else {
+                $map = [
+                    ['考核结果', '=', $kaohejieguo],
+                ];
+            }
             // 超管
             $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
             if (checkAdmin()) {
-                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where(1)->select()->toArray();
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where($map)->select()->toArray();
             } else {
-                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where([
-                    ['商品负责人', '=', session('admin.name')]
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where($map)->where([
+                    ['商品负责人', '=', session('admin.name')],
                 ])->select()->toArray();
             }
              
@@ -308,7 +317,6 @@ class Budongxiaosystem extends AdminController
 
         $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店')->where('id=1')->find();
 
-
         $select_nostore = explode(',', $select_config['不考核门店']);
         $select_province = explode(',', $select_config['省份']);
         // dump($select_province);
@@ -502,7 +510,7 @@ class Budongxiaosystem extends AdminController
             // $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
             $res_end['考核结果'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? '不合格' : '合格';
             // $res_end['合格率'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
-            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不及格</span>" : '';
+            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
             $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;

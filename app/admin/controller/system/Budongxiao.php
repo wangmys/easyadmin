@@ -304,7 +304,7 @@ class Budongxiao extends AdminController
             // $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
             $res_end['考核结果'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? '不合格' : '合格';
             // $res_end['合格率'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
-            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不及格</span>" : '';
+            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
             $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
