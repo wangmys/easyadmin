@@ -44,7 +44,7 @@ class Inventory extends AdminController
 
     /**
      * 展示配饰库存不足标准的数据
-     * @NodeAnotation(title="配饰库存不合格展示")
+     * @NodeAnotation(title="配饰总览1.0")
      * @return mixed|\think\response\Json
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -316,7 +316,7 @@ class Inventory extends AdminController
                 $item2 = [
                     'order_num' => $sort_num++,
                     '商品负责人' => $name,
-                    'name' => '引流款库存不足',
+                    'name' => '引流库存不足1.0',
                     // 问题总数
                     'total' => $item_2['total'][$name]??0,
                     'not_total' => $item_2['not_total'][$name]??0,
