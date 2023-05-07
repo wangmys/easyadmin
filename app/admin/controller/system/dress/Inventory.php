@@ -325,8 +325,23 @@ class Inventory extends AdminController
                     'type' => 'yinliu'
                 ];
 
+                // 配饰2.0
+                $item3 = [
+                    'order_num' => $sort_num++,
+                    '商品负责人' => $name,
+                    'name' => '配饰库存不足2.0',
+                    // 问题总数
+                    'total' => '-',
+                    'not_total' => '-',
+                    'this_num' => '-',
+                    'time' => '-',
+                    'type' => 'accessories_2'
+                ];
+
+
                 $data[] = $item;
                 $data[] = $item2;
+                $data[] = $item3;
             }
             $list = [
                 'code'  => 0,
