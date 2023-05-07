@@ -181,7 +181,7 @@ class AccessoriesService
                         $v['_'.$kk]  = 0;
                     }else{
                         // 计算周转( 库存 / 一周销量 )
-                        $v['_'.$kk] = bcadd($stockValue / $vv,0,2);
+                        $v['_'.$kk] = bcadd($stockValue / $vv,0,1);
                     }
                }
             }else{
