@@ -156,6 +156,14 @@ class Budongxiao extends AdminController
             $map[] = ['上市天数' , '>=', $this->params['上市天数']];
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+            // 预计skc
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count([
+                ['店铺名称', '=', $store],
+                ['季节归集', '=', $this->params['季节归集']],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ]);
             $res_all_new = [];
 
             // echo SpWwBudongxiaoDetail::getLastSql(); die;
@@ -167,7 +175,16 @@ class Budongxiao extends AdminController
                 $res_all_new[] = $res_all[$key];
             }
         } else {
+            $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+            // 预计skc
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count([
+                ['店铺名称', '=', $store],
+                ['季节归集', '=', $this->params['季节归集']],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ]);
             $res_all_new = [];
             foreach($res_all as $key => $val) {
                 $diffDay1 = $this->diffDay($val['上市时间'], $this->params['上市时间']);
@@ -276,7 +293,8 @@ class Budongxiao extends AdminController
             // die;
 
             // 预计skc数
-            $yujiSkc = count($res_all_new);
+            // $yujiSkc = count($res_all_new);yujiSkc_res
+            $yujiSkc = $yujiSkc_res;
 
             // die;
             $this->db_easyA->startTrans();
@@ -722,12 +740,12 @@ class Budongxiao extends AdminController
         $map = [
             // '省份' => '广东省',
             '商品负责人' => '于燕华',
-            '季节归集' => '春季',
+            '季节归集' => '夏季',
             '考核区间' => '30天以上',
             // '店铺名称' => '巴马一店',
             // '上市时间' => '2023-04-01',
             // '中类' => '长T',
-            '不考核门店' => '万年一店,万年二店',
+            // '不考核门店' => '万年一店,万年二店',
             '上市天数' => 30,
             'limit' => 10000,
         ];
