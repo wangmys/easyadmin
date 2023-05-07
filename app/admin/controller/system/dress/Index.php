@@ -117,6 +117,28 @@ class Index extends AdminController
     }
 
     /**
+     * 配饰总览2.0导出
+     */
+    public function index_export()
+    {
+        // 查询数据
+        $list = $this->service->getTableBody(date('Y-m-06'));
+        // 固定表头
+        $column_1 = $this->service->getFixField('',1);
+        // 动态表头
+        $column_2 = array_column($this->service->getTableField(),'name');
+        // 设置标题头
+        $header = [
+            'column_1' => $column_1,
+            'column_2' => $column_2
+        ];
+        $exec = new PHPExecl();
+        // 导出
+        $exec->export($header,$list);
+        exit();
+    }
+
+    /**
     * @NodeAnotation(title="配饰结果2.0")
     */
     public function list()
@@ -312,27 +334,5 @@ class Index extends AdminController
             'd_field' => $d_field,
         ]);
         return $this->fetch();
-    }
-
-    /**
-     * 配饰总览2.0导出
-     */
-    public function index_export()
-    {
-        // 查询数据
-        $list = $this->service->getTableBody(date('Y-m-06'));
-        // 固定表头
-        $column_1 = $this->service->getFixField('',1);
-        // 动态表头
-        $column_2 = array_column($this->service->getTableField(),'name');
-        // 设置标题头
-        $header = [
-            'column_1' => $column_1,
-            'column_2' => $column_2
-        ];
-        $exec = new PHPExecl();
-        // 导出
-        $exec->export($header,$list);
-        exit();
     }
 }

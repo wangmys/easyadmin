@@ -136,22 +136,26 @@ class AccessoriesService
         // 组合完整字段
         $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
 
-        // 当前登录信息
-        $user = session('admin');
-        // 超级管理员ID
-        $admin_id = AdminConstant::SUPER_ADMIN_ID;
+
 
         // 查询库存数据
         $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
             'ShutOut' => 0,
             'Date' => $Date
         ]);
+
+        // 获取当前登录信息
+        $user = session('admin');
+        // 超级管理员ID
+        $admin_id = AdminConstant::SUPER_ADMIN_ID;
         // 如果用户不为超管,则进行商品负责人筛选
         if($user['id'] != $admin_id){
             $model->where([
                 'CustomItem17' => $user['name']
             ]);
         }
+        // 筛选掉配饰排除的店铺
+        $model = $this->setStoreFilter($model);
         // 查询库存数据
         $stock_list = $model->order('CustomItem17 desc,State')->where('Region','<>','闭店区')->select()->toArray();
         // 获取库存预警配置
@@ -194,6 +198,7 @@ class AccessoriesService
             // 根据筛选条件,设置颜色是否标红
             $this->setStyle($v,$sysconfig,$new_list);
         }
+        // 是否只需要标红(结果)数据
         if($is_result){
             return  $new_list;
         }
@@ -204,7 +209,8 @@ class AccessoriesService
      * 根据引流配置,判断库存是否标红
      * @param $list
      * @param $config
-     * @return array|mixed
+     * @param $new_list  返回有标红的数据
+     * @return mixed
      */
     public function setStyle(&$list,$config,&$new_list)
     {
@@ -239,5 +245,16 @@ class AccessoriesService
         }
         if($isWarning) $new_list[] = $list;
         return $list;
+    }
+
+    /**
+     * 设置引流款门店筛选
+     */
+    public function setStoreFilter($model,$name = 'accessories_store_list')
+    {
+        // 获取配饰门店排除列表
+        $storeList = sysconfig('site',$name);
+        if(empty($storeList) || empty($model)) return $model;
+        return $model->whereNotIn('CustomerName',$storeList);
     }
 }
