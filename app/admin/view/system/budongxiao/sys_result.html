@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
+        body {
+            overflow: hidden;
+        }
         .layui-table-cell {
             font-size: 12px;
             padding: 0 5px;
@@ -104,11 +107,27 @@
         <form class="layui-form layui-form-pane ok-form layui-col-space8">
             <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                 <div class="layui-form-item">
-                    <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">查询</label>
-                    <div class="layui-input-inline" style="width: 150px !important;">
+                    <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">考核结果({$success_percent}%)</label>
+                    <div class="layui-input-inline" style="width: 120px !important;">
                         <select name="kaohejieguo" lay-verify="">
-                            <option value="不合格">异常记录</option>
+                            <option value="不合格">不合格</option>
                             <option value="所有">所有记录</option>
+                        </select>
+                    </div>
+                    <label class="layui-form-label" style="width: 120px !important; text-align: center;">经营模式</label>
+                    <div class="layui-input-inline" style="width: 120px !important; ">
+                        <select name="经营属性" lay-verify="" id="jingyingmoshi_id">
+                            <option value="">所有模式</option>
+                            <option value="加盟">加盟</option>
+                            <option value="直营">直营</option>
+                        </select>
+                    </div>
+                    <label class="layui-form-label" style="width: 120px !important; text-align: center;">经营模式</label>
+                    <div class="layui-input-inline" style="width: 120px !important; ">
+                        <select name="经营属性" lay-verify="" id="jingyingmoshi_id">
+                            <option value="">所有模式</option>
+                            <option value="加盟">加盟</option>
+                            <option value="直营">直营</option>
                         </select>
                     </div>
                     <div class="layui-input-inline" style="width: 150px !important;">
@@ -120,7 +139,7 @@
             </div>
         </form>
     </div>
-    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:none;">
         <table class="layui-hide" id="table2" lay-filter="table2">
             <div class="title_text2" style="text-align: center; display: none; color:#0051ff;">不动销汇总  <a class="dateStr"></a></div>
         </table>
@@ -139,10 +158,13 @@
 <!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-      <button class="layui-btn layui-btn-sm" lay-event="download">导出所有单店明细</button>
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
-      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="budongxiao_total">【表】单店不动销汇总</button>
+       <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单店明细</button>
+       <!-- <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
     </div>
+</script>
+<script type="text/html" id="introduceHtml">
+    <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
@@ -154,8 +176,8 @@
             , laydate = layui.laydate
             , url1 = "{:url('admin/system.Budongxiaosystem/sysResult')}"
             , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}" 
+            , url_total = "{$total_url}"
             , url_download_history = "{:url('admin/system.Budongxiaosystem/excel_history_detail')}" 
-
 
         // 表1初始化
         startTable();
@@ -193,8 +215,14 @@
                 case 'download':
                     location.href=url_download_history
                 break;
-                case 'delete':
-                layer.msg('删除');
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
                 break;
                 case 'update':
                 layer.msg('编辑');
@@ -211,6 +239,7 @@
                 , toolbar: '#toolbar1'
                 , page: false
                 , limit: 0
+                , height: 750
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '商品负责人', title: '商品负责人' }
@@ -224,9 +253,11 @@
                     , { field: '15-20天', title: '15-20天' }
                     , { field: '20-30天', title: '20-30天' }
                     , { field: '30天以上', title: '30天以上' }
-                    , { field: '【考核标准】键', title: '【考核标准】键' }
-                    , { field: '【考核标准】值', title: '【考核标准】值' }
-                    , { field: '合格率', title: '考核结果' }
+                    , { field: '考核标准', title: '考核标准' }
+                    , { field: '考核标准占比', title: '考核标准占比', templet: function (res) {
+                        return res['考核标准占比'] + '%';
+                    }}
+                    , { field: '合格率', title: '考核结果({$success_percent}%)' }
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {

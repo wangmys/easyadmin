@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>单店不动销-系统推送</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
+        <table class="layui-hide" id="table2" lay-filter="table2">
+            <div class="title_text2" style="text-align: center; color:#0051ff;">不动销汇总  <a class="dateStr"></a></div>
+        </table>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="introduceHtml">
+    <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , url1 = "{:url('admin/system.Budongxiaosystem/sysResult')}"
+            , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}" 
+            , url_download_history = "{:url('admin/system.Budongxiaosystem/excel_history_detail')}" 
+
+
+        // 表1初始化
+        startTable2("{$rand_code}");
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            // $('#table2').css('display', 'none');
+            // 因此表格
+            // $("[lay-id='table2']").css('display', 'none');
+            // $('.title_text2').css('display', 'none');
+            console.log(data.field);
+            // layer.msg(JSON.stringify(data.field));
+            // data.field.isAjax = true
+
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: false
+                , limit: 0
+            })
+            return false;
+        });
+
+        // 单店不动销数据统计 
+        function startTable2(rand_code) {
+            table.render({
+                elem: '#table2'
+                ,url: url2
+                , loading: false
+                , method: 'post'
+                , toolbar: true
+                , page: false
+                , limit: 0
+                , where: {rand_code: rand_code}
+                , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '排名', title: '排名' }
+                    ,{ field: '商品负责人', title: '商品负责人' }
+                    , { field: '总家数', title: '总家数' }
+                    , { field: '合格家数', title: '合格家数' }
+                    , { field: '不合格家数', title: '不合格家数' }
+                    , { field: '合格率', title: '合格率' }
+                    , { field: '直营总家数', title: '直营总家数' }
+                    , { field: '直营合格家数', title: '直营合格家数' }
+                    , { field: '直营不合格家数', title: '直营不合格家数' }
+                    , { field: '直营合格率', title: '直营合格率' }
+                    , { field: '加盟总家数', title: '加盟总家数' }
+                    , { field: '加盟合格家数', title: '加盟合格家数' }
+                    , { field: '加盟不合格家数', title: '加盟不合格家数' }
+                    , { field: '加盟合格率', title: '加盟合格率' }
+                ]]
+                ,done: function (res, curr, count) {
+                    // layer.alert("加载完成");
+                    $('.dateStr').text("{$create_time}");
+                    console.log(res);
+                }
+            });
+        }
+    });
+
+</script>
