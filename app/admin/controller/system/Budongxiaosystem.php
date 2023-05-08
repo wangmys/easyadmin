@@ -61,6 +61,8 @@ class Budongxiaosystem extends AdminController
         // 
         $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
         
+        // dump($select_config );die;
+
         return View('system/budongxiao/config', [
             'config' => $select_config,
             'typeQima' => $typeQima,
@@ -116,12 +118,34 @@ class Budongxiaosystem extends AdminController
             // $select_static = $this->single_statistics($select_map['rand_code']);
             return json(["code" => "0", "msg" => "", "count" => count($select_result), "data" => $select_result, 'rand_code' => $select_map['rand_code'], 'create_time' => $select_map['create_time']]);
         } else {
+            $find_result_sys = $this->db_easyA->table('cwl_budongxiao_result_sys')->where(1)->find();
+            if ($find_result_sys) {
+                $success_percent = $find_result_sys['合格率2'];
+            } else {
+                $success_percent = "";
+            }
+            $total_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.Budongxiaosystem/open_dandian_total');
             return View('system/budongxiao/sys_result', [
                 // 'config' => $select_config,
                 // 'typeQima' => $typeQima,
-                // 'people' => $people,
+                'total_url' => $total_url,
+                'success_percent' => $success_percent,
             ]);
         }
+    }
+
+    public function open_dandian_total() {
+        // 超管
+        // dump($_SERVER);
+        // echo $_SERVER['HTTP_HOST']  . url('admin/system.Budongxiaosystem/open_dandian_total'); die;
+        $find_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+
+        return View('system/budongxiao/open_dandian_total', [
+            // 'config' => $select_config,
+            // 'typeQima' => $typeQima,
+            'rand_code' => $find_map['rand_code'],
+            'create_time' => $find_map['create_time'],
+        ]);
     }
 
     /**
@@ -527,13 +551,12 @@ class Budongxiaosystem extends AdminController
             $res_end['15-20天'] = $day15_20;
             $res_end['20-30天'] = $day20_30;
             $res_end['30天以上'] = $day30;
-            $res_end['【考核标准】键'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
-            $res_end['【考核标准】值'] = round($this->zeroHandle($res_end[$res_end['【考核标准】键']], $res_end['预计SKC数'])  * 100, 2);
-            // $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
-            $res_end['考核结果'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? '不合格' : '合格';
-            // $res_end['合格率'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
-            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
-            $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
+            $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+            $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
+            $res_end['考核结果'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? '不合格' : '合格';
+            $res_end['合格率'] = $res_end['【考核标准占比'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
+            $res_end['合格率2'] = $this->params['合格率'];
+            $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? round((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数'], 0) : '';
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
 

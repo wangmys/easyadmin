@@ -106,7 +106,7 @@
 <!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-      <button class="layui-btn layui-btn-sm" lay-event="download">导出所有区域明细</button>
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有区域明细</button>
       <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
       <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
     </div>
@@ -154,8 +154,8 @@
                 , method: 'post'
                 , toolbar: '#toolbar1'
                 , page: true
-                , limit: 1000
-                , limits: [1000, 5000, 10000, 20000]
+                , limit: 100
+                , limits: [100, 500, 1000, 5000, 10000, 20000]
                 , height: 800
                 , cellMinWidth: 75 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[

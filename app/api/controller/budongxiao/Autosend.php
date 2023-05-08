@@ -53,6 +53,8 @@ class Autosend extends BaseController
         }
         $this->params = $params;
 
+        // dump($this->params);die;
+
         $data = [];
         $storeArr = SpWwBudongxiaoDetail::getStore($this->params);
 
@@ -278,13 +280,12 @@ class Autosend extends BaseController
             $res_end['15-20天'] = $day15_20;
             $res_end['20-30天'] = $day20_30;
             $res_end['30天以上'] = $day30;
-            $res_end['【考核标准】键'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
-            $res_end['【考核标准】值'] = round($this->zeroHandle($res_end[$res_end['【考核标准】键']], $res_end['预计SKC数'])  * 100, 2);
-            // $res_end['考核结果'] = $res_end['【考核标准】值'] >= 10 ? '不合格' : '合格';
-            $res_end['考核结果'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? '不合格' : '合格';
-            // $res_end['合格率'] = $res_end['【考核标准】值'] >= 10 ? "<span style='color: red;'>不及格</span>" : '';
-            $res_end['合格率'] = $res_end['【考核标准】值'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
-            $res_end['需要调整SKC数'] = $res_end['【考核标准】值'] >= 10 ? round((  $res_end['【考核标准】值'] - 10)/100  * $res_end['预计SKC数'], 0) : '';
+            $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+            $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
+            $res_end['考核结果'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? '不合格' : '合格';
+            $res_end['合格率'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
+            $res_end['合格率2'] = $this->params['合格率'];
+            $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? ceil((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数']) : '';
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
 
@@ -301,12 +302,14 @@ class Autosend extends BaseController
     // 判断云仓不动销状态，齐码数，库存
     public function checkQiMa($data) {
         // 设置缓存 1小时
-        if (!cache('static_qima_sys')) {
-            $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
-            cache('static_qima_sys', $static_qima, 3600);
-        } else {
-            $static_qima = cache('static_qima_sys');
-        }
+        // if (!cache('static_qima_sys')) {
+        //     $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+        //     cache('static_qima_sys', $static_qima, 3600);
+        // } else {
+        //     $static_qima = cache('static_qima_sys');
+        // }
+
+        $static_qima = $this->params;
         
         // 结果
         $res = '';
