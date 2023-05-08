@@ -337,9 +337,8 @@ class Inventory extends AdminController
                     'time' => '-',
                     'type' => 'accessories_2'
                 ];
-
-
-                $data[] = $item;
+                
+//                $data[] = $item;
                 $data[] = $item2;
                 $data[] = $item3;
             }

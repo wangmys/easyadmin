@@ -376,6 +376,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                     ea.url(init.index_url)+'?商品负责人=' + data['商品负责人']
                                                 );
                                                 break;
+                                            case 'accessories_2':
+                                                ea.open(
+                                                    $(this).attr('data-title'),
+                                                    ea.url(init.dress_index_url)
+                                                );
+                                                break;
                                         }
 
                                     }
