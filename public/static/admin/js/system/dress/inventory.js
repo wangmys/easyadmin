@@ -3,6 +3,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         table_elem: '#currentTable',
         table_render_id: 'currentTableRenderId',
         index_url: 'system.dress.inventory/index',
+        dress_index_url: 'system.dress.index/list',
         dress_url: 'system.dress.dress/index',
         question_index: '/admin/system.dress.inventory/question',
         list_url: '/admin/system.dress.inventory/index',
@@ -375,6 +376,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
                                                     ea.url(init.index_url)+'?商品负责人=' + data['商品负责人']
                                                 );
                                                 break;
+                                            case 'accessories_2':
+                                                ea.open(
+                                                    $(this).attr('data-title'),
+                                                    ea.url(init.dress_index_url)
+                                                );
+                                                break;
                                         }
 
                                     }
@@ -406,6 +413,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         break;
                     case 'accessories':
                         url = init.index_url;
+                        break;
+                    case 'accessories_2':
+                        url = init.dress_index_url;
                         break;
                 }
             }
