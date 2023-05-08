@@ -90,7 +90,7 @@ class Weather extends AdminController
             $dateList = $this->getDateList(1);
             $list = $list->toArray();
             if(!empty($list)){
-                foreach ($list as &$v_list) $v_list['State'] = str_replace('省', '', $v_list['State']);
+                foreach ($list as &$v_list) $v_list['State'] = mb_substr($v_list['State'], 0, 2);
 
                 $cid_list = array_column($list,'cid');
                 // 查询天气
