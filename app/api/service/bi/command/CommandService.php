@@ -129,7 +129,8 @@ class CommandService
     public function getLastSql($date = '',$op = 'eq')
     {
         // 时间
-        $date = $date?:date('Y-m-d');
+        $date = date('Y-m-d');
+        $start = date('Y-01-01');
         $sql = "SELECT
             A.*
             ,
@@ -249,13 +250,14 @@ class CommandService
             AND TT.[单据类型] NOT IN ( '零售核销单', '其他' )
             ) A
         WHERE
-            A.[次数] >= 2 and A.[变动时间] >= '2023-03-01'
+            A.[次数] >= 2 and A.[变动时间] >='{$start}' and A.[变动时间] <= '{$date}'
             AND CONCAT ( A.[单据类型], A.[库存数量] ) != '店铺收货单0'
         ORDER BY
             A.[商品负责人],
             A.[店铺名称],
             A.[清空货号],
             A.[变动时间]";
+
         return $sql;
     }
 

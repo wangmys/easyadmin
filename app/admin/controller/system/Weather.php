@@ -112,6 +112,9 @@ class Weather extends AdminController
                             } else if ($vv['min_c'] >= 22 && $vv['min_c']  < 26) {
                                 $bgCol = '#fecc51';   
                                 $fontCol = '#000000';  
+                            } else{
+                                $bgCol = '#fecc51';
+                                $fontCol = '#000000';
                             }
 //                             $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
 //                             $list[$k]['_'.$key] = $bgCol;
