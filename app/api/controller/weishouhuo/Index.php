@@ -16,6 +16,13 @@ use \think\Request;
 
 class Index
 {
+    /**
+     * -店铺未收调拨
+     * @param Request $req
+     * @return bool
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
     public function index(Request $req)
     {
         $sql = "SELECT 
@@ -53,7 +60,7 @@ class Index
             ED.UpdateTime
         ORDER BY ED.UpdateTime,EC.CustomerName";
         $is_true = $req->get('is_true');
-         if(empty($res = Cache::get('weishouhuo_index'))){
+         if(empty($res = Cache::get('weishouhuo_index'))  || $is_true){
             $res = Db::connect('sqlsrv')->query($sql);
             Cache::set('weishouhuo_index',$res);
          }
@@ -67,6 +74,13 @@ class Index
         return Excel::exportData($res, $header, $fileName, 'xlsx');
     }
 
+    /**
+     * -店铺未收调拨发出
+     * @param Request $req
+     * @return bool
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
     public function index2(Request $req)
     {
         $sql = "SELECT
@@ -102,7 +116,7 @@ class Index
         EI.CustOutboundId,
         EI.UpdateTime";
          $is_true = $req->get('is_true');
-         if(empty($res = Cache::get('weishouhuo_index2'))){
+         if(empty($res = Cache::get('weishouhuo_index2')) || $is_true){
             $res = Db::connect('sqlsrv')->query($sql);
             Cache::set('weishouhuo_index2',$res);
          }
@@ -111,7 +125,7 @@ class Index
          if($res){
               $header = array_map(function($v){ return [$v,$v]; }, array_keys($res[0]));
          }
-         $fileName = time();
+         $fileName = '店铺未收调拨发出';
          return Excel::exportData($res, $header, $fileName, 'xlsx');
     }
 }
