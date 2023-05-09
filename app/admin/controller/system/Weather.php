@@ -318,5 +318,18 @@ class Weather extends AdminController
 
     }
 
+    /**
+     * 根据省份获取温带
+     * @return void
+     */
+    public function get_wendai() {
+
+        $province = input('province');
+        $sql = "select distinct CustomItem30 from customers where State='{$province}' and CustomItem30!=''";
+        $res = Db::connect('tianqi')->query($sql);
+        return json(["code" => "0", "msg" => "",  "data" => $res]);
+
+    }
+
 
 }
