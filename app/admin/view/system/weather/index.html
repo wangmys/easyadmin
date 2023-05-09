@@ -45,6 +45,7 @@
             , $ = layui.$
             , layer = layui.layer
             , url1 = "{:url('admin/system.Weather/get_wenqu')}"
+            , url2 = "{:url('admin/system.Weather/get_wendai')}"
         ;
 
         //监听温带下拉
@@ -80,6 +81,41 @@
             });
 
         });
+
+        //监听省份下拉
+        form.on('select(State)', function (data) {
+
+            var province = data.value;
+            $.ajax({
+                type: "POST",
+                url: url2,
+                data: {'province':province},
+                dataType: 'json',
+                success: function (res) {
+
+                    $('#c-CustomItem30').empty();
+                    $('#c-CustomItem30').next().empty();
+
+                    var append_str = '<option value="">- 全部 -</option>';
+                    var dd_append_str = '<div class="layui-unselect layui-form-select">';
+                    dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+                    dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+                    dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+                    $.each(res.data, function(key, val){
+                        append_str += '<option value="'+val.CustomItem30+'">'+val.CustomItem30+'</option>';
+                        dd_append_str += '<dd lay-value="'+val.CustomItem30+'" class="">'+val.CustomItem30+'</dd>';
+                    });
+                    dd_append_str += '</dl></div>';
+                    $('#c-CustomItem30').append(append_str);
+                    $('#c-CustomItem30').next().append(dd_append_str);
+                    form.render('select');
+
+                }
+            });
+
+        });
+
 
     });
 
