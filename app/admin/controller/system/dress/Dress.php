@@ -302,6 +302,9 @@ class Dress extends AdminController
                     }
                     if(!empty($where['商品负责人'])){
                        $q->whereIn('商品负责人',$where['商品负责人']);
+                    }else{
+                        $user = session('admin');
+                        if($user['id'] != AdminConstant::SUPER_ADMIN_ID) $q->whereIn('商品负责人',$user['name']);
                     }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
                 // 根据筛选条件,设置颜色是否标红
