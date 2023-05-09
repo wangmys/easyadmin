@@ -42,14 +42,15 @@ class Tableupdate extends BaseController
         // echo 111; die;
         // 删除所有基础计算结果
         // $this->db_easyA->startTrans();
-        $this->db_bi->startTrans();
+        // $this->db_bi->startTrans();
         // $del_weishouhou = $this->db_easyA->table('sp_custoemr_weishouhou')->where(1)->delete();
-        $handle = $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
-        if ($handle) {
-            $handle = $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
-        } else {
-            $handle =  true;
-        }
+        // $handle = $this->db_easyA->table('sp_custoemr_weishouhou')->where(1)->delete();
+        // if ($handle) {
+        //     $handle = $this->db_easyA->table('sp_custoemr_weishouhou')->where(1)->delete();
+        // } else {
+        //     $handle =  true;
+        // }
+        
 
         $select_weishouhuo = $this->db_sqlsrv->query("   
             SELECT 
@@ -87,6 +88,13 @@ class Tableupdate extends BaseController
             ORDER BY ED.UpdateTime,EC.CustomerName
         ");
 
+        if (!$select_weishouhuo) {
+            echo '没有数据更新';
+            die;
+        }
+
+        // 删除 
+        $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
         $select_weishouhuo = array_chunk($select_weishouhuo, 500);
 
         // echo '<pre>';
@@ -95,21 +103,24 @@ class Tableupdate extends BaseController
 
         foreach($select_weishouhuo as $key => $val) {
             $insert = $this->db_bi->table('sp_custoemr_weishouhou')->insertAll($val);
+            
             if (! $insert) {
                 $res_weishouhou = false;
                 break;
             }
+
+            // print_r($res_weishouhou);
         }
 
-        if ($handle && $res_weishouhou) {
-            $this->db_bi->commit();    
+        if ($res_weishouhou) {
+            // $this->db_easyA->commit();    
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => 'sp_custoemr_weishouhou 更新成功！'
             ]);
         } else {
-            $this->db_bi->rollback();   
+            // $this->db_bi->rollback();   
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -125,12 +136,12 @@ class Tableupdate extends BaseController
         // 删除所有基础计算结果
         // $this->db_easyA->startTrans();
         // $handle = $this->db_easyA->table('sp_custoemr_weishouhou_diaobo')->where(1)->find();
-        $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->find();
-        if ($handle) {
-            $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->delete();
-        } else {
-            $handle =  true;
-        }
+        // $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->find();
+        // if ($handle) {
+        //     $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->delete();
+        // } else {
+        //     $handle =  true;
+        // }
         
         $select_weishouhuo_diaobo = $this->db_sqlsrv->query("   
             SELECT
@@ -165,6 +176,12 @@ class Tableupdate extends BaseController
                 EI.CustOutboundId,
                 EI.UpdateTime;
         ");
+        if (!$select_weishouhuo_diaobo) {
+            echo '没有数据更新';
+            die;
+        }
+
+        $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->delete();
 
         $select_weishouhuo_diaobo = array_chunk($select_weishouhuo_diaobo, 500);
 
@@ -182,15 +199,15 @@ class Tableupdate extends BaseController
         }
 
 
-        if ($handle && $res_weishouhou_diaobo) {
-            $this->db_bi->commit();    
+        if ($res_weishouhou_diaobo) {
+            // $this->db_bi->commit();    
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => 'sp_custoemr_weishouhou 更新成功！'
             ]);
         } else {
-            $this->db_bi->rollback();   
+            // $this->db_bi->rollback();   
             return json([
                 'status' => 0,
                 'msg' => 'error',
