@@ -44,7 +44,12 @@ class Tableupdate extends BaseController
         // $this->db_easyA->startTrans();
         $this->db_bi->startTrans();
         // $del_weishouhou = $this->db_easyA->table('sp_custoemr_weishouhou')->where(1)->delete();
-        $del_weishouhou = $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
+        $handle = $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
+        if ($handle) {
+            $handle = $this->db_bi->table('sp_custoemr_weishouhou')->where(1)->delete();
+        } else {
+            $handle =  true;
+        }
 
         $select_weishouhuo = $this->db_sqlsrv->query("   
             SELECT 
@@ -96,7 +101,7 @@ class Tableupdate extends BaseController
             }
         }
 
-        if ($del_weishouhou && $res_weishouhou) {
+        if ($handle && $res_weishouhou) {
             $this->db_bi->commit();    
             return json([
                 'status' => 1,
@@ -123,6 +128,8 @@ class Tableupdate extends BaseController
         $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->find();
         if ($handle) {
             $handle = $this->db_bi->table('sp_custoemr_weishouhou_diaobo')->where(1)->delete();
+        } else {
+            $handle =  true;
         }
         
         $select_weishouhuo_diaobo = $this->db_sqlsrv->query("   
