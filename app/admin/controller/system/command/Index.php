@@ -44,16 +44,18 @@ class Index extends AdminController
         // 筛选
         $filters = json_decode($this->request->get('filter', '{}',null), true);
          // 商品负责人列表
-        $manager = $this->logModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
+        $manager = $this->errorLogModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
+        $month = $this->errorLogModel->group('month')->order('month','desc')->column('month','month');
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {
             // 查询指令记录
-            $list = $this->logModel->where(function ($q)use($filters,$manager){
+            $list = $this->errorLogModel->where(function ($q)use($filters,$manager){
                 if(!empty($filters['商品负责人'])){
                      $q->whereIn('商品负责人',$filters['商品负责人']);
-                }else{
-                     $q->whereIn('商品负责人',reset($manager));
+                }
+                if(!empty($filters['month'])){
+                     $q->whereIn('month',$filters['month']);
                 }
             })->select();
             // 返回数据
@@ -68,7 +70,8 @@ class Index extends AdminController
 
         return $this->fetch('',[
             'manager' => $manager,
-            'searchValue' => reset($manager)
+            'searchValue' => reset($manager),
+            'month' => $month,
         ]);
     }
 
