@@ -100,18 +100,31 @@ class Weather extends AdminController
                         if($vv['cid'] == $v['cid']){
                             $key = date('m-d',strtotime($vv['weather_time']));
 
-                            if ($vv['min_c'] < 10) {
-                                $bgCol = '#1a6bd7';   
+                            // 使用最高温
+                            if(in_array(date('m',strtotime($vv['weather_time'])),[2,3,4,5,6,7])){
+                                $value_c = $vv['max_c'];
+                            }else{
+                                // 使用最低温
+                                $value_c = $vv['min_c'];
+                            }
+                            if ($value_c < 10) {
+                                $bgCol = 'rgb(26,107,215)';
                                 $fontCol = '#000000';
-                            } else if ($vv['min_c'] >= 10 && $vv['min_c'] < 18) {
-                                $bgCol = '#68b8f5';   
+                            } else if ($value_c >= 10 && $value_c < 18) {
+                                $bgCol = 'rgb(104,184,245)';
                                 $fontCol = '#000000';
-                            } else if ($vv['min_c'] >= 18 && $vv['min_c'] < 22) {
-                                $bgCol = '#faf1a4';   
+                            } else if ($value_c >= 18 && $value_c < 22) {
+                                $bgCol = 'rgb(250,241,164)';
                                 $fontCol = '#000000';  
-                            } else if ($vv['min_c'] >= 22 && $vv['min_c']  < 26) {
-                                $bgCol = '#fecc51';   
+                            } else if ($value_c >= 22 && $value_c  < 26) {
+                                $bgCol = 'rgb(254,204,81)';
                                 $fontCol = '#000000';  
+                            } else if ($value_c >= 26 && $value_c  < 30) {
+                                $bgCol = 'rgb(244,119,0)';
+                                $fontCol = '#000000';
+                            } else if ($value_c >= 30) {
+                                $bgCol = 'rgb(170,3,13)';
+                                $fontCol = '#000000';
                             } else{
                                 $bgCol = '#fecc51';
                                 $fontCol = '#000000';
@@ -300,6 +313,19 @@ class Weather extends AdminController
 
         $wendai = input('wendai');
         $sql = "select distinct CustomItem36 from customers where CustomItem30='{$wendai}'";
+        $res = Db::connect('tianqi')->query($sql);
+        return json(["code" => "0", "msg" => "",  "data" => $res]);
+
+    }
+
+    /**
+     * 根据省份获取温带
+     * @return void
+     */
+    public function get_wendai() {
+
+        $province = input('province');
+        $sql = "select distinct CustomItem30 from customers where State='{$province}' and CustomItem30!=''";
         $res = Db::connect('tianqi')->query($sql);
         return json(["code" => "0", "msg" => "",  "data" => $res]);
 

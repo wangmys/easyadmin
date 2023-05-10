@@ -60,11 +60,17 @@ class CommandService
                 if(!empty($item) && $item['单据类型']=='店铺收货单' && $item['库存数量'] > 0 ){
                     // 月份
                     $month = date('Y-m',strtotime($v['变动时间']));
+                    // 年份
+                    $year = date('Y',strtotime($v['变动时间']));
                     if(empty($result[$v['商品负责人']][$month])) $result[$v['商品负责人']][$month] = 0;
                     // 二层判断全部通过,计入错误指令结果集
                     $result[$v['商品负责人']][$month] += 1;
+                    $v['year'] = $year;
+                    $v['month'] = date('m',strtotime($v['变动时间']));
                     $result_log[] = $v;
                     $item['type'] = 1;
+                    $item['year'] = $year;
+                    $item['month'] = date('m',strtotime($v['变动时间']));
                     $result_log[] = $item;
                     $log[$k+1]['is_error'] = 1;
                 }else{
