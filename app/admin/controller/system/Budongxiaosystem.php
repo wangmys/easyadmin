@@ -191,11 +191,13 @@ class Budongxiaosystem extends AdminController
             } else {
                 $map4 = " ";
             }
-            if (!empty($map_input['排名率'])) {
-                $map5 = " having 排名率 >={$map_input['排名率']} ";
+            if (!empty($this->params['排名率'])) {
+                $map5 = " having rank_b >={$this->params['排名率']} ";
+                // $map5 = " having 排名率B >=50";
             } else {
                 $map5 = " ";
             }
+            // $map5 = " having rank_b >=80 ";
     
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
@@ -220,6 +222,7 @@ class Budongxiaosystem extends AdminController
                     CONCAT(a.省份售罄, '%') as 省份售罄,
                     a.品类排名,
                     CONCAT(FORMAT(a.品类排名 / b.相同中类数 * 100, 2), '%') AS 排名率,
+                    FORMAT( a.品类排名 / b.相同中类数 * 100, 2 ) AS rank_b,
                     a.上架店数,
                     a.店铺库存数量,
                     a.可用库存Quantity,
@@ -247,20 +250,27 @@ class Budongxiaosystem extends AdminController
                     a.省份 ASC
                 limit {$pageParams1}, {$pageParams2}  
             "; 
-
+            
             // 总条数 
             $sql4 = "
                 SELECT
-                    count(*) as tatalCount
+                    count(*) AS tatalCount 
                 FROM
-                    `cwl_budongxiao_history_sys` AS a
-                    LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
-                WHERE 
-                    " . $map1 . $map2 . $map3 . $map4 . $map5 ."
-                ORDER BY
-                    a.省份 ASC
+                    (
+                    SELECT
+                        b.相同中类数,
+                        FORMAT( a.品类排名 / b.相同中类数 * 100, 2 ) AS rank_b 
+                    FROM
+                        `cwl_budongxiao_history_sys` AS a
+                        LEFT JOIN cwl_budongxiao_areanum_sys AS b ON a.省份 = b.省份 
+                        AND a.中类 = b.中类 
+                    WHERE
+                        " . $map1 . $map2 . $map3 . $map4 . $map5 ."
+                    ORDER BY
+                    a.省份 ASC 
+                    ) AS c     
             ";
-            
+            // echo $sql4; die;
             $select_history_area = Db::connect('mysql')->query($sql3);
             $count = Db::connect('mysql')->query($sql4); 
     
