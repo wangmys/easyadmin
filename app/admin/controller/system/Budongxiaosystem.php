@@ -666,6 +666,7 @@ class Budongxiaosystem extends AdminController
                         b.合格家数,
                         IFNULL( c.不合格家数, 0 ) AS 不合格家数,
                         CONCAT(FORMAT(IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100, 2), '%') AS 合格率,
+                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100 as rank_b,
                         IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
                         IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
                         IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
@@ -689,7 +690,7 @@ class Budongxiaosystem extends AdminController
                         a.商品负责人 
                     ) AS aa 
                 ORDER BY
-                    aa.合格率 DESC 
+                    aa.rank_b DESC 
             ";
         } else {
             $name = session('admin.name');
