@@ -9,7 +9,8 @@ use app\common\model\TimeModel;
 class SpXwBudongxiaoYuncangkeyong extends TimeModel
 {
 
-    protected $connection = 'mysql2';
+    protected $connection = 'mysql'; // easyadmin
+    // protected $connection = 'mysql2'; // bi
     protected $autoWriteTimestamp = 'datetime';
     protected $createTime = 'create_time';
     protected $updateTime = 'update_time';
