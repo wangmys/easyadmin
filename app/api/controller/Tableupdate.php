@@ -204,14 +204,14 @@ class Tableupdate extends BaseController
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'sp_custoemr_weishouhou 更新成功！'
+                'content' => 'sp_custoemr_weishouhou_diaobo 更新成功！'
             ]);
         } else {
             // $this->db_bi->rollback();   
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'sp_custoemr_weishouhou 更新失败！'
+                'content' => 'sp_custoemr_weishouhou_diaobo 更新失败！'
             ]);
         }
 
