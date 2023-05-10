@@ -270,7 +270,7 @@
                                 <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap2"
                                 style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">保存筛选
                                 </button>
-                                <button lay-submit class="layui-btn layui-btn-sm" lay-filter="submit"
+                                <button lay-submit class="layui-btn layui-btn-sm" lay-filter="submit2"
                                 style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">立即执行
                                 </button>
                             </div>
@@ -299,6 +299,7 @@
             , url1 = "{:url('admin/system.Budongxiaosystem/index')}"
             , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}"
             , url3 = "{:url('api/budongxiao.Autosend/sysReshandle')}"
+            , url4 = "{:url('api/budongxiao.Autosend/areaNumHandle')}"
             , url_getXmMapSelect = "{:url('admin/system.Budongxiaosystem/getXmMapSelect')}"
             , url_saveMap = "{:url('admin/system.Budongxiaosystem/saveMap')}"  
             , url_saveMap2 = "{:url('admin/system.Budongxiaosystem/saveMap2')}";  
@@ -401,6 +402,30 @@
             })
 
             $.get(url3, {}, function(res) {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                        layer.msg('执行成功', {time: 2000, icon:1});
+                    }, 2000);
+                });
+            }, 'json');
+            return false;
+        });
+
+        form.on('submit(submit2)', function (res) {
+            //开始加载效果
+            layui.use('layer', function () {
+                layui.layer.load();
+                //console.log(Lodingindex) opacity
+                $(".layui-layer-shade").css('background', '#000000')
+                $(".layui-layer-shade").css('opacity', '0.2')
+                $(".layui-layer-shade").click(function (event) {
+                    event.stopPropagation();
+                })
+            })
+
+            $.get(url4, {}, function(res) {
                 //上传成功结束加载效果
                 layui.use('layer', function () {
                     setTimeout(function () {
