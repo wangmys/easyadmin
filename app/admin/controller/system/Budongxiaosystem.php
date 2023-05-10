@@ -338,16 +338,48 @@ class Budongxiaosystem extends AdminController
 
         $sql = "
             SELECT
-                a.*,
-                b.`相同中类数`,
-                a.品类排名 / b.相同中类数 * 100 AS 排名率 
-            FROM
-                `cwl_budongxiao_history_sys` AS a
-                LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
-            WHERE 
-                " . $map1 . $map2 . $map3 . $map4. $map5 . "
-            ORDER BY
-                a.省份 ASC
+            a.商品负责人,
+            a.省份,
+            a.季节归集,
+            a.店铺名称,
+            a.经营模式,
+            a.云仓,
+            a.货号,
+            a.大类,
+            a.中类,
+            a.小类,
+            a.上架店数,
+            a.总店数,
+            CONCAT(a.上柜率, '%') as 上柜率,
+            b.相同中类数,
+            CONCAT(a.省份售罄, '%') as 省份售罄,
+            a.品类排名,
+            CONCAT(FORMAT(a.品类排名 / b.相同中类数 * 100, 2), '%') AS 排名率,
+            a.上架店数,
+            a.店铺库存数量,
+            a.可用库存Quantity,
+            a.齐码情况,
+            a.上市时间,
+            a.上市时间修正,
+            a.上市天数,
+            a.上市天数修正,
+            a.考核标准,
+            a.不动销区间,
+            a.不动销区间修订,
+            a.累销量,
+            a.月销量,
+            a.五天销量,
+            a.十天销量,
+            a.十五天销量,
+            a.二十天销量,
+            a.三十天销量 
+        FROM
+            `cwl_budongxiao_history_sys` AS a
+            LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
+        WHERE 
+            " . $map1 . $map2 . $map3 . $map4. $map5 . "
+        ORDER BY
+            a.省份 ASC
         "; 
         $select_history_area = Db::connect('mysql')->query($sql);
 
