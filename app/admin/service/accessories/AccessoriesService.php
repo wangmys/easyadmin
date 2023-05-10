@@ -77,7 +77,7 @@ class AccessoriesService
             // 清空多余字符串
             $field_str = trim($field_str,'+');
             // 拼接查询字段
-            $field .= ",( $field_str ) as {$v['name']}";
+            $field .= ",( $field_str ) as `{$v['name']}`";
         }
         // 清空多余字符串
         $field = trim($field,',');
@@ -135,8 +135,6 @@ class AccessoriesService
         $fix_field = $this->getFixField('c');
         // 组合完整字段
         $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
-
-
 
         // 查询库存数据
         $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
@@ -238,8 +236,15 @@ class AccessoriesService
                 if(isset($_data[$key]) && !empty($_data[$key]) && !empty($v)){
                     $vv = intval($v);
                     if($vv < $_data[$key]){
-                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";;
+                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";
                     }
+                }
+            }
+            if(empty($str = strip_tags($list[$k]))){
+                if($list[$k] == $str){
+                    $list[$k] = '';
+                }else{
+                    $list[$k] = "<span style='width: 100%;height: 100%;display: block;background: rgba(255,0,0,.2);color:white'> 0 </span>";
                 }
             }
         }
