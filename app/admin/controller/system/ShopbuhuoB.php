@@ -645,6 +645,12 @@ class ShopbuhuoB extends AdminController
                     $this->db_easyA->table('cwl_qudaodiaobo_2')->insertAll($val);
                 }
 
+                $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
+                    'option' => '区域调拨',
+                    'aid' => $this->authInfo['id'],
+                    'aname' => $this->authInfo['name'],
+                    'create_time' => date("Y-m-d H:i:s"),
+                ]);
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
@@ -815,6 +821,12 @@ class ShopbuhuoB extends AdminController
                     WHERE
                         a.aid = '{$this->authInfo["id"]}'
                 ");
+                $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
+                    'option' => '店铺补货',
+                    'aid' => $this->authInfo['id'],
+                    'aname' => $this->authInfo['name'],
+                    'create_time' => date("Y-m-d H:i:s"),
+                ]);
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
