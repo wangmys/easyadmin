@@ -9,6 +9,7 @@ return [
         'node'      => 'app\common\command\Node',
         'OssStatic' => 'app\common\command\OssStatic',
         'worker' => 'think\Workerman\command\worker',
-         'action'    => 'app\common\command\Action'
+         'action'    => 'app\common\command\Action',
+        'stock' => 'app\Command\Stock',
     ],
 ];
