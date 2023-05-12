@@ -117,7 +117,47 @@ return [
             'charset'           => Env::get('database3.charset', 'utf8'),
             // 数据库表前缀
             'prefix'            => Env::get('database3.prefix', ''),
-        ]
+        ],
+        'cip' => [
+            // 数据库类型
+            'type'              => Env::get('database4.type', 'mysql'),
+            // 服务器地址
+            'hostname'          => Env::get('database4.hostname', '43.137.6.80'),
+            // 数据库名
+            'database'          => Env::get('database4.database', 'cip'),
+            // 用户名
+            'username'          => Env::get('database4.username', 'cip'),
+            // 密码
+            'password'          => Env::get('database4.password', 'RhTsz4jSyLYy4whR'),
+            // 端口
+            'hostport'          => Env::get('database4.hostport', '35016'),
+            // 数据库连接参数
+            'params'            => [],
+            // 数据库编码默认采用utf8
+            'charset'           => Env::get('database4.charset', 'utf8'),
+            // 数据库表前缀
+            'prefix'            => Env::get('database4.prefix', ''),
+        ],
+        'db_core' => [
+            // 数据库类型
+            'type'              => Env::get('database5.type', 'mysql'),
+            // 服务器地址
+            'hostname'          => Env::get('database5.hostname', '43.137.6.80'),
+            // 数据库名
+            'database'          => Env::get('database5.database', 'db_core'),
+            // 用户名
+            'username'          => Env::get('database5.username', 'db_core'),
+            // 密码
+            'password'          => Env::get('database5.password', 'Bdb3fCtnXKTCzLfD'),
+            // 端口
+            'hostport'          => Env::get('database5.hostport', '35016'),
+            // 数据库连接参数
+            'params'            => [],
+            // 数据库编码默认采用utf8
+            'charset'           => Env::get('database5.charset', 'utf8'),
+            // 数据库表前缀
+            'prefix'            => Env::get('database5.prefix', ''),
+        ],
         // 更多的数据库配置信息
     ],
 ];
