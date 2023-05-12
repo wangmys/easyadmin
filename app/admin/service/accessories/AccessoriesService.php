@@ -77,7 +77,7 @@ class AccessoriesService
             // 清空多余字符串
             $field_str = trim($field_str,'+');
             // 拼接查询字段
-            $field .= ",( $field_str ) as {$v['name']}";
+            $field .= ",( $field_str ) as `{$v['name']}`";
         }
         // 清空多余字符串
         $field = trim($field,',');
@@ -96,7 +96,7 @@ class AccessoriesService
             '店铺ID' => 'CustomerId',
             '商品负责人' =>'CustomItem17',
             '店铺名称' =>'CustomerName',
-            '店铺等级' => 'CustomerGrade',
+            '店铺等级' => 'CustomItem16',
             '省份' =>'State',
             '运营模式' =>'Mathod'
         ];
@@ -135,8 +135,6 @@ class AccessoriesService
         $fix_field = $this->getFixField('c');
         // 组合完整字段
         $field = str_replace('c.State','left(c.State,2) as State',$fix_field).$trends_field;
-
-
 
         // 查询库存数据
         $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
@@ -214,12 +212,12 @@ class AccessoriesService
      */
     public function setStyle(&$list,$config,&$new_list)
     {
-        if(empty($list) || empty($list['CustomerGrade'])) return $list;
+        if(empty($list) || empty($list['CustomItem16'])) return $list;
         $isWarning = 0;
         foreach ($list as $k => $v){
             if((strpos($k,'_') === false)){
                 // 等级配置
-                $item = $config["{$list['CustomerGrade']}_库存"];
+                $item = $config[trim($list['CustomItem16'])."_库存"];
                 // 具体配置
                 $_data = $item['_data'];
                 if(isset($_data[$k]) && !empty($_data[$k])){
@@ -231,15 +229,22 @@ class AccessoriesService
                 }
             }else{
                 // 等级配置
-                $item = $config["{$list['CustomerGrade']}_周转"];
+                $item = $config[trim($list['CustomItem16'])."_周转"];
                 $key = str_replace('_','',$k);
                 // 具体配置
                 $_data = $item['_data'];
                 if(isset($_data[$key]) && !empty($_data[$key]) && !empty($v)){
                     $vv = intval($v);
                     if($vv < $_data[$key]){
-                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";;
+                        $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";
                     }
+                }
+            }
+            if(empty($str = strip_tags($list[$k]))){
+                if($list[$k] == $str){
+                    $list[$k] = '';
+                }else{
+                    $list[$k] = "<span style='width: 100%;height: 100%;display: block;background: rgba(255,0,0,.2);color:white'> 0 </span>";
                 }
             }
         }

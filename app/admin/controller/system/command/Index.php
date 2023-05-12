@@ -53,6 +53,9 @@ class Index extends AdminController
             $list = $this->errorLogModel->where(function ($q)use($filters,$manager){
                 if(!empty($filters['商品负责人'])){
                      $q->whereIn('商品负责人',$filters['商品负责人']);
+                }else{
+//                     $user = session('admin');
+//                     if($user['id'] != AdminConstant::SUPER_ADMIN_ID) $q->whereIn('商品负责人',$user['name']);
                 }
                 if(!empty($filters['month'])){
                      $q->whereIn('month',$filters['month']);
@@ -72,6 +75,7 @@ class Index extends AdminController
             'manager' => $manager,
             'searchValue' => reset($manager),
             'month' => $month,
+            'searchValue2' => date('n'),
         ]);
     }
 

@@ -70,27 +70,6 @@ class Budongxiaosystem extends AdminController
         ]);
     }
 
-    public function testMap() {
-        $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
-        $select_qima = $this->db_easyA->table('cwl_budongxiao_qima')->where(1)->select()->toArray();
-
-                // 二维转一维
-                // $typeQima = $this->arr2to1($typeQima, '类别', '尺码数');
-
-        $select_qima = $this->arr2to1($select_qima, '类别', '尺码数');
-        $map = json_decode($select_map['map'], true);
-        
-        dump($select_qima);
-        $qima_str = '';
-        foreach ($map as $key => $val) {
-            foreach ($select_qima as $key2 => $val2) {
-                if ($key == $key2) {
-                    // $qima_str
-                }
-            }
-        }
-    }
-
     /**
      * @NodeAnotation(title="单店不动销系统推送结果")
      */
@@ -134,6 +113,7 @@ class Budongxiaosystem extends AdminController
         }
     }
 
+    // 单店汇总
     public function open_dandian_total() {
         // 超管
         // dump($_SERVER);
@@ -150,10 +130,33 @@ class Budongxiaosystem extends AdminController
 
     /**
      * @NodeAnotation(title="区域不动销系统推送结果")
+     * 
+     *  相同中类数
+          SELECT
+            省份,
+            中类,
+            count(*) AS 相同中类数 
+        FROM
+            (
+                SELECT--
+                省份,
+                中类,
+                货号,
+                `品类排名` 
+            FROM
+                sp_ww_budongxiao_detail 
+            WHERE
+                省份 = '海南省' 
+                AND 中类 = '短T' 
+                AND 店铺库存数量 > 1 
+                AND `季节归集` = '夏季'
+                AND `上市天数`>= 7 
+            GROUP BY
+            省份,货号 
+            ) AS b
      */
     public function sysAreaResult() {
         if (request()->isAjax()) {
-
             $input = input();
              
             $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
@@ -188,60 +191,88 @@ class Budongxiaosystem extends AdminController
             } else {
                 $map4 = " ";
             }
-            if (!empty($map_input['排名率'])) {
-                $map5 = " having 排名率 >={$map_input['排名率']} ";
+            if (!empty($this->params['排名率'])) {
+                $map5 = " having rank_b >={$this->params['排名率']} ";
+                // $map5 = " having 排名率B >=50";
             } else {
                 $map5 = " ";
             }
+            // $map5 = " having rank_b >=80 ";
     
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
-            $pageParams2 = $this->params['limit'];
-    
-            $sql = "
+            $pageParams2 = input('limit');
+            
+            // 带分页
+            $sql3 = "
                 SELECT
-                    a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
+                    a.商品负责人,
+                    a.省份,
+                    a.季节归集,
+                    a.店铺名称,
+                    a.经营模式,
+                    a.云仓,
+                    a.货号,
+                    a.大类,
+                    a.中类,
+                    a.小类,
+                    a.上架店数,
+                    a.总店数,
+                    CONCAT(a.上柜率, '%') as 上柜率,
+                    b.相同中类数,
+                    CONCAT(a.省份售罄, '%') as 省份售罄,
+                    a.品类排名,
+                    CONCAT(FORMAT(a.品类排名 / b.相同中类数 * 100, 2), '%') AS 排名率,
+                    FORMAT( a.品类排名 / b.相同中类数 * 100, 2 ) AS rank_b,
+                    a.上架店数,
+                    a.店铺库存数量,
+                    a.可用库存Quantity,
+                    a.齐码情况,
+                    a.上市时间,
+                    a.上市时间修正,
+                    a.上市天数,
+                    a.上市天数修正,
+                    a.考核标准,
+                    a.不动销区间,
+                    a.不动销区间修订,
+                    a.累销量,
+                    a.月销量,
+                    a.五天销量,
+                    a.十天销量,
+                    a.十五天销量,
+                    a.二十天销量,
+                    a.三十天销量 
                 FROM
                     `cwl_budongxiao_history_sys` AS a
-                    LEFT JOIN (
-                    SELECT
-                        商品负责人,省份,货号,品类排名, 
-                        count(*) AS 相同货号数
-                    FROM
-                        cwl_budongxiao_history_sys 
-                    GROUP BY
-                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-                    AND a.省份 = b.省份 
-                    AND a.货号 = b.货号 
+                    LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
                 WHERE 
                     " . $map1 . $map2 . $map3 . $map4. $map5 . "
                 ORDER BY
-                    a.商品负责人 ASC
-                limit {$pageParams1}, {$pageParams2}    
-            "; 
-    
-            $sql2 = "
-                SELECT
-                    count(*) as tatalCount
-                FROM
-                    `cwl_budongxiao_history_sys` AS a
-                    LEFT JOIN (
-                    SELECT
-                        商品负责人,省份,货号,品类排名, 
-                        count(*) AS 相同货号数
-                    FROM
-                        cwl_budongxiao_history_sys 
-                    GROUP BY
-                    商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-                    AND a.省份 = b.省份 
-                    AND a.货号 = b.货号 
-                WHERE 
-                    " . $map1 . $map2 . $map3 . $map4 . $map5 ."
-                ORDER BY
-                    a.商品负责人 ASC
+                    a.省份 ASC
+                limit {$pageParams1}, {$pageParams2}  
             "; 
             
-            $select_history_area = Db::connect('mysql')->query($sql);
-            $count = Db::connect('mysql')->query($sql2); 
+            // 总条数 
+            $sql4 = "
+                SELECT
+                    count(*) AS tatalCount 
+                FROM
+                    (
+                    SELECT
+                        b.相同中类数,
+                        FORMAT( a.品类排名 / b.相同中类数 * 100, 2 ) AS rank_b 
+                    FROM
+                        `cwl_budongxiao_history_sys` AS a
+                        LEFT JOIN cwl_budongxiao_areanum_sys AS b ON a.省份 = b.省份 
+                        AND a.中类 = b.中类 
+                    WHERE
+                        " . $map1 . $map2 . $map3 . $map4 . $map5 ."
+                    ORDER BY
+                    a.省份 ASC 
+                    ) AS c     
+            ";
+            // echo $sql4; die;
+            $select_history_area = Db::connect('mysql')->query($sql3);
+            $count = Db::connect('mysql')->query($sql4); 
     
             // print_r( $count);
             // die;
@@ -317,23 +348,48 @@ class Budongxiaosystem extends AdminController
 
         $sql = "
             SELECT
-                a.*,b.`相同货号数`, a.品类排名 / b.相同货号数 * 100 as 排名率
-            FROM
-                `cwl_budongxiao_history_sys` AS a
-                LEFT JOIN (
-                SELECT
-                    商品负责人,省份,货号,品类排名, 
-                    count(*) AS 相同货号数
-                FROM
-                    cwl_budongxiao_history_sys 
-                GROUP BY
-                商品负责人,省份,货号) AS b ON a.商品负责人 = b.商品负责人 
-                AND a.省份 = b.省份 
-                AND a.货号 = b.货号 
-            WHERE 
-                " . $map1 . $map2 . $map3 . $map4. $map5 . "
-            ORDER BY
-                a.商品负责人 ASC 
+            a.商品负责人,
+            a.省份,
+            a.季节归集,
+            a.店铺名称,
+            a.经营模式,
+            a.云仓,
+            a.货号,
+            a.大类,
+            a.中类,
+            a.小类,
+            a.上架店数,
+            a.总店数,
+            CONCAT(a.上柜率, '%') as 上柜率,
+            b.相同中类数,
+            CONCAT(a.省份售罄, '%') as 省份售罄,
+            a.品类排名,
+            CONCAT(FORMAT(a.品类排名 / b.相同中类数 * 100, 2), '%') AS 排名率,
+            a.上架店数,
+            a.店铺库存数量,
+            a.可用库存Quantity,
+            a.齐码情况,
+            a.上市时间,
+            a.上市时间修正,
+            a.上市天数,
+            a.上市天数修正,
+            a.考核标准,
+            a.不动销区间,
+            a.不动销区间修订,
+            a.累销量,
+            a.月销量,
+            a.五天销量,
+            a.十天销量,
+            a.十五天销量,
+            a.二十天销量,
+            a.三十天销量 
+        FROM
+            `cwl_budongxiao_history_sys` AS a
+            LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
+        WHERE 
+            " . $map1 . $map2 . $map3 . $map4. $map5 . "
+        ORDER BY
+            a.省份 ASC
         "; 
         $select_history_area = Db::connect('mysql')->query($sql);
 
@@ -343,6 +399,7 @@ class Budongxiaosystem extends AdminController
         }
         return Excel::exportData($select_history_area, $header, '区域不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
+    
 
     // 二维数组转一维数组
     public function arr2to1($arr, $key, $val) {
@@ -608,15 +665,16 @@ class Budongxiaosystem extends AdminController
                         COUNT( 'a.店铺简称' ) AS 总家数,
                         b.合格家数,
                         IFNULL( c.不合格家数, 0 ) AS 不合格家数,
-                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                        CONCAT(FORMAT(IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100, 2), '%') AS 合格率,
+                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100 as rank_b,
                         IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
                         IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
                         IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
-                        IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
+                        CONCAT(FORMAT(IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100, 2), '%') AS 直营合格率,
                         IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
                         IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
                         IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
-                        IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                        CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
                     FROM
                         cwl_budongxiao_statistics_sys a
                         LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
@@ -632,7 +690,7 @@ class Budongxiaosystem extends AdminController
                         a.商品负责人 
                     ) AS aa 
                 ORDER BY
-                    aa.合格率 DESC 
+                    aa.rank_b DESC 
             ";
         } else {
             $name = session('admin.name');
@@ -647,15 +705,15 @@ class Budongxiaosystem extends AdminController
                         COUNT( 'a.店铺简称' ) AS 总家数,
                         b.合格家数,
                         IFNULL( c.不合格家数, 0 ) AS 不合格家数,
-                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) AS 合格率,
+                        CONCAT(FORMAT(IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100, 2), '%') AS 合格率,
                         IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
                         IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
                         IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
-                        IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) AS 直营合格率,
+                        CONCAT(FORMAT(IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100, 2), '%') AS 直营合格率,
                         IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
                         IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
                         IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
-                        IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) AS 加盟合格率 
+                        CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
                     FROM
                         cwl_budongxiao_statistics_sys a
                         LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人

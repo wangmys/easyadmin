@@ -89,6 +89,60 @@ class Autosend extends BaseController
 
     }
 
+    // 区域不动销同省同二级分类数量统计
+    public function areaNumHandle() {
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        $select_map_sys = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->field('create_time,rand_code')->order('id desc')->find();
+
+        // 删除空参数
+        foreach ($select_config as $key => $val) {
+            if (empty($val)) {
+                unset($select_config[$key]);
+            }
+        }
+        
+        // dump($select_config);die;
+        $map = [];
+        $map[] = ['上市天数', '>=', $select_config['上市天数']];
+        $map[] = ['店铺库存数量', '>', '1'];
+        // dump( $map);die;
+        $select_history_sys = $this->db_easyA->table('cwl_budongxiao_history_sys')->field('省份,中类')->group('省份,中类')->limit(100000)->select()->toArray();
+        foreach ($select_history_sys as $key => $val) {
+            $map[] = ['省份', '=', $val['省份']];
+            $map[] = ['中类', '=', $val['中类']];
+            $map_str = "上市天数>='{$select_config['上市天数']}' AND 店铺库存数量>1 AND 省份='{$val['省份']}' AND 季节归集='{$select_config['季节归集']}' AND 中类='{$val['中类']}'";
+            $sql = "
+                SELECT
+                    count(*) AS 相同中类数 
+                FROM
+                    (
+                        SELECT
+                        货号
+                    FROM
+                        sp_ww_budongxiao_detail 
+                    WHERE
+                        {$map_str}
+                    GROUP BY
+                    货号 
+                ) AS b
+            ";
+            // die;
+            $num = Db::connect('mysql')->query($sql);
+            $select_history_sys[$key]['create_time'] = $select_map_sys['create_time'];
+            $select_history_sys[$key]['rand_code'] = $select_map_sys['rand_code'];
+            $select_history_sys[$key]['相同中类数'] = $num[0]['相同中类数'];
+
+        }
+        // echo '<pre>';
+        // print_r($select_history_sys);
+        $del_areanum = $this->db_easyA->table('cwl_budongxiao_areanum_sys')->where(1)->delete();
+        $insert_areanum = $this->db_easyA->table('cwl_budongxiao_areanum_sys')->insertAll($select_history_sys);
+        // dump($insert_areanum);
+        if ($insert_areanum) {
+            echo 1;
+        }
+    }
+
     // 二维数组转一维数组
     public function arr2to1($arr, $key, $val) {
         $newArr = [];

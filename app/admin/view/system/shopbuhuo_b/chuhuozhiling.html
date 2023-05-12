@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>补货检验表</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff; display:block;">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8">
+            <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                <div class="layui-col-md2 layui-col-sm11"
+                    style="border:0px solid red; float: right; text-align: right;">
+                    <button id="test3" name="fileExcel" type="reset" class="layui-btn layui-btn-xs"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】出货指令单
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" >
+            <div class="title_text1" style="text-align: center; color:#0051ff;">补货检验表 <span style="color:#a5a2a2;" class="lasttime">上次查询时间：{$create_time}</span></div>
+        </table>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button id="test4" class="layui-btn layui-btn-sm" 
+       style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;" lay-event="download">【导入】出货指令单</button>
+       <!-- <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'upload'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , upload = layui.upload
+            , url = "{:url('admin/system.Shopbuhuo_b/chuhuozhiling')}"
+            , url_upload = "{:url('admin/system.Shopbuhuo_b/uploadExcel_buhuo')}";
+
+        // 表1初始化
+        startTable();
+
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#test3'
+            ,url: url_upload //此处配置你自己的上传接口即可
+            ,accept: 'file' //普通文件
+            ,before: function (obj) {
+                console.log(obj);
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
+            ,done: function(res) {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+                table.reload('table', {
+                    // where: data.field
+                    method: 'post'
+                    , url: url
+                    , loading: true
+                    , page: false
+                    , limit: 5000
+                    , done: function (res, curr, count) {
+                        $('.lasttime').text('上次查询时间：' + res.create_time);
+                        if (res.count == 0) {
+                            alert('恭喜，没有异常情况');
+                        }
+                    }
+                })
+            }
+        });
+
+        //监听提交
+        function startTable() {
+            table.render({
+                elem: '#table'
+                , url: url
+                , loading: true
+                , method: 'post'
+                , toolbar: true
+                , page: false
+                , limit: 0
+                , height: 800
+                , cellMinWidth: 50 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '原单编号', title: '原单编号', fixed: 'left' }
+                    , { field: '单据日期', title: '单据日期', fixed: 'left' }
+                    , { field: '仓库编号', title: '仓库编号' , fixed: 'left'}
+                    , { field: '店铺编号', title: '店铺编号', fixed: 'left' }
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' }
+                    , { field: '货号', title: '货号' , fixed: 'left'}
+                    , { field: '商品负责人', title: '商品负责人' , fixed: 'left'}
+                    , { field: '数量', title: '补货数量' }
+                    , { field: '库存数量', title: '库存数量' }
+                    , { field: '调出数量', title: '7天内调出数量' }
+                    , { field: '清空时间', title: '调空日期' }
+                ]]
+                ,done: function (res, curr, count) {
+                    // $('.title_text2').css('display', 'block');
+                    // startTable2(res.rand_code);
+                }
+            });
+        }
+    });
+
+</script>
