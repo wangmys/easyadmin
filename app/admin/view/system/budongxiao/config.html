@@ -129,6 +129,14 @@
                                     <option value="冬季">冬季</option>
                                 </select>
                             </div>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">风格</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <select id="fengge_id" name="风格" lay-verify="">
+                                    <option value="">所有</option>
+                                    <option value="基本款">基本款</option>
+                                    <option value="引流款">引流款</option>
+                                </select>
+                            </div>
                             <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 250px !important;">
                                 <div id="xm-province" class="xm-select-demo"></div>
@@ -476,6 +484,7 @@
             }, 'json')
 
             $("#season_id").val("{$config['季节归集']}");
+            $("#fengge_id").val("{$config['风格']}");
             $("#people_id").val("{$config['商品负责人']}");
             $("#jingyingmoshi_id").val("{$config['经营模式']}");
             $("#kaohequjian_id").val("{$config['考核区间']}");
