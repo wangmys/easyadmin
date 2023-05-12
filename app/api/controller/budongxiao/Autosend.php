@@ -165,6 +165,27 @@ class Autosend extends BaseController
             ['大类' , '<>', '配饰'],
             ['店铺库存数量' , '>', 1],
         ];
+        if (! empty($this->params['风格'])) {
+            $map[] = ['d.风格' , '=', $this->params['风格']];
+            // map2计算skc用
+            $map2 = [
+                ['店铺名称', '=', $store],
+                ['季节归集', '=', $this->params['季节归集']],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['d.风格', '=', $this->params['风格']],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ];
+        } else {
+            // map2计算skc用
+            $map2 = [
+                ['店铺名称', '=', $store],
+                ['季节归集', '=', $this->params['季节归集']],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ];
+        }
 
         // dump($map); die;
 
@@ -174,14 +195,12 @@ class Autosend extends BaseController
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
             // 预计skc
-            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count([
-                ['店铺名称', '=', $store],
-                ['季节归集', '=', $this->params['季节归集']],
-                ['大类' , '<>', '配饰'],
-                ['店铺库存数量' , '>', 1],
-                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
-            ]);
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
             $res_all_new = [];
+
+            // echo '<pre>';
+            // print_r($res_all);
+            // die;
 
             // echo SpWwBudongxiaoDetail::getLastSql(); die;
             
@@ -195,13 +214,7 @@ class Autosend extends BaseController
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
             // 预计skc
-            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count([
-                ['店铺名称', '=', $store],
-                ['季节归集', '=', $this->params['季节归集']],
-                ['大类' , '<>', '配饰'],
-                ['店铺库存数量' , '>', 1],
-                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
-            ]);
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
             $res_all_new = [];
             foreach($res_all as $key => $val) {
                 $diffDay1 = $this->diffDay($val['上市时间'], $this->params['上市时间']);
@@ -305,7 +318,7 @@ class Autosend extends BaseController
             }
 
             // echo '<pre>';
-            // print_r($res_all_new);
+            // print_r($insert_history_data);
             // dump($insert_history_data);
             // die;
 

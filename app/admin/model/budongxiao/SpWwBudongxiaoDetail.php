@@ -15,7 +15,7 @@ class SpWwBudongxiaoDetail extends TimeModel
     protected $createTime = 'create_time';
     protected $updateTime = 'update_time';
     protected $table = 'sp_ww_budongxiao_detail';
-    protected static $fields = 'd.商品负责人,d.省份,d.季节归集,d.上市时间,d.经营模式,d.店铺名称,d.店铺库存数量,d.云仓,d.货号,d.大类,d.中类,d.小类,d.累销量,d.月销量,d.五天销量,d.十天销量,d.十五天销量,d.二十天销量
+    protected static $fields = 'd.商品负责人,d.省份,d.季节归集,d.风格,d.上市时间,d.经营模式,d.店铺名称,d.店铺库存数量,d.云仓,d.货号,d.大类,d.中类,d.小类,d.累销量,d.月销量,d.五天销量,d.十天销量,d.十五天销量,d.二十天销量
     ,d.三十天销量,d.上市天数,d.上架店数,d.总店数,d.上柜率,d.省份售罄,d.品类排名,y.可用库存Quantity,y.齐码情况';
 
     
