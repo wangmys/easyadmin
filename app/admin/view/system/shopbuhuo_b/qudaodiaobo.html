@@ -111,13 +111,19 @@
                     <button id="test3" name="fileExcel" type="reset" class="layui-btn layui-btn-xs"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】调拨申请单
                     </button>
+                    <button lay-submit id="test3" name="fileExcel" type="submit" class="layui-btn layui-btn-xs" lay-filter="search"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">查询
+                    </button>
+                    <!-- <button lay-submit class="layui-btn layui-btn-sm" lay-filter="formDemo"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">数据筛选
+                    </button> -->
                 </div>
             </div>
         </form>
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" >
-            <div class="title_text1" style="text-align: center; color:#0051ff;">调拨检验表 <span style="color:#a5a2a2;" class="lasttime">上次查询时间：{$create_time}</span></div>
+            <div class="title_text1" style="text-align: center; color:#0051ff;">调拨检验表 <span style="color:#a5a2a2;" class="lasttime">上次上传时间：{$create_time}</span></div>
         </table>
     </div>
 </body>
@@ -180,22 +186,42 @@
                         layui.layer.closeAll();
                     }, 2000);
                 });
-
-                table.reload('table', {
-                    // where: data.field
-                    method: 'post'
-                    , url: url
-                    , loading: true
-                    , page: false
-                    , limit: 5000
-                    , done: function (res, curr, count) {
-                        $('.lasttime').text('上次查询时间：' + res.create_time);
-                        if (res.count == 0) {
-                            alert('恭喜，没有异常情况');
-                        }
-                    }
-                })
+                alert('上传成功，执行查询');
+                // table.reload('table', {
+                //     // where: data.field
+                //     method: 'post'
+                //     , url: url
+                //     , loading: true
+                //     , page: false
+                //     , limit: 5000
+                //     , done: function (res, curr, count) {
+                //         $('.lasttime').text('上次查询时间：' + res.create_time);
+                //         if (res.count == 0) {
+                //             alert('恭喜，没有异常情况');
+                //         }
+                //     }
+                // })
             }
+        });
+
+        //监听提交
+        form.on('submit(search)', function (data) {
+            // console.log(111)
+            table.reload('table', {
+                // where: data.field
+                method: 'post'
+                , url: url
+                , loading: true
+                , page: false
+                , limit: 5000
+                , done: function (res, curr, count) {
+                    $('.lasttime').text('上次上传时间：' + res.create_time);
+                    if (res.count == 0) {
+                        alert('恭喜，没有异常情况');
+                    }
+                }
+            })
+            return false;
         });
 
 
@@ -225,8 +251,8 @@
         function startTable() {
             table.render({
                 elem: '#table'
-                , url: url
-                , loading: true
+                // , url: url
+                , loading: false
                 , method: 'post'
                 , toolbar: true
                 , page: false
