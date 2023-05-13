@@ -216,4 +216,41 @@ class Tableupdate extends BaseController
         }
 
     }
+
+
+    // 更新 customer
+    public function update_customer() {
+        // 查询bi
+        $select_customer = $this->db_bi->table('customer')->where(1)->select()->toArray();
+        if (!$select_customer) {
+            echo '没有数据更新';
+            die;
+        } 
+
+        $handle = $this->db_easyA->table('customer')->where(1)->delete();
+
+        $select_customer = array_chunk($select_customer, 500);
+
+        foreach($select_customer as $key => $val) {
+            $insert = $this->db_easyA->table('customer')->insertAll($val);
+        }
+
+
+        if ($select_customer) {
+            // $this->db_bi->commit();    
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'easyadmin2 customer 更新成功！'
+            ]);
+        } else {
+            // $this->db_bi->rollback();   
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'easyadmin2 customer 更新失败！'
+            ]);
+        }
+
+    }
 }
