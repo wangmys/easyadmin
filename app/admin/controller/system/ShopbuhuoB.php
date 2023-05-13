@@ -673,6 +673,8 @@ class ShopbuhuoB extends AdminController
                 // $diaochu_zaitu = $this->qudaodiaobo_zaitu_new('曹太阳', '兰州二店', 'B11501001');
                 // dump($weiwancheng);
                 // dump($diaochu_zaitu);die;
+
+
                 // 调出店铺调拨未完成
                 if ($weiwancheng) {
                     // 现有库存 - 调拨未完成数 - 调入店所需数量 
@@ -692,7 +694,24 @@ class ShopbuhuoB extends AdminController
                             continue;
                         }
                     }
-                    
+                // 调出店没有调拨记录    
+                } else {
+                    if ($kucun[0]['actual_quantity'] - $val['总数量'] <= 0) {
+                        // 1.调出店是否有在途
+                        $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        if ($diaochu_zaitu) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有在途";
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                        // 2.上市天数不足8天
+                        if ($val['上市天数'] && $val['上市天数'] < 7) {
+                            $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                    }
                 }
                 
                 // 2 调入店铺7天内清空过
