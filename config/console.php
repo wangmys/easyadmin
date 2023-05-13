@@ -10,6 +10,6 @@ return [
         'OssStatic' => 'app\common\command\OssStatic',
         'worker' => 'think\Workerman\command\worker',
          'action'    => 'app\common\command\Action',
-        'stock' => 'app\Command\Stock',
+        'stock' => 'app\command\Stock',
     ],
 ];
