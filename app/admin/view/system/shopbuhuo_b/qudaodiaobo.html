@@ -112,7 +112,7 @@
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】调拨申请单
                     </button>
                     <button lay-submit id="test3" name="fileExcel" type="submit" class="layui-btn layui-btn-xs" lay-filter="search"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">查询
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">表单校验
                     </button>
                     <!-- <button lay-submit class="layui-btn layui-btn-sm" lay-filter="formDemo"
                     style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">数据筛选
@@ -122,7 +122,7 @@
         </form>
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
-        <table class="layui-hide" id="table" >
+        <table class="layui-hide" id="table" lay-filter="table">
             <div class="title_text1" style="text-align: center; color:#0051ff;">调拨检验表 <span style="color:#a5a2a2;" class="lasttime">上次上传时间：{$create_time}</span></div>
         </table>
     </div>
@@ -134,8 +134,9 @@
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-       <button id="test4" lay-event="uploadExcel" class="layui-btn layui-btn-sm"
+        <button id="test4" lay-event="uploadExcel" class="layui-btn layui-btn-sm"
         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】调拨申请单</button>
+        <button class="layui-btn layui-btn-sm" lay-event="download">表单校验</button>
     </div>
 </script>
 <script>
@@ -155,7 +156,7 @@
 
         //指定允许上传的文件类型
         upload.render({
-            elem: '#test3'
+            elem: '#test4'
             ,url: url_upload //此处配置你自己的上传接口即可
             ,accept: 'file' //普通文件
             ,before: function () {
@@ -186,7 +187,7 @@
                         layui.layer.closeAll();
                     }, 2000);
                 });
-                alert('上传成功，执行查询');
+                alert('上传成功，请执行表单校验');
                 // table.reload('table', {
                 //     // where: data.field
                 //     method: 'post'
@@ -231,18 +232,14 @@
                 case 'uploadExcel':
                     // location.href=url_download_history
                     alert('上传');
+                    
                 break;
-                case 'budongxiao_total':
-                    console.log(url_total)
-                    layer.open({
-                        title: '单店不动销汇总'
-                        ,type: 2
-                        ,area: ['100%', '100%'] // 100%全屏
-                        ,content: url_total
-                    });   
+                case 'download':
+                    // location.href=url_download_history
+                    alert('数据有点多，请耐心等待');
                 break;
                 case 'update':
-                layer.msg('编辑');
+                    layer.msg('编辑');
                 break;
             };
         });
@@ -254,7 +251,8 @@
                 // , url: url
                 , loading: false
                 , method: 'post'
-                , toolbar: true
+                // , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: false
                 , limit: 0
                 , height: 800
