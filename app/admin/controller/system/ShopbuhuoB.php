@@ -683,12 +683,15 @@ class ShopbuhuoB extends AdminController
                         $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
                         if ($diaochu_zaitu) {
                             $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = $weiwancheng[0]['调拨未完成数'];
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有在途";
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
                         // 2.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
@@ -701,12 +704,15 @@ class ShopbuhuoB extends AdminController
                         $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
                         if ($diaochu_zaitu) {
                             $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有在途";
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
                         // 2.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
@@ -716,6 +722,7 @@ class ShopbuhuoB extends AdminController
                 
                 // 2 调入店铺7天内清空过
                 if (!empty($val['清空时间'])) {
+                    $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                     // $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
                     $select_qudaodiaobo[$key]['信息反馈'] = "调入店7天内清空过"; 
                     $wrongData[] = $select_qudaodiaobo[$key];

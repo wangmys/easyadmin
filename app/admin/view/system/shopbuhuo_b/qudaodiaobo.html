@@ -104,7 +104,7 @@
 
 <body class="" style="background-color: #ffffff;">
     <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
-        <form class="layui-form layui-form-pane ok-form layui-col-space8" style="display:bloc;">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8" style="display:none;">
             <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                 <div class="layui-col-md2 layui-col-sm11"
                     style="border:0px solid red; float: right; text-align: right;">
@@ -121,6 +121,7 @@
             </div>
         </form>
     </div>
+    <button id="importExcel" style="display:none;">【导入】调拨申请单</button>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
             <div class="title_text1" style="text-align: center; color:#0051ff;">调拨检验表 <span style="color:#a5a2a2;" class="lasttime">上次上传时间：{$create_time}</span></div>
@@ -134,9 +135,9 @@
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-        <button id="test4" lay-event="uploadExcel" class="layui-btn layui-btn-sm"
+        <button id="test4" lay-event="uploadExcel" class="layui-btn search_btn layui-btn-sm"
         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】调拨申请单</button>
-        <button class="layui-btn layui-btn-sm" lay-event="download">表单校验</button>
+        <button class="layui-btn layui-btn-sm" id="btn_submit" lay-submit lay-event="submit" lay-filter="search">校验调拨检核表</button>
     </div>
 </script>
 <script>
@@ -156,7 +157,7 @@
 
         //指定允许上传的文件类型
         upload.render({
-            elem: '#test4'
+            elem: '#importExcel'
             ,url: url_upload //此处配置你自己的上传接口即可
             ,accept: 'file' //普通文件
             ,before: function () {
@@ -187,7 +188,7 @@
                         layui.layer.closeAll();
                     }, 2000);
                 });
-                alert('上传成功，请执行表单校验');
+                alert('上传成功，请校验调拨检核表');
                 // table.reload('table', {
                 //     // where: data.field
                 //     method: 'post'
@@ -205,42 +206,36 @@
             }
         });
 
-        //监听提交
-        form.on('submit(search)', function (data) {
-            // console.log(111)
-            table.reload('table', {
-                // where: data.field
-                method: 'post'
-                , url: url
-                , loading: true
-                , page: false
-                , limit: 5000
-                , done: function (res, curr, count) {
-                    $('.lasttime').text('上次上传时间：' + res.create_time);
-                    if (res.count == 0) {
-                        alert('恭喜，没有异常情况');
-                    }
-                }
-            })
-            return false;
-        });
-
 
         //触发事件
         table.on('toolbar(table)', function(obj) {
             switch(obj.event){
                 case 'uploadExcel':
                     // location.href=url_download_history
-                    alert('上传');
-                    
-                break;
-                case 'download':
+                    // alert('上传');
+                    $('#importExcel').click();
+                    break;
+                case 'submit':
                     // location.href=url_download_history
-                    alert('数据有点多，请耐心等待');
-                break;
+                    // alert('数据有点多，请耐心等待');
+                    table.reload('table', {
+                        // where: data.field
+                        method: 'post'
+                        , url: url
+                        , loading: true
+                        , page: false
+                        , limit: 5000
+                        , done: function (res, curr, count) {
+                            $('.lasttime').text('上次上传时间：' + res.create_time);
+                            if (res.count == 0) {
+                                alert('恭喜，没有异常情况');
+                            }
+                        }
+                    }) 
+                    break;
                 case 'update':
                     layer.msg('编辑');
-                break;
+                    break;
             };
         });
 
@@ -273,7 +268,7 @@
                     , { field: '店铺库存', title: '店铺库存', width:80}
                     , { field: '未完成调拨量', title: '未完成调拨量' , width:80}
                     , { field: '调出店在途量', title: '调出店在途量', width:80} // 库存
-                    , { field: '调出店铺该货号数据合计', title: '本次调拨量', width:80} // 库存
+                    , { field: '本次调拨量', title: '本次调拨量', width:80} // 库存
                     , { field: '清空时间', title: '调入店清空时间' , width:150} // 库存
                     // , { field: '调出店铺该货号数据合计', title: '调出店铺该货号数据合计', width:150 }
                     // , { field: '是否完成', title: '是否完成' }
