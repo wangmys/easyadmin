@@ -104,7 +104,7 @@
 
 <body class="" style="background-color: #ffffff;">
     <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff; display:block;">
-        <form class="layui-form layui-form-pane ok-form layui-col-space8">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8" style="display:none;">
             <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                 <div class="layui-col-md2 layui-col-sm11"
                     style="border:0px solid red; float: right; text-align: right;">
@@ -115,8 +115,9 @@
             </div>
         </form>
     </div>
+    <button id="importExcel" style="display:none;">【导入】出货指令单</button>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
-        <table class="layui-hide" id="table" >
+        <table class="layui-hide" id="table" lay-filter="table">
             <div class="title_text1" style="text-align: center; color:#0051ff;">补货检验表 <span style="color:#a5a2a2;" class="lasttime">上次查询时间：{$create_time}</span></div>
         </table>
     </div>
@@ -128,9 +129,8 @@
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-       <button id="test4" class="layui-btn layui-btn-sm" 
-       style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;" lay-event="download">【导入】出货指令单</button>
-       <!-- <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+       <button id="test4" class="layui-btn layui-btn-sm" lay-event="uploadExcel"
+       style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">【导入】出货指令单</button>
     </div>
 </script>
 <script>
@@ -150,7 +150,7 @@
 
         //指定允许上传的文件类型
         upload.render({
-            elem: '#test3'
+            elem: '#importExcel'
             ,url: url_upload //此处配置你自己的上传接口即可
             ,accept: 'file' //普通文件
             ,before: function (obj) {
@@ -198,6 +198,22 @@
             }
         });
 
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            switch(obj.event){
+                case 'uploadExcel':
+                    // location.href=url_download_history
+                    // alert('上传');
+                    $('#importExcel').click();
+                    break;
+                case 'submit':
+                    break;
+                case 'update':
+                    layer.msg('编辑');
+                    break;
+            };
+        });
+
         //监听提交
         function startTable() {
             table.render({
@@ -205,7 +221,8 @@
                 , url: url
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                // , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: false
                 , limit: 0
                 , height: 800
