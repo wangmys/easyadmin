@@ -349,8 +349,8 @@ class Autosend extends BaseController
             $res_end['30天以上'] = $day30;
             $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
             $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
-            $res_end['考核结果'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? '不合格' : '合格';
-            $res_end['合格率'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
+            $res_end['考核结果'] = $res_end['考核标准占比'] > $this->params['合格率'] ? '不合格' : '合格';
+            $res_end['合格率'] = $res_end['考核标准占比'] > $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
             $res_end['合格率2'] = $this->params['合格率'];
             $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? ceil((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数']) : '';
             $res_end['create_time'] = $this->create_time;

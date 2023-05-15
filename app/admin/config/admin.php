@@ -33,6 +33,8 @@ return [
         'system.dress.inventory/index_export',
         'system.dress.dress/index',
         'system.dress.dress/index_export',
+        'system.weather/index',
+        'system.weather/getWeatherField'
     ],
 
     // 不需要验证权限的控制器
@@ -50,6 +52,7 @@ return [
         'login/index',
         'login/out',
         'system.dress.inventory/index',
+        'system.dress.inventory/index',
         'system.dress.inventory/question',
         'system.dress.inventory/finish_rate',
         'system.dress.inventory/gather',
@@ -62,5 +65,7 @@ return [
         'system.dress.index/stock',
         'system.dress.index/index_export',
         'system.dress.index/list_export',
+        'system.weather/index',
+        'system.weather/getWeatherField'
     ],
 ];

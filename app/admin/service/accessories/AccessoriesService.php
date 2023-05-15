@@ -233,7 +233,7 @@ class AccessoriesService
                 $key = str_replace('_','',$k);
                 // 具体配置
                 $_data = $item['_data'];
-                if(isset($_data[$key]) && !empty($_data[$key]) && !empty($v)){
+                if(isset($_data[$key]) && !empty($_data[$key]) && !empty($v) && $v > 0){
                     $vv = intval($v);
                     if($vv < $_data[$key]){
                         $list[$k] = "<span style='width: 100%;display: block;background: rgba(255,0,0,.2)'>{$v}</span>";
