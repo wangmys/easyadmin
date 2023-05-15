@@ -258,7 +258,9 @@
                     , { field: '考核标准占比', title: '考核标准占比', templet: function (res) {
                         return res['考核标准占比'] + '%';
                     }}
-                    , { field: '合格率', title: '考核结果({$success_percent}%)' }
+                    , { field: '合格率', title: '考核结果({$success_percent}%)' , templet: function (res) {
+                        return res['合格率'] ? res['合格率'] : `<span style='color: blue;'>合格</span>`;
+                    }}
                     , { field: '需要调整SKC数', title: '需要调整SKC数' }
                 ]]
                 ,done: function (res, curr, count) {

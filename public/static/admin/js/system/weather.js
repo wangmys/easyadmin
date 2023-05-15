@@ -22,6 +22,8 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var province_list = res.province_list;
                 // 区域列表
                 var area_list = res.area_list;
+                // 商品负责人
+                var liable_list = res.liable_list;
                 // 地级市
                 var city_list = res.city_list;
                 // 气温区域
@@ -39,6 +41,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
+                    {field: 'liable', width: 100, title: '商品负责人',fixed:'left',search: 'xmSelect',selectList:liable_list},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     // {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},

@@ -197,6 +197,171 @@ class ShopbuhuoB extends AdminController
     }  
 
     // 康雷在途 给区域调拨用   调出负责人$diaochufuzheren
+    public function qudaodiaobo_zaitu_new($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
+        $sql = "
+            SELECT
+            T.CustomItem17 商品专员,
+            T.CustomerName 店铺名称,
+            T.GoodsNo 货号,
+            SUM ( T.intransit_quantity ) 在途数量 
+        FROM
+            (
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName ,
+                EG.GoodsNo,
+                SUM ( EDG.Quantity ) AS intransit_quantity 
+            FROM
+                ErpDelivery ED
+                LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID= EDG.DeliveryID
+                LEFT JOIN ErpCustomer EC ON ED.CustomerId= EC.CustomerId
+                LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId 
+            WHERE
+                ED.CodingCode= 'EndNode2' 
+                AND ED.IsCompleted= 0 --AND ED.IsReceipt IS NULL
+                
+                AND ED.DeliveryID NOT IN (
+                SELECT
+                    ERG.DeliveryId 
+                FROM
+                    ErpCustReceipt ER
+                    LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID= ERG.ReceiptID 
+                WHERE
+                    ER.CodingCodeText= '已审结' 
+                    AND ERG.DeliveryId IS NOT NULL 
+                    AND ERG.DeliveryId!= '' 
+                GROUP BY
+                    ERG.DeliveryId 
+                ) 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' AND EC.CustomerName = '{$CustomerName}' AND EG.GoodsNo = '{$GoodsNo}'
+            GROUP BY
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EG.GoodsNo UNION ALL--店店调拨在途
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName AS dept_name,
+                EG.GoodsNo,
+                SUM ( EIG.Quantity ) AS intransit_quantity 
+            FROM
+                ErpCustOutbound EI
+                LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId= EIG.CustOutboundId
+                LEFT JOIN ErpCustomer EC ON EI.InCustomerId= EC.CustomerId
+                LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId 
+            WHERE
+                EI.CodingCodeText= '已审结' 
+                AND EI.IsCompleted= 0 
+                AND EI.CustOutboundId NOT IN (
+                SELECT
+                    ERG.CustOutboundId 
+                FROM
+                    ErpCustReceipt ER
+                    LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID= ERG.ReceiptID 
+                WHERE
+                    ER.CodingCodeText= '已审结' 
+                    AND ERG.CustOutboundId IS NOT NULL 
+                    AND ERG.CustOutboundId!= '' 
+                GROUP BY
+                    ERG.CustOutboundId 
+                ) 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' 
+                                AND EC.CustomerName = '{$CustomerName}'
+                                AND EG.GoodsNo = '{$GoodsNo}'
+                AND EC.ShutOut= 0 
+            GROUP BY
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EG.GoodsNo 
+            ) T 
+        GROUP BY
+            T.CustomItem17,
+            T.CustomerName,
+            T.GoodsNo;
+        ";
+        // 在途 调出店铺是不能有在途的，这样没意义
+        $zaitu = $this->db_sqlsrv->query($sql);
+        return $zaitu;
+    }
+
+    // 康雷在途 调出店铺 调拨未完成计算 actual_quantity
+    public function qudaodiaobo_weiwancheng($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
+        // 调拨未完成数量
+        $sql3 = "
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerName ,
+                EIA.InstructionApplyId,
+                EG.GoodsNo ,
+                SUM ( EIAG.Quantity ) AS 调拨未完成数
+            FROM
+                ErpCustomer EC 
+                LEFT JOIN ErpInstructionApply EIA ON EC.CustomerId = EIA.OutItemId
+                LEFT JOIN ErpInstructionApplyGoods EIAG ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
+                LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
+            WHERE
+                EC.ShutOut= 0 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' 
+                AND EC.CustomerName = '{$CustomerName}' 
+                AND EG.GoodsNo = '{$GoodsNo}' 
+                AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
+                AND EIA.CodingCodeText='已审结'
+                AND EIA.IsCompleted=0
+            GROUP BY
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.GoodsNo,
+                EIA.InstructionApplyId
+        ";
+
+        $kucun = $this->db_sqlsrv->query($sql3);
+        return $kucun;
+    }
+
+    // 康雷库存 给区域调拨用   调出负责人$diaochufuzheren
+    public function qudaodiaobo_kucun_new($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
+        $year = date('Y', time());
+        // 可查是否完成，未完成数量
+        $sql3 = "
+            SELECT
+                EC.CustomItem17,
+                EC.CustomerName ,
+                EG.GoodsNo ,
+                SUM ( ECS.Quantity ) AS actual_quantity,
+                EIA.IsCompleted AS '是否完成',
+                EIAG.Quantity AS '调出数量' 
+            FROM
+                ErpCustomerStock ECS
+                LEFT JOIN ErpCustomer EC ON ECS.CustomerId= EC.CustomerId
+                LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
+                LEFT JOIN ErpInstructionApplyGoods EIAG ON ECS.GoodsId= EIAG.GoodsId
+                LEFT JOIN ErpInstructionApply EIA ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
+            WHERE
+                EC.ShutOut= 0 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' 
+                                AND EC.CustomerName = '{$CustomerName}' 
+                                AND EG.GoodsNo = '{$GoodsNo}' 
+                AND EG.TimeCategoryName1= {$year} 
+                                AND EIA.CodingCodeText='已审结'
+                                AND EIA.IsCompleted=0
+            GROUP BY
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.GoodsNo,
+                EIA.IsCompleted,
+                EIAG.Quantity 
+            HAVING
+            SUM ( ECS.Quantity ) !=0
+        ";
+
+        $kucun = $this->db_sqlsrv->query($sql3);
+        return $kucun;
+    }
+
+    // 康雷在途 给区域调拨用   调出负责人$diaochufuzheren
     public function qudaodiaobo_zaitu($diaochufuzheren = "") {
         $sql = "
         SELECT
@@ -267,7 +432,7 @@ class ShopbuhuoB extends AdminController
                 GROUP BY
                     ERG.CustOutboundId 
                 ) 
-                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' 
                 AND EC.ShutOut= 0 
             GROUP BY
                 EC.CustomItem17,
@@ -286,7 +451,8 @@ class ShopbuhuoB extends AdminController
     }
 
     // 康雷库存 给区域调拨用   调出负责人$diaochufuzheren
-    public function qudaodiaobo_kucun($diaochufuzheren = "") {
+    public function qudaodiaobo_kucun($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
+
         // 店铺库存
         $sql = "
             SELECT
@@ -299,7 +465,9 @@ class ShopbuhuoB extends AdminController
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
             WHERE  EC.ShutOut=0
                 AND EC.CustomItem17 = '{$diaochufuzheren}' 
-                AND EG.TimeCategoryName1=2023
+                AND EG.GoodsNo = '{$GoodsNo}'
+                AND EC.CustomerName = '{$CustomerName}'
+                AND EG.TimeCategoryName1 in (2021,2022,2023)
             GROUP BY 
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -324,8 +492,8 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpInstructionApply EIA ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
             WHERE
                 EC.ShutOut= 0 
-                AND EC.CustomItem17 = '{$this->authInfo["name"]}' 
-                AND EG.TimeCategoryName1= 2023 
+                AND EC.CustomItem17 = '{$diaochufuzheren}' 
+                AND EG.TimeCategoryName1= in (2021,2022,2023)
             GROUP BY
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -336,7 +504,7 @@ class ShopbuhuoB extends AdminController
             SUM ( ECS.Quantity ) !=0
         ";
 
-        $kucun = $this->db_sqlsrv->query($sql2);
+        $kucun = $this->db_sqlsrv->query($sql);
         return $kucun;
     }
 
@@ -357,6 +525,7 @@ class ShopbuhuoB extends AdminController
 
     // 康雷7天 近七天做了调出清空的数据  店铺商品负责人$shangpingfuzheren
     public function day7($shangpingfuzheren = '') {
+        $year = date("Y", time());
         $sql = "
             SELECT
                 T.CustomItem17 商品专员,
@@ -387,7 +556,7 @@ class ShopbuhuoB extends AdminController
             LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
             WHERE EC.CustomItem17='{$shangpingfuzheren}'-- EC.CustomerName='大石二店'
-            AND EG.TimeCategoryName1=2023
+            AND EG.TimeCategoryName1={$year}
             ) T
             WHERE T.[清空时间] > GETDATE()-7
         ";
@@ -401,39 +570,40 @@ class ShopbuhuoB extends AdminController
     }
 
 
-
     // qudaodiaobo康雷数据合并 相同货号 统计数量累加
-    public function qudaodiaobo_group() {
-        // 旧
-        // $select_qudaodiaobo = $this->db_easyA->query("
-        //     select aa.*,b.CustomerName as 调出店铺名称, c.CustomerName as 调入店铺名称, '' as 备注 from (
-        //     SELECT a.*,sum(a.数量) as `调出店铺该货号数据合计` FROM `cwl_qudaodiaobo_2` as a
-        //     WHERE a.aid='{$this->authInfo["id"]}'
-        //     GROUP BY 调出店铺编号,货号
-        //     ) as aa left join customer as b on aa.调出店铺编号=b.CustomerCode 
-        //     left join customer as c on aa.调入店铺编号=c.CustomerCode
-        // ");
-
-        // echo '<pre>';
-        // print_r($select_qudaodiaobo); 
-        // die;
-        
+    public function qudaodiaobo_group() {   
         // 新
-        $select_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo_2')
-        ->field("原单编号,单据日期,审结日期,审结日期,调入店铺编号,调入店铺名称,调入店商品负责人,调出店铺编号,调出店铺名称,调出店商品负责人,
-        调出价格类型,调入价格类型,货号,sum(数量) as 调出店铺该货号数据合计,create_time,aid,aname")
-        ->where([
-            ['aid', '=', $this->authInfo["id"]]
-        ])->group('调出店铺编号,货号')->select()->toArray();
-        // print_r($select_qudaodiaobo); 
-        
+        $select_qudaodiaobo = $this->db_easyA->query("
+            SELECT
+                原单编号,单据日期,审结日期,调入店铺编号,调入店铺名称,调入店商品负责人,调出店铺编号,调出店铺名称,调出店商品负责人,
+                调出价格类型,调入价格类型,
+                a.货号,
+                sum(数量) AS 总数量,
+                b.`上市天数`,
+                create_time,
+                aid,
+                aname 
+            FROM
+                `cwl_qudaodiaobo_2` AS a
+                LEFT JOIN sp_ww_budongxiao_detail AS b ON a.`调出店商品负责人` = b.`商品负责人` 
+                AND a.`调出店铺名称` = b.`店铺名称` 
+                AND a.货号 = b.货号 
+            WHERE
+                `aid` = {$this->authInfo["id"]} 
+            GROUP BY
+                a.`调入店铺名称`,
+                a.`货号`
+        ");
+
+        // dump($select_qudaodiaobo); die;
+
         if (! empty($select_qudaodiaobo)) {
             //  调出不能有在途！！！
-            $zaitu = $this->qudaodiaobo_zaitu($select_qudaodiaobo[0]['调出店商品负责人']);
+            // $zaitu = $this->qudaodiaobo_zaitu($select_qudaodiaobo[0]['调出店商品负责人']);
             // 调空不能有在途！！！
-            $kucun = $this->qudaodiaobo_kucun($select_qudaodiaobo[0]['调出店商品负责人']);
+            // $kucun = $this->qudaodiaobo_kucun($select_qudaodiaobo[0]['调出店商品负责人']);
             // 单店单品上市天数必须大于7！！！
-            $elt7day = $this->qudaodiaobo_elt7day($select_qudaodiaobo[0]['调出店商品负责人']);
+            // $elt7day = $this->qudaodiaobo_elt7day($select_qudaodiaobo[0]['调出店商品负责人']);
 
             $store_in_map = "";
             // 组合调入店铺的条件
@@ -491,84 +661,135 @@ class ShopbuhuoB extends AdminController
 
             $wrongData = [];
             foreach ($select_qudaodiaobo as $key => $val) {
-                $end1 = false;
-                $end2 = false;
-                $end3 = false;
+                // 计算库存
+                $kucun = $this->qudaodiaobo_kucun($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                if ($kucun) {
+                    $select_qudaodiaobo[$key]['店铺库存'] = $kucun[0]['actual_quantity'];
+                }
 
-                // 0 调入店铺7天内清空过
+                // 1 调出店调拨未完成，调空，并且有在途
+                $weiwancheng = $this->qudaodiaobo_weiwancheng($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                // $weiwancheng = $this->qudaodiaobo_weiwancheng('曹太阳', '甘谷一店', 'B12501003');
+                // $diaochu_zaitu = $this->qudaodiaobo_zaitu_new('曹太阳', '兰州二店', 'B11501001');
+                // dump($weiwancheng);
+                // dump($diaochu_zaitu);die;
+
+
+                // 调出店铺调拨未完成
+                if ($weiwancheng) {
+                    // 现有库存 - 调拨未完成数 - 调入店所需数量 
+                    if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] - $val['总数量'] <= 0) {
+                        // 1.调出店是否有在途
+                        $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        if ($diaochu_zaitu) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = $weiwancheng[0]['调拨未完成数'];
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有在途";
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                        // 2.上市天数不足8天
+                        if ($val['上市天数'] && $val['上市天数'] < 7) {
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                    }
+                // 调出店没有调拨记录    
+                } else {
+                    if ($kucun[0]['actual_quantity'] - $val['总数量'] <= 0) {
+                        // 1.调出店是否有在途
+                        $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        if ($diaochu_zaitu) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有在途";
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                        // 2.上市天数不足8天
+                        if ($val['上市天数'] && $val['上市天数'] < 7) {
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
+                            $wrongData[] = $select_qudaodiaobo[$key];
+                            continue;
+                        }
+                    }
+                }
+                
+                // 2 调入店铺7天内清空过
                 if (!empty($val['清空时间'])) {
+                    $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                     // $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
                     $select_qudaodiaobo[$key]['信息反馈'] = "调入店7天内清空过"; 
                     $wrongData[] = $select_qudaodiaobo[$key];
                     continue;
                 }
 
+                // 单店单品上市天数
+                // if ($val['上市天数'] && $val['上市天数'] < 7) {
+                //     $select_qudaodiaobo[$key]['信息反馈']  = "调出店上市不足8天"; 
+                //     $wrongData[] = $select_qudaodiaobo[$key];
+                //     continue;
+                // }
+
                 // 1 调出不能有在途
-                foreach ($zaitu as $key2 => $val2) {
-                    if ($val['调出店铺名称'] == $val2['店铺名称'] && $val['货号'] == $val2['货号']) {
-                        $select_qudaodiaobo[$key]['调出店在途量'] = $val2['在途数量']; 
-                        // $select_qudaodiaobo[$key]['信息反馈'] = "【调出不能有在途】 在途数量：" . $val2['在途数量']; 
-                        $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                        $wrongData[] = $select_qudaodiaobo[$key];
-                        $end1 = true;
-                        break;
-                    }
-                }
-                if ($end1 == true) continue;
+                // $zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                // // $zaitu = $this->qudaodiaobo_zaitu_new('曹太阳', '罗田一店', '212612001');
+                // if ($zaitu) {
+                //     $select_qudaodiaobo[$key]['调出店在途量'] = $zaitu[0]['在途数量']; 
+                //     $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途";
+                //     $wrongData[] = $select_qudaodiaobo[$key];
+                //     continue;
+                // }
 
-                // 3 单店单品上市天数<=7
-                foreach ($elt7day as $key4 => $val4) {
-                    if ($val['调出店铺名称'] == $val4['店铺名称'] && $val['货号'] == $val4['货号']) {
-                        $select_qudaodiaobo[$key]['信息反馈']  = "调出店上市不足7天"; 
-                        // $select_qudaodiaobo[$key]['信息反馈'] = "上市天数不足8天"; 
-                        $wrongData[] = $select_qudaodiaobo[$key];
-                        $end3 = true;
-                        break;
-                    }
-                }
-                if ($end3 == true) continue;
 
-                // 2 调空 7天内别调入
-                foreach ($kucun as $key3 => $val3) {
-                    if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
-                        // 未完成
-                        if (empty($val3['是否完成'])) {
-                            // 调空并且有在途
-                            if ($val3['actual_quantity'] - $val3['调入数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
-                                // 是否有在途
-                                foreach ($zaitu as $key3_1 => $val3_1) {
-                                    if ($val['调出店铺名称'] == $val3_1['店铺名称'] && $val['货号'] == $val3_1['货号']) {
-                                        $select_qudaodiaobo[$key]['在途数量'] =  $val3_1['在途数量']; 
-                                        $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                                        $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调入数量'];
-                                        $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                                        // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                                        $wrongData[] = $select_qudaodiaobo[$key];
-                                        $end1 = true;
-                                        break 2;
-                                    }
-                                }
-                            }
-                        } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-                            // 是否有在途
-                            foreach ($zaitu as $key3_1 => $val3_2) {
-                                if ($val['调出店铺名称'] == $val3_2['店铺名称'] && $val['货号'] == $val3_2['货号']) {
-                                    $select_qudaodiaobo[$key]['在途数量'] =  $val3_2['在途数量']; 
-                                    $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                                    $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
-                                    // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
-                                    $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                                    // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                                    $wrongData[] = $select_qudaodiaobo[$key];
-                                    $end1 = true;
-                                    break 2;
-                                }
-                            }
-                        }
-                    }
-                }
-                if ($end2 == true) continue; 
+
+                // 2  7天内别调入
+                // foreach ($kucun as $key3 => $val3) {
+                //     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
+                //         // 未完成 调出店发给别人未完成
+                //         if (empty($val3['是否完成'])) {
+                //             // 库存调过头成负数
+                //             if ($val3['actual_quantity'] - $val3['调出数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
+                //                 // 是否有在途
+                //                 foreach ($zaitu as $key3_1 => $val3_1) {
+                //                     if ($val['调出店铺名称'] == $val3_1['店铺名称'] && $val['货号'] == $val3_1['货号']) {
+                //                         $select_qudaodiaobo[$key]['在途数量'] =  $val3_1['在途数量']; 
+                //                         $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                //                         $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调出数量'];
+                //                         $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                //                         // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                //                         $wrongData[] = $select_qudaodiaobo[$key];
+                //                         $end1 = true;
+                //                         break 2;
+                //                     }
+                //                 }
+                //             }
+                //         } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
+                //             // 是否有在途 别人给调出店发货
+                //             foreach ($zaitu as $key3_1 => $val3_2) {
+                //                 if ($val['调出店铺名称'] == $val3_2['店铺名称'] && $val['货号'] == $val3_2['货号']) {
+                //                     $select_qudaodiaobo[$key]['在途数量'] =  $val3_2['在途数量']; 
+                //                     $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
+                //                     $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                //                     // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
+                //                     $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                //                     // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
+                //                     $wrongData[] = $select_qudaodiaobo[$key];
+                //                     $end1 = true;
+                //                     break 2;
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
             }
+            // dump($wrongData);
+            // die;
             return $wrongData;
         } else {
             return [];
