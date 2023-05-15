@@ -267,3 +267,18 @@ function getDateFromRange_m($startdate, $enddate){
     }
     return $date;
 }
+
+/**
+ * 根据数组某个下标字段排序
+ * @param $arr
+ * @param $param
+ * @param $sort
+ * @return mixed
+ */
+function sort_arr($arr, $param, $sort=SORT_DESC) {
+    foreach ($arr as $arr2) {
+        $flag[] = $arr2[$param];
+    }
+    array_multisort($flag, $sort, $arr);
+    return $arr;
+}

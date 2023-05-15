@@ -17,12 +17,12 @@ class SendPic extends BaseController
         //所有店铺数据
         $sql = "select id, name, erp_shop_id from dept where del_flag=0 and is_virtual=0 and type=1";
         $data = Db::connect("cip")->Query($sql);
-//        print_r($data);die;
 
         $month_start = date('Y-m-01 00:00:00');
         $day_start = date('Y-m-d 00:00:00');
         $month_end = date('Y-m-d 23:59:59');
-//        echo $day_start;die;
+        $month_aim_date_start = date('Ym01');
+        $month_aim_date_end = date('Ymd');
 
         if ($data) {
             foreach ($data as $v_data) {
@@ -32,43 +32,50 @@ class SendPic extends BaseController
 left join user_dept_relation udr on u.id=udr.user_id 
 left join user_role_relations urr on u.id=urr.user_id 
 left join role r on r.id=urr.role_id 
-where dept_id='{$v_data['id']}'"; // and r.name like '%导购%'
+where dept_id='{$v_data['id']}' and u.erp_uid<>'' and u.state=0 "; // and r.name like '%导购%'
                 $daogou_users_data = Db::connect("cip")->Query($daogou_users_sql);
-//                print_r($daogou_users_data);die;
 
                 //该店铺所有导购今天的业绩
                 $all_daogou_today_data = Db::connect("sqlsrv")->Query($this->return_daogou_sql($v_data['name'], $day_start, $month_end));
                 //该店铺所有导购本月的业绩
                 $all_daogou_month_data = Db::connect("sqlsrv")->Query($this->return_daogou_sql($v_data['name'], $month_start, $month_end));
-//                print_r($all_daogou_month_data);die;
+                //全国导购本月的业绩 /连带/件单 排名
+                $whole_country_month_data = Db::connect("sqlsrv")->Query($this->return_daogou_sql('', $month_start, $month_end, 1));
 
                 //该店铺里所有导购本月销售业绩情况 数据
                 $daogou_users_table_data = [];
-                $empty_daogou_users = [];
+
+                //今日有业绩的人员，排前面去
+                if ($all_daogou_today_data) {
+                    foreach ($all_daogou_today_data as $v_all_daogou_today_data) {
+                        $daogou_users_table_data[] = ['name'=>$v_all_daogou_today_data['Name'], 'liandai'=>$v_all_daogou_today_data['ld'].'%', 'jiandanjia'=>$v_all_daogou_today_data['jd'], 'today_finish'=>$v_all_daogou_today_data['sum']];
+                    }
+                }
+                //今日无业绩的人员处理，排后面去
                 if ($daogou_users_data) {
                     foreach ($daogou_users_data as $v_daogou_users_data) {
-//                        $daogou_users_table_data[] = ['name'=>$v_daogou_users_data['real_name'], 'liandai'=>'0%', 'jiandanjia'=>0, 'today_finish'=>0];
-
+                        $sign = false;
+                        foreach ($all_daogou_today_data as $v_all_daogou_today_data) {
+                            if ($v_daogou_users_data['erp_uid'] == $v_all_daogou_today_data['SalesmanID']) {
+                                $sign = true;
+                            }
+                        }
+                        if ($sign == false) {
+                            $daogou_users_table_data[] = ['name'=>$v_daogou_users_data['real_name'], 'liandai'=>'0%', 'jiandanjia'=>0, 'today_finish'=>0];
+                        }
                     }
-                    /*foreach ($all_daogou_today_data as $v_all_daogou_today_data) {
-                        $daogou_users_table_data[] = ['name'=>$v_all_daogou_today_data['Name'], 'liandai'=>$v_all_daogou_today_data['ld'].'%', 'jiandanjia'=>$v_all_daogou_today_data['jd'], 'today_finish'=>$v_all_daogou_today_data['sum']];
-                    }*/
                 }
 
                 if ($daogou_users_data) {
                     foreach ($daogou_users_data as $v_daogou) {
 
-
-
-
                         //每个店铺的每个导购业绩情况：
                         $sql = "";
-
-                        $code = 'daogou_night';//如果每个店铺看到的都一样，则在这里填入店铺id即可
+                        $code = 'daogou_night'.$v_daogou['id'];//导购用户id区分
 
                         //店铺本月排名、全国业绩排名 数据
                         $store_month_sort = $this->return_sort($all_daogou_month_data, $v_daogou['erp_uid']);//店铺本月排名
-                        $whole_country_sort = 15;//全国业绩排名
+                        $whole_country_sort = $this->return_sort($whole_country_month_data, $v_daogou['erp_uid']);//sort_arr($arr, 'sum');//全国业绩排名
                         $table_header = [''];
                         $title = ['店铺本月排名', $store_month_sort, '全国业绩排名', $whole_country_sort];
                         $table_header = array_merge($table_header, $title);
@@ -81,30 +88,28 @@ where dept_id='{$v_data['id']}'"; // and r.name like '%导购%'
                         $field_width[3] = 150;
                         $field_width[4] = 150;
                         //全国连带排名、全国件单排名、本月目标、实际完成多少 数据
-                        $whole_country_liandai_sort = '20';
-                        $whole_country_jiandan_sort = '22';
-                        $month_aim = '20000';
-                        $actual_finish = '13500';
+                        $whole_country_liandai_sort = $this->return_sort(sort_arr($whole_country_month_data, 'ld'), $v_daogou['erp_uid']);//sort_arr($arr, 'sum');//全国连带排名
+                        $whole_country_jiandan_sort = $this->return_sort(sort_arr($whole_country_month_data, 'jd'), $v_daogou['erp_uid']);//sort_arr($arr, 'sum');//全国件单排名
+                        //每个导购目标值
+                        //test....
+//                        $month_aim_date_start = '20230401';
+//                        $month_aim_date_end = '20230430';
+                        $month_aim = $this->return_month_aim_sql($v_daogou['erp_uid'], $month_aim_date_start, $month_aim_date_end);//本月目标
+                        $actual_finish = $this->return_sum($all_daogou_month_data, $v_daogou['erp_uid']);//实际完成多少
                         $table_data= [
                             ['name'=>'全国连带排名', 'liandai'=>$whole_country_liandai_sort, 'jiandanjia'=>'全国件单排名', 'today_finish'=>$whole_country_jiandan_sort],
                             ['name'=>'本月目标', 'liandai'=>$month_aim, 'jiandanjia'=>'实际完成多少', 'today_finish'=>$actual_finish],
                             ['name'=>'姓名', 'liandai'=>'连带率', 'jiandanjia'=>'件单价', 'today_finish'=>'今日完成多少'],
                         ];
-                        foreach ($daogou_users_table_data as $V=>$k){
-                            $new = [
-                                'name'=>$k['name'],
-                                'liandai'=>$k['liandai'],
-                                'jiandanjia'=>$k['jiandanjia'],
-                                'today_finish'=>$k['today_finish'],
-                            ];
-                            $table_data[]=$new;
+                        foreach ($daogou_users_table_data as $kk=>$vv){
+                            $table_data[] = $vv;
                         }
                         //20号前每天需要做多少 数据
                         $before_20_date = 1000;
                         $table_data[] = ['name'=>'20号前每天需要做多少', 'liandai'=>$before_20_date, 'jiandanjia'=>'', 'today_finish'=>''];
 
                         $table_explain = [
-                            0 => "导购-".'aa'//.date('Y年m月d日 H时')
+                            0 => "导购-".$v_daogou['real_name']//.date('Y年m月d日 H时')
                         ];
 
                         $params = [
@@ -141,36 +146,145 @@ where dept_id='{$v_data['id']}'"; // and r.name like '%导购%'
                             $res = $sample->sendImageMsg($val['userid'], $media_id);
                         }
 
-
-
-
-
-
-
-
                     }
                 }
 
-
 //                print_r($daogou_users_data);die;
-
-
-
 
             }
         }
 
     }
 
-    //返回排名
-    protected function return_sort($all_daogou_month_data, $erp_uid) {
+    /**
+     * 返回排名
+     * @param $all_daogou_month_data
+     * @param $erp_uid
+     * @param $param
+     * @return int|mixed|string
+     */
+    protected function return_sort($all_daogou_month_data, $erp_uid, $param = 'SalesmanID') {
 
-
+        $sort = 1;
+        if ($all_daogou_month_data) {
+            $sign = false;
+            foreach ($all_daogou_month_data as $k=>$v) {
+                if ($v[$param] == $erp_uid) {
+                    $sign = true;
+                    $sort = $sort+$k;
+                }
+            }
+            if ($sign == false) {
+                $sort = count($all_daogou_month_data)+1;
+            }
+        }
+        return $sort;
 
     }
 
-    protected function return_daogou_sql($store_name, $start_time, $end_time) {
+    /**
+     * 返回该店铺个人业绩
+     * @param $all_daogou_month_data
+     * @param $erp_uid
+     * @param $param
+     * @return int
+     */
+    protected function return_sum($all_daogou_month_data, $erp_uid, $param='SalesmanID') {
 
+        $sum = 0;
+        foreach ($all_daogou_month_data as $v_data) {
+            if ($v_data[$param] == $erp_uid) $sum = $v_data['sum'];
+        }
+        return $sum;
+
+    }
+
+    /**
+     * 返回导购本月目标
+     * @param $erp_uid
+     * @param $start_time
+     * @param $end_time
+     * @return string
+     */
+    protected function return_month_aim_sql($erp_uid, $start_time, $end_time) {
+
+        $sql = "SELECT
+ userId,
+ userName,
+ userErpId,
+ deptId,
+ deptName,
+ deptErpId,
+ postId,
+ postName,
+ storeRelationId,
+ SUM( originalTarget ) monthOriginalTarget,
+ SUM( practicalTarget ) monthPracticalTarget 
+FROM
+ (
+ SELECT
+ u.id AS userId,
+ u.real_name AS userName,
+ u.erp_uid AS userErpId,
+ d.id AS deptId,
+ d.`name` AS deptName,
+ d.erp_shop_id AS deptErpId,
+ uspr.post_id AS postId,
+ sp.post AS postName,
+ sp.type AS storeRelationId,
+ CASE
+ sp.type 
+ WHEN 3 THEN
+ '店长' 
+ WHEN 2 THEN
+ '店助' ELSE '导购' 
+ END AS storeRelationName,
+ IFNULL( sdot.old_amount, 0 ) AS originalTarget,
+ IFNULL( sdot.amount, 0 ) AS practicalTarget 
+ FROM
+ `user` u
+ LEFT JOIN user_salary_post_relation uspr ON u.id = uspr.user_id
+ LEFT JOIN salary_post sp ON uspr.post_id = sp.id
+ LEFT JOIN user_dept_relation udr ON u.id = udr.user_id
+ LEFT JOIN dept d ON d.id = udr.dept_id
+ LEFT JOIN sales_day_object_target sdot ON sdot.for_id = u.id 
+ AND sdot.type = 0 
+ AND sdot.for_type = 1 
+ WHERE
+ u.state = 0 
+ AND u.is_virtual = 0 
+ AND uspr.post_id IS NOT NULL 
+ AND d.sale_quality = 'ZY' 
+ AND d.del_flag = 0 
+ AND d.is_virtual = 0 
+ AND d.type = 1 
+ AND u.erp_uid = '{$erp_uid}' 
+ AND sdot.date between '{$start_time}' and '{$end_time}'
+ ) z 
+GROUP BY
+ userId,
+ userName,
+ userErpId,
+ deptId,
+ deptName,
+ deptErpId,
+ postId,
+ postName,
+ storeRelationId
+";
+        $res = Db::connect("cip")->Query($sql);
+        return $res ? $res[0]['monthPracticalTarget'] : [];
+
+    }
+
+    protected function return_daogou_sql($store_name, $start_time, $end_time, $if_whole_country = 0, $order_by = 'sum') {
+
+        $if_whole_country_str = '';
+        if ($if_whole_country) {
+            $if_whole_country_str = "";
+        } else {
+            $if_whole_country_str = "AND EC.CustomerName='{$store_name}'";
+        }
         return "SELECT 
 	T.CustomerCode,
 	T.CustomerName,
@@ -203,7 +317,7 @@ LEFT JOIN ErpCustomer EC ON ER.CustomerId=EC.CustomerId
 LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
 WHERE EC.ShutOut=0
 	AND ER.CodingCodeText='已审结'
-	AND EC.CustomerName='{$store_name}'
+	{$if_whole_country_str}
 	AND ER.RetailDate BETWEEN '{$start_time}'  AND '{$end_time}'
 	AND ER.RetailID NOT IN (SELECT ER.RetailID FROM ErpRetail ER  LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID WHERE ERG.Status='退'  	AND ER.RetailDate BETWEEN '{$start_time}'  AND '{$end_time}' GROUP BY ER.RetailID )
 	AND ERG.Status!='赠'
@@ -222,7 +336,7 @@ GROUP BY
 	T.CustomerName,
 	T.CustomItem19
 ORDER BY 
-	sum desc;";
+	{$order_by} desc;";
 
     }
 
