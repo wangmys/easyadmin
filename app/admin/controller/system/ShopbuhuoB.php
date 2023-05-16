@@ -665,12 +665,12 @@ class ShopbuhuoB extends AdminController
                 $kucun = $this->qudaodiaobo_kucun($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
                 if ($kucun) {
                     $select_qudaodiaobo[$key]['店铺库存'] = $kucun[0]['actual_quantity'];
+                } else {
+                    $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                    $select_qudaodiaobo[$key]['信息反馈'] = "调出店铺该货号不存在，请核对信息：" . $val['货号'];
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    continue;
                 }
-                //  else {
-                //     dump($val);
-                //     dump($kucun);
-                //     die;
-                // }
 
                 // 1 调出店调拨未完成，调空，并且有在途
                 $weiwancheng = $this->qudaodiaobo_weiwancheng($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
@@ -682,6 +682,7 @@ class ShopbuhuoB extends AdminController
 
                 // 调出店铺调拨未完成
                 if ($weiwancheng) {
+
                     // 现有库存 - 调拨未完成数 - 调入店所需数量 
                     if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] - $val['总数量'] <= 0) {
                         // 1.调出店是否有在途
