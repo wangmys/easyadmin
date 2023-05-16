@@ -472,7 +472,7 @@ class ShopbuhuoB extends AdminController
                 EC.CustomItem17,
                 EC.CustomerName,
                 EG.GoodsNo 
-            HAVING SUM(ECS.Quantity)!=0
+            --HAVING SUM(ECS.Quantity)!=0
         ";
 
         // 可查是否完成，未完成数量
@@ -666,6 +666,11 @@ class ShopbuhuoB extends AdminController
                 if ($kucun) {
                     $select_qudaodiaobo[$key]['店铺库存'] = $kucun[0]['actual_quantity'];
                 }
+                //  else {
+                //     dump($val);
+                //     dump($kucun);
+                //     die;
+                // }
 
                 // 1 调出店调拨未完成，调空，并且有在途
                 $weiwancheng = $this->qudaodiaobo_weiwancheng($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
