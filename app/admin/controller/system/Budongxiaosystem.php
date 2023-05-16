@@ -174,7 +174,7 @@ class Budongxiaosystem extends AdminController
             }
             $this->params = $params;
     
-            $map1 = " a.create_time='{$select_map['create_time']}' ";
+            $map1 = " a.create_time='{$select_map['create_time']}' AND a.不动销区间 = '{$select_config['考核区间']}'";
             if (!empty($this->params['上柜率'])) {
                 $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
             } else {
@@ -323,7 +323,7 @@ class Budongxiaosystem extends AdminController
         }
         $this->params = $params;
 
-        $map1 = " a.create_time='{$select_map['create_time']}' ";
+        $map1 = " a.create_time='{$select_map['create_time']}' AND a.不动销区间 = '{$select_config['考核区间']}'";
         if (!empty($this->params['上柜率'])) {
             $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
         } else {

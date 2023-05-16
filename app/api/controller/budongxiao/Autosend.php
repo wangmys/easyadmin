@@ -82,9 +82,14 @@ class Autosend extends BaseController
                 'map' => json_encode($this->params),
             ]);
 
-            // 基础结果 
-            $this->db_easyA->table('cwl_budongxiao_result_sys')->strict(false)->insertAll($data);
+            // 批量插入切割
+            $chunk_list = array_chunk($data, 300);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_budongxiao_result_sys')->strict(false)->insertAll($val);
+            }
             echo 1;
+
         }
 
     }
@@ -103,14 +108,17 @@ class Autosend extends BaseController
         
         // dump($select_config);die;
         $map = [];
-        $map[] = ['上市天数', '>=', $select_config['上市天数']];
-        $map[] = ['店铺库存数量', '>', '1'];
+        // $map[] = ['上市天数', '>=', $select_config['上市天数']];
+        // $map[] = ['上市天数', '>=', 0];
+        // $map[] = ['店铺库存数量', '>', '1'];
         // dump( $map);die;
-        $select_history_sys = $this->db_easyA->table('cwl_budongxiao_history_sys')->field('省份,中类')->group('省份,中类')->limit(100000)->select()->toArray();
+        $select_history_sys = $this->db_easyA->table('cwl_budongxiao_history_sys')->field('省份,中类')->where([
+            ['不动销区间', '=', $select_config['考核区间']]
+        ])->group('省份,中类')->limit(100000)->select()->toArray();
         foreach ($select_history_sys as $key => $val) {
-            $map[] = ['省份', '=', $val['省份']];
-            $map[] = ['中类', '=', $val['中类']];
-            $map_str = "上市天数>='{$select_config['上市天数']}' AND 店铺库存数量>1 AND 省份='{$val['省份']}' AND 季节归集='{$select_config['季节归集']}' AND 中类='{$val['中类']}'";
+            // $map[] = ['省份', '=', $val['省份']];
+            // $map[] = ['中类', '=', $val['中类']];
+            $map_str = "店铺库存数量>1 AND 省份='{$val['省份']}' AND 季节归集='{$select_config['季节归集']}' AND 中类='{$val['中类']}'";
             $sql = "
                 SELECT
                     count(*) AS 相同中类数 
@@ -291,30 +299,39 @@ class Autosend extends BaseController
                     $day5_10 ++;
                 }
 
-                if ($this->params['考核区间'] == '30天以上') {
-                    if ($res_all_new[$key]['不动销区间'] == '30天以上') {
+                if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                    if (($res_all_new[$key]['不动销区间'] == '30天以上' ||  $res_all_new[$key]['不动销区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
                         $insert_history_data[] = $res_all_new[$key];
                     }
+                } 
 
-                } elseif ($this->params['考核区间'] == '20-30天') {
-                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天') {
-                        $insert_history_data[] = $res_all_new[$key];
-                    }
-                } elseif ($this->params['考核区间'] == '15-20天') {
-                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天') {
-                        $insert_history_data[] = $res_all_new[$key];
-                    }
-                } elseif ($this->params['考核区间'] == '10-15天') {
-                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
-                    || $res_all_new[$key]['不动销区间'] == '10-15天') {
-                        $insert_history_data[] = $res_all_new[$key];
-                    }
-                } elseif ($this->params['考核区间'] == '5-10天') {
-                    if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
-                    || $res_all_new[$key]['不动销区间'] == '10-15天' || $res_all_new[$key]['不动销区间'] == '5-10天') {
-                        $insert_history_data[] = $res_all_new[$key];
-                    }
-                }
+                // if ($this->params['考核区间'] == '30天以上') {
+                //     if ($res_all_new[$key]['不动销区间'] == '30天以上' && !empty($res_all_new[$key]['不动销区间修订'])) {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } elseif ($this->params['考核区间'] == '20-30天') {
+                //     if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天') {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } elseif ($this->params['考核区间'] == '15-20天') {
+                //     if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天') {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } elseif ($this->params['考核区间'] == '10-15天') {
+                //     if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
+                //     || $res_all_new[$key]['不动销区间'] == '10-15天') {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } elseif ($this->params['考核区间'] == '5-10天') {
+                //     if ($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天' || $res_all_new[$key]['不动销区间'] == '15-20天' 
+                //     || $res_all_new[$key]['不动销区间'] == '10-15天' || $res_all_new[$key]['不动销区间'] == '5-10天') {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // }
+
+                // if (!empty($res_all_new[$key]['不动销区间修订'])) {
+                //     $insert_history_data[] = $res_all_new[$key];
+                // }
             }
 
             // echo '<pre>';
@@ -350,6 +367,7 @@ class Autosend extends BaseController
             $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
             $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
             $res_end['考核结果'] = $res_end['考核标准占比'] > $this->params['合格率'] ? '不合格' : '合格';
+            $res_end['合格率'] = $res_end['考核标准占比'] > $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
             $res_end['合格率'] = $res_end['考核标准占比'] > $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
             $res_end['合格率2'] = $this->params['合格率'];
             $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? ceil((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数']) : '';
