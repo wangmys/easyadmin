@@ -370,7 +370,6 @@ class Tableupdate extends BaseController
 
     // 更新周销
     public function retail_second() {
-        echo 111;
         // 康雷查询周销
         $find_retail =$this->db_easyA->table('cwl_retail')->where([
             ['groupby聚合', '=', '否']
