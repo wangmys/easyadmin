@@ -120,10 +120,10 @@ class Weather extends AdminController
                                 $bgCol = 'rgb(254,204,81)';
                                 $fontCol = '#000000';  
                             } else if ($value_c >= 26 && $value_c  < 30) {
-                                $bgCol = 'rgb(244,119,0)';
+                                $bgCol = 'rgb(244,149,21)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 30) {
-                                $bgCol = 'rgb(170,3,13)';
+                                $bgCol = 'rgb(239,13,14)';
                                 $fontCol = '#000000';
                             } else{
                                 $bgCol = '#fecc51';
