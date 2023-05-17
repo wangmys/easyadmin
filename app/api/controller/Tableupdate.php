@@ -251,6 +251,191 @@ class Tableupdate extends BaseController
                 'content' => 'easyadmin2 customer 更新失败！'
             ]);
         }
+    }
 
+    // 更新周销
+    public function retail_first() {
+        // 康雷查询周销
+        $select = $this->db_sqlsrv->query("   
+            SELECT TOP
+                200000 EC.CustomItem17 AS 商品负责人,
+                EC.State AS 省份,
+                EBC.Mathod AS 渠道属性,
+                EC.CustomItem15 AS 店铺云仓,
+                ER.CustomerName AS 店铺名称,
+            --  DATEPART( yy, ER.RetailDate ) AS 年份,
+                DATEPART( yy, GETDATE() ) AS 年份,
+            CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN
+                    '春季'
+                    WHEN '正春' THEN
+                    '春季'
+                    WHEN '春季' THEN
+                    '春季'
+                    WHEN '初秋' THEN
+                    '秋季'
+                    WHEN '深秋' THEN
+                    '秋季'
+                    WHEN '秋季' THEN
+                    '秋季'
+                    WHEN '初夏' THEN
+                    '夏季'
+                    WHEN '盛夏' THEN
+                    '夏季'
+                    WHEN '夏季' THEN
+                    '夏季'
+                    WHEN '冬季' THEN
+                    '冬季'
+                    WHEN '初冬' THEN
+                    '冬季'
+                    WHEN '深冬' THEN
+                    '冬季'
+                END AS 季节归集,
+                EG.TimeCategoryName2 AS 二级时间分类,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 小类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo  AS 商品代码,
+                SUM ( ERG.Quantity ) AS 销售数量,
+                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
+
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                --AND ER.CustomerName = '九江六店'
+                --AND EG.GoodsNo= 'B32503009'
+            GROUP BY
+                EC.CustomItem17
+                ,ER.CustomerName
+                ,EG.GoodsNo
+                ,EC.State
+                ,EC.CustomItem15
+                ,EBC.Mathod
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+                ,ERG.Quantity
+        ");
+        // echo count($select);
+        if ($select) {
+            // 删除
+            $this->db_easyA->table('cwl_retail')->where(1)->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+            $this->db_easyA->startTrans();
+
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_retail')->strict(false)->insertAll($val);
+                if (! $insert) {
+                    $status = false;
+                    break;
+                }
+            }
+
+            if ($status) {
+                $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_retail first 更新成功！'
+                ]);
+            } else {
+                $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_retail first 更新失败！'
+                ]);
+            }
+
+        }
+    }
+
+    // 更新周销
+    public function retail_second() {
+        // 康雷查询周销
+        $find_retail =$this->db_easyA->table('cwl_retail')->where([
+            ['groupby聚合', '=', '否']
+        ])->find();
+        // echo $this->db_easyA->getLastSql();
+        // dump($find_retail);die;
+        // echo count($select);
+        if ($find_retail['groupby聚合'] == '否') {
+            $select = $this->db_easyA->query("
+                SELECT
+                    商品负责人,
+                    省份,
+                    渠道属性,
+                    店铺云仓,
+                    店铺名称,
+                    年份,
+                    季节归集,
+                    二级时间分类,
+                    大类,
+                    中类,
+                    小类,
+                    领型,
+                    风格,
+                    商品代码,
+                    SUM(销售数量) AS 销售数量, 
+                    SUM(销售金额) AS  销售金额,
+                    '是' AS groupby聚合
+                FROM
+                    cwl_retail 
+                    GROUP BY 商品负责人,店铺名称,商品代码
+            ");
+
+            if ($select) {
+                // 删除
+                $this->db_easyA->table('cwl_retail')->where(1)->delete();
+
+                $chunk_list = array_chunk($select, 1000);
+                $this->db_easyA->startTrans();
+
+                $status = true;
+                foreach($chunk_list as $key => $val) {
+                    // 基础结果 
+                    $insert = $this->db_easyA->table('cwl_retail')->strict(false)->insertAll($val);
+                    if (! $insert) {
+                        $status = false;
+                        break;
+                    }
+                }
+
+                if ($status) {
+                    $this->db_easyA->commit();
+                    return json([
+                        'status' => 1,
+                        'msg' => 'success',
+                        'content' => 'cwl_retail second 更新成功！'
+                    ]);
+                } else {
+                    $this->db_easyA->rollback();
+                    return json([
+                        'status' => 0,
+                        'msg' => 'error',
+                        'content' => 'cwl_retail second 更新失败！'
+                    ]);
+                }
+            }
+
+        }
     }
 }
