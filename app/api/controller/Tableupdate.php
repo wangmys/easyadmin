@@ -253,7 +253,7 @@ class Tableupdate extends BaseController
         }
     }
 
-    // 更新周销
+    // 更新周销 断码率专用 初步加工康雷表 groub by合并插入自己的retail表里
     public function retail_first() {
         // 康雷查询周销
         $select = $this->db_sqlsrv->query("   
@@ -264,7 +264,8 @@ class Tableupdate extends BaseController
                 EC.CustomItem15 AS 店铺云仓,
                 ER.CustomerName AS 店铺名称,
             --  DATEPART( yy, ER.RetailDate ) AS 年份,
-                DATEPART( yy, GETDATE() ) AS 年份,
+            --  DATEPART( yy, GETDATE() ) AS 年份,
+                EG.TimeCategoryName1 as 年份,
             CASE
                     EG.TimeCategoryName2
                     WHEN '初春' THEN
@@ -315,6 +316,7 @@ class Tableupdate extends BaseController
                 AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023')
                 --AND ER.CustomerName = '九江六店'
                 --AND EG.GoodsNo= 'B32503009'
             GROUP BY
@@ -324,12 +326,12 @@ class Tableupdate extends BaseController
                 ,EC.State
                 ,EC.CustomItem15
                 ,EBC.Mathod
+                ,EG.TimeCategoryName1
                 ,EG.TimeCategoryName2
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
                 ,EG.StyleCategoryName
-                ,ERG.Quantity
         ");
         // echo count($select);
         if ($select) {
@@ -372,37 +374,60 @@ class Tableupdate extends BaseController
     public function retail_second() {
         // 康雷查询周销
         $find_retail =$this->db_easyA->table('cwl_retail')->where([
-            ['groupby聚合', '=', '否']
+            ['排名', 'exp', new Raw('IS NULL')]
         ])->find();
         // echo $this->db_easyA->getLastSql();
         // dump($find_retail);die;
         // echo count($select);
-        if ($find_retail['groupby聚合'] == '否') {
+
+        // 需要进行排名
+        if ($find_retail) {
             $select = $this->db_easyA->query("
                 SELECT
-                    商品负责人,
-                    省份,
-                    渠道属性,
-                    店铺云仓,
-                    店铺名称,
-                    年份,
-                    季节归集,
-                    二级时间分类,
-                    大类,
-                    中类,
-                    小类,
-                    领型,
-                    风格,
-                    商品代码,
-                    SUM(销售数量) AS 销售数量, 
-                    SUM(销售金额) AS  销售金额,
-                    '是' AS groupby聚合
+                    a.商品负责人,
+                    a.省份,
+                    a.渠道属性,
+                    a.店铺云仓,
+                    a.店铺名称,
+                    a.年份,
+                    a.季节归集,
+                    a.二级时间分类,
+                    a.大类,
+                    a.小类,
+                    a.领型,
+                    a.风格,
+                    a.商品代码,
+                    a.销售数量,
+                    a.销售金额, 
+                (
+                    @rank :=
+                IF
+                ( @GROUP = a.中类, @rank + 1, 1 )) AS 排名
+                ,
+                ( @GROUP := a.中类 ) AS 中类
+            FROM
+                (
+                SELECT
+                    *
                 FROM
                     cwl_retail 
-                    GROUP BY 商品负责人,店铺名称,商品代码
+                WHERE
+                    1
+            -- 		省份='江西省'
+            -- 		店铺名称 = '九江六店' 
+                ORDER BY
+                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC, 排名 ASC,
+                    销售数量 DESC 
+                ) a,
+                ( SELECT @rank := 0, @GROUP := '' ) AS b
             ");
 
             if ($select) {
+                // dump($select[0]);
+                // dump($select[1]);
+                // dump($select[2]);
+                // dump($select[3]);
+                // die;
                 // 删除
                 $this->db_easyA->table('cwl_retail')->where(1)->delete();
 
@@ -434,6 +459,13 @@ class Tableupdate extends BaseController
                         'content' => 'cwl_retail second 更新失败！'
                     ]);
                 }
+            } else {
+                $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_retail 排名执行失败！'
+                ]);
             }
 
         }

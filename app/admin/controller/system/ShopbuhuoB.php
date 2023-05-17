@@ -884,7 +884,7 @@ class ShopbuhuoB extends AdminController
     }
 
     public function redExcel_test() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/test444.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/出货指令单_有问题.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -912,7 +912,7 @@ class ShopbuhuoB extends AdminController
         // }
         $data = $this->readExcel1($save_path, $read_column);
         echo '<pre>';
-        // print_r($data);
+        print_r($data);
 
         // 店铺信息
         $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
