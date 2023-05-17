@@ -167,7 +167,7 @@ class Weather extends AdminController
         $start_date = date('Y-m-d',strtotime(date('Y-m-d').'-3day'));
         // 日期列表
         $date_list = [];
-        for ($i = 0;$i <= 17;$i++){
+        for ($i = 0;$i <= 23;$i++){
             $date_list[] = date($str,strtotime($start_date."+{$i}day"));
         }
         return $date_list;
