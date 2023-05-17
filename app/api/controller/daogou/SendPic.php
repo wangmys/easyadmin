@@ -105,7 +105,8 @@ where dept_id='{$v_data['id']}' and u.erp_uid<>'' and u.state=0 "; // and r.name
                             $table_data[] = $vv;
                         }
                         //20号前每天需要做多少 数据
-                        $before_20_date = 1000;
+                        $month_aim_total = $this->return_month_aim_sql($v_daogou['erp_uid'], $month_aim_date_start, date("Y-m-t", strtotime(date('Y-m-d'))));//该导购本月总目标
+                        $before_20_date = $this->return_20_day_aim($month_aim_total, $actual_finish);
                         $table_data[] = ['name'=>'20号前每天需要做多少', 'liandai'=>$before_20_date, 'jiandanjia'=>'', 'today_finish'=>''];
 
                         $table_explain = [
@@ -152,6 +153,19 @@ where dept_id='{$v_data['id']}' and u.erp_uid<>'' and u.state=0 "; // and r.name
 //                print_r($daogou_users_data);die;
 
             }
+        }
+
+    }
+
+    protected function return_20_day_aim($month_aim_total, $actual_finish) {
+
+        $aim = 0;
+        if ($month_aim_total) {
+            $current_day = date('d');
+
+
+
+
         }
 
     }
