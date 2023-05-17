@@ -884,7 +884,7 @@ class ShopbuhuoB extends AdminController
     }
 
     public function redExcel_test() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/9851683357737.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/test444.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -904,41 +904,103 @@ class ShopbuhuoB extends AdminController
             'P' => '备注',
         ];
 
-        if (! cache('test_date')) {
-            $data = $this->readExcel1($save_path, $read_column);
-            cache('test_date', $data, 3600);
-        } else {
-            $data = cache('test_date'); 
-        }
+        // if (! cache('test_date')) {
+        //     $data = $this->readExcel1($save_path, $read_column);
+        //     cache('test_date', $data, 3600);
+        // } else {
+        //     $data = cache('test_date'); 
+        // }
+        $data = $this->readExcel1($save_path, $read_column);
+        echo '<pre>';
+        // print_r($data);
 
-        // $data = $this->readExcel1($save_path, $read_column);
+        // 店铺信息
+        $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
+        // $data = array_filter($data);
         foreach ($data as $key => $val) {
-            if ( empty($val['店铺编号']) || empty($val['货号']) ) {
-                unset($data[$key]);
-            } else {
-                $data[$key]['aname'] = $this->authInfo['name'];
-                $data[$key]['aid'] = $this->authInfo['id'];
-                $data[$key]['create_time'] = $this->create_time;
+            // if ( empty($val['店铺编号']) || empty($val['货号']) ) {
+            //     unset($data[$key]);
+            // } else {
+            //     $data[$key]['aname'] = $this->authInfo['name'];
+            //     $data[$key]['aid'] = $this->authInfo['id'];
+            //     $data[$key]['create_time'] = $this->create_time;
+            // }
+            $data[$key]['aname'] = $this->authInfo['name'];
+            $data[$key]['aid'] = $this->authInfo['id'];
+            $data[$key]['create_time'] = $this->create_time;
+            // a.店铺编号 = b.CustomerCode 
+            foreach ($select_customer as $key2 => $val2) {
+                if ($val['店铺编号'] == $val2['CustomerCode']) {
+                    $data[$key]['店铺名称'] = $val2['CustomerName'];
+                    $data[$key]['商品负责人'] = $val2['CustomItem17'];
+                    break;
+                } else {
+                    $data[$key]['店铺名称'] = '';
+                    $data[$key]['商品负责人'] = '';
+                }
             }
         }
 
-        
+        // print_r($data);
+        // die;
+        // // 7天清空库存数据 
+        // $day7 = $this->day7();
 
-        // 7天清空库存数据 
-        $day7 = $this->day7();
+
+        // $this->db_easyA->startTrans();
         $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
             ['aid', '=', $this->authInfo['id']]
         ])->delete();
         $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_2')->where([
             ['aid', '=', $this->authInfo['id']]
-        ])->delete(); 
+        ])->delete();    
 
+        // $insertAll_chuhuozhilingdan = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->insertAll($data);
 
-        // 批量插入切割 
+        // 批量插入切割
         $chunk_list = array_chunk($data, 1000);
         foreach($chunk_list as $key => $val) {
             $this->db_easyA->table('cwl_chuhuozhilingdan_2')->insertAll($val);
+            $this->db_easyA->getLastSql();
         }
+
+        
+
+        // $update_chuhuozhilingdan = $this->db_easyA->execute("
+        //     UPDATE cwl_chuhuozhilingdan_2 AS a
+        //     LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 
+        //     SET 店铺名称 = b.CustomerName,
+        //     商品负责人 = b.CustomItem17
+        //     WHERE
+        //         a.aid = '{$this->authInfo["id"]}'
+        // ");
+
+        // 7天清空库存数据 
+        $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->field('商品负责人')->where([
+            ['aid', '=', $this->authInfo['id']]
+        ])->find();
+        // echo $find_fuzheren['商品负责人']; die;
+        $day7 = $this->day7($find_fuzheren['商品负责人']);
+
+        $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_2')->insertAll($day7);
+        $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
+            UPDATE cwl_chuhuozhilingdan_7dayclean_2 AS a
+            LEFT JOIN cwl_chuhuozhilingdan_2 AS b ON a.店铺名称 = b.店铺名称 
+            AND a.货号 = b.货号 
+            AND b.aid = '{$this->authInfo["id"]}'
+            SET b.清空时间 = a.清空时间,
+                b.调出数量 = a.调出数量,
+                b.库存数量 = a.库存数量 
+            WHERE
+                a.aid = '{$this->authInfo["id"]}'
+        ");
+        $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
+            'option' => '店铺补货',
+            'aid' => $this->authInfo['id'],
+            'aname' => $this->authInfo['name'],
+            'create_time' => date("Y-m-d H:i:s"),
+        ]);
+        return json(['code' => 0, 'msg' => '上传成功']);
         
     }
     
@@ -973,6 +1035,7 @@ class ShopbuhuoB extends AdminController
                 ];
                 //读取数据
                 $data = $this->readExcel1($info, $read_column);
+
                 // echo '<pre>';
                 // print_r($data);die;
 
@@ -980,19 +1043,25 @@ class ShopbuhuoB extends AdminController
                 $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
                 // $data = array_filter($data);
                 foreach ($data as $key => $val) {
-                    if ( empty($val['店铺编号']) || empty($val['货号']) ) {
-                        unset($data[$key]);
-                    } else {
-                        $data[$key]['aname'] = $this->authInfo['name'];
-                        $data[$key]['aid'] = $this->authInfo['id'];
-                        $data[$key]['create_time'] = $this->create_time;
-                    }
+                    // if ( empty($val['店铺编号']) || empty($val['货号']) ) {
+                    //     unset($data[$key]);
+                    // } else {
+                    //     $data[$key]['aname'] = $this->authInfo['name'];
+                    //     $data[$key]['aid'] = $this->authInfo['id'];
+                    //     $data[$key]['create_time'] = $this->create_time;
+                    // }
+                    $data[$key]['aname'] = $this->authInfo['name'];
+                    $data[$key]['aid'] = $this->authInfo['id'];
+                    $data[$key]['create_time'] = $this->create_time;
                     // a.店铺编号 = b.CustomerCode 
                     foreach ($select_customer as $key2 => $val2) {
                         if ($val['店铺编号'] == $val2['CustomerCode']) {
                             $data[$key]['店铺名称'] = $val2['CustomerName'];
                             $data[$key]['商品负责人'] = $val2['CustomItem17'];
                             break;
+                        } else {
+                            $data[$key]['店铺名称'] = '';
+                            $data[$key]['商品负责人'] = '';
                         }
                     }
                 }
