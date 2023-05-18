@@ -13,6 +13,11 @@ class SortingService
 
     use Singleton;
 
+    /**
+     * 创建
+     * @param $params
+     * @return void
+     */
     public function createSorting($params) {
 
         Db::startTrans();
@@ -28,6 +33,11 @@ class SortingService
             $new = array_merge($arr, ErpSortingModel::INSERT);
             $new['SortingDate'] = $now;
             $new['Remark'] = $params['Remark'];
+
+            if ($params['CodingCode'] == ErpSortingModel::CodingCode['HADCOMMIT']) {//已审结
+                $new['CodingCode'] = $params['CodingCode'];
+                $new['CodingCodeText'] = ErpSortingModel::CodingCode_TEXT[$params['CodingCode']];
+            }
 
             //出货指令单 处理
             ErpSortingModel::create($new);
@@ -89,7 +99,58 @@ class SortingService
 
     }
 
+    /**
+     * 更新
+     * @param $params
+     * @return void
+     */
+    public function updateSorting($params) {
 
+        Db::startTrans();
+        try {
+
+            $new['CodingCode'] = $params['CodingCode'];
+            if ($params['CodingCode'] == ErpSortingModel::CodingCode['HADCOMMIT']) {//已审结
+                $new['CodingCodeText'] = ErpSortingModel::CodingCode_TEXT[$params['CodingCode']];
+            } elseif ($params['CodingCode'] == ErpSortingModel::CodingCode['NOTCOMMIT']) {
+                $new['CodingCodeText'] = ErpSortingModel::CodingCode_TEXT[$params['CodingCode']];
+            }
+            $new['UpdateTime'] = date('Ymd H:i:s');
+            //出货指令单 处理
+            ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->update($new);
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            log_error($e);
+            abort(0, '更新失败');
+        }
+
+    }
+
+    /**
+     * 删除
+     * @param $params
+     * @return void
+     */
+    public function deleteSorting($params) {
+
+        Db::startTrans();
+        try {
+
+            ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->delete();
+            $SortingGoodsID = ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->column('SortingGoodsID');
+            ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->delete();
+            if ($SortingGoodsID) {
+                ErpSortingGoodsDetailModel::where([['SortingGoodsID', 'in', $SortingGoodsID]])->delete();
+            }
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            log_error($e);
+            abort(0, '删除失败');
+        }
+
+    }
 
 }
 

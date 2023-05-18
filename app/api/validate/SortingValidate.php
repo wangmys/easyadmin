@@ -19,10 +19,13 @@ class SortingValidate extends Validate
         'CustomerId' => 'require',
 //        'Remark' => 'require',
         'Goods' => 'require|array',
+        'CodingCode' => 'require',
     ];
 
     protected $scene = [
-        'create' => ['SortingID', 'WarehouseId', 'CustomerId', 'Goods'],
+        'create' => ['SortingID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode'],
+        'update' => ['SortingID', 'CodingCode'],
+        'delete' => ['SortingID'],
     ];
 
     /**
@@ -38,6 +41,7 @@ class SortingValidate extends Validate
         'Remark.require' => 'Remark不能为空',
         'Goods.array' => 'Goods必须为数组',
         'Goods.require' => 'Goods不能为空',
+        'CodingCode.require' => 'CodingCode不能为空',
     ];
 
 }

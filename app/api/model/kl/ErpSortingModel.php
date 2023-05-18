@@ -51,4 +51,14 @@ class ErpSortingModel extends TimeModel
         'PrintNum' => '0',
     ];
 
+    const CodingCode = [
+        'NOTCOMMIT'    => 'StartNode1', #'未提交'
+        'HADCOMMIT'    => 'EndNode2' #'已审结'
+    ];
+
+    const CodingCode_TEXT = [
+        self::CodingCode['NOTCOMMIT']  => '未提交',
+        self::CodingCode['HADCOMMIT']  => '已审结'
+    ];
+
 }
