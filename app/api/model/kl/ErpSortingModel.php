@@ -14,6 +14,27 @@ class ErpSortingModel extends TimeModel
     // 表名
     protected $name = 'Sorting';
 
+    protected $schema = [
+        'OrderType' => 'nvarchar',
+        'OrderTypeText' => 'nvarchar',
+        'SortingID' => 'nvarchar',
+        'SortingDate' => 'datetime',
+        'WarehouseId' => 'nvarchar',
+        'CustomerId' => 'nvarchar',
+        'CodingCode' => 'nvarchar',
+        'Remark' => 'nvarchar',
+        'IsCompleted' => 'bit',
+        'BranchId' => 'bigint',
+        'WorkflowId' => 'bigint',
+        'CodingCodeText' => 'nvarchar',
+        'CreateUserName' => 'nvarchar',
+        'UpdateUserName' => 'nvarchar',
+        'CreateUserId' => 'bigint',
+        'UpdateUserId' => 'bigint',
+        'CreateTime' => 'datetime',
+        'UpdateTime' => 'datetime',
+    ];
+
     const INSERT = [
         'OrderType' => 'ErpOrder_BU',
         'OrderTypeText' => '补货',
