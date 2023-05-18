@@ -5,7 +5,7 @@ namespace app\api\model\kl;
 use app\common\model\TimeModel;
 
 /**
- * 零售核销单支付表 model
+ * 出货指令单 model
  */
 class ErpSortingModel extends TimeModel
 {

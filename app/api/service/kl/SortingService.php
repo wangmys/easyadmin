@@ -5,6 +5,8 @@ use app\common\traits\Singleton;
 use app\api\model\kl\ErpSortingModel;
 use app\api\model\kl\ErpSortingGoodsModel;
 use app\api\model\kl\ErpSortingGoodsDetailModel;
+use app\api\model\kl\ErpGoodsModel;
+use app\api\model\kl\ErpBarCodeModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
@@ -50,6 +52,8 @@ class SortingService
                 }
             }
 
+            Db::commit();
+
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
@@ -62,40 +66,42 @@ class SortingService
 
         $arr['SortingGoodsID'] = $SortingGoodsID;
         $arr['SortingID'] = $sortingid;
-        $arr['GoodsId'] = $detail['GoodsId'];
+        $arr['GoodsId'] = ErpGoodsModel::where([['GoodsNo', '=', $detail['GoodsNo']]])->value('GoodsId');
         $arr['UnitPrice'] = $detail['UnitPrice'];
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
 
-        Db::startTrans();
-        try {
+//        Db::startTrans();
+//        try {
             ErpSortingGoodsModel::create($arr);
             foreach ($detail['detail'] as $k => $v) {
                 //ErpSortingGoodsDetail 处理
-                $this->addSortGoodsDetail($SortingGoodsID, $detail['ColorId'], $v);
+                $this->addSortGoodsDetail($SortingGoodsID, $v);
             }
-        } catch (\Exception $e) {
-            log_error($e);
-            Db::rollback(); // 回滚事务
-        }
+//        } catch (\Exception $e) {
+//            log_error($e);
+//            Db::rollback(); // 回滚事务
+//        }
 
     }
 
-    public function addSortGoodsDetail($detailid, $colorid, $detail) {
+    public function addSortGoodsDetail($detailid, $detail) {
 
+        //根据barcode获取ColorId,SizeId,GoodsId
+        $barCodeInfo = ErpBarCodeModel::where([['BarCode', '=', $detail['Barcode']]])->field('ColorId,SizeId')->find();
         $arr['SortingGoodsID'] = $detailid;
-        $arr['ColorId'] = $colorid;
-        $arr['SizeId'] = $detail['SizeId'];
+        $arr['ColorId'] = $barCodeInfo ? $barCodeInfo['ColorId'] : '';
+        $arr['SizeId'] = $barCodeInfo ? $barCodeInfo['SizeId'] : '';
         $arr['Quantity'] = $detail['Quantity'];
         $arr['SpecId'] = 1;
-        Db::startTrans();
-        try {
+//        Db::startTrans();
+//        try {
             ErpSortingGoodsDetailModel::create($arr);
-        } catch (\Exception $e) {
-            log_error($e);
-            Db::rollback(); // 回滚事务
-        }
+//        } catch (\Exception $e) {
+//            log_error($e);
+//            Db::rollback(); // 回滚事务
+//        }
 
     }
 
