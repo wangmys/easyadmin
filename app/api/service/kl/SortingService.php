@@ -73,16 +73,16 @@ class SortingService
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
 
 //        Db::startTrans();
-//        try {
+        try {
             ErpSortingGoodsModel::create($arr);
             foreach ($detail['detail'] as $k => $v) {
                 //ErpSortingGoodsDetail 处理
                 $this->addSortGoodsDetail($SortingGoodsID, $v);
             }
-//        } catch (\Exception $e) {
-//            log_error($e);
+        } catch (\Exception $e) {
+            log_error($e);
 //            Db::rollback(); // 回滚事务
-//        }
+        }
 
     }
 
@@ -96,12 +96,12 @@ class SortingService
         $arr['Quantity'] = $detail['Quantity'];
         $arr['SpecId'] = 1;
 //        Db::startTrans();
-//        try {
+        try {
             ErpSortingGoodsDetailModel::create($arr);
-//        } catch (\Exception $e) {
-//            log_error($e);
+        } catch (\Exception $e) {
+            log_error($e);
 //            Db::rollback(); // 回滚事务
-//        }
+        }
 
     }
 
@@ -112,7 +112,7 @@ class SortingService
      */
     public function updateSorting($params) {
 
-        Db::startTrans();
+//        Db::startTrans();
         try {
 
             $new['CodingCode'] = $params['CodingCode'];
@@ -126,7 +126,7 @@ class SortingService
             ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->update($new);
 
         } catch (\Exception $e) {
-            Db::rollback();
+//            Db::rollback();
             log_error($e);
             abort(0, '更新失败');
         }
@@ -149,6 +149,8 @@ class SortingService
             if ($SortingGoodsID) {
                 ErpSortingGoodsDetailModel::where([['SortingGoodsID', 'in', $SortingGoodsID]])->delete();
             }
+
+            Db::commit();
 
         } catch (\Exception $e) {
             Db::rollback();
