@@ -29,7 +29,6 @@ class ErpSorting extends BaseController
             return json([$exception->getError()], 400);
         }
 
-        if (!$params || !isset($params['SortingID']) || !isset($params['Goods'])) return json(['参数缺失'], 400);
         $sortingService = new SortingService();
         $sortingService->createSorting($params);
         return json(['okk']);
