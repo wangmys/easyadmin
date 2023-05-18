@@ -12,7 +12,7 @@ class ErpSortingGoodsDetailModel extends TimeModel
     protected $connection = 'sqlsrv2';
 
     // 表名
-    protected $name = 'SortingGoodsDetail';
+    protected $name = 'Sortinggoodsdetail';
     protected $schema = [
         'SortingGoodsID' => 'nvarchar',
         'ColorId' => 'bigint',
