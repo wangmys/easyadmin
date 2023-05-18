@@ -38,6 +38,26 @@ return [
              // 数据库表前缀
              'prefix'            => Env::get('database3.prefix', ''),
          ],
+        'sqlsrv2' => [
+            // 数据库类型
+            'type'              => Env::get('database4.type', 'sqlsrv'),
+            // 服务器地址
+            'hostname'          => Env::get('database4.hostname', '47.113.79.107'),
+            // 数据库名
+            'database'          => Env::get('database4.database', 'ff21120220830'),
+            // 用户名
+            'username'          => Env::get('database4.username', 'reader'),
+            // 密码
+            'password'          => Env::get('database4.password', 'suoge@2023'),
+            // 端口
+            'hostport'          => Env::get('database4.hostport', '19122'),
+            // 数据库连接参数
+            'params'            => [],
+            // 数据库编码默认采用utf8
+            'charset'           => Env::get('database4.charset', 'utf8'),
+            // 数据库表前缀
+            'prefix'            => Env::get('database4.prefix', 'ERP'),
+        ],
         'mysql' => [
             // 数据库类型
             'type'              => Env::get('database.type', 'mysql'),

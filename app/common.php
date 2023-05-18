@@ -3,6 +3,7 @@
 
 use app\common\service\AuthService;
 use think\facade\Cache;
+use think\facade\Log;
 
 if (!function_exists('__url')) {
 
@@ -266,4 +267,14 @@ function getDateFromRange_m($startdate, $enddate){
         $date[] = date('m月d日', $stimestamp+(86400*$i));
     }
     return $date;
+}
+
+function log_error($e)
+{
+    Log::channel('error')->error($e->__toString());
+}
+
+function make_order_number($start, $num, $length = 8)
+{
+    return $start . str_pad(strval($num + 1), $length, "0", STR_PAD_LEFT);
 }
