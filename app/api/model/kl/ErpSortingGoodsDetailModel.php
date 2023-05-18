@@ -13,4 +13,11 @@ class ErpSortingGoodsDetailModel extends TimeModel
 
     // 表名
     protected $name = 'SortingGoodsDetail';
+    protected $schema = [
+        'SortingGoodsID' => 'nvarchar',
+        'ColorId' => 'bigint',
+        'SizeId' => 'bigint',
+        'SpecId' => 'bigint',
+        'Quantity' => 'decimal',
+    ];
 }
