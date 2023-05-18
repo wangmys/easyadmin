@@ -258,25 +258,27 @@ class Autosend extends BaseController
             $insert_history_data = [];
             foreach ($res_all_new as $key => $val) {
                 // 30天以上
-                if (empty($val['累销量'])) {
+                if (empty($val['累销量']) && $val['上市天数'] >= 30) {
                     $res_all_new[$key]['不动销区间'] = '30天以上';
                     
                 // 20-30天
-                } elseif (!empty($val['累销量']) && empty($val['二十天销量'])) {
+                } elseif ( (!empty($val['累销量']) && empty($val['二十天销量'])) && ($val['上市天数'] >= 20 && $val['上市天数'] < 30) ) {
                     $res_all_new[$key]['不动销区间'] = '20-30天';
                     
                 // 15-20天
-                } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && empty($val['十五天销量'])) {
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && empty($val['十五天销量']))
+                    && ($val['上市天数'] >= 15 && $val['上市天数'] < 20) ) {
                     $res_all_new[$key]['不动销区间'] = '15-20天';
                     
                 // 10-15天
-                } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && empty($val['十天销量'])) {
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && empty($val['十天销量']))
+                    && ($val['上市天数'] >= 10 && $val['上市天数'] < 15) ) {
                     $res_all_new[$key]['不动销区间'] = '10-15天';
                     
                 // 5-10天
-                } elseif (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && !empty($val['十天销量']) && !empty($val['十天销量']) && empty($val['五天销量'])) {
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && !empty($val['十天销量']) && !empty($val['十天销量']) && empty($val['五天销量'])) 
+                    && ($val['上市天数'] >= 5 && $val['上市天数'] < 10) ) {
                     $res_all_new[$key]['不动销区间'] = '5-10天';
-                    
                 } else {
                     $res_all_new[$key]['不动销区间'] = '';
                 }
