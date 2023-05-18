@@ -22,7 +22,7 @@ class SortingValidate extends Validate
     ];
 
     protected $scene = [
-        'create' => ['SortingID', 'WarehouseId', 'CustomerId', 'Remark', 'Goods'],
+        'create' => ['SortingID', 'WarehouseId', 'CustomerId', 'Goods'],
     ];
 
     /**
