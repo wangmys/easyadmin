@@ -26,12 +26,12 @@ class ErpSorting extends BaseController
         try {
             validate(SortingValidate::class)->scene('create')->check($params);
         } catch (ValidateException $exception) {
-            return json([$exception->getError()], 400);
+            return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
         $sortingService = new SortingService();
         $sortingService->createSorting($params);
-        return json(['okk']);
+        return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
 
