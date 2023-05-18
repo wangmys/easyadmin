@@ -36,7 +36,7 @@ class SortingService
             //ErpSortingGoods 处理
             if ($goods) {
                 foreach ($goods as $k => $v) {
-                    $this->addSortGoods($new['SortingID'], $new['SortingID'] . make_order_number($k), $v);
+                    $this->addSortGoods($new['SortingID'], $new['SortingID'] . make_order_number($k, 99), $v);
                 }
             }
 
