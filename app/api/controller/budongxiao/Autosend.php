@@ -258,11 +258,13 @@ class Autosend extends BaseController
             $insert_history_data = [];
             foreach ($res_all_new as $key => $val) {
                 // 30天以上
-                if (empty($val['累销量']) && $val['上市天数'] >= 30) {
+                if (empty($val['累销量']) 
+                && $val['上市天数'] >= 30 ) {
                     $res_all_new[$key]['不动销区间'] = '30天以上';
                     
                 // 20-30天
-                } elseif ( (!empty($val['累销量']) && empty($val['二十天销量'])) && ($val['上市天数'] >= 20 && $val['上市天数'] < 30) ) {
+                } elseif ( (!empty($val['累销量']) && empty($val['二十天销量'])) 
+                && ($val['上市天数'] >= 20 && $val['上市天数'] < 30) ) {
                     $res_all_new[$key]['不动销区间'] = '20-30天';
                     
                 // 15-20天
