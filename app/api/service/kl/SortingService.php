@@ -148,11 +148,6 @@ class SortingService
         try {
 
             ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->delete();
-            $SortingGoodsID = ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->column('SortingGoodsID');
-            ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->delete();
-            if ($SortingGoodsID) {
-                ErpSortingGoodsDetailModel::where([['SortingGoodsID', 'in', $SortingGoodsID]])->delete();
-            }
 
             Db::commit();
 

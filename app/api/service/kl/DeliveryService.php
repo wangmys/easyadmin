@@ -146,11 +146,6 @@ class DeliveryService
         try {
 
             ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
-            $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
-            ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
-            if ($DeliveryGoodsID) {
-                ErpDeliveryGoodsDetailModel::where([['DeliveryGoodsID', 'in', $DeliveryGoodsID]])->delete();
-            }
 
             Db::commit();
 
