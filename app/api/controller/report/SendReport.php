@@ -250,10 +250,10 @@ class SendReport extends BaseController
                 'title' => '秋季新品发货及入库明细 表号:S111',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111秋季.jpg'
             ],
-            'S111' => [
-                'title' => '冬季新品发货及入库明细 表号:S111',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
-            ],
+            // 'S111' => [
+            //     'title' => '冬季新品发货及入库明细 表号:S111',
+            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
+            // ],
             'S112' => [
                 'title' => '春季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112春季.jpg'
@@ -266,16 +266,16 @@ class SendReport extends BaseController
                 'title' => '秋季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112秋季.jpg'
             ],
-            'S112' => [
-                'title' => '冬季新品发货及入库汇总 表号:S112',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
-            ],            
+            // 'S112' => [
+            //     'title' => '冬季新品发货及入库汇总 表号:S112',
+            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
+            // ],            
         ];
         $res = [];
 
         foreach ($send_data as $k=>$v){
-            echo $v['jpg_url'];
-            echo '<br>';
+            // echo $v['jpg_url'];
+            // echo '<br>';
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
@@ -415,15 +415,22 @@ class SendReport extends BaseController
         $this->service->create_table_s111('春季');
         $this->service->create_table_s111('夏季');
         $this->service->create_table_s111('秋季');
-        $this->service->create_table_s111('冬季');
+        // $this->service->create_table_s111('冬季');
 
         $this->service->create_table_s112('春季');
         $this->service->create_table_s112('夏季');
         $this->service->create_table_s112('秋季');
-        $this->service->create_table_s112('冬季');
+        // $this->service->create_table_s112('冬季');
 
         // 发送数据报表
         $this->send_caigoudingtui();
+    }
+
+    public function testSend() {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $res[] = $model->send('夏季新品发货及入库汇总 表号:S112', 'http://im.babiboy.com/img/20230520/S112%E5%A4%8F%E5%AD%A3.jpg', 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b');
+        return json($res);
     }
 
 }
