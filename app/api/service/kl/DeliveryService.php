@@ -48,7 +48,7 @@ class DeliveryService
             //ErpDeliveryGoods 处理
             if ($goods) {
                 foreach ($goods as $k => $v) {
-                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v);
+                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v, $params['SortingID']);
                 }
             }
 
@@ -62,7 +62,7 @@ class DeliveryService
 
     }
 
-    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail) {
+    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail, $SortingID) {
 
         $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
 
@@ -73,6 +73,7 @@ class DeliveryService
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
+        $arr['SortingID'] = $SortingID;
 
 //        Db::startTrans();
         try {
