@@ -635,6 +635,7 @@ class Tableupdate extends BaseController
 
         if ($insert_receipt && $insert_receiptNotice) {
             $this->db_easyA->commit();
+            $this->receipt_receiptNotice_report1();
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -669,7 +670,6 @@ class Tableupdate extends BaseController
                 SUM(ER.数量) AS 入库总量
             FROM
                 cwl_ErpReceipt AS ER
-                WHERE ER.季节='夏季'
             GROUP BY
                 ER.风格,ER.供应商,ER.中类,ER.领型
         ";
@@ -691,7 +691,6 @@ class Tableupdate extends BaseController
                 '0' AS 入库总量
             FROM
                 cwl_ErpReceiptNotice AS ERN
-                WHERE ERN.季节='夏季'
             GROUP BY
                 ERN.风格,ERN.供应商,ERN.中类,ERN.领型
         ";
@@ -703,44 +702,58 @@ class Tableupdate extends BaseController
         $mergeData = array_merge($select_receipt, $select_receiptNotic);
         // $mergeData = $select_receiptNotic;
 
-        echo '<pre>';
-        print_r($mergeData);
+        // echo '<pre>';
+        // print_r($mergeData);
+        // 删除旧数据
+        $this->db_easyA->table('cwl_ErpReceipt_report1')->where(1)->delete();
 
-        $this->db_easyA->table('cwl_ErpReceipt_report1')->strict(false)->insertAll($mergeData);
-        die;
-        // 合并 基本款
-        $mergeData_jiben = []; 
-        // 合并 引流款
-        $mergeData_yinliu = [];
-        // dump($select_receipt);
-        // dump($select_receiptNotic);
+        $report1 = $this->db_easyA->table('cwl_ErpReceipt_report1')->strict(false)->insertAll($mergeData);
+       
+        return $report1;
+    }
 
+    // 采购定推表1 采购定推表2 sql
+    public function receipt_receiptNotice_report1_create($seasion = '夏季') {
+        $sql1 = "
+            SELECT
+                供应商,
+                SUM(发货总量) AS 发货总量,
+                SUM(入库总量) AS 入库总量,
+                风格,
+                中类,
+                领型 
+            FROM
+                `cwl_ErpReceipt_report1`
+                WHERE 季节='{$seasion}'
+            GROUP BY 	
+                风格,
+                供应商,
+                中类,
+                领型 
+        ";
+        $sql2 = "
+            SELECT
+                IFNULL(风格, '总计') AS 风格,
+                IFNULL(中类, '大类合计') AS 中类,
+                IFNULL(领型,'中类合计') AS 领型,
+                SUM(发货总量) AS 发货总量,
+                SUM(入库总量) AS 入库总量
+            FROM
+                `cwl_ErpReceipt_report1`
+                WHERE 季节='夏季'
+            GROUP BY 	
+                风格,
+                大类,
+                中类,
+                领型 
+            WITH ROLLUP
+        ";
 
-        $select_receipt_test[] = $select_receipt[0];
+        $select_report1 = $this->db_easyA->query($sql1);
+        $select_report2 = $this->db_easyA->query($sql2);
 
-        // dump($select_receipt_test);
-        foreach ($select_receipt as $key => $val) {
-            foreach ($select_receiptNotic as $key2 => $val2) {
-                $receiptNotic_len = count($select_receiptNotic);
-                if ($val2['供应商'] == $val['供应商'] && $val2['风格'] == $val['风格'] && $val2['中类'] == $val['中类'] && $val2['领型'] == $val['领型']) {
-                    $select_receipt[$key]['出库总量'] = $val2['出库总量'];   
-                    continue;   
-                }
+        dump($select_report1);
+        dump($select_report2);
 
-                // 到结束也没找到
-                if ($key2 == $receiptNotic_len - 1) {
-                    if ($val2['风格'] == '基本款') {
-                        $mergeData_jiben[] = $val2;
-                    } elseif ($val2['风格'] == '引流款') {
-                        $mergeData_yinliu[] = $val2;
-                    }
-                }
-            }
-        }
-        echo '<pre>';
-        print_r($select_receipt);
-        dump($mergeData_jiben);
-        dump($mergeData_yinliu);
-      
     }
 }
