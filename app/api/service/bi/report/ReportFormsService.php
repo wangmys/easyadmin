@@ -261,6 +261,7 @@ class ReportFormsService
         $date_ = date('Y-m-d');
         $start = date("Y-m-d", strtotime("$date_ -1 day"));
         $data_date = date("Y-m-d", strtotime("-7 day"));
+        // $data_date = date("Y-m-d", strtotime("-1 day"));
         $date_arr = getDateFromRange_m($data_date, $start);
         $date_arr = array_reverse($date_arr);
         $table_header = array_merge(['ID', '省份', '季节'], $date_arr);
@@ -290,7 +291,8 @@ class ReportFormsService
         //        $field_width[4] = 260;
         //        $field_width[7] = 260;
         $table_explain = [
-            0 => "报表更新日期" . $data_date,
+            // 0 => "报表更新日期" . $data_date,
+            0 => "报表更新日期" . date("Y-m-d", strtotime("-1 day")),
         ];
         $params = [
             'row' => count($res), //数据的行数

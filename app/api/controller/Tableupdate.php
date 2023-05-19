@@ -470,4 +470,277 @@ class Tableupdate extends BaseController
 
         }
     }
+
+    // 采购顶推报表 receipt收货 receiptNotice采集入库
+    public function receipt_receiptNotice() {
+        // 采购收货
+        $sql1 = "
+            SELECT
+                EW.WarehouseName AS 云仓,
+                EG.TimeCategoryName1 AS 年份,
+            CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节,
+                EG.TimeCategoryName2 AS 二级时间,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.GoodsName AS 货号名称,
+                EG.CategoryName AS 分类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo AS 货号,
+                EGC.ColorDesc AS 颜色,
+                SUM(ERG.Quantity) AS 数量,
+                ES.SupplyName AS 供应商 
+            FROM
+                ErpReceipt AS ER
+                LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
+                LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                LEFT JOIN erpGoodsColor AS EGC ON ERG.GoodsId = EGC.GoodsId
+                LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
+            WHERE
+                ER.CodingCodeText = '已审结' 
+                AND ER.ReceiptDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ER.Type= 1 
+            -- 	AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+                AND EG.TimeCategoryName1 IN ( '2023' ) 
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
+            GROUP BY
+                EW.WarehouseName
+                ,ES.SupplyName
+                ,EG.GoodsNo
+                ,EG.GoodsName 
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+                ,EGC.ColorDesc
+        ";
+
+        $sql2 = "
+            SELECT
+                EW.WarehouseName AS 云仓,
+                EG.TimeCategoryName1 AS 年份,
+            CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节,
+                EG.TimeCategoryName2 AS 二级时间,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.GoodsName AS 货号名称,
+                EG.CategoryName AS 分类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo AS 货号,
+                EGC.ColorDesc AS 颜色,
+                SUM(ERNG.Quantity) AS 数量,
+                ES.SupplyName AS 供应商 
+            FROM
+                ErpReceiptNotice AS ERN
+                LEFT JOIN ErpWarehouse AS EW ON ERN.WarehouseId = EW.WarehouseId
+                LEFT JOIN ErpReceiptNoticeGoods AS ERNG ON ERN.ReceiptNoticeId = ERNG.ReceiptNoticeId
+                LEFT JOIN erpGoods AS EG ON ERNG.GoodsId = EG.GoodsId
+                LEFT JOIN erpGoodsColor AS EGC ON ERNG.GoodsId = EGC.GoodsId
+                LEFT JOIN ErpSupply AS ES ON ERN.SupplyId = ES.SupplyId 
+            WHERE
+                ERN.CodingCodeText = '已审结' 
+                AND ERN.ReceiptNoticeDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+            -- 	AND ER.Type= 2 
+                AND ERN.IsCompleted IS NULL
+                AND EG.TimeCategoryName1 IN ( '2023' ) 
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
+            GROUP BY
+                EW.WarehouseName
+                ,ES.SupplyName
+                ,EG.GoodsNo
+            -- 	,ERNG.Quantity
+                ,EG.GoodsName 
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+                ,EGC.ColorDesc
+            -- 	,ERN.IsCompleted
+            ";
+
+        $select_receipt = $this->db_sqlsrv->query($sql1);
+        $select_receiptNotice = $this->db_sqlsrv->query($sql2);
+        
+        // 删除旧数据
+        $this->db_easyA->table('cwl_ErpReceipt')->where(1)->delete();
+        $this->db_easyA->table('cwl_ErpReceiptNotice')->where(1)->delete();
+        
+        $this->db_easyA->startTrans();
+        // 采购收货
+        $insert_receipt = $this->db_easyA->table('cwl_ErpReceipt')->strict(false)->insertAll($select_receipt);
+        // 采集入库
+        $insert_receiptNotice = $this->db_easyA->table('cwl_ErpReceiptNotice')->strict(false)->insertAll($select_receiptNotice);
+
+        if ($insert_receipt && $insert_receiptNotice) {
+            $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => '采购定推表 更新成功！'
+            ]);
+        } else {
+            $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => '采购定推表 更新失败！'
+            ]);
+        }
+    }
+
+    public function receipt_receiptNotice_report1() {
+        $sql_receipt = "
+            SELECT
+                ER.云仓,
+                ER.年份,
+                ER.季节,
+                ER.二级时间,
+                ER.大类,
+                ER.中类,
+                ER.货号名称,
+                ER.分类,
+                ER.领型,
+                ER.风格,
+                ER.颜色,
+                ER.供应商,
+                '0' AS 发货总量,
+                SUM(ER.数量) AS 入库总量
+            FROM
+                cwl_ErpReceipt AS ER
+                WHERE ER.季节='夏季'
+            GROUP BY
+                ER.风格,ER.供应商,ER.中类,ER.领型
+        ";
+        $sql_receiptNotic = "
+            SELECT
+                ERN.云仓,
+                ERN.年份,
+                ERN.季节,
+                ERN.二级时间,
+                ERN.大类,
+                ERN.中类,
+                ERN.货号名称,
+                ERN.分类,
+                ERN.领型,
+                ERN.风格,
+                ERN.颜色,
+                ERN.供应商,
+                SUM(ERN.数量) AS 发货总量,
+                '0' AS 入库总量
+            FROM
+                cwl_ErpReceiptNotice AS ERN
+                WHERE ERN.季节='夏季'
+            GROUP BY
+                ERN.风格,ERN.供应商,ERN.中类,ERN.领型
+        ";
+
+        $select_receipt = $this->db_easyA->query($sql_receipt);
+        $select_receiptNotic = $this->db_easyA->query($sql_receiptNotic);
+
+        $mergeData = []; 
+        $mergeData = array_merge($select_receipt, $select_receiptNotic);
+        // $mergeData = $select_receiptNotic;
+
+        echo '<pre>';
+        print_r($mergeData);
+
+        $this->db_easyA->table('cwl_ErpReceipt_report1')->strict(false)->insertAll($mergeData);
+        die;
+        // 合并 基本款
+        $mergeData_jiben = []; 
+        // 合并 引流款
+        $mergeData_yinliu = [];
+        // dump($select_receipt);
+        // dump($select_receiptNotic);
+
+
+        $select_receipt_test[] = $select_receipt[0];
+
+        // dump($select_receipt_test);
+        foreach ($select_receipt as $key => $val) {
+            foreach ($select_receiptNotic as $key2 => $val2) {
+                $receiptNotic_len = count($select_receiptNotic);
+                if ($val2['供应商'] == $val['供应商'] && $val2['风格'] == $val['风格'] && $val2['中类'] == $val['中类'] && $val2['领型'] == $val['领型']) {
+                    $select_receipt[$key]['出库总量'] = $val2['出库总量'];   
+                    continue;   
+                }
+
+                // 到结束也没找到
+                if ($key2 == $receiptNotic_len - 1) {
+                    if ($val2['风格'] == '基本款') {
+                        $mergeData_jiben[] = $val2;
+                    } elseif ($val2['风格'] == '引流款') {
+                        $mergeData_yinliu[] = $val2;
+                    }
+                }
+            }
+        }
+        echo '<pre>';
+        print_r($select_receipt);
+        dump($mergeData_jiben);
+        dump($mergeData_yinliu);
+      
+    }
 }
