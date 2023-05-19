@@ -1980,6 +1980,15 @@ class ReportFormsService
     {
         // 编号
         $code = 'S111';
+        if ($seasion == '春季') {
+            $str = 'A';
+        } elseif ($seasion == '夏季') {
+            $str = 'B';
+        } elseif ($seasion == '秋季') {
+            $str = 'C';
+        } elseif ($seasion == '冬季') {
+            $str = 'D';
+        }
         $date = date('Y-m-d', strtotime('+1day'));
 
         $sql = "
@@ -2035,7 +2044,7 @@ class ReportFormsService
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '           编号: ' . $code,
+                'banben' => '           编号: ' . $code . $str,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
@@ -2052,14 +2061,21 @@ class ReportFormsService
         // 编号
         $code = 'S112';
         $date = date('Y-m-d', strtotime('+1day'));
-        
+        if ($seasion == '春季') {
+            $str = 'A';
+        } elseif ($seasion == '夏季') {
+            $str = 'B';
+        } elseif ($seasion == '秋季') {
+            $str = 'C';
+        } elseif ($seasion == '冬季') {
+            $str = 'D';
+        } 
 
         $sql = "
             SELECT
                 IFNULL(风格, '总计') AS 风格,
-                IFNULL(大类, '风格合计') AS 大类,
-                IFNULL(中类, '大类合计') AS 中类,
-                IFNULL(领型,'中类合计') AS 领型,
+                IFNULL(中类, '合计') AS 中类,
+                IFNULL(领型,'合计') AS 领型,
                 SUM(发货总量) AS 发货总量,
                 SUM(入库总量) AS 入库总量
             FROM
@@ -2107,7 +2123,7 @@ class ReportFormsService
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '           编号: ' . $code,
+                'banben' => '           编号: ' . $code . $str,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     

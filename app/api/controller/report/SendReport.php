@@ -239,35 +239,35 @@ class SendReport extends BaseController
         $model = new $name;
         $send_data = [
             'S111A' => [
-                'title' => '春季新品发货及入库明细 表号:S111',
+                'title' => '春季新品发货及入库明细 表号:S111A',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111春季.jpg'
             ],
             'S111B' => [
-                'title' => '夏季新品发货及入库明细 表号:S111',
+                'title' => '夏季新品发货及入库明细 表号:S111B',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111夏季.jpg'
             ],
             'S111C' => [
-                'title' => '秋季新品发货及入库明细 表号:S111',
+                'title' => '秋季新品发货及入库明细 表号:S111C',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111秋季.jpg'
             ],
             'S111D' => [
-                'title' => '冬季新品发货及入库明细 表号:S111',
+                'title' => '冬季新品发货及入库明细 表号:S111C',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
             ],
             'S112A' => [
-                'title' => '春季新品发货及入库汇总 表号:S112',
+                'title' => '春季新品发货及入库汇总 表号:S112A',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112春季.jpg'
             ],
             'S112B' => [
-                'title' => '夏季新品发货及入库汇总 表号:S112',
+                'title' => '夏季新品发货及入库汇总 表号:S112B',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112夏季.jpg'
             ],
             'S112C' => [
-                'title' => '秋季新品发货及入库汇总 表号:S112',
+                'title' => '秋季新品发货及入库汇总 表号:S112C',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112秋季.jpg'
             ],
             'S112D' => [
-                'title' => '冬季新品发货及入库汇总 表号:S112',
+                'title' => '冬季新品发货及入库汇总 表号:S112D',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
             ],            
         ];
