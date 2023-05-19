@@ -20,10 +20,11 @@ class DeliveryValidate extends Validate
 //        'Remark' => 'require',
         'Goods' => 'require|array',
         'CodingCode' => 'require',
+        'SortingID' => 'require',
     ];
 
     protected $scene = [
-        'create' => ['DeliveryID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode'],
+        'create' => ['DeliveryID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode', 'SortingID'],
         'update' => ['DeliveryID', 'CodingCode'],
         'delete' => ['DeliveryID'],
     ];
@@ -42,6 +43,7 @@ class DeliveryValidate extends Validate
         'Goods.array' => 'Goods必须为数组',
         'Goods.require' => 'Goods不能为空',
         'CodingCode.require' => 'CodingCode不能为空',
+        'SortingID.require' => 'SortingID不能为空',
     ];
 
 }

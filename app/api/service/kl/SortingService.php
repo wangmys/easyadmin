@@ -64,9 +64,11 @@ class SortingService
 
     public function addSortGoods($sortingid, $SortingGoodsID, $detail) {
 
+        $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
+
         $arr['SortingGoodsID'] = $SortingGoodsID;
         $arr['SortingID'] = $sortingid;
-        $arr['GoodsId'] = ErpGoodsModel::where([['GoodsNo', '=', $detail['GoodsNo']]])->value('GoodsId');
+        $arr['GoodsId'] = $goodsId['GoodsId'];
         $arr['UnitPrice'] = $detail['UnitPrice'];
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
@@ -81,6 +83,7 @@ class SortingService
             }
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败2');
 //            Db::rollback(); // 回滚事务
         }
 
@@ -100,6 +103,7 @@ class SortingService
             ErpSortingGoodsDetailModel::create($arr);
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败3');
 //            Db::rollback(); // 回滚事务
         }
 
@@ -144,11 +148,6 @@ class SortingService
         try {
 
             ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->delete();
-            $SortingGoodsID = ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->column('SortingGoodsID');
-            ErpSortingGoodsModel::where([['SortingID', '=', $params['SortingID']]])->delete();
-            if ($SortingGoodsID) {
-                ErpSortingGoodsDetailModel::where([['SortingGoodsID', 'in', $SortingGoodsID]])->delete();
-            }
 
             Db::commit();
 

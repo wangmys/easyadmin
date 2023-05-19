@@ -48,7 +48,7 @@ class DeliveryService
             //ErpDeliveryGoods 处理
             if ($goods) {
                 foreach ($goods as $k => $v) {
-                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v);
+                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v, $params['SortingID']);
                 }
             }
 
@@ -62,15 +62,18 @@ class DeliveryService
 
     }
 
-    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail) {
+    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail, $SortingID) {
+
+        $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
 
         $arr['DeliveryGoodsID'] = $DeliveryGoodsID;
         $arr['DeliveryID'] = $deliveryid;
-        $arr['GoodsId'] = ErpGoodsModel::where([['GoodsNo', '=', $detail['GoodsNo']]])->value('GoodsId');
+        $arr['GoodsId'] = $goodsId['GoodsId'];
         $arr['UnitPrice'] = $detail['UnitPrice'];
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
+        $arr['SortingID'] = $SortingID;
 
 //        Db::startTrans();
         try {
@@ -81,6 +84,7 @@ class DeliveryService
             }
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败2');
 //            Db::rollback(); // 回滚事务
         }
 
@@ -100,6 +104,7 @@ class DeliveryService
             ErpDeliveryGoodsDetailModel::create($arr);
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败3');
 //            Db::rollback(); // 回滚事务
         }
 
@@ -142,11 +147,6 @@ class DeliveryService
         try {
 
             ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
-            $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
-            ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
-            if ($DeliveryGoodsID) {
-                ErpDeliveryGoodsDetailModel::where([['DeliveryGoodsID', 'in', $DeliveryGoodsID]])->delete();
-            }
 
             Db::commit();
 
