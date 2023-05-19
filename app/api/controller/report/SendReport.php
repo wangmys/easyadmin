@@ -250,10 +250,10 @@ class SendReport extends BaseController
                 'title' => '秋季新品发货及入库明细 表号:S111',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111秋季.jpg'
             ],
-            // 'S111D' => [
-            //     'title' => '冬季新品发货及入库明细 表号:S111',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
-            // ],
+            'S111D' => [
+                'title' => '冬季新品发货及入库明细 表号:S111',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
+            ],
             'S112A' => [
                 'title' => '春季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112春季.jpg'
@@ -266,10 +266,10 @@ class SendReport extends BaseController
                 'title' => '秋季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112秋季.jpg'
             ],
-            // 'S112D' => [
-            //     'title' => '冬季新品发货及入库汇总 表号:S112',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
-            // ],            
+            'S112D' => [
+                'title' => '冬季新品发货及入库汇总 表号:S112',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
+            ],            
         ];
         $res = [];
 
@@ -412,15 +412,15 @@ class SendReport extends BaseController
     // 采购定推
     public function run_caigoudingtui()
     {
-        // $this->service->create_table_s111('春季');
+        $this->service->create_table_s111('春季');
         $this->service->create_table_s111('夏季');
-        // $this->service->create_table_s111('秋季');
-        // $this->service->create_table_s111('冬季');
+        $this->service->create_table_s111('秋季');
+        $this->service->create_table_s111('冬季');
 
-        // $this->service->create_table_s112('春季');
+        $this->service->create_table_s112('春季');
         $this->service->create_table_s112('夏季');
-        // $this->service->create_table_s112('秋季');
-        // $this->service->create_table_s112('冬季');
+        $this->service->create_table_s112('秋季');
+        $this->service->create_table_s112('冬季');
 
         // 发送数据报表
         $this->send_caigoudingtui();
