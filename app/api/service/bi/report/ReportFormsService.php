@@ -2221,13 +2221,13 @@ class ReportFormsService
             }
 
             if (@$params['code'] == 'S112') {
-                if (isset($item['领型']) && $item['领型'] == '中类合计') {
+                if (isset($item['领型']) && $item['领型'] == '合计') {
                     imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow2);
                 }
-                if (isset($item['中类']) && $item['中类'] == '大类合计') {
+                if (isset($item['中类']) && $item['中类'] == '合计') {
                     imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $blue2);
                 }
-                if (isset($item['大类']) && $item['大类'] == '风格合计') {
+                if (isset($item['大类']) && $item['大类'] == '合计') {
                     imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['风格']) && $item['风格'] == '总计') {
