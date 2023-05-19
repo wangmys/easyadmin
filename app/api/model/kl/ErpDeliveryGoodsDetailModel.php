@@ -5,16 +5,16 @@ namespace app\api\model\kl;
 use app\common\model\TimeModel;
 
 /**
- * 出货指令单商品详情 model
+ * 仓库收货单商品详情 model
  */
-class ErpSortingGoodsDetailModel extends TimeModel
+class ErpDeliveryGoodsDetailModel extends TimeModel
 {
     protected $connection = 'sqlsrv2';
 
     // 表名
-    protected $name = 'Sortinggoodsdetail';
+    protected $name = 'Deliverygoodsdetail';
     protected $schema = [
-        'SortingGoodsID' => 'nvarchar',
+        'DeliveryGoodsID' => 'nvarchar',
         'ColorId' => 'bigint',
         'SizeId' => 'bigint',
         'SpecId' => 'bigint',

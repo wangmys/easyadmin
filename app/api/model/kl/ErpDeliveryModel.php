@@ -5,28 +5,26 @@ namespace app\api\model\kl;
 use app\common\model\TimeModel;
 
 /**
- * 出货指令单 model
+ * 仓库收货单 model
  */
-class ErpSortingModel extends TimeModel
+class ErpDeliveryModel extends TimeModel
 {
     protected $connection = 'sqlsrv2';
 
     // 表名
-    protected $name = 'Sorting';
+    protected $name = 'Delivery';
 
     protected $schema = [
-        'OrderType' => 'nvarchar',
-        'OrderTypeText' => 'nvarchar',
-        'SortingID' => 'nvarchar',
-        'SortingDate' => 'datetime',
+        'DeliveryID' => 'nvarchar',
         'WarehouseId' => 'nvarchar',
+        'DeliveryDate' => 'datetime',
         'CustomerId' => 'nvarchar',
-        'CodingCode' => 'nvarchar',
-        'Remark' => 'nvarchar',
         'IsCompleted' => 'bit',
         'BranchId' => 'bigint',
-        'WorkflowId' => 'bigint',
+        'CodingCode' => 'nvarchar',
         'CodingCodeText' => 'nvarchar',
+        'Remark' => 'nvarchar',
+        'WorkflowId' => 'bigint',
         'CreateUserName' => 'nvarchar',
         'UpdateUserName' => 'nvarchar',
         'CreateUserId' => 'bigint',
@@ -36,18 +34,15 @@ class ErpSortingModel extends TimeModel
     ];
 
     const INSERT = [
-        'OrderType' => 'ErpOrder_BU',
-        'OrderTypeText' => '补货',
         'IsCompleted' => 0,
         'BranchId' => '2',
-        'CodingCode' => 'StartNode1',
-        'CodingCodeText' => '未提交',
-        'WorkflowId' => 1,
         'CreateUserId' => '29',
         'CreateUserName' => '辛斌',
         'UpdateUserId' => '29',
         'UpdateUserName' => '辛斌',
-        'Type' => '0',
+        'CodingCode' => 'StartNode1',
+        'CodingCodeText' => '未提交',
+        'WorkflowId' => 1,
         'PrintNum' => '0',
     ];
 

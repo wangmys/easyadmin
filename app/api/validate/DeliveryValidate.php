@@ -5,7 +5,7 @@ namespace app\api\validate;
 
 use think\Validate;
 
-class SortingValidate extends Validate
+class DeliveryValidate extends Validate
 {
     /**
      * 定义验证规则
@@ -14,7 +14,7 @@ class SortingValidate extends Validate
      * @var array
      */
     protected $rule = [
-        'SortingID' => 'require',
+        'DeliveryID' => 'require',
         'WarehouseId' => 'require',
         'CustomerId' => 'require',
 //        'Remark' => 'require',
@@ -23,9 +23,9 @@ class SortingValidate extends Validate
     ];
 
     protected $scene = [
-        'create' => ['SortingID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode'],
-        'update' => ['SortingID', 'CodingCode'],
-        'delete' => ['SortingID'],
+        'create' => ['DeliveryID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode'],
+        'update' => ['DeliveryID', 'CodingCode'],
+        'delete' => ['DeliveryID'],
     ];
 
     /**
@@ -35,7 +35,7 @@ class SortingValidate extends Validate
      * @var array
      */
     protected $message = [
-        'SortingID.require' => 'SortingID不能为空',
+        'DeliveryID.require' => 'DeliveryID不能为空',
         'WarehouseId.require' => 'WarehouseId不能为空',
         'CustomerId.require' => 'CustomerId不能为空',
         'Remark.require' => 'Remark不能为空',

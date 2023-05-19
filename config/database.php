@@ -46,9 +46,9 @@ return [
             // 数据库名
             'database'          => Env::get('database4.database', 'ff21120220830'),
             // 用户名
-            'username'          => Env::get('database4.username', 'reader'),
+            'username'          => Env::get('database4.username', 'app'),
             // 密码
-            'password'          => Env::get('database4.password', 'suoge@2023'),
+            'password'          => Env::get('database4.password', 'skiLSUWosdif@^sf3'),
             // 端口
             'hostport'          => Env::get('database4.hostport', '19122'),
             // 数据库连接参数

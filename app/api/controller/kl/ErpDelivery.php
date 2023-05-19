@@ -7,10 +7,10 @@ use app\BaseController;
 use think\exception\ValidateException;
 use think\Request;
 use think\facade\Db;
-use app\api\service\kl\SortingService;
-use app\api\validate\SortingValidate;
+use app\api\service\kl\DeliveryService;
+use app\api\validate\DeliveryValidate;
 
-class ErpSorting extends BaseController
+class ErpDelivery extends BaseController
 {
     protected $request;
 
@@ -20,7 +20,7 @@ class ErpSorting extends BaseController
     }
 
     /**
-     * 创建 出货指令单
+     * 创建 仓库出货单
      * @return \think\response\Json
      */
     public function create() {
@@ -28,19 +28,19 @@ class ErpSorting extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(SortingValidate::class)->scene('create')->check($params);
+            validate(DeliveryValidate::class)->scene('create')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $sortingService = new SortingService();
-        $sortingService->createSorting($params);
+        $deliveryService = new DeliveryService();
+        $deliveryService->createdelivery($params);
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
 
     /**
-     * 更新 出货指令单
+     * 更新 仓库出货单
      * @return \think\response\Json
      */
     public function update() {
@@ -48,19 +48,19 @@ class ErpSorting extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(SortingValidate::class)->scene('update')->check($params);
+            validate(DeliveryValidate::class)->scene('update')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $sortingService = new SortingService();
-        $sortingService->updateSorting($params);
+        $deliveryService = new DeliveryService();
+        $deliveryService->updatedelivery($params);
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
 
     /**
-     * 删除 出货指令单
+     * 删除 仓库出货单
      * @return \think\response\Json
      */
     public function delete() {
@@ -68,13 +68,13 @@ class ErpSorting extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(SortingValidate::class)->scene('delete')->check($params);
+            validate(DeliveryValidate::class)->scene('delete')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $sortingService = new SortingService();
-        $sortingService->deleteSorting($params);
+        $deliveryService = new DeliveryService();
+        $deliveryService->deletedelivery($params);
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
