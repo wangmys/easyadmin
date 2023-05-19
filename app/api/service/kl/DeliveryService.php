@@ -81,6 +81,7 @@ class DeliveryService
             }
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败2');
 //            Db::rollback(); // 回滚事务
         }
 
@@ -100,6 +101,7 @@ class DeliveryService
             ErpDeliveryGoodsDetailModel::create($arr);
         } catch (\Exception $e) {
             log_error($e);
+            abort(0, '保存失败3');
 //            Db::rollback(); // 回滚事务
         }
 
