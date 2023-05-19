@@ -427,10 +427,10 @@ class SendReport extends BaseController
     }
 
     public function testSend() {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $res[] = $model->send('夏季新品发货及入库汇总 表号:S112', 'http://im.babiboy.com/img/20230520/S112%E5%A4%8F%E5%AD%A3.jpg', 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b');
-        return json($res);
+        // $name = '\app\api\service\DingdingService';
+        // $model = new $name;
+        // $res[] = $model->send('夏季新品发货及入库汇总 表号:S112', 'http://im.babiboy.com/img/20230520/S112%E5%A4%8F%E5%AD%A3.jpg', 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b');
+        // return json($res);
     }
 
 }

@@ -2074,6 +2074,7 @@ class ReportFormsService
         $sql = "
             SELECT
                 IFNULL(风格, '总计') AS 风格,
+                IFNULL(大类, '合计') AS 大类,
                 IFNULL(中类, '合计') AS 中类,
                 IFNULL(领型,'合计') AS 领型,
                 SUM(发货总量) AS 发货总量,
