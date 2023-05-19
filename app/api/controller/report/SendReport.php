@@ -274,8 +274,8 @@ class SendReport extends BaseController
         $res = [];
 
         foreach ($send_data as $k=>$v){
-            // echo $v['jpg_url'];
-            // echo '<br>';
+            echo $v['jpg_url'];
+            echo '<br>';
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
