@@ -238,35 +238,35 @@ class SendReport extends BaseController
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-            'S111' => [
+            'S111A' => [
                 'title' => '春季新品发货及入库明细 表号:S111',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111春季.jpg'
             ],
-            'S111' => [
+            'S111B' => [
                 'title' => '夏季新品发货及入库明细 表号:S111',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111夏季.jpg'
             ],
-            'S111' => [
+            'S111C' => [
                 'title' => '秋季新品发货及入库明细 表号:S111',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111秋季.jpg'
             ],
-            // 'S111' => [
+            // 'S111D' => [
             //     'title' => '冬季新品发货及入库明细 表号:S111',
             //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S111冬季.jpg'
             // ],
-            'S112' => [
+            'S112A' => [
                 'title' => '春季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112春季.jpg'
             ],
-            'S112' => [
+            'S112B' => [
                 'title' => '夏季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112夏季.jpg'
             ],
-            'S112' => [
+            'S112C' => [
                 'title' => '秋季新品发货及入库汇总 表号:S112',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112秋季.jpg'
             ],
-            // 'S112' => [
+            // 'S112D' => [
             //     'title' => '冬季新品发货及入库汇总 表号:S112',
             //     'jpg_url' => $this->request->domain()."/img/".date('Ymd', strtotime('+1day')).'/S112冬季.jpg'
             // ],            
@@ -412,14 +412,14 @@ class SendReport extends BaseController
     // 采购定推
     public function run_caigoudingtui()
     {
-        $this->service->create_table_s111('春季');
+        // $this->service->create_table_s111('春季');
         $this->service->create_table_s111('夏季');
-        $this->service->create_table_s111('秋季');
+        // $this->service->create_table_s111('秋季');
         // $this->service->create_table_s111('冬季');
 
-        $this->service->create_table_s112('春季');
+        // $this->service->create_table_s112('春季');
         $this->service->create_table_s112('夏季');
-        $this->service->create_table_s112('秋季');
+        // $this->service->create_table_s112('秋季');
         // $this->service->create_table_s112('冬季');
 
         // 发送数据报表
