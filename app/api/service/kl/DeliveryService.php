@@ -64,9 +64,11 @@ class DeliveryService
 
     public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail) {
 
+        $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
+
         $arr['DeliveryGoodsID'] = $DeliveryGoodsID;
         $arr['DeliveryID'] = $deliveryid;
-        $arr['GoodsId'] = ErpGoodsModel::where([['GoodsNo', '=', $detail['GoodsNo']]])->value('GoodsId');
+        $arr['GoodsId'] = $goodsId['GoodsId'];
         $arr['UnitPrice'] = $detail['UnitPrice'];
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
