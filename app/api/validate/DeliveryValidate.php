@@ -16,7 +16,9 @@ class DeliveryValidate extends Validate
     protected $rule = [
         'DeliveryID' => 'require',
         'WarehouseId' => 'require',
+        'WarehouseName' => 'require',
         'CustomerId' => 'require',
+        'CustomerName' => 'require',
 //        'Remark' => 'require',
         'Goods' => 'require|array',
         'CodingCode' => 'require',
@@ -24,7 +26,7 @@ class DeliveryValidate extends Validate
     ];
 
     protected $scene = [
-        'create' => ['DeliveryID', 'WarehouseId', 'CustomerId', 'Goods', 'CodingCode', 'SortingID'],
+        'create' => ['DeliveryID', 'WarehouseId', 'WarehouseName', 'CustomerId', 'CustomerName', 'Goods', 'CodingCode', 'SortingID'],
         'update' => ['DeliveryID', 'CodingCode'],
         'delete' => ['DeliveryID'],
     ];
@@ -38,7 +40,9 @@ class DeliveryValidate extends Validate
     protected $message = [
         'DeliveryID.require' => 'DeliveryID不能为空',
         'WarehouseId.require' => 'WarehouseId不能为空',
+        'WarehouseName.require' => 'WarehouseName不能为空',
         'CustomerId.require' => 'CustomerId不能为空',
+        'CustomerName.require' => 'CustomerName不能为空',
         'Remark.require' => 'Remark不能为空',
         'Goods.array' => 'Goods必须为数组',
         'Goods.require' => 'Goods不能为空',
