@@ -5,7 +5,7 @@ namespace app\api\validate;
 
 use think\Validate;
 
-class DeliveryValidate extends Validate
+class ReceiptValidate extends Validate
 {
     /**
      * 定义验证规则
@@ -14,7 +14,7 @@ class DeliveryValidate extends Validate
      * @var array
      */
     protected $rule = [
-        'DeliveryID' => 'require',
+        'ReceiptID' => 'require',
         'WarehouseId' => 'require',
         'WarehouseName' => 'require',
         'CustomerId' => 'require',
@@ -22,13 +22,13 @@ class DeliveryValidate extends Validate
 //        'Remark' => 'require',
         'Goods' => 'require|array',
         'CodingCode' => 'require',
-        'SortingID' => 'require',
+        'Type' => 'require',
     ];
 
     protected $scene = [
-        'create' => ['DeliveryID', 'WarehouseId', 'WarehouseName', 'CustomerId', 'CustomerName', 'Goods', 'CodingCode', 'SortingID'],
-        'update' => ['DeliveryID', 'CodingCode'],
-        'delete' => ['DeliveryID'],
+        'create' => ['ReceiptID', 'WarehouseId', 'WarehouseName', 'CustomerId', 'CustomerName', 'Goods', 'CodingCode', 'Type'],
+        'update' => ['ReceiptID', 'CodingCode'],
+        'delete' => ['ReceiptID'],
     ];
 
     /**
@@ -38,7 +38,7 @@ class DeliveryValidate extends Validate
      * @var array
      */
     protected $message = [
-        'DeliveryID.require' => 'DeliveryID不能为空',
+        'ReceiptID.require' => 'ReceiptID不能为空',
         'WarehouseId.require' => 'WarehouseId不能为空',
         'WarehouseName.require' => 'WarehouseName不能为空',
         'CustomerId.require' => 'CustomerId不能为空',
@@ -47,7 +47,7 @@ class DeliveryValidate extends Validate
         'Goods.array' => 'Goods必须为数组',
         'Goods.require' => 'Goods不能为空',
         'CodingCode.require' => 'CodingCode不能为空',
-        'SortingID.require' => 'SortingID不能为空',
+        'Type.require' => 'Type不能为空',
     ];
 
 }

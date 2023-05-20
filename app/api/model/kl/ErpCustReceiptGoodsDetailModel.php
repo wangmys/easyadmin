@@ -5,21 +5,19 @@ namespace app\api\model\kl;
 use app\common\model\TimeModel;
 
 /**
- * 零售核销单库存流水尺码表 model
+ * 收仓库收货单商品详情 model
  */
-class ErpCustomerStockDetailModel extends TimeModel
+class ErpCustReceiptGoodsDetailModel extends TimeModel
 {
     protected $connection = 'sqlsrv2';
 
     // 表名
-    protected $name = 'Customerstockdetail';
-
+    protected $name = 'Custreceiptgoodsdetail';
     protected $schema = [
-        'StockId' => 'nvarchar',
+        'ReceiptGoodsID' => 'nvarchar',
         'ColorId' => 'bigint',
         'SizeId' => 'bigint',
         'SpecId' => 'bigint',
         'Quantity' => 'decimal',
     ];
-
 }
