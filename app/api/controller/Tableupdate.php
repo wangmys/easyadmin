@@ -525,8 +525,9 @@ class Tableupdate extends BaseController
                 LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
             WHERE
                 ER.CodingCodeText = '已审结' 
-                AND ER.ReceiptDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
-                AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ER.ReceiptDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+            --  AND ER.ReceiptDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
+            --  AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
                 AND ER.Type= 1 
             -- 	AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
@@ -546,6 +547,7 @@ class Tableupdate extends BaseController
                 ,EGC.ColorDesc
         ";
 
+        // 采购入库
         $sql2 = "
             SELECT
                 EW.WarehouseName AS 云仓,
@@ -597,8 +599,9 @@ class Tableupdate extends BaseController
                 LEFT JOIN ErpSupply AS ES ON ERN.SupplyId = ES.SupplyId 
             WHERE
                 ERN.CodingCodeText = '已审结' 
-                AND ERN.ReceiptNoticeDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
-                AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ERN.ReceiptNoticeDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+            --  AND ERN.ReceiptNoticeDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
+            --  AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
             -- 	AND ER.Type= 2 
                 AND ERN.IsCompleted IS NULL
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
@@ -664,6 +667,7 @@ class Tableupdate extends BaseController
                 ER.分类,
                 ER.领型,
                 ER.风格,
+                ER.货号,
                 ER.颜色,
                 ER.供应商,
                 '0' AS 发货总量,
@@ -685,6 +689,7 @@ class Tableupdate extends BaseController
                 ERN.分类,
                 ERN.领型,
                 ERN.风格,
+                ERN.货号,
                 ERN.颜色,
                 ERN.供应商,
                 SUM(ERN.数量) AS 发货总量,
