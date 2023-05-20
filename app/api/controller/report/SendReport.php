@@ -430,34 +430,34 @@ class SendReport extends BaseController
         // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
         $res =json_decode($res, true);
         if ($res['status'] == 1) {
-        $this->service->create_table_s111('春季');
-        $this->service->create_table_s111('夏季');
-        $this->service->create_table_s111('秋季');
-        $this->service->create_table_s111('冬季');
+            $this->service->create_table_s111('春季');
+            $this->service->create_table_s111('夏季');
+            $this->service->create_table_s111('秋季');
+            $this->service->create_table_s111('冬季');
 
-        $this->service->create_table_s112('春季');
-        $this->service->create_table_s112('夏季');
-        $this->service->create_table_s112('秋季');
-        $this->service->create_table_s112('冬季');
+            $this->service->create_table_s112('春季');
+            $this->service->create_table_s112('夏季');
+            $this->service->create_table_s112('秋季');
+            $this->service->create_table_s112('冬季');
 
-        // 发送数据报表
-        $this->send_caigoudingtui();
+            // 发送数据报表
+            $this->send_caigoudingtui();
         } else {
             return $res;
         }
-        die;
-        $this->service->create_table_s111('春季');
-        $this->service->create_table_s111('夏季');
-        $this->service->create_table_s111('秋季');
-        $this->service->create_table_s111('冬季');
+        // die;
+        // $this->service->create_table_s111('春季');
+        // $this->service->create_table_s111('夏季');
+        // $this->service->create_table_s111('秋季');
+        // $this->service->create_table_s111('冬季');
 
-        $this->service->create_table_s112('春季');
-        $this->service->create_table_s112('夏季');
-        $this->service->create_table_s112('秋季');
-        $this->service->create_table_s112('冬季');
+        // $this->service->create_table_s112('春季');
+        // $this->service->create_table_s112('夏季');
+        // $this->service->create_table_s112('秋季');
+        // $this->service->create_table_s112('冬季');
 
-        // 发送数据报表
-        $this->send_caigoudingtui();
+        // // 发送数据报表
+        // $this->send_caigoudingtui();
     }
 
     public function testSend() {
