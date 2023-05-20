@@ -31,4 +31,11 @@ class ErpCustomerStockModel extends TimeModel
         'UpdateTime' => 'datetime',
     ];
 
+    const INSERT = [
+        'CreateUserId' => '29',
+        'CreateUserName' => '辛斌',
+        'UpdateUserId' => '29',
+        'UpdateUserName' => '辛斌',
+    ];
+
 }
