@@ -119,7 +119,7 @@ class ReportFormsService
         $code = 'S030';
         $sql = "
             SELECT
-                CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '合计' END AS 经营,
+                CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
                 ISNULL(EC.State,'合计') AS 省份,
                 CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年春],
                 CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年夏],
@@ -175,6 +175,7 @@ class ReportFormsService
         ];
         //参数
         $params = [
+            'code' => $code,
             'row' => count($data),          //数据的行数
             'file_name' => $code . '.jpg',      //保存的文件名
             'title' => "昨天各省各季节销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
@@ -197,7 +198,7 @@ class ReportFormsService
         $code = 'S031';
         $sql = "
         SELECT
-            CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '合计' END AS 经营,
+            CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
             ISNULL(EC.State,'合计') AS 省份,
             CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年春],
             CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年夏],
@@ -245,6 +246,7 @@ class ReportFormsService
         ];
         //参数
         $params = [
+            'code' => $code,
             'row' => count($data),          //数据的行数
             'file_name' => $code . '.jpg',      //保存的文件名
             'title' => "近三天各省各季节销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
@@ -574,6 +576,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "省份老店业绩同比-分经营模式 [" . date("Y-m-d") . ']',
@@ -624,6 +627,7 @@ class ReportFormsService
             累销递增金额差
             from old_customer_state  where 更新时间 = '$date' and 经营模式='加盟'";
         $list = Db::connect("mysql2")->query($sql);
+
         foreach ($list as $key => $val) {
             $list[$key]['省份'] = province2zi($val['省份']);
         }
@@ -660,6 +664,7 @@ class ReportFormsService
 
         //参数
         $params = [
+
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "数据更新时间 （" . date("Y-m-d") . "） - 省份老店业绩同比-加盟 表号:S103B",
@@ -1244,7 +1249,7 @@ class ReportFormsService
 
         $sql3 = "
             SELECT
-            IFNULL(SCL.`督导`,'合计') AS 督导,
+            IFNULL(SCL.`督导`,'总计') AS 督导,
             IFNULL(SCL.`省份`,'合计') AS 省份,
             CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
             CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
@@ -1295,6 +1300,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "督导挑战目标完成率 [" . date("Y-m-d") . "]",
@@ -1465,6 +1471,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "各省挑战目标完成情况 [" . date("Y-m-d") . ']',
@@ -1993,20 +2000,22 @@ class ReportFormsService
 
         $sql = "
             SELECT
-            供应商,
-            SUM(发货总量) AS 发货总量,
-            SUM(入库总量) AS 入库总量,
-            风格,
-            中类,
-            领型 
-        FROM
-            `cwl_ErpReceipt_report1`
-            WHERE 季节='{$seasion}'
-        GROUP BY 	
-            风格,
-            供应商,
-            中类,
-            领型 
+                供应商,
+                SUM(发货总量) AS 发货总量,
+                SUM(入库总量) AS 入库总量,
+                领型, 
+                风格,
+                大类,
+                中类
+            FROM
+                `cwl_ErpReceipt_report1`
+                WHERE 季节='{$seasion}'
+            GROUP BY 	
+                风格,
+                领型, 
+                大类,
+                中类,
+                供应商
         ";
         $list = $this->db_easyA->query($sql);
 
@@ -2024,10 +2033,6 @@ class ReportFormsService
             // $field_width[3] = 90;
             // $field_width[4] = 90;
     
-    
-            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-            $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
-            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
             //图片左上角汇总说明数据，可为空
             $table_explain = [
                 // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
@@ -2071,14 +2076,30 @@ class ReportFormsService
             $str = 'D';
         } 
 
+    //     SELECT
+    //     IFNULL(风格, '总计') AS 风格,
+    //     IFNULL(大类, '合计') AS 大类,
+    //     IFNULL(中类, '合计') AS 中类,
+    //     IFNULL(领型,'合计') AS 领型,
+    //     SUM(发货总量) AS 发货总量,
+    //     SUM(入库总量) AS 入库总量
+    // FROM
+    //     `cwl_ErpReceipt_report1`
+    //     WHERE 季节='{$seasion}'
+    // GROUP BY 	
+    //     风格,
+    //     大类,
+    //     中类,
+    //     领型 
+    // WITH ROLLUP
         $sql = "
             SELECT
-                IFNULL(风格, '总计') AS 风格,
-                IFNULL(大类, '合计') AS 大类,
                 IFNULL(中类, '合计') AS 中类,
                 IFNULL(领型,'合计') AS 领型,
                 SUM(发货总量) AS 发货总量,
-                SUM(入库总量) AS 入库总量
+                SUM(入库总量) AS 入库总量,
+                IFNULL(大类, '合计') AS 大类,
+                IFNULL(风格, '总计') AS 风格
             FROM
                 `cwl_ErpReceipt_report1`
                 WHERE 季节='{$seasion}'
@@ -2087,7 +2108,7 @@ class ReportFormsService
                 大类,
                 中类,
                 领型 
-            WITH ROLLUP
+            WITH ROLLUP           
         ";
         $list = $this->db_easyA->query($sql);
         if ($list) {
@@ -2209,43 +2230,53 @@ class ReportFormsService
 
         foreach ($params['data'] as $key => $item) {
             if (isset($item['省份']) && $item['省份'] == '合计') {
-                imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
             }
 
             if ($params['banben'] == '图片报表编号: S107') {
                 if (isset($item['二级分类']) && $item['二级分类'] == '合计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['新老品']) && $item['新老品'] == '总计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $littleblue);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S030' || @$params['code'] == 'S031') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['经营']) && $item['经营'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
             }
 
             if (@$params['code'] == 'S112') {
                 if (isset($item['领型']) && $item['领型'] == '合计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow2);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
                 }
                 if (isset($item['中类']) && $item['中类'] == '合计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $blue2);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $blue2);
                 }
                 if (isset($item['大类']) && $item['大类'] == '合计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['风格']) && $item['风格'] == '总计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $orange);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
             }
         }
         // create_table_s105
         if ($params['banben'] == '图片报表编号: S105') {
             if (isset($item['一级分类']) && $item['一级分类'] == '总计') {
-                imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
             }
         }
         // s106
         if ($params['banben'] == '图片报表编号: S106') {
             imagefilledrectangle($img, 370, $y1, $x2 + 3000, $y2, $yellow);
         }
+        
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
             $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
@@ -2253,6 +2284,7 @@ class ReportFormsService
             imagettftext($img, $base['text_size'], 0, $sum + (($x - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $params['table_header'][$key]); //写入表头文字
             $sum += $params['field_width'][$key];
         }
+        
 
         //画表格横线
         foreach ($params['data'] as $key => $item) {
@@ -2497,6 +2529,7 @@ class ReportFormsService
         $blue = imagecolorallocate($img, 0, 42, 212); //设定图片背景色
         $gray = imagecolorallocate($img, 37, 240, 240); //设定图片背景色
         $littleblue = imagecolorallocate($img, 22, 172, 176); //设定图片背景色
+        $orange = imagecolorallocate($img, 255, 192, 0); //设定图片背景色
 
         imagefill($img, 0, 0, $bg_color); //填充图片背景色
 
@@ -2514,19 +2547,46 @@ class ReportFormsService
 
         // 1 统计上色
         foreach ($params['data'] as $key => $item) {
-            if (isset($item['省份']) && $item['省份'] == '合计') {
-                imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
-            }
             if (isset($item['店铺名称']) && $item['店铺名称'] == '合计') {
-                imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+            }
+            if (isset($item['省份']) && $item['省份'] == '合计') {
+                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
             }
             if ($params['banben'] == '图片报表编号: S107') {
                 if (isset($item['二级分类']) && $item['二级分类'] == '合计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['新老品']) && $item['新老品'] == '总计') {
-                    imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $littleblue);
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $littleblue);
                 }
+            }
+
+            if (@$params['code'] == 'S103') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['经营']) && $item['经营'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }   
+            }
+
+            if (@$params['code'] == 'S108A') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['督导']) && $item['督导'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }   
+            }
+
+            if (@$params['code'] == 'S109') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['经营']) && $item['经营'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }   
             }
         }
 
