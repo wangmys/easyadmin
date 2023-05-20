@@ -2042,7 +2042,7 @@ class ReportFormsService
             //参数
             $params = [
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $seasion . '.jpg',   //保存的文件名
+                'file_name' => $code . $str . '.jpg',   //保存的文件名
                 'title' => "{$seasion}新品发货及入库明细 [" . date("Y-m-d") . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
@@ -2138,7 +2138,7 @@ class ReportFormsService
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $seasion . '.jpg',   //保存的文件名
+                'file_name' => $code . $str . '.jpg',   //保存的文件名
                 'title' => "{$seasion}新品发货及入库汇总 [" . date("Y-m-d") . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
