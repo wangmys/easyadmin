@@ -439,6 +439,9 @@ class SendReport extends BaseController
         $this->service->create_table_s112('夏季');
         $this->service->create_table_s112('秋季');
         $this->service->create_table_s112('冬季');
+
+        // 发送数据报表
+        $this->send_caigoudingtui();
         } else {
             return $res;
         }
