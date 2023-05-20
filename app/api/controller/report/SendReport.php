@@ -102,12 +102,6 @@ class SendReport extends BaseController
             } else {
                 return $res;
             }
-
-        } elseif ($name =='S112') {
-            $this->service->create_table_s112('春季');
-            $this->service->create_table_s112('夏季');
-            $this->service->create_table_s112('秋季');
-            $this->service->create_table_s112('冬季');
         }
     }
 
@@ -294,8 +288,12 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // 推送 测试群https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
                 // $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b');
-                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
+                // 数据测试群
+                // $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2');
                 // dump($v);
+                // 采购群
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=751850d0366d9494e16070bdbf14a5459b76c59ced68c86ac3d46c53869d908f');
+
             }
         }
         return json($res);
@@ -427,6 +425,24 @@ class SendReport extends BaseController
     // 采购定推
     public function run_caigoudingtui()
     {
+
+        $res = http_get('http://im.babiboy.com//api/Tableupdate/receipt_receiptNotice');
+        // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
+        $res =json_decode($res, true);
+        if ($res['status'] == 1) {
+        $this->service->create_table_s111('春季');
+        $this->service->create_table_s111('夏季');
+        $this->service->create_table_s111('秋季');
+        $this->service->create_table_s111('冬季');
+
+        $this->service->create_table_s112('春季');
+        $this->service->create_table_s112('夏季');
+        $this->service->create_table_s112('秋季');
+        $this->service->create_table_s112('冬季');
+        } else {
+            return $res;
+        }
+        die;
         $this->service->create_table_s111('春季');
         $this->service->create_table_s111('夏季');
         $this->service->create_table_s111('秋季');
