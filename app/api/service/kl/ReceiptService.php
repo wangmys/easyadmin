@@ -26,6 +26,10 @@ class ReceiptService
      */
     public function create($params) {
 
+        if (ErpCustReceiptModel::where([['ReceiptID', '=', $params['ReceiptID']]])->field('ReceiptID')->find()) {
+            json_fail(400, 'ReceiptID单号已存在');
+        }
+
         Db::startTrans();
         try {
 

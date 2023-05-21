@@ -26,6 +26,10 @@ class OutboundService
      */
     public function create($params) {
 
+        if (ErpOutboundModel::where([['OutboundId', '=', $params['OutboundId']]])->field('OutboundId')->find()) {
+            json_fail(400, 'OutboundId单号已存在');
+        }
+
         Db::startTrans();
         try {
 

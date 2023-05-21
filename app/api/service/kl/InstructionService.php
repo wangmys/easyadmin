@@ -22,6 +22,10 @@ class InstructionService
      */
     public function create($params) {
 
+        if (ErpInstructionModel::where([['InstructionId', '=', $params['InstructionId']]])->field('InstructionId')->find()) {
+            json_fail(400, 'InstructionId单号已存在');
+        }
+
         Db::startTrans();
         try {
 

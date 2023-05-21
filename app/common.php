@@ -292,3 +292,11 @@ function make_order_number($start, $num, $length = 8)
 {
     return $start . str_pad(strval($num + 1), $length, "0", STR_PAD_LEFT);
 }
+
+function json_success($code=200, $msg='okk', $data=[]) {
+    echo json_encode(['code'=>$code, 'msg'=>$msg, 'data'=>$data]);die;
+}
+
+function json_fail($code=400, $msg='参数有误', $data=[]) {
+    echo json_encode(['code'=>$code, 'msg'=>$msg, 'data'=>$data]);die;
+}

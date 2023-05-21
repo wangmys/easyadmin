@@ -26,6 +26,10 @@ class DeliveryService
      */
     public function createDelivery($params) {
 
+        if (ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->field('DeliveryID')->find()) {
+            json_fail(400, 'DeliveryID单号已存在');
+        }
+
         Db::startTrans();
         try {
 
