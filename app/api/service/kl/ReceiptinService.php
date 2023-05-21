@@ -100,7 +100,7 @@ class ReceiptinService
         $arr['Quantity'] = $detail['Quantity'];#NOT NULL
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);#NOT NULL
         $arr['Remark'] = $detail['Remark'];
-        $arr['PurchaseID'] = $detail['PurchaseID'];
+        $arr['PurchaseID'] = $params['PurchaseID'];
         $arr['DeliveryId'] = $detail['DeliveryId'];
         $arr['ReturnId'] = $detail['ReturnId'];
         $arr['InstructionId'] = $params['InstructionId'];
