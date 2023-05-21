@@ -288,6 +288,11 @@ function log_error($e)
     Log::channel('error')->error($e->__toString());
 }
 
+function log_error_write($msg, $path = 'error')
+{
+    Log::channel($path)->error($msg);
+}
+
 function make_order_number($start, $num, $length = 8)
 {
     return $start . str_pad(strval($num + 1), $length, "0", STR_PAD_LEFT);
