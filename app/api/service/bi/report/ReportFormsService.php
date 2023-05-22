@@ -2167,8 +2167,8 @@ class ReportFormsService
             SELECT
                 IFNULL(经营属性, '总计') AS 经营属性,
                 IFNULL(省份, '合计') AS 省份,
-                concat(ROUND( SUM(今日流水) / SUM( `环比流水` ) - 1, 2 ), '%') AS 今日环比,
-                concat(ROUND( SUM( `本月累计流水` ) / SUM( `环比累计流水` ) - 1, 2 ), '%') AS 月度环比,
+                concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
+                concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
                 ROUND( SUM(今日流水), 2 ) AS 今日流水,
                 ROUND( SUM( `环比流水` ), 2 ) AS 环比流水,
                 ROUND( SUM( `本月累计流水` ), 2 ) AS 本月累计流水,

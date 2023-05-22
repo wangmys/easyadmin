@@ -105,7 +105,7 @@ class SendReport extends BaseController
         }
     }
 
-    // 配饰每日销售数量
+    // 
     public function createS113()
     {
         $this->service->create_table_s113();
