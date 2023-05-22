@@ -35,7 +35,11 @@ class ErpOutbound extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $this->service->create($params);
+        try {
+            $this->service->create($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
@@ -54,7 +58,11 @@ class ErpOutbound extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $this->service->update($params);
+        try {
+            $this->service->update($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
@@ -73,7 +81,11 @@ class ErpOutbound extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $this->service->delete($params);
+        try {
+            $this->service->delete($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
