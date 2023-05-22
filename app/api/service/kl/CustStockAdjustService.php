@@ -180,7 +180,7 @@ class CustStockAdjustService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '更新失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -207,7 +207,7 @@ class CustStockAdjustService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '删除失败');
+            abort(0, $e->getMessage());
         }
 
     }

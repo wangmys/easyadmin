@@ -68,7 +68,7 @@ class ReceiptService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '保存失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -119,7 +119,7 @@ class ReceiptService
             }
         } catch (\Exception $e) {
             log_error($e);
-            abort(0, '保存失败2');
+            abort(0, $e->getMessage());
 //            Db::rollback(); // 回滚事务
         }
 
@@ -144,7 +144,7 @@ class ReceiptService
             }
         } catch (\Exception $e) {
             log_error($e);
-            abort(0, '保存失败3');
+            abort(0, $e->getMessage());
 //            Db::rollback(); // 回滚事务
         }
 
@@ -181,7 +181,7 @@ class ReceiptService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '更新失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -211,7 +211,7 @@ class ReceiptService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '删除失败');
+            abort(0, $e->getMessage());
         }
 
     }

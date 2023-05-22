@@ -68,7 +68,7 @@ class DeliveryService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '保存失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -115,8 +115,8 @@ class DeliveryService
             }
         } catch (\Exception $e) {
             log_error($e);
-            //abort(0, '保存失败2');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
@@ -142,8 +142,8 @@ class DeliveryService
             }
         } catch (\Exception $e) {
             log_error($e);
-            //abort(0, '保存失败3');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
@@ -180,8 +180,8 @@ class DeliveryService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            //abort(0, '更新失败');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
         }
 
     }
@@ -207,8 +207,8 @@ class DeliveryService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            //abort(0, '删除失败');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
         }
 
     }

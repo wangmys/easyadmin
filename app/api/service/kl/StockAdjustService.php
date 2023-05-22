@@ -180,8 +180,8 @@ class StockAdjustService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            //abort(0, '更新失败');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
         }
 
     }
@@ -207,8 +207,8 @@ class StockAdjustService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            //abort(0, '删除失败');
-            return $e->getMessage();
+            abort(0, $e->getMessage());
+            // return $e->getMessage();
         }
 
     }

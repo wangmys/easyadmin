@@ -13,10 +13,12 @@ use app\api\validate\DeliveryValidate;
 class ErpDelivery extends BaseController
 {
     protected $request;
+    protected $service;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->service = new DeliveryService();
     }
 
     /**
@@ -33,8 +35,11 @@ class ErpDelivery extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $deliveryService = new DeliveryService();
-        $deliveryService->createdelivery($params);
+        try {
+            $this->service->createdelivery($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
@@ -53,8 +58,11 @@ class ErpDelivery extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $deliveryService = new DeliveryService();
-        $deliveryService->updatedelivery($params);
+        try {
+            $this->service->updatedelivery($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
@@ -73,8 +81,11 @@ class ErpDelivery extends BaseController
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
-        $deliveryService = new DeliveryService();
-        $deliveryService->deletedelivery($params);
+        try {
+            $this->service->deletedelivery($params);
+        } catch (\Exception $e) {
+            return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
+        }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
