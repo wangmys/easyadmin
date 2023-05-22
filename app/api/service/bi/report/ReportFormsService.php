@@ -2156,6 +2156,78 @@ class ReportFormsService
         }
     }
 
+    // 门店业绩环比报表
+    public function create_table_s113($seasion = '春季')
+    {
+        // 编号
+        $code = 'S113';
+        $date = date('Y-m-d', strtotime('+1day'));
+
+        $sql = "
+            SELECT
+                IFNULL(经营属性, '总计') AS 经营属性,
+                IFNULL(省份, '合计') AS 省份,
+                concat(ROUND( SUM(今日流水) / SUM( `环比流水` ) - 1, 2 ), '%') AS 今日环比,
+                concat(ROUND( SUM( `本月累计流水` ) / SUM( `环比累计流水` ) - 1, 2 ), '%') AS 月度环比,
+                ROUND( SUM(今日流水), 2 ) AS 今日流水,
+                ROUND( SUM( `环比流水` ), 2 ) AS 环比流水,
+                ROUND( SUM( `本月累计流水` ), 2 ) AS 本月累计流水,
+                ROUND( SUM( `环比累计流水` ), 2 ) AS 环比累计流水 
+            FROM
+                cwl_dianpuyejihuanbi_2 
+            WHERE
+                `use` = 1 
+            GROUP BY
+                经营属性,省份 
+                WITH ROLLUP
+        ";
+        $list = $this->db_easyA->query($sql);
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 100;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 80;
+            $field_width[2] = 80;
+            $field_width[3] = 80;
+            $field_width[4] = 80;
+            $field_width[7] = 110;
+            $field_width[8] = 110;
+            // $field_width[4] = 90;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => ' '
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code  . '.jpg',   //保存的文件名
+                'title' => "门店业绩环比 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '           编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
     public function create_image($params)
     {
         $base = [
@@ -2196,8 +2268,6 @@ class ReportFormsService
 
         $img = imagecreatetruecolor($base['img_width'], $base['img_height']); //创建指定尺寸图片
         $bg_color = imagecolorallocate($img, 24, 98, 229); //设定图片背景色
-
-
 
         $yellow = imagecolorallocate($img, 238, 228, 0); //设定图片背景色
         $yellow2 = imagecolorallocate($img, 255, 252, 188); //设定图片背景色
@@ -2262,6 +2332,16 @@ class ReportFormsService
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['风格']) && $item['风格'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S113') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['经营属性']) && $item['经营属性'] == '总计') {
+                    
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
             }

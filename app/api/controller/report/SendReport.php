@@ -41,7 +41,7 @@ class SendReport extends BaseController
     }
 
     public function create_test() {
-        $name = input('param.name') ? input('param.name') : 'S101';
+        $name = input('param.name') ? input('param.name') : 'S101'; die;
         $date = input('param.date') ? input('param.date') : '';
         if ($name =='S101') {
             $this->service->create_table_s101('S101', $date);
@@ -103,6 +103,12 @@ class SendReport extends BaseController
                 return $res;
             }
         }
+    }
+
+    // 配饰每日销售数量
+    public function createS113()
+    {
+        $this->service->create_table_s113();
     }
 
     // 配饰每日销售数量
