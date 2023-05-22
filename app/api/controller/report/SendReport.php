@@ -110,7 +110,6 @@ class SendReport extends BaseController
     {
         $this->service->create_table_s113();
 
-        die;
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
