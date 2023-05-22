@@ -7,10 +7,10 @@ use app\BaseController;
 use think\exception\ValidateException;
 use think\Request;
 use think\facade\Db;
-use app\api\service\kl\DeliveryService;
-use app\api\validate\DeliveryValidate;
+use app\api\service\kl\PurchaseService;
+use app\api\validate\PurchaseValidate;
 
-class ErpDelivery extends BaseController
+class ErpPurchase extends BaseController
 {
     protected $request;
     protected $service;
@@ -18,11 +18,11 @@ class ErpDelivery extends BaseController
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->service = new DeliveryService();
+        $this->service = new PurchaseService();
     }
 
     /**
-     * 创建 仓库出货单
+     * 创建
      * @return \think\response\Json
      */
     public function create() {
@@ -30,22 +30,23 @@ class ErpDelivery extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(DeliveryValidate::class)->scene('create')->check($params);
+            validate(PurchaseValidate::class)->scene('create')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
         try {
-            $this->service->createdelivery($params);
+            $this->service->create($params);
         } catch (\Exception $e) {
             return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
         }
+
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
     }
 
     /**
-     * 更新 仓库出货单
+     * 更新
      * @return \think\response\Json
      */
     public function update() {
@@ -53,13 +54,13 @@ class ErpDelivery extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(DeliveryValidate::class)->scene('update')->check($params);
+            validate(PurchaseValidate::class)->scene('update')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
         try {
-            $this->service->updatedelivery($params);
+            $this->service->update($params);
         } catch (\Exception $e) {
             return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
         }
@@ -68,7 +69,7 @@ class ErpDelivery extends BaseController
     }
 
     /**
-     * 删除 仓库出货单
+     * 删除
      * @return \think\response\Json
      */
     public function delete() {
@@ -76,13 +77,13 @@ class ErpDelivery extends BaseController
         $params = $this->request->param();
 
         try {
-            validate(DeliveryValidate::class)->scene('delete')->check($params);
+            validate(PurchaseValidate::class)->scene('delete')->check($params);
         } catch (ValidateException $exception) {
             return json(['code'=>400, 'msg'=>$exception->getError(), 'data'=>[]]);
         }
 
         try {
-            $this->service->deletedelivery($params);
+            $this->service->delete($params);
         } catch (\Exception $e) {
             return json(['code'=>500, 'msg'=>$e->getMessage(), 'data'=>[]]);
         }

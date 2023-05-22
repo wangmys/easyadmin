@@ -22,6 +22,10 @@ class InstructionService
      */
     public function create($params) {
 
+        if (ErpInstructionModel::where([['InstructionId', '=', $params['InstructionId']]])->field('InstructionId')->find()) {
+            json_fail(400, 'InstructionId单号已存在');
+        }
+
         Db::startTrans();
         try {
 
@@ -61,7 +65,7 @@ class InstructionService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '保存失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -96,7 +100,7 @@ class InstructionService
             }
         } catch (\Exception $e) {
             log_error($e);
-            abort(0, '保存失败2');
+            abort(0, $e->getMessage());
 //            Db::rollback(); // 回滚事务
         }
 
@@ -116,7 +120,7 @@ class InstructionService
             ErpInstructionGoodsDetailModel::create($arr);
         } catch (\Exception $e) {
             log_error($e);
-            abort(0, '保存失败3');
+            abort(0, $e->getMessage());
 //            Db::rollback(); // 回滚事务
         }
 
@@ -144,7 +148,7 @@ class InstructionService
         } catch (\Exception $e) {
 //            Db::rollback();
             log_error($e);
-            abort(0, '更新失败');
+            abort(0, $e->getMessage());
         }
 
     }
@@ -166,7 +170,7 @@ class InstructionService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
-            abort(0, '删除失败');
+            abort(0, $e->getMessage());
         }
 
     }

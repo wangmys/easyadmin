@@ -22,6 +22,10 @@ class SortingService
      */
     public function createSorting($params) {
 
+        if (ErpSortingModel::where([['SortingID', '=', $params['SortingID']]])->field('SortingID')->find()) {
+            json_fail(400, 'SortingID单号已存在');
+        }
+
         Db::startTrans();
         try {
 

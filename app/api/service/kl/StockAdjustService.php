@@ -2,9 +2,9 @@
 
 namespace app\api\service\kl;
 use app\common\traits\Singleton;
-use app\api\model\kl\ErpDeliveryModel;
-use app\api\model\kl\ErpDeliveryGoodsModel;
-use app\api\model\kl\ErpDeliveryGoodsDetailModel;
+use app\api\model\kl\ErpStockAdjustModel;
+use app\api\model\kl\ErpStockAdjustGoodsModel;
+use app\api\model\kl\ErpStockAdjustGoodsDetailModel;
 use app\api\model\kl\ErpGoodsModel;
 use app\api\model\kl\ErpBarCodeModel;
 use app\api\model\kl\ErpWarehouseStockModel;
@@ -12,7 +12,7 @@ use app\api\model\kl\ErpWarehouseStockDetailModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
-class DeliveryService
+class StockAdjustService
 {
 
     use Singleton;
@@ -24,42 +24,45 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function createDelivery($params) {
+    public function create($params) {
 
-        if (ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->field('DeliveryID')->find()) {
-            json_fail(400, 'DeliveryID单号已存在');
+        if (ErpStockAdjustModel::where([['StockAdjustID', '=', $params['StockAdjustID']]])->field('StockAdjustID')->find()) {
+            json_fail(400, 'StockAdjustID单号已存在');
         }
 
         Db::startTrans();
         try {
 
             $now = date('Ymd');
-            $arr['DeliveryID'] = $params['DeliveryID'];//.'xcb' . make_order_number(rand(0, 99)) . time();
+            $arr['StockAdjustID'] = $params['StockAdjustID'];//.'xcb' . make_order_number(rand(0, 99)) . time();
             $arr['CreateTime'] = date('Ymd H:i:s');
             $arr['UpdateTime'] = date('Ymd H:i:s');
             $arr['WarehouseId'] = $params['WarehouseId'];
             $arr['Version'] = time();
-            $arr['CustomerId'] = $params['CustomerId'];
-            $new = array_merge($arr, ErpDeliveryModel::INSERT);
-            $new['DeliveryDate'] = $now;
-            $new['Remark'] = $params['Remark'];
+            $new = array_merge($arr, ErpStockAdjustModel::INSERT);
+            $new['AdjustDate'] = $now;
+            $new['ManualNo'] = $params['ManualNo']  ?? '';
+            $new['Remark'] = $params['Remark']  ?? '';
+            $new['BillSource'] = $params['BillSource'] ?? '';
 
+            if ($params['StockAdjustAttributesId']) {
+                $new['StockAdjustAttributesId'] = $params['StockAdjustAttributesId'];
+            }
 
             $goods = $params['Goods'] ?? [];
 
-            if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['HADCOMMIT']) {//已审结
+            if ($params['CodingCode'] == ErpStockAdjustModel::CodingCode['HADCOMMIT']) {//已审结
                 $new['CodingCode'] = $params['CodingCode'];
-                $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
+                $new['CodingCodeText'] = ErpStockAdjustModel::CodingCode_TEXT[$params['CodingCode']];
                 $this->is_commit = 1;
             }
 
-            //出货指令单 处理
-            ErpDeliveryModel::create($new);
+            ErpStockAdjustModel::create($new);
 
-            //ErpDeliveryGoods 处理
+            //ErpStockAdjustGoods 处理
             if ($goods) {
                 foreach ($goods as $k => $v) {
-                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v, $params);
+                    $this->addStockAdjustGoods($new['StockAdjustID'], $new['StockAdjustID'] . make_order_number($k, $k), $v, $params);
                 }
             }
 
@@ -73,27 +76,26 @@ class DeliveryService
 
     }
 
-    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail, $params) {
+    public function addStockAdjustGoods($StockAdjustID, $StockAdjustGoodsID, $detail, $params) {
 
         $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
 
-        $arr['DeliveryGoodsID'] = $DeliveryGoodsID;
-        $arr['DeliveryID'] = $deliveryid;
+        $arr['StockAdjustGoodsID'] = $StockAdjustGoodsID;
+        $arr['StockAdjustID'] = $StockAdjustID;
         $arr['GoodsId'] = $goodsId['GoodsId'];
         $arr['UnitPrice'] = $detail['UnitPrice'];
-        $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
-        $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
-        $arr['SortingID'] = $params['SortingID'];
+        $arr['Remark'] = $detail['Remark'] ?? '';
+        $arr['CostPrice'] = $detail['CostPrice']  ?? '';
 
         //仓库库存处理 ErpWarehouseStock
         $WarehouseStockData = [
-            'StockId' => $DeliveryGoodsID,
+            'StockId' => $StockAdjustGoodsID,
             'WarehouseId' => $params['WarehouseId'],
             'WarehouseName' => $params['WarehouseName'],
             'StockDate' => date('Ymd'),
-            'BillType' => 'ErpDelivery',
-            'BillId' => $params['DeliveryID'],
+            'BillType' => 'ErpStockAdjust',
+            'BillId' => $params['StockAdjustID'],
             'GoodsId' => $goodsId['GoodsId'],
             'Quantity' => $detail['Quantity'],
             'CreateTime' => date('Ymd H:i:s'),
@@ -105,28 +107,27 @@ class DeliveryService
 
 //        Db::startTrans();
         try {
-            ErpDeliveryGoodsModel::create($arr);
+            ErpStockAdjustGoodsModel::create($arr);
             if ($this->is_commit == 1) {//已审结的 新增仓库库存记录
                 ErpWarehouseStockModel::create($WarehouseStockData);
             }
             foreach ($detail['detail'] as $k => $v) {
-                //ErpDeliveryGoodsDetail 处理
-                $this->addDeliveryGoodsDetail($DeliveryGoodsID, $v);
+                //ErpStockAdjustGoodsDetail 处理
+                $this->addStockAdjustGoodsDetail($StockAdjustGoodsID, $v);
             }
         } catch (\Exception $e) {
             log_error($e);
             abort(0, $e->getMessage());
-            // return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
     }
 
-    public function addDeliveryGoodsDetail($detailid, $detail) {
+    public function addStockAdjustGoodsDetail($detailid, $detail) {
 
         //根据barcode获取ColorId,SizeId,GoodsId
         $barCodeInfo = ErpBarCodeModel::where([['BarCode', '=', $detail['Barcode']]])->field('ColorId,SizeId')->find();
-        $arr['DeliveryGoodsID'] = $detailid;
+        $arr['StockAdjustGoodsID'] = $detailid;
         $arr['ColorId'] = $barCodeInfo ? $barCodeInfo['ColorId'] : '';
         $arr['SizeId'] = $barCodeInfo ? $barCodeInfo['SizeId'] : '';
         $arr['Quantity'] = $detail['Quantity'];
@@ -134,16 +135,15 @@ class DeliveryService
 
 //        Db::startTrans();
         try {
-            ErpDeliveryGoodsDetailModel::create($arr);
+            ErpStockAdjustGoodsDetailModel::create($arr);
             if ($this->is_commit == 1) {//已审结的 新增仓库库存记录
-                unset($arr['DeliveryGoodsID']);
+                unset($arr['StockAdjustGoodsID']);
                 $arr['StockId'] = $detailid;
                 ErpWarehouseStockDetailModel::create($arr);
             }
         } catch (\Exception $e) {
             log_error($e);
             abort(0, $e->getMessage());
-            // return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
@@ -154,25 +154,25 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function updateDelivery($params) {
+    public function update($params) {
 
         $new['CodingCode'] = $params['CodingCode'];
-        if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['HADCOMMIT']) {//已审结
-            $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
-        } elseif ($params['CodingCode'] == ErpDeliveryModel::CodingCode['NOTCOMMIT']) {
-            $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
+        if ($params['CodingCode'] == ErpStockAdjustModel::CodingCode['HADCOMMIT']) {//已审结
+            $new['CodingCodeText'] = ErpStockAdjustModel::CodingCode_TEXT[$params['CodingCode']];
+        } elseif ($params['CodingCode'] == ErpStockAdjustModel::CodingCode['NOTCOMMIT']) {
+            $new['CodingCodeText'] = ErpStockAdjustModel::CodingCode_TEXT[$params['CodingCode']];
         }
         $new['UpdateTime'] = date('Ymd H:i:s');
 
         Db::startTrans();
         try {
 
-            ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->update($new);
+            ErpStockAdjustModel::where([['StockAdjustID', '=', $params['StockAdjustID']]])->update($new);
 
             //库存记录处理 当状态变为未提交时 要删除对应库存记录
-            if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['NOTCOMMIT']) {
-                $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
-                ErpWarehouseStockModel::where([['StockId', 'in', $DeliveryGoodsID]])->delete();
+            if ($params['CodingCode'] == ErpStockAdjustModel::CodingCode['NOTCOMMIT']) {
+                $StockAdjustGoodsID = ErpStockAdjustGoodsModel::where([['StockAdjustID', '=', $params['StockAdjustID']]])->column('StockAdjustGoodsID');
+                ErpWarehouseStockModel::where([['StockId', 'in', $StockAdjustGoodsID]])->delete();
             }
 
             Db::commit();
@@ -191,16 +191,16 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function deleteDelivery($params) {
+    public function delete($params) {
 
-        $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
+        $StockAdjustGoodsID = ErpStockAdjustGoodsModel::where([['StockAdjustID', '=', $params['StockAdjustID']]])->column('StockAdjustGoodsID');
 
         Db::startTrans();
         try {
 
-            ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
+            ErpStockAdjustModel::where([['StockAdjustID', '=', $params['StockAdjustID']]])->delete();
             //清理库存记录
-            ErpWarehouseStockModel::where([['StockId', 'in', $DeliveryGoodsID]])->delete();
+            ErpWarehouseStockModel::where([['StockId', 'in', $StockAdjustGoodsID]])->delete();
 
             Db::commit();
 

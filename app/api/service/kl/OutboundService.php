@@ -2,9 +2,9 @@
 
 namespace app\api\service\kl;
 use app\common\traits\Singleton;
-use app\api\model\kl\ErpDeliveryModel;
-use app\api\model\kl\ErpDeliveryGoodsModel;
-use app\api\model\kl\ErpDeliveryGoodsDetailModel;
+use app\api\model\kl\ErpOutboundModel;
+use app\api\model\kl\ErpOutboundGoodsModel;
+use app\api\model\kl\ErpOutboundGoodsDetailModel;
 use app\api\model\kl\ErpGoodsModel;
 use app\api\model\kl\ErpBarCodeModel;
 use app\api\model\kl\ErpWarehouseStockModel;
@@ -12,7 +12,7 @@ use app\api\model\kl\ErpWarehouseStockDetailModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
-class DeliveryService
+class OutboundService
 {
 
     use Singleton;
@@ -24,42 +24,40 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function createDelivery($params) {
+    public function create($params) {
 
-        if (ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->field('DeliveryID')->find()) {
-            json_fail(400, 'DeliveryID单号已存在');
+        if (ErpOutboundModel::where([['OutboundId', '=', $params['OutboundId']]])->field('OutboundId')->find()) {
+            json_fail(400, 'OutboundId单号已存在');
         }
 
         Db::startTrans();
         try {
 
             $now = date('Ymd');
-            $arr['DeliveryID'] = $params['DeliveryID'];//.'xcb' . make_order_number(rand(0, 99)) . time();
+            $arr['OutboundId'] = $params['OutboundId'];//.'xcb' . make_order_number(rand(0, 99)) . time();
             $arr['CreateTime'] = date('Ymd H:i:s');
             $arr['UpdateTime'] = date('Ymd H:i:s');
             $arr['WarehouseId'] = $params['WarehouseId'];
+            $arr['InWarehouseId'] = $params['InWarehouseId'];
             $arr['Version'] = time();
-            $arr['CustomerId'] = $params['CustomerId'];
-            $new = array_merge($arr, ErpDeliveryModel::INSERT);
-            $new['DeliveryDate'] = $now;
+            $new = array_merge($arr, ErpOutboundModel::INSERT);
+            $new['OutboundDate'] = $now;
             $new['Remark'] = $params['Remark'];
-
 
             $goods = $params['Goods'] ?? [];
 
-            if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['HADCOMMIT']) {//已审结
+            if ($params['CodingCode'] == ErpOutboundModel::CodingCode['HADCOMMIT']) {//已审结
                 $new['CodingCode'] = $params['CodingCode'];
-                $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
+                $new['CodingCodeText'] = ErpOutboundModel::CodingCode_TEXT[$params['CodingCode']];
                 $this->is_commit = 1;
             }
 
-            //出货指令单 处理
-            ErpDeliveryModel::create($new);
+            ErpOutboundModel::create($new);
 
-            //ErpDeliveryGoods 处理
+            //ErpOutboundGoods 处理
             if ($goods) {
                 foreach ($goods as $k => $v) {
-                    $this->addDeliveryGoods($new['DeliveryID'], $new['DeliveryID'] . make_order_number($k, $k), $v, $params);
+                    $this->addOutboundGoods($new['OutboundId'], $new['OutboundId'] . make_order_number($k, $k), $v, $params);
                 }
             }
 
@@ -73,27 +71,27 @@ class DeliveryService
 
     }
 
-    public function addDeliveryGoods($deliveryid, $DeliveryGoodsID, $detail, $params) {
+    public function addOutboundGoods($OutboundId, $OutboundGoodsId, $detail, $params) {
 
         $goodsId = ErpGoodsModel::where('GoodsNo', $detail['GoodsNo'])->field('GoodsId')->find();
 
-        $arr['DeliveryGoodsID'] = $DeliveryGoodsID;
-        $arr['DeliveryID'] = $deliveryid;
+        $arr['OutboundGoodsId'] = $OutboundGoodsId;
+        $arr['OutboundId'] = $OutboundId;
         $arr['GoodsId'] = $goodsId['GoodsId'];
         $arr['UnitPrice'] = $detail['UnitPrice'];
         $arr['Price'] = $detail['Price'];
         $arr['Quantity'] = $detail['Quantity'];
         $arr['Discount'] = round($detail['Price'] / $detail['UnitPrice'], 2);
-        $arr['SortingID'] = $params['SortingID'];
+        $arr['InstructionId'] = $params['InstructionId'];
 
         //仓库库存处理 ErpWarehouseStock
         $WarehouseStockData = [
-            'StockId' => $DeliveryGoodsID,
+            'StockId' => $OutboundGoodsId,
             'WarehouseId' => $params['WarehouseId'],
             'WarehouseName' => $params['WarehouseName'],
             'StockDate' => date('Ymd'),
-            'BillType' => 'ErpDelivery',
-            'BillId' => $params['DeliveryID'],
+            'BillType' => 'ErpOutbound',
+            'BillId' => $params['OutboundId'],
             'GoodsId' => $goodsId['GoodsId'],
             'Quantity' => $detail['Quantity'],
             'CreateTime' => date('Ymd H:i:s'),
@@ -105,28 +103,28 @@ class DeliveryService
 
 //        Db::startTrans();
         try {
-            ErpDeliveryGoodsModel::create($arr);
+            ErpOutboundGoodsModel::create($arr);
             if ($this->is_commit == 1) {//已审结的 新增仓库库存记录
                 ErpWarehouseStockModel::create($WarehouseStockData);
             }
             foreach ($detail['detail'] as $k => $v) {
-                //ErpDeliveryGoodsDetail 处理
-                $this->addDeliveryGoodsDetail($DeliveryGoodsID, $v);
+                //ErpOutboundGoodsDetail 处理
+                $this->addOutboundGoodsDetail($OutboundGoodsId, $v);
             }
         } catch (\Exception $e) {
             log_error($e);
             abort(0, $e->getMessage());
-            // return $e->getMessage();
+//            return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
     }
 
-    public function addDeliveryGoodsDetail($detailid, $detail) {
+    public function addOutboundGoodsDetail($detailid, $detail) {
 
         //根据barcode获取ColorId,SizeId,GoodsId
         $barCodeInfo = ErpBarCodeModel::where([['BarCode', '=', $detail['Barcode']]])->field('ColorId,SizeId')->find();
-        $arr['DeliveryGoodsID'] = $detailid;
+        $arr['OutboundGoodsId'] = $detailid;
         $arr['ColorId'] = $barCodeInfo ? $barCodeInfo['ColorId'] : '';
         $arr['SizeId'] = $barCodeInfo ? $barCodeInfo['SizeId'] : '';
         $arr['Quantity'] = $detail['Quantity'];
@@ -134,16 +132,16 @@ class DeliveryService
 
 //        Db::startTrans();
         try {
-            ErpDeliveryGoodsDetailModel::create($arr);
+            ErpOutboundGoodsDetailModel::create($arr);
             if ($this->is_commit == 1) {//已审结的 新增仓库库存记录
-                unset($arr['DeliveryGoodsID']);
+                unset($arr['OutboundGoodsId']);
                 $arr['StockId'] = $detailid;
                 ErpWarehouseStockDetailModel::create($arr);
             }
         } catch (\Exception $e) {
             log_error($e);
             abort(0, $e->getMessage());
-            // return $e->getMessage();
+//            return $e->getMessage();
 //            Db::rollback(); // 回滚事务
         }
 
@@ -154,25 +152,25 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function updateDelivery($params) {
+    public function update($params) {
 
         $new['CodingCode'] = $params['CodingCode'];
-        if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['HADCOMMIT']) {//已审结
-            $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
-        } elseif ($params['CodingCode'] == ErpDeliveryModel::CodingCode['NOTCOMMIT']) {
-            $new['CodingCodeText'] = ErpDeliveryModel::CodingCode_TEXT[$params['CodingCode']];
+        if ($params['CodingCode'] == ErpOutboundModel::CodingCode['HADCOMMIT']) {//已审结
+            $new['CodingCodeText'] = ErpOutboundModel::CodingCode_TEXT[$params['CodingCode']];
+        } elseif ($params['CodingCode'] == ErpOutboundModel::CodingCode['NOTCOMMIT']) {
+            $new['CodingCodeText'] = ErpOutboundModel::CodingCode_TEXT[$params['CodingCode']];
         }
         $new['UpdateTime'] = date('Ymd H:i:s');
 
         Db::startTrans();
         try {
 
-            ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->update($new);
+            ErpOutboundModel::where([['OutboundId', '=', $params['OutboundId']]])->update($new);
 
             //库存记录处理 当状态变为未提交时 要删除对应库存记录
-            if ($params['CodingCode'] == ErpDeliveryModel::CodingCode['NOTCOMMIT']) {
-                $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
-                ErpWarehouseStockModel::where([['StockId', 'in', $DeliveryGoodsID]])->delete();
+            if ($params['CodingCode'] == ErpOutboundModel::CodingCode['NOTCOMMIT']) {
+                $OutboundGoodsId = ErpOutboundGoodsModel::where([['OutboundId', '=', $params['OutboundId']]])->column('OutboundGoodsId');
+                ErpWarehouseStockModel::where([['StockId', 'in', $OutboundGoodsId]])->delete();
             }
 
             Db::commit();
@@ -191,16 +189,16 @@ class DeliveryService
      * @param $params
      * @return void
      */
-    public function deleteDelivery($params) {
+    public function delete($params) {
 
-        $DeliveryGoodsID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $params['DeliveryID']]])->column('DeliveryGoodsID');
+        $OutboundGoodsId = ErpOutboundGoodsModel::where([['OutboundId', '=', $params['OutboundId']]])->column('OutboundGoodsId');
 
         Db::startTrans();
         try {
 
-            ErpDeliveryModel::where([['DeliveryID', '=', $params['DeliveryID']]])->delete();
+            ErpOutboundModel::where([['OutboundId', '=', $params['OutboundId']]])->delete();
             //清理库存记录
-            ErpWarehouseStockModel::where([['StockId', 'in', $DeliveryGoodsID]])->delete();
+            ErpWarehouseStockModel::where([['StockId', 'in', $OutboundGoodsId]])->delete();
 
             Db::commit();
 
