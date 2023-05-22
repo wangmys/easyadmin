@@ -105,10 +105,31 @@ class SendReport extends BaseController
         }
     }
 
-    // 
+    // 门店业绩环比
     public function createS113()
     {
         $this->service->create_table_s113();
+
+        die;
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S113' => [
+                'title' => '门店业绩环比 表号:S113',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113.jpg'
+            ],
+        ];
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($v['title'], $v['jpg_url']);
+                // echo $v['title'];
+                // echo '<br>';
+            }
+        }
+        return json($res);
     }
 
     // 配饰每日销售数量
