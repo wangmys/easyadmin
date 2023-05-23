@@ -253,17 +253,42 @@ class Dianpuyejihuanbi extends BaseController
         }
     }
 
-    public function testDay() {
-        // 今天是星期几
-        $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
-        // 上月开始
-        $last_month  = date("Y-m-01", strtotime('-1month')); 
-        // 上月今天
-        $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
-        // 本月开始
-        $current_month  = date("Y-m-01", time()); 
-        // 本月今天
-        $today_date = date("Y-m-d", time());
+    public function testDay($date = '2023-05-23') {
+        if ($date) {
+            // 今天是星期几
+            echo $today = date_to_week2($date);
+            echo '<br>';
+            // 上月开始
+            echo $last_month  = date("Y-m-01", strtotime('-1month')); 
+            echo '<br>';
+            // 上月今天
+            echo $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", strtotime($date)); 
+            echo '<br>';
+            // 本月开始
+            echo $current_month  = date("Y-m-01", time()); 
+            echo '<br>';
+            // 本月今天
+            echo $today_date = $date;
+        } else {
+            // 今天是星期几
+            echo  $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
+            echo '<br>';
+            // 上月开始
+            echo $last_month  = date("Y-m-01", strtotime('-1month')); 
+            echo '<br>';
+            // 上月今天
+            echo $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
+            echo '<br>';
+            // 本月开始
+            echo $current_month  = date("Y-m-01", time()); 
+            echo '<br>';
+            // 本月今天
+            echo $today_date = date("Y-m-d", time());
+            echo '<br>';
+        }
+
+        die;
+
 
         $first = '2023-04-05';
         // $first = '2023-04-27';
@@ -285,6 +310,32 @@ class Dianpuyejihuanbi extends BaseController
 
     // 展示表数据计算
     public function dianpuyejihuanbi_handle() {
+        // $date = input('date') ? input('date') : '';
+        // if (! empty($date)) {
+        //     // 今天是星期几
+        //     $today = date_to_week2($date);
+        //     // 上月开始
+        //     $last_month  = date("Y-m-01", strtotime('-1month')); 
+        //     // 上月今天
+        //     $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", strtotime($date)); 
+        //     // 本月开始
+        //     $current_month  = date("Y-m-01", time()); 
+
+        //     // 本月今天
+        //     $today_date = $date;
+        // } else {
+        //     // 今天是星期几
+        //     $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
+        //     // 上月开始
+        //     $last_month  = date("Y-m-01", strtotime('-1month')); 
+        //     // 上月今天
+        //     $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
+        //     // 本月开始
+        //     $current_month  = date("Y-m-01", time()); 
+        //     // 本月今天
+        //     $today_date = date("Y-m-d", time());
+        // }
+
         // 今天是星期几
         $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
         // 上月开始
@@ -295,6 +346,7 @@ class Dianpuyejihuanbi extends BaseController
         $current_month  = date("Y-m-01", time()); 
         // 本月今天
         $today_date = date("Y-m-d", time());
+     
         $sql1 = "
         SELECT
             a.省份,
@@ -319,12 +371,7 @@ class Dianpuyejihuanbi extends BaseController
         ])->delete();
         $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->insertAll($select_1);
         // 数据初始化结束
-
-        // $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->table('cwl_dianpuyejihuanbi_lastmonth')->where([
-        //     // ['handle', 'exp', new Raw('IS NULL')],
-        //     // ['店铺名称', '=', '彝良一店']
-        //     ['日期', '=', date("Y-m", strtotime('-1month'))]
-        // ])->limit(1)->select();    
+ 
 
         $ym = date("Y-m", strtotime('-1month'));
         $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->query("

@@ -110,7 +110,7 @@ class SendReport extends BaseController
             $res = json_decode($res, true);
             if ($res['status'] == 1) {
                 $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
-                // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
+                // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
                 $this->service->create_table_s113();
             }
       
@@ -130,29 +130,26 @@ class SendReport extends BaseController
             $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
             // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
             $this->service->create_table_s113();
-        }
-        // $this->service->create_table_s113();
-        // die;
-
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S113' => [
-                'title' => '门店业绩环比 表号:S113',
-                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113.jpg'
-            ],
-        ];
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                $res[] = $model->send($v['title'], $v['jpg_url']);
-                // echo $v['title'];
-                // echo '<br>';
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+            $send_data = [
+                'S113' => [
+                    'title' => '门店业绩环比 表号:S113',
+                    'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113.jpg'
+                ],
+            ];
+            $res = [];
+            foreach ($send_data as $k=>$v){
+                $headers = get_headers($v['jpg_url']);
+                if(substr($headers[0], 9, 3) == 200){
+                    // 推送
+                    $res[] = $model->send($v['title'], $v['jpg_url']);
+                    // echo $v['title'];
+                    // echo '<br>';
+                }
             }
+            return json($res);
         }
-        return json($res);
     }
 
     // 配饰每日销售数量
