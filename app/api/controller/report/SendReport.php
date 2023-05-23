@@ -103,18 +103,18 @@ class SendReport extends BaseController
                 return $res;
             }
         } elseif ($name =='S113') {
-            // echo "";die;
+
             $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             
             $res = json_decode($res, true);
             if ($res['status'] == 1) {
-                $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
+                $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
                 // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
-                $this->service->create_table_s113();
+                $this->service->create_table_s113($date);
             }
       
-            // $this->service->create_table_s113();
+            // $this->service->create_table_s113($date);
         }
     }
 
@@ -127,9 +127,11 @@ class SendReport extends BaseController
         
         $res = json_decode($res, true);
         if ($res['status'] == 1) {
-            $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
+            $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
             // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
-            $this->service->create_table_s113();
+            $this->service->create_table_s113($date);
+
+            die;
             $name = '\app\api\service\DingdingService';
             $model = new $name;
             $send_data = [

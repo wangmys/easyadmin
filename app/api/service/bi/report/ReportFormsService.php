@@ -2157,12 +2157,11 @@ class ReportFormsService
     }
 
     // 门店业绩环比报表
-    public function create_table_s113($seasion = '春季')
+    public function create_table_s113($date = '')
     {
         // 编号
         $code = 'S113';
-        $date = date('Y-m-d', strtotime('+1day'));
-
+        $date = $date ? $date : date('Y-m-d');
         $sql = "
             SELECT
                 IFNULL(经营属性, '总计') AS 经营属性,
@@ -2177,6 +2176,7 @@ class ReportFormsService
                 cwl_dianpuyejihuanbi_handle 
             WHERE
                 `use` = 1 
+                AND 更新日期='{$date}'
             GROUP BY
                 经营属性,省份 
                 WITH ROLLUP
