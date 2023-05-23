@@ -221,7 +221,10 @@ class Tableupdate extends BaseController
     // 更新 customer
     public function update_customer() {
         // 查询bi
-        $select_customer = $this->db_bi->table('customer')->where(1)->select()->toArray();
+        $select_customer = $this->db_bi->table('customer')->where([
+            ['Mathod', 'exp',  new Raw("IN ('直营', '加盟')")],
+            ['Region', '<>', '闭店区']
+        ])->select()->toArray();
         if (!$select_customer) {
             echo '没有数据更新';
             die;
@@ -249,6 +252,51 @@ class Tableupdate extends BaseController
                 'status' => 0,
                 'msg' => 'error',
                 'content' => 'easyadmin2 customer 更新失败！'
+            ]);
+        }
+    }
+
+    public function customer_first() {
+        // 首单日期   
+        $sql2 = "
+            SELECT
+                ER.CustomerName AS 店铺名称,
+                (
+                    SELECT TOP 1 RetailDate FROM
+                        ErpRetail  
+                    WHERE CustomerName = ER.CustomerName
+                ) AS 首单日期,
+                EC.RegionId
+            FROM
+                ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND EC.ShutOut = 0	
+                AND EC.RegionId <> 55
+                AND EBC.Mathod IN ('直营', '加盟')
+            GROUP BY ER.CustomerName,EC.RegionId
+        ";
+        // 首单日期
+        $select_firstDate = $this->db_sqlsrv->query($sql2);
+
+        $handle = $this->db_easyA->table('customer_first')->where(1)->delete();
+        $insert_all = $this->db_easyA->table('customer_first')->insertAll($select_firstDate);
+        if ($insert_all) {
+            // $this->db_bi->commit();    
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'easyadmin2 customer_first 更新成功！'
+            ]);
+        } else {
+            // $this->db_bi->rollback();   
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'easyadmin2 customer_first 更新失败！'
             ]);
         }
     }
@@ -822,12 +870,12 @@ class Tableupdate extends BaseController
         if ($select_data) {
             // dump($select_data);
             // 删 easyadmin2
-            $this->db_easyA->table('cwl_dianpuyejihuanbi')->where([
+            $this->db_easyA->table('cwl_dianpuyejihuanbi_data')->where([
                 ['日期', '=', $date]
             ])->delete();
 
             $this->db_easyA->startTrans();
-            $insertAll = $this->db_easyA->table('cwl_dianpuyejihuanbi')->strict(false)->insertAll($select_data);
+            $insertAll = $this->db_easyA->table('cwl_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
                 $this->db_easyA->commit();
                 return [
@@ -846,8 +894,8 @@ class Tableupdate extends BaseController
         }
     }
 
-    // 上月环比数据整理   cwl_dianpuyejihuanbi_2   
-    public function dianpuyejihuanbi_2_handle($date = '') {
+    // 上月环比数据整理   cwl_dianpuyejihuanbi_lastmonth   
+    public function dianpuyejihuanbi_lastmonth_handle($date = '') {
         $date_str = "2023-04-01";
         $date = date('Y-m', strtotime($date_str));
         $sql0 = "set @date_str = '{$date_str}';";
@@ -860,7 +908,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w1.销售金额) / count(w1.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w1
+                    cwl_dianpuyejihuanbi_data AS w1
                 WHERE
                     w1.日期 >= @date_str
                     AND w1.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -871,7 +919,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w2.销售金额) / count(w2.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w2
+                    cwl_dianpuyejihuanbi_data AS w2
                 WHERE
                     w2.日期 >= @date_str
                     AND w2.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -882,7 +930,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w3.销售金额) / count(w3.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w3
+                    cwl_dianpuyejihuanbi_data AS w3
                 WHERE
                     w3.日期 >= @date_str
                     AND w3.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -893,7 +941,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w4.销售金额) / count(w4.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w4
+                    cwl_dianpuyejihuanbi_data AS w4
                 WHERE
                     w4.日期 >= @date_str
                     AND w4.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -904,7 +952,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w5.销售金额) / count(w5.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w5
+                    cwl_dianpuyejihuanbi_data AS w5
                 WHERE
                     w5.日期 >= @date_str
                     AND w5.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -915,7 +963,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w6.销售金额) / count(w6.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w6
+                    cwl_dianpuyejihuanbi_data AS w6
                 WHERE
                     w6.日期 >= @date_str
                     AND w6.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -926,7 +974,7 @@ class Tableupdate extends BaseController
                 SELECT
                     ROUND(SUM(w7.销售金额) / count(w7.星期), 2) 
                 FROM
-                    cwl_dianpuyejihuanbi AS w7
+                    cwl_dianpuyejihuanbi_data AS w7
                 WHERE
                     w7.日期 >= @date_str
                     AND w7.日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -934,7 +982,7 @@ class Tableupdate extends BaseController
                     AND w7.`店铺名称`=a.店铺名称
                 ) as 星期日	
             FROM
-                cwl_dianpuyejihuanbi AS a
+                cwl_dianpuyejihuanbi_data AS a
             WHERE
                 日期 >= @date_str
                 AND 日期 < DATE_ADD(@date_str, INTERVAL 1 MONTH) 
@@ -946,51 +994,51 @@ class Tableupdate extends BaseController
         $select_data = $this->db_easyA->query($sql);
 
         // 首单日期   
-        $sql2 = "
-            SELECT
-                ER.CustomerName AS 店铺名称,
-                (
-                    SELECT TOP 1 RetailDate FROM
-                        ErpRetail  
-                    WHERE CustomerName = ER.CustomerName
-                ) AS 首单日期
-            FROM
-                ErpRetail AS ER 
-            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-            WHERE
-                ER.CodingCodeText = '已审结'
-                AND EC.ShutOut = 0	
-                AND EC.RegionId <> 55
-                AND EBC.Mathod IN ('直营', '加盟')
-            GROUP BY ER.CustomerName
-        ";
-        // 首单日期
-        $select_firstDate = $this->db_sqlsrv->query($sql2);
+        // $sql2 = "
+        //     SELECT
+        //         ER.CustomerName AS 店铺名称,
+        //         (
+        //             SELECT TOP 1 RetailDate FROM
+        //                 ErpRetail  
+        //             WHERE CustomerName = ER.CustomerName
+        //         ) AS 首单日期
+        //     FROM
+        //         ErpRetail AS ER 
+        //     LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+        //     LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+        //     LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+        //     WHERE
+        //         ER.CodingCodeText = '已审结'
+        //         AND EC.ShutOut = 0	
+        //         AND EC.RegionId <> 55
+        //         AND EBC.Mathod IN ('直营', '加盟')
+        //     GROUP BY ER.CustomerName
+        // ";
+        // // 首单日期
+        // $select_firstDate = $this->db_sqlsrv->query($sql2);
 
-        foreach ($select_data as $key => $val) {
-            foreach ($select_firstDate as $key2 => $val2) {
-                if ($val2['店铺名称'] == $val['店铺名称']) {
-                    $select_data[$key]['首单日期'] = $val2['首单日期'];
-                    break;
-                }
+        // foreach ($select_data as $key => $val) {
+        //     foreach ($select_firstDate as $key2 => $val2) {
+        //         if ($val2['店铺名称'] == $val['店铺名称']) {
+        //             $select_data[$key]['首单日期'] = $val2['首单日期'];
+        //             break;
+        //         }
 
-                if ($key2 == count($select_firstDate) -1) {
-                    $select_data[$key]['首单日期'] = '';
-                }
-            }
-        }
+        //         if ($key2 == count($select_firstDate) -1) {
+        //             $select_data[$key]['首单日期'] = '';
+        //         }
+        //     }
+        // }
 
         if ($select_data) {
             // dump($select_data);
             // 删 easyadmin2
-            $this->db_easyA->table('cwl_dianpuyejihuanbi_2')->where([
+            $this->db_easyA->table('cwl_dianpuyejihuanbi_lastmonth')->where([
                 ['日期', '=', $date]
             ])->delete();
 
             $this->db_easyA->startTrans();
-            $insertAll = $this->db_easyA->table('cwl_dianpuyejihuanbi_2')->strict(false)->insertAll($select_data);
+            $insertAll = $this->db_easyA->table('cwl_dianpuyejihuanbi_lastmonth')->strict(false)->insertAll($select_data);
             if ($insertAll) {
                 $this->db_easyA->commit();
 
@@ -1041,7 +1089,7 @@ class Tableupdate extends BaseController
     }
 
     // 上月环比数据整理  cwl_dianpuyejihuanbi_2 二次加工  
-    public function dianpuyejihuanbi_2_handle2() {
+    public function dianpuyejihuanbi_lastmonth_handle2() {
         // 今天是星期几
         $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
         // 上月开始
@@ -1053,14 +1101,14 @@ class Tableupdate extends BaseController
         // 本月今天
         $today_date = date("Y-m-d", time());
 
-        $select_dianpuyejihuanbi_2 = $this->db_easyA->table('cwl_dianpuyejihuanbi_2')->where([
+        $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->table('cwl_dianpuyejihuanbi_lastmonth')->where([
             ['handle', 'exp', new Raw('IS NULL')],
             // ['店铺名称', '=', '彝良一店']
         ])
         // ->limit(1)
         ->select()->toArray();
         // dump($select_dianpuyejihuanbi_2);die;    
-        foreach ($select_dianpuyejihuanbi_2 as $key => $val) {
+        foreach ($select_dianpuyejihuanbi_lastmonth as $key => $val) {
             // $updateData = [];
             $updateData = $val;
             // 今日流水
@@ -1137,7 +1185,7 @@ class Tableupdate extends BaseController
             $updateData['handle'] = 1;
 
             // dump($updateData);die;
-            $this->db_easyA->table('cwl_dianpuyejihuanbi_2')->where([
+            $this->db_easyA->table('cwl_dianpuyejihuanbi_lastmonth')->where([
                 ['店铺名称', '=', $updateData['店铺名称']]
             ])->update($updateData);
         }
