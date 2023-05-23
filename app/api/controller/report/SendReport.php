@@ -121,7 +121,8 @@ class SendReport extends BaseController
     // 门店业绩环比
     public function createS113()
     {
-        $date = date('Y-m-d');
+        $date = input('param.date') ? input('param.date') : date('Y-m-d');
+        // $date = date('Y-m-d');
         $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}"); 
         // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
         
@@ -131,7 +132,6 @@ class SendReport extends BaseController
             // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
             $this->service->create_table_s113($date);
 
-            die;
             $name = '\app\api\service\DingdingService';
             $model = new $name;
             $send_data = [
