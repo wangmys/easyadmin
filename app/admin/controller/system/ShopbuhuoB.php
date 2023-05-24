@@ -85,6 +85,13 @@ class ShopbuhuoB extends AdminController
                     }
                 }
             }
+
+            // 删除空行，好用的很
+            if(!implode('', $data_origin)){
+                //删除空行
+                continue;
+            }
+
             //取出指定的数据
             foreach ($read_column as $key => $val) {
                 $data[$row - 2][$val] = $data_origin[$key];
@@ -135,6 +142,11 @@ class ShopbuhuoB extends AdminController
                         $data_origin[$column] = $data_origin[$column];
                     }
                 }
+            }
+            // 删除空行，好用的很
+            if(!implode('', $data_origin)){
+                //删除空行
+                continue;
             }
             //取出指定的数据
             foreach ($read_column as $key => $val) {
@@ -997,8 +1009,9 @@ class ShopbuhuoB extends AdminController
     }
 
     // 补货测试
-    public function redExcel_test() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/出货指令单_有问题.xlsx';   //文件保存路径
+    public function redExcel_test_buhuo() {
+        // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/bbbbbbbbbbbbbbbb.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -1027,6 +1040,8 @@ class ShopbuhuoB extends AdminController
         $data = $this->readExcel1($save_path, $read_column);
         echo '<pre>';
         print_r($data);
+
+        die;
 
         // 店铺信息
         $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
