@@ -82,7 +82,8 @@ class Duanmalv extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo  AS 商品代码,
                 SUM ( ERG.Quantity ) AS 销售数量,
-                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额
+                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
                 ErpRetail AS ER
                 LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
@@ -146,7 +147,7 @@ class Duanmalv extends BaseController
                 return json([
                     'status' => 1,
                     'msg' => 'success',
-                    'content' => 'cwl_duanmalv_retail first 更新成功，数量{$count}！'
+                    'content' => "cwl_duanmalv_retail first 更新成功，数量：{$count}！"
                 ]);
             } else {
                 $this->db_easyA->rollback();
@@ -188,6 +189,7 @@ class Duanmalv extends BaseController
                     a.商品代码,
                     a.销售数量,
                     a.销售金额, 
+                    a.更新日期,
                 (
                     @rank :=
                 IF
