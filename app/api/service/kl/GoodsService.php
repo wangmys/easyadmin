@@ -2,13 +2,12 @@
 
 namespace app\api\service\kl;
 use app\common\traits\Singleton;
-use app\api\model\kl\ErpCustomerModel;
 use app\api\model\kl\ErpGoodsModel;
 use app\api\model\kl\ErpBarCodeModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
-class CustomerService
+class GoodsService
 {
 
     use Singleton;
@@ -20,8 +19,8 @@ class CustomerService
      */
     public function create($params) {
 
-        if (ErpCustomerModel::where([['CustomerId', '=', $params['CustomerId']]])->field('CustomerId')->find()) {
-            json_fail(400, 'CustomerId单号已存在');
+        if (ErpGoodsModel::where([['GoodsId', '=', $params['GoodsId']]])->field('GoodsId')->find()) {
+            json_fail(400, 'GoodsId单号已存在');
         }
 
         Db::startTrans();
@@ -32,9 +31,9 @@ class CustomerService
             $arr['Version'] = time();
 
             $arr = array_merge($arr, $params);
-            $arr = array_merge($arr, ErpCustomerModel::INSERT);
+            $arr = array_merge($arr, ErpGoodsModel::INSERT);
 
-            ErpCustomerModel::create($arr);
+            ErpGoodsModel::create($arr);
 
             Db::commit();
 
@@ -57,7 +56,8 @@ class CustomerService
         try {
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
-            ErpCustomerModel::where([['CustomerId', '=', $params['CustomerId']]])->update($new);
+            unset($new['GoodsId']);
+            ErpGoodsModel::where([['GoodsId', '=', $params['GoodsId']]])->update($new);
 
             Db::commit();
 
@@ -79,7 +79,7 @@ class CustomerService
         Db::startTrans();
         try {
 
-            ErpCustomerModel::where([['CustomerId', '=', $params['CustomerId']]])->delete();
+            ErpGoodsModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
 
             Db::commit();
 
