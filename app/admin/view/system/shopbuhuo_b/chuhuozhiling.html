@@ -181,20 +181,25 @@
                         layui.layer.closeAll();
                     }, 2000);
                 });
-                table.reload('table', {
-                    // where: data.field
-                    method: 'post'
-                    , url: url
-                    , loading: true
-                    , page: false
-                    , limit: 5000
-                    , done: function (res, curr, count) {
-                        $('.lasttime').text('上次查询时间：' + res.create_time);
-                        if (res.count == 0) {
-                            alert('恭喜，没有异常情况');
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    table.reload('table', {
+                        // where: data.field
+                        method: 'post'
+                        , url: url
+                        , loading: true
+                        , page: false
+                        , limit: 5000
+                        , done: function (res, curr, count) {
+                            $('.lasttime').text('上次查询时间：' + res.create_time);
+                            if (res.count == 0) {
+                                alert('恭喜，没有异常情况');
+                            }
                         }
-                    }
-                })
+                    })
+                }
+
             }
         });
 
@@ -239,6 +244,7 @@
                     , { field: '库存数量', title: '库存数量' }
                     , { field: '调出数量', title: '7天内调出数量' }
                     , { field: '清空时间', title: '调空日期' }
+                    , { field: '调拨未完成数', title: '调拨未完成数' }
                 ]]
                 ,done: function (res, curr, count) {
                     // $('.title_text2').css('display', 'block');

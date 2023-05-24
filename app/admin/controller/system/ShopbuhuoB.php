@@ -163,21 +163,32 @@ class ShopbuhuoB extends AdminController
      */
     public function chuhuozhiling() {      
         if (request()->isAjax()) {
-            // 筛选条件
-            $find_chuhuozhiling = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
-                ['aid', '=', $this->authInfo['id']],
-                ['清空时间', 'exp', new Raw('IS NOT NULL')]
-            ])->order('create_time DESC')
-            ->select();
-            return json(["code" => "0", "msg" => "", "data" => $find_chuhuozhiling, "count" => count($find_chuhuozhiling), 'create_time' => $this->create_time]);
+        // if (1) {    
+            // // 筛选条件  7天调空
+            // $select_chuhuozhiling_clean = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
+            //     ['aid', '=', $this->authInfo['id']],
+            //     ['清空时间', 'exp', new Raw('IS NOT NULL')]
+            // ])->order('create_time DESC')
+            // ->select();
+            
+            // 7天调空 或者 有未完成调拨且库存-调拨未完成<=0
+            $select_chuhuozhiling_clean = $this->db_easyA->query("
+                SELECT * FROM cwl_chuhuozhilingdan_2
+                WHERE 
+                    aid = '{$this->authInfo['id']}'
+                    AND (清空时间 IS NOT NULL OR 调拨未完成数 IS NOT NULL)
+                ORDER BY create_time DESC    
+            ");    
+
+            return json(["code" => "0", "msg" => "", "data" => $select_chuhuozhiling_clean, "count" => count($select_chuhuozhiling_clean), 'create_time' => $this->create_time]);
         } else {
-            $find_chuhuozhiling = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
+            $select_chuhuozhiling_clean = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
                 ['aid', '=', $this->authInfo['id']]
             ])->field('create_time')
             ->order('create_time DESC')
             ->find();
             return View('chuhuozhiling',[
-                'create_time' => $find_chuhuozhiling ? $find_chuhuozhiling['create_time'] : '无记录'
+                'create_time' => $select_chuhuozhiling_clean ? $select_chuhuozhiling_clean['create_time'] : '无记录'
             ]);
         }
     }  
@@ -746,72 +757,21 @@ class ShopbuhuoB extends AdminController
                     $wrongData[] = $select_qudaodiaobo[$key];
                     continue;
                 }
-
-                // 单店单品上市天数
-                // if ($val['上市天数'] && $val['上市天数'] < 7) {
-                //     $select_qudaodiaobo[$key]['信息反馈']  = "调出店上市不足8天"; 
-                //     $wrongData[] = $select_qudaodiaobo[$key];
-                //     continue;
-                // }
-
-                // 1 调出不能有在途
-                // $zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
-                // // $zaitu = $this->qudaodiaobo_zaitu_new('曹太阳', '罗田一店', '212612001');
-                // if ($zaitu) {
-                //     $select_qudaodiaobo[$key]['调出店在途量'] = $zaitu[0]['在途数量']; 
-                //     $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途";
-                //     $wrongData[] = $select_qudaodiaobo[$key];
-                //     continue;
-                // }
-
-
-
-                // 2  7天内别调入
-                // foreach ($kucun as $key3 => $val3) {
-                //     if ($val['调出店铺名称'] == $val3['CustomerName'] && $val['货号'] == $val3['GoodsNo']) {
-                //         // 未完成 调出店发给别人未完成
-                //         if (empty($val3['是否完成'])) {
-                //             // 库存调过头成负数
-                //             if ($val3['actual_quantity'] - $val3['调出数量'] - $val['调出店铺该货号数据合计'] <= 0) {   
-                //                 // 是否有在途
-                //                 foreach ($zaitu as $key3_1 => $val3_1) {
-                //                     if ($val['调出店铺名称'] == $val3_1['店铺名称'] && $val['货号'] == $val3_1['货号']) {
-                //                         $select_qudaodiaobo[$key]['在途数量'] =  $val3_1['在途数量']; 
-                //                         $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                //                         $select_qudaodiaobo[$key]['未完成调拨量'] = $val3['调出数量'];
-                //                         $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                //                         // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                //                         $wrongData[] = $select_qudaodiaobo[$key];
-                //                         $end1 = true;
-                //                         break 2;
-                //                     }
-                //                 }
-                //             }
-                //         } elseif ($val3['actual_quantity'] - $val['调出店铺该货号数据合计'] <= 0) {
-                //             // 是否有在途 别人给调出店发货
-                //             foreach ($zaitu as $key3_1 => $val3_2) {
-                //                 if ($val['调出店铺名称'] == $val3_2['店铺名称'] && $val['货号'] == $val3_2['货号']) {
-                //                     $select_qudaodiaobo[$key]['在途数量'] =  $val3_2['在途数量']; 
-                //                     $select_qudaodiaobo[$key]['店铺库存'] = $val3['actual_quantity'];
-                //                     $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
-                //                     // $select_qudaodiaobo[$key]['信息反馈'] = "【调空在途1】调入已完成 店铺库存：{$val3['actual_quantity']} 调出总数：{$val['调出店铺该货号数据合计']}";
-                //                     $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                //                     // $select_qudaodiaobo[$key]['信息反馈'] = "调出店有在途"; 
-                //                     $wrongData[] = $select_qudaodiaobo[$key];
-                //                     $end1 = true;
-                //                     break 2;
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
             }
-            // dump($wrongData);
-            // die;
             return $wrongData;
         } else {
             return [];
         }
+    }
+
+    public function buhuo_test() {
+        $need_num = 1;
+        $weiwancheng = $this->qudaodiaobo_weiwancheng('黎亿炎', '凤凰二店', 'B12502005');
+        $kucun = $this->qudaodiaobo_kucun('黎亿炎', '凤凰二店', 'B12502005');
+
+
+        dump($weiwancheng);
+        dump($kucun);
     }
 
     // 上传excel 调拨
@@ -1188,17 +1148,12 @@ class ShopbuhuoB extends AdminController
                             $data[$key]['店铺名称'] = $val2['CustomerName'];
                             $data[$key]['商品负责人'] = $val2['CustomItem17'];
                             break;
-                        } else {
-                            $data[$key]['店铺名称'] = '';
-                            $data[$key]['商品负责人'] = '';
+                        } 
+                        if ($key2 == count($select_customer) -1) {
+                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['调出店铺编号']]);
                         }
                     }
                 }
-
-        
-                // // 7天清空库存数据 
-                // $day7 = $this->day7();
-
 
                 // $this->db_easyA->startTrans();
                 $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
@@ -1215,17 +1170,6 @@ class ShopbuhuoB extends AdminController
                 foreach($chunk_list as $key => $val) {
                     $this->db_easyA->table('cwl_chuhuozhilingdan_2')->insertAll($val);
                 }
-
-
-
-                // $update_chuhuozhilingdan = $this->db_easyA->execute("
-                //     UPDATE cwl_chuhuozhilingdan_2 AS a
-                //     LEFT JOIN customer AS b ON a.店铺编号 = b.CustomerCode 
-                //     SET 店铺名称 = b.CustomerName,
-                //     商品负责人 = b.CustomItem17
-                //     WHERE
-                //         a.aid = '{$this->authInfo["id"]}'
-                // ");
 
                 // 7天清空库存数据 
                 $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->field('商品负责人')->where([
@@ -1246,6 +1190,32 @@ class ShopbuhuoB extends AdminController
                     WHERE
                         a.aid = '{$this->authInfo["id"]}'
                 ");
+
+                // 未完成
+                $select_chuhuozhiling_weiwancheng = $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
+                    ['aid', '=', $this->authInfo['id']],
+                    ['清空时间', 'exp', new Raw('IS NULL')]
+                ])->order('create_time DESC')
+                ->select()->toArray();
+                // dump($select_chuhuozhiling_weiwancheng);    
+                if ($select_chuhuozhiling_weiwancheng) {
+                    foreach ($select_chuhuozhiling_weiwancheng as $key => $val) {
+                        // 在途未完成 - 库存 <= 0
+                        $zaitu_kucun_0 = $this->buhuo_weiwancheng_handle($val['商品负责人'], $val['店铺名称'], $val['货号']);
+                        if ($zaitu_kucun_0) {
+                            $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
+                                ['商品负责人', '=', $val['商品负责人']],
+                                ['店铺名称', '=', $val['店铺名称']],
+                                ['货号', '=', $val['货号']],
+                                ['aid', '=', $this->authInfo['id']],
+                            ])->update([
+                                '调拨未完成数' => $zaitu_kucun_0['调拨未完成数'],
+                                '库存数量' => $zaitu_kucun_0['库存数量']
+                            ]);
+                        }
+                    }
+                }
+
                 $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
                     'option' => '店铺补货',
                     'aid' => $this->authInfo['id'],
@@ -1254,6 +1224,25 @@ class ShopbuhuoB extends AdminController
                 ]);
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
+        }
+    }
+
+    // 补货的店铺调拨未完成计算
+    public function buhuo_weiwancheng_handle($user = '', $store = '', $no = '') {
+        // 调拨未完成
+        $weiwancheng = $this->qudaodiaobo_weiwancheng($user, $store, $no);
+        if ($weiwancheng) {
+            $kucun = $this->qudaodiaobo_kucun($user, $store, $no);
+            // 库存 - 调拨未完成
+            if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] <= 0) {
+                $data['调拨未完成数'] = $weiwancheng[0]['调拨未完成数'];
+                $data['库存数量'] = $kucun[0]['actual_quantity']; 
+                return $data;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 
