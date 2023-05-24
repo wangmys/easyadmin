@@ -37,7 +37,7 @@ class Duanmalv extends BaseController
     // 更新周销 断码率专用 初步加工康雷表 groub by合并插入自己的retail表里
     public function retail_first() {
         // 康雷查询周销
-        $select = $this->db_sqlsrv->query("   
+        $sql = "   
             SELECT TOP
                 200000 EC.CustomItem17 AS 商品负责人,
                 EC.State AS 省份,
@@ -113,8 +113,17 @@ class Duanmalv extends BaseController
                 ,EG.CategoryName2
                 ,EG.CategoryName
                 ,EG.StyleCategoryName
-        ");
-        // echo count($select);
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        $count = count($select);
+        // if (! cache('duanmalv_retail_data')) {
+        //     $select = $this->db_sqlsrv->query($sql);
+        //     cache('duanmalv_retail_data', $select, 3600);
+        // } else {
+        //     $select = cache('duanmalv_retail_data');
+        // }
+        // echo count($select);die;
+        // dump($select);die;
         if ($select) {
             // 删除
             $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
@@ -137,7 +146,7 @@ class Duanmalv extends BaseController
                 return json([
                     'status' => 1,
                     'msg' => 'success',
-                    'content' => 'cwl_duanmalv_retail first 更新成功！'
+                    'content' => 'cwl_duanmalv_retail first 更新成功，数量{$count}！'
                 ]);
             } else {
                 $this->db_easyA->rollback();
