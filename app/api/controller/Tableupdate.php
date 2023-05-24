@@ -12,9 +12,7 @@ use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
 
 /**
- * Class Budongxiao
- * @package app\admin\controller\system
- * @ControllerAnnotation(title="不动销")
+ * @ControllerAnnotation(title="基础表更新")
  */
 class Tableupdate extends BaseController
 {
@@ -221,7 +219,10 @@ class Tableupdate extends BaseController
     // 更新 customer
     public function update_customer() {
         // 查询bi
-        $select_customer = $this->db_bi->table('customer')->where(1)->select()->toArray();
+        $select_customer = $this->db_bi->table('customer')->where([
+            ['Mathod', 'exp',  new Raw("IN ('直营', '加盟')")],
+            ['Region', '<>', '闭店区']
+        ])->select()->toArray();
         if (!$select_customer) {
             echo '没有数据更新';
             die;
@@ -253,223 +254,51 @@ class Tableupdate extends BaseController
         }
     }
 
-    // 更新周销 断码率专用 初步加工康雷表 groub by合并插入自己的retail表里
-    public function retail_first() {
-        // 康雷查询周销
-        $select = $this->db_sqlsrv->query("   
-            SELECT TOP
-                200000 EC.CustomItem17 AS 商品负责人,
-                EC.State AS 省份,
-                EBC.Mathod AS 渠道属性,
-                EC.CustomItem15 AS 店铺云仓,
+    public function customer_first() {
+        // 首单日期   
+        $sql2 = "
+            SELECT
                 ER.CustomerName AS 店铺名称,
-            --  DATEPART( yy, ER.RetailDate ) AS 年份,
-            --  DATEPART( yy, GETDATE() ) AS 年份,
-                EG.TimeCategoryName1 as 年份,
-            CASE
-                    EG.TimeCategoryName2
-                    WHEN '初春' THEN
-                    '春季'
-                    WHEN '正春' THEN
-                    '春季'
-                    WHEN '春季' THEN
-                    '春季'
-                    WHEN '初秋' THEN
-                    '秋季'
-                    WHEN '深秋' THEN
-                    '秋季'
-                    WHEN '秋季' THEN
-                    '秋季'
-                    WHEN '初夏' THEN
-                    '夏季'
-                    WHEN '盛夏' THEN
-                    '夏季'
-                    WHEN '夏季' THEN
-                    '夏季'
-                    WHEN '冬季' THEN
-                    '冬季'
-                    WHEN '初冬' THEN
-                    '冬季'
-                    WHEN '深冬' THEN
-                    '冬季'
-                END AS 季节归集,
-                EG.TimeCategoryName2 AS 二级时间分类,
-                EG.CategoryName1 AS 大类,
-                EG.CategoryName2 AS 中类,
-                EG.CategoryName AS 小类,
-                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
-                EG.StyleCategoryName AS 风格,
-                EG.GoodsNo  AS 商品代码,
-                SUM ( ERG.Quantity ) AS 销售数量,
-                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额
+                (
+                    SELECT TOP 1 RetailDate FROM
+                        ErpRetail  
+                    WHERE CustomerName = ER.CustomerName
+                ) AS 首单日期,
+                EC.RegionId
             FROM
-                ErpRetail AS ER
-                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
             WHERE
                 ER.CodingCodeText = '已审结'
-                AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
-
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
-                AND EC.CustomItem17 IS NOT NULL
+                AND EC.ShutOut = 0	
+                AND EC.RegionId <> 55
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023')
-                --AND ER.CustomerName = '九江六店'
-                --AND EG.GoodsNo= 'B32503009'
-            GROUP BY
-                EC.CustomItem17
-                ,ER.CustomerName
-                ,EG.GoodsNo
-                ,EC.State
-                ,EC.CustomItem15
-                ,EBC.Mathod
-                ,EG.TimeCategoryName1
-                ,EG.TimeCategoryName2
-                ,EG.CategoryName1
-                ,EG.CategoryName2
-                ,EG.CategoryName
-                ,EG.StyleCategoryName
-        ");
-        // echo count($select);
-        if ($select) {
-            // 删除
-            $this->db_easyA->table('cwl_retail')->where(1)->delete();
+            GROUP BY ER.CustomerName,EC.RegionId
+        ";
+        // 首单日期
+        $select_firstDate = $this->db_sqlsrv->query($sql2);
 
-            $chunk_list = array_chunk($select, 1000);
-            $this->db_easyA->startTrans();
-
-            $status = true;
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_retail')->strict(false)->insertAll($val);
-                if (! $insert) {
-                    $status = false;
-                    break;
-                }
-            }
-
-            if ($status) {
-                $this->db_easyA->commit();
-                return json([
-                    'status' => 1,
-                    'msg' => 'success',
-                    'content' => 'cwl_retail first 更新成功！'
-                ]);
-            } else {
-                $this->db_easyA->rollback();
-                return json([
-                    'status' => 0,
-                    'msg' => 'error',
-                    'content' => 'cwl_retail first 更新失败！'
-                ]);
-            }
-
+        $handle = $this->db_easyA->table('customer_first')->where(1)->delete();
+        $insert_all = $this->db_easyA->table('customer_first')->insertAll($select_firstDate);
+        if ($insert_all) {
+            // $this->db_bi->commit();    
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'easyadmin2 customer_first 更新成功！'
+            ]);
+        } else {
+            // $this->db_bi->rollback();   
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'easyadmin2 customer_first 更新失败！'
+            ]);
         }
     }
 
-    // 更新周销
-    public function retail_second() {
-        // 康雷查询周销
-        $find_retail =$this->db_easyA->table('cwl_retail')->where([
-            ['排名', 'exp', new Raw('IS NULL')]
-        ])->find();
-        // echo $this->db_easyA->getLastSql();
-        // dump($find_retail);die;
-        // echo count($select);
-
-        // 需要进行排名
-        if ($find_retail) {
-            $select = $this->db_easyA->query("
-                SELECT
-                    a.商品负责人,
-                    a.省份,
-                    a.渠道属性,
-                    a.店铺云仓,
-                    a.店铺名称,
-                    a.年份,
-                    a.季节归集,
-                    a.二级时间分类,
-                    a.大类,
-                    a.小类,
-                    a.领型,
-                    a.风格,
-                    a.商品代码,
-                    a.销售数量,
-                    a.销售金额, 
-                (
-                    @rank :=
-                IF
-                ( @GROUP = a.中类, @rank + 1, 1 )) AS 排名
-                ,
-                ( @GROUP := a.中类 ) AS 中类
-            FROM
-                (
-                SELECT
-                    *
-                FROM
-                    cwl_retail 
-                WHERE
-                    1
-            -- 		省份='江西省'
-            -- 		店铺名称 = '九江六店' 
-                ORDER BY
-                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC, 排名 ASC,
-                    销售数量 DESC 
-                ) a,
-                ( SELECT @rank := 0, @GROUP := '' ) AS b
-            ");
-
-            if ($select) {
-                // dump($select[0]);
-                // dump($select[1]);
-                // dump($select[2]);
-                // dump($select[3]);
-                // die;
-                // 删除
-                $this->db_easyA->table('cwl_retail')->where(1)->delete();
-
-                $chunk_list = array_chunk($select, 1000);
-                $this->db_easyA->startTrans();
-
-                $status = true;
-                foreach($chunk_list as $key => $val) {
-                    // 基础结果 
-                    $insert = $this->db_easyA->table('cwl_retail')->strict(false)->insertAll($val);
-                    if (! $insert) {
-                        $status = false;
-                        break;
-                    }
-                }
-
-                if ($status) {
-                    $this->db_easyA->commit();
-                    return json([
-                        'status' => 1,
-                        'msg' => 'success',
-                        'content' => 'cwl_retail second 更新成功！'
-                    ]);
-                } else {
-                    $this->db_easyA->rollback();
-                    return json([
-                        'status' => 0,
-                        'msg' => 'error',
-                        'content' => 'cwl_retail second 更新失败！'
-                    ]);
-                }
-            } else {
-                $this->db_easyA->rollback();
-                return json([
-                    'status' => 0,
-                    'msg' => 'error',
-                    'content' => 'cwl_retail 排名执行失败！'
-                ]);
-            }
-
-        }
-    }
 
     // 采购顶推报表 receipt收货 receiptNotice采集入库
     public function receipt_receiptNotice() {
@@ -526,10 +355,8 @@ class Tableupdate extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结' 
                 AND ER.ReceiptDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-            --  AND ER.ReceiptDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
-            --  AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
                 AND ER.Type= 1 
-            -- 	AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+                AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
                 AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
@@ -600,10 +427,8 @@ class Tableupdate extends BaseController
             WHERE
                 ERN.CodingCodeText = '已审结' 
                 AND ERN.ReceiptNoticeDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-            --  AND ERN.ReceiptNoticeDate >= DATEADD( DAY, - 1, CAST ( GETDATE( ) AS DATE ) ) 
-            --  AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-            -- 	AND ER.Type= 2 
                 AND ERN.IsCompleted IS NULL
+                AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
                 AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
@@ -611,7 +436,6 @@ class Tableupdate extends BaseController
                 EW.WarehouseName
                 ,ES.SupplyName
                 ,EG.GoodsNo
-            -- 	,ERNG.Quantity
                 ,EG.GoodsName 
                 ,EG.TimeCategoryName1
                 ,EG.TimeCategoryName2
@@ -620,7 +444,6 @@ class Tableupdate extends BaseController
                 ,EG.CategoryName
                 ,EG.StyleCategoryName
                 ,EGC.ColorDesc
-            -- 	,ERN.IsCompleted
             ";
 
         $select_receipt = $this->db_sqlsrv->query($sql1);
@@ -761,4 +584,5 @@ class Tableupdate extends BaseController
         dump($select_report2);
 
     }
+
 }

@@ -41,7 +41,7 @@ class SendReport extends BaseController
     }
 
     public function create_test() {
-        $name = input('param.name') ? input('param.name') : 'S101';
+        $name = input('param.name') ? input('param.name') : 'S101'; 
         $date = input('param.date') ? input('param.date') : '';
         if ($name =='S101') {
             $this->service->create_table_s101('S101', $date);
@@ -85,23 +85,72 @@ class SendReport extends BaseController
             $this->service->create_table_s031();
         } elseif ($name =='S043') {
             $this->service->create_table_s043();
-        } elseif ($name =='S111' || $name = 'S112') {
+        } elseif ($name =='S111' || $name == 'S112') {
             $res = http_get('http://im.babiboy.com//api/Tableupdate/receipt_receiptNotice');
             // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
             $res =json_decode($res, true);
             if ($res['status'] == 1) {
-            $this->service->create_table_s111('春季');
-            $this->service->create_table_s111('夏季');
-            $this->service->create_table_s111('秋季');
-            $this->service->create_table_s111('冬季');
+                $this->service->create_table_s111('春季');
+                $this->service->create_table_s111('夏季');
+                $this->service->create_table_s111('秋季');
+                $this->service->create_table_s111('冬季');
 
-            $this->service->create_table_s112('春季');
-            $this->service->create_table_s112('夏季');
-            $this->service->create_table_s112('秋季');
-            $this->service->create_table_s112('冬季');
+                $this->service->create_table_s112('春季');
+                $this->service->create_table_s112('夏季');
+                $this->service->create_table_s112('秋季');
+                $this->service->create_table_s112('冬季');
             } else {
                 return $res;
             }
+        } elseif ($name =='S113') {
+
+            $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+            // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+            
+            $res = json_decode($res, true);
+            if ($res['status'] == 1) {
+                $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
+                // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
+                $this->service->create_table_s113($date);
+            }
+      
+            // $this->service->create_table_s113($date);
+        }
+    }
+
+    // 门店业绩环比
+    public function createS113()
+    {
+        $date = input('param.date') ? input('param.date') : date('Y-m-d');
+        // $date = date('Y-m-d');
+        $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}"); 
+        // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+        
+        $res = json_decode($res, true);
+        if ($res['status'] == 1) {
+            $res2 = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle?date={$date}");
+            // $res2 = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_handle");
+            $this->service->create_table_s113($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+            $send_data = [
+                'S113' => [
+                    'title' => '门店业绩环比 表号:S113',
+                    'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113.jpg'
+                ],
+            ];
+            $res = [];
+            foreach ($send_data as $k=>$v){
+                $headers = get_headers($v['jpg_url']);
+                if(substr($headers[0], 9, 3) == 200){
+                    // 推送
+                    $res[] = $model->send($v['title'], $v['jpg_url']);
+                    // echo $v['title'];
+                    // echo '<br>';
+                }
+            }
+            return json($res);
         }
     }
 
