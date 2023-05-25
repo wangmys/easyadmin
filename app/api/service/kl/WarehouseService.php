@@ -33,6 +33,10 @@ class WarehouseService
             $arr = array_merge($arr, $params);
             $arr = array_merge($arr, ErpWarehouseModel::INSERT);
 
+            if (!$arr['RegionId']) {
+                $arr['RegionId'] = null;
+            }
+
             ErpWarehouseModel::create($arr);
 
             Db::commit();
@@ -57,6 +61,9 @@ class WarehouseService
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
             unset($new['WarehouseId']);
+            if (!$params['RegionId']) {
+                $new['RegionId'] = null;
+            }
             ErpWarehouseModel::where([['WarehouseId', '=', $params['WarehouseId']]])->update($new);
 
             Db::commit();

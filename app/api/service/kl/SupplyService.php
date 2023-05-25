@@ -34,6 +34,10 @@ class SupplyService
             $arr = array_merge($arr, $params);
             $arr = array_merge($arr, ErpSupplyModel::INSERT);
 
+            if (!$arr['RegionId']) {
+                $arr['RegionId'] = null;
+            }
+
             ErpSupplyModel::create($arr);
 
             Db::commit();
@@ -57,6 +61,9 @@ class SupplyService
         try {
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
+            if (!$params['RegionId']) {
+                $new['RegionId'] = null;
+            }
             ErpSupplyModel::where([['SupplyId', '=', $params['SupplyId']]])->update($new);
 
             Db::commit();

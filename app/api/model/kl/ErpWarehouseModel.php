@@ -23,7 +23,7 @@ class ErpWarehouseModel extends TimeModel
         'Fax' => 'nvarchar',
         'ShutOut' => 'bit',
         'ZipCode' => 'nvarchar',
-        // 'RegionId' => 'bigint',
+        'RegionId' => 'bigint',
         'Address' => 'nvarchar',
         'RoleCategoryId' => 'bigint',
         'BranchId' => 'bigint',
