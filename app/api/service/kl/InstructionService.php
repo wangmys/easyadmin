@@ -65,6 +65,8 @@ class InstructionService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
+            //事务回滚失败，执行删除操作处理多余数据
+            $this->delete($params);
             abort(0, $e->getMessage());
         }
 
@@ -83,13 +85,13 @@ class InstructionService
         $arr['InPrice'] = $detail['InPrice'];
         $arr['InDiscount'] = $detail['InDiscount'];
         $arr['Quantity'] = $detail['Quantity'];
-        $arr['Remark'] = $detail['Remark'];
-        $arr['ReturnApplyID'] = $detail['ReturnApplyID'];
-        $arr['JUnitPrice'] = $detail['JUnitPrice'];
-        $arr['JDiscount'] = $detail['JDiscount'];
-        $arr['InJUnitPrice'] = $detail['InJUnitPrice'];
-        $arr['InJDiscount'] = $detail['InJDiscount'];
-        $arr['InstructionApplyId'] = $detail['InstructionApplyId'];
+        $arr['Remark'] = $detail['Remark'] ?? null;
+        $arr['ReturnApplyID'] = $detail['ReturnApplyID'] ?? null;
+        $arr['JUnitPrice'] = $detail['JUnitPrice'] ?? null;
+        $arr['JDiscount'] = $detail['JDiscount'] ?? null;
+        $arr['InJUnitPrice'] = $detail['InJUnitPrice'] ?? null;
+        $arr['InJDiscount'] = $detail['InJDiscount'] ?? null;
+        $arr['InstructionApplyId'] = $detail['InstructionApplyId'] ?? null;
 
 //        Db::startTrans();
         try {
