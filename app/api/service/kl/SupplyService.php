@@ -57,7 +57,6 @@ class SupplyService
         try {
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
-            unset($new['RegionId']);//更新时不能更新regionId，具体看ErpSupply表的外键规则
             ErpSupplyModel::where([['SupplyId', '=', $params['SupplyId']]])->update($new);
 
             Db::commit();

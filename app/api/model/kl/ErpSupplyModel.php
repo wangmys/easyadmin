@@ -23,7 +23,7 @@ class ErpSupplyModel extends TimeModel
         'Fax' => 'nvarchar',
         'ShutOut' => 'bit',
         'ZipCode' => 'nvarchar',
-        // 'RegionId' => 'bigint',
+        'RegionId' => 'bigint',
         'StateId' => 'bigint',
         'State' => 'nvarchar',
         'CityId' => 'bigint',
