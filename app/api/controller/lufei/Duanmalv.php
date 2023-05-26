@@ -164,107 +164,107 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 更新周销
+    // 更新周销 进行排名
     public function retail_second() {
-        // 康雷查询周销
-        $find_retail =$this->db_easyA->table('cwl_duanmalv_retail')->where([
-            ['排名', 'exp', new Raw('IS NULL')]
-        ])->find();
-        // echo $this->db_easyA->getLastSql();
-        // dump($find_retail);die;
-        // echo count($select);
-
-        // 需要进行排名
-        if ($find_retail) {
-            $select = $this->db_easyA->query("
-                SELECT
-                    a.商品负责人,
-                    a.省份,
-                    a.渠道属性,
-                    a.店铺云仓,
-                    a.店铺名称,
-                    a.年份,
-                    a.季节归集,
-                    a.二级时间分类,
-                    a.大类,
-                    a.小类,
-                    a.领型,
-                    a.风格,
-                    a.商品代码,
-                    a.零售价,
-                    a.当前零售价,
-                    a.销售数量,
-                    a.销售金额, 
-                    a.更新日期,
+        // 计算折率
+        $sql1 = "
+            UPDATE cwl_duanmalv_retail 
+            SET 折率= ROUND(`当前零售价` / 零售价, 2)
+            WHERE 
+            `折率` IS NULL
+        ";
+        $this->db_easyA->execute($sql1);
+        
+        $select = $this->db_easyA->query("
+            SELECT
+                a.商品负责人,
+                a.省份,
+                a.渠道属性,
+                a.店铺云仓,
+                a.店铺名称,
+                a.年份,
+                a.季节归集,
+                a.二级时间分类,
+                a.大类,
+                a.中类,
+                a.小类,
+                a.风格,
+                a.商品代码,
+                a.零售价,
+                a.当前零售价,
+                a.销售数量,
+                a.销售金额,
+                a.折率,
+                a.更新日期,
                 (
                     @rank :=
                 IF
-                ( @GROUP = a.中类, @rank + 1, 1 )) AS 排名
-                ,
-                ( @GROUP := a.中类 ) AS 中类
+                ( @GROUP = a.领型, @rank + 1, 1 )) AS 排名,
+                ( @GROUP := a.领型 ) AS 领型 
             FROM
                 (
                 SELECT
-                    *
+                    * 
                 FROM
                     cwl_duanmalv_retail 
                 WHERE
-                    1
-            -- 		省份='江西省'
-            -- 		店铺名称 = '九江六店' 
+                    折率 >= 1 
+                 -- AND 省份 = '安徽省' 
+                 -- AND 店铺名称 = '巢湖二店' 
                 ORDER BY
-                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC, 排名 ASC,
+                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC,
+                    领型 ASC,
                     销售数量 DESC 
                 ) a,
                 ( SELECT @rank := 0, @GROUP := '' ) AS b
-            ");
+        ");
 
-            if ($select) {
-                // dump($select[0]);
-                // dump($select[1]);
-                // dump($select[2]);
-                // dump($select[3]);
-                // die;
-                // 删除
-                $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+        // echo '<pre>';
+        // print_r($select); die;
 
-                $chunk_list = array_chunk($select, 1000);
-                $this->db_easyA->startTrans();
+        if ($select) {
+            // $this->db_easyA->startTrans();
 
-                $status = true;
-                foreach($chunk_list as $key => $val) {
-                    // 基础结果 
-                    $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
-                    if (! $insert) {
-                        $status = false;
-                        break;
-                    }
+            // 删除 需要计算排名的
+            $this->db_easyA->table('cwl_duanmalv_retail')->where([
+                ['折率', '>=', 1]
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+            
+
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
+                if (! $insert) {
+                    $status = false;
+                    break;
                 }
+            }
 
-                if ($status) {
-                    $this->db_easyA->commit();
-                    return json([
-                        'status' => 1,
-                        'msg' => 'success',
-                        'content' => 'cwl_duanmalv_retail second 更新成功！'
-                    ]);
-                } else {
-                    $this->db_easyA->rollback();
-                    return json([
-                        'status' => 0,
-                        'msg' => 'error',
-                        'content' => 'cwl_duanmalv_retail second 更新失败！'
-                    ]);
-                }
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_retail second 更新成功！'
+                ]);
             } else {
-                $this->db_easyA->rollback();
+                // $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
-                    'content' => 'cwl_duanmalv_retail 排名执行失败！'
+                    'content' => 'cwl_duanmalv_retail second 更新失败！'
                 ]);
             }
-
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_retail 排名执行失败！'
+            ]);
         }
     }
 
@@ -539,7 +539,7 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 更新店铺排名 零售价 当前零售价
+    // 更新店铺排名 零售价 当前零售价  (可能不需要)
     public function sk_second() {
         $sql = "
             UPDATE cwl_duanmalv_sk AS sk
@@ -550,14 +550,14 @@ class Duanmalv extends BaseController
                 WHERE sk.店铺近一周排名 is null
         ";
 
-        $status = $this->db_easyA->query($sql);
-        $count = count($status);
+        $this->db_easyA->startTrans();
+        $status = $this->db_easyA->execute($sql);
         if ($status) {
             $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$count}！"
+                'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$status}！"
             ]);
         } else {
             $this->db_easyA->rollback();
@@ -569,13 +569,43 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 断码判定
+    // 断码 无效库存判定
     public function sk_third() {
-        
+        $sql1 = "set @内搭 = 4, @外套=4, @鞋履=4, @松紧长裤=5, @下装=6;";
+        $this->db_easyA->execute($sql1);
 
-        $this->db_easyA->table("cwl_duanmalv_sk")->field('')->where(
-
-        )->select();
+        $sql2 = "
+            UPDATE cwl_duanmalv_sk 
+            SET 标准齐码识别修订 = 
+                CASE 
+                    WHEN (`累销数量`<= 0 || `累销数量` IS NULL) && (预计库存数量 <= 1 || 预计库存数量 IS NULL) THEN '无效库存'
+                    
+                    WHEN (`一级分类`='下装' && `预计库存连码个数` < @下装) THEN '断码'
+                    WHEN (`一级分类`='松紧长裤' && `预计库存连码个数` < @松紧长裤) THEN '断码' 
+                    WHEN (`一级分类`='鞋履' && `预计库存连码个数` < @鞋履) THEN '断码' 
+                    WHEN (`一级分类`='外套' && `预计库存连码个数` < @外套) THEN '断码' 
+                    WHEN (`一级分类`='内搭' && `预计库存连码个数` < @内搭) THEN '断码'
+                    ELSE '无'
+                END	
+            WHERE 
+            `标准齐码识别修订` IS NULL";
+        $this->db_easyA->startTrans();
+        $status = $this->db_easyA->execute($sql2);
+        if ($status) {
+            $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_duanmalv_sk 标准齐码识别修订 更新成功，数量：{$status}！"
+            ]);
+        } else {
+            $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_sk 标准齐码识别修订 更新失败！'
+            ]);
+        }
     }
 
 }
