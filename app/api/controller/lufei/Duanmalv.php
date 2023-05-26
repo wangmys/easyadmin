@@ -551,6 +551,7 @@ class Duanmalv extends BaseController
         ";
 
         $status = $this->db_easyA->query($sql);
+        $count = count($status);
         if ($status) {
             $this->db_easyA->commit();
             return json([
