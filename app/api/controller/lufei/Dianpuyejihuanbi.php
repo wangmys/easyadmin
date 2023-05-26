@@ -127,7 +127,8 @@ class Dianpuyejihuanbi extends BaseController
 
     // 上月环比数据整理   cwl_dianpuyejihuanbi_lastmonth   
     public function dianpuyejihuanbi_lastmonth($date = '') {
-        $date_str = "2023-04-01";
+        // $date_str = "2023-04-01";
+        $date_str = date("Y-m-01", strtotime('-1month')); 
         $date = date('Y-m', strtotime($date_str));
         $sql0 = "set @date_str = '{$date_str}';";
 
@@ -135,7 +136,7 @@ class Dianpuyejihuanbi extends BaseController
         $sql = "
             SELECT
                 a.省份,a.店铺名称,a.经营属性,DATE_FORMAT( @date_str, '%Y-%m') AS 日期,
-                (
+                (   
                 SELECT
                     ROUND(SUM(w1.销售金额) / count(w1.星期), 2) 
                 FROM
