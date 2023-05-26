@@ -52,13 +52,14 @@ class ReceiptinService
             $arr['IsDiff'] = $params['IsDiff'];
             $arr['CreateTime'] = date('Ymd H:i:s');
             $arr['UpdateTime'] = date('Ymd H:i:s');
+            $arr['PaymentDate'] = $params['PaymentDate'];
             $new = array_merge($arr, ErpReceiptModel::INSERT);
 
             if ($params['SupplyId']) {
-                $arr['SupplyId'] = $params['SupplyId'];
+                $new['SupplyId'] = $params['SupplyId'];
             }
             if ($params['CustomerId']) {
-                $arr['CustomerId'] = $params['CustomerId'];
+                $new['CustomerId'] = $params['CustomerId'];
             }
 
             $goods = $params['Goods'] ?? [];
