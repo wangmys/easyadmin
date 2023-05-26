@@ -61,6 +61,8 @@ class SortingService
         } catch (\Exception $e) {
             Db::rollback();
             log_error($e);
+            //事务回滚失败，执行删除操作处理多余数据
+            $this->deleteSorting($params);
             abort(0, '保存失败');
         }
 
