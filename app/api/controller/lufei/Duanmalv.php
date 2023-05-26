@@ -508,7 +508,7 @@ class Duanmalv extends BaseController
         if ($select_sk) {
             // 删除历史数据
             $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $chunk_list = array_chunk($select_sk, 3000);
+            $chunk_list = array_chunk($select_sk, 1000);
             $this->db_easyA->startTrans();
 
             $status = true;
