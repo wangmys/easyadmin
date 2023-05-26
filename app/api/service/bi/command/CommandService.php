@@ -86,13 +86,19 @@ class CommandService
         Db::startTrans();
         try{
             // 保存指令日志
-            $this->logModel->insertAll($log);
+//            $this->logModel->insertAll($log);
+             // 删除错误指令记录
+            $this->errorLogModel->where('id','>',0)->delete();
+            // 删除错误指令统计
+            $this->totalModel->where('id','>',0)->delete();
+
             // 保存错误指令记录
             $this->errorLogModel->saveAll($result_log);
             // 加工错误指令统计数据(重组)
             $result_process = $this->processData($result);
             // 保存错误指令统计
             $this->totalModel->insertAll($result_process);
+
             // 提交事务
             Db::commit();
         }catch (\Exception $e){

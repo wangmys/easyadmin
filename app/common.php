@@ -3,6 +3,7 @@
 
 use app\common\service\AuthService;
 use think\facade\Cache;
+use think\facade\Log;
 
 if (!function_exists('__url')) {
 
@@ -171,6 +172,20 @@ if (!function_exists('curl_post')) {
     }
 }
 
+// curl
+function http_get($url)
+{
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 500);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    $res = curl_exec($curl);
+    curl_close($curl);
+    return $res;
+}
+
 /**
  * @param $time
  * @return string
@@ -179,6 +194,16 @@ function date_to_week($time)
 {
     $weekarray = array("日", "一", "二", "三", "四", "五", "六");
     return "周" . $weekarray[date("w", strtotime($time))];
+}
+
+/**
+ * @param $time
+ * @return string
+ */
+function date_to_week2($time)
+{
+    $weekarray = array("日", "一", "二", "三", "四", "五", "六");
+    return "星期" . $weekarray[date("w", strtotime($time))];
 }
 
 /**
@@ -268,7 +293,7 @@ function getDateFromRange_m($startdate, $enddate){
     return $date;
 }
 
-/**
+/*
  * 根据数组某个下标字段排序
  * @param $arr
  * @param $param
@@ -281,4 +306,27 @@ function sort_arr($arr, $param, $sort=SORT_DESC) {
     }
     array_multisort($flag, $sort, $arr);
     return $arr;
+}
+
+function log_error($e)
+{
+    Log::channel('error')->error($e->__toString());
+}
+
+function log_error_write($msg, $path = 'error')
+{
+    Log::channel($path)->error($msg);
+}
+
+function make_order_number($start, $num, $length = 8)
+{
+    return $start . str_pad(strval($num + 1), $length, "0", STR_PAD_LEFT);
+}
+
+function json_success($code=200, $msg='okk', $data=[]) {
+    echo json_encode(['code'=>$code, 'msg'=>$msg, 'data'=>$data]);die;
+}
+
+function json_fail($code=400, $msg='参数有误', $data=[]) {
+    echo json_encode(['code'=>$code, 'msg'=>$msg, 'data'=>$data]);die;
 }

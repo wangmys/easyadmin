@@ -33,7 +33,7 @@ class Stock extends Command
             if ($data) {
                 foreach ($data as $k=>$v_data) {
                     StockSaleTwoyear::create($v_data);
-//                    print_r($v_data);die;
+                   print_r($v_data);die;
                 }
             }
         }

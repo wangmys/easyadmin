@@ -188,7 +188,13 @@
                         layui.layer.closeAll();
                     }, 2000);
                 });
-                alert('上传成功，请校验调拨检核表');
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    alert('上传成功，请校验调拨检核表');
+                }
+                
+                // alert('上传成功，请校验调拨检核表');
                 // table.reload('table', {
                 //     // where: data.field
                 //     method: 'post'

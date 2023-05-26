@@ -108,22 +108,22 @@ class Weather extends AdminController
                                 $value_c = $vv['min_c'];
                             }
                             if ($value_c < 10) {
-                                $bgCol = 'rgb(26,107,215)';
+                                $bgCol = 'rgb(3,117,233)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 10 && $value_c < 18) {
-                                $bgCol = 'rgb(104,184,245)';
+                                $bgCol = 'rgb(155,194,230)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 18 && $value_c < 22) {
-                                $bgCol = 'rgb(250,241,164)';
+                                $bgCol = 'rgb(255,230,153)';
                                 $fontCol = '#000000';  
                             } else if ($value_c >= 22 && $value_c  < 26) {
-                                $bgCol = 'rgb(254,204,81)';
+                                $bgCol = 'rgb(255,202,59)';
                                 $fontCol = '#000000';  
                             } else if ($value_c >= 26 && $value_c  < 30) {
-                                $bgCol = 'rgb(244,119,0)';
+                                $bgCol = 'rgb(255,255,0)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 30) {
-                                $bgCol = 'rgb(170,3,13)';
+                                $bgCol = 'rgb(215,28,4)';
                                 $fontCol = '#000000';
                             } else{
                                 $bgCol = '#fecc51';
@@ -167,7 +167,7 @@ class Weather extends AdminController
         $start_date = date('Y-m-d',strtotime(date('Y-m-d').'-3day'));
         // 日期列表
         $date_list = [];
-        for ($i = 0;$i <= 17;$i++){
+        for ($i = 0;$i <= 23;$i++){
             $date_list[] = date($str,strtotime($start_date."+{$i}day"));
         }
         return $date_list;

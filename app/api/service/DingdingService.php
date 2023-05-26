@@ -49,6 +49,8 @@ class DingdingService
     protected $hook_test_url2 = 'https://oapi.dingtalk.com/robot/send?access_token=f892dc03bdf32e94a7332d4a04c8d4328f940a8c6edd2140f3b3a33ab82589de';
     // 数据播报群
     protected $hook_test_url3 = 'https://oapi.dingtalk.com/robot/send?access_token=889f8683bd1947670a9d755f6398a49a15abda994c2a975216f3d6a1384ab79d';
+    // 开黑群
+    protected $hook_test_url4 = 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b';
     protected $token = '';
 
     public static function getAccessToken()

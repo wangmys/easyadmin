@@ -174,7 +174,7 @@ class Budongxiaosystem extends AdminController
             }
             $this->params = $params;
     
-            $map1 = " a.create_time='{$select_map['create_time']}' ";
+            $map1 = " a.create_time='{$select_map['create_time']}' AND a.不动销区间 = '{$select_config['考核区间']}'";
             if (!empty($this->params['上柜率'])) {
                 $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
             } else {
@@ -323,7 +323,7 @@ class Budongxiaosystem extends AdminController
         }
         $this->params = $params;
 
-        $map1 = " a.create_time='{$select_map['create_time']}' ";
+        $map1 = " a.create_time='{$select_map['create_time']}' AND a.不动销区间 = '{$select_config['考核区间']}'";
         if (!empty($this->params['上柜率'])) {
             $map2 = " AND a.上柜率>='{$this->params['上柜率']}' ";
         } else {
@@ -650,6 +650,84 @@ class Budongxiaosystem extends AdminController
         return $res;
     }
 
+    public function test8() {
+        $rand_code = '8209257175';
+        $sql = "
+            SELECT
+                *,
+                @counter := @counter + 1 AS 排名 
+            FROM
+                (
+                SELECT
+                    a.商品负责人,
+                    COUNT( 'a.店铺简称' ) AS 总家数,
+                    b.合格家数,
+                    IFNULL( c.不合格家数, 0 ) AS 不合格家数,
+                    CONCAT(FORMAT(IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100, 2), '%') AS 合格率,
+                    -- IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100 as rank_b,
+                    IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
+                    IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
+                    IFNULL( e.`直营合格家数`, 0 ) 直营不合格家数,
+                    IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100 as rank_b,
+                    CONCAT(FORMAT(IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100, 2), '%') AS 直营合格率,
+                    IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
+                    IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
+                    IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
+                    CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
+                FROM
+                    cwl_budongxiao_statistics_sys a
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                WHERE a.rand_code = '{$rand_code}'    
+                GROUP BY
+                    a.商品负责人 
+                ) AS aa 
+            ORDER BY
+                aa.rank_b DESC         
+        ";
+        Db::connect('mysql')->query('SET @counter = 0;');
+        $res = Db::connect('mysql')->query($sql);
+        // dump($res);
+        $res_end_key = count($res);
+        $res_end['排名'] = '合计';
+        $res_end['商品负责人'] = '总计';
+        $res_end['rank_b'] = '';
+        $res_end['总家数'] = 0;
+        $res_end['合格家数'] = 0;
+        $res_end['不合格家数'] = 0;
+        $res_end['直营总家数'] = 0;
+        $res_end['直营合格家数'] = 0;
+        $res_end['直营不合格家数'] = 0;
+        $res_end['加盟总家数'] = 0;
+        $res_end['加盟合格家数'] = 0;
+        $res_end['加盟不合格家数'] = 0;
+        
+        foreach ($res as $key => $val) {
+            $res_end['总家数']  += $val['总家数'];
+            $res_end['合格家数']  += $val['合格家数'];
+            $res_end['不合格家数']  += $val['不合格家数'];
+            $res_end['直营总家数']  += $val['直营总家数'];
+            $res_end['直营合格家数']  += $val['直营合格家数'];
+            $res_end['直营不合格家数']  += $val['直营不合格家数'];
+            $res_end['加盟总家数']  += $val['加盟总家数'];
+            $res_end['加盟合格家数']  += $val['加盟合格家数'];
+            $res_end['加盟不合格家数']  += $val['加盟不合格家数'];
+        }
+        $res_end['合格率'] = round($res_end['合格家数'] /  $res_end['总家数'] * 100, 2);
+        $res_end['直营合格率'] = round($res_end['直营合格家数'] /  $res_end['直营总家数'] * 100, 2);
+        $res_end['加盟合格率'] = round($res_end['加盟合格家数'] /  $res_end['加盟总家数'] * 100, 2);
+        
+        $res[$res_end_key] = $res_end;
+
+        dump($res);
+    }
+
     // 单店不动销 详情
     public function single_statistics($rand_code) {
         $rand_code = input('rand_code');
@@ -666,10 +744,11 @@ class Budongxiaosystem extends AdminController
                         b.合格家数,
                         IFNULL( c.不合格家数, 0 ) AS 不合格家数,
                         CONCAT(FORMAT(IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100, 2), '%') AS 合格率,
-                        IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100 as rank_b,
+                        -- IFNULL( b.合格家数 / COUNT( 'a.店铺简称' ), 0 ) * 100 as rank_b,
                         IFNULL( d.直营总家数, 0 ) AS 直营总家数, 
                         IFNULL( e.`直营合格家数`, 0 ) AS 直营合格家数,
                         IFNULL( f.`直营不合格家数`, 0 ) 直营不合格家数,
+                        IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100 as rank_b,
                         CONCAT(FORMAT(IFNULL( e.`直营合格家数` / d.直营总家数, 0 ) * 100, 2), '%') AS 直营合格率,
                         IFNULL( g.`加盟总家数`, 0 ) AS 加盟总家数,
                         IFNULL( h.`加盟合格家数`, 0 ) AS 加盟合格家数,
@@ -692,6 +771,41 @@ class Budongxiaosystem extends AdminController
                 ORDER BY
                     aa.rank_b DESC 
             ";
+
+            Db::connect('mysql')->query('SET @counter = 0;');
+            $res = Db::connect('mysql')->query($sql);
+            
+            $res_end_key = count($res);
+            $res_end['排名'] = '合计';
+            $res_end['商品负责人'] = '总计';
+            $res_end['rank_b'] = '';
+            $res_end['总家数'] = 0;
+            $res_end['合格家数'] = 0;
+            $res_end['不合格家数'] = 0;
+            $res_end['直营总家数'] = 0;
+            $res_end['直营合格家数'] = 0;
+            $res_end['直营不合格家数'] = 0;
+            $res_end['加盟总家数'] = 0;
+            $res_end['加盟合格家数'] = 0;
+            $res_end['加盟不合格家数'] = 0;
+            
+            foreach ($res as $key => $val) {
+                $res_end['总家数']  += $val['总家数'];
+                $res_end['合格家数']  += $val['合格家数'];
+                $res_end['不合格家数']  += $val['不合格家数'];
+                $res_end['直营总家数']  += $val['直营总家数'];
+                $res_end['直营合格家数']  += $val['直营合格家数'];
+                $res_end['直营不合格家数']  += $val['直营不合格家数'];
+                $res_end['加盟总家数']  += $val['加盟总家数'];
+                $res_end['加盟合格家数']  += $val['加盟合格家数'];
+                $res_end['加盟不合格家数']  += $val['加盟不合格家数'];
+            }
+            
+            $res_end['合格率'] = round($res_end['合格家数'] /  $res_end['总家数'] * 100, 2) . '%';
+            $res_end['直营合格率'] = round($res_end['直营合格家数'] /  $res_end['直营总家数'] * 100, 2) . '%';
+            $res_end['加盟合格率'] = round($res_end['加盟合格家数'] /  $res_end['加盟总家数'] * 100, 2) . '%';
+            $res[$res_end_key] = $res_end;
+            return json(["code" => "0", "msg" => "",  "data" => $res]);
         } else {
             $name = session('admin.name');
             $sql = "    
@@ -732,14 +846,12 @@ class Budongxiaosystem extends AdminController
                 ORDER BY
                     aa.合格率 DESC 
             ";
-        }
 
-        Db::connect('mysql')->query('SET @counter = 0;');
-        $res = Db::connect('mysql')->query($sql);
-        // dump($res);die;            
-        // return $res;
-        // return $res;
-        return json(["code" => "0", "msg" => "",  "data" => $res]);
+            Db::connect('mysql')->query('SET @counter = 0;');
+            $res = Db::connect('mysql')->query($sql);
+            
+            return json(["code" => "0", "msg" => "",  "data" => $res]);
+        }
     }
 
     // 齐码默认值
