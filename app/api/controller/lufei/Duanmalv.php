@@ -506,7 +506,9 @@ class Duanmalv extends BaseController
         $count = count($select_sk);
 
         if ($select_sk) {
-            $chunk_list = array_chunk($select_sk, 1000);
+            // 删除历史数据
+            $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $chunk_list = array_chunk($select_sk, 3000);
             $this->db_easyA->startTrans();
 
             $status = true;
@@ -548,7 +550,31 @@ class Duanmalv extends BaseController
                 WHERE sk.店铺近一周排名 is null
         ";
 
-        $this->db_easyA->query($sql);
+        $status = $this->db_easyA->query($sql);
+        if ($status) {
+            $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$count}！"
+            ]);
+        } else {
+            $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新失败！'
+            ]);
+        }
+    }
+
+    // 断码判定
+    public function sk_third() {
+        
+
+        $this->db_easyA->table("cwl_duanmalv_sk")->field('')->where(
+
+        )->select();
     }
 
 }
