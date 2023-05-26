@@ -32,6 +32,7 @@ class Duanma_sk extends Command
 
     protected function execute(Input $input, Output $output)
     {
+        ini_set('memory_limit','1024M');
         $sql = "
             SELECT 
                 sk.云仓,
