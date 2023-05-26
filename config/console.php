@@ -11,6 +11,6 @@ return [
         'worker' => 'think\Workerman\command\worker',
         'action'    => 'app\common\command\Action',
         'stock' => 'app\command\Stock',
-        'Lufei' => 'app\command\Lufei',
+        'duanma_sk' => 'app\command\Duanma_sk',
     ],
 ];
