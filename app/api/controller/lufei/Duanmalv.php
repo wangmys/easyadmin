@@ -82,7 +82,7 @@ class Duanmalv extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo  AS 商品代码,
                 ERG.UnitPrice AS 零售价,
-                ERG.DiscountPrice AS 当前零售价,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM ( ERG.Quantity ) AS 当前零售价,
                 SUM ( ERG.Quantity ) AS 销售数量,
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
@@ -95,14 +95,15 @@ class Duanmalv extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
-
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                 AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('2023')
-                --AND ER.CustomerName = '九江六店'
-                --AND EG.GoodsNo= 'B32503009'
+                AND ERG.Quantity > 0
+                AND ERG.DiscountPrice > 0
+        --      AND ER.CustomerName = '三江一店'
+        --      AND EG.GoodsNo= 'B31502004'
             GROUP BY
                 EC.CustomItem17
                 ,ER.CustomerName
@@ -117,7 +118,6 @@ class Duanmalv extends BaseController
                 ,EG.CategoryName
                 ,EG.StyleCategoryName
                 ,ERG.UnitPrice
-                ,ERG.DiscountPrice
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -208,7 +208,7 @@ class Duanmalv extends BaseController
                 FROM
                     cwl_duanmalv_retail 
                 WHERE
-                    折率 >= 1 
+                    折率 >= 0.9 
                  -- AND 省份 = '安徽省' 
                  -- AND 店铺名称 = '巢湖二店' 
                 ORDER BY
@@ -227,7 +227,7 @@ class Duanmalv extends BaseController
 
             // 删除 需要计算排名的
             $this->db_easyA->table('cwl_duanmalv_retail')->where([
-                ['折率', '>=', 1]
+                ['折率', '>=', 0.9]
             ])->delete();
 
             $chunk_list = array_chunk($select, 1000);
@@ -541,13 +541,23 @@ class Duanmalv extends BaseController
 
     // 更新店铺排名 零售价 当前零售价  (可能不需要)
     public function sk_second() {
+        // 有排名才更新，折率1以下
         $sql = "
-            UPDATE cwl_duanmalv_sk AS sk
-                INNER JOIN cwl_duanmalv_retail AS dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
-                SET sk.店铺近一周排名 = dr.排名,
+            UPDATE 
+                cwl_duanmalv_sk AS sk
+            INNER JOIN
+                cwl_duanmalv_retail AS dr 
+            ON 
+                sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+            SET 
+                sk.店铺近一周排名 = dr.排名,
                 sk.零售价 = dr.零售价,
-                sk.当前零售价 = dr.当前零售价 
-                WHERE sk.店铺近一周排名 is null
+                sk.当前零售价 = dr.当前零售价, 
+                sk.折率 = dr.折率,
+                sk.销售金额 = dr.`销售金额`
+            WHERE 
+               -- dr.排名 IS NOT NULL
+                dr.销售金额 > 0
         ";
 
         $this->db_easyA->startTrans();
@@ -608,8 +618,78 @@ class Duanmalv extends BaseController
         }
     }
 
-    public function test() {
-        
-    }
+    public function handle_1() {
+        $sql1 = "SET @风格 = '基本款';";
+        $this->db_easyA->execute($sql1);
 
+        $sql2 = "
+            SELECT sk.经营模式,
+            sk.省份,
+            sk.店铺名称,
+            dr.风格,
+            sk.一级分类,
+            sk.二级分类,
+            dr.领型,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 销售占比,
+            sum(sk.`店铺SKC计数`) as SKC数,
+            (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 店铺总SKC数,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as SKC占比,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 销售TOP分配,
+            ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 +
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60
+            ) / 2, 0) AS 实际分配TOP
+            
+            from cwl_duanmalv_sk as sk
+            LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+            where 
+                dr.风格=@风格
+                AND sk.销售金额 > 0
+                AND sk.店铺名称 in ('三江一店')
+            GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
+            order by sk.`经营模式` asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
+        ";
+        $select = $this->db_easyA->query($sql2);
+        if ($select) {
+            // 删除 需要计算排名的
+            $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+
+
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_handle_1')->strict(false)->insertAll($val);
+                if (! $insert) {
+                    $status = false;
+                    break;
+                }
+            }
+
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_handle_1 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_handle_1  更新失败！'
+                ]);
+            }
+
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_handle_1 更新失败！'
+            ]);
+        }
+    }
 }
