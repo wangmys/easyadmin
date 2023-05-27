@@ -608,4 +608,8 @@ class Duanmalv extends BaseController
         }
     }
 
+    public function test() {
+        
+    }
+
 }
