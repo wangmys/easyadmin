@@ -37,8 +37,8 @@ class ReceiptService
             $arr['ReceiptID'] = $params['ReceiptID'];//.'xcb' . make_order_number(rand(0, 99)) . time();
             $arr['CreateTime'] = date('Ymd H:i:s');
             $arr['UpdateTime'] = date('Ymd H:i:s');
-            $arr['WarehouseId'] = $params['WarehouseId'];
-            $arr['WarehouseName'] = $params['WarehouseName'];
+            // $arr['WarehouseId'] = $params['WarehouseId'];
+            // $arr['WarehouseName'] = $params['WarehouseName'];
             $arr['Version'] = time();
             $arr['CustomerId'] = $params['CustomerId'];
             $arr['CustomerName'] = $params['CustomerName'];
