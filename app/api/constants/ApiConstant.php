@@ -123,4 +123,18 @@ class ApiConstant
             'userid' => '0812473564939990'
         ]
     ];
+
+    /**
+     * 码比数据缓存key,通过缓存的数据同步到MYSQL数据库
+     */
+    const RATIO_PULL_REDIS_KEY = [
+        // 周销
+        '7DaySale',
+        // 累销
+        'AccumulatedSale',
+        // 店铺预计库存
+        'ShopEstimatedStock',
+        // 云仓可用库存
+        'WarehouseAvailableStock'
+    ];
 }
