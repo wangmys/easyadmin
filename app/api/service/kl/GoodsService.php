@@ -23,25 +23,34 @@ class GoodsService
             json_fail(400, 'GoodsId单号已存在');
         }
 
-        Db::startTrans();
-        try {
+        $arr['CreateTime'] = date('Ymd H:i:s');
+        $arr['UpdateTime'] = date('Ymd H:i:s');
+        $arr['Version'] = time();
 
-            $arr['CreateTime'] = date('Ymd H:i:s');
-            $arr['UpdateTime'] = date('Ymd H:i:s');
-            $arr['Version'] = time();
+        $arr = array_merge($arr, $params);
+        $arr = array_merge($arr, ErpGoodsModel::INSERT);
 
-            $arr = array_merge($arr, $params);
-            $arr = array_merge($arr, ErpGoodsModel::INSERT);
+        unset($arr['Version']);
+        $sql = $this->generate_sql($arr);
+        // echo $sql;die;
+        Db::connect("sqlsrv2")->Query($sql);
 
-            ErpGoodsModel::create($arr);
+    }
 
-            Db::commit();
+    protected function generate_sql($arr) {
 
-        } catch (\Exception $e) {
-            Db::rollback();
-            log_error($e);
-            abort(0, $e->getMessage());
+        $sql_str = 'set identity_insert ErpGoods ON; insert into [ErpGoods] (';
+        $key = '';
+        $value = ' VALUES (';
+        foreach ($arr as $k_arr => $v_arr) {
+            $key .= '['.$k_arr.'],';
+            $value .= "'".$v_arr."',";
         }
+        $key = substr($key, 0, -1);
+        $value = substr($value, 0, -1);
+        $sql_str = $sql_str.$key.')'.$value.');';
+        // echo $sql_str;die;
+        return $sql_str;
 
     }
 
