@@ -33,6 +33,9 @@ class CustomerService
 
             $arr = array_merge($arr, $params);
             $arr = array_merge($arr, ErpCustomerModel::INSERT);
+            if (!$arr['RegionId']) {
+                $arr['RegionId'] = null;
+            }
 
             ErpCustomerModel::create($arr);
 
@@ -57,6 +60,9 @@ class CustomerService
         try {
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
+            if (!$new['RegionId']) {
+                $new['RegionId'] = null;
+            }
             ErpCustomerModel::where([['CustomerId', '=', $params['CustomerId']]])->update($new);
 
             Db::commit();
