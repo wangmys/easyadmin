@@ -10,6 +10,8 @@ use app\admin\model\code\Size7DaySale;
 use app\admin\model\code\SizeAccumulatedSale;
 use app\admin\model\code\SizeShopEstimatedStock;
 use app\admin\model\code\SizeWarehouseAvailableStock;
+use app\admin\model\code\SizeWarehouseTransitStock;
+use app\admin\model\code\SizePurchaseStock;
 use think\App;
 use think\cache\driver\Redis;
 use think\facade\Db;
@@ -49,6 +51,10 @@ class CodeService
         $this->sizeShopEstimatedModel = new SizeShopEstimatedStock;
         // 码比-云仓可用库存
         $this->sizeWarehouseAvailableModel = new SizeWarehouseAvailableStock;
+        // 码比-云仓在途库存
+        $this->sizeWarehouseTransitModel = new SizeWarehouseTransitStock;
+        // 码比-仓库采购表
+        $this->sizePurchaseStockModel = new SizePurchaseStock;
         // 实例化redis客户端
         $this->redis = new Redis();
     }
@@ -137,7 +143,7 @@ class CodeService
             SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存36/6XL],
             SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存38/7XL],
             SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存40/8XL],
-            SUM(ergd.Quantity) AS 销量,
+            SUM(ergd.Quantity) AS Quantity,
             SUM(ergd.Quantity * erg.UnitPrice) AS 金额,
             SUM(ergd.Quantity * erg.RetailPrice) AS 零售额,
             CASE WHEN CAST(er.RetailDate AS DATE) < DATEADD(DAY, -4, CAST(GETDATE() AS DATE))  THEN '否' ELSE '是' END as 近三天识别,
@@ -229,7 +235,7 @@ class CodeService
                 SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存36/6XL],
                 SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存38/7XL],
                 SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存40/8XL],
-                SUM(ergd.Quantity) AS 销量,
+                SUM(ergd.Quantity) AS Quantity,
                 SUM(ergd.Quantity * erg.UnitPrice) AS 金额,
                 SUM(ergd.Quantity * erg.RetailPrice) AS 零售额,
                 LEFT(eg.CategoryName, 2)	as 领型
@@ -321,8 +327,8 @@ class CodeService
             SUM(CASE WHEN EBGS.ViewOrder=9 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存36/6XL],
             SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.预计库存 ELSE NULL END ) AS  [店铺库存38/7XL],
             SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.预计库存 ELSE NULL END ) AS  [店铺库存40/8XL],
-            SUM(T.[预计库存]) as reckon_stock,
-            MAX(LEFT(EG.CategoryName, 2))	as collar
+            SUM(T.[预计库存]) as Quantity,
+            MAX(LEFT(EG.CategoryName, 2))	as Collar
         FROM 
         (
         -- 店铺库存
@@ -818,7 +824,7 @@ class CodeService
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
         // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        $res = array_chunk($list,2000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[3];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -833,7 +839,154 @@ class CodeService
     }
 
 
+    /**
+     * 拉取云仓在途库存保存到缓存
+     * @return int
+     */
+    public function pullWarehouseTransitStock()
+    {
+        // 查询累销数据
+        $sql = "SELECT
+            ew.WarehouseName,
+            eg.TimeCategoryName1,
+            eg.TimeCategoryName2,
+            eg.CategoryName,
+            eg.CategoryName1,
+            eg.CategoryName2,
+            eg.GoodsName,
+            eg.StyleCategoryName,
+            eg.GoodsNo,
+            SUM(CASE WHEN rbgs.ViewOrder=1 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_00/28/37/44/100/160/S],
+            SUM(CASE WHEN rbgs.ViewOrder=2 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_29/38/46/105/165/M],
+            SUM(CASE WHEN rbgs.ViewOrder=3 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_30/39/48/110/170/L],
+            SUM(CASE WHEN rbgs.ViewOrder=4 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_31/40/50/115/175/XL],
+            SUM(CASE WHEN rbgs.ViewOrder=5 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_32/41/52/120/180/2XL],
+            SUM(CASE WHEN rbgs.ViewOrder=6 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_33/42/54/125/185/3XL],
+            SUM(CASE WHEN rbgs.ViewOrder=7 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_34/43/56/190/4XL],
+            SUM(CASE WHEN rbgs.ViewOrder=8 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_35/44/58/195/5XL],
+            SUM(CASE WHEN rbgs.ViewOrder=9 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_36/6XL],
+            SUM(CASE WHEN rbgs.ViewOrder=10 THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_38/7XL],
+            SUM(CASE WHEN rbgs.ViewOrder=11 THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_40/8XL],
+            SUM(erngd.Quantity) AS Quantity
+        FROM 
+        
+        ErpReceiptNotice ern
+        LEFT JOIN ErpReceiptNoticeGoods erng ON ern.ReceiptNoticeId = erng.ReceiptNoticeId
+        LEFT JOIN ErpReceiptNoticeGoodsDetail erngd ON erng.ReceiptNoticeGoodsId = erngd.ReceiptNoticeGoodsId
+        LEFT JOIN ErpBaseGoodsSize rbgs ON erngd.SizeId = rbgs.SizeId
+        LEFT JOIN ErpGoods eg ON erng.GoodsId = eg.GoodsId
+        LEFT JOIN ErpWarehouse ew ON ern.WarehouseId = ew.WarehouseId
+        WHERE
+        ern.IsCompleted IS NULL AND
+        eg.TimeCategoryName1 = '2023'
+        AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+        and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
+        and ew.WarehouseCode IN ('CK002','CK003','CK004','CK005','CK006')
+        GROUP BY
+        ew.WarehouseName,
+        eg.CategoryName1,
+        eg.CategoryName2,
+        eg.CategoryName,
+        eg.TimeCategoryName1,
+        eg.TimeCategoryName2,
+        eg.StyleCategoryName,
+        eg.GoodsNo,
+        eg.GoodsName
+        ";
+        // 查询数据并保存缓存
+        $list = Db::connect("sqlsrv")->query($sql);
+        // 将结果集按2000条数据切割
+        $res = array_chunk($list,2000);
+        $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[4];
+        // 循环存入缓存
+        foreach ($res as $k => $v){
+            // 循环存入缓存
+            $key = $redisKey.'_'.$k;
+            // 将数据的key存入队列
+            $this->redis->lpush($redisKey,$key);
+            // 存入缓存
+            $this->redis->set($key,json_encode($v));
+        }
+        return ApiConstant::SUCCESS_CODE;
+    }
 
+    /**
+     * 拉取采购数据保存到缓存
+     */
+    public function pullPurchaseStock()
+    {
+        // 查询仓库采购数据
+        $sql = "select
+            sp.TimeCategoryName1,
+            sp.TimeCategoryName2,
+            sp.CategoryName1,
+            sp.CategoryName2,
+            sp.CategoryName,
+            sp.GoodsName,
+            sp.GoodsNo,
+            sp.StyleCategoryName,
+            ck.WarehouseCode,
+                SUM(CASE WHEN cm.ViewOrder=1 	THEN c.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+                SUM(CASE WHEN cm.ViewOrder=2 	THEN c.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+                SUM(CASE WHEN cm.ViewOrder=3 	THEN c.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+                SUM(CASE WHEN cm.ViewOrder=4 	THEN c.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+                SUM(CASE WHEN cm.ViewOrder=5 	THEN c.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+                SUM(CASE WHEN cm.ViewOrder=6 	THEN c.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+                SUM(CASE WHEN cm.ViewOrder=7 	THEN c.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+                SUM(CASE WHEN cm.ViewOrder=8 	THEN c.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+                SUM(CASE WHEN cm.ViewOrder=9 	THEN c.Quantity ELSE NULL END ) AS  [库存_36/6XL],
+                SUM(CASE WHEN cm.ViewOrder=10 THEN c.Quantity ELSE NULL END ) AS  [库存_38/7XL],
+                SUM(CASE WHEN cm.ViewOrder=11 THEN c.Quantity ELSE NULL END ) AS  [库存_40/8XL],
+            LEFT(sp.CategoryName, 2) as Collar,
+            SUM(c.Quantity) as Quantity
+            from
+            ErpPurchase a
+            left join 
+            ErpPurchaseGoods b on a.PurchaseID=b.PurchaseID
+            left join
+            ErpPurchaseGoodsDetail c on b.PurchaseGoodsID=c.PurchaseGoodsID
+            left join
+            ErpBaseGoodsSize cm on c.SizeId=cm.SizeId
+            left join
+            ErpGoods sp on b.GoodsId=sp.GoodsId
+            left join
+            ErpWarehouse ck on a.ReceiptWareid=ck.WarehouseId
+            where 
+            ck.WarehouseCode 
+            IN ('C020')
+            and
+            a.CodingCodeText='已审结'
+            and sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
+            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-09-08' and '2023-05-30'
+            -- and sp.GoodsNo = 'B42101021'
+            GROUP BY 
+            sp.TimeCategoryName1,
+            sp.TimeCategoryName2,
+            sp.CategoryName1,
+            sp.CategoryName2,
+            sp.CategoryName,
+            sp.GoodsName,
+            sp.GoodsNo,
+            sp.StyleCategoryName,
+            ck.WarehouseCode
+            order By Collar desc
+        ";
+        // 查询数据并保存缓存
+        $list = Db::connect("sqlsrv")->query($sql);
+        // 将结果集按2000条数据切割
+        $res = array_chunk($list,2000);
+        $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[5];
+        // 循环存入缓存
+        foreach ($res as $k => $v){
+            // 循环存入缓存
+            $key = $redisKey.'_'.$k;
+            // 将数据的key存入队列
+            $this->redis->lpush($redisKey,$key);
+            // 存入缓存
+            $this->redis->set($key,json_encode($v));
+        }
+        return ApiConstant::SUCCESS_CODE;
+    }
 
     /**
      * 从缓存保存数据至数据库
@@ -877,6 +1030,16 @@ class CodeService
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
                              // 执行插入操作
                             $this->sizeWarehouseAvailableModel->insertAll($sale_data);
+                            break;
+                        // 同步云仓可用库存数据
+                        case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
+                             // 执行插入操作
+                            $this->sizeWarehouseTransitModel->insertAll($sale_data);
+                            break;
+                        // 同步仓库采购库存数据
+                        case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
+                             // 执行插入操作
+                            $this->sizePurchaseStockModel->insertAll($sale_data);
                             break;
                     }
                     // 插入完毕
