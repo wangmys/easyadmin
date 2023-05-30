@@ -32,12 +32,21 @@ class Stock extends BaseController
     //每天导出尺码库存json数据给肖甜使用
     public function create_stock_size_json() {
 
+        ini_set('memory_limit','500M');
+
         $start_date = input('start_date');
-        if (!$start_date) {
-            return json(['日期不能为空'], 400);
+        $end_date = input('end_date');
+        if (!$start_date || !$end_date) {
+            return json(['开始日期或结束日期不能为空'], 400);
+        }
+        if ($start_date > $end_date) {
+            return json(['开始日期不能大于结束日期'], 400);
+        }
+        if ( (strtotime($end_date)-strtotime($start_date))/(24*60*60) > 6 ) {
+            return json(['仅限于查询一周数据'], 400);
         }
 
-        $data = Db::connect("mysql2")->Query($this->get_sql3($start_date));
+        $data = Db::connect("mysql2")->Query($this->get_sql3($start_date, $end_date));
         return json($data);
 
     }
@@ -78,7 +87,7 @@ group by start_date,YunCang, WenDai, WenQu, State, Mathod,TimeCategoryName1,Time
     }
 
     //按每周划分的基础数据sql
-    protected function get_sql3($start_date) {
+    protected function get_sql3($start_date, $end_date) {
 
         return "select 
         Date as '日期', 
@@ -135,7 +144,7 @@ group by start_date,YunCang, WenDai, WenQu, State, Mathod,TimeCategoryName1,Time
         sum(SalesVolume) as '销额', 
         sum(RetailAmount) as '零售金额' 
         from sp_customer_stock_sale_size 
-        where DATE = '{$start_date}'   
+        where (DATE BETWEEN '{$start_date}' and '{$end_date}')  
         and TimeCategoryName2 like '%夏%' 
         group by Date,YunCang, WenDai, WenQu, State, CustomItem29, GoodsNo, GoodsName,  TimeCategoryName,TimeCategoryName2,  
         CustomItem17, CategoryName1, CategoryName2, CategoryName, SupplyName, StyleCategoryName, StyleCategoryName1, ColorDesc, CustomItem46, 
