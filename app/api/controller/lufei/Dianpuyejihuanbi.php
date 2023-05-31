@@ -313,22 +313,25 @@ class Dianpuyejihuanbi extends BaseController
     public function dianpuyejihuanbi_handle() {
         $date = input('date') ? input('date') : '';
         
-        if (date('d', time()) == 31) {
+        $date = input('date');
+        // if (date('d', time()) == 31) {
+        if (date('d', strtotime($date)) == 31) {
             $this->dianpuyejihuanbi_handle_31($date);
-            // $ym = date("Y-m", strtotime('-31day'));
             echo 31;
-            die;
+            return;
         } else {
+            echo 'else';
             $ym = date("Y-m", strtotime('-1month'));
         }
+        // die;
 
         if (! empty($date)) {
             // 今天是星期几
             $today = date_to_week2($date);
             // 上月开始
-            $last_month  = date("Y-m-01", strtotime('-1month')); 
+            $last_month  = date("Y-m-01", strtotime('-1month', strtotime($date))); 
             // 上月今天
-            $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", strtotime($date)); 
+            $last_month_today = date("Y-m", strtotime('-1month', strtotime($date))) . date("-d", strtotime($date)); 
             // 本月开始
             $current_month  = date("Y-m-01", time()); 
             // 本月今天
