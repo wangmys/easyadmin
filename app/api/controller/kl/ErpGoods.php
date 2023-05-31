@@ -38,7 +38,17 @@ class ErpGoods extends BaseController
         try {
             $this->service->create($params);
         } catch (\Exception $e) {
-            return json(['code'=>200, 'msg'=>'okkk', 'data'=>[]]);
+
+            try {
+                $this->service->deal_barcode($params);
+            } catch (\Exception $e) {
+                $msg = json_decode($e->getMessage(), true);
+                if ($msg && $msg['abort_code']=='goods_error_001') {
+                    $this->service->delete($params);
+                    return json(['code'=>500, 'msg'=>$msg ? $msg['abort_msg'] : $msg['abort_code'], 'data'=>[]]);
+                }
+            }
+
         }
         return json(['code'=>200, 'msg'=>'okk', 'data'=>[]]);
 
