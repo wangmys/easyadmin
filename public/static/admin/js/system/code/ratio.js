@@ -26,6 +26,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '图片', minWidth: 80, title: '图片', search: false, templet: ea.table.image},
                     {field: '尺码情况', minWith: 134, title: '尺码情况',search:false},
                     {field: '货号', minWith: 134, title: '货号',search:false},
+                    {field: '单码售罄比', minWith: 134, title: '单码售罄比',search:false},
+                    {field: '当前库存', minWith: 134, title: '当前库存',search:false},
                     {field: '总库存', minWith: 134, title: '总库存',search:false},
                     {field: '累销尺码比', minWith: 134, title: '累销尺码比',search:false},
                     {field: '单码售罄', minWith: 134, title: '单码售罄',search:false},

@@ -135,6 +135,10 @@ class ApiConstant
         // 店铺预计库存
         'ShopEstimatedStock',
         // 云仓可用库存
-        'WarehouseAvailableStock'
+        'WarehouseAvailableStock',
+        // 云仓在途库存
+        'WarehouseTransitStock',
+        // 云仓采购库存
+        'PurchaseStock'
     ];
 }

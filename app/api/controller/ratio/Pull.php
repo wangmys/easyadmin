@@ -100,4 +100,36 @@ class Pull extends BaseController
             'msg' => $model->getError($code)
         ]);
     }
+
+    /**
+     * 拉取云仓可用库存到缓存
+     * @return \think\response\Json
+     */
+    public function pullWarehouseTransitStock()
+    {
+        $this->service = new CodeService;
+        $model = $this->service;
+        // 拉取调拨数据
+        $code = $model->pullWarehouseTransitStock();
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
+    }
+
+    /**
+     * 拉取仓库采购库存到缓存
+     * @return \think\response\Json
+     */
+    public function pullPurchaseStock()
+    {
+        $this->service = new CodeService;
+        $model = $this->service;
+        // 拉取调拨数据
+        $code = $model->pullPurchaseStock();
+        return json([
+            'code' => $code,
+            'msg' => $model->getError($code)
+        ]);
+    }
 }
