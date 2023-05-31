@@ -313,7 +313,6 @@ class Dianpuyejihuanbi extends BaseController
     public function dianpuyejihuanbi_handle() {
         $date = input('date') ? input('date') : '';
         
-        $date = input('date');
         // if (date('d', time()) == 31) {
         if (date('d', strtotime($date)) == 31) {
             $this->dianpuyejihuanbi_handle_31($date);
@@ -321,7 +320,7 @@ class Dianpuyejihuanbi extends BaseController
             return;
         } else {
             echo 'else';
-            $ym = date("Y-m", strtotime('-1month'));
+            echo $ym = date("Y-m", strtotime('-1month', strtotime($date)));
         }
         // die;
 
@@ -380,6 +379,7 @@ class Dianpuyejihuanbi extends BaseController
         // echo $ym;die;
         // $ym = date("Y-m", strtotime('-1month'));
         // $ym = date("Y-m", strtotime('-' . date('d', time()) . 'day'));
+        
         $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->query("
             SELECT
                 a.*,
