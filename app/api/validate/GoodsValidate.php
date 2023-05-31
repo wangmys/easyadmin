@@ -30,16 +30,17 @@ class GoodsValidate extends Validate
         'IsOnlyShopPickUp' => 'require',
         'IsDecimal' => 'require',
         'IsOverseas' => 'require',
+        'BarCodeInfo' => 'require',
     ];
 
     protected $scene = [
         'create' => [
             'GoodsId', 'GoodsNo', 'GoodsName', 'Status', 'UnitPrice'
-        , 'GoodsType', 'CategoryId', 'CategoryName', 'RoleCategoryId', 'RoleCategory', 'DiscountTypeId', 'IsHasSku', 'IsAdvance', 'IsOnlyShopPickUp', 'IsDecimal', 'IsOverseas'
+        , 'GoodsType', 'CategoryId', 'CategoryName', 'RoleCategoryId', 'RoleCategory', 'DiscountTypeId', 'IsHasSku', 'IsAdvance', 'IsOnlyShopPickUp', 'IsDecimal', 'IsOverseas', 'BarCodeInfo'
     ],
         'update' => [
             'GoodsId', 'GoodsNo', 'GoodsName', 'Status', 'UnitPrice'
-        , 'GoodsType', 'CategoryId', 'CategoryName', 'RoleCategoryId', 'RoleCategory', 'DiscountTypeId', 'IsHasSku', 'IsAdvance', 'IsOnlyShopPickUp', 'IsDecimal', 'IsOverseas'
+        , 'GoodsType', 'CategoryId', 'CategoryName', 'RoleCategoryId', 'RoleCategory', 'DiscountTypeId', 'IsHasSku', 'IsAdvance', 'IsOnlyShopPickUp', 'IsDecimal', 'IsOverseas', 'BarCodeInfo'
         ],
         'delete' => ['GoodsId'],
     ];
@@ -67,6 +68,7 @@ class GoodsValidate extends Validate
         'IsOnlyShopPickUp.require' => 'IsOnlyShopPickUp不能为空',
         'IsDecimal.require' => 'IsDecimal不能为空',
         'IsOverseas.require' => 'IsOverseas不能为空',
+        'BarCodeInfo.require' => 'BarCodeInfo不能为空',
     ];
 
 }

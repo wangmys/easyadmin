@@ -3,7 +3,11 @@
 namespace app\api\service\kl;
 use app\common\traits\Singleton;
 use app\api\model\kl\ErpGoodsModel;
+use app\api\model\kl\ErpGoodsColorModel;
+use app\api\model\kl\ErpGoodsSizeModel;
 use app\api\model\kl\ErpBarCodeModel;
+use app\api\model\kl\ErpBaseGoodsColorModel;
+use app\api\model\kl\ErpBaseGoodsSizeModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
@@ -31,9 +35,74 @@ class GoodsService
         $arr = array_merge($arr, ErpGoodsModel::INSERT);
 
         unset($arr['Version']);
+        unset($arr['BarCodeInfo']);
+
         $sql = $this->generate_sql($arr);
         // echo $sql;die;
         Db::connect("sqlsrv2")->Query($sql);
+        
+
+    }
+
+    /**
+     * 单独处理 ErpBarCode、ErpGoodsColor、ErpGoodsSize表
+     */
+    public function deal_barcode($params) {
+
+        $BarCodeInfo = $params['BarCodeInfo'];
+
+        //ErpBarCode、ErpGoodsColor、ErpGoodsSize表处理
+        if ($BarCodeInfo) {
+                    
+            $init_arr['CreateTime'] = date('Ymd H:i:s');
+            $init_arr['UpdateTime'] = date('Ymd H:i:s');
+            $init_arr['Version'] = time();
+
+            try {
+
+                foreach ($BarCodeInfo as $v_barcode) {
+
+                    //ErpBarCode
+                    $BarCodeData = [
+                        'BarCode' => $v_barcode['BarCode'],
+                        'GoodsId' => $params['GoodsId'],
+                        'ColorId' => $v_barcode['ColorId'],
+                        'SizeId' => $v_barcode['SizeId'],
+                        'SpecId' => '1',
+                    ];
+                    $BarCodeData = array_merge($BarCodeData, $init_arr, ErpBarCodeModel::INSERT);
+                    ErpBarCodeModel::create($BarCodeData);
+
+                    //ErpGoodsColor
+                    $GoodsColorInfo = ErpBaseGoodsColorModel::where([['ColorId', '=', $v_barcode['ColorId']]])->find();
+                    $GoodsColorData = [
+                        'GoodsId' => $params['GoodsId'],
+                        'ColorId' => $v_barcode['ColorId'],
+                        'ColorGroup' => $GoodsColorInfo['ColorGroup'],
+                        'ColorCode' => $GoodsColorInfo['ColorCode'],
+                        'ColorDesc' => $GoodsColorInfo['ColorDesc'],
+                    ];
+                    $GoodsColorData = array_merge($GoodsColorData, $init_arr, ErpGoodsColorModel::INSERT);
+                    ErpGoodsColorModel::create($GoodsColorData);
+
+                    //ErpGoodsSize
+                    $GoodsSizeInfo = ErpBaseGoodsSizeModel::where([['SizeId', '=', $v_barcode['SizeId']]])->find();
+                    $GoodsSizeData = [
+                        'GoodsId' => $params['GoodsId'],
+                        'SizeId' => $v_barcode['SizeId'],
+                        'SizeClass' => $GoodsSizeInfo['SizeClass'],
+                        'Size' => $GoodsSizeInfo['Size'],
+                    ];
+                    $GoodsSizeData = array_merge($GoodsSizeData, $init_arr, ErpGoodsSizeModel::INSERT);
+                    ErpGoodsSizeModel::create($GoodsSizeData);
+
+                }
+            } catch (\Exception $e) {
+                log_error($e);
+                abort(0, json_encode(['abort_code'=>'goods_error_001', 'abort_msg'=>$e->getMessage()]));
+            }
+
+        }
 
     }
 
@@ -65,8 +134,17 @@ class GoodsService
         try {
             $new['UpdateTime'] = date('Ymd H:i:s');
             $new = array_merge($new, $params);
+            $BarCodeInfo = $new['BarCodeInfo'];
+
             unset($new['GoodsId']);
+            unset($new['BarCodeInfo']);
             ErpGoodsModel::where([['GoodsId', '=', $params['GoodsId']]])->update($new);
+
+            //删除旧数据，重新插入新数据
+            ErpBarCodeModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
+            ErpGoodsColorModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
+            ErpGoodsSizeModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
+            $this->deal_barcode($params);
 
             Db::commit();
 

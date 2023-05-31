@@ -5,22 +5,24 @@ namespace app\api\model\kl;
 use app\common\model\TimeModel;
 
 /**
- * BarCode model
+ * ErpBaseGoodsSize model
  */
-class ErpBarCodeModel extends TimeModel
+class ErpBaseGoodsSizeModel extends TimeModel
 {
     protected $connection = 'sqlsrv2';
 
     // 表名
-    protected $name = 'Barcode';
+    protected $name = 'Basegoodssize';
 
     protected $schema = [
-        'BarCode' => 'varchar', 
+        'SizeId' => 'bigint', 
+        'SizeClass' => 'nvarchar', 
+        'ClassName' => 'nvarchar', 
+        'Size' => 'nvarchar', 
+        'ViewOrder' => 'int', 
+        'IsEnable' => 'bit',
         'BranchId' => 'bigint', 
-        'GoodsId' => 'bigint', 
-        'ColorId' => 'bigint', 
-        'SizeId' => 'bigint',
-        'SpecId' => 'bigint',
+        'IsSystemDefault' => 'bit',
         'CreateTime' => 'datetime',
         'CreateUserId' => 'bigint',
         'CreateUserName' => 'nvarchar',
@@ -30,6 +32,8 @@ class ErpBarCodeModel extends TimeModel
     ];
 
     const INSERT = [
+        'IsEnable' => '1',
+        'IsSystemDefault' => '0',
         'BranchId' => '2',
         'CreateUserId' => '29',
         'CreateUserName' => '辛斌',
