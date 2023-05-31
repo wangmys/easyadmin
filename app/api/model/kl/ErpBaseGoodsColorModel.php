@@ -32,6 +32,7 @@ class ErpBaseGoodsColorModel extends TimeModel
     ];
 
     const INSERT = [
+        'BranchId' => '2',
         'IsEnable' => '1',
         'IsSystemDefault' => '0',
         'CreateUserId' => '29',
