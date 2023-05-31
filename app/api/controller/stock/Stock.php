@@ -9,6 +9,16 @@ use think\facade\Db;
 
 class Stock extends BaseController
 {
+
+    //创建20天库存数据json返回给肖甜使用
+    public function create_20day_stock_json() {
+
+        $res = exec("cd /www/wwwroot/easyadmin2/easyadmin && php think stock_size");
+        echo 'okkk';die;
+
+    }
+
+
     //创建一周库存数据json返回给肖甜使用
     public function create_stock_json() {
 
