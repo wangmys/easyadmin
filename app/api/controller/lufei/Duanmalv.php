@@ -175,6 +175,7 @@ class Duanmalv extends BaseController
         ";
         $this->db_easyA->execute($sql1);
         
+        // 分组排名
         $select = $this->db_easyA->query("
             SELECT
                 a.商品负责人,
@@ -186,9 +187,9 @@ class Duanmalv extends BaseController
                 a.季节归集,
                 a.二级时间分类,
                 a.大类,
-                a.中类,
+                -- a.中类,
                 a.小类,
-                a.风格,
+                -- a.风格,
                 a.商品代码,
                 a.零售价,
                 a.当前零售价,
@@ -196,28 +197,26 @@ class Duanmalv extends BaseController
                 a.销售金额,
                 a.折率,
                 a.更新日期,
-                (
-                    @rank :=
-                IF
-                ( @GROUP = a.领型, @rank + 1, 1 )) AS 排名,
-                ( @GROUP := a.领型 ) AS 领型 
-            FROM
-                (
-                SELECT
-                    * 
+                CASE
+                    WHEN 
+                        a.中类 = @中类 and 
+                        a.风格 = @风格 and 
+                        a.领型 = @领型 THEN
+                        @rank := @rank + 1 ELSE @rank := 1
+                    END AS 排名,
+                    @中类 := a.中类 AS 中类,
+                    @风格 := a.风格 AS 风格,
+                    @领型 := a.领型 AS 领型
                 FROM
-                    cwl_duanmalv_retail 
+                    cwl_duanmalv_retail a,
+                    ( SELECT @中类 := null,  @风格 := null,  @领型 := null, @rank := 0 ) T
                 WHERE
-                    折率 >= 0.9 
-                 -- AND 省份 = '安徽省' 
-                 -- AND 店铺名称 = '巢湖二店' 
+                    折率 >= 0.9
+                -- 	AND 中类='休闲长裤'
+                -- 	AND 店铺名称 = '三江一店'
                 ORDER BY
-                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC,
-                    领型 ASC,
-                    销售数量 DESC 
-                ) a,
-                ( SELECT @rank := 0, @GROUP := '' ) AS b
-        ");
+                    a.店铺名称 ASC,a.中类 ASC, a.风格 ASC,a.领型 ASC,a.销售数量 DESC
+        "); 
 
         // echo '<pre>';
         // print_r($select); die;
@@ -491,9 +490,9 @@ class Duanmalv extends BaseController
 
                 WHERE
                     sk.季节 IN ('初夏', '盛夏', '夏季') 
+                    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'
-                -- 	AND sk.店铺名称='东莞三店'
                 -- 	AND sk.货号='B32101027'
                 GROUP BY 
                     sk.店铺名称, 
@@ -589,13 +588,12 @@ class Duanmalv extends BaseController
             SET 标准齐码识别修订 = 
                 CASE 
                     WHEN (`累销数量`<= 0 || `累销数量` IS NULL) && (预计库存数量 <= 1 || 预计库存数量 IS NULL) THEN '无效库存'
-                    
                     WHEN (`一级分类`='下装' && `预计库存连码个数` < @下装) THEN '断码'
                     WHEN (`一级分类`='松紧长裤' && `预计库存连码个数` < @松紧长裤) THEN '断码' 
                     WHEN (`一级分类`='鞋履' && `预计库存连码个数` < @鞋履) THEN '断码' 
                     WHEN (`一级分类`='外套' && `预计库存连码个数` < @外套) THEN '断码' 
                     WHEN (`一级分类`='内搭' && `预计库存连码个数` < @内搭) THEN '断码'
-                    ELSE '无'
+                    ELSE ''
                 END	
             WHERE 
             `标准齐码识别修订` IS NULL";
@@ -618,12 +616,241 @@ class Duanmalv extends BaseController
         }
     }
 
+    // 更新在途表
+    public function zt_1() {
+        $sql = "
+            SELECT
+                zt.云仓,
+                zt.合计,
+                zt.货号,
+                sk.一级分类, 
+                sk.二级分类,
+                zt.年份,
+                zt.季节, 
+                zt.`00/28/37/44/100/160/S`,
+                zt.`29/38/46/105/165/M`,
+                zt.`30/39/48/110/170/L`,
+                zt.`31/40/50/115/175/XL`,
+                zt.`32/41/52/120/180/2XL`,
+                zt.`33/42/54/125/185/3XL`,
+                zt.`34/43/56/190/4XL`,
+                zt.`35/44/58/195/5XL`,
+                zt.`36/6XL`,
+                zt.`38/7XL`,
+                zt.`_40`,
+                CASE
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAAAA%' THEN 11 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAAA%' THEN 10 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAA%' THEN 9 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAA%' THEN 8 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAA%' THEN 7 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAA%' THEN 6	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAA%' THEN 5	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAA%' THEN 4	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAA%' THEN 3	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AA%' THEN 2		
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%A%' THEN 1		
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%BBBBBBBBBBB%' THEN 0
+                END AS 在途连码个数
+            FROM
+                `sp_ww_zt` AS zt
+                
+                left JOIN (select 货号,一级分类, 二级分类 from sjp_goods where 一级分类 is not null and 二级分类 is not null GROUP BY 货号 ) AS sk ON zt.货号 = sk.货号
+                group by zt.货号,zt.云仓        
+        ";
+                        
+        $select = $this->db_bi->query($sql);
+        // echo '<pre>';
+        // print_r($select);
+        if ($select) {
+
+            $qimaArr = [
+                '内搭' => '4',
+                '外套' => '4',
+                '鞋履' => '4',
+                '松紧' => '5',
+                '下装' => '6',
+            ];
+            foreach ($select as $key => $val) {
+                $select[$key]['连码要求个数'] = $qimaArr[$val['一级分类']];
+            }
+            // echo '<pre>';
+            // print_r($select);
+            // die;
+            // 删除
+            $this->db_easyA->table('cwl_duanmalv_zt')->where(1)->delete();
+            // 插入
+            $status = $this->db_easyA->table('cwl_duanmalv_zt')->insertAll($select);
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_zt 在途 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_zt 在途 更新失败！'
+                ]);
+            }
+        }
+    }
+
     public function handle_1() {
         $sql1 = "SET @风格 = '基本款';";
         $this->db_easyA->execute($sql1);
 
         $sql2 = "
             SELECT sk.经营模式,
+            sk.商品负责人,
+            sk.云仓,
             sk.省份,
             sk.店铺名称,
             dr.风格,
@@ -645,9 +872,9 @@ class Duanmalv extends BaseController
             where 
                 dr.风格=@风格
                 AND sk.销售金额 > 0
-                AND sk.店铺名称 in ('三江一店')
+                AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
             GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
-            order by sk.`经营模式` asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
+            order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
         ";
         $select = $this->db_easyA->query($sql2);
         if ($select) {
@@ -655,7 +882,6 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
 
             $chunk_list = array_chunk($select, 1000);
-
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -692,4 +918,148 @@ class Duanmalv extends BaseController
             ]);
         }
     }
+
+    // 计算是否top 60考核款
+    public function handle_2() {
+        // 1.先判断有排名 & 实际分配TOP 再判断在途情况
+        $sql = "
+            update cwl_duanmalv_handle_1 h
+                LEFT JOIN cwl_duanmalv_sk sk ON h.店铺名称 = sk.店铺名称 
+                AND h.`二级分类` = sk.`二级分类` 
+                AND h.风格=sk.风格
+                AND h.领型 = sk.领型
+                SET sk.`是否TOP60` = '是'
+            WHERE	
+                h.`店铺名称`=sk.`店铺名称` 
+                AND h.风格=sk.风格
+                and h.`一级分类`=sk.`一级分类`
+                and h.二级分类=sk.`二级分类` 
+                and h.领型=sk.领型
+                and sk.`店铺近一周排名` > 0
+                and sk.`店铺近一周排名` <= h.`实际分配TOP`
+                and sk.标准齐码识别修订 = '断码'
+        ";
+        $status = $this->db_easyA->execute($sql);
+
+        // 2.没有在途，是top60考核款
+        $sql2 = "
+            update cwl_duanmalv_sk sk
+                LEFT JOIN cwl_duanmalv_zt zt ON sk.货号 = zt.`货号` and sk.云仓 = zt.云仓
+                set sk.是否TOP60考核款='是'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+                AND zt.货号 is null
+        ";
+        $status2 = $this->db_easyA->execute($sql2);
+
+        // 3.有在途，库存<50 && 不连码 是top60考核款	
+        $sql3 = "
+            update cwl_duanmalv_sk sk
+                LEFT JOIN cwl_duanmalv_zt zt ON sk.货号 = zt.`货号` and sk.云仓 = zt.云仓
+                set sk.是否TOP60考核款='是'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+                AND zt.货号 is not null
+                AND zt.合计 < 50
+                AND zt.在途连码个数 < zt.连码要求个数	
+        ";
+        $status3 = $this->db_easyA->execute($sql3);
+
+        // 4.在途不满足的设置为top60考核款
+        $sql4 = "
+            update cwl_duanmalv_sk sk
+                set sk.是否TOP60考核款='否'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+        ";
+        $status4 = $this->db_easyA->execute($sql4);
+
+        // echo $status;die;
+        if ($status) {
+            // $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_sk 是否top60考核款 更新成功！'
+            ]);
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_sk 是否top60考核款  更新失败！'
+            ]);
+        }
+    }
+
+    // 更新TOP断码数  全部短码数 
+    public function handle_3() {
+        // 分组查询
+        $sql = "
+            SELECT sk.店铺名称,
+                sk.一级分类,
+                sk.二级分类, 
+                sk.领型,
+                sk.风格, 
+                sk.货号,
+                sk.是否TOP60考核款,
+                sk.是否TOP60,
+                SUM(
+                    case
+                        sk.是否TOP60考核款
+                    when '是' THEN 1 ELSE 0
+                END 
+                ) AS TOP断码SKC数,
+                COUNT(1) AS 全部断码SKC数	
+                from cwl_duanmalv_sk sk 
+            WHERE sk.`是否TOP60`='是'
+            GROUP BY sk.`店铺名称`,sk.风格, sk.一级分类,sk.`二级分类`,sk.领型
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_sk_group')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_sk_group')->strict(false)->insertAll($select);
+
+            $sql2 = "
+                UPDATE cwl_duanmalv_handle_1 AS h
+                LEFT JOIN cwl_duanmalv_sk_group skg ON h.`店铺名称` = skg.`店铺名称` 
+                AND h.风格 = skg.风格 
+                AND h.一级分类 = skg.`一级分类` 
+                AND h.`二级分类` = skg.`二级分类` 
+                AND h.领型 = skg.领型 
+                SET h.TOP断码SKC数 = skg.TOP断码SKC数, h.全部断码SKC数 = skg.全部断码SKC数 
+                WHERE
+                    h.TOP断码SKC数 IS NULL
+            ";
+            $status = $this->db_easyA->execute($sql2);
+
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新失败！'
+                ]);
+            }
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新失败！'
+            ]);
+        }
+
+    } 
 }

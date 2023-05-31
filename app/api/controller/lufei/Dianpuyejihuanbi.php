@@ -312,6 +312,16 @@ class Dianpuyejihuanbi extends BaseController
     // 展示表数据计算
     public function dianpuyejihuanbi_handle() {
         $date = input('date') ? input('date') : '';
+        
+        if (date('d', time()) == 31) {
+            $this->dianpuyejihuanbi_handle_31($date);
+            // $ym = date("Y-m", strtotime('-31day'));
+            echo 31;
+            die;
+        } else {
+            $ym = date("Y-m", strtotime('-1month'));
+        }
+
         if (! empty($date)) {
             // 今天是星期几
             $today = date_to_week2($date);
@@ -336,44 +346,37 @@ class Dianpuyejihuanbi extends BaseController
             $today_date = date("Y-m-d", time());
         }
 
-        // // 今天是星期几
-        // $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
-        // // 上月开始
-        // $last_month  = date("Y-m-01", strtotime('-1month')); 
-        // // 上月今天
-        // $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
-        // // 本月开始
-        // $current_month  = date("Y-m-01", time()); 
-        // // 本月今天
-        // $today_date = date("Y-m-d", time());
-     
         $sql1 = "
-        SELECT
-            a.省份,
-            a.店铺名称,
-            a.经营属性,
-            b.RegionId,
-            b.首单日期,
-            '{$today_date}' AS 更新日期
-        FROM
-            `cwl_dianpuyejihuanbi_data` AS a
-        LEFT JOIN customer_first as b ON a.店铺名称 = b.店铺名称
-        WHERE
-            a.日期 >= '{$current_month}' 
-            AND a.日期 <= '{$today_date}' 
-        GROUP BY
-            a.店铺名称
+            SELECT
+                a.省份,
+                a.店铺名称,
+                a.经营属性,
+                b.RegionId,
+                b.首单日期,
+                '{$today_date}' AS 更新日期
+            FROM
+                `cwl_dianpuyejihuanbi_data` AS a
+            LEFT JOIN customer_first as b ON a.店铺名称 = b.店铺名称
+            WHERE
+                a.日期 >= '{$current_month}' 
+                AND a.日期 <= '{$today_date}' 
+            GROUP BY
+                a.店铺名称
         ";
         // 数据初始化开始
         $select_1 = $this->db_easyA->query($sql1);
+
+        // echo "<pre>";
+        // print_r($select_1); die;
         $delete_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
             ['更新日期', '=', $today_date]
         ])->delete();
         $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->insertAll($select_1);
         // 数据初始化结束
  
-
-        $ym = date("Y-m", strtotime('-1month'));
+        // echo $ym;die;
+        // $ym = date("Y-m", strtotime('-1month'));
+        // $ym = date("Y-m", strtotime('-' . date('d', time()) . 'day'));
         $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->query("
             SELECT
                 a.*,
@@ -384,7 +387,8 @@ class Dianpuyejihuanbi extends BaseController
             WHERE 日期='{$ym}'   
         ");
 
-        // dump($select_dianpuyejihuanbi_lastmonth);die;
+        // echo "<pre>";
+        // print_r($select_dianpuyejihuanbi_lastmonth);die;
 
         foreach ($select_dianpuyejihuanbi_lastmonth as $key => $val) {
             // $updateData = [];
@@ -472,85 +476,63 @@ class Dianpuyejihuanbi extends BaseController
         }
     }
 
+    public function dianpuyejihuanbi_handle_31($date) {
+        $ym = date("Y-m", strtotime('-31day'));
 
-    // 展示表数据计算
-    public function dianpuyejihuanbi_handle_test() {
-        $date = input('date') ? input('date') : '';
-        if (! empty($date)) {
-            // 今天是星期几
-            $today = date_to_week2($date);
-            // 上月开始
-            $last_month  = date("Y-m-01", strtotime('-1month')); 
-            // 上月今天
-            $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", strtotime($date)); 
-            // 本月开始
-            $current_month  = date("Y-m-01", time()); 
-            // 本月今天
-            $today_date = $date;
-        } else {
-            // 今天是星期几
-            $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
-            // 上月开始
-            $last_month  = date("Y-m-01", strtotime('-1month')); 
-            // 上月今天
-            $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
-            // 本月开始
-            $current_month  = date("Y-m-01", time()); 
-            // 本月今天
-            $today_date = date("Y-m-d", time());
-        }
-
-        // // 今天是星期几
-        // $today =  date_to_week2(date("Y-m-d", strtotime("-0 day")));
-        // // 上月开始
-        // $last_month  = date("Y-m-01", strtotime('-1month')); 
-        // // 上月今天
-        // $last_month_today = date("Y-m", strtotime('-1month')) . date("-d", time()); 
-        // // 本月开始
-        // $current_month  = date("Y-m-01", time()); 
-        // // 本月今天
-        // $today_date = date("Y-m-d", time());
-        
+        $today = date_to_week2($date);
+               
+        // 上月开始
+        $last_month  = date("Y-m-01", strtotime('-31day')); 
+        // 上月今天
+        $last_month_today = date("Y-m-d", strtotime('-31day')); 
+        // 本月开始
+        $current_month  = date("Y-m-01", time()); 
+        // 本月今天
+        $today_date = $date; $today_date = date("Y-m-d", time());
+ 
         $sql1 = "
-        SELECT
-            a.省份,
-            a.店铺名称,
-            a.经营属性,
-            b.RegionId,
-            b.首单日期,
-            '{$today_date}' AS 更新日期
-        FROM
-            `cwl_dianpuyejihuanbi_data` AS a
-        LEFT JOIN customer_first as b ON a.店铺名称 = b.店铺名称
-        WHERE
-            a.日期 >= '{$current_month}' 
-            AND a.日期 <= '{$today_date}' 
-        GROUP BY
-            a.店铺名称
+            SELECT
+                a.省份,
+                a.店铺名称,
+                a.经营属性,
+                b.RegionId,
+                b.首单日期,
+                '{$today_date}' AS 更新日期
+            FROM
+                `cwl_dianpuyejihuanbi_data` AS a
+            LEFT JOIN customer_first as b ON a.店铺名称 = b.店铺名称
+            WHERE
+                a.日期 >= '{$current_month}' 
+                AND a.日期 <= '{$today_date}' 
+            GROUP BY
+                a.店铺名称
         ";
         // 数据初始化开始
         $select_1 = $this->db_easyA->query($sql1);
-        $delete_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle_test')->where([
+
+        // echo "<pre>";
+        // print_r($select_1); die;
+        $delete_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
             ['更新日期', '=', $today_date]
         ])->delete();
-        $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle_test')->insertAll($select_1);
+        $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->insertAll($select_1);
         // 数据初始化结束
-    
-
-        $ym = date("Y-m", strtotime('-1month'));
-
-        // 获取上月数据
+ 
+        // echo $ym;die;
+        // $ym = date("Y-m", strtotime('-1month'));
+        // $ym = date("Y-m", strtotime('-' . date('d', time()) . 'day'));
         $select_dianpuyejihuanbi_lastmonth = $this->db_easyA->query("
             SELECT
                 a.*,
                 b.`首单日期` AS 首单日期 
             FROM
                 cwl_dianpuyejihuanbi_lastmonth AS a
-                LEFT JOIN cwl_dianpuyejihuanbi_handle_test AS b ON a.`店铺名称` = b.`店铺名称`
+                LEFT JOIN cwl_dianpuyejihuanbi_handle AS b ON a.`店铺名称` = b.`店铺名称`
             WHERE 日期='{$ym}'   
         ");
 
-        // dump($select_dianpuyejihuanbi_lastmonth);die;
+        // echo "<pre>";
+        // print_r($select_dianpuyejihuanbi_lastmonth);die;
 
         foreach ($select_dianpuyejihuanbi_lastmonth as $key => $val) {
             // $updateData = [];
@@ -561,7 +543,7 @@ class Dianpuyejihuanbi extends BaseController
                 ['日期', '=', $today_date],
                 ['店铺名称', '=', $val['店铺名称']]
             ])->find();
-    
+ 
             // 今日流水
             if ($find_dianpuyejihuanbi) {
                 $updateData['今日流水'] = $find_dianpuyejihuanbi['销售金额'];
@@ -632,7 +614,7 @@ class Dianpuyejihuanbi extends BaseController
 
 
             // dump($updateData);die;
-            $this->db_easyA->table('cwl_dianpuyejihuanbi_handle_test')->where([
+            $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
                 ['店铺名称', '=', $updateData['店铺名称']]
             ])->strict(false)->update($updateData);
         }
