@@ -15,7 +15,7 @@ class ErpGoodsModel extends TimeModel
     protected $name = 'Goods';
 
     protected $schema = [
-        // 'GoodsId' => 'bigint', 
+        'GoodsId' => 'bigint', 
         'GoodsNo' => 'nvarchar',
         'GoodsName' => 'nvarchar',
         'Status' => 'nvarchar',

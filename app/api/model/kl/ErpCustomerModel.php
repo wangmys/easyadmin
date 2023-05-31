@@ -35,7 +35,7 @@ class ErpCustomerModel extends TimeModel
         'City' => 'nvarchar',
         'DistrictId' => 'bigint',
         'District' => 'nvarchar',
-        // 'RegionId' => 'bigint',
+        'RegionId' => 'bigint',
         'RoleCategoryId' => 'bigint',
         'BranchId' => 'bigint',
         'AccountId' => 'nvarchar',
