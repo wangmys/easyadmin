@@ -293,7 +293,7 @@ class Dianpuyejihuanbi extends BaseController
             WHERE
                 a.日期 >= '{$current_month}' 
                 AND a.日期 <= '{$today_date}' 
-                --AND a.店铺名称 = '永宁一店'
+                AND a.店铺名称 = '新乡一店'
             GROUP BY
                 a.店铺名称
         ";
@@ -324,26 +324,26 @@ class Dianpuyejihuanbi extends BaseController
         ");
 
 
-        echo "<pre>";
-        print_r($select_dianpuyejihuanbi_lastmonth);die;
+        // echo "<pre>";
+        // print_r($select_dianpuyejihuanbi_lastmonth);die;
 
 
-        $first = '2023-04-05';
-        // $first = '2023-04-27';
-        if (strtotime($first) <= strtotime($last_month)) {
-            echo '首单<=' . $last_month; 
-        } elseif (strtotime($first) > strtotime($last_month) && strtotime($first) <= strtotime($last_month_today)) {
-            echo '首单>' . $last_month; 
-            echo '<br>';
-            echo '首单<=' . $last_month_today; 
-            echo '<br>';
-            echo '结果:' . $first . '-' . $last_month_today;
-            echo '<br>';
-            echo date("Y-m-", time()) . date('d', strtotime($first));
-        } else {
-            echo '其他情况';
+        // $first = '2023-04-05';
+        // // $first = '2023-04-27';
+        // if (strtotime($first) <= strtotime($last_month)) {
+        //     echo '首单<=' . $last_month; 
+        // } elseif (strtotime($first) > strtotime($last_month) && strtotime($first) <= strtotime($last_month_today)) {
+        //     echo '首单>' . $last_month; 
+        //     echo '<br>';
+        //     echo '首单<=' . $last_month_today; 
+        //     echo '<br>';
+        //     echo '结果:' . $first . '-' . $last_month_today;
+        //     echo '<br>';
+        //     echo date("Y-m-", time()) . date('d', strtotime($first));
+        // } else {
+        //     echo '其他情况';
             
-        }
+        // }
 
         foreach ($select_dianpuyejihuanbi_lastmonth as $key => $val) {
             // $updateData = [];
@@ -354,6 +354,8 @@ class Dianpuyejihuanbi extends BaseController
                 ['日期', '=', $today_date],
                 ['店铺名称', '=', $val['店铺名称']]
             ])->find();
+
+            // dump($find_dianpuyejihuanbi);die;
  
             // 今日流水
             if ($find_dianpuyejihuanbi) {
@@ -361,6 +363,8 @@ class Dianpuyejihuanbi extends BaseController
             } else {
                 $updateData['今日流水'] = '';
             }
+
+            // dump($updateData);die;
 
             // 今日环比： (今天的店铺流水 / 上个月周N平均值) -1
             if ($updateData['今日流水'] && $val[$today]) {
@@ -424,7 +428,7 @@ class Dianpuyejihuanbi extends BaseController
             }
 
 
-            // dump($updateData);die;
+            dump($updateData);die;
             $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
                 ['店铺名称', '=', $updateData['店铺名称']]
             ])->strict(false)->update($updateData);
@@ -435,7 +439,7 @@ class Dianpuyejihuanbi extends BaseController
     public function dianpuyejihuanbi_handle() {
         $date = input('date') ? input('date') : '';
         
-        // if (date('d', time()) == 31) {
+        // 31号特殊处理
         if (date('d', strtotime($date)) == 31) {
             $this->dianpuyejihuanbi_handle_31($date);
             echo 31;
