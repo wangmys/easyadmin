@@ -126,9 +126,10 @@ class Dianpuyejihuanbi extends BaseController
     }
 
     // 上月环比数据整理   cwl_dianpuyejihuanbi_lastmonth   
-    public function dianpuyejihuanbi_lastmonth($date = '') {
+    public function dianpuyejihuanbi_lastmonth() {
         // $date_str = "2023-04-01";
         $date_str = date("Y-m-01", strtotime('-1month')); 
+
         $date = date('Y-m', strtotime($date_str));
         $sql0 = "set @date_str = '{$date_str}';";
 
