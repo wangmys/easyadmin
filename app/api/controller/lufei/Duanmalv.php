@@ -83,11 +83,11 @@ class Duanmalv extends BaseController
             SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
             EG.StyleCategoryName AS 风格,
             EG.GoodsNo  AS 商品代码,
-            ERG.UnitPrice AS 零售价,
-    -- 								CASE
-    -- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
-    -- 									ELSE 0
-    -- 								END  AS 当前零售价,
+--          ERG.UnitPrice AS 零售价,
+-- 								CASE
+-- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
+-- 									ELSE 0
+-- 								END  AS 当前零售价,
             SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
             SUM ( ERG.Quantity ) AS 销售数量,
             SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
@@ -126,7 +126,7 @@ class Duanmalv extends BaseController
             ,EG.CategoryName2
             ,EG.CategoryName
             ,EG.StyleCategoryName
-            ,ERG.UnitPrice
+    --      ,ERG.UnitPrice
         HAVING  SUM ( ERG.Quantity ) <> 0
         ";
         $select = $this->db_sqlsrv->query($sql);
