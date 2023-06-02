@@ -8,6 +8,8 @@ use app\api\model\kl\ErpGoodsSizeModel;
 use app\api\model\kl\ErpBarCodeModel;
 use app\api\model\kl\ErpBaseGoodsColorModel;
 use app\api\model\kl\ErpBaseGoodsSizeModel;
+use app\api\model\kl\ErpGoodsPriceTypeModel;
+use app\api\model\kl\ErpGoodsSpecModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
@@ -39,6 +41,8 @@ class GoodsService
 
         unset($arr['Version']);
         unset($arr['BarCodeInfo']);
+        unset($arr['PriceId']);
+        unset($arr['PriceName']);
 
         $sql = $this->generate_sql($arr);
         // echo $sql;die;
@@ -100,6 +104,29 @@ class GoodsService
                     ErpGoodsSizeModel::create($GoodsSizeData);
 
                 }
+
+                //ErpGoodsPriceType
+                $GoodsPriceTypeData = [
+                    'GoodsId' => $params['GoodsId'],
+                    'PriceId' => $params['PriceId'],
+                    'PriceName' => $params['PriceName'],
+                    'UnitPrice' => $params['UnitPrice'],
+                ];
+                $GoodsPriceTypeData = array_merge($GoodsPriceTypeData, $init_arr, ErpGoodsPriceTypeModel::INSERT);
+                ErpGoodsPriceTypeModel::create($GoodsPriceTypeData);
+
+                //ErpGoodsSpec
+                $GoodsSpecData = [
+                    'GoodsId' => $params['GoodsId'],
+                    'SpecId' => '1',
+                    'SpecName' => 'A',
+                    'IsEnable' => '1',
+                ];
+                $GoodsSpecData = array_merge($GoodsSpecData, $init_arr, ErpGoodsSpecModel::INSERT);
+                ErpGoodsSpecModel::create($GoodsSpecData);
+            
+                
+
             } catch (\Exception $e) {
                 log_error($e);
                 abort(0, json_encode(['abort_code'=>'goods_error_001', 'abort_msg'=>$e->getMessage()]));
@@ -141,6 +168,8 @@ class GoodsService
 
             unset($new['GoodsId']);
             unset($new['BarCodeInfo']);
+            unset($new['PriceId']);
+            unset($new['PriceName']);
             $new['BrandId'] = '100';
             $new['BrandName'] = 'BABIBOY';
             $new['DiscountTypeName'] = '默认';
@@ -150,6 +179,8 @@ class GoodsService
             ErpBarCodeModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
             ErpGoodsColorModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
             ErpGoodsSizeModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
+            ErpGoodsPriceTypeModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
+            ErpGoodsSpecModel::where([['GoodsId', '=', $params['GoodsId']]])->delete();
             $this->deal_barcode($params);
 
             Db::commit();
