@@ -176,6 +176,12 @@ class Duanmalv extends BaseController
 
     // 更新周销 进行排名
     public function retail_second() {
+        // 更新零售价
+        $sql0 = "update cwl_duanmalv_retail as r left join sjp_goods as g on r.`商品代码` = g.货号 
+        set r.零售价 = g.零售价
+        where r.零售价 is null";
+        $this->db_easyA->execute($sql0);
+
         // 计算折率
         $sql1 = "
             UPDATE cwl_duanmalv_retail 
