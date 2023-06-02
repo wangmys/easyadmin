@@ -33,6 +33,9 @@ class GoodsService
 
         $arr = array_merge($arr, $params);
         $arr = array_merge($arr, ErpGoodsModel::INSERT);
+        $arr['BrandId'] = '100';
+        $arr['BrandName'] = 'BABIBOY';
+        $arr['DiscountTypeName'] = '默认';
 
         unset($arr['Version']);
         unset($arr['BarCodeInfo']);
@@ -138,6 +141,9 @@ class GoodsService
 
             unset($new['GoodsId']);
             unset($new['BarCodeInfo']);
+            $new['BrandId'] = '100';
+            $new['BrandName'] = 'BABIBOY';
+            $new['DiscountTypeName'] = '默认';
             ErpGoodsModel::where([['GoodsId', '=', $params['GoodsId']]])->update($new);
 
             //删除旧数据，重新插入新数据
