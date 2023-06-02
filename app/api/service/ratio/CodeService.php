@@ -65,35 +65,39 @@ class CodeService
     public function pullData()
     {
        $sql = "SELECT 
-        EG.GoodsNo as 货号,
-        MAX(eg.StyleCategoryName) AS 风格,
-            MAX(eg.CategoryName1) AS 一级分类,
-            MAX(eg.CategoryName2) AS 二级分类,
-            MAX(eg.CategoryName) AS 分类,
-            MAX(LEFT(eg.CategoryName, 2))	as 领型,
-        COUNT(DISTINCT ECS.CustomerId) as 上柜家数,
-        DATEDIFF(day, MIN(ECS.StockDate), GETDATE()) as 上市天数,
-        -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) as 销量,
-        
-        CASE WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())<1 
-          THEN 0
-            WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())<7 
-          THEN -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) / DATEDIFF(day, MIN(ECS.StockDate), GETDATE()) / COUNT(DISTINCT ECS.CustomerId)
-           WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())>=7 
-          THEN -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) / 7 / COUNT(DISTINCT ECS.CustomerId)
-          ELSE 0 
-        END  AS 日均销
-        FROM ErpCustomerStock ECS
-        LEFT JOIN ErpGoods EG ON ECS.GoodsId = EG.GoodsId
-        LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
-        WHERE 
-        EC.ShutOut=0 
-        AND EC.MathodId IN (7,4)
-        AND eg.TimeCategoryName1 = '2023'
-        AND eg.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
-        and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
-        GROUP BY 
-         EG.GoodsNo order by 日均销 desc";
+            EG.GoodsNo as 货号,
+            MAX(eg.StyleCategoryName) AS 风格,
+                MAX(eg.CategoryName1) AS 一级分类,
+                MAX(eg.CategoryName2) AS 二级分类,
+                MAX(eg.CategoryName) AS 分类,
+                MAX(LEFT(eg.CategoryName, 2))	as 领型,
+								MAX(eg.StyleCategoryName2) as 货品等级,
+            COUNT(DISTINCT ECS.CustomerId) as 上柜家数,
+            DATEDIFF(day, MIN(ECS.StockDate), GETDATE()) as 上市天数,
+            -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) as 销量,
+            
+            CASE WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())<1 
+              THEN 0
+                WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())<7 
+              THEN -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) / DATEDIFF(day, MIN(ECS.StockDate), GETDATE()) / COUNT(DISTINCT ECS.CustomerId)
+               WHEN DATEDIFF(day, MIN(ECS.StockDate), GETDATE())>=7 
+              THEN -SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN CONVERT(VARCHAR(10),GETDATE()-7,23)  AND CONVERT(VARCHAR(10),GETDATE()-1,23) THEN ECS.Quantity ELSE 0 END ) / 7 / COUNT(DISTINCT ECS.CustomerId)
+              ELSE 0 
+            END  AS 日均销,
+						MAX(EGI.Img) AS 图片
+            FROM ErpCustomerStock ECS
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId = EG.GoodsId
+            LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+						LEFT JOIN ErpGoodsImg EGI ON EG.GoodsId=EGI.GoodsId
+            WHERE 
+            EC.ShutOut=0 
+            AND EC.MathodId IN (7,4)
+            AND eg.TimeCategoryName1 = '2023'
+            AND eg.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+            and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
+-- 						and eg.GoodsNo = 'B42101021'
+            GROUP BY 
+             EG.GoodsNo order by 日均销 desc";
         $order_num = 1;
         Db::startTrans();
         $list = Db::connect("sqlsrv")->query($sql);
