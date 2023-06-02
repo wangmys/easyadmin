@@ -46,6 +46,12 @@ class ReceiptService
             $new['ReceiptDate'] = $now;
             $new['Remark'] = $params['Remark'];
             $new['Type'] = $params['Type'];
+            $new['CustOutID'] = $params['CustOutID'] ?? '';
+            $new['FromCustomerId'] = $params['FromCustomerId'] ?? '';
+            $new['FromCustomerName'] = $params['FromCustomerName'] ?? '';
+            $new['DeliveryId'] = $params['DeliveryId'] ?? '';
+            $new['WarehouseId'] = $params['WarehouseId'] ?? '';
+            $new['WarehouseName'] = $params['WarehouseName'] ?? '';
 
             if ($params['CodingCode'] == ErpCustReceiptModel::CodingCode['HADCOMMIT']) {//已审结
                 $new['CodingCode'] = $params['CodingCode'];
