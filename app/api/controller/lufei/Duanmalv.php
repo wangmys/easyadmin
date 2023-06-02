@@ -508,7 +508,7 @@ class Duanmalv extends BaseController
 
                 WHERE
                     sk.季节 IN ('初夏', '盛夏', '夏季') 
-                    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
+                --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'
                 -- 	AND sk.货号='B32101027'
@@ -526,7 +526,7 @@ class Duanmalv extends BaseController
             // 删除历史数据
             $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
             $chunk_list = array_chunk($select_sk, 1000);
-            $this->db_easyA->startTrans();
+            // $this->db_easyA->startTrans();
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -539,14 +539,14 @@ class Duanmalv extends BaseController
             }
 
             if ($status) {
-                $this->db_easyA->commit();
+                // $this->db_easyA->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "cwl_duanmalv_sk first 更新成功，数量：{$count}！"
                 ]);
             } else {
-                $this->db_easyA->rollback();
+                // $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -577,17 +577,17 @@ class Duanmalv extends BaseController
                 dr.销售金额 > 0
         ";
 
-        $this->db_easyA->startTrans();
+        // $this->db_easyA->startTrans();
         $status = $this->db_easyA->execute($sql);
         if ($status) {
-            $this->db_easyA->commit();
+            // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$status}！"
             ]);
         } else {
-            $this->db_easyA->rollback();
+            // $this->db_easyA->rollback();
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -617,17 +617,17 @@ class Duanmalv extends BaseController
                 END	
             WHERE 
             `标准齐码识别修订` IS NULL";
-        $this->db_easyA->startTrans();
+        // $this->db_easyA->startTrans();
         $status = $this->db_easyA->execute($sql2);
         if ($status) {
-            $this->db_easyA->commit();
+            // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => "cwl_duanmalv_sk 标准齐码识别修订 更新成功，数量：{$status}！"
             ]);
         } else {
-            $this->db_easyA->rollback();
+            // $this->db_easyA->rollback();
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -899,7 +899,7 @@ class Duanmalv extends BaseController
             where 
                 dr.风格=@风格
                 AND sk.销售金额 > 0
-                AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+            --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
             GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
             order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
         ";
