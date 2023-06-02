@@ -41,8 +41,7 @@ class GoodsService
 
         unset($arr['Version']);
         unset($arr['BarCodeInfo']);
-        unset($arr['PriceId']);
-        unset($arr['PriceName']);
+        unset($arr['PriceInfo']);
 
         $sql = $this->generate_sql($arr);
         // echo $sql;die;
@@ -57,6 +56,7 @@ class GoodsService
     public function deal_barcode($params) {
 
         $BarCodeInfo = $params['BarCodeInfo'];
+        $PriceInfo = $params['PriceInfo'];
 
         //ErpBarCode、ErpGoodsColor、ErpGoodsSize表处理
         if ($BarCodeInfo) {
@@ -105,15 +105,19 @@ class GoodsService
 
                 }
 
-                //ErpGoodsPriceType
-                $GoodsPriceTypeData = [
-                    'GoodsId' => $params['GoodsId'],
-                    'PriceId' => $params['PriceId'],
-                    'PriceName' => $params['PriceName'],
-                    'UnitPrice' => $params['UnitPrice'],
-                ];
-                $GoodsPriceTypeData = array_merge($GoodsPriceTypeData, $init_arr, ErpGoodsPriceTypeModel::INSERT);
-                ErpGoodsPriceTypeModel::create($GoodsPriceTypeData);
+                if ($PriceInfo) {
+                    foreach ($PriceInfo as $v_PriceInfo) {
+                        //ErpGoodsPriceType
+                        $GoodsPriceTypeData = [
+                            'GoodsId' => $params['GoodsId'],
+                            'PriceId' => $v_PriceInfo['PriceId'],
+                            'PriceName' => $v_PriceInfo['PriceName'],
+                            'UnitPrice' => $v_PriceInfo['UnitPrice'],
+                        ];
+                        $GoodsPriceTypeData = array_merge($GoodsPriceTypeData, $init_arr, ErpGoodsPriceTypeModel::INSERT);
+                        ErpGoodsPriceTypeModel::create($GoodsPriceTypeData);
+                    }
+                }
 
                 //ErpGoodsSpec
                 $GoodsSpecData = [
@@ -168,8 +172,7 @@ class GoodsService
 
             unset($new['GoodsId']);
             unset($new['BarCodeInfo']);
-            unset($new['PriceId']);
-            unset($new['PriceName']);
+            unset($new['PriceInfo']);
             $new['BrandId'] = '100';
             $new['BrandName'] = 'BABIBOY';
             $new['DiscountTypeName'] = '默认';
