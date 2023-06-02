@@ -825,11 +825,18 @@ class Duanmalv extends BaseController
                 '内搭' => '4',
                 '外套' => '4',
                 '鞋履' => '4',
-                '松紧' => '5',
+                '松紧长裤' => '5',
+                '松紧短裤' => '5',
                 '下装' => '6',
             ];
             foreach ($select as $key => $val) {
-                $select[$key]['连码要求个数'] = $qimaArr[$val['一级分类']];
+                if ($val['二级分类'] == '松紧长裤' || $val['二级分类'] == '松紧短裤') {
+
+                    $select[$key]['连码要求个数'] = $qimaArr[$val['二级分类']];
+                } else {
+                    $select[$key]['连码要求个数'] = $qimaArr[$val['一级分类']];
+                }
+                
             }
             // echo '<pre>';
             // print_r($select);
