@@ -508,7 +508,7 @@ class Duanmalv extends BaseController
 
                 WHERE
                     sk.季节 IN ('初夏', '盛夏', '夏季') 
-                    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
+                --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'
                 -- 	AND sk.货号='B32101027'
@@ -899,7 +899,7 @@ class Duanmalv extends BaseController
             where 
                 dr.风格=@风格
                 AND sk.销售金额 > 0
-                AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+            --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
             GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
             order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
         ";
