@@ -67,6 +67,24 @@ class GoodsService
 
             try {
 
+                $BarCodeColors = array_column($BarCodeInfo, 'ColorId');
+                $BarCodeColors = array_unique($BarCodeColors);
+                if ($BarCodeColors) {
+                    foreach ($BarCodeColors as $v_colors) {
+                        //ErpGoodsColor
+                        $GoodsColorInfo = ErpBaseGoodsColorModel::where([['ColorId', '=', $v_colors]])->find();
+                        $GoodsColorData = [
+                            'GoodsId' => $params['GoodsId'],
+                            'ColorId' => $v_colors,
+                            'ColorGroup' => $GoodsColorInfo['ColorGroup'],
+                            'ColorCode' => $GoodsColorInfo['ColorCode'],
+                            'ColorDesc' => $GoodsColorInfo['ColorDesc'],
+                        ];
+                        $GoodsColorData = array_merge($GoodsColorData, $init_arr, ErpGoodsColorModel::INSERT);
+                        ErpGoodsColorModel::create($GoodsColorData);
+                    }
+                }
+
                 foreach ($BarCodeInfo as $v_barcode) {
 
                     //ErpBarCode
@@ -79,18 +97,6 @@ class GoodsService
                     ];
                     $BarCodeData = array_merge($BarCodeData, $init_arr, ErpBarCodeModel::INSERT);
                     ErpBarCodeModel::create($BarCodeData);
-
-                    //ErpGoodsColor
-                    $GoodsColorInfo = ErpBaseGoodsColorModel::where([['ColorId', '=', $v_barcode['ColorId']]])->find();
-                    $GoodsColorData = [
-                        'GoodsId' => $params['GoodsId'],
-                        'ColorId' => $v_barcode['ColorId'],
-                        'ColorGroup' => $GoodsColorInfo['ColorGroup'],
-                        'ColorCode' => $GoodsColorInfo['ColorCode'],
-                        'ColorDesc' => $GoodsColorInfo['ColorDesc'],
-                    ];
-                    $GoodsColorData = array_merge($GoodsColorData, $init_arr, ErpGoodsColorModel::INSERT);
-                    ErpGoodsColorModel::create($GoodsColorData);
 
                     //ErpGoodsSize
                     $GoodsSizeInfo = ErpBaseGoodsSizeModel::where([['SizeId', '=', $v_barcode['SizeId']]])->find();
