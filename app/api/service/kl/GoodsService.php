@@ -41,8 +41,7 @@ class GoodsService
 
         unset($arr['Version']);
         unset($arr['BarCodeInfo']);
-        unset($arr['PriceId']);
-        unset($arr['PriceName']);
+        unset($arr['PriceInfo']);
 
         $sql = $this->generate_sql($arr);
         // echo $sql;die;
@@ -57,6 +56,7 @@ class GoodsService
     public function deal_barcode($params) {
 
         $BarCodeInfo = $params['BarCodeInfo'];
+        $PriceInfo = $params['PriceInfo'];
 
         //ErpBarCode、ErpGoodsColor、ErpGoodsSize表处理
         if ($BarCodeInfo) {
@@ -66,6 +66,24 @@ class GoodsService
             $init_arr['Version'] = time();
 
             try {
+
+                $BarCodeColors = array_column($BarCodeInfo, 'ColorId');
+                $BarCodeColors = array_unique($BarCodeColors);
+                if ($BarCodeColors) {
+                    foreach ($BarCodeColors as $v_colors) {
+                        //ErpGoodsColor
+                        $GoodsColorInfo = ErpBaseGoodsColorModel::where([['ColorId', '=', $v_colors]])->find();
+                        $GoodsColorData = [
+                            'GoodsId' => $params['GoodsId'],
+                            'ColorId' => $v_colors,
+                            'ColorGroup' => $GoodsColorInfo['ColorGroup'],
+                            'ColorCode' => $GoodsColorInfo['ColorCode'],
+                            'ColorDesc' => $GoodsColorInfo['ColorDesc'],
+                        ];
+                        $GoodsColorData = array_merge($GoodsColorData, $init_arr, ErpGoodsColorModel::INSERT);
+                        ErpGoodsColorModel::create($GoodsColorData);
+                    }
+                }
 
                 foreach ($BarCodeInfo as $v_barcode) {
 
@@ -80,18 +98,6 @@ class GoodsService
                     $BarCodeData = array_merge($BarCodeData, $init_arr, ErpBarCodeModel::INSERT);
                     ErpBarCodeModel::create($BarCodeData);
 
-                    //ErpGoodsColor
-                    $GoodsColorInfo = ErpBaseGoodsColorModel::where([['ColorId', '=', $v_barcode['ColorId']]])->find();
-                    $GoodsColorData = [
-                        'GoodsId' => $params['GoodsId'],
-                        'ColorId' => $v_barcode['ColorId'],
-                        'ColorGroup' => $GoodsColorInfo['ColorGroup'],
-                        'ColorCode' => $GoodsColorInfo['ColorCode'],
-                        'ColorDesc' => $GoodsColorInfo['ColorDesc'],
-                    ];
-                    $GoodsColorData = array_merge($GoodsColorData, $init_arr, ErpGoodsColorModel::INSERT);
-                    ErpGoodsColorModel::create($GoodsColorData);
-
                     //ErpGoodsSize
                     $GoodsSizeInfo = ErpBaseGoodsSizeModel::where([['SizeId', '=', $v_barcode['SizeId']]])->find();
                     $GoodsSizeData = [
@@ -105,15 +111,19 @@ class GoodsService
 
                 }
 
-                //ErpGoodsPriceType
-                $GoodsPriceTypeData = [
-                    'GoodsId' => $params['GoodsId'],
-                    'PriceId' => $params['PriceId'],
-                    'PriceName' => $params['PriceName'],
-                    'UnitPrice' => $params['UnitPrice'],
-                ];
-                $GoodsPriceTypeData = array_merge($GoodsPriceTypeData, $init_arr, ErpGoodsPriceTypeModel::INSERT);
-                ErpGoodsPriceTypeModel::create($GoodsPriceTypeData);
+                if ($PriceInfo) {
+                    foreach ($PriceInfo as $v_PriceInfo) {
+                        //ErpGoodsPriceType
+                        $GoodsPriceTypeData = [
+                            'GoodsId' => $params['GoodsId'],
+                            'PriceId' => $v_PriceInfo['PriceId'],
+                            'PriceName' => $v_PriceInfo['PriceName'],
+                            'UnitPrice' => $v_PriceInfo['UnitPrice'],
+                        ];
+                        $GoodsPriceTypeData = array_merge($GoodsPriceTypeData, $init_arr, ErpGoodsPriceTypeModel::INSERT);
+                        ErpGoodsPriceTypeModel::create($GoodsPriceTypeData);
+                    }
+                }
 
                 //ErpGoodsSpec
                 $GoodsSpecData = [
@@ -168,8 +178,7 @@ class GoodsService
 
             unset($new['GoodsId']);
             unset($new['BarCodeInfo']);
-            unset($new['PriceId']);
-            unset($new['PriceName']);
+            unset($new['PriceInfo']);
             $new['BrandId'] = '100';
             $new['BrandName'] = 'BABIBOY';
             $new['DiscountTypeName'] = '默认';
