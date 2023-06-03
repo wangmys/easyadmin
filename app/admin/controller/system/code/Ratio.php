@@ -224,7 +224,7 @@ class Ratio extends AdminController
                     $list[] = $item;
                 }
 
-                // 提取数据
+                // 提取偏码判断数据
                 $ranking_data = [];
                 foreach ($list as $lk => $lv){
                     $ranking_data['单码售罄比'][$lv['尺码情况']] = intval($lv['单码售罄比']);
@@ -232,26 +232,20 @@ class Ratio extends AdminController
                     $ranking_data['总库存'][$lv['尺码情况']] = intval($lv['总库存']);
                     $ranking_data['累销尺码比'][$lv['尺码情况']] = intval($lv['累销尺码比']);
                 }
-
+                // 对数据进行排序
                 foreach ($ranking_data as $kk => $vv){
                     asort($ranking_data[$kk]);
                 }
-                
-                echo '<pre>';
-                print_r($ranking_data);
-                die;
 
 
-
-
-                $arr = array_column($list,'当前库存');
-                $ar = array_map(function ($v){
-                    return intval($v);
-                },$arr);
-                rsort($ar);
-                echo '<pre>';
-                print_r($ranking_data);
-                die;
+//                $arr = array_column($list,'当前库存');
+//                $ar = array_map(function ($v){
+//                    return intval($v);
+//                },$arr);
+//                rsort($ar);
+//                echo '<pre>';
+//                print_r($ranking_data);
+//                die;
                 
                 $list[] = $total_item;
             }
