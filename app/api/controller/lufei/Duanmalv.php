@@ -145,7 +145,6 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
 
             $chunk_list = array_chunk($select, 1000);
-            $this->db_easyA->startTrans();
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -158,14 +157,12 @@ class Duanmalv extends BaseController
             }
 
             if ($status) {
-                $this->db_easyA->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "cwl_duanmalv_retail first 更新成功，数量：{$count}！"
                 ]);
             } else {
-                $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -218,12 +215,13 @@ class Duanmalv extends BaseController
                     WHEN 
                         a.中类 = @中类 and 
                         a.风格 = @风格 and 
-                        a.领型 = @领型 THEN
+                        a.领型 = @领型 
+                    THEN
                         @rank := @rank + 1 ELSE @rank := 1
-                    END AS 排名,
-                    @中类 := a.中类 AS 中类,
-                    @风格 := a.风格 AS 风格,
-                    @领型 := a.领型 AS 领型
+                END AS 排名,
+                @中类 := a.中类 AS 中类,
+                @风格 := a.风格 AS 风格,
+                @领型 := a.领型 AS 领型
                 FROM
                     cwl_duanmalv_retail a,
                     ( SELECT @中类 := null,  @风格 := null,  @领型 := null, @rank := 0 ) T
@@ -948,6 +946,7 @@ class Duanmalv extends BaseController
 
     // 计算是否top 60考核款
     public function handle_2() {
+        // $this->db_easyA->commit();die;
         // 1.先判断有排名 & 实际分配TOP 再判断在途情况
         $sql = "
             update cwl_duanmalv_handle_1 h
@@ -1087,6 +1086,153 @@ class Duanmalv extends BaseController
                 'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新失败！'
             ]);
         }
-
     } 
+
+    // 单店品类断码情况（商品专员可看）
+    public function table6() {
+        $sql = "
+            SELECT
+                云仓,
+                省份,
+                商品负责人,
+                店铺名称,
+                经营模式,
+                风格,
+                一级分类,
+                二级分类,
+                领型,
+                店铺总SKC数,
+                TOP断码SKC数,
+                ROUND( TOP断码SKC数 / 店铺总SKC数, 2 ) AS TOP断码率,
+                全部断码SKC数,
+                ROUND( 全部断码SKC数 / 店铺总SKC数, 2 ) AS 全部断码率 
+            FROM
+                cwl_duanmalv_handle_1 
+            ORDER BY
+                商品负责人 ASC
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table6')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table6')->strict(false)->insertAll($val);
+            }
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table6 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table6 更新失败！'
+            ]);
+        }
+    }
+
+    // 单店断码情况（商品专员可看）
+    public function table5() {
+        $sql = "
+            select 
+                h.云仓,
+                h.省份,
+                h.商品负责人,
+                h.店铺名称,
+                c.CustomerGrade AS 店铺等级,
+                h.经营模式,
+                h.店铺总SKC数,
+                SUM( h.TOP断码SKC数 ) AS TOP断码SKC数,
+                ROUND( SUM(h.TOP断码SKC数) / h.店铺总SKC数, 2 ) AS TOP断码率,
+                SUM(h.全部断码SKC数) AS 全部断码SKC数,
+                ROUND( SUM(h.全部断码SKC数) / h.店铺总SKC数, 2 ) AS 全部断码率
+            from cwl_duanmalv_handle_1 as h
+            left join customer as c on h.店铺名称 = c.CustomerName
+            GROUP BY h.店铺名称
+            ORDER BY h.商品负责人
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+            
+            // 全部断码率排名sql
+            $sql2 = "
+                select 
+                    t5.云仓,
+                    t5.省份,
+                    t5.店铺名称,
+                    t5.店铺等级,
+                    t5.经营模式,
+                    t5.店铺总SKC数,
+                    t5.TOP断码SKC数,
+                    t5.TOP断码率,
+                    t5.全部断码SKC数,
+                    t5.全部断码率,
+                    case 
+                        when t5.商品负责人 = @商品负责人 then @rank := @rank + 1 ELSE @rank := 1
+                    end as 全部断码排名,
+                    @商品负责人 := t5.商品负责人 AS 商品负责人
+                from cwl_duanmalv_table5 as t5,
+                ( SELECT @商品负责人 := null, @rank := 0 ) T
+                order by t5.商品负责人 ASC, t5.`全部断码SKC数` DESC	
+            ";
+            $select2 = $this->db_easyA->query($sql2);
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list2 = array_chunk($select2, 1000);
+            foreach($chunk_list2 as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+
+            // 全部断码率排名sql
+            $sql3 = "
+                    select 
+                    t5.云仓,
+                    t5.省份,
+                    t5.店铺名称,
+                    t5.店铺等级,
+                    t5.经营模式,
+                    t5.店铺总SKC数,
+                    t5.TOP断码SKC数,
+                    t5.TOP断码率,
+                    t5.全部断码SKC数,
+                    t5.全部断码率,
+                    t5.全部断码排名,
+                    case 
+                        when t5.商品负责人 = @商品负责人  then @rank := @rank + 1 ELSE @rank := 1
+                    end as TOP断码排名,
+                    @商品负责人 := t5.商品负责人 AS 商品负责人
+                from cwl_duanmalv_table5 as t5,
+                ( SELECT @商品负责人 := null, @rank := 0 ) T
+                order by t5.商品负责人 ASC, t5.`TOP断码SKC数` DESC
+            ";
+            $select3 = $this->db_easyA->query($sql3);
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list3 = array_chunk($select3, 1000);
+            foreach($chunk_list3 as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table5 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table5 更新失败！'
+            ]);
+        }
+    }
 }
