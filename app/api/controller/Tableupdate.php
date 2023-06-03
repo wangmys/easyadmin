@@ -254,6 +254,31 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 拉取 sjp_goods
+    public function sjp_goods() {
+        // 查询bi
+        $select = $this->db_bi->table('sjp_goods')->where(1)->select()->toArray();
+        if (!$select) {
+            echo '没有数据更新';
+            die;
+        } 
+
+        $handle = $this->db_easyA->table('sjp_goods')->where(1)->delete();
+
+        $select = array_chunk($select, 1000);
+
+        foreach($select as $key => $val) {
+            $insert = $this->db_easyA->table('sjp_goods')->insertAll($val);
+        }
+
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => 'easyadmin2 sjp_goods 更新成功！'
+        ]);
+    }
+
     public function customer_first() {
         // 首单日期   
         $sql2 = "

@@ -39,95 +39,96 @@ class Duanmalv extends BaseController
         // 康雷查询周销
         $sql = "   
             SELECT TOP
-            200000 EC.CustomItem17 AS 商品负责人,
-    -- 		ER.RetailID,
-    -- 		ER.RetailDate,
-            EC.State AS 省份,
-            EBC.Mathod AS 渠道属性,
-            EC.CustomItem15 AS 店铺云仓,
-            ER.CustomerName AS 店铺名称,
-        --  DATEPART( yy, ER.RetailDate ) AS 年份,
-        --  DATEPART( yy, GETDATE() ) AS 年份,
-            EG.TimeCategoryName1 as 年份,
-        CASE
-                EG.TimeCategoryName2
-                WHEN '初春' THEN
-                '春季'
-                WHEN '正春' THEN
-                '春季'
-                WHEN '春季' THEN
-                '春季'
-                WHEN '初秋' THEN
-                '秋季'
-                WHEN '深秋' THEN
-                '秋季'
-                WHEN '秋季' THEN
-                '秋季'
-                WHEN '初夏' THEN
-                '夏季'
-                WHEN '盛夏' THEN
-                '夏季'
-                WHEN '夏季' THEN
-                '夏季'
-                WHEN '冬季' THEN
-                '冬季'
-                WHEN '初冬' THEN
-                '冬季'
-                WHEN '深冬' THEN
-                '冬季'
-            END AS 季节归集,
-            EG.TimeCategoryName2 AS 二级时间分类,
-            EG.CategoryName1 AS 大类,
-            EG.CategoryName2 AS 中类,
-            EG.CategoryName AS 小类,
-            SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
-            EG.StyleCategoryName AS 风格,
-            EG.GoodsNo  AS 商品代码,
---          ERG.UnitPrice AS 零售价,
--- 								CASE
--- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
--- 									ELSE 0
--- 								END  AS 当前零售价,
-            SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
-            SUM ( ERG.Quantity ) AS 销售数量,
-            SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
-            CONVERT(varchar(10),GETDATE(),120) AS 更新日期
-        FROM
-            ErpRetail AS ER
-            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-            LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-        WHERE
-            ER.CodingCodeText = '已审结'
-            AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
-            AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
-    -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-            AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
-            AND EC.CustomItem17 IS NOT NULL
-            AND EBC.Mathod IN ('直营', '加盟')
-            AND EG.TimeCategoryName1 IN ('2023')
-    --      AND ERG.Quantity  > 0
-    --      AND ERG.DiscountPrice > 0
-    -- 		AND ER.CustomerName = '舒城一店'
-    -- 		AND EG.GoodsNo= 'B42513005'
-        GROUP BY
-            EC.CustomItem17
-    -- 		,ER.RetailID
-    -- 		,ER.RetailDate
-            ,ER.CustomerName
-            ,EG.GoodsNo
-            ,EC.State
-            ,EC.CustomItem15
-            ,EBC.Mathod
-            ,EG.TimeCategoryName1
-            ,EG.TimeCategoryName2
-            ,EG.CategoryName1
-            ,EG.CategoryName2
-            ,EG.CategoryName
-            ,EG.StyleCategoryName
-    --      ,ERG.UnitPrice
-        HAVING  SUM ( ERG.Quantity ) <> 0
+                200000 EC.CustomItem17 AS 商品负责人,
+        -- 		ER.RetailID,
+        -- 		ER.RetailDate,
+                EC.State AS 省份,
+                EBC.Mathod AS 渠道属性,
+                EC.CustomItem15 AS 店铺云仓,
+                ER.CustomerName AS 店铺名称,
+            --  DATEPART( yy, ER.RetailDate ) AS 年份,
+            --  DATEPART( yy, GETDATE() ) AS 年份,
+                EG.TimeCategoryName1 as 年份,
+            CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN
+                    '春季'
+                    WHEN '正春' THEN
+                    '春季'
+                    WHEN '春季' THEN
+                    '春季'
+                    WHEN '初秋' THEN
+                    '秋季'
+                    WHEN '深秋' THEN
+                    '秋季'
+                    WHEN '秋季' THEN
+                    '秋季'
+                    WHEN '初夏' THEN
+                    '夏季'
+                    WHEN '盛夏' THEN
+                    '夏季'
+                    WHEN '夏季' THEN
+                    '夏季'
+                    WHEN '冬季' THEN
+                    '冬季'
+                    WHEN '初冬' THEN
+                    '冬季'
+                    WHEN '深冬' THEN
+                    '冬季'
+                END AS 季节归集,
+                EG.TimeCategoryName2 AS 二级时间分类,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 小类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo  AS 商品代码,
+    --          ERG.UnitPrice AS 零售价,
+    -- 								CASE
+    -- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
+    -- 									ELSE 0
+    -- 								END  AS 当前零售价,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
+                SUM ( ERG.Quantity ) AS 销售数量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+        -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023')
+        --      AND ERG.Quantity  > 0
+        --      AND ERG.DiscountPrice > 0
+        -- 		AND ER.CustomerName = '舒城一店'
+        -- 		AND EG.GoodsNo= 'B42513005'
+            GROUP BY
+                EC.CustomItem17
+        -- 		,ER.RetailID
+        -- 		,ER.RetailDate
+                ,ER.CustomerName
+                ,EG.GoodsNo
+                ,EC.State
+                ,EC.CustomItem15
+                ,EBC.Mathod
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+        --      ,ERG.UnitPrice
+            HAVING  SUM ( ERG.Quantity ) <> 0
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -176,6 +177,12 @@ class Duanmalv extends BaseController
 
     // 更新周销 进行排名
     public function retail_second() {
+        // 更新零售价
+        $sql0 = "update cwl_duanmalv_retail as r left join sjp_goods as g on r.`商品代码` = g.货号 
+        set r.零售价 = g.零售价
+        where r.零售价 is null";
+        $this->db_easyA->execute($sql0);
+
         // 计算折率
         $sql1 = "
             UPDATE cwl_duanmalv_retail 
@@ -501,7 +508,7 @@ class Duanmalv extends BaseController
 
                 WHERE
                     sk.季节 IN ('初夏', '盛夏', '夏季') 
-                    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
+                --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'
                 -- 	AND sk.货号='B32101027'
@@ -519,7 +526,7 @@ class Duanmalv extends BaseController
             // 删除历史数据
             $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
             $chunk_list = array_chunk($select_sk, 1000);
-            $this->db_easyA->startTrans();
+            // $this->db_easyA->startTrans();
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -532,14 +539,14 @@ class Duanmalv extends BaseController
             }
 
             if ($status) {
-                $this->db_easyA->commit();
+                // $this->db_easyA->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "cwl_duanmalv_sk first 更新成功，数量：{$count}！"
                 ]);
             } else {
-                $this->db_easyA->rollback();
+                // $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -570,17 +577,17 @@ class Duanmalv extends BaseController
                 dr.销售金额 > 0
         ";
 
-        $this->db_easyA->startTrans();
+        // $this->db_easyA->startTrans();
         $status = $this->db_easyA->execute($sql);
         if ($status) {
-            $this->db_easyA->commit();
+            // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$status}！"
             ]);
         } else {
-            $this->db_easyA->rollback();
+            // $this->db_easyA->rollback();
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -610,17 +617,17 @@ class Duanmalv extends BaseController
                 END	
             WHERE 
             `标准齐码识别修订` IS NULL";
-        $this->db_easyA->startTrans();
+        // $this->db_easyA->startTrans();
         $status = $this->db_easyA->execute($sql2);
         if ($status) {
-            $this->db_easyA->commit();
+            // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
                 'content' => "cwl_duanmalv_sk 标准齐码识别修订 更新成功，数量：{$status}！"
             ]);
         } else {
-            $this->db_easyA->rollback();
+            // $this->db_easyA->rollback();
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -892,7 +899,7 @@ class Duanmalv extends BaseController
             where 
                 dr.风格=@风格
                 AND sk.销售金额 > 0
-                AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+            --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
             GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
             order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
         ";
