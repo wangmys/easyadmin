@@ -42,7 +42,7 @@ class Stock extends BaseController
     //每天导出尺码库存json数据给肖甜使用
     public function create_stock_size_json() {
 
-        ini_set('memory_limit','500M');
+        ini_set('memory_limit','2000M');
 
         $start_date = input('start_date');
         $end_date = input('end_date');
