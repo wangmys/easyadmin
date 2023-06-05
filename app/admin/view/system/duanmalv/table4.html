@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>断码率-单省单款断码情况</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">单省单款断码情况 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Duanmalv/table4')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table4')}" 
+
+        startTable();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                , toolbar: '#toolbar1'
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 780
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                     { field: '风格', title: '风格', fixed: 'left' }
+                    , { field: '大类', title: '大类', fixed: 'left'}
+                    , { field: '中类', title: '中类', fixed: 'left'}
+                    , { field: '领型', title: '领型', fixed: 'left' }
+                    , { field: '货号', title: '货号' ,fixed:'left'} 
+                    , { field: '省份-滇', title: '省份-滇'}
+                    , { field: '上柜数-滇', title: '上柜数-滇'}
+                    , { field: '断码家数-滇', title: '断码家数-滇', width: 80}
+                    , { field: '断码率-滇', title: '断码率-滇' }
+                    , { field: '周转-滇', title: '周转-滇' }
+                    , { field: '省份-蜀', title: '省份-蜀'}
+                    , { field: '上柜数-蜀', title: '上柜数-蜀' }
+                    , { field: '断码家数-蜀', title: '断码家数-蜀', width: 80}
+                    , { field: '断码率-蜀', title: '断码率-蜀' }
+                    , { field: '周转-蜀', title: '周转-蜀' }
+                    , { field: '省份-津', title: '省份-津' }
+                    , { field: '上柜数-津', title: '上柜数-津' }
+                    , { field: '断码家数-津', title: '断码家数-津' , width: 80}
+                    , { field: '断码率-津', title: '断码率-津' }
+                    , { field: '周转-津', title: '周转-津' }
+                    , { field: '省份-宁', title: '省份-宁' }
+                    , { field: '上柜数-宁', title: '上柜数-宁' }
+                    , { field: '断码家数-宁', title: '断码家数-宁' , width: 80}
+                    , { field: '断码率-宁', title: '断码率-宁' }
+                    , { field: '周转-宁', title: '周转-宁' }
+                    , { field: '省份-皖', title: '省份-皖' }
+                    , { field: '上柜数-皖', title: '上柜数-皖' }
+                    , { field: '断码家数-皖', title: '断码家数-皖' , width: 80}
+                    , { field: '断码率-皖', title: '断码率-皖' }
+                    , { field: '周转-皖', title: '周转-皖' }
+                    , { field: '省份-粤', title: '省份-粤' }
+                    , { field: '上柜数-粤', title: '上柜数-粤' }
+                    , { field: '断码家数-粤', title: '断码家数-粤' , width: 80}
+                    , { field: '断码率-粤', title: '断码率-粤' }
+                    , { field: '周转-粤', title: '周转-粤' }
+                    , { field: '省份-桂', title: '省份-桂' }
+                    , { field: '上柜数-桂', title: '上柜数-桂' }
+                    , { field: '断码家数-桂', title: '断码家数-桂' , width: 80}
+                    , { field: '断码率-桂', title: '断码率-桂' }
+                    , { field: '周转-桂', title: '周转-桂' }
+                    , { field: '省份-新', title: '省份-新' }
+                    , { field: '上柜数-新', title: '上柜数-新' }
+                    , { field: '断码家数-新', title: '断码家数-新' , width: 80}
+                    , { field: '断码率-新', title: '断码率-新' }
+                    , { field: '周转-新', title: '周转-新' }
+                    , { field: '省份-赣', title: '省份-赣' }
+                    , { field: '上柜数-赣', title: '上柜数-赣' }
+                    , { field: '断码家数-赣', title: '断码家数-赣' , width: 80}
+                    , { field: '断码率-赣', title: '断码率-赣' }
+                    , { field: '周转-赣', title: '周转-赣' }
+                    , { field: '省份-豫', title: '省份-豫' }
+                    , { field: '上柜数-豫', title: '上柜数-豫' }
+                    , { field: '断码家数-豫', title: '断码家数-豫' , width: 80}
+                    , { field: '断码率-豫', title: '断码率-豫' }
+                    , { field: '周转-豫', title: '周转-豫' }
+                    , { field: '省份-鄂', title: '省份-鄂' }
+                    , { field: '上柜数-鄂', title: '上柜数-鄂' }
+                    , { field: '断码家数-鄂', title: '断码家数-鄂' , width: 80}
+                    , { field: '断码率-鄂', title: '断码率-鄂' }
+                    , { field: '周转-鄂', title: '周转-鄂' }
+                    , { field: '省份-湘', title: '省份-湘' }
+                    , { field: '上柜数-湘', title: '上柜数-湘' }
+                    , { field: '断码家数-湘', title: '断码家数-湘' , width: 80}
+                    , { field: '断码率-湘', title: '断码率-湘' }
+                    , { field: '周转-湘', title: '周转-湘' }
+                    , { field: '省份-甘', title: '省份-甘' }
+                    , { field: '上柜数-甘', title: '上柜数-甘' }
+                    , { field: '断码家数-甘', title: '断码家数-甘' , width: 80}
+                    , { field: '断码率-甘', title: '断码率-甘' }
+                    , { field: '周转-甘', title: '周转-甘' }
+                    , { field: '省份-闽', title: '省份-闽' }
+                    , { field: '上柜数-闽', title: '上柜数-闽' }
+                    , { field: '断码家数-闽', title: '断码家数-闽' , width: 80}
+                    , { field: '断码率-闽', title: '断码率-闽' }
+                    , { field: '周转-闽', title: '周转-闽' }
+                    , { field: '省份-贵', title: '省份-贵' }
+                    , { field: '上柜数-贵', title: '上柜数-贵' }
+                    , { field: '断码家数-贵', title: '断码家数-贵' , width: 80}
+                    , { field: '断码率-贵', title: '断码率-贵' }
+                    , { field: '周转-贵', title: '周转-贵' }
+                    , { field: '省份-渝', title: '省份-渝' }
+                    , { field: '上柜数-渝', title: '上柜数-渝' }
+                    , { field: '断码家数-渝', title: '断码家数-渝' , width: 80}
+                    , { field: '断码率-渝', title: '断码率-渝' }
+                    , { field: '周转-渝', title: '周转-渝' }
+                    , { field: '省份-陕', title: '省份-陕' }
+                    , { field: '上柜数-陕', title: '上柜数-陕' }
+                    , { field: '断码家数-陕', title: '断码家数-陕' , width: 80}
+                    , { field: '断码率-陕', title: '断码率-陕' }
+                    , { field: '周转-陕', title: '周转-陕' }
+                    , { field: '省份-青', title: '省份-青' }
+                    , { field: '上柜数-青', title: '上柜数-青' }
+                    , { field: '断码家数-青', title: '断码家数-青' , width: 80}
+                    , { field: '断码率-青', title: '断码率-青' }
+                    , { field: '周转-青', title: '周转-青' }
+                ]]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>

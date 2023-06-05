@@ -636,6 +636,7 @@ class Duanmalv extends BaseController
 
     // 更新在途表
     public function zt_1() {
+        $date = date('Y-m-d');
         $sql = "
             SELECT
                 zt.云仓,
@@ -813,7 +814,8 @@ class Duanmalv extends BaseController
                                     CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
                                     CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
                             ) LIKE '%BBBBBBBBBBB%' THEN 0
-                END AS 在途连码个数
+                END AS 在途连码个数,
+                '{$date}' AS 更新日期
             FROM
                 `sp_ww_zt` AS zt
                 
@@ -869,10 +871,40 @@ class Duanmalv extends BaseController
     }
 
     public function handle_1() {
-        $sql1 = "SET @风格 = '基本款';";
-        $this->db_easyA->execute($sql1);
+        // $sql1 = "SET @风格 = '基本款';";
+        // $this->db_easyA->execute($sql1);
 
-        $sql2 = "
+        // $sql2 = "
+        //     SELECT sk.经营模式,
+        //     sk.商品负责人,
+        //     sk.云仓,
+        //     sk.省份,
+        //     sk.店铺名称,
+        //     dr.风格,
+        //     sk.一级分类,
+        //     sk.二级分类,
+        //     dr.领型,
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 销售占比,
+        //     sum(sk.`店铺SKC计数`) as SKC数,
+        //     (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 店铺总SKC数,
+        //     sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as SKC占比,
+        //     sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 销售TOP分配,
+        //     ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 +
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60
+        //     ) / 2, 0) AS 实际分配TOP
+            
+        //     from cwl_duanmalv_sk as sk
+        //     LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+        //     where 
+        //         dr.风格=@风格
+        //         AND sk.销售金额 > 0
+        //     --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+        //     GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
+        //     order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
+        // ";
+
+        $sql3 = "
             SELECT sk.经营模式,
             sk.商品负责人,
             sk.云仓,
@@ -882,26 +914,26 @@ class Duanmalv extends BaseController
             sk.一级分类,
             sk.二级分类,
             dr.领型,
-            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 销售占比,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as 销售占比,
             sum(sk.`店铺SKC计数`) as SKC数,
-            (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 店铺总SKC数,
-            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as SKC占比,
-            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
-            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 销售TOP分配,
-            ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 +
-            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60
+            (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as 店铺总SKC数,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as SKC占比,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 销售TOP分配,
+            ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 +
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60
             ) / 2, 0) AS 实际分配TOP
             
             from cwl_duanmalv_sk as sk
             LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
             where 
-                dr.风格=@风格
+                dr.风格 IN ('基本款', '引流款')
                 AND sk.销售金额 > 0
             --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
             GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
             order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
         ";
-        $select = $this->db_easyA->query($sql2);
+        $select = $this->db_easyA->query($sql3);
         if ($select) {
             // 删除 需要计算排名的
             $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
@@ -1088,7 +1120,7 @@ class Duanmalv extends BaseController
         }
     } 
 
-    // 单店品类断码情况（商品专员可看）
+    // 6.单店品类断码情况（商品专员可看）
     public function table6() {
         $sql = "
             SELECT
@@ -1134,7 +1166,7 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 单店断码情况（商品专员可看）
+    // 5. 单店断码情况（商品专员可看）
     public function table5() {
         $sql = "
             select 
@@ -1232,6 +1264,73 @@ class Duanmalv extends BaseController
                 'status' => 0,
                 'msg' => 'error',
                 'content' => 'cwl_duanmalv_table5 更新失败！'
+            ]);
+        }
+    }
+
+    // 4.单省单款断码情况
+    public function table4() {
+        $sql = "
+            SELECT
+                sk.风格,
+                sk.一级分类 AS 大类,
+                sk.二级分类 AS 中类,
+                sk.领型,
+                sk.货号,
+                sk.省份,
+                sum(sk.`店铺SKC计数`) as 上柜数,
+                sum(
+                    case sk.标准齐码识别修订
+                        when '断码' then 1 else 0
+                    end
+                ) as 断码家数,
+                sum(
+                    case sk.标准齐码识别修订
+                        when '断码' then 1 else 0
+                    end
+                ) / sum(sk.`店铺SKC计数`) AS 断码率,
+                (SELECT
+                sum(销售数量) as 销售数量
+                FROM
+                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    AND 省份 = sk.省份
+                    group by 省份,商品代码
+                ) AS 销售数量,
+                sum(sk.`预计库存数量`) as 预计库存数量,
+                sum(sk.`预计库存数量`) / (SELECT
+                sum(销售数量) as 销售数量
+                FROM
+                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    AND 省份 = sk.省份
+                    group by 省份,商品代码
+                ) as 周转
+            FROM
+                cwl_duanmalv_sk AS sk
+            --  where sk.省份='浙江省'
+            --  and sk.货号='B32502003'
+            GROUP BY
+            sk.省份,sk.风格, sk.一级分类, sk.二级分类, sk.货号
+            ORDER BY sk.省份
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table4')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table4')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table4 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table4 更新失败！'
             ]);
         }
     }
