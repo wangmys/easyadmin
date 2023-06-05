@@ -17,20 +17,22 @@ class Stock_size extends Command
     {
         // 指令配置
         $this->setName('stock')
+            ->addArgument('start_date', Argument::OPTIONAL)
+            ->addArgument('end_date', Argument::OPTIONAL)
             ->setDescription('the stock command');
     }
 
     protected function execute(Input $input, Output $output)
     {
-        ini_set('memory_limit','1000M');
+        ini_set('memory_limit','2000M');
 
-        $start_date = date('Y-m-d', time()-24*60*60*21);//'2023-01-02';////填入 开始日期 的前一天
-        $end_date = date('Y-m-d', time()-24*60*60);//'2023-01-21';//
+        $start_date    = $input->getArgument('start_date') ?: date('Y-m-d', time()-24*60*60*7);//不传参默认导出近一周
+        $end_date    = $input->getArgument('end_date') ?: date('Y-m-d', time()-24*60*60);
 
 		//生成json文件
 		$data = Db::connect("mysql2")->Query($this->get_sql($start_date, $end_date));
 		// print_r($data);die;
-		@file_put_contents(app()->getRootPath().'/public'.'/img/20day_json.txt', json_encode($data));
+		@file_put_contents(app()->getRootPath().'/public'.'/img/day_json.txt', json_encode($data));
 
         echo 'okk';die;
     }

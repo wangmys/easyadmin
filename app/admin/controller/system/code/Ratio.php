@@ -126,6 +126,16 @@ class Ratio extends AdminController
                     $total_item['单码售罄'] = bcadd($all_total / ($all_total + $all_thisTotal) * 100,0,2) . '%';
                 }
 
+                // 货品等级
+                $config = sysconfig('site');
+                // 单码缺量判断数值
+                $level_rate = 0;
+                if($info['StyleCategoryName2']=='B级'){
+                    $level_rate = $config['level_b'];
+                }else{
+                    $level_rate = $config['level_other'];
+                }
+
                 foreach ($size_list as $key =>$value){
 
                     // 根据货号尺码获取周销尺码字段
@@ -208,14 +218,6 @@ class Ratio extends AdminController
                     }
                     $item['单码售罄比'] = (intval($item['单码售罄']) - intval($total_item['单码售罄'])).'%';
 
-                    // 等级限制
-                    $config = sysconfig('site');
-                    $level_rate = 0;
-                    if($info['StyleCategoryName2']=='B级'){
-                        $level_rate = $config['level_b'];
-                    }else{
-                        $level_rate = $config['level_other'];
-                    }
                     if(intval($item['单码售罄比']) > $level_rate){
                         $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
                     }
@@ -226,8 +228,10 @@ class Ratio extends AdminController
 
                 // 提取偏码判断数据
                 $ranking_data = [];
+                // 单码售罄比
+                $sell_out_ratio = [];
                 foreach ($list as $lk => $lv){
-                    $ranking_data['单码售罄比'][$lv['尺码情况']] = intval($lv['单码售罄比']);
+                    $sell_out_ratio[$lv['尺码情况']] = intval($lv['单码售罄比']);
                     $ranking_data['当前库存'][$lv['尺码情况']] = intval($lv['当前库存']);
                     $ranking_data['总库存'][$lv['尺码情况']] = intval($lv['总库存']);
                     $ranking_data['累销尺码比'][$lv['尺码情况']] = intval($lv['累销尺码比']);
@@ -236,17 +240,42 @@ class Ratio extends AdminController
                 foreach ($ranking_data as $kk => $vv){
                     asort($ranking_data[$kk]);
                 }
+                // 判断尺码个数,如果大于等于配置数,则使用配置数,如果小于配置数,则使用尺码数
+                $_count = 3;
+                if($n = count($ranking_data['累销尺码比']) < $_count){
+                    $_count = $n;
+                }
+                // 获取指定前几名的尺码数据
+                $ranking_arr = [];
+                foreach ($ranking_data as $rk => $rv){
+                    $item = array_slice($rv,-$_count,null,true);
+                    $ranking_arr[$rk] = $item;
+                }
+                // 总库存偏码对比
+                $total_inventory_1 = array_diff_key($ranking_arr['总库存'],$ranking_arr['累销尺码比']);
+                $total_inventory_2 = array_diff_key($ranking_arr['累销尺码比'],$ranking_arr['总库存']);
+                $total_inventory = $total_inventory_1 + $total_inventory_2;
+                // 当前库存偏码对比
+                $current_inventory_1 = array_diff_key($ranking_arr['当前库存'],$ranking_arr['累销尺码比']);
+                $current_inventory_2 = array_diff_key($ranking_arr['累销尺码比'],$ranking_arr['当前库存']);
+                $current_inventory = $current_inventory_1 + $current_inventory_2;
 
-
-//                $arr = array_column($list,'当前库存');
-//                $ar = array_map(function ($v){
-//                    return intval($v);
-//                },$arr);
-//                rsort($ar);
-//                echo '<pre>';
-//                print_r($ranking_data);
-//                die;
-                
+                // 判断总库存是否偏码
+                foreach ($total_inventory as $total_key => $total_val){
+                    // 单码售罄比是否高于设定偏码参数
+                    if(isset($sell_out_ratio[$total_key]) && $sell_out_ratio[$total_key] > $level_rate){
+                        // 高于则提示总库存偏码
+                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                    }
+                }
+                // 判断当前库存是否偏码
+                foreach ($current_inventory as $current_key => $current_val){
+                    // 单码售罄比是否高于设定偏码参数
+                    if(isset($sell_out_ratio[$current_key]) && $sell_out_ratio[$current_key] > $level_rate){
+                        // 高于则提示当前库存偏码
+                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                    }
+                }
                 $list[] = $total_item;
             }
 
