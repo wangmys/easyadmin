@@ -40,6 +40,8 @@ class Duanmalv extends BaseController
         $sql = "   
             SELECT TOP
                 200000 EC.CustomItem17 AS 商品负责人,
+        -- 		ER.RetailID,
+        -- 		ER.RetailDate,
                 EC.State AS 省份,
                 EBC.Mathod AS 渠道属性,
                 EC.CustomItem15 AS 店铺云仓,
@@ -81,10 +83,14 @@ class Duanmalv extends BaseController
                 SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo  AS 商品代码,
-                ERG.UnitPrice AS 零售价,
-                ERG.DiscountPrice AS 当前零售价,
+    --          ERG.UnitPrice AS 零售价,
+    -- 								CASE
+    -- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
+    -- 									ELSE 0
+    -- 								END  AS 当前零售价,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
                 SUM ( ERG.Quantity ) AS 销售数量,
-                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
                 ErpRetail AS ER
@@ -95,16 +101,21 @@ class Duanmalv extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
-
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+        -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
                 AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('2023')
-                --AND ER.CustomerName = '九江六店'
-                --AND EG.GoodsNo= 'B32503009'
+        --      AND ERG.Quantity  > 0
+        --      AND ERG.DiscountPrice > 0
+        -- 		AND ER.CustomerName = '舒城一店'
+        -- 		AND EG.GoodsNo= 'B42513005'
             GROUP BY
                 EC.CustomItem17
+        -- 		,ER.RetailID
+        -- 		,ER.RetailDate
                 ,ER.CustomerName
                 ,EG.GoodsNo
                 ,EC.State
@@ -116,8 +127,8 @@ class Duanmalv extends BaseController
                 ,EG.CategoryName2
                 ,EG.CategoryName
                 ,EG.StyleCategoryName
-                ,ERG.UnitPrice
-                ,ERG.DiscountPrice
+        --      ,ERG.UnitPrice
+            HAVING  SUM ( ERG.Quantity ) <> 0
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -134,7 +145,6 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
 
             $chunk_list = array_chunk($select, 1000);
-            $this->db_easyA->startTrans();
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -147,14 +157,12 @@ class Duanmalv extends BaseController
             }
 
             if ($status) {
-                $this->db_easyA->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "cwl_duanmalv_retail first 更新成功，数量：{$count}！"
                 ]);
             } else {
-                $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -164,107 +172,114 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 更新周销
+    // 更新周销 进行排名
     public function retail_second() {
-        // 康雷查询周销
-        $find_retail =$this->db_easyA->table('cwl_duanmalv_retail')->where([
-            ['排名', 'exp', new Raw('IS NULL')]
-        ])->find();
-        // echo $this->db_easyA->getLastSql();
-        // dump($find_retail);die;
-        // echo count($select);
+        // 更新零售价
+        $sql0 = "update cwl_duanmalv_retail as r left join sjp_goods as g on r.`商品代码` = g.货号 
+        set r.零售价 = g.零售价
+        where r.零售价 is null";
+        $this->db_easyA->execute($sql0);
 
-        // 需要进行排名
-        if ($find_retail) {
-            $select = $this->db_easyA->query("
-                SELECT
-                    a.商品负责人,
-                    a.省份,
-                    a.渠道属性,
-                    a.店铺云仓,
-                    a.店铺名称,
-                    a.年份,
-                    a.季节归集,
-                    a.二级时间分类,
-                    a.大类,
-                    a.小类,
-                    a.领型,
-                    a.风格,
-                    a.商品代码,
-                    a.零售价,
-                    a.当前零售价,
-                    a.销售数量,
-                    a.销售金额, 
-                    a.更新日期,
-                (
-                    @rank :=
-                IF
-                ( @GROUP = a.中类, @rank + 1, 1 )) AS 排名
-                ,
-                ( @GROUP := a.中类 ) AS 中类
-            FROM
-                (
-                SELECT
-                    *
+        // 计算折率
+        $sql1 = "
+            UPDATE cwl_duanmalv_retail 
+            SET 折率= ROUND(`当前零售价` / 零售价, 2)
+            WHERE 
+            `折率` IS NULL
+        ";
+        $this->db_easyA->execute($sql1);
+        
+        // 分组排名
+        $select = $this->db_easyA->query("
+            SELECT
+                a.商品负责人,
+                a.省份,
+                a.渠道属性,
+                a.店铺云仓,
+                a.店铺名称,
+                a.年份,
+                a.季节归集,
+                a.二级时间分类,
+                a.大类,
+                -- a.中类,
+                a.小类,
+                -- a.风格,
+                a.商品代码,
+                a.零售价,
+                a.当前零售价,
+                a.销售数量,
+                a.销售金额,
+                a.折率,
+                a.更新日期,
+                CASE
+                    WHEN 
+                        a.中类 = @中类 and 
+                        a.风格 = @风格 and 
+                        a.领型 = @领型 
+                    THEN
+                        @rank := @rank + 1 ELSE @rank := 1
+                END AS 排名,
+                @中类 := a.中类 AS 中类,
+                @风格 := a.风格 AS 风格,
+                @领型 := a.领型 AS 领型
                 FROM
-                    cwl_duanmalv_retail 
+                    cwl_duanmalv_retail a,
+                    ( SELECT @中类 := null,  @风格 := null,  @领型 := null, @rank := 0 ) T
                 WHERE
-                    1
-            -- 		省份='江西省'
-            -- 		店铺名称 = '九江六店' 
+                    折率 >= 0.9
+
+                -- 	AND 中类='休闲长裤'
+                -- 	AND 店铺名称 = '三江一店'
                 ORDER BY
-                    店铺名称 ASC,风格 ASC,季节归集 ASC,中类 ASC, 排名 ASC,
-                    销售数量 DESC 
-                ) a,
-                ( SELECT @rank := 0, @GROUP := '' ) AS b
-            ");
+                    a.店铺名称 ASC,a.中类 ASC, a.风格 ASC,a.领型 ASC,a.销售数量 DESC
+        "); 
 
-            if ($select) {
-                // dump($select[0]);
-                // dump($select[1]);
-                // dump($select[2]);
-                // dump($select[3]);
-                // die;
-                // 删除
-                $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+        // echo '<pre>';
+        // print_r($select); die;
 
-                $chunk_list = array_chunk($select, 1000);
-                $this->db_easyA->startTrans();
+        if ($select) {
+            // $this->db_easyA->startTrans();
 
-                $status = true;
-                foreach($chunk_list as $key => $val) {
-                    // 基础结果 
-                    $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
-                    if (! $insert) {
-                        $status = false;
-                        break;
-                    }
+            // 删除 需要计算排名的
+            $this->db_easyA->table('cwl_duanmalv_retail')->where([
+                ['折率', '>=', 0.9]
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+            
+
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
+                if (! $insert) {
+                    $status = false;
+                    break;
                 }
+            }
 
-                if ($status) {
-                    $this->db_easyA->commit();
-                    return json([
-                        'status' => 1,
-                        'msg' => 'success',
-                        'content' => 'cwl_duanmalv_retail second 更新成功！'
-                    ]);
-                } else {
-                    $this->db_easyA->rollback();
-                    return json([
-                        'status' => 0,
-                        'msg' => 'error',
-                        'content' => 'cwl_duanmalv_retail second 更新失败！'
-                    ]);
-                }
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_retail second 更新成功！'
+                ]);
             } else {
-                $this->db_easyA->rollback();
+                // $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
-                    'content' => 'cwl_duanmalv_retail 排名执行失败！'
+                    'content' => 'cwl_duanmalv_retail second 更新失败！'
                 ]);
             }
-
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_retail 排名执行失败！'
+            ]);
         }
     }
 
@@ -491,9 +506,10 @@ class Duanmalv extends BaseController
 
                 WHERE
                     sk.季节 IN ('初夏', '盛夏', '夏季') 
+                    AND c.Region <> '闭店区'
+                --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'
-                -- 	AND sk.店铺名称='东莞三店'
                 -- 	AND sk.货号='B32101027'
                 GROUP BY 
                     sk.店铺名称, 
@@ -509,7 +525,7 @@ class Duanmalv extends BaseController
             // 删除历史数据
             $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
             $chunk_list = array_chunk($select_sk, 1000);
-            $this->db_easyA->startTrans();
+            // $this->db_easyA->startTrans();
 
             $status = true;
             foreach($chunk_list as $key => $val) {
@@ -522,14 +538,14 @@ class Duanmalv extends BaseController
             }
 
             if ($status) {
-                $this->db_easyA->commit();
+                // $this->db_easyA->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "cwl_duanmalv_sk first 更新成功，数量：{$count}！"
                 ]);
             } else {
-                $this->db_easyA->rollback();
+                // $this->db_easyA->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -539,28 +555,38 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 更新店铺排名 零售价 当前零售价
+    // 更新店铺排名 零售价 当前零售价  (可能不需要)
     public function sk_second() {
+        // 有排名才更新，折率1以下
         $sql = "
-            UPDATE cwl_duanmalv_sk AS sk
-                INNER JOIN cwl_duanmalv_retail AS dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
-                SET sk.店铺近一周排名 = dr.排名,
+            UPDATE 
+                cwl_duanmalv_sk AS sk
+            INNER JOIN
+                cwl_duanmalv_retail AS dr 
+            ON 
+                sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+            SET 
+                sk.店铺近一周排名 = dr.排名,
                 sk.零售价 = dr.零售价,
-                sk.当前零售价 = dr.当前零售价 
-                WHERE sk.店铺近一周排名 is null
+                sk.当前零售价 = dr.当前零售价, 
+                sk.折率 = dr.折率,
+                sk.销售金额 = dr.`销售金额`
+            WHERE 
+               -- dr.排名 IS NOT NULL
+                dr.销售金额 > 0
         ";
 
-        $status = $this->db_easyA->query($sql);
-        $count = count($status);
+        // $this->db_easyA->startTrans();
+        $status = $this->db_easyA->execute($sql);
         if ($status) {
-            $this->db_easyA->commit();
+            // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$count}！"
+                'content' => "cwl_duanmalv_sk 店铺排名 零售价 当前零售价 更新成功，数量：{$status}！"
             ]);
         } else {
-            $this->db_easyA->rollback();
+            // $this->db_easyA->rollback();
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -569,13 +595,744 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 断码判定
+    // 断码 无效库存判定
     public function sk_third() {
-        
+        $sql1 = "set @内搭 = 4, @外套=4, @鞋履=4, @松紧长裤=5, @松紧短裤=5, @下装=6;";
+        $this->db_easyA->execute($sql1);
 
-        $this->db_easyA->table("cwl_duanmalv_sk")->field('')->where(
-
-        )->select();
+        $sql2 = "
+            UPDATE cwl_duanmalv_sk 
+            SET 标准齐码识别修订 = 
+                CASE 
+                    WHEN (`累销数量`<= 0 || `累销数量` IS NULL) && (预计库存数量 <= 1 || 预计库存数量 IS NULL) THEN '无效库存'
+                    -- WHEN (`一级分类`='下装' && 店铺SKC计数=1 && `预计库存连码个数` < @下装) THEN '断码'
+                    WHEN (`二级分类`='松紧长裤' && 店铺SKC计数=1 && `预计库存连码个数` < @松紧长裤) THEN '断码' 
+                    WHEN (`二级分类`='松紧短裤' && 店铺SKC计数=1 && `预计库存连码个数` < @松紧短裤) THEN '断码' 
+                    WHEN (`一级分类`='下装' && `二级分类`!='松紧短裤' &&  `二级分类`!='松紧长裤' && 店铺SKC计数=1 && `预计库存连码个数` < @下装) THEN '断码' 
+                    WHEN (`一级分类`='鞋履' && 店铺SKC计数=1 && `预计库存连码个数` < @鞋履) THEN '断码' 
+                    WHEN (`一级分类`='外套' && 店铺SKC计数=1 && `预计库存连码个数` < @外套) THEN '断码' 
+                    WHEN (`一级分类`='内搭' && 店铺SKC计数=1 && `预计库存连码个数` < @内搭) THEN '断码'
+                    ELSE ''
+                END	
+            WHERE 
+            `标准齐码识别修订` IS NULL";
+        // $this->db_easyA->startTrans();
+        $status = $this->db_easyA->execute($sql2);
+        if ($status) {
+            // $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_duanmalv_sk 标准齐码识别修订 更新成功，数量：{$status}！"
+            ]);
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_sk 标准齐码识别修订 更新失败！'
+            ]);
+        }
     }
 
+    // 更新在途表
+    public function zt_1() {
+        $date = date('Y-m-d');
+        $sql = "
+            SELECT
+                zt.云仓,
+                zt.合计,
+                zt.货号,
+                sk.一级分类, 
+                sk.二级分类,
+                zt.年份,
+                zt.季节, 
+                zt.`00/28/37/44/100/160/S`,
+                zt.`29/38/46/105/165/M`,
+                zt.`30/39/48/110/170/L`,
+                zt.`31/40/50/115/175/XL`,
+                zt.`32/41/52/120/180/2XL`,
+                zt.`33/42/54/125/185/3XL`,
+                zt.`34/43/56/190/4XL`,
+                zt.`35/44/58/195/5XL`,
+                zt.`36/6XL`,
+                zt.`38/7XL`,
+                zt.`_40`,
+                CASE
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAAAA%' THEN 11 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAAA%' THEN 10 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAAA%' THEN 9 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAAA%' THEN 8 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAAA%' THEN 7 
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAAA%' THEN 6	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAAA%' THEN 5	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAAA%' THEN 4	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AAA%' THEN 3	
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%AA%' THEN 2		
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%A%' THEN 1		
+                    WHEN CONCAT(
+                                    CASE WHEN SUM(zt.`00/28/37/44/100/160/S`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`29/38/46/105/165/M`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`30/39/48/110/170/L`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`31/40/50/115/175/XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`32/41/52/120/180/2XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`33/42/54/125/185/3XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`34/43/56/190/4XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`35/44/58/195/5XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`36/6XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`38/7XL`) >0 THEN 'A' ELSE 'B' END,
+                                    CASE WHEN SUM(zt.`_40`) >0 THEN 'A' ELSE 'B' END
+                            ) LIKE '%BBBBBBBBBBB%' THEN 0
+                END AS 在途连码个数,
+                '{$date}' AS 更新日期
+            FROM
+                `sp_ww_zt` AS zt
+                
+                left JOIN (select 货号,一级分类, 二级分类 from sjp_goods where 一级分类 is not null and 二级分类 is not null GROUP BY 货号 ) AS sk ON zt.货号 = sk.货号
+                group by zt.货号,zt.云仓        
+        ";
+                        
+        $select = $this->db_bi->query($sql);
+        // echo '<pre>';
+        // print_r($select);
+        if ($select) {
+
+            $qimaArr = [
+                '内搭' => '4',
+                '外套' => '4',
+                '鞋履' => '4',
+                '松紧长裤' => '5',
+                '松紧短裤' => '5',
+                '下装' => '6',
+            ];
+            foreach ($select as $key => $val) {
+                if ($val['二级分类'] == '松紧长裤' || $val['二级分类'] == '松紧短裤') {
+
+                    $select[$key]['连码要求个数'] = $qimaArr[$val['二级分类']];
+                } else {
+                    $select[$key]['连码要求个数'] = $qimaArr[$val['一级分类']];
+                }
+                
+            }
+            // echo '<pre>';
+            // print_r($select);
+            // die;
+            // 删除
+            $this->db_easyA->table('cwl_duanmalv_zt')->where(1)->delete();
+            // 插入
+            $status = $this->db_easyA->table('cwl_duanmalv_zt')->insertAll($select);
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_zt 在途 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_zt 在途 更新失败！'
+                ]);
+            }
+        }
+    }
+
+    public function handle_1() {
+        // $sql1 = "SET @风格 = '基本款';";
+        // $this->db_easyA->execute($sql1);
+
+        // $sql2 = "
+        //     SELECT sk.经营模式,
+        //     sk.商品负责人,
+        //     sk.云仓,
+        //     sk.省份,
+        //     sk.店铺名称,
+        //     dr.风格,
+        //     sk.一级分类,
+        //     sk.二级分类,
+        //     dr.领型,
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 销售占比,
+        //     sum(sk.`店铺SKC计数`) as SKC数,
+        //     (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as 店铺总SKC数,
+        //     sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) as SKC占比,
+        //     sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 销售TOP分配,
+        //     ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60 +
+        //     sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=@风格 AND 销售金额 > 0) * 60
+        //     ) / 2, 0) AS 实际分配TOP
+            
+        //     from cwl_duanmalv_sk as sk
+        //     LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+        //     where 
+        //         dr.风格=@风格
+        //         AND sk.销售金额 > 0
+        //     --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+        //     GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
+        //     order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
+        // ";
+
+        $sql3 = "
+            SELECT sk.经营模式,
+            sk.商品负责人,
+            sk.云仓,
+            sk.省份,
+            sk.店铺名称,
+            dr.风格,
+            sk.一级分类,
+            sk.二级分类,
+            dr.领型,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as 销售占比,
+            sum(sk.`店铺SKC计数`) as SKC数,
+            (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as 店铺总SKC数,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) as SKC占比,
+            sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 AS SKC数TOP分配,
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 销售TOP分配,
+            ROUND((sum(sk.`店铺SKC计数`) / (select sum(店铺SKC计数) from cwl_duanmalv_sk where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60 +
+            sum(dr.销售金额) / (select sum(销售金额) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格=dr.风格 AND 销售金额 > 0) * 60
+            ) / 2, 0) AS 实际分配TOP
+            
+            from cwl_duanmalv_sk as sk
+            LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+            where 
+                dr.风格 IN ('基本款', '引流款')
+                AND sk.销售金额 > 0
+            --    AND sk.店铺名称 in ('三江一店', '安化二店', '南宁二店')
+            GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, dr.领型	
+            order by sk.`经营模式` asc, sk.云仓 asc, sk.省份 asc, sk.店铺名称 asc, dr.风格 asc, sk.`一级分类` asc, sk.`二级分类` asc, dr.领型 asc
+        ";
+        $select = $this->db_easyA->query($sql3);
+        if ($select) {
+            // 删除 需要计算排名的
+            $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_handle_1')->strict(false)->insertAll($val);
+                if (! $insert) {
+                    $status = false;
+                    break;
+                }
+            }
+
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_handle_1 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_handle_1  更新失败！'
+                ]);
+            }
+
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_handle_1 更新失败！'
+            ]);
+        }
+    }
+
+    // 计算是否top 60考核款
+    public function handle_2() {
+        // $this->db_easyA->commit();die;
+        // 1.先判断有排名 & 实际分配TOP 再判断在途情况
+        $sql = "
+            update cwl_duanmalv_handle_1 h
+                LEFT JOIN cwl_duanmalv_sk sk ON h.店铺名称 = sk.店铺名称 
+                AND h.`二级分类` = sk.`二级分类` 
+                AND h.风格=sk.风格
+                AND h.领型 = sk.领型
+                SET sk.`是否TOP60` = '是'
+            WHERE	
+                h.`店铺名称`=sk.`店铺名称` 
+                AND h.风格=sk.风格
+                and h.`一级分类`=sk.`一级分类`
+                and h.二级分类=sk.`二级分类` 
+                and h.领型=sk.领型
+                and sk.`店铺近一周排名` > 0
+                and sk.`店铺近一周排名` <= h.`实际分配TOP`
+                and sk.标准齐码识别修订 = '断码'
+        ";
+        $status = $this->db_easyA->execute($sql);
+
+        // 2.没有在途，是top60考核款
+        $sql2 = "
+            update cwl_duanmalv_sk sk
+                LEFT JOIN cwl_duanmalv_zt zt ON sk.货号 = zt.`货号` and sk.云仓 = zt.云仓
+                set sk.是否TOP60考核款='是'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+                AND zt.货号 is null
+        ";
+        $status2 = $this->db_easyA->execute($sql2);
+
+        // 3.有在途，库存<50 && 不连码 是top60考核款	
+        $sql3 = "
+            update cwl_duanmalv_sk sk
+                LEFT JOIN cwl_duanmalv_zt zt ON sk.货号 = zt.`货号` and sk.云仓 = zt.云仓
+                set sk.是否TOP60考核款='是'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+                AND zt.货号 is not null
+                AND zt.合计 < 50
+                AND zt.在途连码个数 < zt.连码要求个数	
+        ";
+        $status3 = $this->db_easyA->execute($sql3);
+
+        // 4.在途不满足的设置为top60考核款
+        $sql4 = "
+            update cwl_duanmalv_sk sk
+                set sk.是否TOP60考核款='否'
+            WHERE
+                sk.`是否TOP60` = '是'
+                AND sk.是否TOP60考核款 IS NULL
+        ";
+        $status4 = $this->db_easyA->execute($sql4);
+
+        // echo $status;die;
+        if ($status) {
+            // $this->db_easyA->commit();
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_sk 是否top60考核款 更新成功！'
+            ]);
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_sk 是否top60考核款  更新失败！'
+            ]);
+        }
+    }
+
+    // 更新TOP断码数  全部短码数 
+    public function handle_3() {
+        // 分组查询
+        $sql = "
+            SELECT sk.店铺名称,
+                sk.一级分类,
+                sk.二级分类, 
+                sk.领型,
+                sk.风格, 
+                sk.货号,
+                sk.是否TOP60考核款,
+                sk.是否TOP60,
+                SUM(
+                    case
+                        sk.是否TOP60考核款
+                    when '是' THEN 1 ELSE 0
+                END 
+                ) AS TOP断码SKC数,
+                COUNT(1) AS 全部断码SKC数	
+                from cwl_duanmalv_sk sk 
+            WHERE sk.`是否TOP60`='是'
+            GROUP BY sk.`店铺名称`,sk.风格, sk.一级分类,sk.`二级分类`,sk.领型
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_sk_group')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_sk_group')->strict(false)->insertAll($select);
+
+            $sql2 = "
+                UPDATE cwl_duanmalv_handle_1 AS h
+                LEFT JOIN cwl_duanmalv_sk_group skg ON h.`店铺名称` = skg.`店铺名称` 
+                AND h.风格 = skg.风格 
+                AND h.一级分类 = skg.`一级分类` 
+                AND h.`二级分类` = skg.`二级分类` 
+                AND h.领型 = skg.领型 
+                SET h.TOP断码SKC数 = skg.TOP断码SKC数, h.全部断码SKC数 = skg.全部断码SKC数 
+                WHERE
+                    h.TOP断码SKC数 IS NULL
+            ";
+            $status = $this->db_easyA->execute($sql2);
+
+            if ($status) {
+                // $this->db_easyA->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新成功！'
+                ]);
+            } else {
+                // $this->db_easyA->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新失败！'
+                ]);
+            }
+        } else {
+            // $this->db_easyA->rollback();
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_handle_1 TOP断码数  全部短码数 更新失败！'
+            ]);
+        }
+    } 
+
+    // 6.单店品类断码情况（商品专员可看）
+    public function table6() {
+        $sql = "
+            SELECT
+                云仓,
+                省份,
+                商品负责人,
+                店铺名称,
+                经营模式,
+                风格,
+                一级分类,
+                二级分类,
+                领型,
+                店铺总SKC数,
+                TOP断码SKC数,
+                ROUND( TOP断码SKC数 / 店铺总SKC数, 2 ) AS TOP断码率,
+                全部断码SKC数,
+                ROUND( 全部断码SKC数 / 店铺总SKC数, 2 ) AS 全部断码率 
+            FROM
+                cwl_duanmalv_handle_1 
+            ORDER BY
+                商品负责人 ASC
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table6')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            $status = true;
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table6')->strict(false)->insertAll($val);
+            }
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table6 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table6 更新失败！'
+            ]);
+        }
+    }
+
+    // 5. 单店断码情况（商品专员可看）
+    public function table5() {
+        $sql = "
+            select 
+                h.云仓,
+                h.省份,
+                h.商品负责人,
+                h.店铺名称,
+                c.CustomerGrade AS 店铺等级,
+                h.经营模式,
+                h.店铺总SKC数,
+                SUM( h.TOP断码SKC数 ) AS TOP断码SKC数,
+                ROUND( SUM(h.TOP断码SKC数) / h.店铺总SKC数, 2 ) AS TOP断码率,
+                SUM(h.全部断码SKC数) AS 全部断码SKC数,
+                ROUND( SUM(h.全部断码SKC数) / h.店铺总SKC数, 2 ) AS 全部断码率
+            from cwl_duanmalv_handle_1 as h
+            left join customer as c on h.店铺名称 = c.CustomerName
+            GROUP BY h.店铺名称
+            ORDER BY h.商品负责人
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+            
+            // 全部断码率排名sql
+            $sql2 = "
+                select 
+                    t5.云仓,
+                    t5.省份,
+                    t5.店铺名称,
+                    t5.店铺等级,
+                    t5.经营模式,
+                    t5.店铺总SKC数,
+                    t5.TOP断码SKC数,
+                    t5.TOP断码率,
+                    t5.全部断码SKC数,
+                    t5.全部断码率,
+                    case 
+                        when t5.商品负责人 = @商品负责人 then @rank := @rank + 1 ELSE @rank := 1
+                    end as 全部断码排名,
+                    @商品负责人 := t5.商品负责人 AS 商品负责人
+                from cwl_duanmalv_table5 as t5,
+                ( SELECT @商品负责人 := null, @rank := 0 ) T
+                order by t5.商品负责人 ASC, t5.`全部断码SKC数` DESC	
+            ";
+            $select2 = $this->db_easyA->query($sql2);
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list2 = array_chunk($select2, 1000);
+            foreach($chunk_list2 as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+
+            // 全部断码率排名sql
+            $sql3 = "
+                    select 
+                    t5.云仓,
+                    t5.省份,
+                    t5.店铺名称,
+                    t5.店铺等级,
+                    t5.经营模式,
+                    t5.店铺总SKC数,
+                    t5.TOP断码SKC数,
+                    t5.TOP断码率,
+                    t5.全部断码SKC数,
+                    t5.全部断码率,
+                    t5.全部断码排名,
+                    case 
+                        when t5.商品负责人 = @商品负责人  then @rank := @rank + 1 ELSE @rank := 1
+                    end as TOP断码排名,
+                    @商品负责人 := t5.商品负责人 AS 商品负责人
+                from cwl_duanmalv_table5 as t5,
+                ( SELECT @商品负责人 := null, @rank := 0 ) T
+                order by t5.商品负责人 ASC, t5.`TOP断码SKC数` DESC
+            ";
+            $select3 = $this->db_easyA->query($sql3);
+            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $chunk_list3 = array_chunk($select3, 1000);
+            foreach($chunk_list3 as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table5 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table5 更新失败！'
+            ]);
+        }
+    }
+
+    // 4.单省单款断码情况
+    public function table4() {
+        $sql = "
+            SELECT
+                sk.风格,
+                sk.一级分类 AS 大类,
+                sk.二级分类 AS 中类,
+                sk.领型,
+                sk.货号,
+                sk.省份,
+                sum(sk.`店铺SKC计数`) as 上柜数,
+                sum(
+                    case sk.标准齐码识别修订
+                        when '断码' then 1 else 0
+                    end
+                ) as 断码家数,
+                sum(
+                    case sk.标准齐码识别修订
+                        when '断码' then 1 else 0
+                    end
+                ) / sum(sk.`店铺SKC计数`) AS 断码率,
+                (SELECT
+                sum(销售数量) as 销售数量
+                FROM
+                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    AND 省份 = sk.省份
+                    group by 省份,商品代码
+                ) AS 销售数量,
+                sum(sk.`预计库存数量`) as 预计库存数量,
+                sum(sk.`预计库存数量`) / (SELECT
+                sum(销售数量) as 销售数量
+                FROM
+                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    AND 省份 = sk.省份
+                    group by 省份,商品代码
+                ) as 周转
+            FROM
+                cwl_duanmalv_sk AS sk
+            --  where sk.省份='浙江省'
+            --  and sk.货号='B32502003'
+            GROUP BY
+            sk.省份,sk.风格, sk.一级分类, sk.二级分类, sk.货号
+            ORDER BY sk.省份
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table4')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table4')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table4 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table4 更新失败！'
+            ]);
+        }
+    }
 }

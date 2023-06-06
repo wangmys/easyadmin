@@ -361,3 +361,20 @@ function json_success($code=200, $msg='okk', $data=[]) {
 function json_fail($code=400, $msg='参数有误', $data=[]) {
     echo json_encode(['code'=>$code, 'msg'=>$msg, 'data'=>$data]);die;
 }
+
+function generate_sql($arr, $table) {
+
+    $sql_str = "set identity_insert {$table} ON; insert into [{$table}] (";
+    $key = '';
+    $value = ' VALUES (';
+    foreach ($arr as $k_arr => $v_arr) {
+        $key .= '['.$k_arr.'],';
+        $value .= "'".$v_arr."',";
+    }
+    $key = substr($key, 0, -1);
+    $value = substr($value, 0, -1);
+    $sql_str = $sql_str.$key.')'.$value.');';
+    // echo $sql_str;die;
+    return $sql_str;
+
+}

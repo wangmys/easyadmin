@@ -108,22 +108,22 @@ class Weather extends AdminController
                                 $value_c = $vv['min_c'];
                             }
                             if ($value_c < 10) {
-                                $bgCol = 'rgb(3,117,233)';
+                                $bgCol = 'rgb(47,117,181)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 10 && $value_c < 18) {
-                                $bgCol = 'rgb(155,194,230)';
+                                $bgCol = 'rgb(163,200,232)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 18 && $value_c < 22) {
-                                $bgCol = 'rgb(255,230,153)';
+                                $bgCol = 'rgb(254,250,186)';
                                 $fontCol = '#000000';  
                             } else if ($value_c >= 22 && $value_c  < 26) {
-                                $bgCol = 'rgb(255,202,59)';
+                                $bgCol = 'rgb(252,216,84)';
                                 $fontCol = '#000000';  
                             } else if ($value_c >= 26 && $value_c  < 30) {
-                                $bgCol = 'rgb(255,255,0)';
+                                $bgCol = 'rgb(251,184,5)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 30) {
-                                $bgCol = 'rgb(215,28,4)';
+                                $bgCol = 'rgb(239,33,33)';
                                 $fontCol = '#000000';
                             } else{
                                 $bgCol = '#fecc51';

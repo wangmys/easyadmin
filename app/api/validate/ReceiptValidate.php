@@ -15,8 +15,8 @@ class ReceiptValidate extends Validate
      */
     protected $rule = [
         'ReceiptID' => 'require',
-        'WarehouseId' => 'require',
-        'WarehouseName' => 'require',
+        // 'WarehouseId' => 'require',
+        // 'WarehouseName' => 'require',
         'CustomerId' => 'require',
         'CustomerName' => 'require',
 //        'Remark' => 'require',
@@ -26,7 +26,7 @@ class ReceiptValidate extends Validate
     ];
 
     protected $scene = [
-        'create' => ['ReceiptID', 'WarehouseId', 'WarehouseName', 'CustomerId', 'CustomerName', 'Goods', 'CodingCode', 'Type'],
+        'create' => ['ReceiptID', 'CustomerId', 'CustomerName', 'Goods', 'CodingCode', 'Type'],
         'update' => ['ReceiptID', 'CodingCode'],
         'delete' => ['ReceiptID'],
     ];
@@ -39,8 +39,8 @@ class ReceiptValidate extends Validate
      */
     protected $message = [
         'ReceiptID.require' => 'ReceiptID不能为空',
-        'WarehouseId.require' => 'WarehouseId不能为空',
-        'WarehouseName.require' => 'WarehouseName不能为空',
+        // 'WarehouseId.require' => 'WarehouseId不能为空',
+        // 'WarehouseName.require' => 'WarehouseName不能为空',
         'CustomerId.require' => 'CustomerId不能为空',
         'CustomerName.require' => 'CustomerName不能为空',
         'Remark.require' => 'Remark不能为空',

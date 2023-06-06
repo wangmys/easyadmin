@@ -1,0 +1,22 @@
+<style>
+    .layuimini-main tr td{
+        margin: 0px;
+        padding: 0px 0;
+    }
+
+    .layui-table-cell {
+        font-size: 12px;
+        color: #606266;
+        padding: 0 0px;
+    }
+    th.layui-table-patch{padding: 0 !important;}
+    .layui-card .layui-card-body .layui-table td { max-width: 100%;}
+</style>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
+    </table>
+</div>
+</div>
+</div>
+<input type="text" id="where" class="layui-hide" value="{:htmlspecialchars(json_encode($where))}">

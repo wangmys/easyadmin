@@ -17,14 +17,14 @@ class PurchaseReturnValidate extends Validate
         'PurchaseReturnId' => 'require',
         'WarehouseId' => 'require',
         'SupplyId' => 'require',
-        'PurchaseID' => 'require',
+        // 'PurchaseID' => 'require',
         'WarehouseName' => 'require',
         'Goods' => 'require|array',
         'CodingCode' => 'require',
     ];
 
     protected $scene = [
-        'create' => ['PurchaseReturnId', 'WarehouseId', 'SupplyId', 'PurchaseID', 'WarehouseName', 'Goods', 'CodingCode'],
+        'create' => ['PurchaseReturnId', 'WarehouseId', 'SupplyId', 'WarehouseName', 'Goods', 'CodingCode'],
         'update' => ['PurchaseReturnId', 'CodingCode'],
         'delete' => ['PurchaseReturnId'],
     ];
@@ -39,7 +39,7 @@ class PurchaseReturnValidate extends Validate
         'PurchaseReturnId.require' => 'PurchaseReturnId不能为空',
         'WarehouseId.require' => 'WarehouseId不能为空',
         'SupplyId.require' => 'SupplyId不能为空',
-        'PurchaseID.require' => 'PurchaseID不能为空',
+        // 'PurchaseID.require' => 'PurchaseID不能为空',
         'WarehouseName.require' => 'WarehouseName不能为空',
         'Goods.array' => 'Goods必须为数组',
         'Goods.require' => 'Goods不能为空',

@@ -2,6 +2,8 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
     var form = layui.form,
     table = layui.table;
+     var colorpicker = layui.colorpicker;
+     var $ = layui.$;
 
     var Controller = {
         index: function () {
@@ -15,6 +17,17 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             // form.on("radio(upload_type)", function (data) {
             //     app.upload_type = this.value;
             // });
+
+             // 渲染
+  colorpicker.render({
+    elem: '#ID-colorpicker-demo-form',
+    color: '#1c97f5',
+    done: function(color){
+      $('#ID-colorpicker-demo-form-color').val(color);
+    }
+  });
+
+
 
             // 渲染配饰排除门店
             this.exclude_store();

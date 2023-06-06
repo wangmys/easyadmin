@@ -43,7 +43,7 @@ class CustomerValidate extends Validate
         'IsGetDefaultCustStock' => 'require',
         'IsGetDefaultVIPCustStock' => 'require',
         'IsAllowPreSale' => 'require',
-        'RegionId' => 'require',
+        // 'RegionId' => 'require',
     ];
 
     protected $scene = [
@@ -51,13 +51,13 @@ class CustomerValidate extends Validate
             'CustomerId', 'CustomerCode', 'CustomerName', 'MathodId', 'ShutOut'
         , 'StateId', 'RoleCategoryId', 'AccountId', 'PosSalesmanControl', 'RoundingMode', 'RoundingType', 'RoundingUnit', 'PosPrintNum', 'ShopNature', 'IsCustReceiptDelivery'
         , 'IsInCustomer', 'AllowNegativeInventory', 'IsPosStockCheck', 'DeliveryRoundingMode', 'DeliveryRoundingType', 'DeliveryRoundingUnit', 'IsNotReturnDiscount', 'IsAllowShopPickUp', 'IsInstructionCustOutbound', 'IsPosRetailInProportion'
-        , 'SupplyStockType', 'IsGetDefaultCustStock', 'IsGetDefaultVIPCustStock', 'IsAllowPreSale', 'RegionId'
+        , 'SupplyStockType', 'IsGetDefaultCustStock', 'IsGetDefaultVIPCustStock', 'IsAllowPreSale'
     ],
         'update' => [
             'CustomerId', 'CustomerCode', 'CustomerName', 'MathodId', 'ShutOut'
             , 'StateId', 'RoleCategoryId', 'AccountId', 'PosSalesmanControl', 'RoundingMode', 'RoundingType', 'RoundingUnit', 'PosPrintNum', 'ShopNature', 'IsCustReceiptDelivery'
             , 'IsInCustomer', 'AllowNegativeInventory', 'IsPosStockCheck', 'DeliveryRoundingMode', 'DeliveryRoundingType', 'DeliveryRoundingUnit', 'IsNotReturnDiscount', 'IsAllowShopPickUp', 'IsInstructionCustOutbound', 'IsPosRetailInProportion'
-            , 'SupplyStockType', 'IsGetDefaultCustStock', 'IsGetDefaultVIPCustStock', 'IsAllowPreSale', 'RegionId'
+            , 'SupplyStockType', 'IsGetDefaultCustStock', 'IsGetDefaultVIPCustStock', 'IsAllowPreSale'
         ],
         'delete' => ['CustomerId'],
     ];
