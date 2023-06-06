@@ -434,7 +434,9 @@ class SendPic extends BaseController
             $store_jiandanjia_aim = config('sendpic')[$province]['jd'];
         }
         // print_r([$store_liandai_aim, $store_jiandanjia_aim]);die;
-        $today_shoe_aim = '8';
+        //该店铺对应的导购：
+        $daogou_users_data = $this->service->get_daogou_users($v_data['id']);
+        $today_shoe_aim = count($daogou_users_data);
         $today_dianzhang_aim = '2000';
         $table_data= [
             ['title' => '店铺连带目标', 'number' => $store_liandai_aim],
