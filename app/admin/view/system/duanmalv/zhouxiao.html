@@ -160,26 +160,26 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '商品负责人', title: '商品负责人', fixed: 'left'}
-                    , { field: '省份', title: '省份', fixed: 'left' }
-                    , { field: '渠道属性', title: '渠道属性', fixed: 'left'}
-                    , { field: '店铺云仓', title: '店铺云仓', fixed: 'left' }
-                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' }
-                    , { field: '年份', title: '年份', fixed: 'left' }
-                    , { field: '季节归集', title: '季节归集', fixed: 'left' }
-                    , { field: '二级时间分类', title: '二级时间分类', fixed: 'left' }
-                    , { field: '大类', title: '大类', fixed: 'left' }
-                    , { field: '中类', title: '中类', fixed: 'left' }
-                    , { field: '小类', title: '小类', fixed: 'left' }
-                    , { field: '领型', title: '领型' ,fixed:'left'}
-                    , { field: '风格', title: '风格' ,fixed:'left'} 
-                    , { field: '商品代码', title: '商品代码' ,fixed:'left' }
-                    , { field: '零售价', title: '零售价' }
-                    , { field: '当前零售价', title: '当前零售价' }
-                    , { field: '销售数量', title: '销售数量' }
-                    , { field: '销售金额', title: '销售金额' }
-                    , { field: '折率', title: '折率' }
-                    , { field: '排名', title: '排名' }
+                    { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center'}
+                    , { field: '省份', title: '省份', fixed: 'left', width: 100, align: 'center' }
+                    , { field: '渠道属性', title: '渠道属性', fixed: 'left', align: 'center'}
+                    , { field: '店铺云仓', title: '店铺云仓', fixed: 'left' , align: 'center'}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' , align: 'center'}
+                    , { field: '年份', title: '年份', fixed: 'left', align: 'center' }
+                    , { field: '季节归集', title: '季节归集', fixed: 'left', align: 'center' }
+                    , { field: '二级时间分类', title: '二级时间分类', fixed: 'left', align: 'center' }
+                    , { field: '大类', title: '大类', fixed: 'left', align: 'center' }
+                    , { field: '中类', title: '中类', fixed: 'left', align: 'center' }
+                    , { field: '小类', title: '小类', fixed: 'left', align: 'center' }
+                    , { field: '领型', title: '领型' ,fixed:'left', align: 'center'}
+                    , { field: '风格', title: '风格' ,fixed:'left', align: 'center'} 
+                    , { field: '商品代码', title: '商品代码' ,fixed:'left', align: 'center' }
+                    , { field: '零售价', title: '零售价', align: 'center' }
+                    , { field: '当前零售价', title: '当前零售价', align: 'center' }
+                    , { field: '销售数量', title: '销售数量', align: 'center' }
+                    , { field: '销售金额', title: '销售金额', align: 'center' }
+                    , { field: '折率', title: '折率', align: 'center' }
+                    , { field: '排名', title: '排名', align: 'center' }
                 ]]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);

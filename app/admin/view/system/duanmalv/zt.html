@@ -160,26 +160,26 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '云仓', title: '云仓', fixed: 'left'}
-                    , { field: '年份', title: '年份', fixed: 'left' }
-                    , { field: '季节', title: '季节', fixed: 'left' }
-                    , { field: '一级分类', title: '一级分类', fixed: 'left' }
-                    , { field: '二级分类', title: '二级分类', fixed: 'left' }
-                    , { field: '货号', title: '货号', fixed: 'left' ,width: 80}
-                    , { field: '合计', title: '合计', fixed: 'left' }
-                    , { field: '在途连码个数', title: '在途连码数 ',width: 80, fixed: 'left' }
-                    , { field: '连码要求个数', title: '连码要求数',width: 80, fixed: 'left' }
-                    , { field: '00/28/37/44/100/160/S', title: '00/28/37/44/100/160/S', width: 130 }
-                    , { field: '29/38/46/105/165/M', title: '29/38/46/105/165/M', width: 130 }
-                    , { field: '30/39/48/110/170/L', title: '30/39/48/110/170/L', width: 130 } 
-                    , { field: '31/40/50/115/175/XL', title: '31/40/50/115/175/XL', width: 130 }
-                    , { field: '32/41/52/120/180/2XL', title: '32/41/52/120/180/2XL', width: 130 }
-                    , { field: '33/42/54/125/185/3XL', title: '33/42/54/125/185/3XL', width: 130 }
-                    , { field: '34/43/56/190/4XL', title: '34/43/56/190/4XL', width: 130 }
-                    , { field: '35/44/58/195/5XL', title: '35/44/58/195/5XL' , width: 130}
-                    , { field: '36/6XL', title: '36/6XL' }
-                    , { field: '38/7XL', title: '38/7XL' }
-                    , { field: '_40', title: '_40' }
+                    { field: '云仓', title: '云仓', fixed: 'left', align: 'center'}
+                    , { field: '年份', title: '年份', fixed: 'left', align: 'center' }
+                    , { field: '季节', title: '季节', fixed: 'left', align: 'center' }
+                    , { field: '一级分类', title: '一级分类', fixed: 'left', align: 'center' }
+                    , { field: '二级分类', title: '二级分类', fixed: 'left', align: 'center' }
+                    , { field: '货号', title: '货号', fixed: 'left' ,width: 80, align: 'center'}
+                    , { field: '合计', title: '合计', fixed: 'left', align: 'center' }
+                    , { field: '在途连码个数', title: '在途连码数 ',width: 80, fixed: 'left', align: 'center' }
+                    , { field: '连码要求个数', title: '连码要求数',width: 80, fixed: 'left', align: 'center' }
+                    , { field: '00/28/37/44/100/160/S', title: '00/28/37/44/100/160/S', width: 130, align: 'center' }
+                    , { field: '29/38/46/105/165/M', title: '29/38/46/105/165/M', width: 130, align: 'center' }
+                    , { field: '30/39/48/110/170/L', title: '30/39/48/110/170/L', width: 130, align: 'center' } 
+                    , { field: '31/40/50/115/175/XL', title: '31/40/50/115/175/XL', width: 130, align: 'center' }
+                    , { field: '32/41/52/120/180/2XL', title: '32/41/52/120/180/2XL', width: 130, align: 'center' }
+                    , { field: '33/42/54/125/185/3XL', title: '33/42/54/125/185/3XL', width: 130, align: 'center' }
+                    , { field: '34/43/56/190/4XL', title: '34/43/56/190/4XL', width: 130, align: 'center' }
+                    , { field: '35/44/58/195/5XL', title: '35/44/58/195/5XL' , width: 130, align: 'center'}
+                    , { field: '36/6XL', title: '36/6XL', align: 'center' }
+                    , { field: '38/7XL', title: '38/7XL', align: 'center' }
+                    , { field: '_40', title: '_40', align: 'center' }
                 ]]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
