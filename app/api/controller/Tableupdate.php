@@ -324,6 +324,630 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 原来 summer_report_2加了分类
+    public function summer_report_3() {
+        $sql = "
+            -- s032
+            --2022冬季数据
+            WITH T1 AS 
+            (
+            --仓库库存 warehouse_stock
+            SELECT 
+                ROW_NUMBER() OVER (ORDER BY T1.ID) AS ID,
+                T1.[云仓],
+                T1.[风格],
+                T1.[一级分类],
+                T1.[二级分类],
+                T1.[分类],
+                T1.[仓库库存],
+                T1.[仓库库存成本]
+            FROM 
+            (
+            SELECT 
+                ROW_NUMBER() OVER (ORDER BY T.ID) AS ID,
+                CASE WHEN T.[云仓] IS NULL THEN '总计'  ELSE T.[云仓] END AS 云仓,
+                CASE WHEN T.[风格] IS NULL THEN '合计'  ELSE T.[风格] END AS 风格,
+                CASE WHEN T.[一级分类] IS NULL THEN '合计' ELSE T.[一级分类] END AS 一级分类,
+                CASE WHEN T.[二级分类] IS NULL THEN '合计' ELSE T.[二级分类] END AS 二级分类,
+                CASE WHEN T.[分类] IS NULL THEN '合计' ELSE T.[分类] END AS 分类,
+                T.[仓库库存],
+                T.[仓库库存成本]	
+            FROM 
+            (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ID,
+                EW.WarehouseName AS 云仓,
+                EG.StyleCategoryName AS 风格,
+                eg.CategoryName1 AS 一级分类,
+                eg.CategoryName2 AS 二级分类,
+            -- 	cwl
+                eg.CategoryName AS 分类,
+                SUM ( Quantity ) AS 仓库库存,
+                SUM ( Quantity * egc.ProductionCost ) AS 仓库库存成本 
+            FROM ErpWarehouse EW 
+            LEFT JOIN ErpGoods EG ON 1=1
+            LEFT JOIN ErpWarehouseStock ews ON EW.WarehouseId=ews.WarehouseId AND EG.GoodsId=ews.GoodsId
+            LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+            WHERE EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+            GROUP BY ROLLUP
+                (EW.WarehouseName,
+                eg.StyleCategoryName,
+                eg.CategoryName1 ,
+                eg.CategoryName2,
+                eg.CategoryName)
+                ) T
+            WHERE T.[二级分类] IS NOT NULL 
+                    OR T.[一级分类] IS NULL
+            ) T1
+            ),
+
+
+
+
+
+
+
+            T2 AS 
+            (
+            --仓库可用库存  spring_warehouse_occupy_stock
+                
+            SELECT
+                CASE WHEN WarehouseName IS NULL THEN '总计' ELSE WarehouseName END  AS 云仓,
+                CASE WHEN StyleCategoryName IS NULL THEN '合计' ELSE StyleCategoryName END  AS 风格,
+                CASE WHEN CategoryName1 IS NULL THEN '合计' ELSE CategoryName1 END AS 一级分类,
+                CASE WHEN CategoryName2 IS NULL THEN '合计' ELSE CategoryName2 END AS 二级分类,
+                CASE WHEN CategoryName IS NULL THEN '合计' ELSE CategoryName END AS 分类,
+                SUM ( SumQuantity ) AS 仓库可用库存,
+                SUM ( SumCost ) AS 仓库可用库存成本
+            FROM
+                (
+                --仓库库存
+            SELECT
+                EW.WarehouseName ,
+                EG.StyleCategoryName ,
+                eg.CategoryName1 ,
+                eg.CategoryName2 ,
+                eg.CategoryName,
+                SUM ( Quantity ) AS SumQuantity,
+                SUM ( Quantity * egc.ProductionCost ) AS SumCost 
+            FROM ErpWarehouse EW 
+            LEFT JOIN ErpWarehouseStock ews ON EW.WarehouseId=ews.WarehouseId
+            LEFT JOIN ErpGoods eg ON ews.GoodsId= eg.GoodsId
+            LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+            WHERE
+                EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+            GROUP BY 
+                EW.WarehouseName,
+                eg.StyleCategoryName,
+                eg.CategoryName1 ,
+                eg.CategoryName2,
+                eg.CategoryName
+            UNION ALL 
+                --出货指令单占用库存
+            SELECT
+                EW.WarehouseName,
+                EG.StyleCategoryName AS StyleCategoryName,
+                eg.CategoryName1 ,
+                eg.CategoryName2 ,
+                eg.CategoryName,
+                -SUM ( esg.Quantity ) AS SumQuantity,
+                -SUM ( esg.Quantity* egc.ProductionCost ) AS SumCost 
+                FROM ErpSorting es
+                    LEFT JOIN ErpSortingGoods esg ON es.SortingID= esg.SortingID
+                    LEFT JOIN ErpGoods eg ON esg.GoodsId= eg.GoodsId
+                    LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId
+                    LEFT JOIN ErpWarehouse EW ON ES.WarehouseId=EW.WarehouseId 
+                WHERE	EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                    AND (es.CodingCode= 'StartNode1'
+                                OR (es.CodingCode= 'EndNode2' AND es.IsCompleted= 0 )
+                            )
+                AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')		
+                GROUP BY
+                    EW.WarehouseName,
+                eg.StyleCategoryName ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2,
+                    eg.CategoryName
+                UNION ALL
+                --仓库出货单占用库存
+                SELECT
+                    EW.WarehouseName,
+                EG.StyleCategoryName AS StyleCategoryName,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2 ,
+                    eg.CategoryName,
+                    -SUM ( edg.Quantity ) AS SumQuantity,
+                    -SUM ( edg.Quantity* egc.ProductionCost ) AS SumCost 
+                FROM
+                    ErpDelivery ed
+                    LEFT JOIN ErpDeliveryGoods edg ON ed.DeliveryID= edg.DeliveryID
+                    LEFT JOIN ErpGoods eg ON edg.GoodsId= eg.GoodsId
+                    LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+                    LEFT JOIN ErpWarehouse EW ON ED.WarehouseId=EW.WarehouseId
+                WHERE
+                    ed.CodingCode= 'StartNode1' 
+                    AND edg.SortingID IS NULL 
+                    AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+                GROUP BY
+                    EW.WarehouseName,
+                    eg.StyleCategoryName ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2,
+                    eg.CategoryName
+                UNION ALL
+                --采购退货指令单占用库存
+                SELECT
+                    EW.WarehouseName,
+                    EG.StyleCategoryName AS StyleCategoryName,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2 ,
+                    eg.CategoryName,
+                    -SUM ( eprng.Quantity ) AS SumQuantity,
+                    -SUM ( eprng.Quantity* egc.ProductionCost ) AS SumCost 
+                FROM
+                    ErpPuReturnNotice eprn
+                    LEFT JOIN ErpPuReturnNoticeGoods eprng ON eprn.PuReturnNoticeId= eprng.PuReturnNoticeId
+                    LEFT JOIN ErpGoods eg ON eprng.GoodsId= eg.GoodsId
+                    LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+                    LEFT JOIN ErpWarehouse EW ON eprn.WarehouseId=EW.WarehouseId
+                WHERE
+                    eprn.CodingCode= 'StartNode1' 
+                    AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+                GROUP BY
+                    EW.WarehouseName,
+                    eg.StyleCategoryName ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2,
+                    eg.CategoryName
+                UNION ALL
+                --采购退货单占用库存
+                SELECT
+                    EW.WarehouseName,
+                    EG.StyleCategoryName AS StyleCategoryName,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2 ,
+                    eg.CategoryName,
+                    -SUM ( epcrg.Quantity ) AS SumQuantity,
+                    -SUM ( epcrg.Quantity* egc.ProductionCost ) AS SumCost 
+                FROM
+                    ErpPurchaseReturn epcr
+                    LEFT JOIN ErpPurchaseReturnGoods epcrg ON epcr.PurchaseReturnId= epcrg.PurchaseReturnId
+                    LEFT JOIN ErpGoods eg ON epcrg.GoodsId= eg.GoodsId
+                    LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+                    LEFT JOIN ErpWarehouse EW ON epcr.WarehouseId=EW.WarehouseId
+                WHERE
+                    epcr.CodingCode= 'StartNode1' 
+                    AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+                GROUP BY
+                    EW.WarehouseName,
+                    eg.StyleCategoryName ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2,
+                    eg.CategoryName
+                UNION ALL
+                --仓库调拨占用库存
+                SELECT
+                    EW.WarehouseName,
+                    EG.StyleCategoryName AS StyleCategoryName  ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2 ,
+                    eg.CategoryName,
+                    -SUM ( EIGD.Quantity ) AS SumQuantity,
+                    -SUM ( EIGD.Quantity* egc.ProductionCost ) AS SumCost 
+                FROM
+                    ErpInstruction EI
+                    LEFT JOIN ErpInstructionGoods EIG ON EI.InstructionId= EIG.InstructionId
+                    LEFT JOIN ErpInstructionGoodsDetail EIGD ON EIG.InstructionGoodsId=EIGD.InstructionGoodsId
+                    LEFT JOIN ErpGoods eg ON EIG.GoodsId= eg.GoodsId
+                    LEFT JOIN ErpGoodsCost egc ON EIG.GoodsId= egc.GoodsId 
+                    LEFT JOIN ErpWarehouse EW ON EI.OutItemId=EW.WarehouseId 
+                WHERE EI.Type= 1
+                    AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                    AND (EI.CodingCode= 'StartNode1' OR (EI.CodingCode= 'EndNode2' AND EI.IsCompleted=0 ))
+                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+                GROUP BY
+                    EW.WarehouseName,
+                    eg.StyleCategoryName ,
+                    eg.CategoryName1 ,
+                    eg.CategoryName2,
+                    eg.CategoryName
+            ) AS A 
+            GROUP BY ROLLUP
+                (WarehouseName,
+                StyleCategoryName,
+                CategoryName1,
+                CategoryName2,
+                CategoryName)
+            HAVING A.CategoryName2!='合计' OR A.CategoryName1 IS NULL
+
+            ),
+
+
+
+            T3 AS 
+            (
+            --收仓在途  spring_warehouse_intransit_stock
+
+            SELECT 
+                CASE WHEN EW.WarehouseName IS NULL THEN '总计' ELSE EW.WarehouseName END  AS 云仓,
+                CASE WHEN eg.StyleCategoryName IS NULL THEN '合计' ELSE eg.StyleCategoryName END  AS 风格,
+                CASE WHEN eg.CategoryName1 IS NULL THEN '合计' ELSE eg.CategoryName1 END AS 一级分类,
+                CASE WHEN eg.CategoryName2 IS NULL THEN '合计' ELSE eg.CategoryName2 END AS 二级分类,
+                CASE WHEN eg.CategoryName IS NULL THEN '合计' ELSE eg.CategoryName END AS 分类,
+                SUM(ERG.Quantity) AS 收仓在途,
+                SUM(ERG.Quantity*EGC.ProductionCost) AS 收仓在途成本
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpReturn ER ON EC.CustomerId=ER.CustomerId
+            LEFT JOIN ErpReturnGoods  ERG ON ER.ReturnID=ERG.ReturnID
+            LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+            LEFT JOIN ErpGoodsCost	EGC	on EG.GoodsId=EGC.GoodsId 
+            LEFT JOIN ErpWarehouse EW ON ER.WarehouseId=EW.WarehouseId 
+            WHERE EC.MathodId IN (4,7) 
+                    AND EC.ShutOut=0
+                    AND ER.CodingCode='EndNode2'
+                    AND (ER.IsCompleted IS NULL OR ER.IsCompleted=0)
+                    AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')	
+                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+            GROUP BY ROLLUP
+                (EW.WarehouseName,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName)
+            ),
+
+
+
+
+
+
+            T4 AS 
+            (
+            --已配未发
+            SELECT  
+                CASE WHEN EC.CustomItem15 IS NULL THEN '总计' ELSE EC.CustomItem15 END  AS 云仓,
+                CASE WHEN EG.StyleCategoryName IS NULL THEN '合计' ELSE EG.StyleCategoryName END  AS 风格,
+                CASE WHEN EG.CategoryName1 IS NULL THEN '合计' ELSE EG.CategoryName1 END AS 一级分类,
+                CASE WHEN EG.CategoryName2 IS NULL THEN '合计' ELSE EG.CategoryName2 END AS 二级分类,
+                CASE WHEN EG.CategoryName IS NULL THEN '合计' ELSE EG.CategoryName END AS 分类,
+                SUM(ESG.Quantity) AS 已配未发,
+                SUM(ESG.Quantity*EGC.ProductionCost) AS 已配未发成本
+            FROM ErpCustomer EC
+            LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+            LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+            LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+            LEFT JOIN ErpGoodsCost	EGC	on ESG.GoodsId=EGC.GoodsId
+            LEFT JOIN ErpWarehouse EW ON ES.WarehouseId=EW.WarehouseId 
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND ES.IsCompleted=0
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044')
+            GROUP BY ROLLUP
+                (EC.CustomItem15,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName)
+            ),
+
+
+
+            T5 AS
+            (
+            --销量情况
+
+            SELECT  
+                CASE WHEN EC.CustomItem15 IS NULL THEN '总计' ELSE EC.CustomItem15 END  AS 云仓,
+                CASE WHEN EG.StyleCategoryName IS NULL THEN '合计' ELSE EG.StyleCategoryName END  AS 风格,
+                CASE WHEN EG.CategoryName1 IS NULL THEN '合计' ELSE EG.CategoryName1 END AS 一级分类,
+                CASE WHEN EG.CategoryName2 IS NULL THEN '合计' ELSE EG.CategoryName2 END AS 二级分类,
+                CASE WHEN EG.CategoryName IS NULL THEN '合计' ELSE EG.CategoryName END AS 分类,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,GETDATE()-7,23) AND CONVERT(VARCHAR,GETDATE()-1,23)) THEN ERG.Quantity ELSE 0 END) AS 最后一周销,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,GETDATE()-1,23)) THEN ERG.Quantity ELSE 0 END) AS 昨天销,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,GETDATE()-7,23) AND CONVERT(VARCHAR,GETDATE()-1,23)) THEN ERG.Quantity ELSE 0 END) AS 前一周销量,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,GETDATE()-14,23) AND CONVERT(VARCHAR,GETDATE()-8,23)) THEN ERG.Quantity ELSE 0 END) AS 前两周销量,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,GETDATE()-21,23) AND CONVERT(VARCHAR,GETDATE()-15,23)) THEN ERG.Quantity ELSE 0 END) AS 前三周销量,
+                SUM(CASE WHEN (CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,GETDATE()-28,23) AND CONVERT(VARCHAR,GETDATE()-22,23)) THEN ERG.Quantity ELSE 0 END) AS 前四周销量,
+                SUM(ERG.Quantity) AS 累计销售,
+                SUM(ERG.Quantity*EGC.ProductionCost) AS 累销成本
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
+            LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+            LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+            LEFT JOIN ErpGoodsCost	EGC	on ERG.GoodsId=EGC.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND ER.CodingCode='EndNode2'
+                AND EC.CustomItem15 IN ('广州云仓','南昌云仓','长沙云仓','武汉云仓','贵阳云仓')
+            GROUP BY ROLLUP
+                (EC.CustomItem15,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName)
+            ),
+
+
+
+
+
+            T6 AS 
+            (
+            --店铺在途库存
+            SELECT 
+                    ISNULL(CustomItem15,'总计') AS 云仓,
+                    ISNULL(风格,'合计') AS 风格,
+                    ISNULL(一级分类,'合计') AS 一级分类,
+                    ISNULL(二级分类,'合计') AS 二级分类,
+                    ISNULL(分类,'合计') AS 分类,
+                    SUM(Quantity) AS 在途库存数量,
+                    SUM(ProductionCost) AS 在途成本
+            FROM 
+            (SELECT 
+                EC.CustomItem15,
+                eg.StyleCategoryName  AS 风格,
+                eg.CategoryName1 AS 一级分类,
+                eg.CategoryName2 AS 二级分类,
+                eg.CategoryName AS 分类,
+                SUM(EDG.Quantity) AS Quantity,
+                SUM(EDG.Quantity*EGC.ProductionCost) AS ProductionCost
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpDelivery ED ON EC.CustomerId=ED.CustomerId
+            LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+            LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
+            LEFT JOIN ErpGoodsCost	EGC	on EG.GoodsId=EGC.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND ED.CodingCode='EndNode2'
+                AND ED.IsCompleted=0
+                AND ED.DeliveryID NOT IN (SELECT DeliveryId FROM ErpCustReceipt WHERE CodingCodeText='已审结' AND DeliveryId IS NOT NULL )	
+            GROUP BY
+                EC.CustomItem15,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName
+                
+            UNION ALL
+            SELECT 
+                EC.CustomItem15,
+                eg.StyleCategoryName  AS 风格,
+                eg.CategoryName1 AS 一级分类,
+                eg.CategoryName2 AS 二级分类,
+                eg.CategoryName AS 分类,
+                SUM(EIG.Quantity) AS Quantity,
+                SUM(EIG.Quantity*EGC.ProductionCost) AS ProductionCost
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustOutbound EI ON EI.InCustomerId=EC.CustomerId
+            LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+            LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
+            LEFT JOIN ErpGoodsCost	EGC	on EG.GoodsId=EGC.GoodsId
+            WHERE EC.MathodId IN (4,7)
+                AND EC.ShutOut=0
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                AND EI.CodingCodeText='已审结'
+                AND EI.IsCompleted=0
+                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )		
+            GROUP BY
+                EC.CustomItem15,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName
+            ) AS A
+            GROUP BY ROLLUP
+                    (CustomItem15,
+                    风格,
+                    一级分类,
+                    二级分类,
+                    分类)
+            ),
+
+
+
+
+
+            T7 AS
+            (
+            --店铺库存数  spring_customer_stock
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY T2.ID) AS ID,
+                T2.[云仓],
+                T2.[风格],
+                T2.[一级分类],
+                T2.[二级分类],
+                T2.[分类],
+                T2.[店库存数量],
+                T2.[店铺库存成本]
+            FROM
+            (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY (select 0)) AS ID,
+                ISNULL(EC.CustomItem15,'总计') AS 云仓,
+                ISNULL(eg.StyleCategoryName,'合计') AS 风格,
+                ISNULL(eg.CategoryName1,'合计') AS 一级分类,
+                ISNULL(eg.CategoryName2,'合计') AS 二级分类,
+                ISNULL(eg.CategoryName,'合计') AS 分类,
+                SUM(ECS.Quantity) AS 店库存数量,
+                SUM(ECS.Quantity*EGC.ProductionCost) AS 店铺库存成本
+            FROM ErpCustomer EC 
+            JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
+            JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
+            JOIN ErpGoodsCost	EGC	on EG.GoodsId=EGC.GoodsId
+            WHERE EC.MathodId IN (4,7) 
+                AND EC.ShutOut=0
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+            GROUP BY ROLLUP
+                (EC.CustomItem15,
+                eg.StyleCategoryName,
+                eg.CategoryName1,
+                eg.CategoryName2,
+                eg.CategoryName)
+            ) T2
+            WHERE T2.[分类]!='合计' OR T2.[二级分类]!='合计' OR T2.[一级分类]='合计'
+            ),
+
+
+            T8 AS
+            (
+            --仓仓调拨在途
+            SELECT 
+                CASE WHEN T.[云仓] IS NULL THEN '总计'  ELSE T.[云仓] END AS 云仓,
+                CASE WHEN T.[风格] IS NULL THEN '合计'  ELSE T.[风格] END AS 风格,
+                CASE WHEN T.[一级分类] IS NULL THEN '合计' ELSE T.[一级分类] END AS 一级分类,
+                CASE WHEN T.[二级分类] IS NULL THEN '合计' ELSE T.[二级分类] END AS 二级分类,
+                CASE WHEN T.[分类] IS NULL THEN '合计' ELSE T.[分类] END AS 分类,
+                T.[仓库在途库存],
+                T.[仓库在途库存成本]
+            FROM 
+            (
+            SELECT
+                EW.WarehouseName AS 云仓,
+                EG.StyleCategoryName AS 风格,
+                eg.CategoryName1 AS 一级分类,
+                eg.CategoryName2 AS 二级分类,
+                eg.CategoryName AS 分类,
+                SUM ( Quantity ) AS 仓库在途库存,
+                SUM ( Quantity * egc.ProductionCost ) AS 仓库在途库存成本 
+            FROM ErpOutbound EO
+            LEFT JOIN ErpOutboundGoods EOG ON EO.OutboundId=EOG.OutboundId
+            LEFT JOIN ErpGoods eg ON EOG.GoodsId= eg.GoodsId
+            LEFT JOIN ErpGoodsCost egc ON eg.GoodsId= egc.GoodsId 
+            LEFT JOIN ErpWarehouse EW ON EO.InWarehouseId=EW.WarehouseId
+            WHERE EO.CodingCode= 'EndNode2' 
+                AND EO.IsCompleted=0
+                AND EO.OutboundId  NOT IN (SELECT ER.OutboundId FROM ErpReceipt ER WHERE ER.Type=2 )
+                AND EG.TimeCategoryName1= 2023 
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏')
+                AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+            GROUP BY ROLLUP
+                (EW.WarehouseName,
+                eg.StyleCategoryName,
+                eg.CategoryName1 ,
+                eg.CategoryName2,
+                eg.CategoryName)
+                ) T
+            WHERE T.[二级分类] IS NOT NULL 
+                    OR T.[一级分类] IS NULL
+
+            )
+
+
+            --关联合并
+            SELECT 
+                T1.ID,
+                T1.[云仓],
+                T1.[风格],
+                T1.[一级分类],
+                T1.[二级分类],
+            -- 	cwl
+                T1.[分类],
+                ISNULL(T1.[仓库库存],0) + ISNULL(T3.[收仓在途],0) + ISNULL(T8.[仓库在途库存],0) + ISNULL(T7.[店库存数量],0) + ISNULL(T6.[在途库存数量],0) + ISNULL(T5.[累计销售],0) AS 采购入库数,
+                T1.[仓库库存],
+                T2.[仓库可用库存],
+                T1.[仓库库存成本],
+                T3.[收仓在途],
+                T3.[收仓在途成本],
+                T4.[已配未发],
+                T5.[最后一周销],
+                T5.[昨天销],
+                T5.[累计销售],
+                CONVERT(DECIMAL(10,2),T5.[累销成本]/10000) AS 累销成本,
+                T6.[在途库存数量],
+                T7.[店库存数量],
+                ISNULL(T1.[仓库库存],0) + ISNULL(T3.[收仓在途],0) + ISNULL(T8.[仓库在途库存],0) + ISNULL(T7.[店库存数量],0) + ISNULL(T6.[在途库存数量],0) AS 合计库存数 ,
+                CONCAT(CONVERT(DECIMAL(10,2),(ISNULL(T1.[仓库库存成本],0) + ISNULL(T3.[收仓在途成本],0) + ISNULL(T8.[仓库在途库存成本],0) + ISNULL(T7.[店铺库存成本],0) + ISNULL(T6.[在途成本],0)) / 
+                (SELECT ISNULL(T1.[仓库库存成本],0) + ISNULL(T3.[收仓在途成本],0) + ISNULL(T8.[仓库在途库存成本],0) + ISNULL(T7.[店铺库存成本],0) + ISNULL(T6.[在途成本],0) 
+                        FROM T1 
+                    LEFT JOIN T7 ON T1.[云仓]=T7.[云仓] AND T1.[风格]=T7.[风格] AND T1.[一级分类]=T7.[一级分类] AND T1.[二级分类]=T7.[二级分类]
+                    LEFT JOIN T3 ON T1.[云仓]=T3.[云仓] AND T1.[风格]=T3.[风格] AND T1.[一级分类]=T3.[一级分类] AND T1.[二级分类]=T3.[二级分类]
+                    LEFT JOIN T6 ON T1.[云仓]=T6.[云仓] AND T1.[风格]=T6.[风格] AND T1.[一级分类]=T6.[一级分类] AND T1.[二级分类]=T6.[二级分类]
+                    LEFT JOIN T8 ON T1.[云仓]=T8.[云仓] AND T1.[风格]=T8.[风格] AND T1.[一级分类]=T8.[一级分类] AND T1.[二级分类]=T8.[二级分类] 
+                    WHERE T7.[云仓]='总计' ) *100),'%') AS 合计库存数占比,
+                CONVERT(DECIMAL(10,2),(ISNULL(T1.[仓库库存成本],0) + ISNULL(T3.[收仓在途成本],0) + ISNULL(T8.[仓库在途库存成本],0) + ISNULL(T7.[店铺库存成本],0) + ISNULL(T6.[在途成本],0))/10000) AS 合计库存成本 ,
+                CASE WHEN ISNULL(T1.[仓库库存],0) + ISNULL(T3.[收仓在途],0) + ISNULL(T8.[仓库在途库存],0) + ISNULL(T7.[店库存数量],0) + ISNULL(T6.[在途库存数量],0) + ISNULL(T5.[累计销售],0)=0  THEN NULL 
+                ELSE CONCAT(CONVERT(DECIMAL(10,1),ISNULL(T5.[累计销售],0) / ( ISNULL(T1.[仓库库存],0) + ISNULL(T3.[收仓在途],0) + ISNULL(T8.[仓库在途库存],0) + ISNULL(T7.[店库存数量],0) + ISNULL(T6.[在途库存数量],0) + ISNULL(T5.[累计销售],0) ) *100),'%') END   AS 数量售罄率,
+                CASE WHEN ISNULL(T1.[仓库库存成本],0) + ISNULL(T3.[收仓在途成本],0) + ISNULL(T8.[仓库在途库存成本],0) + ISNULL(T7.[店铺库存成本],0) + ISNULL(T6.[在途成本],0) + ISNULL(T5.[累销成本],0)=0 THEN NULL
+                ELSE CONCAT(CONVERT(DECIMAL(10,1),ISNULL(T5.[累销成本],0) / ( ISNULL(T1.[仓库库存成本],0) + ISNULL(T3.[收仓在途成本],0) + ISNULL(T8.[仓库在途库存成本],0) + ISNULL(T7.[店铺库存成本],0) + ISNULL(T6.[在途成本],0) + ISNULL(T5.[累销成本],0) )*100),'%') END AS 成本售罄率,
+                T5.[前四周销量],
+                T5.[前三周销量],
+                T5.[前两周销量],
+                T5.[前一周销量],
+                CASE WHEN ISNULL(T5.[前一周销量],0) + ISNULL(T5.[前两周销量],0) + ISNULL(T5.[前三周销量],0)=0 /*OR T5.[前一周销量] IS NULL*/ THEN NULL ELSE ROUND((ISNULL(T1.[仓库库存],0) + ISNULL(T3.[收仓在途],0) + ISNULL(T7.[店库存数量],0) + ISNULL(T6.[在途库存数量],0))/((ISNULL(T5.[前一周销量],0) + ISNULL(T5.[前两周销量],0) + ISNULL(T5.[前三周销量],0))/3),1) END AS 周转周,
+                CONVERT(VARCHAR,GETDATE(),23) AS 更新日期	
+            FROM T1 
+            LEFT JOIN T7 ON T1.[云仓]=T7.[云仓] AND T7.[风格]=T1.[风格] AND T7.[一级分类]=T1.[一级分类] AND T7.[二级分类]=T1.[二级分类] AND T7.[分类]=T1.[分类]
+            LEFT JOIN T2 ON T1.[云仓]=T2.[云仓] AND T1.[风格]=T2.[风格] AND T1.[一级分类]=T2.[一级分类] AND T1.[二级分类]=T2.[二级分类] AND T1.[分类]=T2.[分类]
+            LEFT JOIN T3 ON T1.[云仓]=T3.[云仓] AND T1.[风格]=T3.[风格] AND T1.[一级分类]=T3.[一级分类] AND T1.[二级分类]=T3.[二级分类] AND T1.[分类]=T3.[分类]
+            LEFT JOIN T4 ON T1.[云仓]=T4.[云仓] AND T1.[风格]=T4.[风格] AND T1.[一级分类]=T4.[一级分类] AND T1.[二级分类]=T4.[二级分类] AND T1.[分类]=T4.[分类]
+            LEFT JOIN T5 ON T1.[云仓]=T5.[云仓] AND T1.[风格]=T5.[风格] AND T1.[一级分类]=T5.[一级分类] AND T1.[二级分类]=T5.[二级分类] AND T1.[分类]=T5.[分类]
+            LEFT JOIN T6 ON T1.[云仓]=T6.[云仓] AND T1.[风格]=T6.[风格] AND T1.[一级分类]=T6.[一级分类] AND T1.[二级分类]=T6.[二级分类] AND T1.[分类]=T6.[分类]
+            LEFT JOIN T8 ON T1.[云仓]=T8.[云仓] AND T1.[风格]=T8.[风格] AND T1.[一级分类]=T8.[一级分类] AND T1.[二级分类]=T8.[二级分类] AND T1.[分类]=T8.[分类]
+            ORDER BY T1.ID
+        ";
+
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_bi->table('summer_report_3')->where([
+                ['更新日期', '=', date('Y-m-d')]
+            ])->delete();
+            $select_chunk = array_chunk($select, 500);
+
+            // echo '<pre>';
+            // print_r($weishouhuo);
+            $res_weishouhou = true;
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_bi->table('summer_report_3')->insertAll($val);
+            }
+            
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'summer_report_3 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'summer_report_3 更新失败！'
+            ]);
+        }
+    }
+
 
     // 采购顶推报表 receipt收货 receiptNotice采集入库
     public function receipt_receiptNotice() {
