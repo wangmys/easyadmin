@@ -1383,6 +1383,24 @@ class Duanmalv extends BaseController
                 $this->db_easyA->table('cwl_duanmalv_table3')->strict(false)->insertAll($val);
             }
 
+            $sql2 = "
+                UPDATE cwl_duanmalv_table3 AS A
+                LEFT JOIN (
+                    SELECT
+                        风格,大类,中类,领型,
+                        MAX(单款排名) AS 最后排名 
+                    FROM
+                        `cwl_duanmalv_table3` 
+                    GROUP BY
+                    风格,大类,中类,领型) AS B ON A.风格 = B.风格 
+                    AND A.大类 = B.大类 
+                    AND A.中类 = B.中类 
+                    AND A.领型 = B.领型 
+                    SET A.排名率 = ROUND(
+                        A.单款排名 / B.最后排名, 2)
+            ";
+            $this->db_easyA->execute($sql2);
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
