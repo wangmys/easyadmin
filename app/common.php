@@ -172,6 +172,37 @@ if (!function_exists('curl_post')) {
     }
 }
 
+if (!function_exists('curl_post_pro')) {
+
+    /**
+     * post请求
+     * @param $url
+     * @param array $data
+     * @param string $cookiePath
+     * @return bool|string
+     */
+    function curl_post_pro($url, $data = [], $cookiePath = '', $time_limit = 1800)
+    {
+        $ch = curl_init(); // 初始化
+        curl_setopt($ch, CURLOPT_URL, $url); // 抓取指定网页
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 要求结果为字符串且输出到屏幕上
+        curl_setopt($ch, CURLOPT_POST, 1); // POST提交方式
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data); // 请求参数
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookiePath); // 连接结束后保存cookie信息的文件
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookiePath); // 包含cookie信息的文件
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 禁用后cURL将终止从服务端进行验证
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // 检查服务器SSL证书中是否存在一个公用名
+        curl_setopt($ch, CURLOPT_TIMEOUT, $time_limit); //超时时间 3600s
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
+            'Content-Length: ' . strlen($data)
+        ));
+        $res = curl_exec($ch); // 执行一个cURL会话
+        curl_close($ch); // 关闭一个cURL会话
+        return $res;
+    }
+}
+
 // curl
 function http_get($url)
 {
@@ -291,6 +322,21 @@ function getDateFromRange_m($startdate, $enddate){
         $date[] = date('m月d日', $stimestamp+(86400*$i));
     }
     return $date;
+}
+
+/*
+ * 根据数组某个下标字段排序
+ * @param $arr
+ * @param $param
+ * @param $sort
+ * @return mixed
+ */
+function sort_arr($arr, $param, $sort=SORT_DESC) {
+    foreach ($arr as $arr2) {
+        $flag[] = $arr2[$param];
+    }
+    array_multisort($flag, $sort, $arr);
+    return $arr;
 }
 
 function log_error($e)
