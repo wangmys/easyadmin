@@ -10,6 +10,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\facade\Db;
 use app\api\service\dingding\Sample;
+use think\facade\Log;
 
 class Sendpic extends Command
 {
@@ -50,6 +51,9 @@ class Sendpic extends Command
 						}
 					}
 
+					//记录发送日志：
+					Log::write(json_encode($path), 'sendpic:sign=1,dept_id='.$v_data['id']);
+
 					// die;
 	
 				}
@@ -71,6 +75,9 @@ class Sendpic extends Command
 							$this->send_dingding($v_path['img_url'], $v_path['userid']);
 						}
 					}
+
+					//记录发送日志：
+					Log::write(json_encode($path), 'sendpic:sign=2,dept_id='.$v_data['id']);
 
 					// die;
 	
@@ -95,6 +102,9 @@ class Sendpic extends Command
 						}
 					}
 
+					//记录发送日志：
+					Log::write(json_encode($path), 'sendpic:sign=3,dept_id='.$v_data['id']);
+
 					// die;
 	
 				}
@@ -116,6 +126,9 @@ class Sendpic extends Command
 							$this->send_dingding($v_path['img_url'], $v_path['userid']);
 						}
 					}
+
+					//记录发送日志：
+					Log::write(json_encode($path), 'sendpic:sign=4,dept_id='.$v_data['id']);
 
 					// die;
 	
