@@ -1335,4 +1335,65 @@ class Duanmalv extends BaseController
             ]);
         }
     }
+
+    // 3.整体-单款断码情况
+    public function table3() {
+        $sql = "
+            SELECT
+                a.大类,
+                a.货号,
+                a.上柜数,
+                a.断码家数,
+                a.断码率,
+            CASE	
+                WHEN a.中类 = @中类 
+                AND a.风格 = @风格 
+                AND a.领型 = @领型 THEN
+                    @rank := @rank + 1 ELSE @rank := 1 
+                END AS 单款排名,
+                @风格 := a.风格 AS 风格,
+                @中类 := a.中类 AS 中类,
+                @领型 := a.领型 AS 领型 
+            FROM
+                (
+                SELECT
+                    sk.风格,
+                    sk.一级分类 AS 大类,
+                    sk.二级分类 AS 中类,
+                    sk.领型,
+                    sk.货号,
+                    sum( sk.`店铺SKC计数` ) AS 上柜数,
+                    sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) AS 断码家数,
+                    round(sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) / sum( sk.`店铺SKC计数` ), 2) AS 断码率
+                FROM
+                    cwl_duanmalv_sk AS sk 
+                GROUP BY
+                    sk.货号 
+                ORDER BY
+                    风格,大类,中类,领型,断码率 DESC 
+                ) AS a,
+            ( SELECT @中类 := NULL, @风格 := NULL, @领型 := NULL, @rank := 0 ) T 
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_duanmalv_table3')->where(1)->delete();
+            $chunk_list = array_chunk($select, 1000);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $this->db_easyA->table('cwl_duanmalv_table3')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_table3 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'cwl_duanmalv_table3 更新失败！'
+            ]);
+        }
+    }
 }
