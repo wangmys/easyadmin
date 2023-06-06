@@ -12,5 +12,6 @@ return [
         'action'    => 'app\common\command\Action',
         'stock' => 'app\command\Stock',
         'duanma_sk' => 'app\command\Duanma_sk',
+        'sendpic' => 'app\command\Sendpic',
     ],
 ];
