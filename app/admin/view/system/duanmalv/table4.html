@@ -160,102 +160,133 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                     { field: '风格', title: '风格', fixed: 'left' }
-                    , { field: '大类', title: '大类', fixed: 'left'}
-                    , { field: '中类', title: '中类', fixed: 'left'}
-                    , { field: '领型', title: '领型', fixed: 'left' }
-                    , { field: '货号', title: '货号' ,fixed:'left'} 
-                    , { field: '省份-滇', title: '省份-滇'}
-                    , { field: '上柜数-滇', title: '上柜数-滇'}
-                    , { field: '断码家数-滇', title: '断码家数-滇', width: 80}
-                    , { field: '断码率-滇', title: '断码率-滇' }
-                    , { field: '周转-滇', title: '周转-滇' }
-                    , { field: '省份-蜀', title: '省份-蜀'}
-                    , { field: '上柜数-蜀', title: '上柜数-蜀' }
-                    , { field: '断码家数-蜀', title: '断码家数-蜀', width: 80}
-                    , { field: '断码率-蜀', title: '断码率-蜀' }
-                    , { field: '周转-蜀', title: '周转-蜀' }
-                    , { field: '省份-津', title: '省份-津' }
-                    , { field: '上柜数-津', title: '上柜数-津' }
-                    , { field: '断码家数-津', title: '断码家数-津' , width: 80}
-                    , { field: '断码率-津', title: '断码率-津' }
-                    , { field: '周转-津', title: '周转-津' }
-                    , { field: '省份-宁', title: '省份-宁' }
-                    , { field: '上柜数-宁', title: '上柜数-宁' }
-                    , { field: '断码家数-宁', title: '断码家数-宁' , width: 80}
-                    , { field: '断码率-宁', title: '断码率-宁' }
-                    , { field: '周转-宁', title: '周转-宁' }
-                    , { field: '省份-皖', title: '省份-皖' }
-                    , { field: '上柜数-皖', title: '上柜数-皖' }
-                    , { field: '断码家数-皖', title: '断码家数-皖' , width: 80}
-                    , { field: '断码率-皖', title: '断码率-皖' }
-                    , { field: '周转-皖', title: '周转-皖' }
-                    , { field: '省份-粤', title: '省份-粤' }
-                    , { field: '上柜数-粤', title: '上柜数-粤' }
-                    , { field: '断码家数-粤', title: '断码家数-粤' , width: 80}
-                    , { field: '断码率-粤', title: '断码率-粤' }
-                    , { field: '周转-粤', title: '周转-粤' }
-                    , { field: '省份-桂', title: '省份-桂' }
-                    , { field: '上柜数-桂', title: '上柜数-桂' }
-                    , { field: '断码家数-桂', title: '断码家数-桂' , width: 80}
-                    , { field: '断码率-桂', title: '断码率-桂' }
-                    , { field: '周转-桂', title: '周转-桂' }
-                    , { field: '省份-新', title: '省份-新' }
-                    , { field: '上柜数-新', title: '上柜数-新' }
-                    , { field: '断码家数-新', title: '断码家数-新' , width: 80}
-                    , { field: '断码率-新', title: '断码率-新' }
-                    , { field: '周转-新', title: '周转-新' }
-                    , { field: '省份-赣', title: '省份-赣' }
-                    , { field: '上柜数-赣', title: '上柜数-赣' }
-                    , { field: '断码家数-赣', title: '断码家数-赣' , width: 80}
-                    , { field: '断码率-赣', title: '断码率-赣' }
-                    , { field: '周转-赣', title: '周转-赣' }
-                    , { field: '省份-豫', title: '省份-豫' }
-                    , { field: '上柜数-豫', title: '上柜数-豫' }
-                    , { field: '断码家数-豫', title: '断码家数-豫' , width: 80}
-                    , { field: '断码率-豫', title: '断码率-豫' }
-                    , { field: '周转-豫', title: '周转-豫' }
-                    , { field: '省份-鄂', title: '省份-鄂' }
-                    , { field: '上柜数-鄂', title: '上柜数-鄂' }
-                    , { field: '断码家数-鄂', title: '断码家数-鄂' , width: 80}
-                    , { field: '断码率-鄂', title: '断码率-鄂' }
-                    , { field: '周转-鄂', title: '周转-鄂' }
-                    , { field: '省份-湘', title: '省份-湘' }
-                    , { field: '上柜数-湘', title: '上柜数-湘' }
-                    , { field: '断码家数-湘', title: '断码家数-湘' , width: 80}
-                    , { field: '断码率-湘', title: '断码率-湘' }
-                    , { field: '周转-湘', title: '周转-湘' }
-                    , { field: '省份-甘', title: '省份-甘' }
-                    , { field: '上柜数-甘', title: '上柜数-甘' }
-                    , { field: '断码家数-甘', title: '断码家数-甘' , width: 80}
-                    , { field: '断码率-甘', title: '断码率-甘' }
-                    , { field: '周转-甘', title: '周转-甘' }
-                    , { field: '省份-闽', title: '省份-闽' }
-                    , { field: '上柜数-闽', title: '上柜数-闽' }
-                    , { field: '断码家数-闽', title: '断码家数-闽' , width: 80}
-                    , { field: '断码率-闽', title: '断码率-闽' }
-                    , { field: '周转-闽', title: '周转-闽' }
-                    , { field: '省份-贵', title: '省份-贵' }
-                    , { field: '上柜数-贵', title: '上柜数-贵' }
-                    , { field: '断码家数-贵', title: '断码家数-贵' , width: 80}
-                    , { field: '断码率-贵', title: '断码率-贵' }
-                    , { field: '周转-贵', title: '周转-贵' }
-                    , { field: '省份-渝', title: '省份-渝' }
-                    , { field: '上柜数-渝', title: '上柜数-渝' }
-                    , { field: '断码家数-渝', title: '断码家数-渝' , width: 80}
-                    , { field: '断码率-渝', title: '断码率-渝' }
-                    , { field: '周转-渝', title: '周转-渝' }
-                    , { field: '省份-陕', title: '省份-陕' }
-                    , { field: '上柜数-陕', title: '上柜数-陕' }
-                    , { field: '断码家数-陕', title: '断码家数-陕' , width: 80}
-                    , { field: '断码率-陕', title: '断码率-陕' }
-                    , { field: '周转-陕', title: '周转-陕' }
-                    , { field: '省份-青', title: '省份-青' }
-                    , { field: '上柜数-青', title: '上柜数-青' }
-                    , { field: '断码家数-青', title: '断码家数-青' , width: 80}
-                    , { field: '断码率-青', title: '断码率-青' }
-                    , { field: '周转-青', title: '周转-青' }
-                ]]
+                     { field: '风格', title: '风格', rowspan: 2}
+                    , { field: '大类', title: '大类' , rowspan: 2}
+                    , { field: '中类', title: '中类', rowspan: 2}
+                    , { field: '领型', title: '领型', rowspan: 2}
+                    , { field: '货号', title: '货号', rowspan: 2} 
+                    , { title: '云南', colspan: 5, align: 'center' } 
+                    , { title: '四川', colspan: 5, align: 'center' } 
+                    , { title: '天津', colspan: 5, align: 'center' } 
+                    , { title: '宁夏回族自治区', colspan: 5, align: 'center' } 
+                    , { title: '安徽省', colspan: 5, align: 'center' } 
+                    , { title: '广东省', colspan: 5, align: 'center' } 
+                    , { title: '广西壮族自治区', colspan: 5, align: 'center' } 
+                    , { title: '新疆维吾尔自治区', colspan: 5, align: 'center' } 
+                    , { title: '江西省', colspan: 5, align: 'center' } 
+                    , { title: '河南省', colspan: 5, align: 'center' } 
+                    , { title: '浙江省', colspan: 5, align: 'center' } 
+                    , { title: '海南省', colspan: 5, align: 'center' } 
+                    , { title: '湖北省', colspan: 5, align: 'center' } 
+                    , { title: '湖南省', colspan: 5, align: 'center' } 
+                    , { title: '甘肃省', colspan: 5, align: 'center' } 
+                    , { title: '福建省', colspan: 5, align: 'center' } 
+                    , { title: '贵州省', colspan: 5, align: 'center' } 
+                    , { title: '重庆', colspan: 5, align: 'center' } 
+                    , { title: '陕西省', colspan: 5, align: 'center' } 
+                    , { title: '青海省', colspan: 5, align: 'center' } 
+                    ],
+                    [ { field: '省份-滇', title: '省份'}
+                    , { field: '上柜数-滇', title: '上柜数'}
+                    , { field: '断码家数-滇', title: '断码家数'}
+                    , { field: '断码率-滇', title: '断码率' }
+                    , { field: '周转-滇', title: '周转' }
+                    , { field: '省份-蜀', title: '省份'}
+                    , { field: '上柜数-蜀', title: '上柜数' }
+                    , { field: '断码家数-蜀', title: '断码家数'}
+                    , { field: '断码率-蜀', title: '断码率' }
+                    , { field: '周转-蜀', title: '周转' }
+                    , { field: '省份-津', title: '省份' }
+                    , { field: '上柜数-津', title: '上柜数' }
+                    , { field: '断码家数-津', title: '断码家数'}
+                    , { field: '断码率-津', title: '断码率' }
+                    , { field: '周转-津', title: '周转' }
+                    , { field: '省份-宁', title: '省份' , width: 100}
+                    , { field: '上柜数-宁', title: '上柜数' }
+                    , { field: '断码家数-宁', title: '断码家数'}
+                    , { field: '断码率-宁', title: '断码率' }
+                    , { field: '周转-宁', title: '周转' }
+                    , { field: '省份-皖', title: '省份' }
+                    , { field: '上柜数-皖', title: '上柜数' }
+                    , { field: '断码家数-皖', title: '断码家数'}
+                    , { field: '断码率-皖', title: '断码率' }
+                    , { field: '周转-皖', title: '周转' }
+                    , { field: '省份-粤', title: '省份' }
+                    , { field: '上柜数-粤', title: '上柜数' }
+                    , { field: '断码家数-粤', title: '断码家数'}
+                    , { field: '断码率-粤', title: '断码率' }
+                    , { field: '周转-粤', title: '周转' }
+                    , { field: '省份-桂', title: '省份' , width: 100}
+                    , { field: '上柜数-桂', title: '上柜数' }
+                    , { field: '断码家数-桂', title: '断码家数'}
+                    , { field: '断码率-桂', title: '断码率' }
+                    , { field: '周转-桂', title: '周转' }
+                    , { field: '省份-新', title: '省份'  , width: 100}
+                    , { field: '上柜数-新', title: '上柜数' }
+                    , { field: '断码家数-新', title: '断码家数'}
+                    , { field: '断码率-新', title: '断码率' }
+                    , { field: '周转-新', title: '周转' }
+                    , { field: '省份-赣', title: '省份' }
+                    , { field: '上柜数-赣', title: '上柜数' }
+                    , { field: '断码家数-赣', title: '断码家数'}
+                    , { field: '断码率-赣', title: '断码率' }
+                    , { field: '周转-赣', title: '周转' }
+                    , { field: '省份-豫', title: '省份' }
+                    , { field: '上柜数-豫', title: '上柜数' }
+                    , { field: '断码家数-豫', title: '断码家数'}
+                    , { field: '断码率-豫', title: '断码率' }
+                    , { field: '周转-豫', title: '周转' }
+                    , { field: '省份-浙', title: '省份' }
+                    , { field: '上柜数-浙', title: '上柜数' }
+                    , { field: '断码家数-浙', title: '断码家数'}
+                    , { field: '断码率-浙', title: '断码率' }
+                    , { field: '周转-浙', title: '周转' }
+                    , { field: '省份-琼', title: '省份' }
+                    , { field: '上柜数-琼', title: '上柜数' }
+                    , { field: '断码家数-琼', title: '断码家数'}
+                    , { field: '断码率-琼', title: '断码率' }
+                    , { field: '周转-琼', title: '周转' }
+                    , { field: '省份-鄂', title: '省份' }
+                    , { field: '上柜数-鄂', title: '上柜数' }
+                    , { field: '断码家数-鄂', title: '断码家数'}
+                    , { field: '断码率-鄂', title: '断码率' }
+                    , { field: '周转-鄂', title: '周转' }
+                    , { field: '省份-湘', title: '省份' }
+                    , { field: '上柜数-湘', title: '上柜数' }
+                    , { field: '断码家数-湘', title: '断码家数'}
+                    , { field: '断码率-湘', title: '断码率' }
+                    , { field: '周转-湘', title: '周转' }
+                    , { field: '省份-甘', title: '省份' }
+                    , { field: '上柜数-甘', title: '上柜数' }
+                    , { field: '断码家数-甘', title: '断码家数'}
+                    , { field: '断码率-甘', title: '断码率' }
+                    , { field: '周转-甘', title: '周转' }
+                    , { field: '省份-闽', title: '省份' }
+                    , { field: '上柜数-闽', title: '上柜数' }
+                    , { field: '断码家数-闽', title: '断码家数'}
+                    , { field: '断码率-闽', title: '断码率' }
+                    , { field: '周转-闽', title: '周转' }
+                    , { field: '省份-贵', title: '省份' }
+                    , { field: '上柜数-贵', title: '上柜数' }
+                    , { field: '断码家数-贵', title: '断码家数'}
+                    , { field: '断码率-贵', title: '断码率' }
+                    , { field: '周转-贵', title: '周转' }
+                    , { field: '省份-渝', title: '省份' }
+                    , { field: '上柜数-渝', title: '上柜数' }
+                    , { field: '断码家数-渝', title: '断码家数'}
+                    , { field: '断码率-渝', title: '断码率' }
+                    , { field: '周转-渝', title: '周转' }
+                    , { field: '省份-陕', title: '省份' }
+                    , { field: '上柜数-陕', title: '上柜数' }
+                    , { field: '断码家数-陕', title: '断码家数'}
+                    , { field: '断码率-陕', title: '断码率' }
+                    , { field: '周转-陕', title: '周转' }
+                    , { field: '省份-青', title: '省份' }
+                    , { field: '上柜数-青', title: '上柜数' }
+                    , { field: '断码家数-青', title: '断码家数'}
+                    , { field: '断码率-青', title: '断码率' }
+                    , { field: '周转-青', title: '周转' }]
+                ]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
                 }
