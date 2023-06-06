@@ -160,20 +160,20 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                     { field: '云仓', title: '云仓', fixed: 'left' }
-                    , { field: '省份', title: '省份', fixed: 'left'}
-                    , { field: '商品负责人', title: '商品负责人', fixed: 'left'}
-                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' }
-                    , { field: '店铺等级', title: '店铺等级' ,fixed:'left'} 
-                    , { field: '经营模式', title: '经营模式', fixed: 'left'}
-                    , { field: '店铺总SKC数', title: '店铺总SKC数', fixed: 'left' }
-                    , { field: 'TOP断码SKC数', title: 'TOP断码SKC数', fixed: 'left' }
-                    , { field: 'TOP断码率', title: 'TOP断码率' ,fixed:'left'}
-                    , { field: 'TOP断码排名', title: 'TOP断码排名', fixed: 'left' }
-                    , { field: '全部断码SKC数', title: '全部断码SKC数', fixed: 'left' }
-                    , { field: 'TOP断码率', title: 'TOP断码率', fixed: 'left' }
-                    , { field: '全部断码率', title: '全部断码率', fixed: 'left' }
-                    , { field: '全部断码排名', title: '全部断码排名', fixed: 'left' }
+                     { field: '云仓', title: '云仓', fixed: 'left' , align: 'center'}
+                    , { field: '省份', title: '省份', fixed: 'left', align: 'center'}
+                    , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center'}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' , align: 'center'}
+                    , { field: '店铺等级', title: '店铺等级' ,fixed:'left', align: 'center'} 
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center'}
+                    , { field: '店铺总SKC数', title: '店铺总SKC数', fixed: 'left' , align: 'center'}
+                    , { field: 'TOP断码SKC数', title: 'TOP断码SKC数', fixed: 'left' , align: 'center'}
+                    , { field: 'TOP断码率', title: 'TOP断码率' ,fixed:'left', align: 'center'}
+                    , { field: 'TOP断码排名', title: 'TOP断码排名', fixed: 'left' , align: 'center'}
+                    , { field: '全部断码SKC数', title: '全部断码SKC数', fixed: 'left' , align: 'center'}
+                    , { field: 'TOP断码率', title: 'TOP断码率', fixed: 'left' , align: 'center'}
+                    , { field: '全部断码率', title: '全部断码率', fixed: 'left' , align: 'center'}
+                    , { field: '全部断码排名', title: '全部断码排名', fixed: 'left' , align: 'center'}
                 ]]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
