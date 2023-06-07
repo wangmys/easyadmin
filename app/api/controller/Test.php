@@ -5,6 +5,7 @@ namespace app\api\controller;
 use think\facade\Db;
 use app\api\service\dingding\Sample;
 use voku\helper\HtmlDomParser;
+use think\cache\driver\Redis;
 
 class Test
 {
@@ -78,5 +79,16 @@ class Test
             print_r($el);
             die;
         }
+    }
+
+    /**
+     * 测试redis
+     */
+    public function testRedis()
+    {
+        $redis = new Redis;
+        echo '<pre>';
+        print_r($redis);
+        die;
     }
 }
