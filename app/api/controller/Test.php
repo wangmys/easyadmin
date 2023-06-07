@@ -5,6 +5,7 @@ namespace app\api\controller;
 use think\facade\Db;
 use app\api\service\dingding\Sample;
 use voku\helper\HtmlDomParser;
+use think\cache\driver\Redis;
 
 class Test
 {
@@ -87,7 +88,7 @@ class Test
     {
         $redis = new Redis;
         echo '<pre>';
-        print_r($redis->llen('finish_task'));
+        print_r($redis);
         die;
     }
 }
