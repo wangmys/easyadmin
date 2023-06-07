@@ -1234,4 +1234,87 @@ class Tableupdate extends BaseController
 
     }
 
+
+    // 一年所有周 周销 sqlserver
+    public function year7day() {
+        $sql = "
+                SELECT TOP
+                100000 EBC.Mathod AS 渠道性质,
+                DATEPART( week, ER.RetailDate ) AS 周次,
+            -- 								EC.CustomItem17 AS 商品负责人,
+            -- 	CONVERT ( VARCHAR ( 10 ), ER.RetailDate, 23 ) AS 销售年份,
+            -- 	DATEPART( yy, ER.RetailDate ) AS 销售年份,
+                EG.TimeCategoryName1 AS 商品年份,
+                CONVERT(VARCHAR(10), DATEADD(day, -(DATEPART(dw, ER.RetailDate)-1), ER.RetailDate), 23) as 开始,
+                CONVERT(VARCHAR(10), DATEADD(day, 7-(DATEPART(dw, ER.RetailDate)), ER.RetailDate), 23) as 结束,
+            CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' ELSE EG.TimeCategoryName2 
+                END AS 季节归集,
+                EG.StyleCategoryName AS 风格,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 小类,
+                
+                SUM ( ERG.Quantity ) AS 销售数量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额 
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId 
+            WHERE
+                ER.CodingCodeText = '已审结' 
+                AND ER.RetailDate >= '2021-01-01' 
+                AND ER.RetailDate < '2021-12-31' 
+                AND EC.CustomItem17 IS NOT NULL 
+                AND EBC.Mathod IN ( '直营', '加盟' ) 
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+            GROUP BY
+            -- 	ER.RetailDate,
+                DATEPART( yy, ER.RetailDate ),
+                DATEPART( week, ER.RetailDate ),
+                CONVERT(VARCHAR(10), DATEADD(day, -(DATEPART(dw, ER.RetailDate)-1), ER.RetailDate), 23),
+                CONVERT(VARCHAR(10), DATEADD(day, 7-(DATEPART(dw, ER.RetailDate)), ER.RetailDate), 23),
+                EBC.Mathod,
+                EG.TimeCategoryName1,
+                EG.TimeCategoryName2,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.StyleCategoryName
+            ORDER BY
+                DATEPART( week, ER.RetailDate ),
+                EBC.Mathod,
+                EG.StyleCategoryName,
+                EG.CategoryName1,
+                EG.CategoryName2        
+        
+        ";
+    }
+
 }
