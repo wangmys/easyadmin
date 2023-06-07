@@ -79,4 +79,15 @@ class Test
             die;
         }
     }
+
+    /**
+     * 测试redis
+     */
+    public function testRedis()
+    {
+        $redis = new Redis;
+        echo '<pre>';
+        print_r($redis->llen('finish_task'));
+        die;
+    }
 }
