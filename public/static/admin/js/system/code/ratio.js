@@ -4,6 +4,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         table_render_id: 'currentTableRenderId',
         index_url: 'system.code.ratio/index',
         list_url: 'system.code.ratio/list',
+        index3_url: 'system.code.ratio/index3',
         export_url: 'system.code.ratio/index_export'
     };
     var table = layui.table
@@ -49,6 +50,29 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '云仓在途库存', width: 115, title: '云仓在途库存',search:false},
                     {field: '当前单店均深', width: 115, title: '当前单店均深',search:false}
                 ]]
+            });
+            ea.listen();
+        },
+        index3: function () {
+            var $get = JSON.parse($("#where").val());
+            var $cols = JSON.parse($("#cols").val());
+            console.log($cols)
+            ea.table.render({
+                init:{
+                   table_elem: '#currentTable',
+                   table_render_id: 'currentTableRenderId',
+                   index_url: 'system.code.ratio/index3',
+                   export_url: 'system.command.index/index_export'
+                },
+                where:$get,
+                height: 760,
+                toolbar:[],
+                limit:10000,
+                limits:[10000],
+                cols: [$cols],
+                done: function (res, curr, count) {
+                   console.log(45)
+                }
             });
             ea.listen();
         },

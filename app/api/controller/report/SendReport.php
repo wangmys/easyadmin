@@ -137,7 +137,7 @@ class SendReport extends BaseController
             $send_data = [
                 'S113' => [
                     'title' => '门店业绩环比 表号:S113',
-                    'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113.jpg'
+                    'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S113A.jpg'
                 ],
             ];
             $res = [];
