@@ -14,5 +14,7 @@ return [
         'duanma_sk' => 'app\command\Duanma_sk',
         'stock_size' => 'app\command\Stock_size',
         'sendpic' => 'app\command\Sendpic',
+        'create_daogou_aim' => 'app\command\Create_daogou_aim',
+        'customer_sz_detail' => 'app\command\Customer_sz_detail',
     ],
 ];
