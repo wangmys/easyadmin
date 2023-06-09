@@ -103,4 +103,11 @@ class Index
             'msg' => $model->getError($code)
         ]);
     }
+
+    public function saveRatio()
+    {
+        $res = \app\admin\model\code\SizeAllRatio::saveData();
+        echo '<pre>';
+        print_r($res);
+    }
 }

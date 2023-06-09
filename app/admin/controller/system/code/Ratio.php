@@ -18,6 +18,7 @@ use app\admin\model\code\SizeAccumulatedSale;
 use app\admin\model\code\SizeWarehouseAvailableStock;
 use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
+use app\admin\model\code\SizeAllRatio;
 
 /**
  * Class Ratio
@@ -574,7 +575,7 @@ class Ratio extends AdminController
         $where = $this->request->get();
         if ($this->request->isAjax()) {
             // 指定货号
-            $goodsno = $filters['货号']??'B42101019';
+            $goodsno = $filters['货号']??'B32503010';
             $arr = [$goodsno];
             $list = [];
             foreach ($arr as $k => $v){
@@ -664,6 +665,21 @@ class Ratio extends AdminController
                     $level_rate = $config['level_other'];
                 }
 
+                // 总尺码
+                $size_list = [
+                    '库存_00/28/37/44/100/160/S',
+                    '库存_29/38/46/105/165/M',
+                    '库存_30/39/48/110/170/L',
+                    '库存_31/40/50/115/175/XL',
+                    '库存_32/41/52/120/180/2XL',
+                    '库存_33/42/54/125/185/3XL',
+                    '库存_34/43/56/190/4XL',
+                    '库存_35/44/58/195/5XL',
+                    '库存_36/6XL',
+                    '库存_38/7XL',
+                    '库存_40/8XL'
+                ];
+
                 foreach ($size_list as $key =>$value){
 
                     // 根据货号尺码获取周销尺码字段
@@ -747,7 +763,8 @@ class Ratio extends AdminController
                     $item['单码售罄比'] = (floatval($item['单码售罄']) - floatval($total_item['单码售罄'])).'%';
 
                     if(intval($item['单码售罄比']) > $level_rate){
-                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
+//                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
+                        $total_item['单码售罄比'] = "单码缺量";
 //                        $item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >{$item['单码售罄比']}</span>";
                     }
 
@@ -759,10 +776,11 @@ class Ratio extends AdminController
                 // 单码售罄比
                 $sell_out_ratio = [];
                 foreach ($list as $lk => $lv){
-                    $sell_out_ratio[$lv['尺码情况']] = floatval($lv['单码售罄比']);
-                    $ranking_data['当前库存'][$lv['尺码情况']] = floatval($lv['当前库存']);
-                    $ranking_data['总库存'][$lv['尺码情况']] = floatval($lv['总库存']);
-                    $ranking_data['累销尺码比'][$lv['尺码情况']] = floatval($lv['累销尺码比']);
+                    $size_k = Size7DaySale::getSizeKey($lv['尺码情况']);
+                    $sell_out_ratio[$size_k] = floatval($lv['单码售罄比']);
+                    $ranking_data['当前库存'][$size_k] = floatval($lv['当前库存']);
+                    $ranking_data['总库存'][$size_k] = floatval($lv['总库存']);
+                    $ranking_data['累销尺码比'][$size_k] = floatval($lv['累销尺码比']);
                 }
                 // 对数据进行排序
                 foreach ($ranking_data as $kk => $vv){
@@ -793,7 +811,8 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$total_key]) && $sell_out_ratio[$total_key] > $level_rate){
                         // 高于则提示总库存偏码
-                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+//                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                        $total_item['总库存'] =  "偏码";
                     }
                 }
 
@@ -802,7 +821,8 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$current_key]) && $sell_out_ratio[$current_key] > $level_rate){
                         // 高于则提示当前库存偏码
-                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+//                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                        $total_item['当前库存'] =  "偏码";
                     }
                 }
                 $list[] = $total_item;
@@ -828,6 +848,8 @@ class Ratio extends AdminController
                 $res = [];
                 // 表头
                 $head = [];
+                // 公众字段
+                $common = ['GoodsNo' => $v];
                 foreach ($field as $kk => $vv){
                     if($kk=='尺码情况'){
                         $head[] = ['field' => '字段','width' => 115,'title' => '字段','search' => false];
@@ -847,7 +869,7 @@ class Ratio extends AdminController
                             $size_key = $size_list[$k_2]??'合计';
                             $item[$size_key] = $v_2;
                         }
-                        $res[] = $item;
+                        $res[] = $common + $item;
                     }
                 }
             }
@@ -865,17 +887,20 @@ class Ratio extends AdminController
         return $this->fetch('',[
             'where' => $where,
             'cols' => [
-                ['field' => '字段','width' => 115,'title' => '字段','search' => false],
-                ['field' => '46','width' => 115,'title' => '46','search' => false],
-                ['field' => '48','width' => 115,'title' => '48','search' => false],
-                ['field' => '50','width' => 115,'title' => '50','search' => false],
-                ['field' => '52','width' => 115,'title' => '52','search' => false],
-                ['field' => '54','width' => 115,'title' => '52','search' => false],
-                ['field' => '56','width' => 115,'title' => '56','search' => false],
-                ['field' => '44','width' => 115,'title' => '44','search' => false],
-                ['field' => '58','width' => 115,'title' => '58','search' => false],
-                ['field' => '60','width' => 115,'title' => '58','search' => false],
-                ['field' => '合计','width' => 115,'title' => '合计','search' => false]
+                ['field' => 'GoodsNo','width' => 180,'title' => '货号','search' => false,'fixed' => 'left'],
+                ['field' => '字段','width' => 180,'title' => '字段','search' => false,'fixed' => 'left'],
+                ['field' => '合计','width' => 115,'title' => '合计','search' => false,'fixed' => 'left'],
+                ['field' => '库存_00/28/37/44/100/160/S','width' => 180,'title' => '库存_00/28/37/44/100/160/S','search' => false],
+                ['field' => '库存_29/38/46/105/165/M','width' => 180,'title' => '库存_29/38/46/105/165/M','search' => false],
+                ['field' => '库存_30/39/48/110/170/L','width' => 180,'title' => '库存_30/39/48/110/170/L','search' => false],
+                ['field' => '库存_31/40/50/115/175/XL','width' => 180,'title' => '库存_31/40/50/115/175/XL','search' => false],
+                ['field' => '库存_32/41/52/120/180/2XL','width' => 180,'title' => '库存_32/41/52/120/180/2XL','search' => false],
+                ['field' => '库存_33/42/54/125/185/3XL','width' => 180,'title' => '库存_33/42/54/125/185/3XL','search' => false],
+                ['field' => '库存_34/43/56/190/4XL','width' => 180,'title' => '库存_34/43/56/190/4XL','search' => false],
+                ['field' => '库存_35/44/58/195/5XL','width' => 180,'title' => '库存_35/44/58/195/5XL','search' => false],
+                ['field' => '库存_36/6XL','width' => 115,'title' => '库存_36/6XL','search' => false],
+                ['field' => '库存_38/7XL','width' => 115,'title' => '库存_38/7XL','search' => false],
+                ['field' => '库存_40/8XL','width' => 115,'title' => '库存_40/8XL','search' => false]
             ]
         ]);
     }
@@ -904,6 +929,46 @@ class Ratio extends AdminController
                 'msg'   => '',
                 'count' => count($list),
                 'data'  => $list
+            ];
+            return json($data);
+        }
+
+        return $this->fetch();
+    }
+
+    /**
+     * @NodeAnotation(title="展示所有货号码比")
+     */
+    public function alllist()
+    {
+        // 筛选
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
+
+        // 获取参数
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+
+            $page = isset($get['page']) && !empty($get['page']) ? $get['page'] : 1;
+            $limit = isset($get['limit']) && !empty($get['limit']) ? $get['limit'] : 15;
+
+            // 查询货号列表排名
+            $list = SizeRanking::order('日均销','desc')->page($page, $limit)->select();
+            $count = SizeRanking::count();
+            $allList = [];
+            foreach ($list as $key => &$value){
+                  $value['近三天折率'] = '100%';
+                  $value['全国排名'] = $key+1;
+                  $item = $value->alias('r')->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo')->where(['GoodsNo' => $value['货号'],'Date' => date('Y-m-d')])->select()->toArray();
+                  foreach ($item as $k =>$v){
+                      $allList[] = $value->toArray();
+                  }
+            }
+            // 返回数据
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => $count,
+                'data'  => $allList
             ];
             return json($data);
         }
