@@ -42,7 +42,6 @@ class SizeRatio
     public function saveRatio()
     {
         $res = \app\admin\model\code\SizeAllRatio::saveData();
-        echo '<pre>';
-        print_r($res);
+        print_r($res);die;
     }
 }

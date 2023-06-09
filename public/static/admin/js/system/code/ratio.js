@@ -125,6 +125,14 @@ define(["jquery", "easy-admin"], function ($, ea) {
             ea.listen();
         },
         alllist: function () {
+
+            // 风格
+            var Style = JSON.parse($("#Style").val());
+            var CategoryName1 = JSON.parse($("#CategoryName1").val());
+            var CategoryName2 = JSON.parse($("#CategoryName2").val());
+            var Collar = JSON.parse($("#Collar").val());
+
+            console.log(Style,CategoryName1,CategoryName2,Collar)
             ea.table.render({
                 init:{
                    table_elem: '#currentTable',
@@ -140,10 +148,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 cols: [[
                     {field: '全国排名', width: 115, title: '全国排名',search:false},
                     {field: '货号', width: 115, title: '货号',search:false},
-                    {field: '风格', width: 115, title: '风格',search:true},
-                    {field: '一级分类', width: 115, title: '一级分类',search:true},
-                    {field: '二级分类', width: 115, title: '二级分类',search:true},
-                    {field: '领型', width: 115, title: '领型',search:true},
+                    {field: '风格', width: 115, title: '风格',search:'select',selectList:Style},
+                    {field: '一级分类', width: 115, title: '一级分类',fieldAlias:'cate',search:'select',selectList:CategoryName1},
+                    {field: '二级分类', width: 115, title: '二级分类',fieldAlias:'cate2',search:'select',selectList:CategoryName2},
+                    {field: '领型', width: 115, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar},
                     {field: '近三天折率', width: 115, title: '近三天折率',search:false},
                     {field: '货品等级', width: 115, title: '货品等级',search:false},
                     {field: '上柜家数', width: 115, title: '上柜家数',search:false},
