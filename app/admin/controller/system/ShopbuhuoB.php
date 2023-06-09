@@ -863,7 +863,7 @@ class ShopbuhuoB extends AdminController
 
     // 调拨测试
     public function redExcel_test_diaobo() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/aaaaaaaaaaaa.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/1渠道调拨0608_调拨出问题了.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '单据日期',
@@ -889,7 +889,7 @@ class ShopbuhuoB extends AdminController
         // }
 
 
-        echo '<pre>';
+        // echo '<pre>';
         $data = $this->readExcel2($save_path, $read_column);
         // echo '<pre>';
         // print_r($data);
@@ -1378,25 +1378,6 @@ class ShopbuhuoB extends AdminController
             return json(['code' => 0, 'msg' => '上传成功']);
 
             }
-        }
-    }
-
-    // 补货的店铺调拨未完成计算
-    public function buhuo_weiwancheng_handle($user = '', $store = '', $no = '') {
-        // 调拨未完成
-        $weiwancheng = $this->qudaodiaobo_weiwancheng($user, $store, $no);
-        if ($weiwancheng) {
-            $kucun = $this->qudaodiaobo_kucun($user, $store, $no);
-            // 库存 - 调拨未完成
-            if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] <= 0) {
-                $data['调拨未完成数'] = $weiwancheng[0]['调拨未完成数'];
-                $data['库存数量'] = $kucun[0]['actual_quantity']; 
-                return $data;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
         }
     }
 

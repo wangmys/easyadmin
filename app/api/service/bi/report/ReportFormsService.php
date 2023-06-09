@@ -2210,7 +2210,7 @@ class ReportFormsService
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
-                'file_name' => $code  . '.jpg',   //保存的文件名
+                'file_name' => $code . 'A' . '.jpg',   //保存的文件名
                 'title' => "门店业绩环比 [" . date("Y-m-d") . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
