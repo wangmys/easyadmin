@@ -19,7 +19,7 @@ class SendpicService
         left join user_dept_relation udr on u.id=udr.user_id 
         left join user_role_relations urr on u.id=urr.user_id 
         left join role r on r.id=urr.role_id 
-        where dept_id='{$dept_id}' and u.erp_uid<>'' and u.state=0 and u.is_virtual=0;"; // and r.name like '%导购%'
+        where dept_id='{$dept_id}' and u.erp_uid<>'' and u.state=0 and u.is_virtual=0 and u.checkin_sys_uid<>'';"; // and r.name like '%导购%'
         return Db::connect("cip")->Query($daogou_users_sql);
 
     }
