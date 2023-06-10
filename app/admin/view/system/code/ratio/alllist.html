@@ -1,0 +1,120 @@
+<style>
+    tr{
+        color: #0A0E11;
+        /*border: 5px solid whitesmoke;*/
+    }
+    .layuimini-main tr td{
+        margin: 0px;
+        padding: 0px 0;
+    }
+
+    .layui-table-cell {
+        font-size: 12px;
+        color: #606266;
+        padding: 0 0px;
+    }
+    .layui-table, .layui-table-view {
+        margin: 0px 0;
+    }
+    .layui-table tr:nth-child(14n) td {
+        border-bottom: 2px solid red;
+    }
+</style>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
+    </table>
+</div>
+</div>
+</div>
+
+<script type="text/html" id="toolbar">
+    <a class="layui-btn layui-btn-info layui-btn-xs" lay-event="childDel">查看详情</a>
+</script>
+<input type="text" id="Style" class="layui-hide" value="{:htmlspecialchars(json_encode($Style))}">
+<input type="text" id="CategoryName1" class="layui-hide" value="{:htmlspecialchars(json_encode($CategoryName1))}">
+<input type="text" id="CategoryName2" class="layui-hide" value="{:htmlspecialchars(json_encode($CategoryName2))}">
+<input type="text" id="Collar" class="layui-hide" value="{:htmlspecialchars(json_encode($Collar))}">
+
+<script>
+
+layui.use(['form', 'jquery', 'layer'], function () {
+    let form = layui.form
+        , $ = layui.$
+        , layer = layui.layer
+        , url1 = "{:url('admin/system.code.ratio/getCate2')}"
+        , url2 = "{:url('admin/system.code.ratio/getCollar')}"
+    ;
+
+    //监听温带下拉
+    form.on('select(cate)', function (data) {
+
+        var cate1 = data.value;
+        console.log(cate1)
+        $.ajax({
+            type: "POST",
+            url: url1,
+            data: {'cate1':cate1},
+            dataType: 'json',
+            success: function (res) {
+
+                $('#c-cate2').empty();
+                $('#c-cate2').next().empty();
+
+                var append_str = '<option value="">- 全部 -</option>';
+                var dd_append_str = '<div class="layui-unselect layui-form-select">';
+                dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+                dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+                dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+                $.each(res.data, function(key, val){
+                    console.log(key,val)
+                    append_str += '<option value="'+key+'">'+val+'</option>';
+                    dd_append_str += '<dd lay-value="'+key+'" class="">'+val+'</dd>';
+                });
+                dd_append_str += '</dl></div>';
+                $('#c-cate2').append(append_str);
+                $('#c-cate2').next().append(dd_append_str);
+                form.render('select');
+
+            }
+        });
+
+    });
+
+    //监听省份下拉
+    form.on('select(cate2)', function (data) {
+
+        var cate2 = data.value;
+        $.ajax({
+            type: "POST",
+            url: url2,
+            data: {'cate2':cate2},
+            dataType: 'json',
+            success: function (res) {
+
+                $('#c-collar').empty();
+                $('#c-collar').next().empty();
+
+                var append_str = '<option value="">- 全部 -</option>';
+                var dd_append_str = '<div class="layui-unselect layui-form-select">';
+                dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+                dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+                dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+                $.each(res.data, function(key, val){
+                    append_str += '<option value="'+key+'">'+val+'</option>';
+                    dd_append_str += '<dd lay-value="'+key+'" class="">'+val+'</dd>';
+                });
+                dd_append_str += '</dl></div>';
+                $('#c-collar').append(append_str);
+                $('#c-collar').next().append(dd_append_str);
+                form.render('select');
+
+            }
+        });
+
+    });
+});
+
+</script>
