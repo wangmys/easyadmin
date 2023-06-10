@@ -1438,6 +1438,7 @@ class Duanmalv extends BaseController
             FROM
                 cwl_duanmalv_table1_1 a,
                 ( SELECT @商品负责人 := null, @rank := 0 ) T 
+            WHERE a.更新日期='{$date}'
             ORDER BY
                 商品负责人,
             `齐码率-TOP实际` DESC
@@ -1554,6 +1555,7 @@ class Duanmalv extends BaseController
             FROM
                 cwl_duanmalv_table1_2 a,
                 ( SELECT @rank := 0 ) T 
+            WHERE a.更新日期='{$date}'
             ORDER BY
                 `合计-TOP考核` DESC
         ";
@@ -1671,6 +1673,7 @@ class Duanmalv extends BaseController
             FROM
                 cwl_duanmalv_table1_3 a,
                 ( SELECT @rank := 0 ) T 
+            WHERE a.更新日期='{$date}'
             ORDER BY
                 `合计-TOP考核` DESC
         ";
