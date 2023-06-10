@@ -1361,7 +1361,7 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 首页表
+    // 首页表1_1
     public function table1() {
         $date = date('Y-m-d');
         $sql = "
@@ -1412,7 +1412,7 @@ class Duanmalv extends BaseController
         }
     }
 
-    public function table1_1_sort() {
+    protected function table1_1_sort() {
         $date = date('Y-m-d');
         $sql = "
             SELECT
@@ -1455,6 +1455,238 @@ class Duanmalv extends BaseController
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+            }
+        }
+    }
+
+    // 首页表1_2
+    public function table1_2() {
+        $date = date('Y-m-d');
+            $sql = "
+            SELECT
+                t1.*,
+                case
+                    when t1.`直营-整体` > 0 AND t1.`加盟-整体` > 0 then round((t1.`直营-整体` + t1.`加盟-整体`) / 2, 4)
+                    when t1.`直营-整体` > 0 AND (t1.`加盟-整体` <= 0 || t1.`加盟-整体` is null) then round((t1.`直营-整体`), 4)
+                    when (t1.`直营-整体` >= 0 || t1.`直营-整体` is null) AND t1.`加盟-整体` > 0 then round((t1.`加盟-整体`), 4)
+                    else 0
+                end as 	`合计-整体`,
+                case
+                    when t1.`直营-TOP实际` > 0 AND t1.`加盟-TOP实际` > 0 then round((t1.`直营-TOP实际` + t1.`加盟-TOP实际`) / 2, 4)
+                    when t1.`直营-TOP实际` > 0 AND (t1.`加盟-TOP实际` <= 0 || t1.`加盟-TOP实际` is null) then round((t1.`直营-TOP实际`), 4)
+                    when (t1.`直营-TOP实际` >= 0 || t1.`直营-TOP实际` is null) AND t1.`加盟-TOP实际` > 0 then round((t1.`加盟-TOP实际`), 4)
+                    else 0
+                end as 	`合计-TOP实际`,
+                case
+                    when t1.`直营-TOP考核` > 0 AND t1.`加盟-TOP考核` > 0 then round((t1.`直营-TOP考核` + t1.`加盟-TOP考核`) / 2, 4)
+                    when t1.`直营-TOP考核` > 0 AND (t1.`加盟-TOP考核` <= 0 || t1.`加盟-TOP考核` is null) then round((t1.`直营-TOP考核`), 4)
+                    when (t1.`直营-TOP考核` >= 0 || t1.`直营-TOP考核` is null) AND t1.`加盟-TOP考核` > 0 then round((t1.`加盟-TOP考核`), 4)
+                    else 0
+                end as 	`合计-TOP考核`,
+                date_format(now(),'%Y-%m-%d') as 更新日期
+            FROM
+                (
+                SELECT
+                    zy.云仓,
+                    zy.商品负责人,
+                    ROUND( AVG( zy.`齐码率-整体` ), 4 ) AS `直营-整体`,
+                    jm.`加盟-整体`,
+                    ROUND( AVG( zy.`齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
+                    jm.`加盟-TOP实际`,
+                    ROUND( AVG( zy.`齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`,
+                    jm.`加盟-TOP考核` 
+                FROM
+                    cwl_duanmalv_table1_1 AS zy
+                    LEFT JOIN (
+                    SELECT
+                        云仓,商品负责人,
+                        ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
+                        ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
+                        ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核` 
+                    FROM
+                        cwl_duanmalv_table1_1 
+                    WHERE
+                        经营模式 = '加盟' 
+                    GROUP BY
+                        商品负责人 
+                    ) AS jm ON zy.商品负责人 = jm.`商品负责人` 
+                WHERE
+                    zy.经营模式 = '直营' 
+                GROUP BY
+                zy.商品负责人 
+                ) AS t1                                               
+        ";
+        $select = $this->db_easyA->query($sql);
+        // dump($select); die;
+        if ($select) {
+            // 只删除当天
+            $this->db_easyA->table('cwl_duanmalv_table1_2')->where([
+                '更新日期' => $date
+            ])->delete();
+            // die;
+            $chunk_list = array_chunk($select, 1000);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2')->strict(false)->insertAll($val);
+            }
+            $this->table1_2_sort();   
+        }
+    }
+
+    protected function table1_2_sort() {
+        $date = date('Y-m-d');
+        $sql = "
+            SELECT
+                a.云仓,
+                a.商品负责人,
+                a.`直营-整体`,
+                a.`加盟-整体`,
+                a.`合计-整体`,
+                a.`直营-TOP实际`,
+                a.`加盟-TOP实际`,
+                a.`合计-TOP实际`,
+                a.`直营-TOP考核`,
+                a.`加盟-TOP考核`,
+                a.`合计-TOP考核`,
+                a.`更新日期`,
+                @rank := @rank + 1 AS 齐码排名 
+            FROM
+                cwl_duanmalv_table1_2 a,
+                ( SELECT @rank := 0 ) T 
+            ORDER BY
+                `合计-TOP考核` DESC
+        ";
+        $select = $this->db_easyA->query($sql);
+        // dump($select); die;
+        if ($select) {
+            // 只删除当天
+            $this->db_easyA->table('cwl_duanmalv_table1_2')->where([
+                '更新日期' => $date
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2')->strict(false)->insertAll($val);
+            }
+        }
+    }
+
+    // 首页表1_3
+    public function table1_3() {
+        $date = date('Y-m-d');
+            $sql = "
+                SELECT 
+                    t2.*,
+                case
+                    when t2.`直营-整体` > 0 AND t2.`加盟-整体` > 0 then round((t2.`直营-整体` + t2.`加盟-整体`) / 2, 4)
+                    when t2.`直营-整体` > 0 AND (t2.`加盟-整体` <= 0 || t2.`加盟-整体` is null) then round((t2.`直营-整体`), 4)
+                    when (t2.`直营-整体` >= 0 || t2.`直营-整体` is null) AND t2.`加盟-整体` > 0 then round((t2.`加盟-整体`), 4)
+                    else 0
+                end as 	`合计-整体`,
+                case
+                    when t2.`直营-TOP实际` > 0 AND t2.`加盟-TOP实际` > 0 then round((t2.`直营-TOP实际` + t2.`加盟-TOP实际`) / 2, 4)
+                    when t2.`直营-TOP实际` > 0 AND (t2.`加盟-TOP实际` <= 0 || t2.`加盟-TOP实际` is null) then round((t2.`直营-TOP实际`), 4)
+                    when (t2.`直营-TOP实际` >= 0 || t2.`直营-TOP实际` is null) AND t2.`加盟-TOP实际` > 0 then round((t2.`加盟-TOP实际`), 4)
+                    else 0
+                end as 	`合计-TOP实际`,
+                case
+                    when t2.`直营-TOP考核` > 0 AND t2.`加盟-TOP考核` > 0 then round((t2.`直营-TOP考核` + t2.`加盟-TOP考核`) / 2, 4)
+                    when t2.`直营-TOP考核` > 0 AND (t2.`加盟-TOP考核` <= 0 || t2.`加盟-TOP考核` is null) then round((t2.`直营-TOP考核`), 4)
+                    when (t2.`直营-TOP考核` >= 0 || t2.`直营-TOP考核` is null) AND t2.`加盟-TOP考核` > 0 then round((t2.`加盟-TOP考核`), 4)
+                    else 0
+                end as 	`合计-TOP考核`,
+                date_format(now(),'%Y-%m-%d') as 更新日期
+                FROM (
+                SELECT
+                    t1.省份,
+                    t1.商品负责人,
+                    zy.`直营-整体`,
+                    zy.`直营-TOP实际`,
+                    zy.`直营-TOP考核`,
+                    jm.`加盟-整体`,
+                    jm.`加盟-TOP实际`,
+                    jm.`加盟-TOP考核`
+                FROM
+                    cwl_duanmalv_table1_1 t1
+                LEFT JOIN (
+                SELECT
+                    省份,
+                    商品负责人,
+                    ROUND( AVG( `齐码率-整体` ), 4 ) AS `直营-整体`,
+                    ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
+                    ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`
+                FROM
+                    cwl_duanmalv_table1_1 where 经营模式 = '直营' GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
+                LEFT JOIN (
+                SELECT
+                    省份,
+                    商品负责人,
+                    ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
+                    ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
+                    ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
+                FROM
+                    cwl_duanmalv_table1_1 where 经营模式 = '加盟' GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
+                GROUP BY
+                        t1.省份, t1.商品负责人 
+            ) AS t2                                          
+        ";
+        $select = $this->db_easyA->query($sql);
+        // dump($select); die;
+        if ($select) {
+            // 只删除当天
+            $this->db_easyA->table('cwl_duanmalv_table1_3')->where([
+                '更新日期' => $date
+            ])->delete();
+            // die;
+            $chunk_list = array_chunk($select, 1000);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
+            }
+            $this->table1_3_sort();   
+        }
+    }
+
+    protected function table1_3_sort() {
+        $date = date('Y-m-d');
+        $sql = "
+            SELECT
+                a.省份,
+                a.商品负责人,
+                a.`直营-整体`,
+                a.`加盟-整体`,
+                a.`合计-整体`,
+                a.`直营-TOP实际`,
+                a.`加盟-TOP实际`,
+                a.`合计-TOP实际`,
+                a.`直营-TOP考核`,
+                a.`加盟-TOP考核`,
+                a.`合计-TOP考核`,
+                a.`更新日期`,
+                @rank := @rank + 1 AS 齐码排名 
+            FROM
+                cwl_duanmalv_table1_3 a,
+                ( SELECT @rank := 0 ) T 
+            ORDER BY
+                `合计-TOP考核` DESC
+        ";
+        $select = $this->db_easyA->query($sql);
+        // dump($select); die;
+        if ($select) {
+            // 只删除当天
+            $this->db_easyA->table('cwl_duanmalv_table1_3')->where([
+                '更新日期' => $date
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 1000);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
             }
         }
     }
