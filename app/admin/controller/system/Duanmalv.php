@@ -673,4 +673,56 @@ class Duanmalv extends AdminController
         }
         return Excel::exportData($select, $header, '单店单款断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }    
+
+    // 整体 1_1
+    public function table1() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // $pageParams1 = 0;
+            // $pageParams2 = 100;
+
+            $sql = "
+                SELECT  
+                    t1.商品负责人,t1.云仓,t1.省份,t1.店铺名称,t1.经营模式,
+                    t2.`单店排名` as `单店排名-新`,
+                    t2.`SKC数-整体` as `SKC数-整体-新`,
+                    t2.`齐码率-整体` as `齐码率-整体-新`,
+                    t2.`SKC数-TOP实际` as `SKC数-TOP实际-新`,
+                    t2.`齐码率-TOP实际` as `齐码率-TOP实际-新`,
+                    t2.`SKC数-TOP考核` as `SKC数-TOP考核-新`,
+                    t2.`齐码率-TOP实际` as `齐码率-TOP考核-新`,
+                    t2.`更新日期` as `更新日期-新`,
+                    t3.`单店排名` as `单店排名-旧`,
+                    t3.`SKC数-整体` as `SKC数-整体-旧`,
+                    t3.`齐码率-整体` as `齐码率-整体-旧`,
+                    t3.`SKC数-TOP实际` as `SKC数-TOP实际-旧`,
+                    t3.`齐码率-TOP实际` as `齐码率-TOP实际-旧`,
+                    t3.`SKC数-TOP考核` as `SKC数-TOP考核-旧`,
+                    t3.`齐码率-TOP实际` as `齐码率-TOP考核-旧`,
+                    t3.`更新日期` as `更新日期-旧`  
+                FROM
+                    cwl_duanmalv_table1_1 t1 
+                    left join cwl_duanmalv_table1_1 t2 ON t1.店铺名称=t2.店铺名称 and t2.更新日期 = '2023-06-12'
+                    left join cwl_duanmalv_table1_1 t3 ON t1.店铺名称=t3.店铺名称 and t3.更新日期 = '2023-06-10'
+                WHERE
+                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
+                
+                GROUP BY
+                    t1.店铺名称
+                ORDER BY t2.商品负责人 ASC
+                , t2.`单店排名` ASC
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('table1', [
+
+            ]);
+        }  
+    }
 }
