@@ -1510,11 +1510,13 @@ class Duanmalv extends BaseController
                         cwl_duanmalv_table1_1 
                     WHERE
                         经营模式 = '加盟' 
+                        AND `更新日期` = date_format(now(),'%Y-%m-%d')
                     GROUP BY
                         商品负责人 
                     ) AS jm ON zy.商品负责人 = jm.`商品负责人` 
                 WHERE
                     zy.经营模式 = '直营' 
+                    AND zy.`更新日期` = date_format(now(),'%Y-%m-%d')
                 GROUP BY
                 zy.商品负责人 
                 ) AS t1                                               
@@ -1623,16 +1625,24 @@ class Duanmalv extends BaseController
                     ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
                     ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`
                 FROM
-                    cwl_duanmalv_table1_1 where 经营模式 = '直营' GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
+                    cwl_duanmalv_table1_1 
+                where 
+                    经营模式 = '直营' 
+                    更新日期 = date_format(now(),'%Y-%m-%d')
+                GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
                 LEFT JOIN (
-                SELECT
-                    省份,
-                    商品负责人,
-                    ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
-                    ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
-                    ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
-                FROM
-                    cwl_duanmalv_table1_1 where 经营模式 = '加盟' GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
+                    SELECT
+                        省份,
+                        商品负责人,
+                        ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
+                        ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
+                        ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
+                    FROM
+                        cwl_duanmalv_table1_1 
+                    where 
+                        经营模式 = '加盟' 
+                        更新日期 = date_format(now(),'%Y-%m-%d')
+                    GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
                 GROUP BY
                         t1.省份, t1.商品负责人 
             ) AS t2                                          
