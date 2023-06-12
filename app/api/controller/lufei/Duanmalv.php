@@ -142,7 +142,8 @@ class Duanmalv extends BaseController
         // dump($select);die;
         if ($select) {
             // 删除
-            $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+            // $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
 
             $chunk_list = array_chunk($select, 1000);
 
@@ -906,7 +907,8 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql1);
         if ($select) {
             // 删除 需要计算排名的
-            $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+            // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_duanmalv_handle_1;');
 
             $chunk_list = array_chunk($select, 1000);
 
