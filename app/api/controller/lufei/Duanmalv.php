@@ -1628,7 +1628,7 @@ class Duanmalv extends BaseController
                     cwl_duanmalv_table1_1 
                 where 
                     经营模式 = '直营' 
-                    更新日期 = date_format(now(),'%Y-%m-%d')
+                    AND 更新日期 = date_format(now(),'%Y-%m-%d')
                 GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
                 LEFT JOIN (
                     SELECT
@@ -1641,7 +1641,7 @@ class Duanmalv extends BaseController
                         cwl_duanmalv_table1_1 
                     where 
                         经营模式 = '加盟' 
-                        更新日期 = date_format(now(),'%Y-%m-%d')
+                        AND 更新日期 = date_format(now(),'%Y-%m-%d')
                     GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
                 GROUP BY
                         t1.省份, t1.商品负责人 
