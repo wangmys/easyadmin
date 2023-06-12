@@ -89,9 +89,9 @@ class SizeAllRatio extends TimeModel
                 '当前单店均深' => bcadd($all_thisTotal / $cabinets_num,0,2)
             ];
 
-
+            // 周转 = 当前总库存/周销
             if(!empty($all_shop_stock) && !empty($all_total)){
-                $total_item['周转'] = bcadd($all_shop_stock / $all_total,0,2);
+                $total_item['周转'] = bcadd($all_thisTotal / $all_day7_total,0,2);
             }
 
             if(!empty($all_total) && !empty($all_total + $all_thisTotal)){
