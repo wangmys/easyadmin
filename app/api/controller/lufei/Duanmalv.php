@@ -1373,28 +1373,31 @@ class Duanmalv extends BaseController
                 1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
                 1 - ROUND(`SKC数-TOP实际` / 60, 2)AS '齐码率-TOP实际',
                 1 - ROUND(`SKC数-TOP考核` / 60, 2)AS '齐码率-TOP考核',
-                '{$date}' AS 更新日期
+                date_format(now(),'%Y-%m-%d') AS 更新日期
                 FROM 
                         (SELECT
-                                商品负责人,
-                                云仓,
-                                省份,
-                                店铺名称,
-                                经营模式,
-                                店铺总SKC数 AS 'SKC数-整体',
-                                SUM(`全部断码SKC数`) AS 'SKC数-TOP实际',
-                                SUM(`TOP断码SKC数`) AS 'SKC数-TOP考核'
-                        FROM cwl_duanmalv_handle_1 
+                                f.首单日期,
+                                h0.商品负责人,
+                                h0.云仓,
+                                h0.省份,
+                                h0.店铺名称,
+                                h0.经营模式,
+                                h0.店铺总SKC数 AS 'SKC数-整体',
+                                SUM(h0.`全部断码SKC数`) AS 'SKC数-TOP实际',
+                                SUM(h0.`TOP断码SKC数`) AS 'SKC数-TOP考核'
+                        FROM cwl_duanmalv_handle_1 h0 
+                        LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
                         WHERE 
-                                风格 in ('基本款')
+                                h0.风格 in ('基本款')
+                                AND f.首单日期 IS NOT NULL
                 -- 	店铺名称='大石二店'
                         GROUP BY
-                                商品负责人,
-                                店铺名称,
-                                经营模式
+                                h0.商品负责人,
+                                h0.店铺名称,
+                                h0.经营模式
                         ORDER BY
-                                商品负责人,店铺名称,省份,经营模式) AS h1 
-                ORDER BY `齐码率-TOP实际` DESC                                                 
+                                h0.商品负责人,h0.店铺名称,h0.省份,h0.经营模式) AS h1 
+                ORDER BY `齐码率-TOP实际` DESC                                             
         ";
         $select = $this->db_easyA->query($sql);
         // dump($select); die;

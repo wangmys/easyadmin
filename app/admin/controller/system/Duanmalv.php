@@ -713,7 +713,7 @@ class Duanmalv extends AdminController
                 
                 GROUP BY
                     t1.店铺名称
-                ORDER BY t2.商品负责人 ASC
+                ORDER BY t2.商品负责人 DESC
                 , t2.`单店排名` ASC
             ";
             $select = $this->db_easyA->query($sql);
@@ -721,6 +721,118 @@ class Duanmalv extends AdminController
             return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
         } else {
             return View('table1', [
+
+            ]);
+        }  
+    }
+
+    // 整体 1_2
+    public function table1_2() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // $pageParams1 = 0;
+            // $pageParams2 = 100;
+
+            $sql = "
+                SELECT
+                    t1.云仓,t1.商品负责人,
+                    t2.`齐码排名` as `齐码排名-新`,
+                    t2.`直营-整体` as `直营-整体-新`,
+                    t2.`加盟-整体` as `加盟-整体-新`,
+                    t2.`合计-整体` as `合计-整体-新`,
+                    t2.`直营-TOP实际` as `直营-TOP实际-新`,
+                    t2.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                    t2.`合计-TOP实际` as `合计-TOP实际-新`,
+                    t2.`直营-TOP考核` as `直营-TOP考核-新`,
+                    t2.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                    t2.`合计-TOP考核` as `合计-TOP考核-新`,
+                    t2.`更新日期` as `更新日期-新`,
+                    t3.`齐码排名` as `齐码排名-旧`,
+                    t3.`直营-整体` as `直营-整体-旧`,
+                    t3.`加盟-整体` as `加盟-整体-旧`,
+                    t3.`合计-整体` as `合计-整体-旧`,
+                    t3.`直营-TOP实际` as `直营-TOP实际-旧`,
+                    t3.`加盟-TOP实际` as `加盟-TOP实际-旧`,
+                    t3.`合计-TOP实际` as `合计-TOP实际-旧`,
+                    t3.`直营-TOP考核` as `直营-TOP考核-旧`,
+                    t3.`加盟-TOP考核` as `加盟-TOP考核-旧`,
+                    t3.`合计-TOP考核` as `合计-TOP考核-旧`,
+                    t3.`更新日期` as `更新日期-旧` 
+                FROM
+                    cwl_duanmalv_table1_2 t1 
+                    left join cwl_duanmalv_table1_2 t2 ON t1.云仓=t2.云仓 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '2023-06-12'
+                    left join cwl_duanmalv_table1_2 t3 ON t1.云仓=t3.云仓 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '2023-06-10'
+                WHERE
+                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
+                GROUP BY
+                    t1.云仓, t1.商品负责人
+                ORDER BY  t2.`齐码排名` ASC
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('table1_2', [
+
+            ]);
+        }  
+    }
+
+    // 整体 1_3
+     public function table1_3() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // $pageParams1 = 0;
+            // $pageParams2 = 100;
+
+            $sql = "
+                SELECT
+                    t1.省份,t1.商品负责人,
+                    t2.`齐码排名` as `齐码排名-新`,
+                    t2.`直营-整体` as `直营-整体-新`,
+                    t2.`加盟-整体` as `加盟-整体-新`,
+                    t2.`合计-整体` as `合计-整体-新`,
+                    t2.`直营-TOP实际` as `直营-TOP实际-新`,
+                    t2.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                    t2.`合计-TOP实际` as `合计-TOP实际-新`,
+                    t2.`直营-TOP考核` as `直营-TOP考核-新`,
+                    t2.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                    t2.`合计-TOP考核` as `合计-TOP考核-新`,
+                    t2.`更新日期` as `更新日期-新`,
+                    t3.`齐码排名` as `齐码排名-旧`,
+                    t3.`直营-整体` as `直营-整体-旧`,
+                    t3.`加盟-整体` as `加盟-整体-旧`,
+                    t3.`合计-整体` as `合计-整体-旧`,
+                    t3.`直营-TOP实际` as `直营-TOP实际-旧`,
+                    t3.`加盟-TOP实际` as `加盟-TOP实际-旧`,
+                    t3.`合计-TOP实际` as `合计-TOP实际-旧`,
+                    t3.`直营-TOP考核` as `直营-TOP考核-旧`,
+                    t3.`加盟-TOP考核` as `加盟-TOP考核-旧`,
+                    t3.`合计-TOP考核` as `合计-TOP考核-旧`,
+                    t3.`更新日期` as `更新日期-旧` 
+                FROM
+                    cwl_duanmalv_table1_3 t1 
+                    left join cwl_duanmalv_table1_3 t2 ON t1.省份=t2.省份 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '2023-06-12'
+                    left join cwl_duanmalv_table1_3 t3 ON t1.省份=t3.省份 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '2023-06-10'
+                WHERE
+                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
+                GROUP BY
+                    t1.省份, t1.商品负责人
+                ORDER BY  t2.`齐码排名` ASC
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('table1_3', [
 
             ]);
         }  
