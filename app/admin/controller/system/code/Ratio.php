@@ -986,7 +986,7 @@ class Ratio extends AdminController
                   $value['全国排名'] = $init + $key+1;
                   $item = $value->alias('r')
                       ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo')
-                      ->where(['GoodsNo' => $value['货号'],'Date' => date('Y-m-d')])
+                      ->where(['ra.GoodsNo' => $value['货号'],'ra.Date' => date('Y-m-d')])
                       ->order('ra.id')
                       ->select()
                       ->toArray();
