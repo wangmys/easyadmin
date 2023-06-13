@@ -142,7 +142,8 @@ class Duanmalv extends BaseController
         // dump($select);die;
         if ($select) {
             // 删除
-            $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+            // $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
 
             $chunk_list = array_chunk($select, 1000);
 
@@ -906,7 +907,8 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql1);
         if ($select) {
             // 删除 需要计算排名的
-            $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+            // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_duanmalv_handle_1;');
 
             $chunk_list = array_chunk($select, 1000);
 
@@ -1371,28 +1373,31 @@ class Duanmalv extends BaseController
                 1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
                 1 - ROUND(`SKC数-TOP实际` / 60, 2)AS '齐码率-TOP实际',
                 1 - ROUND(`SKC数-TOP考核` / 60, 2)AS '齐码率-TOP考核',
-                '{$date}' AS 更新日期
+                date_format(now(),'%Y-%m-%d') AS 更新日期
                 FROM 
                         (SELECT
-                                商品负责人,
-                                云仓,
-                                省份,
-                                店铺名称,
-                                经营模式,
-                                店铺总SKC数 AS 'SKC数-整体',
-                                SUM(`全部断码SKC数`) AS 'SKC数-TOP实际',
-                                SUM(`TOP断码SKC数`) AS 'SKC数-TOP考核'
-                        FROM cwl_duanmalv_handle_1 
+                                f.首单日期,
+                                h0.商品负责人,
+                                h0.云仓,
+                                h0.省份,
+                                h0.店铺名称,
+                                h0.经营模式,
+                                h0.店铺总SKC数 AS 'SKC数-整体',
+                                SUM(h0.`全部断码SKC数`) AS 'SKC数-TOP实际',
+                                SUM(h0.`TOP断码SKC数`) AS 'SKC数-TOP考核'
+                        FROM cwl_duanmalv_handle_1 h0 
+                        LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
                         WHERE 
-                                风格 in ('基本款')
+                                h0.风格 in ('基本款')
+                                AND f.首单日期 IS NOT NULL
                 -- 	店铺名称='大石二店'
                         GROUP BY
-                                商品负责人,
-                                店铺名称,
-                                经营模式
+                                h0.商品负责人,
+                                h0.店铺名称,
+                                h0.经营模式
                         ORDER BY
-                                商品负责人,店铺名称,省份,经营模式) AS h1 
-                ORDER BY `齐码率-TOP实际` DESC                                                 
+                                h0.商品负责人,h0.店铺名称,h0.省份,h0.经营模式) AS h1 
+                ORDER BY `齐码率-TOP实际` DESC                                             
         ";
         $select = $this->db_easyA->query($sql);
         // dump($select); die;
@@ -1508,11 +1513,13 @@ class Duanmalv extends BaseController
                         cwl_duanmalv_table1_1 
                     WHERE
                         经营模式 = '加盟' 
+                        AND `更新日期` = date_format(now(),'%Y-%m-%d')
                     GROUP BY
                         商品负责人 
                     ) AS jm ON zy.商品负责人 = jm.`商品负责人` 
                 WHERE
                     zy.经营模式 = '直营' 
+                    AND zy.`更新日期` = date_format(now(),'%Y-%m-%d')
                 GROUP BY
                 zy.商品负责人 
                 ) AS t1                                               
@@ -1621,16 +1628,24 @@ class Duanmalv extends BaseController
                     ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
                     ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`
                 FROM
-                    cwl_duanmalv_table1_1 where 经营模式 = '直营' GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
+                    cwl_duanmalv_table1_1 
+                where 
+                    经营模式 = '直营' 
+                    AND 更新日期 = date_format(now(),'%Y-%m-%d')
+                GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
                 LEFT JOIN (
-                SELECT
-                    省份,
-                    商品负责人,
-                    ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
-                    ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
-                    ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
-                FROM
-                    cwl_duanmalv_table1_1 where 经营模式 = '加盟' GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
+                    SELECT
+                        省份,
+                        商品负责人,
+                        ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
+                        ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
+                        ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
+                    FROM
+                        cwl_duanmalv_table1_1 
+                    where 
+                        经营模式 = '加盟' 
+                        AND 更新日期 = date_format(now(),'%Y-%m-%d')
+                    GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
                 GROUP BY
                         t1.省份, t1.商品负责人 
             ) AS t2                                          
