@@ -157,7 +157,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '上柜家数', width: 115, title: '上柜家数',search:false},
                     {field: '上市天数', width: 115, title: '上市天数',search:false},
                     {field: '日均销', width: 115, title: '日均销',search:false},
-                    {field: '图片', width: 80, title: '图片', search: false, templet: ea.table.image},
+                    {field: '图片', width: 80, title: '图片', search: false, templet: ea.table.image,imageHeight:30},
                     {field: '字段', width: 80, title: '字段', search: false},
                     {field: '合计', width: 115, title: '合计', search: false},
                     {field: '库存_00/28/37/44/100/160/S', width: 160, title: '库存_00/28/37/44/100/160/S', search: false},
@@ -170,24 +170,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: '库存_35/44/58/195/5XL', width: 160, title: '库存_35/44/58/195/5XL', search: false},
                     {field: '库存_36/6XL', width: 110, title: '库存_36/6XL', search: false},
                     {field: '库存_38/7XL', width: 110, title: '库存_38/7XL', search: false},
-                    {field: '库存_40/8XL', width: 110, title: '库存_40/8XL', search: false},
-                    // {
-                    //     width: 120,
-                    //     title: '操作',
-                    //     templet: ea.table.tool,
-                    //     operat: [
-                    //         [{
-                    //             text: '查看详情',
-                    //             url: init.index_url,
-                    //             method: 'open',
-                    //             auth: '',
-                    //             class: 'layui-btn layui-btn-normal layui-btn-xs',
-                    //             extend:"data-full='true' data-title = '尺码情况' ",
-                    //             field:'货号'
-                    //         }],
-                    //     ],
-                    //     fixed: 'right'
-                    // }
+                    {field: '库存_40/8XL', width: 110, title: '库存_40/8XL', search: false}
                 ]]
             });
 

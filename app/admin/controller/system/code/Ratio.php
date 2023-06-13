@@ -90,7 +90,7 @@ class Ratio extends AdminController
 
                 // 货品上柜数
                 $cabinets_num = SizeRanking::where(['货号' => $goodsno])->value("上柜家数");
-                
+
                 $total_item = [
                     '风格' => $info['StyleCategoryName'],
                     '一级分类' => $info['CategoryName1'],
@@ -220,7 +220,7 @@ class Ratio extends AdminController
                     $item['单码售罄比'] = (intval($item['单码售罄']) - intval($total_item['单码售罄'])).'%';
 
                     if(intval($item['单码售罄比']) > $level_rate){
-                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
+                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >单码缺量</span>";
                     }
                     $item['单码售罄比'] = (intval($item['单码售罄']) - intval($total_item['单码售罄'])).'%';
 
@@ -266,7 +266,7 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$total_key]) && $sell_out_ratio[$total_key] > $level_rate){
                         // 高于则提示总库存偏码
-                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >偏码</span>";
                     }
                 }
                 // 判断当前库存是否偏码
@@ -274,7 +274,7 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$current_key]) && $sell_out_ratio[$current_key] > $level_rate){
                         // 高于则提示当前库存偏码
-                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >偏码</span>";
                     }
                 }
                 $list[] = $total_item;
@@ -501,7 +501,7 @@ class Ratio extends AdminController
                     }
                     $item['单码售罄比'] = (intval($item['单码售罄']) - intval($total_item['单码售罄'])).'%';
                     if(intval($item['单码售罄比']) > 0){
-                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
+                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >单码缺量</span>";
                     }
                     $item['单码售罄比'] = (intval($item['单码售罄']) - intval($total_item['单码售罄'])).'%';
 
@@ -763,9 +763,9 @@ class Ratio extends AdminController
                     $item['单码售罄比'] = (floatval($item['单码售罄']) - floatval($total_item['单码售罄'])).'%';
 
                     if(intval($item['单码售罄比']) > $level_rate){
-//                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >单码缺量</span>";
+//                        $total_item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px;' >单码缺量</span>";
                         $total_item['单码售罄比'] = "单码缺量";
-//                        $item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;' >{$item['单码售罄比']}</span>";
+//                        $item['单码售罄比'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px;' >{$item['单码售罄比']}</span>";
                     }
 
                     $list[] = $item;
@@ -811,7 +811,7 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$total_key]) && $sell_out_ratio[$total_key] > $level_rate){
                         // 高于则提示总库存偏码
-//                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+//                        $total_item['总库存'] =  "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px;' >偏码</span>";
                         $total_item['总库存'] =  "偏码";
                     }
                 }
@@ -821,7 +821,7 @@ class Ratio extends AdminController
                     // 单码售罄比是否高于设定偏码参数
                     if(isset($sell_out_ratio[$current_key]) && $sell_out_ratio[$current_key] > $level_rate){
                         // 高于则提示当前库存偏码
-//                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;' >偏码</span>";
+//                        $total_item['当前库存'] =  "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px;' >偏码</span>";
                         $total_item['当前库存'] =  "偏码";
                     }
                 }
@@ -983,6 +983,7 @@ class Ratio extends AdminController
             $init = ($page - 1) * $limit;
             foreach ($list as $key => &$value){
                   $value['近三天折率'] = '100%';
+                  $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
                   $value['全国排名'] = $init + $key+1;
                   $item = $value->alias('r')
                       ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo')
@@ -993,7 +994,7 @@ class Ratio extends AdminController
                   foreach ($item as $k =>$v){
                       foreach (['偏码','单码缺量'] as $kk => $vv){
                           if(($v_key = array_search($vv,$v)) !== false){
-                            $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;' >{$vv}</span>";
+                            $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
                           }
                       }
                       $allList[] = $value->toArray() + $v;

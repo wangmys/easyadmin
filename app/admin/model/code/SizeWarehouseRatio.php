@@ -61,6 +61,7 @@ class SizeWarehouseRatio extends TimeModel
         ";
 
         $fieldStr2 = "
+            sum(CASE WHEN `Quantity` > 0 THEN 1 ELSE 0 END ) `Quantity`,
             sum(CASE WHEN `库存_00/28/37/44/100/160/S` > 0 THEN 1 ELSE 0 END ) `库存_00/28/37/44/100/160/S`,
             sum(CASE WHEN `库存_29/38/46/105/165/M` > 0 THEN 1 ELSE 0 END ) `库存_29/38/46/105/165/M`,
             sum(CASE WHEN `库存_30/39/48/110/170/L` > 0 THEN 1 ELSE 0 END ) `库存_30/39/48/110/170/L`,
@@ -102,9 +103,12 @@ class SizeWarehouseRatio extends TimeModel
         // 单码上柜数
         $size_up_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->group('CustomItem15')->column($fieldStr2,'CustomItem15');
 
+        // 数据
+        $data = [];
+
         foreach ($warehouse as $k => $v){
 
-             // 单款云仓在途库存
+            // 单款云仓在途库存
             $all_transit_stock = 0;
             if(!empty($transit_stock_total[$v])){
                 $all_transit_stock = $transit_stock_total[$v]['Quantity']??0;
@@ -149,6 +153,36 @@ class SizeWarehouseRatio extends TimeModel
                 $size_sell_out = bcadd($sale_total_sum / ($all_total_stock + $sale_total_sum),0,2);
             }
 
+            // 单款上柜数
+            $all_size_up_total = 0;
+            if(!empty($size_up_total[$v])){
+                $all_size_up_total = $size_up_total[$v]['Quantity']??0;
+            }
+            // 单款当前单店均深 = 当前总库存量 / 上柜家数
+            $all_shop_mean = 0;
+            if($all_total_stock > 0 && $all_size_up_total > 0){
+                $all_shop_mean = bcadd($all_total_stock / $all_size_up_total,0,2);
+            }
+
+            $total_item = [
+                '排名' => $info['排名'],
+                '风格' => $info['风格'],
+                '一级分类' => $info['一级分类'],
+                '二级分类' => $info['二级分类'],
+                '领型' => $info['领型'],
+                '近三天折率' => $info['近三天折率'],
+                'GoodsNo' => $goodsno,
+                '货品等级' => $info['货品等级'],
+                '单码售罄' => $all_size_sell_out,
+                '周转' => $all_turnover,
+                '当前总库存量' => $all_total_stock,
+                '单码上柜数' => '',
+                '累销' => $sale_total_sum,
+                '周销' => $all_day7_sale,
+                '店铺库存' => $all_shop_stock,
+                '云仓在途' => $all_transit_stock,
+                '当前单店均深' => $all_shop_mean
+            ];
             foreach ($size as $kk => $vv){
 
                 // 单码云仓在途
@@ -216,15 +250,21 @@ class SizeWarehouseRatio extends TimeModel
                     $size_sell_out_ratio = $size_sell_out - $all_size_sell_out;
                 }
 
+                // 单码缺量 = 如果
                 if($size_sell_out_ratio > $level_rate){
                     $total_item['单码售罄比'] = "单码缺量";
                 }
 
+                // 单码当前单店均深 = 当前总库存量 / 上柜家数
+                $shop_mean = 0;
+                if($this_total_stock > 0 && $all_size_up_total > 0){
+                    $shop_mean = bcadd($all_total_stock / $all_size_up_total,0,2);
+                }
+
+                $data['当前单店均深'][$vv] =
             }
 
             $data[] = $total_item;
-
-            
 
         }
 
