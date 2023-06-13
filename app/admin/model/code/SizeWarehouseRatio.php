@@ -14,13 +14,13 @@ use app\admin\model\code\SizeRanking;
 class SizeWarehouseRatio extends TimeModel
 {
     // 表名
-    protected $name = 'ea_size_warehouse_ratio';
+    protected $name = 'size_warehouse_ratio';
 
     /**
      * 保存云仓偏码数据
      * @param string $goodsno
      */
-    public static function saveData($goodsno = 'B31101236')
+    public static function saveSizeRatio($goodsno = 'B31101236')
     {
         // 云仓
         $warehouse = [
@@ -103,10 +103,92 @@ class SizeWarehouseRatio extends TimeModel
         // 单码上柜数
         $size_up_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->group('CustomItem15')->column($fieldStr2,'CustomItem15');
 
-        // 数据
-        $data = [];
+        // 所有云仓数据
+        $all_warehouse_data = [];
 
         foreach ($warehouse as $k => $v){
+
+            // 单云仓数据
+            $data = [
+                '单码售罄比' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '单码售罄比'
+                ],
+                '当前库存尺码比' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '当前库存尺码比'
+                ],
+                '累销尺码比' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '累销尺码比'
+                ],
+                '单码售罄' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '单码售罄'
+                ],
+                '周转' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '周转'
+                ],
+                '当前总库存量' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '当前总库存量'
+                ],
+                '单码上柜数' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '单码上柜数'
+                ],
+                '累销' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '累销'
+                ],
+                '周销' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '周销'
+                ],
+                '店铺库存' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '店铺库存'
+                ],
+                '云仓库存' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '云仓库存'
+                ],
+                '云仓在途' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '云仓在途'
+                ],
+                '当前单店均深' => [
+                    'GoodsNo' => $goodsno,
+                    'Date' => date('Y-m-d'),
+                    '云仓' => $v,
+                    '字段' => '当前单店均深'
+                ]
+            ];
 
             // 单款云仓在途库存
             $all_transit_stock = 0;
@@ -150,7 +232,7 @@ class SizeWarehouseRatio extends TimeModel
             // 单款售罄 = 单款累销 / (单款当前总库存量 + 单款累销)
             $all_size_sell_out = 0;
             if($sale_total_sum > 0 && ($all_total_stock + $sale_total_sum) > 0){
-                $size_sell_out = bcadd($sale_total_sum / ($all_total_stock + $sale_total_sum),0,2);
+                $all_size_sell_out = bcadd($sale_total_sum / ($all_total_stock + $sale_total_sum) * 100,0,2);
             }
 
             // 单款上柜数
@@ -164,24 +246,10 @@ class SizeWarehouseRatio extends TimeModel
                 $all_shop_mean = bcadd($all_total_stock / $all_size_up_total,0,2);
             }
 
+            // 总计
             $total_item = [
-                '排名' => $info['排名'],
-                '风格' => $info['风格'],
-                '一级分类' => $info['一级分类'],
-                '二级分类' => $info['二级分类'],
-                '领型' => $info['领型'],
-                '近三天折率' => $info['近三天折率'],
-                'GoodsNo' => $goodsno,
-                '货品等级' => $info['货品等级'],
-                '单码售罄' => $all_size_sell_out,
-                '周转' => $all_turnover,
-                '当前总库存量' => $all_total_stock,
-                '单码上柜数' => '',
-                '累销' => $sale_total_sum,
-                '周销' => $all_day7_sale,
-                '店铺库存' => $all_shop_stock,
-                '云仓在途' => $all_transit_stock,
-                '当前单店均深' => $all_shop_mean
+                '单码售罄比' => '',
+                '当前库存尺码比' => ''
             ];
             foreach ($size as $kk => $vv){
 
@@ -214,6 +282,7 @@ class SizeWarehouseRatio extends TimeModel
                 if(!empty($day7_total[$v])){
                     $day7_sale = $day7_total[$v][$vv]??0;
                 }
+
                 // 周转 = 当前总库存量 / 周销
                 $turnover = 0;
                 if($this_total_stock > 0 && $day7_sale > 0){
@@ -229,19 +298,19 @@ class SizeWarehouseRatio extends TimeModel
                 // 单码售罄 = 单码累销 / (单码当前总库存量 + 单码累销)
                 $size_sell_out = 0;
                 if($size_sale_total > 0 && ($this_total_stock + $size_sale_total) > 0){
-                    $size_sell_out = bcadd($size_sale_total / ($this_total_stock + $size_sale_total),0,2);
+                    $size_sell_out = bcadd($size_sale_total / ($this_total_stock + $size_sale_total) * 100,0,2);
                 }
 
                 // 累销尺码比 = (单码累销 / 单款累销)
                 $sale_total_ratio = 0;
                 if($size_sale_total > 0 && $sale_total_sum > 0){
-                    $sale_total_ratio = bcadd($size_sale_total / $sale_total_sum,0,2);
+                    $sale_total_ratio = bcadd($size_sale_total / $sale_total_sum * 100,0,2);
                 }
 
                 // 当前库存尺码比 = 单码当前总库存量 / 单款当前总库存量
                 $total_stock_ratio = 0;
                 if($this_total_stock > 0 && $all_total_stock > 0){
-                    $total_stock_ratio = bcadd($this_total_stock / $all_total_stock,0,2);
+                    $total_stock_ratio = bcadd($this_total_stock / $all_total_stock * 100,0,2);
                 }
 
                 // 单码售罄比 = 单码售罄 - 单款售罄
@@ -250,47 +319,123 @@ class SizeWarehouseRatio extends TimeModel
                     $size_sell_out_ratio = $size_sell_out - $all_size_sell_out;
                 }
 
-                // 单码缺量 = 如果
+                // 单码缺量 = 如果单码售罄比大于设定商品的比例,则为单码缺量
                 if($size_sell_out_ratio > $level_rate){
                     $total_item['单码售罄比'] = "单码缺量";
                 }
 
-                // 单码当前单店均深 = 当前总库存量 / 上柜家数
-                $shop_mean = 0;
-                if($this_total_stock > 0 && $all_size_up_total > 0){
-                    $shop_mean = bcadd($all_total_stock / $all_size_up_total,0,2);
+                // 单码上柜数
+                $size_up_num = 0;
+                if(!empty($size_up_total[$v])){
+                    $size_up_num = $size_up_total[$v][$vv]??0;
                 }
 
-                $data['当前单店均深'][$vv] =
+                // 单码当前单店均深 = 单码当前总库存量 / 单码上柜家数
+                $shop_mean = 0;
+                if($this_total_stock > 0 && $size_up_num > 0){
+                    $shop_mean = bcadd($all_total_stock / $size_up_num,0,2);
+                }
+
+                $data['单码售罄比'][$vv] = $size_sell_out_ratio;
+                $data['当前库存尺码比'][$vv] = $total_stock_ratio;
+                $data['累销尺码比'][$vv] = $sale_total_ratio;
+                $data['单码售罄'][$vv] = $size_sell_out;
+                $data['周转'][$vv] = $turnover;
+                $data['当前总库存量'][$vv] = $this_total_stock;
+                $data['单码上柜数'][$vv] = $size_up_num;
+                $data['累销'][$vv] = $size_sale_total;
+                $data['周销'][$vv] = $day7_sale;
+                $data['店铺库存'][$vv] = $shop_stock;
+                $data['云仓库存'][$vv] = $available_stock;
+                $data['云仓在途'][$vv] = $transit_stock;
+                $data['当前单店均深'][$vv] = $shop_mean;
             }
 
-            $data[] = $total_item;
+            // 1.对数据进行排序
+            foreach (['当前库存尺码比','累销尺码比'] as $key => $val){
+                asort($data[$val]);
+            }
 
+            // 2.获取前多少名尺码个数,如果大于等于配置数,则使用配置数,如果小于配置数,则使用尺码数
+            $_count = 3;
+            if($n = count($data[$val]) < $_count){
+                $_count = $n;
+            }
+
+            // 3.对取好的库存尺码比排序,并截取排名前三的数值
+            // 取出每个尺码指定前几名的当前库存尺码比数据
+            $this_stock_size_ratio = array_slice($data['当前库存尺码比'],-$_count,null,true);
+            // 取出每个尺码指定前几名的累销尺码比数据
+            $accumulated_sale_ratio = array_slice($data['累销尺码比'],-$_count,null,true);
+
+            // 4.使用当前库存尺码比与累销尺码比对比,两组尺码数据是否一致,不一致则判断单码售罄比是否为单码缺量,是的情况下,则标识偏码
+            $current_inventory_1 = array_diff_key($this_stock_size_ratio,$accumulated_sale_ratio);
+            $current_inventory_2 = array_diff_key($accumulated_sale_ratio,$this_stock_size_ratio);
+            $current_inventory = $current_inventory_1 + $current_inventory_2;
+
+            // 5.判断当前库存比是否偏码
+            foreach ($current_inventory as $current_key => $current_val){
+                // 当前库存比是否高于设定偏码参数
+                if(isset($data['单码售罄比'][$current_key]) && $data['单码售罄比'][$current_key] > $level_rate){
+                    // 高于则提示当前库存偏码
+                    $total_item['当前库存尺码比'] =  "偏码";
+                }
+            }
+
+            $data['单码售罄比']['总计'] = $total_item['单码售罄比'];
+            $data['当前库存尺码比']['总计'] = $total_item['当前库存尺码比'];
+            $data['累销尺码比']['总计'] = '';
+            $data['单码售罄']['总计'] = $all_size_sell_out;
+            $data['周转']['总计'] = $all_turnover;
+            $data['当前总库存量']['总计'] = $all_total_stock;
+            $data['单码上柜数']['总计'] = '';
+            $data['累销']['总计'] = $sale_total_sum;
+            $data['周销']['总计'] = $all_day7_sale;
+            $data['店铺库存']['总计'] = $all_shop_stock;
+            $data['云仓库存']['总计'] = $all_available_stock;
+            $data['云仓在途']['总计'] = $all_transit_stock;
+            $data['当前单店均深']['总计'] = $all_shop_mean;
+            $all_warehouse_data[$v] = $data;
         }
 
-
-
-        // 货号
-        $arr = [$goodsno];
-        foreach ($arr as $key => $val){
-             // 商品信息
-                $info = Db::connect('sqlsrv')->table('ErpGoods eg')->leftJoin('ErpGoodsImg egi','eg.GoodsId = egi.GoodsId')
-                        ->field('eg.GoodsId,eg.GoodsNo,
-                        eg.GoodsName,
-                        eg.UnitPrice,
-                        eg.CategoryName,
-                        eg.CategoryName1,
-                        eg.CategoryName2,
-                        eg.TimeCategoryName1,
-                        eg.TimeCategoryName2,
-                        eg.StyleCategoryName,
-                        eg.StyleCategoryName2,
-                        LEFT(eg.CategoryName,2) as Collar,
-                        egi.Img')
-                    ->where([
-                    'GoodsNo' => $val
-                ])->find();
-
+        if(!empty($all_warehouse_data)){
+            // 批量插入云仓偏码数据
+            Db::startTrans();
+            try {
+                foreach($all_warehouse_data as $w_key => $k_val){
+                    (new self)->saveAll($k_val);
+                }
+                // 提交事务
+                Db::commit();
+                return true;
+            }catch (\Exception $e){
+                file_put_contents("./pull_warehouse_size_ratio.txt",var_export($e->getMessage(),true).'  '.date('Y/m/d H:i:s')."\r\n",FILE_APPEND);
+                // 回滚
+                Db::rollback();
+                return false;
+            }
         }
+    }
+
+    public static function saveData()
+    {
+        // 成功结果
+        $result = [];
+        // 失败结果
+        $error = [];
+        $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
+        // 查询货号列表排名
+        $list = SizeRanking::order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
+        foreach ($list as $key => $value){
+            // 计算并保存码比数据
+            $res = self::saveSizeRatio($value['货号']);
+            if($res === true){
+                $result[] = $res;
+            }else{
+                $error[] = $res;
+            }
+            echo $res;
+        }
+        return ['success' => count($result),'error' => $error];
     }
 }
