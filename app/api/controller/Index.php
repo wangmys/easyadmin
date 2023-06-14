@@ -116,11 +116,11 @@ class Index
     }
 
     /**
-     * 查询云仓偏码
+     * 查询并计算云仓偏码
      */
     public function selectRationData()
     {
-        $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
+        $res = \app\admin\model\code\SizeWarehouseRatio::saveSizeRatio();
         print_r($res);die;
     }
 }
