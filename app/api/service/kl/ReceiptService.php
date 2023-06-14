@@ -73,7 +73,7 @@ class ReceiptService
             }
 
             //处理 标记完成 问题
-            if ($this->is_commit == 1) {
+            if ($new['Type']==1 && $this->is_commit == 1) {
                 $this->dealIsCompleted($new['DeliveryId']);
             }
 
@@ -85,7 +85,7 @@ class ReceiptService
             //事务回滚失败，执行删除操作处理多余数据
             $this->delete($params);
             //处理 标记完成 问题
-            if ($this->is_commit == 1) {
+            if ($new['Type']==1 && $this->is_commit == 1) {
                 $this->dealIsCompleted($new['DeliveryId'], 0);
             }
             abort(0, $e->getMessage());
