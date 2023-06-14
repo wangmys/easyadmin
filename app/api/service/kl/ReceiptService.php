@@ -9,6 +9,9 @@ use app\api\model\kl\ErpGoodsModel;
 use app\api\model\kl\ErpBarCodeModel;
 use app\api\model\kl\ErpCustomerStockModel;
 use app\api\model\kl\ErpCustomerStockDetailModel;
+use app\api\model\kl\ErpDeliveryModel;
+use app\api\model\kl\ErpDeliveryGoodsModel;
+use app\api\model\kl\ErpSortingModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
@@ -49,7 +52,7 @@ class ReceiptService
             $new['CustOutID'] = $params['CustOutID'] ?? '';
             $new['FromCustomerId'] = $params['FromCustomerId'] ?? '';
             $new['FromCustomerName'] = $params['FromCustomerName'] ?? '';
-            $new['DeliveryId'] = $params['DeliveryId'] ?? '';
+            $new['DeliveryId'] = $params['DeliveryID'] ?? '';
             $new['WarehouseId'] = $params['WarehouseId'] ?? '';
             $new['WarehouseName'] = $params['WarehouseName'] ?? '';
 
@@ -69,6 +72,11 @@ class ReceiptService
                 }
             }
 
+            //处理 标记完成 问题
+            if ($this->is_commit == 1) {
+                $this->dealIsCompleted($new['DeliveryId']);
+            }
+
             Db::commit();
 
         } catch (\Exception $e) {
@@ -76,10 +84,30 @@ class ReceiptService
             log_error($e);
             //事务回滚失败，执行删除操作处理多余数据
             $this->delete($params);
+            //处理 标记完成 问题
+            if ($this->is_commit == 1) {
+                $this->dealIsCompleted($new['DeliveryId'], 0);
+            }
             abort(0, $e->getMessage());
         }
 
     }
+
+    public function dealIsCompleted($DeliveryID, $IsCompleted=1) {
+
+        if ($DeliveryID) {
+
+            ErpDeliveryModel::where([['DeliveryID', '=', $DeliveryID]])->update(['IsCompleted' => $IsCompleted]);
+            $SortingID = ErpDeliveryGoodsModel::where([['DeliveryID', '=', $DeliveryID]])->field('SortingID')->find();
+            $SortingID = $SortingID ? $SortingID['SortingID'] : '';
+            if ($SortingID) {
+                ErpSortingModel::where([['SortingID', '=', $SortingID]])->update(['IsCompleted' => $IsCompleted]);
+            }
+
+        }
+
+    }
+
 
     public function addCustReceiptGoods($ReceiptID, $ReceiptGoodsID, $detail, $params) {
 
