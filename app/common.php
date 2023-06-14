@@ -378,3 +378,18 @@ function generate_sql($arr, $table) {
     return $sql_str;
 
 }
+
+// 多选提交参数处理
+function xmSelectInput($str = "") {
+    // $str = "于燕华,周奇志,廖翠芳,张洋涛";
+
+    $exploadDate = explode(',', $str);
+    // dump($exploadDate);die;
+    $map = "";
+    foreach ($exploadDate as $key => $val) {
+        $map .=  "'" . $val . "'" . ",";
+    }
+    // 删除最后的逗号
+    $map = mb_substr($map, 0, -1, "UTF-8");
+    return $map;
+}

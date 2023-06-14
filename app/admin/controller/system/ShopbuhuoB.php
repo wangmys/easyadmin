@@ -801,6 +801,15 @@ class ShopbuhuoB extends AdminController
                     'M' => '规格',
                     'N' => '备注',
                 ];
+                // $read_column = [
+                //     'A' => '原单编号',
+                //     'B' => '调出店铺编号',
+                //     'C' => '调入店铺编号',
+                //     'D' => '货号',
+                //     'E' => '尺码',
+                //     'F' => '颜色编号',
+                //     'G' => '数量',
+                // ];
 
                 // 店铺信息
                 $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
@@ -863,22 +872,15 @@ class ShopbuhuoB extends AdminController
 
     // 调拨测试
     public function redExcel_test_diaobo() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/1渠道调拨0608_调拨出问题了.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/222.xls';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
-            'B' => '单据日期',
-            'C' => '审结日期',
-            'D' => '调出店铺编号',
-            'E' => '调入店铺编号',
-            'F' => '调出价格类型',
-            'G' => '调入价格类型',
-            'H' => '货号',
-            'I' => '颜色编号',
-            'J' => '规格',
-            'K' => '尺码',
-            'L' => '数量',
-            'M' => '规格',
-            'N' => '备注',
+            'B' => '调出店铺编号',
+            'C' => '调入店铺编号',
+            'D' => '货号',
+            'E' => '尺码',
+            'F' => '颜色编号',
+            'G' => '数量',
         ];
 
         // if (! cache('test_date')) {
@@ -971,7 +973,7 @@ class ShopbuhuoB extends AdminController
     // 补货测试
     public function redExcel_test_buhuo() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_易丽平_9391685526649.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/222出货指令单0614武汉.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -1025,7 +1027,7 @@ class ShopbuhuoB extends AdminController
                     break;
                 } 
                 if ($key2 == count($select_customer) -1) {
-                    return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['调出店铺编号']]);
+                    return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
                 }
             }
         }
@@ -1230,7 +1232,7 @@ class ShopbuhuoB extends AdminController
                             break;
                         } 
                         if ($key2 == count($select_customer) -1) {
-                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['调出店铺编号']]);
+                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
                         }
                     }
                 }

@@ -22,5 +22,6 @@ class ErpCustReceiptGoodsModel extends TimeModel
         'Price' => 'decimal',
         'Quantity' => 'decimal',
         'Discount' => 'decimal',
+        'DeliveryID' => 'nvarchar',
     ];
 }

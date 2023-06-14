@@ -22,5 +22,6 @@ class ErpDeliveryGoodsModel extends TimeModel
         'Price' => 'decimal',
         'Quantity' => 'decimal',
         'Discount' => 'decimal',
+        'SortingID' => 'nvarchar',
     ];
 }

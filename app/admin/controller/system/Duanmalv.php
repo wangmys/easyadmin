@@ -674,16 +674,71 @@ class Duanmalv extends AdminController
         return Excel::exportData($select, $header, '单店单款断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }    
 
+    // 多选提交参数处理
+    public function xmSelectInput($str = "") {
+        // $str = "于燕华,周奇志,廖翠芳,张洋涛";
+
+        $exploadDate = explode(',', $str);
+        // dump($exploadDate);die;
+        $map = "";
+        foreach ($exploadDate as $key => $val) {
+            $map .=  "'" . $val . "'" . ",";
+        }
+        // 删除最后的逗号
+        $map = mb_substr($map, 0, -1, "UTF-8");
+        return $map;
+    }
+
     // 整体 1_1
     public function table1() {
         if (request()->isAjax()) {
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);  
             // 筛选条件
             $input = input();
-            $pageParams1 = ($input['page'] - 1) * $input['limit'];
-            $pageParams2 = input('limit');
-
-            // $pageParams1 = 0;
-            // $pageParams2 = 100;
+            foreach ($input as $key => $val) {
+                if (empty($val)) {
+                    unset($input[$key]);
+                }
+            }
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map1Str = $this->xmSelectInput($input['商品负责人']);
+                $map1 = " AND t1.商品负责人 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map2Str = $this->xmSelectInput($input['云仓']);
+                $map2 = " AND t1.云仓 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map3Str = $this->xmSelectInput($input['省份']);
+                $map3 = " AND t1.省份 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }
+            if (!empty($input['经营模式'])) {
+                // echo $input['商品负责人'];
+                $map4Str = $this->xmSelectInput($input['经营模式']);
+                $map4 = " AND t1.经营模式 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+            if (!empty($input['setTime1']) && !empty($input['setTime2'])) {
+                // echo $input['商品负责人'];
+                // $map0Str = $this->xmSelectInput($input['经营模式']);
+                // $map0 = " AND t1.经营模式 IN ({$map4Str})";
+                $map0 = "t1.更新日期 IN ('{$input['setTime1']}', '{$input['setTime2']}') ";
+                $limitDate["newDate"] = $input['setTime1'];
+                $limitDate["oldDate"] = $input['setTime2'];
+            } else {
+                $map0 = "t1.更新日期 IN ('{$limitDate["newDate"]}', '{$limitDate["oldDate"]}') ";
+            }
 
             $sql = "
                 SELECT  
@@ -706,22 +761,28 @@ class Duanmalv extends AdminController
                     t3.`更新日期` as `更新日期-旧`  
                 FROM
                     cwl_duanmalv_table1_1 t1 
-                    left join cwl_duanmalv_table1_1 t2 ON t1.店铺名称=t2.店铺名称 and t2.更新日期 = '2023-06-12'
-                    left join cwl_duanmalv_table1_1 t3 ON t1.店铺名称=t3.店铺名称 and t3.更新日期 = '2023-06-10'
+                    left join cwl_duanmalv_table1_1 t2 ON t1.店铺名称=t2.店铺名称 and t2.更新日期 = '{$limitDate["newDate"]}'
+                    left join cwl_duanmalv_table1_1 t3 ON t1.店铺名称=t3.店铺名称 and t3.更新日期 = '{$limitDate["oldDate"]}'
                 WHERE
-                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
-                
+                    {$map0}
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
                 GROUP BY
                     t1.店铺名称
                 ORDER BY t2.商品负责人 DESC
                 , t2.`单店排名` ASC
             ";
+ 
             $select = $this->db_easyA->query($sql);
 
             return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
         } else {
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
             return View('table1', [
-
+                'limitDate' => $limitDate
             ]);
         }  
     }
@@ -736,6 +797,17 @@ class Duanmalv extends AdminController
 
             // $pageParams1 = 0;
             // $pageParams2 = 100;
+
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
+
+            if (!empty($input['setTime1']) && !empty($input['setTime2'])) {
+                $map0 = "t1.更新日期 IN ('{$input['setTime1']}', '{$input['setTime2']}') ";
+                $limitDate["newDate"] = $input['setTime1'];
+                $limitDate["oldDate"] = $input['setTime2'];
+            } else {
+                $map0 = "t1.更新日期 IN ('{$limitDate["newDate"]}', '{$limitDate["oldDate"]}') ";
+            }
 
             $sql = "
                 SELECT
@@ -764,10 +836,10 @@ class Duanmalv extends AdminController
                     t3.`更新日期` as `更新日期-旧` 
                 FROM
                     cwl_duanmalv_table1_2 t1 
-                    left join cwl_duanmalv_table1_2 t2 ON t1.云仓=t2.云仓 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '2023-06-12'
-                    left join cwl_duanmalv_table1_2 t3 ON t1.云仓=t3.云仓 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '2023-06-10'
+                    left join cwl_duanmalv_table1_2 t2 ON t1.云仓=t2.云仓 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '{$limitDate["newDate"]}'
+                    left join cwl_duanmalv_table1_2 t3 ON t1.云仓=t3.云仓 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '{$limitDate["oldDate"]}'
                 WHERE
-                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
+                    {$map0} 
                 GROUP BY
                     t1.云仓, t1.商品负责人
                 ORDER BY  t2.`齐码排名` ASC
@@ -776,8 +848,10 @@ class Duanmalv extends AdminController
 
             return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
         } else {
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
             return View('table1_2', [
-
+                'limitDate' => $limitDate
             ]);
         }  
     }
@@ -792,6 +866,17 @@ class Duanmalv extends AdminController
 
             // $pageParams1 = 0;
             // $pageParams2 = 100;
+
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
+
+            if (!empty($input['setTime1']) && !empty($input['setTime2'])) {
+                $map0 = "t1.更新日期 IN ('{$input['setTime1']}', '{$input['setTime2']}') ";
+                $limitDate["newDate"] = $input['setTime1'];
+                $limitDate["oldDate"] = $input['setTime2'];
+            } else {
+                $map0 = "t1.更新日期 IN ('{$limitDate["newDate"]}', '{$limitDate["oldDate"]}') ";
+            }
 
             $sql = "
                 SELECT
@@ -820,10 +905,10 @@ class Duanmalv extends AdminController
                     t3.`更新日期` as `更新日期-旧` 
                 FROM
                     cwl_duanmalv_table1_3 t1 
-                    left join cwl_duanmalv_table1_3 t2 ON t1.省份=t2.省份 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '2023-06-12'
-                    left join cwl_duanmalv_table1_3 t3 ON t1.省份=t3.省份 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '2023-06-10'
+                    left join cwl_duanmalv_table1_3 t2 ON t1.省份=t2.省份 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '{$limitDate["newDate"]}'
+                    left join cwl_duanmalv_table1_3 t3 ON t1.省份=t3.省份 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '{$limitDate["oldDate"]}'
                 WHERE
-                    t1.更新日期 IN ( '2023-06-12', '2023-06-10' ) 
+                    {$map0}
                 GROUP BY
                     t1.省份, t1.商品负责人
                 ORDER BY  t2.`齐码排名` ASC
@@ -832,9 +917,89 @@ class Duanmalv extends AdminController
 
             return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
         } else {
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
             return View('table1_3', [
-
+                'limitDate' => $limitDate
             ]);
         }  
+    }
+
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect() {
+        // 商品负责人
+        $customer17 = $this->db_easyA->query("
+            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_duanmalv_table1_1 GROUP BY 商品负责人
+        ");
+        $province = $this->db_easyA->query("
+            SELECT 省份 as name, 省份 as value FROM cwl_duanmalv_table1_1 GROUP BY 省份
+        ");
+        
+
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province]]);
+    }
+
+    // 获取每周的周五，周一
+    public function duanmalvDateHandle($defaultTime = false) {
+        if (! $defaultTime) {
+            // echo 111;
+            $input = input();
+            $setTime1Str = '';
+            $setTime2Str = '';
+            if (! empty($input['setTime1'])) {
+                $setTime1Str = date_to_week($input['setTime1']);
+            } 
+            if (! empty($input['setTime2'])) {
+                $setTime2Str = date_to_week($input['setTime2']);
+            } 
+
+            return json([
+                'setTime1' => $input['setTime1'],
+                'setTime1Str' => $setTime1Str,
+                'setTime2' => $input['setTime2'],
+                'setTime2Str' => $setTime2Str,
+            ]);
+        } else {
+            // echo 222;
+            $time = time();
+            $date = date('w', $time);
+    
+            $newDate = '';
+            $oldDate = '';
+            
+            if ($date == 0) { // 周日
+                $newDate = date('Y-m-d', strtotime('-2day', $time)); // 本周五
+                $oldDate = date('Y-m-d', strtotime('-6day', $time)); // 本周一
+            } elseif ($date == 6) { //周六
+                $newDate = date('Y-m-d', strtotime('-1day', $time)); // 本周五
+                $oldDate = date('Y-m-d', strtotime('-5day', $time)); // 本周一
+            } elseif ($date == 5) { // 周五
+                $newDate = date('Y-m-d', strtotime('-0day', $time)); // 本周五
+                $oldDate = date('Y-m-d', strtotime('-4day', $time)); // 本周一
+            } elseif ($date == 4) { // 周四
+                $newDate = date('Y-m-d', strtotime('-3day', $time)); // 本周一
+                $oldDate = date('Y-m-d', strtotime('-6day', $time)); // 上周五
+            } elseif ($date == 3) { // 周三
+                $newDate = date('Y-m-d', strtotime('-2day', $time)); // 本周一
+                $oldDate = date('Y-m-d', strtotime('-5day', $time)); // 上周五
+            } elseif ($date == 2) { // 周二
+                $newDate = date('Y-m-d', strtotime('-1day', $time)); // 本周一
+                $oldDate = date('Y-m-d', strtotime('-4day', $time)); // 上周五
+            }  elseif ($date == 1) { // 周一
+                $newDate = date('Y-m-d', strtotime('-0day', $time)); // 本周一
+                $oldDate = date('Y-m-d', strtotime('-3day', $time)); // 上周五
+            }     
+    
+            return [
+                'newDate' => $newDate,
+                'oldDate' => $oldDate,
+                'newDateStr' => date_to_week($newDate),
+                'oldDateStr' => date_to_week($oldDate),
+            ];
+        }
     }
 }
