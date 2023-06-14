@@ -1,31 +1,37 @@
 <style>
-    tr{
-        color: #0A0E11;
-        /*border: 5px solid whitesmoke;*/
+    .table-header-fixed {
+        top: 0;
+        position: fixed;
+        z-index: 999;
     }
+    th.layui-table-patch{padding: 0 !important;}
+    .layui-card .layui-card-body .layui-table td { max-width: 100%;}
     .layuimini-main tr td{
         margin: 0px;
         padding: 0px 0;
     }
 
     .layui-table-cell {
-        font-size: 12px;
+        font-size: 13px;
         color: #606266;
         padding: 0 0px;
+    }
+    .layui-table-view .layui-table td {
+        padding: 0px 0;
     }
     .layui-table, .layui-table-view {
         margin: 0px 0;
     }
     .layui-table tr:nth-child(14n) td {
         border-bottom: 2px solid red;
+        box-sizing: content-box;
     }
 </style>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
-    </table>
-</div>
-</div>
+        <table id="currentTable" class="layui-table text-center layui-hide" lay-filter="currentTable">
+        </table>
+    </div>
 </div>
 
 <script type="text/html" id="toolbar">
@@ -46,7 +52,7 @@ layui.use(['form', 'jquery', 'layer'], function () {
         , url2 = "{:url('admin/system.code.ratio/getCollar')}"
     ;
 
-    //监听温带下拉
+    //监听一级分类下拉
     form.on('select(cate)', function (data) {
 
         var cate1 = data.value;
@@ -82,7 +88,7 @@ layui.use(['form', 'jquery', 'layer'], function () {
 
     });
 
-    //监听省份下拉
+    //监听二级分类下拉
     form.on('select(cate2)', function (data) {
 
         var cate2 = data.value;

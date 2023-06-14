@@ -41,6 +41,8 @@ class CodeService
      */
     public function __construct()
     {
+        // 设置内存
+        ini_set('memory_limit', '512M');
         // 码比-排名表
         $this->sizeModel = new SizeRanking;
         // 码比-周销表
@@ -104,6 +106,8 @@ class CodeService
         try {
             foreach ($list as $k => &$v){
                 $v['排名'] = $order_num++;
+                $v['Date'] = date('Y-m-d');
+                $v['create_time'] = time();
             }
             $res = $this->sizeModel->saveAll($list);
             Db::commit();
@@ -136,20 +140,20 @@ class CodeService
             eg.GoodsNo AS 货号,
             MAX(egpt.UnitPrice) AS 零售价,
             EBC.Mathod AS 经营模式,
-            SUM(CASE WHEN rbgs.ViewOrder=1 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存00/28/37/44/100/160/S],
-            SUM(CASE WHEN rbgs.ViewOrder=2 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存29/38/46/105/165/M],
-            SUM(CASE WHEN rbgs.ViewOrder=3 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存30/39/48/110/170/L],
-            SUM(CASE WHEN rbgs.ViewOrder=4 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存31/40/50/115/175/XL],
-            SUM(CASE WHEN rbgs.ViewOrder=5 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存32/41/52/120/180/2XL],
-            SUM(CASE WHEN rbgs.ViewOrder=6 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存33/42/54/125/185/3XL],
-            SUM(CASE WHEN rbgs.ViewOrder=7 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存34/43/56/190/4XL],
-            SUM(CASE WHEN rbgs.ViewOrder=8 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存35/44/58/195/5XL],
-            SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存36/6XL],
-            SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存38/7XL],
-            SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存40/8XL],
+            SUM(CASE WHEN rbgs.ViewOrder=1 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+            SUM(CASE WHEN rbgs.ViewOrder=2 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+            SUM(CASE WHEN rbgs.ViewOrder=3 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+            SUM(CASE WHEN rbgs.ViewOrder=4 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+            SUM(CASE WHEN rbgs.ViewOrder=5 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+            SUM(CASE WHEN rbgs.ViewOrder=6 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+            SUM(CASE WHEN rbgs.ViewOrder=7 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+            SUM(CASE WHEN rbgs.ViewOrder=8 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+            SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_36/6XL],
+            SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [库存_38/7XL],
+            SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [库存_40/8XL],
             SUM(ergd.Quantity) AS Quantity,
-            SUM(ergd.Quantity * erg.UnitPrice) AS 金额,
-            SUM(ergd.Quantity * erg.RetailPrice) AS 零售额,
+            SUM(ergd.Quantity * erg.UnitPrice) AS 零售额,
+            SUM(ergd.Quantity * erg.RetailPrice) AS 金额,
             CASE WHEN CAST(er.RetailDate AS DATE) < DATEADD(DAY, -4, CAST(GETDATE() AS DATE))  THEN '否' ELSE '是' END as 近三天识别,
             COUNT(eg.GoodsNo) AS 货号数,
             LEFT(eg.CategoryName, 2)	as 领型
@@ -199,7 +203,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -228,20 +232,20 @@ class CodeService
                 eg.GoodsNo AS 货号,
                 MAX(egpt.UnitPrice) AS 零售价,
                 EBC.Mathod AS 经营模式,
-                SUM(CASE WHEN rbgs.ViewOrder=1 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存00/28/37/44/100/160/S],
-                SUM(CASE WHEN rbgs.ViewOrder=2 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存29/38/46/105/165/M],
-                SUM(CASE WHEN rbgs.ViewOrder=3 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存30/39/48/110/170/L],
-                SUM(CASE WHEN rbgs.ViewOrder=4 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存31/40/50/115/175/XL],
-                SUM(CASE WHEN rbgs.ViewOrder=5 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存32/41/52/120/180/2XL],
-                SUM(CASE WHEN rbgs.ViewOrder=6 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存33/42/54/125/185/3XL],
-                SUM(CASE WHEN rbgs.ViewOrder=7 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存34/43/56/190/4XL],
-                SUM(CASE WHEN rbgs.ViewOrder=8 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存35/44/58/195/5XL],
-                SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存36/6XL],
-                SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存38/7XL],
-                SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [店铺库存40/8XL],
+                SUM(CASE WHEN rbgs.ViewOrder=1 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+                SUM(CASE WHEN rbgs.ViewOrder=2 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+                SUM(CASE WHEN rbgs.ViewOrder=3 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+                SUM(CASE WHEN rbgs.ViewOrder=4 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+                SUM(CASE WHEN rbgs.ViewOrder=5 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+                SUM(CASE WHEN rbgs.ViewOrder=6 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+                SUM(CASE WHEN rbgs.ViewOrder=7 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+                SUM(CASE WHEN rbgs.ViewOrder=8 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+                SUM(CASE WHEN rbgs.ViewOrder=9 	THEN ergd.Quantity ELSE NULL END ) AS  [库存_36/6XL],
+                SUM(CASE WHEN rbgs.ViewOrder=10 THEN ergd.Quantity ELSE NULL END ) AS  [库存_38/7XL],
+                SUM(CASE WHEN rbgs.ViewOrder=11 THEN ergd.Quantity ELSE NULL END ) AS  [库存_40/8XL],
                 SUM(ergd.Quantity) AS Quantity,
-                SUM(ergd.Quantity * erg.UnitPrice) AS 金额,
-                SUM(ergd.Quantity * erg.RetailPrice) AS 零售额,
+                SUM(ergd.Quantity * erg.UnitPrice) AS 零售额,
+                SUM(ergd.Quantity * erg.RetailPrice) AS 金额,
                 LEFT(eg.CategoryName, 2)	as 领型
             FROM 
             
@@ -288,7 +292,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -320,17 +324,17 @@ class CodeService
             MAX(EG.StyleCategoryName) as StyleCategoryName,
             T.GoodsNo as GoodsNo,
             MAX(EG.GoodsName) as GoodsName,
-            SUM(CASE WHEN EBGS.ViewOrder=1 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存00/28/37/44/100/160/S],
-            SUM(CASE WHEN EBGS.ViewOrder=2 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存29/38/46/105/165/M],
-            SUM(CASE WHEN EBGS.ViewOrder=3 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存30/39/48/110/170/L],
-            SUM(CASE WHEN EBGS.ViewOrder=4 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存31/40/50/115/175/XL],
-            SUM(CASE WHEN EBGS.ViewOrder=5 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存32/41/52/120/180/2XL],
-            SUM(CASE WHEN EBGS.ViewOrder=6 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存33/42/54/125/185/3XL],
-            SUM(CASE WHEN EBGS.ViewOrder=7 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存34/43/56/190/4XL],
-            SUM(CASE WHEN EBGS.ViewOrder=8 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存35/44/58/195/5XL],
-            SUM(CASE WHEN EBGS.ViewOrder=9 	THEN T.预计库存 ELSE NULL END ) AS  [店铺库存36/6XL],
-            SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.预计库存 ELSE NULL END ) AS  [店铺库存38/7XL],
-            SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.预计库存 ELSE NULL END ) AS  [店铺库存40/8XL],
+            SUM(CASE WHEN EBGS.ViewOrder=1 	THEN T.预计库存 ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+            SUM(CASE WHEN EBGS.ViewOrder=2 	THEN T.预计库存 ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+            SUM(CASE WHEN EBGS.ViewOrder=3 	THEN T.预计库存 ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+            SUM(CASE WHEN EBGS.ViewOrder=4 	THEN T.预计库存 ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+            SUM(CASE WHEN EBGS.ViewOrder=5 	THEN T.预计库存 ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+            SUM(CASE WHEN EBGS.ViewOrder=6 	THEN T.预计库存 ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+            SUM(CASE WHEN EBGS.ViewOrder=7 	THEN T.预计库存 ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+            SUM(CASE WHEN EBGS.ViewOrder=8 	THEN T.预计库存 ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+            SUM(CASE WHEN EBGS.ViewOrder=9 	THEN T.预计库存 ELSE NULL END ) AS  [库存_36/6XL],
+            SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.预计库存 ELSE NULL END ) AS  [库存_38/7XL],
+            SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.预计库存 ELSE NULL END ) AS  [库存_40/8XL],
             SUM(T.[预计库存]) as Quantity,
             MAX(LEFT(EG.CategoryName, 2))	as Collar
         FROM 
@@ -517,7 +521,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -544,17 +548,17 @@ class CodeService
                 EG.StyleCategoryName,
                 EG.StyleCategoryName1,
                 EG.StyleCategoryName2,
-                SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END) AS [可用库存_00/28/37/44/100/160/S],
-                SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0 END) AS [可用库存_29/38/46/105/165/M],
-                SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0 END) AS [可用库存_30/39/48/110/170/L],
-                SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0 END) AS [可用库存_31/40/50/115/175/XL],
-                SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0 END) AS [可用库存_32/41/52/120/180/2XL],
-                SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0 END) AS [可用库存_33/42/54/125/185/3XL],
-                SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0 END) AS [可用库存_34/43/56/190/4XL],
-                SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0 END) AS [可用库存_35/44/58/195/5XL],
-                SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0 END) AS [可用库存_36/6XL],
-                SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END) AS [可用库存_38/7XL],
-                SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END) AS [可用库存_40/8XL],
+                SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END) AS [库存_00/28/37/44/100/160/S],
+                SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0 END) AS [库存_29/38/46/105/165/M],
+                SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0 END) AS [库存_30/39/48/110/170/L],
+                SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0 END) AS [库存_31/40/50/115/175/XL],
+                SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0 END) AS [库存_32/41/52/120/180/2XL],
+                SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0 END) AS [库存_33/42/54/125/185/3XL],
+                SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0 END) AS [库存_34/43/56/190/4XL],
+                SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0 END) AS [库存_35/44/58/195/5XL],
+                SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0 END) AS [库存_36/6XL],
+                SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END) AS [库存_38/7XL],
+                SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END) AS [库存_40/8XL],
                 SUM(T.Quantity) AS Quantity,
                 CASE WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
                              CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
@@ -835,7 +839,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -860,17 +864,17 @@ class CodeService
             eg.GoodsName,
             eg.StyleCategoryName,
             eg.GoodsNo,
-            SUM(CASE WHEN rbgs.ViewOrder=1 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_00/28/37/44/100/160/S],
-            SUM(CASE WHEN rbgs.ViewOrder=2 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_29/38/46/105/165/M],
-            SUM(CASE WHEN rbgs.ViewOrder=3 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_30/39/48/110/170/L],
-            SUM(CASE WHEN rbgs.ViewOrder=4 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_31/40/50/115/175/XL],
-            SUM(CASE WHEN rbgs.ViewOrder=5 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_32/41/52/120/180/2XL],
-            SUM(CASE WHEN rbgs.ViewOrder=6 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_33/42/54/125/185/3XL],
-            SUM(CASE WHEN rbgs.ViewOrder=7 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_34/43/56/190/4XL],
-            SUM(CASE WHEN rbgs.ViewOrder=8 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_35/44/58/195/5XL],
-            SUM(CASE WHEN rbgs.ViewOrder=9 	THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_36/6XL],
-            SUM(CASE WHEN rbgs.ViewOrder=10 THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_38/7XL],
-            SUM(CASE WHEN rbgs.ViewOrder=11 THEN erngd.Quantity ELSE NULL END ) AS  [云仓库存_40/8XL],
+            SUM(CASE WHEN rbgs.ViewOrder=1 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+            SUM(CASE WHEN rbgs.ViewOrder=2 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+            SUM(CASE WHEN rbgs.ViewOrder=3 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+            SUM(CASE WHEN rbgs.ViewOrder=4 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+            SUM(CASE WHEN rbgs.ViewOrder=5 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+            SUM(CASE WHEN rbgs.ViewOrder=6 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+            SUM(CASE WHEN rbgs.ViewOrder=7 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+            SUM(CASE WHEN rbgs.ViewOrder=8 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+            SUM(CASE WHEN rbgs.ViewOrder=9 	THEN erngd.Quantity ELSE NULL END ) AS  [库存_36/6XL],
+            SUM(CASE WHEN rbgs.ViewOrder=10 THEN erngd.Quantity ELSE NULL END ) AS  [库存_38/7XL],
+            SUM(CASE WHEN rbgs.ViewOrder=11 THEN erngd.Quantity ELSE NULL END ) AS  [库存_40/8XL],
             SUM(erngd.Quantity) AS Quantity
         FROM 
         
@@ -907,7 +911,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -985,7 +989,7 @@ class CodeService
             // 循环存入缓存
             $key = $redisKey.'_'.$k;
             // 将数据的key存入队列
-            $this->redis->lpush($redisKey,$key);
+            $this->redis->rpush($redisKey,$key);
             // 存入缓存
             $this->redis->set($key,json_encode($v));
         }
@@ -1006,7 +1010,7 @@ class CodeService
         // 循环获取周销数据并同步至数据库
         while(true){
             // 获取储存销售数据的key
-            $index_value = $this->redis->rpop($data_key);
+            $index_value = $this->redis->lindex($data_key,0);
             if(!empty($index_value)){
                 // 获取销售数据
                 $sale = $this->redis->get($index_value);
@@ -1019,31 +1023,43 @@ class CodeService
                         case ApiConstant::RATIO_PULL_REDIS_KEY[0]:
                              // 执行插入操作
                             $this->size7DayModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                         // 同步累销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[1]:
                              // 执行插入操作
                             $this->sizeAccumulatedModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                         // 同步店铺预计库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[2]:
                              // 执行插入操作
                             $this->sizeShopEstimatedModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
                              // 执行插入操作
                             $this->sizeWarehouseAvailableModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
                              // 执行插入操作
                             $this->sizeWarehouseTransitModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                         // 同步仓库采购库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
                              // 执行插入操作
                             $this->sizePurchaseStockModel->insertAll($sale_data);
+                            // 任务完成
+                            $this->redis->lpop($data_key);
                             break;
                     }
                     // 插入完毕
@@ -1052,7 +1068,7 @@ class CodeService
                     $this->redis->delete($index_value);
                 }catch (\Exception $e){
                     // 遇到错误将任务重新放入队列
-                    $this->redis->rpush($data_key,$index_value);
+                    $this->redis->lpush($data_key,$index_value);
                     Db::rollback();
                     $this->msg = $e->getMessage();
                     return ApiConstant::ERROR_CODE;
