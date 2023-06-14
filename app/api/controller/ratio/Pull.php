@@ -102,7 +102,7 @@ class Pull extends BaseController
     }
 
     /**
-     * 拉取云仓可用库存到缓存
+     * 拉取云仓在途库存保存到缓存
      * @return \think\response\Json
      */
     public function pullWarehouseTransitStock()

@@ -104,10 +104,23 @@ class Index
         ]);
     }
 
+    /**
+     * 计算并统计码比数据
+     */
     public function saveRatio()
     {
         $res = \app\admin\model\code\SizeAllRatio::saveData();
         echo '<pre>';
         print_r($res);
+        die;
+    }
+
+    /**
+     * 查询云仓偏码
+     */
+    public function selectRationData()
+    {
+        $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
+        print_r($res);die;
     }
 }

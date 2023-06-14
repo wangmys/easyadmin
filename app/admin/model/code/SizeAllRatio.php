@@ -89,9 +89,9 @@ class SizeAllRatio extends TimeModel
                 '当前单店均深' => bcadd($all_thisTotal / $cabinets_num,0,2)
             ];
 
-
+            // 周转 = 当前总库存/周销
             if(!empty($all_shop_stock) && !empty($all_total)){
-                $total_item['周转'] = bcadd($all_shop_stock / $all_total,0,2);
+                $total_item['周转'] = bcadd($all_thisTotal / $all_day7_total,0,2);
             }
 
             if(!empty($all_total) && !empty($all_total + $all_thisTotal)){
@@ -335,7 +335,7 @@ class SizeAllRatio extends TimeModel
         $result = [];
         // 失败结果
         $error = [];
-        $goodsNo = self::group("GoodsNo")->column('GoodsNo');
+        $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
         // 查询货号列表排名
         $list = SizeRanking::order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
         foreach ($list as $key => $value){
@@ -346,6 +346,7 @@ class SizeAllRatio extends TimeModel
             }else{
                 $error[] = $res;
             }
+            echo $res;
         }
         return ['success' => count($result),'error' => $error];
     }

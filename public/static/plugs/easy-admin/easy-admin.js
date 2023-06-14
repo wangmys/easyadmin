@@ -329,7 +329,7 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                                 formHtml += '\t<div class="layui-form-item layui-inline">\n' +
                                     '<label class="layui-form-label">' + d.title + '</label>\n' +
                                     '<div class="layui-input-inline">\n' +
-                                    '<select class="layui-select" ' + (d.laySearch ? 'lay-search' : '') + ' id="c-' + d.fieldAlias + '" name="' + d.fieldAlias + '"  data-search-op="' + d.searchOp + '" >\n' +
+                                    '<select class="layui-select" ' + (d.laySearch ? 'lay-search' : '') + ' id="c-' + d.fieldAlias + '" name="' + d.fieldAlias + '"  data-search-op="' + d.searchOp + '" lay-filter="'+d.fieldAlias+'" >\n' +
                                     '<option value="">- 全部 -</option> \n' +
                                     selectHtml +
                                     '</select>\n' +
