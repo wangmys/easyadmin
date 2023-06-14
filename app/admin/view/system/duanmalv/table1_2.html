@@ -91,13 +91,52 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        th[data-field="2"][data-key="1-0-2"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="齐码排名-新"][data-key="1-1-0"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="3"][data-key="1-0-3"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="齐码排名-旧"][data-key="1-1-4"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
     </style>
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">自定义时间1</label>
+                        <div class="layui-input-inline" style="width: 150px !important;">
+                            <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$limitDate['newDate']}" placeholder="yyyy-MM-dd" lay-verify="required">
+                        </div>
+                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">自定义时间2</label>
+                        <div class="layui-input-inline" style="width: 150px !important;">
+                            <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$limitDate['oldDate']}" placeholder="yyyy-MM-dd" lay-verify="required">
+                        </div>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+    
+                    </div>  
+                </div>
+            </form>
+        </div>
+    </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">整体云仓情况 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;">整体-负责人 统计 <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -124,13 +163,18 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Duanmalv/table1_2')}" 
-            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table1_2')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table1_2')}"
+            , url_setTime = "{:url('admin/system.Duanmalv/duanmalvDateHandle')}"
 
         startTable();
 
         // 日期选择器
         laydate.render({
-            elem: '#shangshiriqi'
+            elem: '#setTime1'
+        });
+
+        laydate.render({
+            elem: '#setTime2'
         });
 
         //触发事件
@@ -150,6 +194,65 @@
             };
         });
 
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            let newDateStr = '未选择';
+            let oldDateStr = '未选择';
+            $.post(url_setTime, data.field, function(res) {
+                newDateStr = `【${res.setTime1Str}】 ${res.setTime1}`;
+                if (res.setTime2Str && res.setTime2) {
+                    oldDateStr = `【${res.setTime2Str}】 ${res.setTime2}`;
+                }
+                
+                table.reload('table', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                    , page: true
+                    , limit: data.field.limit
+                    , cols: [[
+                        { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                        , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 3}
+                        , { title: `${newDateStr}`, align: 'center' ,colspan: 10}
+                        , { title: `${oldDateStr}`, align: 'center' ,colspan: 10}
+                        ],
+                        [ { field: '齐码排名-新', title: '齐码排名', align: 'center' ,rowspan: 2}
+                        ,{ title: '整体', align: 'center' ,colspan: 3}
+                        ,{ title: 'TOP实际', align: 'center' ,colspan: 3}
+                        ,{ title: 'TOP考核', align: 'center' ,colspan: 3}
+
+                        , { field: '齐码排名-旧', title: '齐码排名', align: 'center' ,rowspan: 2}
+                        ,{ title: '整体', align: 'center' ,colspan: 3}
+                        ,{ title: 'TOP实际', align: 'center' ,colspan: 3}
+                        ,{ title: 'TOP考核', align: 'center' ,colspan: 3}],
+
+                        [{ field: '直营-整体-新', title: '直营', align: 'center'}
+                        , { field: '加盟-整体-新', title: '加盟', align: 'center'}
+                        , { field: '合计-整体-新', title: '合计', align: 'center'}
+                        , { field: '直营-TOP实际-新', title: '直营', align: 'center'}
+                        , { field: '加盟-TOP实际-新', title: '加盟', align: 'center'}
+                        , { field: '合计-TOP实际-新', title: '合计', align: 'center'}
+                        , { field: '直营-TOP考核-新', title: '直营', align: 'center'}
+                        , { field: '加盟-TOP考核-新', title: '加盟', align: 'center'}
+                        , { field: '合计-TOP考核-新', title: '合计', align: 'center'}
+                        , { field: '直营-整体-旧', title: '直营', align: 'center'}
+                        , { field: '加盟-整体-旧', title: '加盟', align: 'center'}
+                        , { field: '合计-整体-旧', title: '合计', align: 'center'}
+                        , { field: '直营-TOP实际-旧', title: '直营', align: 'center'}
+                        , { field: '加盟-TOP实际-旧', title: '加盟', align: 'center'}
+                        , { field: '合计-TOP实际-旧', title: '合计', align: 'center'}
+                        , { field: '直营-TOP考核-旧', title: '直营', align: 'center'}
+                        , { field: '加盟-TOP考核-旧', title: '加盟', align: 'center'}
+                        , { field: '合计-TOP考核-旧', title: '合计', align: 'center'}
+                        ]
+                    ]
+                })
+            }, 'json');
+
+            return false; 
+        });
+
         function startTable() {
             table.render({
                 elem: '#table'
@@ -160,13 +263,13 @@
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 780
+                // , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
                     , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { title: '2023-06-12', align: 'center' ,colspan: 10}
-                    , { field: '2023-06-10', title: '2023-06-10', align: 'center' ,colspan: 10}
+                    , { title: '【{$limitDate["newDateStr"]}】 {$limitDate["newDate"]}', align: 'center' ,colspan: 10}
+                    , { title: '【{$limitDate["oldDateStr"]}】 {$limitDate["oldDate"]}', align: 'center' ,colspan: 10}
                     ],
                     [ { field: '齐码排名-新', title: '齐码排名', align: 'center' ,rowspan: 2}
                     ,{ title: '整体', align: 'center' ,colspan: 3}
