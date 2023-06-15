@@ -410,17 +410,17 @@ class SendReport extends BaseController
             ]
         ];
         // dump($send_data);die;
-        // $res = [];
-        // foreach ($send_data as $k=>$v){
-        //     $headers = get_headers($v['jpg_url']);
-        //     if(substr($headers[0], 9, 3) == 200){
-        //         // 推送
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
 
-        //         // 采购群
-        //         $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=751850d0366d9494e16070bdbf14a5459b76c59ced68c86ac3d46c53869d908f');
-        //     }
-        // }
-        // return json($res);
+                // 采购群
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=751850d0366d9494e16070bdbf14a5459b76c59ced68c86ac3d46c53869d908f');
+            }
+        }
+        return json($res);
     }
 
     /**
@@ -528,7 +528,7 @@ class SendReport extends BaseController
         $this->service->create_table_s114();
 
         // 发送数据报表
-        $this->sendS114();
+        // $this->sendS114();
 
     }
 
