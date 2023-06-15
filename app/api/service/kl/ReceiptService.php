@@ -12,6 +12,8 @@ use app\api\model\kl\ErpCustomerStockDetailModel;
 use app\api\model\kl\ErpDeliveryModel;
 use app\api\model\kl\ErpDeliveryGoodsModel;
 use app\api\model\kl\ErpSortingModel;
+use app\api\model\kl\ErpInstructionModel;
+use app\api\model\kl\ErpCustOutboundModel;
 use app\common\constants\AdminConstant;
 use think\facade\Db;
 
@@ -72,9 +74,12 @@ class ReceiptService
                 }
             }
 
-            //处理 标记完成 问题
-            if ($new['Type']==1 && $this->is_commit == 1) {
+            //处理 标记完成 问题 
+            if ($new['Type']==1 && $this->is_commit == 1) {//收仓库出货单
                 $this->dealIsCompleted($new['DeliveryId']);
+            }
+            if ($new['Type']==2 && $this->is_commit == 1) {//调入单
+                $this->dealInIsCompleted($new['ReceiptID'], $new['CustOutID']);
             }
 
             Db::commit();
@@ -85,8 +90,11 @@ class ReceiptService
             //事务回滚失败，执行删除操作处理多余数据
             $this->delete($params);
             //处理 标记完成 问题
-            if ($new['Type']==1 && $this->is_commit == 1) {
+            if ($new['Type']==1 && $this->is_commit == 1) {//收仓库出货单
                 $this->dealIsCompleted($new['DeliveryId'], 0);
+            }
+            if ($new['Type']==2 && $this->is_commit == 1) {//调入单
+                $this->dealInIsCompleted($new['ReceiptID'], $new['CustOutID']);
             }
             abort(0, $e->getMessage());
         }
@@ -102,6 +110,25 @@ class ReceiptService
             $SortingID = $SortingID ? $SortingID['SortingID'] : '';
             if ($SortingID) {
                 ErpSortingModel::where([['SortingID', '=', $SortingID]])->update(['IsCompleted' => $IsCompleted]);
+            }
+
+        }
+
+    }
+
+    public function dealInIsCompleted($ReceiptID, $CustOutID, $IsCompleted=1) {
+
+        if ($ReceiptID) {
+
+            //调拨指令单
+            $InstructionId = ErpCustReceiptGoodsModel::where([['ReceiptID', '=', $ReceiptID]])->field('InstructionId')->find();
+            $InstructionId = $InstructionId ? $InstructionId['InstructionId'] : '';
+            if ($InstructionId) {
+                ErpInstructionModel::where([['InstructionId', '=', $InstructionId]])->update(['IsCompleted' => $IsCompleted, 'IsJizhang'=>$IsCompleted]);    
+            }
+            //调出单
+            if ($CustOutID) {
+                ErpCustOutboundModel::where([['CustOutboundId', '=', $CustOutID]])->update(['IsCompleted' => $IsCompleted]);    
             }
 
         }
@@ -206,10 +233,36 @@ class ReceiptService
 
             ErpCustReceiptModel::where([['ReceiptID', '=', $params['ReceiptID']]])->update($new);
 
+            $ReceiptInfo = ErpCustReceiptModel::where([['ReceiptID', '=', $params['ReceiptID']]])->field('Type,DeliveryId,CustOutID')->find();
+
             //库存记录处理 当状态变为未提交时 要删除对应库存记录
             if ($params['CodingCode'] == ErpCustReceiptModel::CodingCode['NOTCOMMIT']) {
                 $ReceiptGoodsID = ErpCustReceiptGoodsModel::where([['ReceiptID', '=', $params['ReceiptID']]])->column('ReceiptGoodsID');
                 ErpCustomerStockModel::where([['StockId', 'in', $ReceiptGoodsID]])->delete();
+
+                if ($ReceiptInfo) {
+                    switch ($ReceiptInfo['Type']) {
+                        case 1: 
+                            $this->dealIsCompleted($ReceiptInfo['DeliveryId'], 0);
+                            break;
+                        case 2: 
+                            $this->dealInIsCompleted($params['ReceiptID'], $ReceiptInfo['CustOutID'], 0);
+                            break;
+                    }
+                }
+            }
+
+            if ($params['CodingCode'] == ErpCustReceiptModel::CodingCode['HADCOMMIT']) {
+                if ($ReceiptInfo) {
+                    switch ($ReceiptInfo['Type']) {
+                        case 1: 
+                            $this->dealIsCompleted($ReceiptInfo['DeliveryId']);
+                            break;
+                        case 2: 
+                            $this->dealInIsCompleted($params['ReceiptID'], $ReceiptInfo['CustOutID']);
+                            break;
+                    }
+                }
             }
 
             Db::commit();
