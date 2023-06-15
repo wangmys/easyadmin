@@ -528,7 +528,7 @@ class SendReport extends BaseController
         $this->service->create_table_s114();
 
         // 发送数据报表
-        // $this->sendS114();
+        $this->sendS114();
 
     }
 
