@@ -91,17 +91,17 @@ class SizeWarehouseRatio extends TimeModel
         }
 
         // 单款云仓在途库存
-        $transit_stock_total = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno])->group('WarehouseName')->column($fieldStr,'WarehouseName');
+        $transit_stock_total = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->group('WarehouseName')->column($fieldStr,'WarehouseName');
         // 单款云仓可用库存
-        $available_stock_total = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno])->group('WarehouseName')->column($fieldStr,'WarehouseName');
+        $available_stock_total = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->group('WarehouseName')->column($fieldStr,'WarehouseName');
         // 单款店铺预计库存
-        $shop_stock_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->group('CustomItem15')->column($fieldStr,'CustomItem15');
+        $shop_stock_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->group('CustomItem15')->column($fieldStr,'CustomItem15');
         // 单款周销
-        $day7_total = Size7DaySale::where(['货号' => $goodsno])->group('云仓')->column($fieldStr,'云仓');
+        $day7_total = Size7DaySale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->group('云仓')->column($fieldStr,'云仓');
         // 单款累销
-        $sale_total = SizeAccumulatedSale::where(['货号' => $goodsno])->group('云仓')->column($fieldStr,'云仓');
+        $sale_total = SizeAccumulatedSale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->group('云仓')->column($fieldStr,'云仓');
         // 单码上柜数
-        $size_up_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->group('CustomItem15')->column($fieldStr2,'CustomItem15');
+        $size_up_total = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->group('CustomItem15')->column($fieldStr2,'CustomItem15');
 
         // 所有云仓数据
         $all_warehouse_data = [];
@@ -432,7 +432,7 @@ class SizeWarehouseRatio extends TimeModel
         $error = [];
         $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
         // 查询货号列表排名
-        $list = SizeRanking::order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
+        $list = SizeRanking::where(['Date' => date('Y-m-d')])->order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
         foreach ($list as $key => $value){
             // 计算并保存码比数据
             $res = self::saveSizeRatio($value['货号']);

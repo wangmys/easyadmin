@@ -43,24 +43,24 @@ class SizeAllRatio extends TimeModel
             ])->value('Img');
 
             // 单款累销
-            $all_total = SizeAccumulatedSale::where(['货号' => $goodsno])->value("sum( `Quantity` )");
+            $all_total = SizeAccumulatedSale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款7天销量
-            $all_day7_total = Size7DaySale::where(['货号' => $goodsno])->value("sum( `Quantity` )");
+            $all_day7_total = Size7DaySale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款店铺预计库存
-            $all_shop_stock = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->value("sum( `Quantity` )");
+            $all_shop_stock = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款云仓可用库存
-            $all_warehouse_stock = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno])->value("sum( `Quantity` )");
+            $all_warehouse_stock = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款云仓在途库存
-            $all_warehouse_transit_stock = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno])->value("sum( `Quantity` )");
+            $all_warehouse_transit_stock = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款当前总库存量 = 店铺预计库存 + 云仓可用库存 + 云仓在途库存
             $all_thisTotal = intval($all_shop_stock) + intval($all_warehouse_stock) + intval($all_warehouse_transit_stock);
             // 单款采购数量
-            $all_purchase_stock = SizePurchaseStock::where(['GoodsNo' => $goodsno])->value("sum( `Quantity` )");
+            $all_purchase_stock = SizePurchaseStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `Quantity` )");
             // 单款未入量 = 采购库存 - 累销 - 当前总库存
             $all_unearnedQuantity = intval($all_purchase_stock) - intval($all_total) - intval($all_thisTotal);
 
             // 货品上柜数
-            $cabinets_num = SizeRanking::where(['货号' => $goodsno])->value("上柜家数");
+            $cabinets_num = SizeRanking::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->value("上柜家数");
 
             $total_item = [
                 '风格' => $info['StyleCategoryName'],
@@ -128,31 +128,31 @@ class SizeAllRatio extends TimeModel
                 // 根据货号尺码获取周销尺码字段
                 $sum_key = Size7DaySale::getSizeKey($value);
                 // 周销
-                $day7_total = Size7DaySale::where(['货号' => $goodsno])->value("sum( `$sum_key` )");
+                $day7_total = Size7DaySale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$sum_key` )");
                 // 根据尺码获取累销尺码字段
                 $total_key = SizeAccumulatedSale::getSizeKey($value);
                 // 累销
-                $total = SizeAccumulatedSale::where(['货号' => $goodsno])->value("sum( `$total_key` )");
+                $total = SizeAccumulatedSale::where(['货号' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$total_key` )");
                 // 店铺预计库存尺码字段
                 $stock_key = SizeShopEstimatedStock::getSizeKey($value);
                 // 店铺预计库存
-                $shop_stock = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno])->value("sum( `$stock_key` )");
+                $shop_stock = SizeShopEstimatedStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$stock_key` )");
                 // 云仓可用库存尺码字段
                 $warehouse_key = SizeWarehouseAvailableStock::getSizeKey($value);
                 // 云仓可用库存
-                $warehouse_stock = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno])->value("sum( `$warehouse_key` )");
+                $warehouse_stock = SizeWarehouseAvailableStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$warehouse_key` )");
 
                 // 云仓在途库存尺码字段
                 $warehouse_transit_key = SizeWarehouseTransitStock::getSizeKey($value);
                 // 云仓在途库存
-                $warehouse_transit_stock = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno])->value("sum( `$warehouse_transit_key` )");
+                $warehouse_transit_stock = SizeWarehouseTransitStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$warehouse_transit_key` )");
 
                 // 当前总库存量
                 $thisTotal = intval($shop_stock) + intval($warehouse_stock) + intval($warehouse_transit_stock);
                 // 采购库存尺码字段
                 $purchase_key = SizePurchaseStock::getSizeKey($value);
                 // 采购数量
-                $purchase_stock = SizePurchaseStock::where(['GoodsNo' => $goodsno])->value("sum( `$purchase_key` )");
+                $purchase_stock = SizePurchaseStock::where(['GoodsNo' => $goodsno,'Date' => date('Y-m-d')])->value("sum( `$purchase_key` )");
                 // 未入量 = 采购库存 - 累销 - 当前总库存
                 $unearnedQuantity = intval($purchase_stock) - intval($total) - intval($thisTotal);
                 // 当前单店均深
@@ -337,7 +337,7 @@ class SizeAllRatio extends TimeModel
         $error = [];
         $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
         // 查询货号列表排名
-        $list = SizeRanking::order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
+        $list = SizeRanking::where(['Date' => date('Y-m-d')])->order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
         foreach ($list as $key => $value){
             // 计算并保存码比数据
             $res = self::saveSizeRatio($value['货号']);
