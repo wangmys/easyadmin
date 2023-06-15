@@ -2228,6 +2228,69 @@ class ReportFormsService
         }
     }
 
+    // 工厂直发仓库超五天未验收单据
+    public function create_table_s114() {
+        // 编号
+        $code = 'S114';
+
+        $sql = "
+            SELECT 
+            审批时间 as 单据日期,
+            仓库名称 as 收货仓库,
+            供应商名称,
+            单号 as 采购入库指令单,
+            发出天数,
+            数量 as 发货数量
+            FROM `sp_warehouse_ws_cangjiafahuo` where YEAR(审批时间) = 2023 AND 仓库名称 IN ('广州云仓', '贵阳云仓', '南昌云仓', '武汉云仓', '长沙云仓')
+        ";
+        $list = $this->db_bi->query($sql);
+        // dump($list);die;
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 125;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 160;
+            // $field_width[2] = 80;
+            // $field_width[3] = 80;
+            // $field_width[4] = 80;
+            // $field_width[7] = 110;
+            // $field_width[8] = 110;
+            // $field_width[4] = 90;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => ' '
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "工厂直发仓库超五天未验收单据 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '           编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
     public function create_image($params)
     {
         $base = [
