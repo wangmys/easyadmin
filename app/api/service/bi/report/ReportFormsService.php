@@ -2235,13 +2235,15 @@ class ReportFormsService
 
         $sql = "
             SELECT 
-            审批时间 as 单据日期,
-            仓库名称 as 收货仓库,
-            供应商名称,
-            单号 as 采购入库指令单,
-            发出天数,
-            数量 as 发货数量
-            FROM `sp_warehouse_ws_cangjiafahuo` where YEAR(审批时间) = 2023 AND 仓库名称 IN ('广州云仓', '贵阳云仓', '南昌云仓', '武汉云仓', '长沙云仓')
+                审批时间 as 单据日期,
+                仓库名称 as 收货仓库,
+                供应商名称,
+                单号 as 采购入库指令单,
+                发出天数,
+                数量 as 发货数量
+            FROM `sp_warehouse_ws_cangjiafahuo` where 
+                        YEAR(审批时间) = 2023
+                        AND (仓库名称 IN ('广州云仓', '南昌云仓', '武汉云仓', '长沙云仓') OR 仓库名称='贵阳云仓' AND `发出天数`>= 8)
         ";
         $list = $this->db_bi->query($sql);
         // dump($list);die;
