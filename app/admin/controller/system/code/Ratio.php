@@ -19,6 +19,7 @@ use app\admin\model\code\SizeWarehouseAvailableStock;
 use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
 use app\admin\model\code\SizeAllRatio;
+use app\admin\model\code\SizeWarehouseRatio;
 
 /**
  * Class Ratio
@@ -937,7 +938,7 @@ class Ratio extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="展示所有货号码比")
+     * @NodeAnotation(title="展示所有货号整体偏码")
      */
     public function alllist()
     {
@@ -993,6 +994,88 @@ class Ratio extends AdminController
                       ->toArray();
                   foreach ($item as $k =>$v){
                       foreach (['偏码','单码缺量'] as $kk => $vv){
+                          if(($v_key = array_search($vv,$v)) !== false){
+                            $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
+                          }
+                      }
+                      $allList[] = $value->toArray() + $v;
+                  }
+            }
+            // 返回数据
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => $count,
+                'data'  => $allList
+            ];
+            return json($data);
+        }
+        $Style = ['引流款'=> '引流款', '基本款'=> '基本款'];
+        $CategoryName1 = SizeRanking::group('一级分类')->column('一级分类','一级分类');
+        $CategoryName2 = SizeRanking::group('二级分类')->column('二级分类','二级分类');
+        $Collar = SizeRanking::group('领型')->column('领型','领型');
+        return $this->fetch('',[
+            'Style' => $Style,
+            'CategoryName1' => $CategoryName1,
+            'CategoryName2' => $CategoryName2,
+            'Collar' => $Collar
+        ]);
+    }
+
+
+    /**
+     * @NodeAnotation(title="展示所有货号云仓偏码")
+     */
+    public function warehouseList()
+    {
+        // 筛选
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
+
+        // 获取参数
+        $get = $this->request->get();
+        if ($this->request->isAjax()) {
+
+            $page = isset($get['page']) && !empty($get['page']) ? $get['page'] : 1;
+            $limit = isset($get['limit']) && !empty($get['limit']) ? $get['limit'] : 15;
+
+            $where = [];
+
+            $list = new SizeRanking;
+            $model = new SizeRanking;
+            if(isset($filters['风格']) && !empty($filters['风格'])){
+                $list = $list->where(['风格' => $filters['风格']]);
+                $model = $model->where(['风格' => $filters['风格']]);
+            }
+
+            if(isset($filters['cate']) && !empty($filters['cate'])){
+                $list = $list->where(['一级分类' => $filters['cate']]);
+                $model = $model->where(['一级分类' => $filters['cate']]);
+            }
+
+            if(isset($filters['cate2']) && !empty($filters['cate2'])){
+                $list = $list->where(['二级分类' => $filters['cate2']]);
+                $model = $model->where(['二级分类' => $filters['cate2']]);
+            }
+
+            if(isset($filters['collar']) && !empty($filters['collar'])){
+                $list = $list->where(['领型' => $filters['collar']]);
+                $model = $model->where(['领型' => $filters['collar']]);
+            }
+
+
+            // 查询货号列表排名
+            $list = $list->order('日均销','desc')->page($page, $limit)->select();
+            $count = $model->count();
+            $allList = [];
+            $init = ($page - 1) * $limit;
+            foreach ($list as $key => &$value){
+                  $value['近三天折率'] = '100%';
+                  $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
+                  $value['全国排名'] = $init + $key+1;
+                  // 查询码比数据
+                  $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号']);
+                  foreach ($item as $k =>$v){
+                      foreach (['偏码','单码缺量','偏码','单码缺量','偏码','单码缺量','偏码','单码缺量','偏码','单码缺量'] as $kk => $vv){
                           if(($v_key = array_search($vv,$v)) !== false){
                             $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
                           }

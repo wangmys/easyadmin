@@ -17,10 +17,10 @@ class SizeWarehouseRatio extends TimeModel
     protected $name = 'size_warehouse_ratio';
 
     /**
-     * 保存云仓偏码数据
+     * 保存单个货号云仓偏码数据
      * @param string $goodsno
      */
-    public static function saveSizeRatio($goodsno = 'B31101236')
+    public static function saveSizeRatio($goodsno)
     {
         // 云仓
         $warehouse = [
@@ -333,7 +333,7 @@ class SizeWarehouseRatio extends TimeModel
                 // 单码当前单店均深 = 单码当前总库存量 / 单码上柜家数
                 $shop_mean = 0;
                 if($this_total_stock > 0 && $size_up_num > 0){
-                    $shop_mean = bcadd($all_total_stock / $size_up_num,0,2);
+                    $shop_mean = bcadd($this_total_stock / $size_up_num,0,2);
                 }
 
                 $data['单码售罄比'][$vv] = $size_sell_out_ratio;
@@ -417,6 +417,13 @@ class SizeWarehouseRatio extends TimeModel
         }
     }
 
+    /**
+     * 保存所有云仓偏码
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public static function saveData()
     {
         // 成功结果
@@ -437,5 +444,128 @@ class SizeWarehouseRatio extends TimeModel
             echo $res;
         }
         return ['success' => count($result),'error' => $error];
+    }
+
+    /**
+     * 查询云仓偏码数据
+     */
+    public static function selectWarehouseRatio($goodsno)
+    {
+        // 查询时间
+        $Date = date('Y-m-d');
+        $sql = "
+        SELECT 
+        
+        ra.id as rid,
+        ra.`风格`,
+        ra.`一级分类`,
+        ra.`二级分类`,
+        ra.`分类`,
+        ra.`领型`,
+        ra.`货品等级`,
+        
+        
+        r1.id,
+        r2.`云仓`,
+        r2.`字段` as `广州_字段`,
+        r2.`库存_00/28/37/44/100/160/S` as `广州_00/28/37/44/100/160/S`,
+        r2.`库存_29/38/46/105/165/M` as `广州_29/38/46/105/165/M`,
+        r2.`库存_30/39/48/110/170/L` as `广州_30/39/48/110/170/L`,
+        r2.`库存_31/40/50/115/175/XL` as `广州_31/40/50/115/175/XL`,
+        r2.`库存_32/41/52/120/180/2XL` as `广州_32/41/52/120/180/2XL`,
+        r2.`库存_33/42/54/125/185/3XL` as `广州_33/42/54/125/185/3XL`,
+        r2.`库存_34/43/56/190/4XL` as `广州_34/43/56/190/4XL`,
+        r2.`库存_35/44/58/195/5XL` as `广州_35/44/58/195/5XL`,
+        r2.`库存_36/6XL` as `广州_36/6XL`,
+        r2.`库存_38/7XL` as `广州_38/7XL`,
+        r2.`库存_40/8XL` as `广州_40/8XL`,
+        r2.`总计` as `广州_总计`,
+        
+        
+        r3.`云仓`,
+        r3.`字段` as `南昌_字段`,
+        r3.`库存_00/28/37/44/100/160/S` as `南昌_00/28/37/44/100/160/S`,
+        r3.`库存_29/38/46/105/165/M` as `南昌_29/38/46/105/165/M`,
+        r3.`库存_30/39/48/110/170/L` as `南昌_30/39/48/110/170/L`,
+        r3.`库存_31/40/50/115/175/XL` as `南昌_31/40/50/115/175/XL`,
+        r3.`库存_32/41/52/120/180/2XL` as `南昌_32/41/52/120/180/2XL`,
+        r3.`库存_33/42/54/125/185/3XL` as `南昌_33/42/54/125/185/3XL`,
+        r3.`库存_34/43/56/190/4XL` as `南昌_34/43/56/190/4XL`,
+        r3.`库存_35/44/58/195/5XL` as `南昌_35/44/58/195/5XL`,
+        r3.`库存_36/6XL` as `南昌_36/6XL`,
+        r3.`库存_38/7XL` as `南昌_38/7XL`,
+        r3.`库存_40/8XL` as `南昌_40/8XL`,
+        r3.`总计` as `南昌_总计`,
+        
+        
+        r4.`云仓`,
+        r4.`字段` as `武汉_字段`,
+        r4.`库存_00/28/37/44/100/160/S` as `武汉_00/28/37/44/100/160/S`,
+        r4.`库存_29/38/46/105/165/M` as `武汉_29/38/46/105/165/M`,
+        r4.`库存_30/39/48/110/170/L` as `武汉_30/39/48/110/170/L`,
+        r4.`库存_31/40/50/115/175/XL` as `武汉_31/40/50/115/175/XL`,
+        r4.`库存_32/41/52/120/180/2XL` as `武汉_32/41/52/120/180/2XL`,
+        r4.`库存_33/42/54/125/185/3XL` as `武汉_33/42/54/125/185/3XL`,
+        r4.`库存_34/43/56/190/4XL` as `武汉_34/43/56/190/4XL`,
+        r4.`库存_35/44/58/195/5XL` as `武汉_35/44/58/195/5XL`,
+        r4.`库存_36/6XL` as `武汉_36/6XL`,
+        r4.`库存_38/7XL` as `武汉_38/7XL`,
+        r4.`库存_40/8XL` as `武汉_40/8XL`,
+        r4.`总计` as `武汉_总计`,
+        
+        
+        r5.`云仓`,
+        r5.`字段` as `长沙_字段`,
+        r5.`库存_00/28/37/44/100/160/S` as `长沙_00/28/37/44/100/160/S`,
+        r5.`库存_29/38/46/105/165/M` as `长沙_29/38/46/105/165/M`,
+        r5.`库存_30/39/48/110/170/L` as `长沙_30/39/48/110/170/L`,
+        r5.`库存_31/40/50/115/175/XL` as `长沙_31/40/50/115/175/XL`,
+        r5.`库存_32/41/52/120/180/2XL` as `长沙_32/41/52/120/180/2XL`,
+        r5.`库存_33/42/54/125/185/3XL` as `长沙_33/42/54/125/185/3XL`,
+        r5.`库存_34/43/56/190/4XL` as `长沙_34/43/56/190/4XL`,
+        r5.`库存_35/44/58/195/5XL` as `长沙_35/44/58/195/5XL`,
+        r5.`库存_36/6XL` as `长沙_36/6XL`,
+        r5.`库存_38/7XL` as `长沙_38/7XL`,
+        r5.`库存_40/8XL` as `长沙_40/8XL`,
+        r5.`总计` as `长沙_总计`,
+        
+        
+        r6.`云仓`,
+        r6.`字段` as `贵阳_字段`,
+        r6.`库存_00/28/37/44/100/160/S` as `贵阳_00/28/37/44/100/160/S`,
+        r6.`库存_29/38/46/105/165/M` as `贵阳_29/38/46/105/165/M`,
+        r6.`库存_30/39/48/110/170/L` as `贵阳_30/39/48/110/170/L`,
+        r6.`库存_31/40/50/115/175/XL` as `贵阳_31/40/50/115/175/XL`,
+        r6.`库存_32/41/52/120/180/2XL` as `贵阳_32/41/52/120/180/2XL`,
+        r6.`库存_33/42/54/125/185/3XL` as `贵阳_33/42/54/125/185/3XL`,
+        r6.`库存_34/43/56/190/4XL` as `贵阳_34/43/56/190/4XL`,
+        r6.`库存_35/44/58/195/5XL` as `贵阳_35/44/58/195/5XL`,
+        r6.`库存_36/6XL` as `贵阳_36/6XL`,
+        r6.`库存_38/7XL` as `贵阳_38/7XL`,
+        r6.`库存_40/8XL` as `贵阳_40/8XL`,
+        r6.`总计` as `贵阳_总计`
+        
+        from ea_size_ranking as ra
+        left join 
+        ea_size_warehouse_ratio as r1 on ra.货号 = r1.GoodsNo
+        left join 
+        ea_size_warehouse_ratio as r2 on r1.GoodsNo=r2.GoodsNo and r1.`字段`=r2.`字段` and r2.`云仓`='广州云仓' and r2.Date = '{$Date}'
+        
+        left join 
+        ea_size_warehouse_ratio as r3 on r1.GoodsNo=r3.GoodsNo and r1.`字段`=r3.`字段` and r3.`云仓`='南昌云仓' and r3.Date = '{$Date}'
+        
+        left join 
+        ea_size_warehouse_ratio as r4 on r1.GoodsNo=r4.GoodsNo and r1.`字段`=r4.`字段` and r4.`云仓`='武汉云仓' and r4.Date = '{$Date}'
+         
+        left join 
+        ea_size_warehouse_ratio as r5 on r1.GoodsNo=r5.GoodsNo and r1.`字段`=r5.`字段` and r5.`云仓`='长沙云仓' and r5.Date = '{$Date}'
+        
+        left join 
+        ea_size_warehouse_ratio as r6 on r1.GoodsNo=r6.GoodsNo and r1.`字段`=r6.`字段` and r6.`云仓`='贵阳云仓' and r6.Date = '{$Date}'
+        
+        where r1.Date = '{$Date}' and r1.GoodsNo = '{$goodsno}'  and r1.`云仓`='广州云仓'  GROUP BY r1.`字段`,r1.GoodsNo  ORDER BY r1.id asc ";
+        // 执行查询
+        $list = Db::query($sql);
+        return $list;
     }
 }
