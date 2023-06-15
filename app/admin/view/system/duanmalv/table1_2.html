@@ -281,7 +281,9 @@
                     ,{ title: 'TOP实际', align: 'center' ,colspan: 3}
                     ,{ title: 'TOP考核', align: 'center' ,colspan: 3}],
 
-                    [{ field: '直营-整体-新', title: '直营', align: 'center'}
+                    [{ field: '直营-整体-新', title: '直营', align: 'center', templet: function(d) {
+                        return d['直营-整体-新'];
+                    }}
                     , { field: '加盟-整体-新', title: '加盟', align: 'center'}
                     , { field: '合计-整体-新', title: '合计', align: 'center'}
                     , { field: '直营-TOP实际-新', title: '直营', align: 'center'}
