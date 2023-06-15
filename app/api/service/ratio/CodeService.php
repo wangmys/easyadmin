@@ -195,8 +195,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[0];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -283,8 +283,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[1];
 
         // 循环存入缓存
@@ -513,8 +513,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[2];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -1016,59 +1016,61 @@ class CodeService
                 $sale = $this->redis->get($index_value);
                 // json数据格式化
                 $sale_data = json_decode($sale,true);
+                if(empty($sale_data)){
+                    // 销毁缓存数据
+                    $this->redis->lpop($data_key);
+                    $this->msg = '当前数据为空';
+                    return ApiConstant::ERROR_CODE;
+                }
+                $model = null;
                 Db::startTrans();
                 try {
                     switch ($data_key){
                         // 同步周销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[0]:
-                             // 执行插入操作
-                            $this->size7DayModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->size7DayModel;
                             break;
                         // 同步累销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[1]:
-                             // 执行插入操作
-                            $this->sizeAccumulatedModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeAccumulatedModel;
                             break;
                         // 同步店铺预计库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[2]:
-                             // 执行插入操作
-                            $this->sizeShopEstimatedModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeShopEstimatedModel;
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
-                             // 执行插入操作
-                            $this->sizeWarehouseAvailableModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeWarehouseAvailableModel;
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
-                             // 执行插入操作
-                            $this->sizeWarehouseTransitModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeWarehouseTransitModel;
                             break;
                         // 同步仓库采购库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
-                             // 执行插入操作
-                            $this->sizePurchaseStockModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizePurchaseStockModel;
                             break;
                     }
-                    // 插入完毕
-                    Db::commit();
-                    // 销毁缓存数据
-                    $this->redis->delete($index_value);
+                    if($model && $sale_data){
+                        // 切割
+                        $data = array_chunk($sale_data,1000);
+                        foreach ($data as $key => $val){
+                             // 执行插入操作
+                            $model->insertAll($val);
+                        }
+                        // 任务完成
+                        $this->redis->lpop($data_key);
+                        // 插入完毕
+                        Db::commit();
+                        // 销毁缓存数据
+                        $this->redis->delete($index_value);
+                    }else{
+                        // 回滚
+                        Db::rollback();
+                        $this->msg = '任务累销不存在';
+                        return ApiConstant::ERROR_CODE;
+                    }
                 }catch (\Exception $e){
-                    // 遇到错误将任务重新放入队列
-                    $this->redis->lpush($data_key,$index_value);
                     Db::rollback();
                     $this->msg = $e->getMessage();
                     return ApiConstant::ERROR_CODE;

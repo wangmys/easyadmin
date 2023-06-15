@@ -81,7 +81,7 @@ class Index
     }
 
     /**
-     * 同步码比数据
+     * 从redis缓存同步到MySQL数据库
      * @return \think\response\Json
      */
     public function saveSaleData()
@@ -105,7 +105,7 @@ class Index
     }
 
     /**
-     * 计算并统计码比数据
+     * 计算并保存全体偏码
      */
     public function saveRatio()
     {
@@ -116,11 +116,11 @@ class Index
     }
 
     /**
-     * 查询并计算云仓偏码
+     * 计算并保存云仓偏码
      */
     public function selectRationData()
     {
-        $res = \app\admin\model\code\SizeWarehouseRatio::saveSizeRatio();
+        $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
         print_r($res);die;
     }
 }

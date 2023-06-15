@@ -12,6 +12,7 @@ use app\admin\model\dress\Yinliu;
 use voku\helper\HtmlDomParser;
 use app\admin\model\weather\Customers;
 use app\api\service\ratio\CodeService;
+use think\facade\Log;
 
 /**
  * 码比数据处理
@@ -39,16 +40,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullData();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'排名数据');
+        return $model->getError($code);
     }
 
     /**
@@ -61,16 +55,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pull7DaySale();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'周销数据');
+        return $model->getError($code);
     }
 
     /**
@@ -83,16 +70,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullAccumulatedSale();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'累销数据');
+        return $model->getError($code);
     }
 
     /**
@@ -105,16 +85,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullShopEstimatedStock();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'店铺预计库存数据');
+        return $model->getError($code);
     }
 
     /**
@@ -127,16 +100,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullWarehouseAvailableStock();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'云仓可用库存数据');
+        return $model->getError($code);
     }
 
     /**
@@ -149,16 +115,9 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullWarehouseTransitStock();
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        // 记录执行
+        pullLog($code,$model,'云仓在途库存数据');
+        return $model->getError($code);
     }
 
     /**
@@ -171,49 +130,75 @@ class SizeRatio
         $model = $this->service;
         // 拉取调拨数据
         $code = $model->pullPurchaseStock();
+        // 记录执行
+        pullLog($code,$model,'仓库采购库存数据');
+        return $model->getError($code);
+    }
+
+    /**
+     * 1.拉取偏码数据源保存至Redis缓存
+     */
+    public function pullDataToSaveCache()
+    {
+        // 执行结果集
+        $result = [];
+        // 排名数据源
+        $result['排名数据源'] = $this->pullData();
+        // 周销数据源
+        $result['周销数据源'] = $this->pull7DaySale();
+        // 累销数据源
+        $result['累销数据源'] = $this->pullAccumulatedSale();
+        // 店铺预计库存数据源
+        $result['店铺预计库存数据源'] = $this->pullShopEstimatedStock();
+        // 云仓可用库存数据源
+        $result['云仓可用库存数据源'] = $this->pullWarehouseAvailableStock();
+        // 云仓在途库存数据源
+        $result['云仓在途库存数据源'] = $this->pullWarehouseTransitStock();
+        // 仓库采购数据源
+        $result['仓库采购数据源'] = $this->pullPurchaseStock();
         echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        print_r($result);
         die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
     }
 
 
     /**
-     * 从缓存里把码比数据源同步至数据库
-     * @return \think\response\Json
+     * 2.从缓存里把码比数据源同步至数据库
+     * @return false|string
      */
     public function saveSaleData()
     {
+        // 执行结果集
+        $result = [];
         $server = new CodeService;
         $model = $server;
         foreach (ApiConstant::RATIO_PULL_REDIS_KEY as $k => $v){
             // 从缓存同步到MYSQL数据库
             $code = $model->saveSaleData($v);
+            // 记录执行
+            pullLog($code,$model,$v);
+            $result[$v] = $model->getError();
         }
         echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
+        print_r($result);
         die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
     }
 
     /**
-     * 根据码比数据源计算最终码比数据
+     * 3.根据数据源计算并保存全体总体偏码数据
      */
     public function saveRatio()
     {
         $res = \app\admin\model\code\SizeAllRatio::saveData();
+        print_r($res);die;
+    }
+
+    /**
+     * 4.根据数据源计算并保存云仓偏码数据
+     */
+    public function selectRationData()
+    {
+        $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
         print_r($res);die;
     }
 }

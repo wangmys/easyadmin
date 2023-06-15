@@ -5,6 +5,28 @@ use app\common\service\AuthService;
 use think\facade\Cache;
 use think\facade\Log;
 
+
+
+
+
+if (!function_exists('pullLog')){
+
+    /**
+     * 日志记录
+     * @param $code
+     * @param $model
+     */
+    function pullLog($code,$model,$type = 'default')
+    {
+        Log::channel('pull')->error([
+                'code' => $code,
+                'msg' => $model->getError($code),
+                'text' => $type
+            ]);
+    }
+}
+
+
 if (!function_exists('__url')) {
 
     /**
