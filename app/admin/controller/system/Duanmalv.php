@@ -155,13 +155,106 @@ class Duanmalv extends AdminController
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
 
-            // $pageParams1 = 0;
-            // $pageParams2 = 100;
+            foreach ($input as $key => $val) {
+                if (empty($val)) {
+                    unset($input[$key]);
+                }
+            }
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map1Str = $this->xmSelectInput($input['商品负责人']);
+                $map1 = " AND 商品负责人 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map2Str = $this->xmSelectInput($input['云仓']);
+                $map2 = " AND 云仓 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map3Str = $this->xmSelectInput($input['省份']);
+                $map3 = " AND 省份 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }   
+            if (!empty($input['经营模式'])) {
+                // echo $input['商品负责人'];
+                $map4Str = $this->xmSelectInput($input['经营模式']);
+                $map4 = " AND 经营模式 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+            if (!empty($input['店铺名称'])) {
+                // echo $input['商品负责人'];
+                $map5Str = $this->xmSelectInput($input['店铺名称']);
+                $map5 = " AND 店铺名称 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+            if (!empty($input['大类'])) {
+                // echo $input['商品负责人'];
+                $map6Str = $this->xmSelectInput($input['大类']);
+                $map6 = " AND 一级分类 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+            if (!empty($input['中类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = $this->xmSelectInput($input['中类']);
+                $map7 = " AND 二级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+            if (!empty($input['领型'])) {
+                // echo $input['商品负责人'];
+                $map8Str = $this->xmSelectInput($input['领型']);
+                $map8 = " AND 领型 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
 
             $sql = "
                 SELECT 
-                    *
+                    云仓,
+                    店铺名称,
+                    商品负责人,
+                    省份,
+                    经营模式,
+                    年份,
+                    店铺等级,
+                    季节,
+                    一级分类,
+                    二级分类,
+                    分类,
+                    领型,
+                    风格,
+                    货号,
+                    预计库存连码个数,
+                    标准齐码识别修订,
+                    店铺SKC计数,
+                    店铺近一周排名,
+                    是否TOP60考核款,
+                    是否TOP60,
+                    零售价,
+                    当前零售价,
+                    折率,
+                    销售金额,
+                    总入量数量,
+                    累销数量,
+                    预计库存数量
                 FROM cwl_duanmalv_sk WHERE 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
                 ORDER BY 
                     云仓, `商品负责人` desc, 店铺名称, 风格, 季节, 一级分类, 二级分类, 分类, 领型
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -172,8 +265,15 @@ class Duanmalv extends AdminController
                 SELECT 
                     count(*) as total
                 FROM cwl_duanmalv_sk
-                WHERE 
-                    1
+                WHERE  1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
             ";
             $count = $this->db_easyA->query($sql2);
 
@@ -183,6 +283,12 @@ class Duanmalv extends AdminController
 
             ]);
         }
+    }
+
+    public function test() {
+        return View('test', [
+
+        ]); 
     }
 
     // 下载单店断码明细
@@ -1214,19 +1320,26 @@ class Duanmalv extends AdminController
     public function getXmMapSelect() {
         // 商品负责人
         $customer17 = $this->db_easyA->query("
-            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_duanmalv_table1_1 GROUP BY 商品负责人
+            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_duanmalv_sk WHERE 商品负责人 IS NOT NULL GROUP BY 商品负责人
         ");
         $province = $this->db_easyA->query("
-            SELECT 省份 as name, 省份 as value FROM cwl_duanmalv_table1_1 GROUP BY 省份
+            SELECT 省份 as name, 省份 as value FROM cwl_duanmalv_sk WHERE 省份 IS NOT NULL GROUP BY 省份
         ");
         $customer = $this->db_easyA->query("
-            SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_duanmalv_table1_1 GROUP BY 店铺名称
+            SELECT CustomerName as name, CustomerName as value FROM customer  GROUP BY CustomerName
+        ");
+        $zhonglei = $this->db_easyA->query("
+            SELECT 二级分类 as name, 二级分类 as value FROM cwl_duanmalv_sk WHERE  二级分类 IS NOT NULL GROUP BY 二级分类
+        ");
+        $lingxing = $this->db_easyA->query("
+            SELECT 领型 as name, 领型 as value FROM cwl_duanmalv_sk WHERE  领型 IS NOT NULL GROUP BY 领型
         ");
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer, 'zhonglei' => $zhonglei, 
+        'lingxing' => $lingxing]]);
     }
 
     // 获取每周的周五，周一
