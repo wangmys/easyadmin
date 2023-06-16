@@ -322,7 +322,7 @@ class SizeWarehouseRatio extends TimeModel
                 // 单码售罄比 = 单码售罄 - 单款售罄
                 $size_sell_out_ratio = 0;
                 if($size_sell_out > 0 && $all_size_sell_out > 0){
-                    $size_sell_out_ratio = $size_sell_out - $all_size_sell_out;
+                    $size_sell_out_ratio = bcadd($size_sell_out - $all_size_sell_out,0,2);
                 }
 
                 // 单码缺量 = 如果单码售罄比大于设定商品的比例,则为单码缺量

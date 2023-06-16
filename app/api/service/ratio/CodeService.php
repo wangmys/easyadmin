@@ -893,6 +893,7 @@ class CodeService
         AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
         and ew.WarehouseCode IN ('CK002','CK003','CK004','CK005','CK006')
+        and ern.SupplyId != 'K191000638'
         GROUP BY
         ew.WarehouseName,
         eg.CategoryName1,
@@ -965,11 +966,12 @@ class CodeService
             ErpWarehouse ck on a.ReceiptWareid=ck.WarehouseId
             where 
             ck.WarehouseCode 
-            IN ('C020')
+            IN ('C020','C020','C021','C022')
             and
             a.CodingCodeText='已审结'
             and sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
-            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-09-08' and CAST(GETDATE() AS DATE)
+            and sp.TimeCategoryName2  IN ( '初夏', '盛夏', '夏季' ) 
+            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-05-01' and CAST(GETDATE() AS DATE)
             -- and sp.GoodsNo = 'B42101021'
             GROUP BY 
             sp.TimeCategoryName1,
