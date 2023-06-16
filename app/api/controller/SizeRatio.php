@@ -15,7 +15,11 @@ use app\api\service\ratio\CodeService;
 use think\facade\Log;
 
 /**
- * 码比数据处理
+ * 码比-偏码数据处理
+ * 1.拉取码比数据源储存在redis中
+ * 2.从缓存中将码比数据源同步至MySQL
+ * 3.根据据源统计全体偏码数据
+ * 4.根据数据源统计云仓偏码数据
  * Class SizeRatio
  * @package app\api\controller
  */
