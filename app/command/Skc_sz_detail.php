@@ -15,6 +15,7 @@ use app\admin\model\bi\SpWwChunxiaStockModel;
 use app\admin\model\bi\SpWwXiaStock2022Model;
 use app\admin\model\bi\SpSkcWinNumModel;
 use app\admin\model\bi\SpSkcSzDetailModel;
+use app\admin\model\bi\SpSkcConfigModel;
 use app\api\model\kl\ErpRetailModel;
 
 class Skc_sz_detail extends Command
@@ -34,8 +35,9 @@ class Skc_sz_detail extends Command
         $skc_win_nums = SpSkcWinNumModel::where([])->column('*', 'key_str');
 
         $all_customers = SpWwCustomerModel::where([['经营模式', 'in', ['直营', '加盟']]])->select()->toArray();
-        $dt_price = 50;
-        $dc_price = 80;
+        $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('dt_price,dc_price')->find();
+        $dt_price = $skc_config ? $skc_config['dt_price'] : 50;
+        $dc_price = $skc_config ? $skc_config['dc_price'] : 80;
         if ($all_customers) {
             foreach ($all_customers as $v_customer) {
                 // print_r($v_customer);die;

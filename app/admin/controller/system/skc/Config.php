@@ -17,11 +17,6 @@ class Config extends AdminController
 
     protected $service;
 
-    protected $sort = [
-        'sort' => 'desc',
-        'id'   => 'desc',
-    ];
-
     public function __construct(App $app)
     {
         parent::__construct($app);
