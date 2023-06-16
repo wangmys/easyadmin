@@ -46,6 +46,7 @@ class Skc_sz_detail extends Command
                 // print_r($v_customer);die;
                 //test....
                 // $v_customer['店铺名称'] = '开平二店';
+                // $v_customer['店铺ID'] = 'C991000484';
                 // $v_customer['经营模式'] = '加盟';
                 // $v_customer['省份'] = '广东省';
 
@@ -58,7 +59,7 @@ class Skc_sz_detail extends Command
                 $arr['store_type'] = $v_customer['经营模式'] ?: '';
                 $arr['goods_manager'] = $v_customer['商品负责人'] ?: '';
                 $arr['store_name'] = $v_customer['店铺名称'] ?: '';
-                $arr['start_date'] = $RetailInfo ? $RetailInfo[0]['RetailDate'] : '';
+                $arr['start_date'] = $RetailInfo ? $RetailInfo[0]['RetailDate'] : null;
                 $arr['store_level'] = $v_customer['店铺等级'] ?: '';
                 $arr['store_square'] = $v_customer['营业面积'] ?: '';
                 //多少个五件窗计算
@@ -76,7 +77,7 @@ class Skc_sz_detail extends Command
                 
                 //总：
                 $all_sum = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['店铺名称']], ['大类', 'in', ['内搭', '外套']]])->sum('销售金额');
-                if (!$all_sum) continue;//周销为0，不计入统计
+                if (!$arr['five_item_num']) continue;//五件窗为0，不计入统计
 
                 $week_sales_dt_sum = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['店铺名称']], ['中类', '=', '短T']])->sum('销售金额');
                 $week_sales_fl = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['店铺名称']], ['中类', '=', '短T'], ['小类', 'like', "%翻领%"]])->sum('销售金额');
