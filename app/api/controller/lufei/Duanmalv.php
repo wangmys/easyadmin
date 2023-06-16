@@ -147,29 +147,16 @@ class Duanmalv extends BaseController
 
             $chunk_list = array_chunk($select, 1000);
 
-            $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
-                if (! $insert) {
-                    $status = false;
-                    break;
-                }
             }
 
-            if ($status) {
-                return json([
-                    'status' => 1,
-                    'msg' => 'success',
-                    'content' => "cwl_duanmalv_retail first 更新成功，数量：{$count}！"
-                ]);
-            } else {
-                return json([
-                    'status' => 0,
-                    'msg' => 'error',
-                    'content' => 'cwl_duanmalv_retail first 更新失败！'
-                ]);
-            }
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_duanmalv_retail first 更新成功，数量：{$count}！"
+            ]);
         }
     }
 
