@@ -32,6 +32,9 @@ class Skc_sz_detail extends Command
 
         ini_set('memory_limit','500M');
 
+        //先清空旧数据再跑
+        Db::connect("mysql2")->Query("truncate table sp_skc_sz_detail;");
+
         $skc_win_nums = SpSkcWinNumModel::where([])->column('*', 'key_str');
 
         $all_customers = SpWwCustomerModel::where([['经营模式', 'in', ['直营', '加盟']]])->select()->toArray();
