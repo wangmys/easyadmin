@@ -1,0 +1,46 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-win_num-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">标准</th>
+                <th style="width: 120px;">窗数</th>
+                <th style="width: 120px;">SKC测算-短T-翻领</th>
+                <th style="width: 120px;">SKC测算-短T-圆领</th>
+                <th style="width: 150px;">SKC测算-短T-休闲短衬</th>
+                <th style="width: 120px;">标准SKC</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="6">
+                    <span>添加操作</span>
+                </td>
+                <td colspan="1">
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn add_win_num">增加</button>
+                    </div>
+                </td>
+            </tr>
+        {foreach $win_num_list as $vo}
+        <tr class="skc_win_num-select" lay-data="{:htmlspecialchars(json_encode($vo['win_num'].$vo['area_range']))}">
+            {foreach $vo as $key => $val}
+            <td class="{$key}">
+                <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入" value="{$val}" class="layui-input">
+            </td>
+            {/foreach}
+            <td class="handler">
+                <input type="text" name="sign_id[]" class="layui-hide" value="{$vo.win_num}{$vo.area_range}">
+                <button type="button" class="layui-btn layui-btn-normal get">保存</button>
+                <button type="button" class="layui-btn layui-btn-danger del">删除</button>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="win_num_head" class="layui-hide" value="{:htmlspecialchars(json_encode($win_num_head))}">
+<input type="text" id="win_num_list" class="layui-hide" value="{:htmlspecialchars(json_encode($win_num_list))}">
