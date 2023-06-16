@@ -1,0 +1,31 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-skc-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">短T价格</th>
+                <th style="width: 120px;">短衬价格</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="skc_config-select" lay-data="{:htmlspecialchars(json_encode($skc_config['config_str']))}">
+                <td class="dt_price">
+                    <input type="text" name="dt_price" lay-verify="required" placeholder="请输入" value="{$skc_config['dt_price']}" class="layui-input">
+                </td>
+                <td class="dc_price">
+                    <input type="text" name="dc_price" lay-verify="required" placeholder="请输入" value="{$skc_config['dc_price']}" class="layui-input">
+                </td>
+                <td class="handler">
+                    <input type="text" name="sign_id" class="layui-hide" value="{$skc_config['config_str']}">
+                    <button type="button" class="layui-btn layui-btn-normal get_skc_config">保存</button>
+                    <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                </td>
+            </tr>
+       
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="skc_config" class="layui-hide" value="{:htmlspecialchars(json_encode($skc_config))}">
