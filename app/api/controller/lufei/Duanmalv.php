@@ -1050,7 +1050,7 @@ class Duanmalv extends BaseController
     // 6.单店品类断码情况（商品专员可看）
     public function table6() {
         $sql = "
-            SELECT
+                SELECT
                 云仓,
                 省份,
                 商品负责人,
@@ -1060,11 +1060,9 @@ class Duanmalv extends BaseController
                 一级分类,
                 二级分类,
                 领型,
-                店铺总SKC数,
-                TOP断码SKC数,
-                ROUND( TOP断码SKC数 / 店铺总SKC数, 2 ) AS TOP断码率,
-                全部断码SKC数,
-                ROUND( 全部断码SKC数 / 店铺总SKC数, 2 ) AS 全部断码率 
+                SKC数 as 领型SKC数,
+                总断码数 as 领型断码数,
+                CONCAT(round((1 - round(总断码数 / SKC数, 4)) * 100, 1), '%') as 领型齐码率
             FROM
                 cwl_duanmalv_handle_1 
             ORDER BY
