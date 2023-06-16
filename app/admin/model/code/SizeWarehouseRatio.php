@@ -77,6 +77,7 @@ class SizeWarehouseRatio extends TimeModel
 
         // 商品信息
         $info = SizeRanking::where([
+            'Date' => date('Y-m-d'),
             '货号' => $goodsno
         ])->find();
 
@@ -430,6 +431,7 @@ class SizeWarehouseRatio extends TimeModel
         $result = [];
         // 失败结果
         $error = [];
+        // 查询今日云仓偏码数据
         $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
         // 查询货号列表排名
         $list = SizeRanking::where(['Date' => date('Y-m-d')])->order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
