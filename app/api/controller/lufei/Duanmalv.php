@@ -1671,7 +1671,7 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_table1_3')->where([
                 '更新日期' => $date
             ])->delete();
-
+                
             $chunk_list = array_chunk($select, 2000);
 
             foreach($chunk_list as $key => $val) {
