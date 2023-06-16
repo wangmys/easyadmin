@@ -864,6 +864,10 @@ class Duanmalv extends BaseController
                     sk.一级分类,
                     sk.二级分类,
                     sk.领型,
+                    sum(case 
+                        sk.`标准齐码识别修订`
+                        when '断码' then 1 else 0
+                    end) as 总断码数, 	
                     ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 AND
                     sk.领型=领型 and 店铺SKC计数=1) AS SKC数,
                     ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 ) AS 店铺总SKC数,
@@ -1010,7 +1014,9 @@ class Duanmalv extends BaseController
                 AND h.一级分类 = skg.`一级分类` 
                 AND h.`二级分类` = skg.`二级分类` 
                 AND h.领型 = skg.领型 
-                SET h.TOP断码SKC数 = skg.TOP断码SKC数, h.全部断码SKC数 = skg.全部断码SKC数 
+                SET 
+                    h.TOP断码SKC数 = skg.TOP断码SKC数, 
+                    h.全部断码SKC数 = skg.全部断码SKC数 
                 WHERE
                     h.TOP断码SKC数 IS NULL
             ";
