@@ -249,7 +249,7 @@ class Skc_sz_detail extends Command
                 $arr['overflow_xxdc'] = $overflow_xxdc;
                 $arr['overflow_dxxj'] = $overflow_dxxj;
                 
-                $arr['fill_rate'] = round($arr['win_num_dxxj']/$arr['five_item_num'], 1);
+                $arr['fill_rate'] = round($arr['win_num_dxxj']/$arr['five_item_num'], 2);
                 // print_r($arr);die;
 
                 //入库
