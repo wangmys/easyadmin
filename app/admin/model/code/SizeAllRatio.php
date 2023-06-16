@@ -12,11 +12,24 @@ use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
 use think\facade\Db;
 
+/**
+ * 码比-全体偏码情况表
+ * Class SizeAllRatio
+ * @package app\admin\model\code
+ */
 class SizeAllRatio extends TimeModel
 {
     // 表名
     protected $name = 'size_all_ratio';
 
+    /**
+     * 统计单个货号码比数据(偏码判断)
+     * @param $goodsno
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public static function saveSizeRatio($goodsno)
     {
         $arr = [$goodsno];
@@ -328,7 +341,14 @@ class SizeAllRatio extends TimeModel
         }
         return false;
     }
-    
+
+    /**
+     * 查询日均销排名货号,并计算每个货号的码比
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
     public static function saveData()
     {
         // 成功结果

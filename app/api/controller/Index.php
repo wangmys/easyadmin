@@ -79,48 +79,4 @@ class Index
             'data' => $result
         ]);
     }
-
-    /**
-     * 从redis缓存同步到MySQL数据库
-     * @return \think\response\Json
-     */
-    public function saveSaleData()
-    {
-        $server = new CodeService;
-        $model = $server;
-        foreach (ApiConstant::RATIO_PULL_REDIS_KEY as $k => $v){
-            // 从缓存同步到MYSQL数据库
-            $code = $model->saveSaleData($v);
-        }
-        echo '<pre>';
-        print_r([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-        die;
-        return json([
-            'code' => $code,
-            'msg' => $model->getError($code)
-        ]);
-    }
-
-    /**
-     * 计算并保存全体偏码
-     */
-    public function saveRatio()
-    {
-        $res = \app\admin\model\code\SizeAllRatio::saveData();
-        echo '<pre>';
-        print_r($res);
-        die;
-    }
-
-    /**
-     * 计算并保存云仓偏码
-     */
-    public function selectRationData()
-    {
-        $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
-        print_r($res);die;
-    }
 }

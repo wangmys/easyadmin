@@ -262,7 +262,7 @@ class CodeService
             WHERE
             
             er.CodingCodeText = '已审结' AND
-            er.RetailDate >= '2023-01-01' AND er.RetailDate <= CAST(GETDATE() AS DATE) AND
+            er.RetailDate >= '2022-10-01' AND er.RetailDate <= CAST(GETDATE() AS DATE) AND
             eg.TimeCategoryName1 = '2023'
             AND EBC.Mathod IN ('直营', '加盟')
             AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 

@@ -11,6 +11,11 @@ use app\admin\model\code\SizeWarehouseAvailableStock;
 use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
 
+/**
+ * 云仓偏码数据表
+ * Class SizeWarehouseRatio
+ * @package app\admin\model\code
+ */
 class SizeWarehouseRatio extends TimeModel
 {
     // 表名
@@ -77,6 +82,7 @@ class SizeWarehouseRatio extends TimeModel
 
         // 商品信息
         $info = SizeRanking::where([
+            'Date' => date('Y-m-d'),
             '货号' => $goodsno
         ])->find();
 
@@ -418,7 +424,7 @@ class SizeWarehouseRatio extends TimeModel
     }
 
     /**
-     * 保存所有云仓偏码
+     * 查询日均销排名货号,并计算每个货号云仓偏码数据
      * @return array
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -430,6 +436,7 @@ class SizeWarehouseRatio extends TimeModel
         $result = [];
         // 失败结果
         $error = [];
+        // 查询今日云仓偏码数据
         $goodsNo = self::group("GoodsNo")->where(['Date' => date('Y-m-d')])->column('GoodsNo');
         // 查询货号列表排名
         $list = SizeRanking::where(['Date' => date('Y-m-d')])->order('日均销','desc')->whereNotIn('货号',$goodsNo)->select();
@@ -447,7 +454,9 @@ class SizeWarehouseRatio extends TimeModel
     }
 
     /**
-     * 查询云仓偏码数据
+     * 查询五大云仓偏码数据,并拼接在一块
+     * @param $goodsno
+     * @return mixed
      */
     public static function selectWarehouseRatio($goodsno)
     {
