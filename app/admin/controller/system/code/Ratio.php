@@ -978,8 +978,8 @@ class Ratio extends AdminController
 
 
             // 查询货号列表排名
-            $list = $list->order('日均销','desc')->page($page, $limit)->select();
-            $count = $model->count();
+            $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->page($page, $limit)->select();
+            $count = $model->where(['Date' => date('Y-m-d')])->count();
             $allList = [];
             $init = ($page - 1) * $limit;
             foreach ($list as $key => &$value){
@@ -1064,8 +1064,8 @@ class Ratio extends AdminController
 
 
             // 查询货号列表排名
-            $list = $list->order('日均销','desc')->page($page, $limit)->select();
-            $count = $model->count();
+            $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->page($page, $limit)->select();
+            $count = $model->where(['Date' => date('Y-m-d')])->count();
             $allList = [];
             $init = ($page - 1) * $limit;
             foreach ($list as $key => &$value){

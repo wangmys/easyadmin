@@ -77,9 +77,11 @@ class SendReport extends BaseController
             $this->service->create_table_s102C();
         } elseif ($name =='S103C') {
             $this->service->create_table_s103C();
-        }  elseif ($name =='S025') {
+        } elseif ($name =='S023') {
+            $this->service->create_table_s023();
+        } elseif ($name =='S025') {
             $this->service->create_table_s025();
-        }  elseif ($name =='S030') {
+        } elseif ($name =='S030') {
             $this->service->create_table_s030();
         } elseif ($name =='S031') {
             $this->service->create_table_s031();
@@ -115,6 +117,8 @@ class SendReport extends BaseController
             }
       
             // $this->service->create_table_s113($date);
+        } elseif ($name = 'S114') {
+            $this->service->create_table_s114();
         }
     }
 
@@ -259,6 +263,10 @@ class SendReport extends BaseController
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
+            'S023' => [
+                'title' => '商品部-所有年份各品类销售占比 表号:S023',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S023.jpg'
+            ],
             'S025' => [
                 'title' => '商品部-各季节销售占比 表号:S025',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S025.jpg'
@@ -282,7 +290,9 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
+                // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
                 $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
         }
         return json($res);
@@ -396,6 +406,31 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    
+    // 工厂直发仓库超五天未验收单据
+    public function sendS114() {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S107' => [
+                'title' => '工厂直发仓库超五天未验收单据 表号:S114',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S114.jpg'
+            ]
+        ];
+        // dump($send_data);die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+
+                // 采购群
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=751850d0366d9494e16070bdbf14a5459b76c59ced68c86ac3d46c53869d908f');
+            }
+        }
+        return json($res);
+    }
+
     /**
      * 执行指定任务
      * @return \think\response\Json
@@ -450,6 +485,7 @@ class SendReport extends BaseController
     // 00:45
     public function run4()
     {
+        $this->service->create_table_s023();
         $this->service->create_table_s025();
         $this->service->create_table_s030();
         $this->service->create_table_s031();
@@ -494,19 +530,15 @@ class SendReport extends BaseController
         } else {
             return $res;
         }
-        // die;
-        // $this->service->create_table_s111('春季');
-        // $this->service->create_table_s111('夏季');
-        // $this->service->create_table_s111('秋季');
-        // $this->service->create_table_s111('冬季');
+    }
 
-        // $this->service->create_table_s112('春季');
-        // $this->service->create_table_s112('夏季');
-        // $this->service->create_table_s112('秋季');
-        // $this->service->create_table_s112('冬季');
+    public function run_caigoudingtui_s114()
+    {
+        $this->service->create_table_s114();
 
-        // // 发送数据报表
-        // $this->send_caigoudingtui();
+        // 发送数据报表
+        $this->sendS114();
+
     }
 
     public function testSend() {

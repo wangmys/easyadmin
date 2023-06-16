@@ -126,6 +126,7 @@ class CodeService
     public function pull7DaySale()
     {
         $sql = " SELECT
+            CAST(GETDATE() AS DATE) as Date,
             CAST(er.RetailDate AS DATE) AS 单据时间,
             ec.State AS 省份,
             ec.CustomItem15 AS 云仓,
@@ -171,7 +172,7 @@ class CodeService
         WHERE
 
         er.CodingCodeText = '已审结' AND
-        er.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE)) AND er.RetailDate < CAST(GETDATE() AS DATE) AND
+        er.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE)) AND er.RetailDate <= CAST(GETDATE() AS DATE) AND
         -- er.RetailDate >= '2023-05-02' AND er.RetailDate < '2023-05-10' and
         eg.TimeCategoryName1 = '2023'
         AND EBC.Mathod IN ('直营', '加盟')
@@ -195,8 +196,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[0];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -218,7 +219,7 @@ class CodeService
     {
         // 查询累销数据
         $sql = " SELECT
-
+                CAST(GETDATE() AS DATE) as Date,
                 ec.State AS 省份,
                 ec.CustomItem15 AS 云仓,
                 ec.CustomerName AS 店铺名称,
@@ -261,7 +262,7 @@ class CodeService
             WHERE
             
             er.CodingCodeText = '已审结' AND
-            er.RetailDate >= '2023-01-01' AND er.RetailDate <= CONVERT(VARCHAR(10),GETDATE()-1,23) AND
+            er.RetailDate >= '2022-10-01' AND er.RetailDate <= CAST(GETDATE() AS DATE) AND
             eg.TimeCategoryName1 = '2023'
             AND EBC.Mathod IN ('直营', '加盟')
             AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
@@ -283,8 +284,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[1];
 
         // 循环存入缓存
@@ -300,14 +301,14 @@ class CodeService
     }
 
     /**
-     * 拉取累销数据保存到缓存
+     * 拉取店铺预计库存数据保存到缓存
      * @return int
      */
     public function pullShopEstimatedStock()
     {
         // 查询累销数据
         $sql = "SELECT 
-	
+	        CAST(GETDATE() AS DATE) as Date,
             T.CustomItem15,
             T.State,
             T.CustomItem17,
@@ -513,8 +514,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按8000条数据切割
-        $res = array_chunk($list,8000);
+        // 将结果集按5000条数据切割
+        $res = array_chunk($list,5000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[2];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -537,6 +538,7 @@ class CodeService
         // 查询累销数据
         $sql = "--仓库可用库存数量到尺码齐码率
             SELECT 
+                CAST(GETDATE() AS DATE) as Date,
                 T.WarehouseName,
                 EG.GoodsNo,
                 EG.TimeCategoryName1,
@@ -855,6 +857,7 @@ class CodeService
     {
         // 查询累销数据
         $sql = "SELECT
+            CAST(GETDATE() AS DATE) as Date,
             ew.WarehouseName,
             eg.TimeCategoryName1,
             eg.TimeCategoryName2,
@@ -885,7 +888,7 @@ class CodeService
         LEFT JOIN ErpGoods eg ON erng.GoodsId = eg.GoodsId
         LEFT JOIN ErpWarehouse ew ON ern.WarehouseId = ew.WarehouseId
         WHERE
-        ern.IsCompleted IS NULL AND
+        (ern.IsCompleted IS NULL OR ern.IsCompleted = 0) AND
         eg.TimeCategoryName1 = '2023'
         AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
@@ -925,6 +928,7 @@ class CodeService
     {
         // 查询仓库采购数据
         $sql = "select
+            CAST(GETDATE() AS DATE) as Date,
             sp.TimeCategoryName1,
             sp.TimeCategoryName2,
             sp.CategoryName1,
@@ -965,7 +969,7 @@ class CodeService
             and
             a.CodingCodeText='已审结'
             and sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
-            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-09-08' and '2023-05-30'
+            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-09-08' and CAST(GETDATE() AS DATE)
             -- and sp.GoodsNo = 'B42101021'
             GROUP BY 
             sp.TimeCategoryName1,
@@ -1016,59 +1020,61 @@ class CodeService
                 $sale = $this->redis->get($index_value);
                 // json数据格式化
                 $sale_data = json_decode($sale,true);
+                if(empty($sale_data)){
+                    // 销毁缓存数据
+                    $this->redis->lpop($data_key);
+                    $this->msg = '当前数据为空';
+                    return ApiConstant::ERROR_CODE;
+                }
+                $model = null;
                 Db::startTrans();
                 try {
                     switch ($data_key){
                         // 同步周销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[0]:
-                             // 执行插入操作
-                            $this->size7DayModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->size7DayModel;
                             break;
                         // 同步累销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[1]:
-                             // 执行插入操作
-                            $this->sizeAccumulatedModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeAccumulatedModel;
                             break;
                         // 同步店铺预计库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[2]:
-                             // 执行插入操作
-                            $this->sizeShopEstimatedModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeShopEstimatedModel;
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
-                             // 执行插入操作
-                            $this->sizeWarehouseAvailableModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeWarehouseAvailableModel;
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
-                             // 执行插入操作
-                            $this->sizeWarehouseTransitModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizeWarehouseTransitModel;
                             break;
                         // 同步仓库采购库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
-                             // 执行插入操作
-                            $this->sizePurchaseStockModel->insertAll($sale_data);
-                            // 任务完成
-                            $this->redis->lpop($data_key);
+                            $model = $this->sizePurchaseStockModel;
                             break;
                     }
-                    // 插入完毕
-                    Db::commit();
-                    // 销毁缓存数据
-                    $this->redis->delete($index_value);
+                    if($model && $sale_data){
+                        // 批量切割
+                        $data = array_chunk($sale_data,1000);
+                        foreach ($data as $key => $val){
+                             // 执行插入操作
+                            $model->insertAll($val);
+                        }
+                        // 插入完毕
+                        Db::commit();
+                        // 任务完成,从队列里取出任务
+                        $this->redis->lpop($data_key);
+                        // 销毁缓存数据
+                        $this->redis->delete($index_value);
+                    }else{
+                        // 回滚
+                        Db::rollback();
+                        $this->msg = '任务类型不存在';
+                        return ApiConstant::ERROR_CODE;
+                    }
                 }catch (\Exception $e){
-                    // 遇到错误将任务重新放入队列
-                    $this->redis->lpush($data_key,$index_value);
                     Db::rollback();
                     $this->msg = $e->getMessage();
                     return ApiConstant::ERROR_CODE;
