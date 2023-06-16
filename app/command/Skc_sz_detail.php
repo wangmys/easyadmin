@@ -37,7 +37,7 @@ class Skc_sz_detail extends Command
 
         $skc_win_nums = SpSkcWinNumModel::where([])->column('*', 'key_str');
 
-        $all_customers = SpWwCustomerModel::where([['经营模式', 'in', ['直营', '加盟']]])->select()->toArray();
+        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from sp_ww_customer c inner join customer_regionid cr on c.店铺名称=cr.店铺名称 where c.经营模式 in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
         $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('dt_price,dc_price')->find();
         $dt_price = $skc_config ? $skc_config['dt_price'] : 50;
         $dc_price = $skc_config ? $skc_config['dc_price'] : 80;
@@ -50,16 +50,12 @@ class Skc_sz_detail extends Command
                 // $v_customer['经营模式'] = '加盟';
                 // $v_customer['省份'] = '广东省';
 
-                $sql = "select TOP 1 RetailDate from ErpRetail where CustomerId='{$v_customer['店铺ID']}' order by RetailDate asc;";
-		        $RetailInfo = Db::connect("sqlsrv")->Query($sql);
-                // print_r($RetailInfo);die;
-
                 $arr['area_range'] = (strstr($v_customer['省份'], '广东') || strstr($v_customer['省份'], '广西')) ? '二广' : '内陆';
                 $arr['province'] = $v_customer['省份'] ?: '';
                 $arr['store_type'] = $v_customer['经营模式'] ?: '';
                 $arr['goods_manager'] = $v_customer['商品负责人'] ?: '';
                 $arr['store_name'] = $v_customer['店铺名称'] ?: '';
-                $arr['start_date'] = $RetailInfo ? $RetailInfo[0]['RetailDate'] : null;
+                $arr['start_date'] = $v_customer['首单日期'] ?: null;
                 $arr['store_level'] = $v_customer['店铺等级'] ?: '';
                 $arr['store_square'] = $v_customer['营业面积'] ?: '';
                 //多少个五件窗计算
