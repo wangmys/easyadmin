@@ -57,61 +57,65 @@ class ReportFormsService
         $date = date('Y-m-d');
         $sql = "select 二级时间分类 as 季节,前一天,前二天,前三天,前四天,前五天,前六天,前七天 from sp_time_proportion where 更新日期 = '$date'";
         $data = Db::connect("mysql2")->query($sql);
-
-        $table_header = ['ID'];
-        $table_header = array_merge($table_header, array_keys($data[0]));
-        foreach ($table_header as $v => $k) {
-            $field_width[$v] = 130;
-        }
-        foreach ($data as $v => $teams) {
-            $fields = array_keys($teams);
-            foreach ($fields as $vv => $team) {
-                $leng = strlen($team);
-                $field_width[$vv] = $leng * 20;
-                if ($data[$v][$team] === '0') {
-                    $data[$v][$team] = '';
+        if ($data) {
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 130;
+            }
+            foreach ($data as $v => $teams) {
+                $fields = array_keys($teams);
+                foreach ($fields as $vv => $team) {
+                    $leng = strlen($team);
+                    $field_width[$vv] = $leng * 20;
+                    if ($data[$v][$team] === '0') {
+                        $data[$v][$team] = '';
+                    }
                 }
             }
+    
+            // echo '<pre>';
+            // print_r($data);die;
+            $field_width[0] = 35;
+            $field_width[1] = 45;
+            $field_width[2] = 130;
+            $field_width[3] = 130;
+            $field_width[4] = 130;
+            $field_width[5] = 130;
+            $field_width[6] = 130;
+            $field_width[7] = 130;
+            $field_width[8] = 130;
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                0 => "昨天:" . $week . " 去年昨天:" . $last_year_week_today,
+                //            1 => '[类型]：说明8 说明16 ',
+                //            2 => '[类型]：说明8 说明16 ',
+            ];
+            //参数
+            $params = [
+                'row' => count($data),          //数据的行数
+                'file_name' => $code . '.jpg',      //保存的文件名
+                'title' => "商品部-各季节销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'col' => '二级时间分类',
+                'color' => 16711877,
+                'field' => ['通季', '下装汇总', '外套汇总', '鞋履汇总'],
+                'banben' => '  图片报表编号: ' . $code,
+                'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
+            ];
+    
+            // table_pic_new_1($params);
+            $this->create_table($params);
+        } else {
+            return false;
         }
 
-        // echo '<pre>';
-        // print_r($data);die;
-        $field_width[0] = 35;
-        $field_width[1] = 45;
-        $field_width[2] = 130;
-        $field_width[3] = 130;
-        $field_width[4] = 130;
-        $field_width[5] = 130;
-        $field_width[6] = 130;
-        $field_width[7] = 130;
-        $field_width[8] = 130;
-        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
-        //图片左上角汇总说明数据，可为空
-        $table_explain = [
-            0 => "昨天:" . $week . " 去年昨天:" . $last_year_week_today,
-            //            1 => '[类型]：说明8 说明16 ',
-            //            2 => '[类型]：说明8 说明16 ',
-        ];
-        //参数
-        $params = [
-            'row' => count($data),          //数据的行数
-            'file_name' => $code . '.jpg',      //保存的文件名
-            'title' => "商品部-各季节销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $data,
-            'table_explain' => $table_explain,
-            'table_header' => $table_header,
-            'field_width' => $field_width,
-            'col' => '二级时间分类',
-            'color' => 16711877,
-            'field' => ['通季', '下装汇总', '外套汇总', '鞋履汇总'],
-            'banben' => '  图片报表编号: ' . $code,
-            'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
-        ];
-
-        // table_pic_new_1($params);
-        $this->create_table($params);
     }
 
     public function create_table_s030()
@@ -283,44 +287,48 @@ class ReportFormsService
             ->select()
             ->toArray();
 
-        foreach ($res as $key => $val) {
-            $res[$key]['省份'] = province2zi($val['省份']);
+        if ($res) {
+            foreach ($res as $key => $val) {
+                $res[$key]['省份'] = province2zi($val['省份']);
+            }
+            // dump($res);die;
+            foreach ($res as $v => $k) {
+                unset($res[$v]['ID']);
+                unset($res[$v]['更新日期']);
+            }
+    
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 135;
+            }
+            $field_width[0] = 35;
+            $field_width[1] = 45;
+            $field_width[2] = 45;
+            //        $field_width[4] = 260;
+            //        $field_width[7] = 260;
+            $table_explain = [
+                // 0 => "报表更新日期" . $data_date,
+                0 => "报表更新日期" . date("Y-m-d", strtotime("-1 day")),
+            ];
+            $params = [
+                'row' => count($res), //数据的行数
+                'file_name' => $code . '.jpg',      //保存的文件名
+                'title' => "各省7天季节占比（粤/桂/贵/鄂/湘/赣）",
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $res,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'col' => '省份',
+                'color' => 16711877,
+                'field' => [''],
+                'banben' => '  图片报表编号: ' . $code,
+                'last' => 'no',
+                'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
+            ];
+            $this->create_image($params);
+        } else {
+            return false;
         }
-        // dump($res);die;
-        foreach ($res as $v => $k) {
-            unset($res[$v]['ID']);
-            unset($res[$v]['更新日期']);
-        }
-
-        foreach ($table_header as $v => $k) {
-            $field_width[$v] = 135;
-        }
-        $field_width[0] = 35;
-        $field_width[1] = 45;
-        $field_width[2] = 45;
-        //        $field_width[4] = 260;
-        //        $field_width[7] = 260;
-        $table_explain = [
-            // 0 => "报表更新日期" . $data_date,
-            0 => "报表更新日期" . date("Y-m-d", strtotime("-1 day")),
-        ];
-        $params = [
-            'row' => count($res), //数据的行数
-            'file_name' => $code . '.jpg',      //保存的文件名
-            'title' => "各省7天季节占比（粤/桂/贵/鄂/湘/赣）",
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $res,
-            'table_explain' => $table_explain,
-            'table_header' => $table_header,
-            'field_width' => $field_width,
-            'col' => '省份',
-            'color' => 16711877,
-            'field' => [''],
-            'banben' => '  图片报表编号: ' . $code,
-            'last' => 'no',
-            'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
-        ];
-        $this->create_image($params);
     }
 
 
