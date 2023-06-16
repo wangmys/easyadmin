@@ -50,6 +50,61 @@ class ReportFormsService
         }
     }
 
+    public function create_table_s023()
+    {
+        $code = 'S023';
+        $date = date('Y-m-d');
+        $sql = "select 一级分类,二级分类,前一天,前二天,前三天,前四天,前五天,前六天,前七天 from sp_category_proportion where 更新日期 = '$date'";
+        $data = Db::connect("mysql2")->Query($sql);
+        if ($data) {
+            $table_header = ['行号'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 130;
+            }
+            foreach ($data as $v=>$teams){
+                $fields = array_keys($teams);
+                foreach ($fields as $vv=> $team){
+                    $leng = strlen($team);
+                    $field_width[$vv] = $leng*20;
+                    if($data[$v][$team] === '0'){
+                        $data[$v][$team] = '';
+                    }
+                }
+            }
+            $field_width[0] = 60;
+            $field_width[1] = 80;
+            $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+    //            1 => '[类型]：说明8 说明16 ',
+    //            2 => '[类型]：说明8 说明16 ',
+            ];
+            //参数
+            $params = [
+                'row' => count($data),          //数据的行数
+                'file_name' =>$code.'.jpg',      //保存的文件名
+                'title' => "数据更新时间 [". date("Y-m-d", strtotime("-1 day")) ."] 商品部-所有年份各品类销售占比",
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'col' => '二级分类',
+                'color'=>16711877,
+                'field' => ['内搭汇总','下装汇总','外套汇总','鞋履汇总'],
+                'banben' => '图片报表编号: '.$code,
+                'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+            ];
+            $this->create_table($params);
+        } else {
+            return false;
+        }
+
+    }
+
     // 0点30分
     public function create_table_s025()
     {

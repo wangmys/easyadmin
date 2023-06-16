@@ -216,6 +216,34 @@ class Duanmalv extends AdminController
             } else {
                 $map8 = "";
             }
+            if (!empty($input['货号'])) {
+                // echo $input['商品负责人'];
+                $map9Str = $this->xmSelectInput($input['货号']);
+                $map9 = " AND 货号 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+            if (!empty($input['风格'])) {
+                // echo $input['商品负责人'];
+                $map10Str = $this->xmSelectInput($input['风格']);
+                $map10 = " AND 风格 IN ({$map10Str})";
+            } else {
+                $map10 = "";
+            }
+            if (!empty($input['是否TOP60'])) {
+                // echo $input['商品负责人'];
+                $map11Str = $this->xmSelectInput($input['是否TOP60']);
+                $map11 = " AND 是否TOP60 IN ({$map11Str})";
+            } else {
+                $map11 = "";
+            }
+            if (!empty($input['是否TOP60考核款'])) {
+                // echo $input['商品负责人'];
+                $map12Str = $this->xmSelectInput($input['是否TOP60考核款']);
+                $map12 = " AND 是否TOP60考核款 IN ({$map12Str})";
+            } else {
+                $map12 = "";
+            }
 
             $sql = "
                 SELECT 
@@ -255,6 +283,10 @@ class Duanmalv extends AdminController
                     {$map6}
                     {$map7}
                     {$map8}
+                    {$map9}
+                    {$map10}
+                    {$map11}
+                    {$map12}
                 ORDER BY 
                     云仓, `商品负责人` desc, 店铺名称, 风格, 季节, 一级分类, 二级分类, 分类, 领型
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -274,6 +306,10 @@ class Duanmalv extends AdminController
                     {$map6}
                     {$map7}
                     {$map8}
+                    {$map9}
+                    {$map10}
+                    {$map11}
+                    {$map12}
             ";
             $count = $this->db_easyA->query($sql2);
 
@@ -477,8 +513,46 @@ class Duanmalv extends AdminController
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
 
-            // $pageParams1 = 0;
-            // $pageParams2 = 100;
+            foreach ($input as $key => $val) {
+                if (empty($val)) {
+                    unset($input[$key]);
+                }
+            }
+            if (!empty($input['大类'])) {
+                // echo $input['商品负责人'];
+                $map6Str = $this->xmSelectInput($input['大类']);
+                $map6 = " AND t4.大类 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+            if (!empty($input['中类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = $this->xmSelectInput($input['中类']);
+                $map7 = " AND t4.中类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+            if (!empty($input['领型'])) {
+                // echo $input['商品负责人'];
+                $map8Str = $this->xmSelectInput($input['领型']);
+                $map8 = " AND t4.领型 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+            if (!empty($input['货号'])) {
+                // echo $input['商品负责人'];
+                $map9Str = $this->xmSelectInput($input['货号']);
+                $map9 = " AND t4.货号 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+            if (!empty($input['风格'])) {
+                // echo $input['商品负责人'];
+                $map10Str = $this->xmSelectInput($input['风格']);
+                $map10 = " AND t4.风格 IN ({$map10Str})";
+            } else {
+                $map10 = "";
+            }
 
             $sql = "
                 SELECT
@@ -611,6 +685,12 @@ class Duanmalv extends AdminController
                     left join cwl_duanmalv_table4 as qh on t4.货号=qh.货号 and qh.省份='青海省'
                 --  where sk.省份='浙江省'
                 --  and sk.货号='B32502003'
+                WHERE 1
+                    {$map6}
+                    {$map7}
+                    {$map8}
+                    {$map9}
+                    {$map10}
                 GROUP BY
                 t4.风格, t4.大类, t4.中类, t4.货号
                 ORDER BY t4.风格
@@ -623,6 +703,12 @@ class Duanmalv extends AdminController
                    SELECT 
                     count(*) as total
                     FROM cwl_duanmalv_table4 AS t4
+                    WHERE 1
+                        {$map6}
+                        {$map7}
+                        {$map8}
+                        {$map9}
+                        {$map10}
                     GROUP BY
                 t4.风格, t4.大类, t4.中类, t4.货号) as t1
             ";
@@ -1334,13 +1420,18 @@ class Duanmalv extends AdminController
         $lingxing = $this->db_easyA->query("
             SELECT 领型 as name, 领型 as value FROM cwl_duanmalv_sk WHERE  领型 IS NOT NULL GROUP BY 领型
         ");
+        $huohao = $this->db_easyA->query("
+        SELECT 货号 as name, 货号 as value FROM cwl_duanmalv_sk WHERE  货号 IS NOT NULL GROUP BY 货号
+    ");
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
         return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer, 'zhonglei' => $zhonglei, 
-        'lingxing' => $lingxing]]);
+        'lingxing' => $lingxing, 'huohao' => $huohao]]);
     }
+
+    // public function 
 
     // 获取每周的周五，周一
     public function duanmalvDateHandle($defaultTime = false) {

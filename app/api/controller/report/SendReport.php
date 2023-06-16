@@ -77,9 +77,11 @@ class SendReport extends BaseController
             $this->service->create_table_s102C();
         } elseif ($name =='S103C') {
             $this->service->create_table_s103C();
-        }  elseif ($name =='S025') {
+        } elseif ($name =='S023') {
+            $this->service->create_table_s023();
+        } elseif ($name =='S025') {
             $this->service->create_table_s025();
-        }  elseif ($name =='S030') {
+        } elseif ($name =='S030') {
             $this->service->create_table_s030();
         } elseif ($name =='S031') {
             $this->service->create_table_s031();
@@ -261,6 +263,10 @@ class SendReport extends BaseController
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
+            'S023' => [
+                'title' => '商品部-所有年份各品类销售占比 表号:S023',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S023.jpg'
+            ],
             'S025' => [
                 'title' => '商品部-各季节销售占比 表号:S025',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S025.jpg'
@@ -285,8 +291,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
                 // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
         }
         return json($res);
@@ -479,6 +485,7 @@ class SendReport extends BaseController
     // 00:45
     public function run4()
     {
+        $this->service->create_table_s023();
         $this->service->create_table_s025();
         $this->service->create_table_s030();
         $this->service->create_table_s031();

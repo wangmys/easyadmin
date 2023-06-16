@@ -306,9 +306,13 @@ class Tableupdate extends BaseController
         // 首单日期
         $select_firstDate = $this->db_sqlsrv->query($sql2);
 
-        $handle = $this->db_easyA->table('customer_first')->where(1)->delete();
+        // $handle = $this->db_easyA->table('customer_first')->where(1)->delete();
+        $this->db_easyA->execute('TRUNCATE customer_first;');
+        $this->db_bi->execute('TRUNCATE customer_regionid;');
+        
         $insert_all = $this->db_easyA->table('customer_first')->insertAll($select_firstDate);
-        if ($insert_all) {
+        $insert_all2 = $this->db_bi->table('customer_regionid')->insertAll($select_firstDate);
+        if ($insert_all || $insert_all2) {
             // $this->db_bi->commit();    
             return json([
                 'status' => 1,
