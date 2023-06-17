@@ -145,7 +145,7 @@ class Duanmalv extends BaseController
             // $this->db_easyA->table('cwl_duanmalv_retail')->where(1)->delete();
             $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -233,7 +233,7 @@ class Duanmalv extends BaseController
                 ['折率', '>=', 0.9]
             ])->delete();
 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
             
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -885,7 +885,7 @@ class Duanmalv extends BaseController
             // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
             $this->db_easyA->execute('TRUNCATE cwl_duanmalv_handle_1;');
 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1070,7 +1070,7 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table6')->where(1)->delete();
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
             $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1113,7 +1113,7 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
@@ -1142,7 +1142,7 @@ class Duanmalv extends BaseController
             ";
             $select2 = $this->db_easyA->query($sql2);
             $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
-            $chunk_list2 = array_chunk($select2, 2000);
+            $chunk_list2 = array_chunk($select2, 500);
             foreach($chunk_list2 as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
@@ -1172,7 +1172,7 @@ class Duanmalv extends BaseController
             ";
             $select3 = $this->db_easyA->query($sql3);
             $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
-            $chunk_list3 = array_chunk($select3, 2000);
+            $chunk_list3 = array_chunk($select3, 500);
             foreach($chunk_list3 as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
@@ -1239,7 +1239,7 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table4')->where(1)->delete();
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table4')->strict(false)->insertAll($val);
@@ -1300,7 +1300,7 @@ class Duanmalv extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table3')->where(1)->delete();
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table3')->strict(false)->insertAll($val);
@@ -1382,7 +1382,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
             // die;
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1431,7 +1431,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1507,7 +1507,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
             // die;
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1549,7 +1549,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1633,7 +1633,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
             // die;
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
@@ -1675,7 +1675,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
                 
-            $chunk_list = array_chunk($select, 2000);
+            $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
