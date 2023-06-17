@@ -1364,6 +1364,7 @@ class Duanmalv extends BaseController
                         LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
                         WHERE 
                                 h0.风格 in ('基本款')
+                                AND h0.店铺总SKC数 > 0
                                 AND f.首单日期 IS NOT NULL
                 -- 	店铺名称='大石二店'
                         GROUP BY
