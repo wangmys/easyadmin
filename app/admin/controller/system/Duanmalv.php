@@ -327,6 +327,109 @@ class Duanmalv extends AdminController
         ]); 
     }
 
+    public function test2() {
+            // 改良平均值
+            $sql3 = "
+            SELECT
+                t1.云仓,
+                t1.商品负责人,
+                '' as `齐码排名-新`,
+                t1.`直营-整体` as `直营-整体-新`,
+                t1.`加盟-整体` as `加盟-整体-新`,
+                t1.`合计-整体` as `合计-整体-新`,
+                t1.`直营-TOP实际` as `直营-TOP实际-新`,        
+                t1.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                t1.`合计-TOP实际` as `合计-TOP实际-新`,
+                t1.`直营-TOP考核` as `直营-TOP考核-新`,
+                t1.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                t1.`合计-TOP考核` as `合计-TOP考核-新`,
+                t1.`更新日期` as `更新日期-新`,
+                t2.*
+                FROM
+                cwl_duanmalv_table1_avg t1,  (				
+                    SELECT
+                        '' as `齐码排名-旧`,
+                        `直营-整体` as `直营-整体-旧`,
+                        `加盟-整体` as `加盟-整体-旧`,
+                        `合计-整体` as `合计-整体-旧`,
+                        `直营-TOP实际` as `直营-TOP实际-旧`,
+                        `加盟-TOP实际` as `加盟-TOP实际-旧`,
+                        `合计-TOP实际` as `合计-TOP实际-旧`,
+                        `直营-TOP考核` as `直营-TOP考核-旧`,
+                        `加盟-TOP考核` as `加盟-TOP考核-旧`,
+                        `合计-TOP考核` as `合计-TOP考核-旧`,
+                        `更新日期` as `更新日期-旧` 
+                    FROM
+                    cwl_duanmalv_table1_avg  
+                    WHERE
+                    `更新日期` ='2023-06-12'
+                ) as t2 
+                WHERE
+                t1.`更新日期` ='2023-06-16'            
+        "; 
+        
+        $select2 = $this->db_easyA->query($sql3);
+        foreach ($select2 as $key => $val) {
+            if (! empty($val['直营-整体-新'])) {
+                $select2[$key]['直营-整体-新'] = $this->float1($val['直营-整体-新']);
+            }
+            if (! empty($val['加盟-整体-新'])) {
+                $select2[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']);
+            }
+            if (! empty($val['合计-整体-新'])) {
+                $select2[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']);
+            }
+            if (! empty($val['直营-TOP实际-新'])) {
+                $select2[$key]['直营-TOP实际-新'] = $this->float1($val['直营-TOP实际-新']);
+            }
+            if (! empty($val['加盟-TOP实际-新'])) {
+                $select2[$key]['加盟-TOP实际-新'] = $this->float1($val['加盟-TOP实际-新']);
+            }
+            if (! empty($val['合计-TOP实际-新'])) {
+                $select2[$key]['合计-TOP实际-新'] = $this->float1($val['合计-TOP实际-新']);
+            }
+            if (! empty($val['直营-TOP考核-新'])) {
+                $select2[$key]['直营-TOP考核-新'] = $this->float1($val['直营-TOP考核-新']);
+            }
+            if (! empty($val['加盟-TOP考核-新'])) {
+                $select2[$key]['加盟-TOP考核-新'] = $this->float1($val['加盟-TOP考核-新']);
+            }
+            if (! empty($val['合计-TOP考核-新'])) {
+                $select2[$key]['合计-TOP考核-新'] = $this->float1($val['合计-TOP考核-新']);
+            }
+
+            if (! empty($val['直营-整体-旧'])) {
+                $select2[$key]['直营-整体-旧'] = $this->float1($val['直营-整体-旧']);
+            }
+            if (! empty($val['加盟-整体-旧'])) {
+                $select2[$key]['加盟-整体-旧'] = $this->float1($val['加盟-整体-旧']);
+            }
+            if (! empty($val['合计-整体-旧'])) {
+                $select2[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']);
+            }
+            if (! empty($val['直营-TOP实际-旧'])) {
+                $select2[$key]['直营-TOP实际-旧'] = $this->float1($val['直营-TOP实际-旧']);
+            }
+            if (! empty($val['加盟-TOP实际-旧'])) {
+                $select2[$key]['加盟-TOP实际-旧'] = $this->float1($val['加盟-TOP实际-旧']);
+            }
+            if (! empty($val['合计-TOP实际-旧'])) {
+                $select2[$key]['合计-TOP实际-旧'] = $this->float1($val['合计-TOP实际-旧']);
+            }
+            if (! empty($val['直营-TOP考核-旧'])) {
+                $select2[$key]['直营-TOP考核-旧'] = $this->float1($val['直营-TOP考核-旧']);
+            }
+            if (! empty($val['加盟-TOP考核-旧'])) {
+                $select2[$key]['加盟-TOP考核-旧'] = $this->float1($val['加盟-TOP考核-旧']);
+            }
+            if (! empty($val['合计-TOP考核-旧'])) {
+                $select2[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']);
+            }
+        }
+        echo '<pre>';
+        print_r($select2);
+    }
+
     // 下载单店断码明细
     public function excel_sk() {
         $sql = "
@@ -1048,26 +1151,26 @@ class Duanmalv extends AdminController
                     '合计' as 云仓,
                     '' as 商品负责人,
                     '' as `齐码排名-新`,
-                    round(AVG(t0.`直营-整体-新`), 4) as `直营-整体-新`,
-                    round(AVG(t0.`加盟-整体-新`), 4) as `加盟-整体-新`,
-                    round(AVG(t0.`合计-整体-新`), 4) as `合计-整体-新`,
-                    round(AVG(t0.`直营-TOP实际-新`), 4) as `直营-TOP实际-新`,
-                    round(AVG(t0.`加盟-TOP实际-新`), 4) as `加盟-TOP实际-新`,
-                    round(AVG(t0.`合计-TOP实际-新`), 4) as `合计-TOP实际-新`,
-                    round(AVG(t0.`直营-TOP考核-新`), 4) as `直营-TOP考核-新`,
-                    round(AVG(t0.`加盟-TOP考核-新`), 4) as `加盟-TOP考核-新`,
-                    round(AVG(t0.`合计-TOP考核-新`), 4) as `合计-TOP考核-新`,
+                    AVG(t0.`直营-整体-新`) as `直营-整体-新`,
+                    AVG(t0.`加盟-整体-新`) as `加盟-整体-新`,
+                    AVG(t0.`合计-整体-新`) as `合计-整体-新`,
+                    AVG(t0.`直营-TOP实际-新`) as `直营-TOP实际-新`,
+                    AVG(t0.`加盟-TOP实际-新`) as `加盟-TOP实际-新`,
+                    AVG(t0.`合计-TOP实际-新`) as `合计-TOP实际-新`,
+                    AVG(t0.`直营-TOP考核-新`) as `直营-TOP考核-新`,
+                    AVG(t0.`加盟-TOP考核-新`) as `加盟-TOP考核-新`,
+                    AVG(t0.`合计-TOP考核-新`) as `合计-TOP考核-新`,
                     '' as `更新日期-新`,
                     '' as `齐码排名-旧`,
-                    round(AVG(t0.`直营-整体-旧`), 4) as `直营-整体-旧`,
-                    round(AVG(t0.`加盟-整体-旧`), 4) as `加盟-整体-旧`,
-                    round(AVG(t0.`合计-整体-旧`), 4) as `合计-整体-旧`,
-                    round(AVG(t0.`直营-TOP实际-旧`), 4) as `直营-TOP实际-旧`,
-                    round(AVG(t0.`加盟-TOP实际-旧`), 4) as `加盟-TOP实际-旧`,
-                    round(AVG(t0.`合计-TOP实际-旧`), 4) as `合计-TOP实际-旧`,
-                    round(AVG(t0.`直营-TOP考核-旧`), 4) as `直营-TOP考核-旧`,
-                    round(AVG(t0.`加盟-TOP考核-旧`), 4) as `加盟-TOP考核-旧`,
-                    round(AVG(t0.`合计-TOP考核-旧`), 4) as `合计-TOP考核-旧`,
+                    AVG(t0.`直营-整体-旧`) as `直营-整体-旧`,
+                    AVG(t0.`加盟-整体-旧`) as `加盟-整体-旧`,
+                    AVG(t0.`合计-整体-旧`) as `合计-整体-旧`,
+                    AVG(t0.`直营-TOP实际-旧`) as `直营-TOP实际-旧`,
+                    AVG(t0.`加盟-TOP实际-旧`) as `加盟-TOP实际-旧`,
+                    AVG(t0.`合计-TOP实际-旧`) as `合计-TOP实际-旧`,
+                    AVG(t0.`直营-TOP考核-旧`) as `直营-TOP考核-旧`,
+                    AVG(t0.`加盟-TOP考核-旧`) as `加盟-TOP考核-旧`,
+                    AVG(t0.`合计-TOP考核-旧`) as `合计-TOP考核-旧`,
                     '' as `更新日期-旧`,
                     '' as `差值`
                 FROM
@@ -1105,77 +1208,214 @@ class Duanmalv extends AdminController
                     t1.云仓, t1.商品负责人
                     ORDER BY  t2.`齐码排名` ASC) AS t0        
             ";
-            $select2 = $this->db_easyA->query($sql2);
+
+            // 改良平均值
+            $sql3 = "
+                SELECT
+                    t1.云仓,
+                    t1.商品负责人,
+                    '' as `齐码排名-新`,
+                    t1.`直营-整体` as `直营-整体-新`,
+                    t1.`加盟-整体` as `加盟-整体-新`,
+                    t1.`合计-整体` as `合计-整体-新`,
+                    t1.`直营-TOP实际` as `直营-TOP实际-新`,        
+                    t1.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                    t1.`合计-TOP实际` as `合计-TOP实际-新`,
+                    t1.`直营-TOP考核` as `直营-TOP考核-新`,
+                    t1.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                    t1.`合计-TOP考核` as `合计-TOP考核-新`,
+                    t1.`更新日期` as `更新日期-新`,
+                    t2.*
+                    FROM
+                    cwl_duanmalv_table1_avg t1,  (				
+                        SELECT
+                            '' as `齐码排名-旧`,
+                            `直营-整体` as `直营-整体-旧`,
+                            `加盟-整体` as `加盟-整体-旧`,
+                            `合计-整体` as `合计-整体-旧`,
+                            `直营-TOP实际` as `直营-TOP实际-旧`,
+                            `加盟-TOP实际` as `加盟-TOP实际-旧`,
+                            `合计-TOP实际` as `合计-TOP实际-旧`,
+                            `直营-TOP考核` as `直营-TOP考核-旧`,
+                            `加盟-TOP考核` as `加盟-TOP考核-旧`,
+                            `合计-TOP考核` as `合计-TOP考核-旧`,
+                            `更新日期` as `更新日期-旧` 
+                        FROM
+                        cwl_duanmalv_table1_avg  
+                        WHERE
+                        `更新日期` ='{$limitDate["oldDate"]}'
+                    ) as t2 
+                    WHERE
+                    t1.`更新日期` ='{$limitDate["newDate"]}'            
+            "; 
+            
+            $select2 = $this->db_easyA->query($sql3);
+            
 
             // 差值计算
             foreach ($select as $key => $val) {
                 if (! empty($val['合计-TOP考核-新']) && !empty($val['合计-TOP考核-旧'])) {
                     $select[$key]['差值'] = round($val['合计-TOP考核-新'] - $val['合计-TOP考核-旧'], 4);
                     if ($select[$key]['差值'] < 0 ) {
-                        $select[$key]['差值'] = "<div style='color:red; font-weight:bold;'>{$select[$key]['差值']}</div>";
+                        $select[$key]['差值'] = "<div style='color:red; font-weight:bold;'>" . $this->float1($select[$key]['差值']) . "</div>";
+                    } else {
+                        $select[$key]['差值'] = $this->float1($select[$key]['差值']);
                     }
                 } else {
                     $select[$key]['差值'] = '';
                 }
             }
 
-
             // 判断是否小于平均值
             foreach ($select as $key => $val) {
-                if ($val['直营-整体-新'] < $select2[0]['直营-整体-新']) {
-                    $select[$key]['直营-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-整体-新']}</div>";
+                if (!empty($val['直营-整体-新']) && $val['直营-整体-新'] < $select2[0]['直营-整体-新']) {
+                    $select[$key]['直营-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-整体-新']) . "</div>";
+                } else {
+                    $val['直营-整体-新'] ? $select[$key]['直营-整体-新'] = $this->float1($val['直营-整体-新']) :  $select[$key]['直营-整体-新'] = "";
                 }
-                if ($val['加盟-整体-新'] < $select2[0]['加盟-整体-新']) {
-                    $select[$key]['加盟-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-整体-新']}</div>";
+                if (!empty($val['加盟-整体-新']) && $val['加盟-整体-新'] < $select2[0]['加盟-整体-新']) {
+                    $select[$key]['加盟-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-整体-新']) . "</div>";
+                } else {
+                    $val['加盟-整体-新'] ? $select[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']) : $select[$key]['加盟-整体-新'] = "";
                 }
-                if ($val['合计-整体-新'] < $select2[0]['合计-整体-新']) {
-                    $select[$key]['合计-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-整体-新']}</div>";
+                if (!empty($val['合计-整体-新']) && $val['合计-整体-新'] < $select2[0]['合计-整体-新']) {
+                    $select[$key]['合计-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-新']) . "</div>";
+                } else {
+                    $val['合计-整体-新'] ? $select[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']) : $select[$key]['合计-整体-新'] = "";
                 }
-                if ($val['直营-TOP实际-新'] < $select2[0]['直营-TOP实际-新']) {
-                    $select[$key]['直营-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP实际-新']}</div>";
+                if (!empty($val['直营-TOP实际-新']) && $val['直营-TOP实际-新'] < $select2[0]['直营-TOP实际-新']) {
+                    $select[$key]['直营-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-新']) . "</div>";
+                } else {
+                    $val['直营-TOP实际-新'] ? $select[$key]['直营-TOP实际-新'] = $this->float1($val['直营-TOP实际-新']) : $select[$key]['直营-TOP实际-新'] = "";
                 }
-                if ($val['加盟-TOP实际-新'] < $select2[0]['加盟-TOP实际-新']) {
-                    $select[$key]['加盟-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP实际-新']}</div>";
+                if (!empty($val['加盟-TOP实际-新']) && $val['加盟-TOP实际-新'] < $select2[0]['加盟-TOP实际-新']) {
+                    $select[$key]['加盟-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP实际-新']) . "</div>";
+                } else {
+                    $val['加盟-TOP实际-新'] ? $select[$key]['加盟-TOP实际-新'] = $this->float1($val['加盟-TOP实际-新']) : $select[$key]['加盟-TOP实际-新'] = '';
                 }
-                if ($val['合计-TOP实际-新'] < $select2[0]['合计-TOP实际-新']) {
-                    $select[$key]['合计-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP实际-新']}</div>";
+                if (!empty($val['合计-TOP实际-新']) && $val['合计-TOP实际-新'] < $select2[0]['合计-TOP实际-新']) {
+                    $select[$key]['合计-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP实际-新']) . "</div>";
+                } else {
+                    $val['合计-TOP实际-新'] ? $select[$key]['合计-TOP实际-新'] = $this->float1($val['合计-TOP实际-新']) : $select[$key]['合计-TOP实际-新'] = "";
                 }
-                if ($val['直营-TOP考核-新'] < $select2[0]['直营-TOP考核-新']) {
-                    $select[$key]['直营-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP考核-新']}</div>";
+                if (!empty($val['直营-TOP考核-新']) && $val['直营-TOP考核-新'] < $select2[0]['直营-TOP考核-新']) {
+                    $select[$key]['直营-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP考核-新']) . "</div>";
+                } else {
+                    $val['直营-TOP考核-新'] ? $select[$key]['直营-TOP考核-新'] = $this->float1($val['直营-TOP考核-新']) : $select[$key]['直营-TOP考核-新'] = "";
                 }
-                if ($val['加盟-TOP考核-新'] < $select2[0]['加盟-TOP考核-新']) {
-                    $select[$key]['加盟-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP考核-新']}</div>";
+                if (!empty($val['加盟-TOP考核-新']) && $val['加盟-TOP考核-新'] < $select2[0]['加盟-TOP考核-新']) {
+                    $select[$key]['加盟-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP考核-新']) . "</div>";
+                } else {
+                    $val['加盟-TOP考核-新'] ? $select[$key]['加盟-TOP考核-新'] = $this->float1($val['加盟-TOP考核-新']) : $select[$key]['加盟-TOP考核-新'] = "";
                 }
-                if ($val['合计-TOP考核-新'] < $select2[0]['合计-TOP考核-新']) {
-                    $select[$key]['合计-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP考核-新']}</div>";
+                if (!empty($val['合计-TOP考核-新']) && $val['合计-TOP考核-新'] < $select2[0]['合计-TOP考核-新']) {
+                    $select[$key]['合计-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP考核-新']) . "</div>";
+                } else {
+                    $val['合计-TOP考核-新'] ? $select[$key]['合计-TOP考核-新'] = $this->float1($val['合计-TOP考核-新']) : $select[$key]['合计-TOP考核-新'] = "";
                 }
-                
-                if ($val['直营-整体-旧'] < $select2[0]['直营-整体-旧']) {
-                    $select[$key]['直营-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-整体-旧']}</div>";
+
+                if (!empty($val['直营-整体-旧']) && $val['直营-整体-旧'] < $select2[0]['直营-整体-旧']) {
+                    $select[$key]['直营-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-整体-旧']) . "</div>";
+                } else {
+                    $val['直营-整体-旧'] ? $select[$key]['直营-整体-旧'] = $this->float1($val['直营-整体-旧']) :  $select[$key]['直营-整体-旧'] = "";
                 }
-                if ($val['加盟-整体-旧'] < $select2[0]['加盟-整体-旧']) {
-                    $select[$key]['加盟-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-整体-旧']}</div>";
+                if (!empty($val['加盟-整体-旧']) && $val['加盟-整体-旧'] < $select2[0]['加盟-整体-旧']) {
+                    $select[$key]['加盟-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-整体-旧']) . "</div>";
+                } else {
+                    $val['加盟-整体-旧'] ? $select[$key]['加盟-整体-旧'] = $this->float1($val['加盟-整体-旧']) : $select[$key]['加盟-整体-旧'] = "";
                 }
-                if ($val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
-                    $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-整体-旧']}</div>";
+                if (!empty($val['合计-整体-旧']) && $val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
+                    $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-旧']) . "</div>";
+                } else {
+                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-新'] = "";
                 }
-                if ($val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
-                    $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP实际-旧']}</div>";
+                if (!empty($val['直营-TOP实际-旧']) && $val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
+                    $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['直营-TOP实际-旧'] ? $select[$key]['直营-TOP实际-旧'] = $this->float1($val['直营-TOP实际-旧']) : $select[$key]['直营-TOP实际-旧'] = "";
                 }
-                if ($val['加盟-TOP实际-旧'] < $select2[0]['加盟-TOP实际-旧']) {
-                    $select[$key]['加盟-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP实际-旧']}</div>";
+                if (!empty($val['加盟-TOP实际-旧']) && $val['加盟-TOP实际-旧'] < $select2[0]['加盟-TOP实际-旧']) {
+                    $select[$key]['加盟-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['加盟-TOP实际-旧'] ? $select[$key]['加盟-TOP实际-旧'] = $this->float1($val['加盟-TOP实际-旧']) : $select[$key]['加盟-TOP实际-旧'] = '';
                 }
-                if ($val['合计-TOP实际-旧'] < $select2[0]['合计-TOP实际-旧']) {
-                    $select[$key]['合计-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP实际-旧']}</div>";
+                if (!empty($val['合计-TOP实际-旧']) && $val['合计-TOP实际-旧'] < $select2[0]['合计-TOP实际-旧']) {
+                    $select[$key]['合计-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['合计-TOP实际-旧'] ? $select[$key]['合计-TOP实际-旧'] = $this->float1($val['合计-TOP实际-旧']) : $select[$key]['合计-TOP实际-旧'] = "";
                 }
-                if ($val['直营-TOP考核-旧'] < $select2[0]['直营-TOP考核-旧']) {
-                    $select[$key]['直营-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP考核-旧']}</div>";
+                if (!empty($val['直营-TOP考核-旧']) && $val['直营-TOP考核-旧'] < $select2[0]['直营-TOP考核-旧']) {
+                    $select[$key]['直营-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['直营-TOP考核-旧'] ? $select[$key]['直营-TOP考核-旧'] = $this->float1($val['直营-TOP考核-旧']) : $select[$key]['直营-TOP考核-旧'] = "";
                 }
-                if ($val['加盟-TOP考核-旧'] < $select2[0]['加盟-TOP考核-旧']) {
-                    $select[$key]['加盟-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP考核-旧']}</div>";
+                if (!empty($val['加盟-TOP考核-旧']) && $val['加盟-TOP考核-旧'] < $select2[0]['加盟-TOP考核-旧']) {
+                    $select[$key]['加盟-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['加盟-TOP考核-旧'] ? $select[$key]['加盟-TOP考核-旧'] = $this->float1($val['加盟-TOP考核-旧']) : $select[$key]['加盟-TOP考核-旧'] = "";
                 }
-                if ($val['合计-TOP考核-旧'] < $select2[0]['合计-TOP考核-旧']) {
-                    $select[$key]['合计-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP考核-旧']}</div>";
+                if (!empty($val['合计-TOP考核-旧']) && $val['合计-TOP考核-旧'] < $select2[0]['合计-TOP考核-旧']) {
+                    $select[$key]['合计-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['合计-TOP考核-旧'] ? $select[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']) : $select[$key]['合计-TOP考核-旧'] = "";
+                }                
+            }
+
+            foreach ($select2 as $key => $val) {
+                if (! empty($val['直营-整体-新'])) {
+                    $select2[$key]['直营-整体-新'] = $this->float1($val['直营-整体-新']);
+                }
+                if (! empty($val['加盟-整体-新'])) {
+                    $select2[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']);
+                }
+                if (! empty($val['合计-整体-新'])) {
+                    $select2[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']);
+                }
+                if (! empty($val['直营-TOP实际-新'])) {
+                    $select2[$key]['直营-TOP实际-新'] = $this->float1($val['直营-TOP实际-新']);
+                }
+                if (! empty($val['加盟-TOP实际-新'])) {
+                    $select2[$key]['加盟-TOP实际-新'] = $this->float1($val['加盟-TOP实际-新']);
+                }
+                if (! empty($val['合计-TOP实际-新'])) {
+                    $select2[$key]['合计-TOP实际-新'] = $this->float1($val['合计-TOP实际-新']);
+                }
+                if (! empty($val['直营-TOP考核-新'])) {
+                    $select2[$key]['直营-TOP考核-新'] = $this->float1($val['直营-TOP考核-新']);
+                }
+                if (! empty($val['加盟-TOP考核-新'])) {
+                    $select2[$key]['加盟-TOP考核-新'] = $this->float1($val['加盟-TOP考核-新']);
+                }
+                if (! empty($val['合计-TOP考核-新'])) {
+                    $select2[$key]['合计-TOP考核-新'] = $this->float1($val['合计-TOP考核-新']);
+                }
+    
+                if (! empty($val['直营-整体-旧'])) {
+                    $select2[$key]['直营-整体-旧'] = $this->float1($val['直营-整体-旧']);
+                }
+                if (! empty($val['加盟-整体-旧'])) {
+                    $select2[$key]['加盟-整体-旧'] = $this->float1($val['加盟-整体-旧']);
+                }
+                if (! empty($val['合计-整体-旧'])) {
+                    $select2[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']);
+                }
+                if (! empty($val['直营-TOP实际-旧'])) {
+                    $select2[$key]['直营-TOP实际-旧'] = $this->float1($val['直营-TOP实际-旧']);
+                }
+                if (! empty($val['加盟-TOP实际-旧'])) {
+                    $select2[$key]['加盟-TOP实际-旧'] = $this->float1($val['加盟-TOP实际-旧']);
+                }
+                if (! empty($val['合计-TOP实际-旧'])) {
+                    $select2[$key]['合计-TOP实际-旧'] = $this->float1($val['合计-TOP实际-旧']);
+                }
+                if (! empty($val['直营-TOP考核-旧'])) {
+                    $select2[$key]['直营-TOP考核-旧'] = $this->float1($val['直营-TOP考核-旧']);
+                }
+                if (! empty($val['加盟-TOP考核-旧'])) {
+                    $select2[$key]['加盟-TOP考核-旧'] = $this->float1($val['加盟-TOP考核-旧']);
+                }
+                if (! empty($val['合计-TOP考核-旧'])) {
+                    $select2[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']);
                 }
             }
 
@@ -1192,6 +1432,14 @@ class Duanmalv extends AdminController
                 'limitDate' => $limitDate
             ]);
         }  
+    }
+
+
+    // 保留1位小数不进位
+    public function float1($num = 0) {
+        // $num = 12.86;
+        $num *= 100;
+        return sprintf("%.1f",substr(sprintf("%.2f", $num), 0, -1)) . "%";
     }
 
     // 整体 1_3
@@ -1258,25 +1506,25 @@ class Duanmalv extends AdminController
                     '' as 商品负责人,
                     '' as `齐码排名-新`,
 
-                    round(AVG(t0.`直营-整体-新`), 4) as `直营-整体-新`,
-                    round(AVG(t0.`加盟-整体-新`), 4) as `加盟-整体-新`,
-                    round(AVG(t0.`合计-整体-新`), 4) as `合计-整体-新`,
-                    round(AVG(t0.`直营-TOP实际-新`), 4) as `直营-TOP实际-新`,
-                    round(AVG(t0.`加盟-TOP实际-新`), 4) as `加盟-TOP实际-新`,
-                    round(AVG(t0.`合计-TOP实际-新`), 4) as `合计-TOP实际-新`,
-                    round(AVG(t0.`直营-TOP考核-新`), 4) as `直营-TOP考核-新`,
-                    round(AVG(t0.`加盟-TOP考核-新`), 4) as `加盟-TOP考核-新`,
-                    round(AVG(t0.`合计-TOP考核-新`), 4) as `合计-TOP考核-新`,
+                    AVG(t0.`直营-整体-新`) as `直营-整体-新`,
+                    AVG(t0.`加盟-整体-新`) as `加盟-整体-新`,
+                    AVG(t0.`合计-整体-新`) as `合计-整体-新`,
+                    AVG(t0.`直营-TOP实际-新`) as `直营-TOP实际-新`,
+                    AVG(t0.`加盟-TOP实际-新`) as `加盟-TOP实际-新`,
+                    AVG(t0.`合计-TOP实际-新`) as `合计-TOP实际-新`,
+                    AVG(t0.`直营-TOP考核-新`) as `直营-TOP考核-新`,
+                    AVG(t0.`加盟-TOP考核-新`) as `加盟-TOP考核-新`,
+                    AVG(t0.`合计-TOP考核-新`) as `合计-TOP考核-新`,
                     '' as `更新日期-新`,
-                    round(AVG(t0.`直营-整体-旧`), 4) as `直营-整体-旧`,
-                    round(AVG(t0.`加盟-整体-旧`), 4) as `加盟-整体-旧`,
-                    round(AVG(t0.`合计-整体-旧`), 4) as `合计-整体-旧`,
-                    round(AVG(t0.`直营-TOP实际-旧`), 4) as `直营-TOP实际-旧`,
-                    round(AVG(t0.`加盟-TOP实际-旧`), 4) as `加盟-TOP实际-旧`,
-                    round(AVG(t0.`合计-TOP实际-旧`), 4) as `合计-TOP实际-旧`,
-                    round(AVG(t0.`直营-TOP考核-旧`), 4) as `直营-TOP考核-旧`,
-                    round(AVG(t0.`加盟-TOP考核-旧`), 4) as `加盟-TOP考核-旧`,
-                    round(AVG(t0.`合计-TOP考核-旧`), 4) as `合计-TOP考核-旧`,
+                    AVG(t0.`直营-整体-旧`) as `直营-整体-旧`,
+                    AVG(t0.`加盟-整体-旧`) as `加盟-整体-旧`,
+                    AVG(t0.`合计-整体-旧`) as `合计-整体-旧`,
+                    AVG(t0.`直营-TOP实际-旧`) as `直营-TOP实际-旧`,
+                    AVG(t0.`加盟-TOP实际-旧`) as `加盟-TOP实际-旧`,
+                    AVG(t0.`合计-TOP实际-旧`) as `合计-TOP实际-旧`,
+                    AVG(t0.`直营-TOP考核-旧`) as `直营-TOP考核-旧`,
+                    AVG(t0.`加盟-TOP考核-旧`) as `加盟-TOP考核-旧`,
+                    AVG(t0.`合计-TOP考核-旧`) as `合计-TOP考核-旧`,
                     '' as `更新日期-旧`
             FROM
             (SELECT
@@ -1315,14 +1563,57 @@ class Duanmalv extends AdminController
             ";
             $select = $this->db_easyA->query($sql);
 
-            $select2 = $this->db_easyA->query($sql2);
+
+            // 改良平均值
+            $sql3 = "
+            SELECT
+                t1.云仓,
+                t1.商品负责人,
+                '' as `齐码排名-新`,
+                t1.`直营-整体` as `直营-整体-新`,
+                t1.`加盟-整体` as `加盟-整体-新`,
+                t1.`合计-整体` as `合计-整体-新`,
+                t1.`直营-TOP实际` as `直营-TOP实际-新`,        
+                t1.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                t1.`合计-TOP实际` as `合计-TOP实际-新`,
+                t1.`直营-TOP考核` as `直营-TOP考核-新`,
+                t1.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                t1.`合计-TOP考核` as `合计-TOP考核-新`,
+                t1.`更新日期` as `更新日期-新`,
+                t2.*
+                FROM
+                cwl_duanmalv_table1_avg t1,  (				
+                    SELECT
+                        '' as `齐码排名-旧`,
+                        `直营-整体` as `直营-整体-旧`,
+                        `加盟-整体` as `加盟-整体-旧`,
+                        `合计-整体` as `合计-整体-旧`,
+                        `直营-TOP实际` as `直营-TOP实际-旧`,
+                        `加盟-TOP实际` as `加盟-TOP实际-旧`,
+                        `合计-TOP实际` as `合计-TOP实际-旧`,
+                        `直营-TOP考核` as `直营-TOP考核-旧`,
+                        `加盟-TOP考核` as `加盟-TOP考核-旧`,
+                        `合计-TOP考核` as `合计-TOP考核-旧`,
+                        `更新日期` as `更新日期-旧` 
+                    FROM
+                    cwl_duanmalv_table1_avg  
+                    WHERE
+                    `更新日期` ='{$limitDate["oldDate"]}'
+                ) as t2 
+                WHERE
+                t1.`更新日期` ='{$limitDate["newDate"]}'            
+            "; 
+
+            $select2 = $this->db_easyA->query($sql3);
 
             // 差值计算
             foreach ($select as $key => $val) {
                 if (! empty($val['合计-TOP考核-新']) && !empty($val['合计-TOP考核-旧'])) {
                     $select[$key]['差值'] = round($val['合计-TOP考核-新'] - $val['合计-TOP考核-旧'], 4);
                     if ($select[$key]['差值'] < 0 ) {
-                        $select[$key]['差值'] = "<div style='color:red; font-weight:bold;'>{$select[$key]['差值']}</div>";
+                        $select[$key]['差值'] = "<div style='color:red; font-weight:bold;'>" . $this->float1($select[$key]['差值']) . "</div>";
+                    } else {
+                        $select[$key]['差值'] = $this->float1($select[$key]['差值']);
                     }
                 } else {
                     $select[$key]['差值'] = '';
@@ -1331,60 +1622,154 @@ class Duanmalv extends AdminController
 
             // 判断是否小于平均值
             foreach ($select as $key => $val) {
-                if ($val['直营-整体-新'] < $select2[0]['直营-整体-新']) {
-                    $select[$key]['直营-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-整体-新']}</div>";
+                if (!empty($val['直营-整体-新']) && $val['直营-整体-新'] < $select2[0]['直营-整体-新']) {
+                    $select[$key]['直营-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-整体-新']) . "</div>";
+                } else {
+                    $val['直营-整体-新'] ? $select[$key]['直营-整体-新'] = $this->float1($val['直营-整体-新']) :  $select[$key]['直营-整体-新'] = "";
                 }
-                if ($val['加盟-整体-新'] < $select2[0]['加盟-整体-新']) {
-                    $select[$key]['加盟-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-整体-新']}</div>";
+                if (!empty($val['加盟-整体-新']) && $val['加盟-整体-新'] < $select2[0]['加盟-整体-新']) {
+                    $select[$key]['加盟-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-整体-新']) . "</div>";
+                } else {
+                    $val['加盟-整体-新'] ? $select[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']) : $select[$key]['加盟-整体-新'] = "";
                 }
-                if ($val['合计-整体-新'] < $select2[0]['合计-整体-新']) {
-                    $select[$key]['合计-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-整体-新']}</div>";
+                if (!empty($val['合计-整体-新']) && $val['合计-整体-新'] < $select2[0]['合计-整体-新']) {
+                    $select[$key]['合计-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-新']) . "</div>";
+                } else {
+                    $val['合计-整体-新'] ? $select[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']) : $select[$key]['合计-整体-新'] = "";
                 }
-                if ($val['直营-TOP实际-新'] < $select2[0]['直营-TOP实际-新']) {
-                    $select[$key]['直营-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP实际-新']}</div>";
+                if (!empty($val['直营-TOP实际-新']) && $val['直营-TOP实际-新'] < $select2[0]['直营-TOP实际-新']) {
+                    $select[$key]['直营-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-新']) . "</div>";
+                } else {
+                    $val['直营-TOP实际-新'] ? $select[$key]['直营-TOP实际-新'] = $this->float1($val['直营-TOP实际-新']) : $select[$key]['直营-TOP实际-新'] = "";
                 }
-                if ($val['加盟-TOP实际-新'] < $select2[0]['加盟-TOP实际-新']) {
-                    $select[$key]['加盟-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP实际-新']}</div>";
+                if (!empty($val['加盟-TOP实际-新']) && $val['加盟-TOP实际-新'] < $select2[0]['加盟-TOP实际-新']) {
+                    $select[$key]['加盟-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP实际-新']) . "</div>";
+                } else {
+                    $val['加盟-TOP实际-新'] ? $select[$key]['加盟-TOP实际-新'] = $this->float1($val['加盟-TOP实际-新']) : $select[$key]['加盟-TOP实际-新'] = '';
                 }
-                if ($val['合计-TOP实际-新'] < $select2[0]['合计-TOP实际-新']) {
-                    $select[$key]['合计-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP实际-新']}</div>";
+                if (!empty($val['合计-TOP实际-新']) && $val['合计-TOP实际-新'] < $select2[0]['合计-TOP实际-新']) {
+                    $select[$key]['合计-TOP实际-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP实际-新']) . "</div>";
+                } else {
+                    $val['合计-TOP实际-新'] ? $select[$key]['合计-TOP实际-新'] = $this->float1($val['合计-TOP实际-新']) : $select[$key]['合计-TOP实际-新'] = "";
                 }
-                if ($val['直营-TOP考核-新'] < $select2[0]['直营-TOP考核-新']) {
-                    $select[$key]['直营-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP考核-新']}</div>";
+                if (!empty($val['直营-TOP考核-新']) && $val['直营-TOP考核-新'] < $select2[0]['直营-TOP考核-新']) {
+                    $select[$key]['直营-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP考核-新']) . "</div>";
+                } else {
+                    $val['直营-TOP考核-新'] ? $select[$key]['直营-TOP考核-新'] = $this->float1($val['直营-TOP考核-新']) : $select[$key]['直营-TOP考核-新'] = "";
                 }
-                if ($val['加盟-TOP考核-新'] < $select2[0]['加盟-TOP考核-新']) {
-                    $select[$key]['加盟-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP考核-新']}</div>";
+                if (!empty($val['加盟-TOP考核-新']) && $val['加盟-TOP考核-新'] < $select2[0]['加盟-TOP考核-新']) {
+                    $select[$key]['加盟-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP考核-新']) . "</div>";
+                } else {
+                    $val['加盟-TOP考核-新'] ? $select[$key]['加盟-TOP考核-新'] = $this->float1($val['加盟-TOP考核-新']) : $select[$key]['加盟-TOP考核-新'] = "";
                 }
-                if ($val['合计-TOP考核-新'] < $select2[0]['合计-TOP考核-新']) {
-                    $select[$key]['合计-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP考核-新']}</div>";
+                if (!empty($val['合计-TOP考核-新']) && $val['合计-TOP考核-新'] < $select2[0]['合计-TOP考核-新']) {
+                    $select[$key]['合计-TOP考核-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP考核-新']) . "</div>";
+                } else {
+                    $val['合计-TOP考核-新'] ? $select[$key]['合计-TOP考核-新'] = $this->float1($val['合计-TOP考核-新']) : $select[$key]['合计-TOP考核-新'] = "";
                 }
-                
-                if ($val['直营-整体-旧'] < $select2[0]['直营-整体-旧']) {
-                    $select[$key]['直营-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-整体-旧']}</div>";
+
+                if (!empty($val['直营-整体-旧']) && $val['直营-整体-旧'] < $select2[0]['直营-整体-旧']) {
+                    $select[$key]['直营-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-整体-旧']) . "</div>";
+                } else {
+                    $val['直营-整体-旧'] ? $select[$key]['直营-整体-旧'] = $this->float1($val['直营-整体-旧']) :  $select[$key]['直营-整体-旧'] = "";
                 }
-                if ($val['加盟-整体-旧'] < $select2[0]['加盟-整体-旧']) {
-                    $select[$key]['加盟-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-整体-旧']}</div>";
+                if (!empty($val['加盟-整体-旧']) && $val['加盟-整体-旧'] < $select2[0]['加盟-整体-旧']) {
+                    $select[$key]['加盟-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-整体-旧']) . "</div>";
+                } else {
+                    $val['加盟-整体-旧'] ? $select[$key]['加盟-整体-旧'] = $this->float1($val['加盟-整体-旧']) : $select[$key]['加盟-整体-旧'] = "";
                 }
-                if ($val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
-                    $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-整体-旧']}</div>";
+                if (!empty($val['合计-整体-旧']) && $val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
+                    $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-旧']) . "</div>";
+                } else {
+                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-新'] = "";
                 }
-                if ($val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
-                    $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP实际-旧']}</div>";
+                if (!empty($val['直营-TOP实际-旧']) && $val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
+                    $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['直营-TOP实际-旧'] ? $select[$key]['直营-TOP实际-旧'] = $this->float1($val['直营-TOP实际-旧']) : $select[$key]['直营-TOP实际-旧'] = "";
                 }
-                if ($val['加盟-TOP实际-旧'] < $select2[0]['加盟-TOP实际-旧']) {
-                    $select[$key]['加盟-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP实际-旧']}</div>";
+                if (!empty($val['加盟-TOP实际-旧']) && $val['加盟-TOP实际-旧'] < $select2[0]['加盟-TOP实际-旧']) {
+                    $select[$key]['加盟-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['加盟-TOP实际-旧'] ? $select[$key]['加盟-TOP实际-旧'] = $this->float1($val['加盟-TOP实际-旧']) : $select[$key]['加盟-TOP实际-旧'] = '';
                 }
-                if ($val['合计-TOP实际-旧'] < $select2[0]['合计-TOP实际-旧']) {
-                    $select[$key]['合计-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP实际-旧']}</div>";
+                if (!empty($val['合计-TOP实际-旧']) && $val['合计-TOP实际-旧'] < $select2[0]['合计-TOP实际-旧']) {
+                    $select[$key]['合计-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP实际-旧']) . "</div>";
+                } else {
+                    $val['合计-TOP实际-旧'] ? $select[$key]['合计-TOP实际-旧'] = $this->float1($val['合计-TOP实际-旧']) : $select[$key]['合计-TOP实际-旧'] = "";
                 }
-                if ($val['直营-TOP考核-旧'] < $select2[0]['直营-TOP考核-旧']) {
-                    $select[$key]['直营-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['直营-TOP考核-旧']}</div>";
+                if (!empty($val['直营-TOP考核-旧']) && $val['直营-TOP考核-旧'] < $select2[0]['直营-TOP考核-旧']) {
+                    $select[$key]['直营-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['直营-TOP考核-旧'] ? $select[$key]['直营-TOP考核-旧'] = $this->float1($val['直营-TOP考核-旧']) : $select[$key]['直营-TOP考核-旧'] = "";
                 }
-                if ($val['加盟-TOP考核-旧'] < $select2[0]['加盟-TOP考核-旧']) {
-                    $select[$key]['加盟-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['加盟-TOP考核-旧']}</div>";
+                if (!empty($val['加盟-TOP考核-旧']) && $val['加盟-TOP考核-旧'] < $select2[0]['加盟-TOP考核-旧']) {
+                    $select[$key]['加盟-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['加盟-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['加盟-TOP考核-旧'] ? $select[$key]['加盟-TOP考核-旧'] = $this->float1($val['加盟-TOP考核-旧']) : $select[$key]['加盟-TOP考核-旧'] = "";
                 }
-                if ($val['合计-TOP考核-旧'] < $select2[0]['合计-TOP考核-旧']) {
-                    $select[$key]['合计-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>{$val['合计-TOP考核-旧']}</div>";
+                if (!empty($val['合计-TOP考核-旧']) && $val['合计-TOP考核-旧'] < $select2[0]['合计-TOP考核-旧']) {
+                    $select[$key]['合计-TOP考核-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-TOP考核-旧']) . "</div>";
+                } else {
+                    $val['合计-TOP考核-旧'] ? $select[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']) : $select[$key]['合计-TOP考核-旧'] = "";
+                }   
+            }
+
+            foreach ($select2 as $key => $val) {
+                if (! empty($val['直营-整体-新'])) {
+                    $select2[$key]['直营-整体-新'] = $this->float1($val['直营-整体-新']);
+                }
+                if (! empty($val['加盟-整体-新'])) {
+                    $select2[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']);
+                }
+                if (! empty($val['合计-整体-新'])) {
+                    $select2[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']);
+                }
+                if (! empty($val['直营-TOP实际-新'])) {
+                    $select2[$key]['直营-TOP实际-新'] = $this->float1($val['直营-TOP实际-新']);
+                }
+                if (! empty($val['加盟-TOP实际-新'])) {
+                    $select2[$key]['加盟-TOP实际-新'] = $this->float1($val['加盟-TOP实际-新']);
+                }
+                if (! empty($val['合计-TOP实际-新'])) {
+                    $select2[$key]['合计-TOP实际-新'] = $this->float1($val['合计-TOP实际-新']);
+                }
+                if (! empty($val['直营-TOP考核-新'])) {
+                    $select2[$key]['直营-TOP考核-新'] = $this->float1($val['直营-TOP考核-新']);
+                }
+                if (! empty($val['加盟-TOP考核-新'])) {
+                    $select2[$key]['加盟-TOP考核-新'] = $this->float1($val['加盟-TOP考核-新']);
+                }
+                if (! empty($val['合计-TOP考核-新'])) {
+                    $select2[$key]['合计-TOP考核-新'] = $this->float1($val['合计-TOP考核-新']);
+                }
+    
+                if (! empty($val['直营-整体-旧'])) {
+                    $select2[$key]['直营-整体-旧'] = $this->float1($val['直营-整体-旧']);
+                }
+                if (! empty($val['加盟-整体-旧'])) {
+                    $select2[$key]['加盟-整体-旧'] = $this->float1($val['加盟-整体-旧']);
+                }
+                if (! empty($val['合计-整体-旧'])) {
+                    $select2[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']);
+                }
+                if (! empty($val['直营-TOP实际-旧'])) {
+                    $select2[$key]['直营-TOP实际-旧'] = $this->float1($val['直营-TOP实际-旧']);
+                }
+                if (! empty($val['加盟-TOP实际-旧'])) {
+                    $select2[$key]['加盟-TOP实际-旧'] = $this->float1($val['加盟-TOP实际-旧']);
+                }
+                if (! empty($val['合计-TOP实际-旧'])) {
+                    $select2[$key]['合计-TOP实际-旧'] = $this->float1($val['合计-TOP实际-旧']);
+                }
+                if (! empty($val['直营-TOP考核-旧'])) {
+                    $select2[$key]['直营-TOP考核-旧'] = $this->float1($val['直营-TOP考核-旧']);
+                }
+                if (! empty($val['加盟-TOP考核-旧'])) {
+                    $select2[$key]['加盟-TOP考核-旧'] = $this->float1($val['加盟-TOP考核-旧']);
+                }
+                if (! empty($val['合计-TOP考核-旧'])) {
+                    $select2[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']);
                 }
             }
 
