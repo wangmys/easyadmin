@@ -352,27 +352,27 @@
                         , { title: `${newDateStr}`, align: 'center' ,colspan: 7}
                         , { title: `${oldDateStr}`, align: 'center' ,colspan: 7}
                         ],
-                        [ { field: '单店排名-新', title: '单店排名', align: 'center' ,rowspan: 2}
-                        ,{ title: '整体', align: 'center' ,colspan: 2}
-                        ,{ title: 'TOP实际', align: 'center' ,colspan: 2}
-                        ,{ title: 'TOP考核', align: 'center' ,colspan: 2}
-                        , { field: '单店排名-旧', title: '单店排名', align: 'center' ,rowspan: 2}
-                        ,{ title: '整体', align: 'center' ,colspan: 2}
-                        ,{ title: 'TOP实际', align: 'center' ,colspan: 2}
-                        ,{ title: 'TOP考核', align: 'center' ,colspan: 2}],
-                        [{ field: 'SKC数-整体-新', title: 'SKC数', align: 'center'}
-                        , { field: '齐码率-整体-新', title: '齐码率', align: 'center'}
-                        , { field: 'SKC数-TOP实际-新', title: 'SKC断码数', align: 'center'}
-                        , { field: '齐码率-TOP实际-新', title: '齐码率', align: 'center'}
-                        , { field: 'SKC数-TOP考核-新', title: 'SKC断码数', align: 'center'}
-                        , { field: '齐码率-TOP考核-新', title: '齐码率', align: 'center'}
-                        , { field: 'SKC数-整体-旧', title: 'SKC数', align: 'center'}
-                        , { field: '齐码率-整体-旧', title: '齐码率', align: 'center'}
-                        , { field: 'SKC数-TOP实际-旧', title: 'SKC断码数', align: 'center'}
-                        , { field: '齐码率-TOP实际-旧', title: '齐码率', align: 'center'}
-                        , { field: 'SKC数-TOP考核-旧', title: 'SKC断码数', align: 'center'}
-                        , { field: '齐码率-TOP考核-旧', title: '齐码率', align: 'center'}
-                        ]
+                        // [ { field: '单店排名-新', title: '单店排名', align: 'center' ,rowspan: 2}
+                        // ,{ title: '整体', align: 'center' ,colspan: 2}
+                        // ,{ title: 'TOP实际', align: 'center' ,colspan: 2}
+                        // ,{ title: 'TOP考核', align: 'center' ,colspan: 2}
+                        // , { field: '单店排名-旧', title: '单店排名', align: 'center' ,rowspan: 2}
+                        // ,{ title: '整体', align: 'center' ,colspan: 2}
+                        // ,{ title: 'TOP实际', align: 'center' ,colspan: 2}
+                        // ,{ title: 'TOP考核', align: 'center' ,colspan: 2}],
+                        // [{ field: 'SKC数-整体-新', title: 'SKC数', align: 'center'}
+                        // , { field: '齐码率-整体-新', title: '齐码率', align: 'center'}
+                        // , { field: 'SKC数-TOP实际-新', title: 'SKC断码数', align: 'center'}
+                        // , { field: '齐码率-TOP实际-新', title: '齐码率', align: 'center'}
+                        // , { field: 'SKC数-TOP考核-新', title: 'SKC断码数', align: 'center'}
+                        // , { field: '齐码率-TOP考核-新', title: '齐码率', align: 'center'}
+                        // , { field: 'SKC数-整体-旧', title: 'SKC数', align: 'center'}
+                        // , { field: '齐码率-整体-旧', title: '齐码率', align: 'center'}
+                        // , { field: 'SKC数-TOP实际-旧', title: 'SKC断码数', align: 'center'}
+                        // , { field: '齐码率-TOP实际-旧', title: '齐码率', align: 'center'}
+                        // , { field: 'SKC数-TOP考核-旧', title: 'SKC断码数', align: 'center'}
+                        // , { field: '齐码率-TOP考核-旧', title: '齐码率', align: 'center'}
+                        // ]
                     ]
                 })
             }, 'json');
@@ -410,17 +410,54 @@
                     ,{ title: 'TOP实际', align: 'center' ,colspan: 2}
                     ,{ title: 'TOP考核', align: 'center' ,colspan: 2}],
                     [{ field: 'SKC数-整体-新', title: 'SKC数', align: 'center'}
-                    , { field: '齐码率-整体-新', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-整体-新', title: '齐码率', align: 'center' , templet: function (data) {
+                        if (data['齐码率-整体-新']) {
+                            return (data['齐码率-整体-新'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: 'SKC数-TOP实际-新', title: '断码SKC数', align: 'center'}
-                    , { field: '齐码率-TOP实际-新', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-TOP实际-新', title: '齐码率', align: 'center', templet: function (data) {
+                        if (data['齐码率-TOP实际-新']) {
+                            return (data['齐码率-TOP实际-新'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: 'SKC数-TOP考核-新', title: '断码SKC数', align: 'center'}
-                    , { field: '齐码率-TOP考核-新', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-TOP考核-新', title: '齐码率', align: 'center', templet: function (data) {
+                        
+                        if (data['齐码率-TOP考核-新']) {
+                            return (data['齐码率-TOP考核-新'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: 'SKC数-整体-旧', title: 'SKC数', align: 'center'}
-                    , { field: '齐码率-整体-旧', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-整体-旧', title: '齐码率', align: 'center', templet: function (data) {
+                        if (data['齐码率-整体-旧']) {
+                            return (data['齐码率-整体-旧'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: 'SKC数-TOP实际-旧', title: '断码SKC数', align: 'center'}
-                    , { field: '齐码率-TOP实际-旧', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-TOP实际-旧', title: '齐码率', align: 'center', templet: function (data) {
+                        if (data['齐码率-TOP实际-旧']) {
+                            return (data['齐码率-TOP实际-旧'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: 'SKC数-TOP考核-旧', title: '断码SKC数', align: 'center'}
-                    , { field: '齐码率-TOP考核-旧', title: '齐码率', align: 'center'}
+                    , { field: '齐码率-TOP考核-旧', title: '齐码率', align: 'center', templet: function (data) {
+                        if (data['齐码率-TOP考核-旧']) {
+                            return (data['齐码率-TOP考核-旧'] * 100).toFixed(1) + '%';
+                        } else {
+                            return '';
+                        }
+                    }}
                     ]
                 ]
                 ,done: function (res, curr, count) {
