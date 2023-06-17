@@ -12,6 +12,7 @@ use app\admin\model\dress\Yinliu;
 use voku\helper\HtmlDomParser;
 use app\admin\model\weather\Customers;
 use app\api\service\ratio\CodeService;
+use app\admin\model\code\SizeAllRatio;
 
 class Index
 {
@@ -78,5 +79,14 @@ class Index
             'code' => 1,
             'data' => $result
         ]);
+    }
+    
+    public function pull()
+    {
+//        $res = SizeAllRatio::newSaveSizeRatio('B31101051');
+        $res = SizeAllRatio::saveSizeRatio('B31101051');
+        echo '<pre>';
+        print_r($res);
+        die;
     }
 }
