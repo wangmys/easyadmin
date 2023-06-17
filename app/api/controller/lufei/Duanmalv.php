@@ -238,14 +238,13 @@ class Duanmalv extends BaseController
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_retail')->strict(false)->insertAll($val);
-                if ($key = count($chunk_list) - 1) {
-                    return json([
-                        'status' => 1,
-                        'msg' => 'success',
-                        'content' => 'cwl_duanmalv_retail second 更新成功！'
-                    ]);
-                }
             }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'cwl_duanmalv_retail second 更新成功！'
+            ]);
         } else {
             // $this->db_easyA->rollback();
             return json([
