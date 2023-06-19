@@ -361,10 +361,10 @@ class SizeAllRatio extends TimeModel
                 $size_up_num = $size_up_total[$vv]??0;
             }
 
-            // 单码当前单店均深 = 单码当前总库存量 / 单码上柜家数
+            // 单款当前单店均深 = 单码当前总库存量 / 单码上柜家数
             $shop_mean = 0;
-            if($this_total_stock > 0 && $size_up_num > 0){
-                $shop_mean = bcadd($this_total_stock / $size_up_num,0,2);
+            if($this_total_stock > 0 && $all_size_up_total > 0){
+                $shop_mean = bcadd($this_total_stock / $all_size_up_total,0,2);
             }
 
             $data['单码售罄比'][$vv] = $size_sell_out_ratio;
@@ -444,7 +444,6 @@ class SizeAllRatio extends TimeModel
         $data['云仓库存']['合计'] = $all_available_stock;
         $data['云仓在途']['合计'] = $all_transit_stock;
         $data['当前单店均深']['合计'] = $all_shop_mean;
-
         if(!empty($data)){
             // 批量插入云仓偏码数据
             Db::startTrans();

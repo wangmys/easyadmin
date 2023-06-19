@@ -16,5 +16,6 @@ return [
         'sendpic' => 'app\command\Sendpic',
         'create_daogou_aim' => 'app\command\Create_daogou_aim',
         'skc_sz_detail' => 'app\command\Skc_sz_detail',
+        'skc_shoe_detail' => 'app\command\Skc_shoe_detail',
     ],
 ];
