@@ -261,6 +261,18 @@ class Duanmalv extends AdminController
                     领型,
                     风格,
                     货号,
+                    `预计00/28/37/44/100/160/S`,
+                    `预计29/38/46/105/165/M`,
+                    `预计30/39/48/110/170/L`,
+                    `预计31/40/50/115/175/XL`,
+                    `预计32/41/52/120/180/2XL`,
+                    `预计33/42/54/125/185/3XL`,
+                    `预计34/43/56/190/4XL`,
+                    `预计35/44/58/195/5XL`,
+                    `预计36/6XL`,
+                    `预计38/7XL`,
+                    `预计_40`,
+                    预计库存数量,
                     预计库存连码个数,
                     标准齐码识别修订,
                     店铺SKC计数,
@@ -272,8 +284,7 @@ class Duanmalv extends AdminController
                     折率,
                     销售金额,
                     总入量数量,
-                    累销数量,
-                    预计库存数量
+                    累销数量                
                 FROM cwl_duanmalv_sk WHERE 1
                     {$map1}
                     {$map2}
@@ -1142,72 +1153,11 @@ class Duanmalv extends AdminController
                 GROUP BY
                     t1.云仓, t1.商品负责人
                 ORDER BY  t2.`齐码排名` ASC
-            ";
+            "; 
             $select = $this->db_easyA->query($sql);
 
-            // 统计平均值
-            $sql2 = "
-                SELECT
-                    '合计' as 云仓,
-                    '' as 商品负责人,
-                    '' as `齐码排名-新`,
-                    AVG(t0.`直营-整体-新`) as `直营-整体-新`,
-                    AVG(t0.`加盟-整体-新`) as `加盟-整体-新`,
-                    AVG(t0.`合计-整体-新`) as `合计-整体-新`,
-                    AVG(t0.`直营-TOP实际-新`) as `直营-TOP实际-新`,
-                    AVG(t0.`加盟-TOP实际-新`) as `加盟-TOP实际-新`,
-                    AVG(t0.`合计-TOP实际-新`) as `合计-TOP实际-新`,
-                    AVG(t0.`直营-TOP考核-新`) as `直营-TOP考核-新`,
-                    AVG(t0.`加盟-TOP考核-新`) as `加盟-TOP考核-新`,
-                    AVG(t0.`合计-TOP考核-新`) as `合计-TOP考核-新`,
-                    '' as `更新日期-新`,
-                    '' as `齐码排名-旧`,
-                    AVG(t0.`直营-整体-旧`) as `直营-整体-旧`,
-                    AVG(t0.`加盟-整体-旧`) as `加盟-整体-旧`,
-                    AVG(t0.`合计-整体-旧`) as `合计-整体-旧`,
-                    AVG(t0.`直营-TOP实际-旧`) as `直营-TOP实际-旧`,
-                    AVG(t0.`加盟-TOP实际-旧`) as `加盟-TOP实际-旧`,
-                    AVG(t0.`合计-TOP实际-旧`) as `合计-TOP实际-旧`,
-                    AVG(t0.`直营-TOP考核-旧`) as `直营-TOP考核-旧`,
-                    AVG(t0.`加盟-TOP考核-旧`) as `加盟-TOP考核-旧`,
-                    AVG(t0.`合计-TOP考核-旧`) as `合计-TOP考核-旧`,
-                    '' as `更新日期-旧`,
-                    '' as `差值`
-                FROM
-                (SELECT
-                    t1.云仓,t1.商品负责人,
-                    t2.`齐码排名` as `齐码排名-新`,
-                    t2.`直营-整体` as `直营-整体-新`,
-                    t2.`加盟-整体` as `加盟-整体-新`,
-                    t2.`合计-整体` as `合计-整体-新`,
-                    t2.`直营-TOP实际` as `直营-TOP实际-新`,        
-                    t2.`加盟-TOP实际` as `加盟-TOP实际-新`,
-                    t2.`合计-TOP实际` as `合计-TOP实际-新`,
-                    t2.`直营-TOP考核` as `直营-TOP考核-新`,
-                    t2.`加盟-TOP考核` as `加盟-TOP考核-新`,
-                    t2.`合计-TOP考核` as `合计-TOP考核-新`,
-                    t2.`更新日期` as `更新日期-新`,
-                    t3.`齐码排名` as `齐码排名-旧`,
-                    t3.`直营-整体` as `直营-整体-旧`,
-                    t3.`加盟-整体` as `加盟-整体-旧`,
-                    t3.`合计-整体` as `合计-整体-旧`,
-                    t3.`直营-TOP实际` as `直营-TOP实际-旧`,
-                    t3.`加盟-TOP实际` as `加盟-TOP实际-旧`,
-                    t3.`合计-TOP实际` as `合计-TOP实际-旧`,
-                    t3.`直营-TOP考核` as `直营-TOP考核-旧`,
-                    t3.`加盟-TOP考核` as `加盟-TOP考核-旧`,
-                    t3.`合计-TOP考核` as `合计-TOP考核-旧`,
-                    t3.`更新日期` as `更新日期-旧` 
-                    FROM
-                    cwl_duanmalv_table1_2 t1 
-                    left join cwl_duanmalv_table1_2 t2 ON t1.云仓=t2.云仓 and t1.商品负责人=t2.商品负责人 and t2.更新日期 = '{$limitDate["newDate"]}'
-                    left join cwl_duanmalv_table1_2 t3 ON t1.云仓=t3.云仓 and t1.商品负责人=t3.商品负责人 and t3.更新日期 = '{$limitDate["oldDate"]}'
-                    WHERE
-                    {$map0} 
-                    GROUP BY
-                    t1.云仓, t1.商品负责人
-                    ORDER BY  t2.`齐码排名` ASC) AS t0        
-            ";
+            // echo '<pre>';
+            // print_r($select);die;
 
             // 改良平均值
             $sql3 = "
@@ -1248,9 +1198,104 @@ class Duanmalv extends AdminController
                     WHERE
                     t1.`更新日期` ='{$limitDate["newDate"]}'            
             "; 
+
+            // 合计-新日期
+            $select2_new = $this->db_easyA->query("
+                SELECT
+                    '' as 云仓,
+                    t1.商品负责人,
+                    '' as `齐码排名-新`,
+                    t1.`直营-整体` as `直营-整体-新`,
+                    t1.`加盟-整体` as `加盟-整体-新`,
+                    t1.`合计-整体` as `合计-整体-新`,
+                    t1.`直营-TOP实际` as `直营-TOP实际-新`,        
+                    t1.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                    t1.`合计-TOP实际` as `合计-TOP实际-新`,
+                    t1.`直营-TOP考核` as `直营-TOP考核-新`,
+                    t1.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                    t1.`合计-TOP考核` as `合计-TOP考核-新`,
+                    t1.`更新日期` as `更新日期-新`
+                FROM
+                    cwl_duanmalv_table1_avg t1
+                WHERE
+                t1.`更新日期` ='{$limitDate["newDate"]}' 
+            ");
+
+            // 合计-旧日期
+            $select2_old = $this->db_easyA->query("
+                SELECT
+                    '' as `齐码排名-旧`,
+                    `直营-整体` as `直营-整体-旧`,
+                    `加盟-整体` as `加盟-整体-旧`,
+                    `合计-整体` as `合计-整体-旧`,
+                    `直营-TOP实际` as `直营-TOP实际-旧`,
+                    `加盟-TOP实际` as `加盟-TOP实际-旧`,
+                    `合计-TOP实际` as `合计-TOP实际-旧`,
+                    `直营-TOP考核` as `直营-TOP考核-旧`,
+                    `加盟-TOP考核` as `加盟-TOP考核-旧`,
+                    `合计-TOP考核` as `合计-TOP考核-旧`,
+                    `更新日期` as `更新日期-旧` 
+                FROM
+                cwl_duanmalv_table1_avg  
+                WHERE
+                `更新日期` ='{$limitDate["oldDate"]}'
+            ");
             
-            $select2 = $this->db_easyA->query($sql3);
-            
+            // 新旧日期合计不不存在情况处理
+            if (!$select2_new) {
+                $select2_new[0]['云仓'] = "合计";
+                $select2_new[0]['商品负责人'] = "";
+                $select2_new[0]['齐码排名-新'] = "";
+                $select2_new[0]['直营-整体-新'] = "";
+                $select2_new[0]['加盟-整体-新'] = "";
+                $select2_new[0]['合计-整体-新'] = "";
+                $select2_new[0]['直营-TOP实际-新'] = "";
+                $select2_new[0]['加盟-TOP实际-新'] = "";
+                $select2_new[0]['合计-TOP实际-新'] = "";
+                $select2_new[0]['直营-TOP考核-新'] = "";
+                $select2_new[0]['加盟-TOP考核-新'] = "";
+                $select2_new[0]['合计-TOP考核-新'] = "";
+                $select2_new[0]['更新日期-新'] = "";
+            }
+            if (!$select2_old) {
+                $select2_old[0]['齐码排名-旧'] = "";
+                $select2_old[0]['直营-整体-旧'] = "";
+                $select2_old[0]['加盟-整体-旧'] = "";
+                $select2_old[0]['合计-整体-旧'] = "";
+                $select2_old[0]['直营-TOP实际-旧'] = "";
+                $select2_old[0]['加盟-TOP实际-旧'] = "";
+                $select2_old[0]['合计-TOP实际-旧'] = "";
+                $select2_old[0]['直营-TOP考核-旧'] = "";
+                $select2_old[0]['加盟-TOP考核-旧'] = "";
+                $select2_old[0]['合计-TOP考核-旧'] = "";
+                $select2_old[0]['更新日期-旧'] = "";
+            }
+            // 新旧日期的合计组合
+            $select2[0]['云仓'] = "合计";
+            $select2[0]['商品负责人'] = $select2_new[0]['商品负责人'];
+            $select2[0]['齐码排名-新'] = $select2_new[0]['齐码排名-新'];
+            $select2[0]['直营-整体-新'] = $select2_new[0]['直营-整体-新'];
+            $select2[0]['加盟-整体-新'] = $select2_new[0]['加盟-整体-新'];
+            $select2[0]['合计-整体-新'] = $select2_new[0]['合计-整体-新'];
+            $select2[0]['直营-TOP实际-新'] = $select2_new[0]['直营-TOP实际-新'];
+            $select2[0]['加盟-TOP实际-新'] = $select2_new[0]['加盟-TOP实际-新'];
+            $select2[0]['合计-TOP实际-新'] = $select2_new[0]['合计-TOP实际-新'];
+            $select2[0]['直营-TOP考核-新'] = $select2_new[0]['直营-TOP考核-新'];
+            $select2[0]['加盟-TOP考核-新'] = $select2_new[0]['加盟-TOP考核-新'];
+            $select2[0]['合计-TOP考核-新'] = $select2_new[0]['合计-TOP考核-新'];
+            $select2[0]['更新日期-新'] = $select2_new[0]['更新日期-新'];
+            $select2[0]['齐码排名-旧'] = $select2_old[0]['齐码排名-旧'];
+            $select2[0]['直营-整体-旧'] = $select2_old[0]['直营-整体-旧'];
+            $select2[0]['加盟-整体-旧'] = $select2_old[0]['加盟-整体-旧'];
+            $select2[0]['合计-整体-旧'] = $select2_old[0]['合计-整体-旧'];
+            $select2[0]['直营-TOP实际-旧'] = $select2_old[0]['直营-TOP实际-旧'];
+            $select2[0]['加盟-TOP实际-旧'] = $select2_old[0]['加盟-TOP实际-旧'];
+            $select2[0]['合计-TOP实际-旧'] = $select2_old[0]['合计-TOP实际-旧'];
+            $select2[0]['直营-TOP考核-旧'] = $select2_old[0]['直营-TOP考核-旧'];
+            $select2[0]['加盟-TOP考核-旧'] = $select2_old[0]['加盟-TOP考核-旧'];
+            $select2[0]['合计-TOP考核-旧'] = $select2_old[0]['合计-TOP考核-旧'];
+            $select2[0]['更新日期-旧'] = $select2_old[0]['更新日期-旧'];
+    
 
             // 差值计算
             foreach ($select as $key => $val) {
@@ -1279,8 +1324,11 @@ class Duanmalv extends AdminController
                     $val['加盟-整体-新'] ? $select[$key]['加盟-整体-新'] = $this->float1($val['加盟-整体-新']) : $select[$key]['加盟-整体-新'] = "";
                 }
                 if (!empty($val['合计-整体-新']) && $val['合计-整体-新'] < $select2[0]['合计-整体-新']) {
+                    // echo 111;
                     $select[$key]['合计-整体-新'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-新']) . "</div>";
+                    $select[$key]['合计-整体-新'] = "6660";
                 } else {
+                    // echo 222;
                     $val['合计-整体-新'] ? $select[$key]['合计-整体-新'] = $this->float1($val['合计-整体-新']) : $select[$key]['合计-整体-新'] = "";
                 }
                 if (!empty($val['直营-TOP实际-新']) && $val['直营-TOP实际-新'] < $select2[0]['直营-TOP实际-新']) {
@@ -1327,7 +1375,7 @@ class Duanmalv extends AdminController
                 if (!empty($val['合计-整体-旧']) && $val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
                     $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-旧']) . "</div>";
                 } else {
-                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-新'] = "";
+                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-旧'] = "";
                 }
                 if (!empty($val['直营-TOP实际-旧']) && $val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
                     $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-旧']) . "</div>";
@@ -1360,6 +1408,11 @@ class Duanmalv extends AdminController
                     $val['合计-TOP考核-旧'] ? $select[$key]['合计-TOP考核-旧'] = $this->float1($val['合计-TOP考核-旧']) : $select[$key]['合计-TOP考核-旧'] = "";
                 }                
             }
+
+            // echo '<pre>';
+            // print_r($select);
+
+            // die;
 
             foreach ($select2 as $key => $val) {
                 if (! empty($val['直营-整体-新'])) {
@@ -1498,6 +1551,7 @@ class Duanmalv extends AdminController
                 GROUP BY
                     t1.省份, t1.商品负责人
                 ORDER BY  t2.`齐码排名` ASC
+                -- LIMIT 2
             ";
 
             $sql2 = "
@@ -1567,7 +1621,7 @@ class Duanmalv extends AdminController
             // 改良平均值
             $sql3 = "
             SELECT
-                t1.云仓,
+                '合计' as 省份,
                 t1.商品负责人,
                 '' as `齐码排名-新`,
                 t1.`直营-整体` as `直营-整体-新`,
@@ -1604,7 +1658,103 @@ class Duanmalv extends AdminController
                 t1.`更新日期` ='{$limitDate["newDate"]}'            
             "; 
 
-            $select2 = $this->db_easyA->query($sql3);
+
+            // 合计-新日期
+            $select2_new = $this->db_easyA->query("
+                SELECT
+                    '' as 省份,
+                    t1.商品负责人,
+                    '' as `齐码排名-新`,
+                    t1.`直营-整体` as `直营-整体-新`,
+                    t1.`加盟-整体` as `加盟-整体-新`,
+                    t1.`合计-整体` as `合计-整体-新`,
+                    t1.`直营-TOP实际` as `直营-TOP实际-新`,        
+                    t1.`加盟-TOP实际` as `加盟-TOP实际-新`,
+                    t1.`合计-TOP实际` as `合计-TOP实际-新`,
+                    t1.`直营-TOP考核` as `直营-TOP考核-新`,
+                    t1.`加盟-TOP考核` as `加盟-TOP考核-新`,
+                    t1.`合计-TOP考核` as `合计-TOP考核-新`,
+                    t1.`更新日期` as `更新日期-新`
+                FROM
+                    cwl_duanmalv_table1_avg t1
+                WHERE
+                t1.`更新日期` ='{$limitDate["newDate"]}' 
+            ");
+
+            // 合计-旧日期
+            $select2_old = $this->db_easyA->query("
+                SELECT
+                    '' as `齐码排名-旧`,
+                    `直营-整体` as `直营-整体-旧`,
+                    `加盟-整体` as `加盟-整体-旧`,
+                    `合计-整体` as `合计-整体-旧`,
+                    `直营-TOP实际` as `直营-TOP实际-旧`,
+                    `加盟-TOP实际` as `加盟-TOP实际-旧`,
+                    `合计-TOP实际` as `合计-TOP实际-旧`,
+                    `直营-TOP考核` as `直营-TOP考核-旧`,
+                    `加盟-TOP考核` as `加盟-TOP考核-旧`,
+                    `合计-TOP考核` as `合计-TOP考核-旧`,
+                    `更新日期` as `更新日期-旧` 
+                FROM
+                cwl_duanmalv_table1_avg  
+                WHERE
+                `更新日期` ='{$limitDate["oldDate"]}'
+            ");
+            
+            // 新旧日期合计不不存在情况处理
+            if (!$select2_new) {
+                $select2_new[0]['云仓'] = "合计";
+                $select2_new[0]['商品负责人'] = "";
+                $select2_new[0]['齐码排名-新'] = "";
+                $select2_new[0]['直营-整体-新'] = "";
+                $select2_new[0]['加盟-整体-新'] = "";
+                $select2_new[0]['合计-整体-新'] = "";
+                $select2_new[0]['直营-TOP实际-新'] = "";
+                $select2_new[0]['加盟-TOP实际-新'] = "";
+                $select2_new[0]['合计-TOP实际-新'] = "";
+                $select2_new[0]['直营-TOP考核-新'] = "";
+                $select2_new[0]['加盟-TOP考核-新'] = "";
+                $select2_new[0]['合计-TOP考核-新'] = "";
+                $select2_new[0]['更新日期-新'] = "";
+            }
+            if (!$select2_old) {
+                $select2_old[0]['齐码排名-旧'] = "";
+                $select2_old[0]['直营-整体-旧'] = "";
+                $select2_old[0]['加盟-整体-旧'] = "";
+                $select2_old[0]['合计-整体-旧'] = "";
+                $select2_old[0]['直营-TOP实际-旧'] = "";
+                $select2_old[0]['加盟-TOP实际-旧'] = "";
+                $select2_old[0]['合计-TOP实际-旧'] = "";
+                $select2_old[0]['直营-TOP考核-旧'] = "";
+                $select2_old[0]['加盟-TOP考核-旧'] = "";
+                $select2_old[0]['合计-TOP考核-旧'] = "";
+                $select2_old[0]['更新日期-旧'] = "";
+            }
+            // 新旧日期的合计组合
+            $select2[0]['云仓'] = "合计";
+            $select2[0]['商品负责人'] = $select2_new[0]['商品负责人'];
+            $select2[0]['齐码排名-新'] = $select2_new[0]['齐码排名-新'];
+            $select2[0]['直营-整体-新'] = $select2_new[0]['直营-整体-新'];
+            $select2[0]['加盟-整体-新'] = $select2_new[0]['加盟-整体-新'];
+            $select2[0]['合计-整体-新'] = $select2_new[0]['合计-整体-新'];
+            $select2[0]['直营-TOP实际-新'] = $select2_new[0]['直营-TOP实际-新'];
+            $select2[0]['加盟-TOP实际-新'] = $select2_new[0]['加盟-TOP实际-新'];
+            $select2[0]['合计-TOP实际-新'] = $select2_new[0]['合计-TOP实际-新'];
+            $select2[0]['直营-TOP考核-新'] = $select2_new[0]['直营-TOP考核-新'];
+            $select2[0]['加盟-TOP考核-新'] = $select2_new[0]['加盟-TOP考核-新'];
+            $select2[0]['合计-TOP考核-新'] = $select2_new[0]['合计-TOP考核-新'];
+            $select2[0]['更新日期-新'] = $select2_new[0]['更新日期-新'];
+            $select2[0]['齐码排名-旧'] = $select2_old[0]['齐码排名-旧'];
+            $select2[0]['直营-整体-旧'] = $select2_old[0]['直营-整体-旧'];
+            $select2[0]['加盟-整体-旧'] = $select2_old[0]['加盟-整体-旧'];
+            $select2[0]['合计-整体-旧'] = $select2_old[0]['合计-整体-旧'];
+            $select2[0]['直营-TOP实际-旧'] = $select2_old[0]['直营-TOP实际-旧'];
+            $select2[0]['加盟-TOP实际-旧'] = $select2_old[0]['加盟-TOP实际-旧'];
+            $select2[0]['合计-TOP实际-旧'] = $select2_old[0]['合计-TOP实际-旧'];
+            $select2[0]['直营-TOP考核-旧'] = $select2_old[0]['直营-TOP考核-旧'];
+            $select2[0]['加盟-TOP考核-旧'] = $select2_old[0]['加盟-TOP考核-旧'];
+            $select2[0]['合计-TOP考核-旧'] = $select2_old[0]['合计-TOP考核-旧'];
+            $select2[0]['更新日期-旧'] = $select2_old[0]['更新日期-旧'];
 
             // 差值计算
             foreach ($select as $key => $val) {
@@ -1681,7 +1831,7 @@ class Duanmalv extends AdminController
                 if (!empty($val['合计-整体-旧']) && $val['合计-整体-旧'] < $select2[0]['合计-整体-旧']) {
                     $select[$key]['合计-整体-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['合计-整体-旧']) . "</div>";
                 } else {
-                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-新'] = "";
+                    $val['合计-整体-旧'] ? $select[$key]['合计-整体-旧'] = $this->float1($val['合计-整体-旧']) : $select[$key]['合计-整体-旧'] = "";
                 }
                 if (!empty($val['直营-TOP实际-旧']) && $val['直营-TOP实际-旧'] < $select2[0]['直营-TOP实际-旧']) {
                     $select[$key]['直营-TOP实际-旧'] = "<div style='color:red; font-weight:bold; background:yellow;'>" . $this->float1($val['直营-TOP实际-旧']) . "</div>";
