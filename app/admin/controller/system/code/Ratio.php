@@ -435,7 +435,7 @@ class Ratio extends AdminController
                   $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
                   $value['全国排名'] = $init + $key+1;
                   $item = $value->alias('r')
-                      ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo')
+                      ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo and r.Date = ra.Date')
                       ->where(['ra.GoodsNo' => $value['货号'],'ra.Date' => date('Y-m-d')])
                       ->order('ra.id')
                       ->select()
