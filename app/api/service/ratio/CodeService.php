@@ -717,9 +717,7 @@ class CodeService
             LEFT JOIN ErpSortingGoodsDetail ESGD ON ESG.SortingGoodsID=ESGD.SortingGoodsID
             LEFT JOIN ErpWarehouse EW ON ES.WarehouseId=EW.WarehouseId
             LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
-            WHERE	 (ES.CodingCode= 'StartNode1'
-                                OR (ES.CodingCode= 'EndNode2' AND ES.IsCompleted= 0 )
-                            ) 
+            WHERE ES.IsCompleted= 0
                 AND EG.TimeCategoryName1>2022
                 AND EG.CategoryName1 NOT IN ('物料','人事物料')
                 AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓')
@@ -762,7 +760,7 @@ class CodeService
             LEFT JOIN ErpPuReturnNoticeGoodsDetail EPRNGD ON EPRNG.PuReturnNoticeGoodsId=EPRNGD.PuReturnNoticeGoodsId
             LEFT JOIN ErpWarehouse EW ON EPRN.WarehouseId=EW.WarehouseId
             LEFT JOIN ErpGoods EG ON EPRNG.GoodsId=EG.GoodsId
-            WHERE EPRN.CodingCode= 'StartNode1' 
+            WHERE (EPRN.IsCompleted = 0 OR EPRN.IsCompleted IS NULL)
                 AND EG.TimeCategoryName1>2022
                 AND EG.CategoryName1 NOT IN ('物料','人事物料')
                 AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓')
@@ -893,6 +891,7 @@ class CodeService
         AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
         and ew.WarehouseCode IN ('CK002','CK003','CK004','CK005','CK006')
+        and ern.SupplyId != 'K191000638'
         GROUP BY
         ew.WarehouseName,
         eg.CategoryName1,
@@ -927,61 +926,117 @@ class CodeService
     public function pullPurchaseStock()
     {
         // 查询仓库采购数据
-        $sql = "select
-            CAST(GETDATE() AS DATE) as Date,
-            sp.TimeCategoryName1,
-            sp.TimeCategoryName2,
-            sp.CategoryName1,
-            sp.CategoryName2,
-            sp.CategoryName,
-            sp.GoodsName,
-            sp.GoodsNo,
-            sp.StyleCategoryName,
-            ck.WarehouseCode,
-                SUM(CASE WHEN cm.ViewOrder=1 	THEN c.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
-                SUM(CASE WHEN cm.ViewOrder=2 	THEN c.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
-                SUM(CASE WHEN cm.ViewOrder=3 	THEN c.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
-                SUM(CASE WHEN cm.ViewOrder=4 	THEN c.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
-                SUM(CASE WHEN cm.ViewOrder=5 	THEN c.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
-                SUM(CASE WHEN cm.ViewOrder=6 	THEN c.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
-                SUM(CASE WHEN cm.ViewOrder=7 	THEN c.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
-                SUM(CASE WHEN cm.ViewOrder=8 	THEN c.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
-                SUM(CASE WHEN cm.ViewOrder=9 	THEN c.Quantity ELSE NULL END ) AS  [库存_36/6XL],
-                SUM(CASE WHEN cm.ViewOrder=10 THEN c.Quantity ELSE NULL END ) AS  [库存_38/7XL],
-                SUM(CASE WHEN cm.ViewOrder=11 THEN c.Quantity ELSE NULL END ) AS  [库存_40/8XL],
-            LEFT(sp.CategoryName, 2) as Collar,
-            SUM(c.Quantity) as Quantity
-            from
-            ErpPurchase a
-            left join 
-            ErpPurchaseGoods b on a.PurchaseID=b.PurchaseID
-            left join
-            ErpPurchaseGoodsDetail c on b.PurchaseGoodsID=c.PurchaseGoodsID
-            left join
-            ErpBaseGoodsSize cm on c.SizeId=cm.SizeId
-            left join
-            ErpGoods sp on b.GoodsId=sp.GoodsId
-            left join
-            ErpWarehouse ck on a.ReceiptWareid=ck.WarehouseId
-            where 
-            ck.WarehouseCode 
-            IN ('C020')
-            and
-            a.CodingCodeText='已审结'
-            and sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
-            and sp.TimeCategoryName1 = '2023' and a.PurchaseDate BETWEEN '2022-09-08' and CAST(GETDATE() AS DATE)
-            -- and sp.GoodsNo = 'B42101021'
-            GROUP BY 
-            sp.TimeCategoryName1,
-            sp.TimeCategoryName2,
-            sp.CategoryName1,
-            sp.CategoryName2,
-            sp.CategoryName,
-            sp.GoodsName,
-            sp.GoodsNo,
-            sp.StyleCategoryName,
-            ck.WarehouseCode
-            order By Collar desc
+        $sql = "SELECT
+        sp.TimeCategoryName1,
+        sp.TimeCategoryName2,
+        sp.CategoryName1,
+        sp.CategoryName2,
+        sp.CategoryName,
+        sp.GoodsName,
+        sp.GoodsNo,
+        sp.StyleCategoryName,
+        T.WarehouseCode,
+            SUM(CASE WHEN cm.ViewOrder=1 	THEN T.Quantity ELSE NULL END ) AS  [库存_00/28/37/44/100/160/S],
+            SUM(CASE WHEN cm.ViewOrder=2 	THEN T.Quantity ELSE NULL END ) AS  [库存_29/38/46/105/165/M],
+            SUM(CASE WHEN cm.ViewOrder=3 	THEN T.Quantity ELSE NULL END ) AS  [库存_30/39/48/110/170/L],
+            SUM(CASE WHEN cm.ViewOrder=4 	THEN T.Quantity ELSE NULL END ) AS  [库存_31/40/50/115/175/XL],
+            SUM(CASE WHEN cm.ViewOrder=5 	THEN T.Quantity ELSE NULL END ) AS  [库存_32/41/52/120/180/2XL],
+            SUM(CASE WHEN cm.ViewOrder=6 	THEN T.Quantity ELSE NULL END ) AS  [库存_33/42/54/125/185/3XL],
+            SUM(CASE WHEN cm.ViewOrder=7 	THEN T.Quantity ELSE NULL END ) AS  [库存_34/43/56/190/4XL],
+            SUM(CASE WHEN cm.ViewOrder=8 	THEN T.Quantity ELSE NULL END ) AS  [库存_35/44/58/195/5XL],
+            SUM(CASE WHEN cm.ViewOrder=9 	THEN T.Quantity ELSE NULL END ) AS  [库存_36/6XL],
+            SUM(CASE WHEN cm.ViewOrder=10 THEN T.Quantity ELSE NULL END ) AS  [库存_38/7XL],
+            SUM(CASE WHEN cm.ViewOrder=11 THEN T.Quantity ELSE NULL END ) AS  [库存_40/8XL],
+        LEFT(sp.CategoryName, 2)	as Collar,
+        SUM(T.Quantity) as Quantity
+        
+        FROM 
+        (
+        
+        SELECT
+        
+        a.ReceiptWareid as WarehouseId,
+        b.GoodsId,
+        sp.GoodsNo,
+        c.SizeId,
+        ck.WarehouseCode,
+        SUM(c.Quantity) as Quantity
+        from
+        ErpPurchase a
+        left join 
+        ErpPurchaseGoods b on a.PurchaseID=b.PurchaseID
+        left join
+        ErpPurchaseGoodsDetail c on b.PurchaseGoodsID=c.PurchaseGoodsID
+        left join
+        ErpWarehouse ck on a.ReceiptWareid=ck.WarehouseId
+        left join
+        ErpGoods sp on b.GoodsId=sp.GoodsId
+        where 
+        
+        ck.WarehouseCode  IN ('C019','C020','C021','C022') and 
+        a.CodingCodeText='已审结' and a.PurchaseDate BETWEEN '2022-05-01' and CAST(GETDATE() AS DATE)
+        GROUP BY 
+        a.ReceiptWareid,
+        ck.WarehouseCode,
+        b.GoodsId,
+        sp.GoodsNo,
+        c.SizeId
+        
+        
+        UNION ALL
+        
+        SELECT
+        
+        a.WarehouseId,
+        b.GoodsId,
+        sp.GoodsNo,
+        c.SizeId,
+        ck.WarehouseCode,
+        -SUM(c.Quantity) as Quantity
+        from
+        ErpPurchaseReturn a
+        left join 
+        ErpPurchaseReturnGoods b on a.PurchaseReturnId=b.PurchaseReturnId
+        left join
+        ErpPurchaseReturnGoodsDetail c on b.PurchaseReturnGoodsId=c.PurchaseReturnGoodsId
+        left join
+        ErpWarehouse ck on a.WarehouseId=ck.WarehouseId
+        left join
+        ErpGoods sp on b.GoodsId=sp.GoodsId
+        where 
+        a.SupplyId != 'K191000638' and
+        a.CodingCodeText='已审结' and a.PurchaseReturnDate BETWEEN '2022-05-01' and CAST(GETDATE() AS DATE)
+        -- and b.GoodsId = 24768
+        GROUP BY 
+        a.WarehouseId,
+        ck.WarehouseCode,
+        b.GoodsId,
+        sp.GoodsNo,
+        c.SizeId
+        
+        ) T 
+        
+        left join
+        ErpBaseGoodsSize cm on T.SizeId=cm.SizeId
+        left join
+        ErpGoods sp on T.GoodsId=sp.GoodsId
+        where 
+        sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
+        and sp.TimeCategoryName2  IN ( '初夏', '盛夏', '夏季' ) 
+        and sp.TimeCategoryName1 = '2023'
+        -- and sp.GoodsNo = 'B32305004'
+        GROUP BY 
+        
+        sp.TimeCategoryName1,
+        sp.TimeCategoryName2,
+        sp.CategoryName1,
+        sp.CategoryName2,
+        sp.CategoryName,
+        sp.GoodsName,
+        sp.GoodsNo,
+        sp.StyleCategoryName,
+        T.WarehouseCode
+        order By Collar desc
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);

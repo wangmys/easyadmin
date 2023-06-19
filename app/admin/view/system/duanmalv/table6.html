@@ -171,12 +171,10 @@
                     , { field: '风格', title: '风格' ,fixed:'left', align: 'center'} 
                     , { field: '一级分类', title: '一级分类', fixed: 'left' , align: 'center'}
                     , { field: '二级分类', title: '二级分类', fixed: 'left' , align: 'center'}
-                    , { field: '领型', title: '领型' ,fixed:'left', align: 'center'}
-                    , { field: '店铺总SKC数', title: '店铺总SKC数', fixed: 'left' , align: 'center'}
-                    , { field: 'TOP断码SKC数', title: 'TOP断码SKC数', fixed: 'left' , align: 'center'}
-                    , { field: 'TOP断码率', title: 'TOP断码率', fixed: 'left' , align: 'center'}
-                    , { field: '全部断码SKC数', title: '全部断码SKC数', fixed: 'left' , align: 'center'}
-                    , { field: '全部断码率', title: '全部断码率', fixed: 'left' , align: 'center'}
+                    , { field: '领型', title: '领型', fixed: 'left' , align: 'center'}
+                    , { field: '领型SKC数', title: '领型SKC数' ,fixed:'left', align: 'center'}
+                    , { field: '领型断码数', title: '领型断码数', fixed: 'left' , align: 'center'}
+                    , { field: '领型齐码率', title: '领型齐码率', fixed: 'left' , align: 'center'}
                 ]]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
