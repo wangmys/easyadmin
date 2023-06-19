@@ -430,20 +430,20 @@ class SizeAllRatio extends TimeModel
             }
         }
 
-        $data['单码售罄比']['总计'] = $total_item['单码售罄比'];
-        $data['当前库存尺码比']['总计'] = $total_item['当前库存尺码比'];
-        $data['总库存尺码比']['总计'] = $total_item['总库存尺码比'];
-        $data['累销尺码比']['总计'] = '';
-        $data['单码售罄']['总计'] = $all_size_sell_out;
-        $data['周转']['总计'] = $all_turnover;
-        $data['当前总库存量']['总计'] = $all_total_stock;
-        $data['未入量']['总计'] = $not_total_stock;
-        $data['累销']['总计'] = $sale_total_sum;
-        $data['周销']['总计'] = $all_day7_sale;
-        $data['店铺库存']['总计'] = $all_shop_stock;
-        $data['云仓库存']['总计'] = $all_available_stock;
-        $data['云仓在途']['总计'] = $all_transit_stock;
-        $data['当前单店均深']['总计'] = $all_shop_mean;
+        $data['单码售罄比']['合计'] = $total_item['单码售罄比'];
+        $data['当前库存尺码比']['合计'] = $total_item['当前库存尺码比'];
+        $data['总库存尺码比']['合计'] = $total_item['总库存尺码比'];
+        $data['累销尺码比']['合计'] = '';
+        $data['单码售罄']['合计'] = $all_size_sell_out;
+        $data['周转']['合计'] = $all_turnover;
+        $data['当前总库存量']['合计'] = $all_total_stock;
+        $data['未入量']['合计'] = $not_total_stock;
+        $data['累销']['合计'] = $sale_total_sum;
+        $data['周销']['合计'] = $all_day7_sale;
+        $data['店铺库存']['合计'] = $all_shop_stock;
+        $data['云仓库存']['合计'] = $all_available_stock;
+        $data['云仓在途']['合计'] = $all_transit_stock;
+        $data['当前单店均深']['合计'] = $all_shop_mean;
 
         if(!empty($data)){
             // 批量插入云仓偏码数据
