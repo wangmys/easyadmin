@@ -1202,7 +1202,7 @@ class Duanmalv extends AdminController
             // 合计-新日期
             $select2_new = $this->db_easyA->query("
                 SELECT
-                    '' as 云仓,
+                    '合计' as 云仓,
                     t1.商品负责人,
                     '' as `齐码排名-新`,
                     t1.`直营-整体` as `直营-整体-新`,
@@ -1662,7 +1662,7 @@ class Duanmalv extends AdminController
             // 合计-新日期
             $select2_new = $this->db_easyA->query("
                 SELECT
-                    '' as 省份,
+                    '合计' as 省份,
                     t1.商品负责人,
                     '' as `齐码排名-新`,
                     t1.`直营-整体` as `直营-整体-新`,
@@ -1703,7 +1703,7 @@ class Duanmalv extends AdminController
             
             // 新旧日期合计不不存在情况处理
             if (!$select2_new) {
-                $select2_new[0]['云仓'] = "合计";
+                $select2_new[0]['省份'] = "合计";
                 $select2_new[0]['商品负责人'] = "";
                 $select2_new[0]['齐码排名-新'] = "";
                 $select2_new[0]['直营-整体-新'] = "";
@@ -1731,7 +1731,7 @@ class Duanmalv extends AdminController
                 $select2_old[0]['更新日期-旧'] = "";
             }
             // 新旧日期的合计组合
-            $select2[0]['云仓'] = "合计";
+            $select2[0]['省份'] = "合计";
             $select2[0]['商品负责人'] = $select2_new[0]['商品负责人'];
             $select2[0]['齐码排名-新'] = $select2_new[0]['齐码排名-新'];
             $select2[0]['直营-整体-新'] = $select2_new[0]['直营-整体-新'];
