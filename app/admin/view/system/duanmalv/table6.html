@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>断码率-单店品类断码情况</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
@@ -95,6 +96,27 @@
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: auto;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">领型齐码率</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-lingxingqima" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="" style="width:5%; height:auto;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
             <div style="text-align: center; color:#0051ff;">单店品类断码情况 <a class="dateStr"></a></div>
@@ -128,10 +150,34 @@
 
         startTable();
 
-        // 日期选择器
-        laydate.render({
-            elem: '#shangshiriqi'
+        xmSelect.render({
+            el: '#xm-lingxingqima', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '领型齐码率',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "小于100%", value: "1", selected: true},
+            ]
+        })
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
         });
+
 
         //触发事件
         table.on('toolbar(table)', function(obj) {
@@ -162,6 +208,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , where: { "领型齐码率" : "1" }
                 , cols: [[
                      { field: '云仓', title: '云仓', fixed: 'left', align: 'center' }
                     , { field: '省份', title: '省份', fixed: 'left', align: 'center'}

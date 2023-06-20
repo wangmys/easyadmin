@@ -1061,7 +1061,7 @@ class Duanmalv extends BaseController
                 领型,
                 SKC数 as 领型SKC数,
                 总断码数 as 领型断码数,
-                CONCAT(round((1 - round(总断码数 / SKC数, 4)) * 100, 1), '%') as 领型齐码率
+                1 - 总断码数 / SKC数 as 领型齐码率
             FROM
                 cwl_duanmalv_handle_1 
             ORDER BY
