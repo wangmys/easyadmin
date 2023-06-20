@@ -463,6 +463,107 @@ class Tableupdate extends BaseController
         }
     }
 
+    public function retail_2week_by_wangwei() {
+        $sql = "
+            SELECT TOP
+                    3000000
+                    EC.State AS 省份,
+                    EBC.Mathod AS 渠道属性,
+                    EC.CustomItem15 AS 店铺云仓,
+                    EG.TimeCategoryName1 as 年份,
+                CASE
+                        EG.TimeCategoryName2
+                        WHEN '初春' THEN
+                        '春季'
+                        WHEN '正春' THEN
+                        '春季'
+                        WHEN '春季' THEN
+                        '春季'
+                        WHEN '初秋' THEN
+                        '秋季'
+                        WHEN '深秋' THEN
+                        '秋季'
+                        WHEN '秋季' THEN
+                        '秋季'
+                        WHEN '初夏' THEN
+                        '夏季'
+                        WHEN '盛夏' THEN
+                        '夏季'
+                        WHEN '夏季' THEN
+                        '夏季'
+                        WHEN '冬季' THEN
+                        '冬季'
+                        WHEN '初冬' THEN
+                        '冬季'
+                        WHEN '深冬' THEN
+                        '冬季'
+                    END AS 季节归集,
+                    EG.TimeCategoryName2 AS 二级时间分类,
+                    EG.CategoryName1 AS 大类,
+                    EG.CategoryName2 AS 中类,
+                    EG.CategoryName AS 小类,
+                    SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                    EG.StyleCategoryName AS 风格,
+                    EG.GoodsNo  AS 商品代码,
+                    SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
+                    SUM ( ERG.Quantity ) AS 销售数量,
+                    SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                    CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+                FROM
+                    ErpRetail AS ER
+                    LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                    LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                    LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                    LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                WHERE
+                    ER.CodingCodeText = '已审结'
+                    AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
+                    AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                    -- AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                    AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                    AND EC.CustomItem17 IS NOT NULL
+                    AND EBC.Mathod IN ('直营', '加盟')
+                    -- AND EG.TimeCategoryName1 IN ('2023')
+                GROUP BY
+                    EC.CustomItem17
+                    ,EG.GoodsNo
+                    ,EC.State
+                    ,EC.CustomItem15
+                    ,EBC.Mathod
+                    ,EG.TimeCategoryName1
+                    ,EG.TimeCategoryName2
+                    ,EG.CategoryName1
+                    ,EG.CategoryName2
+                    ,EG.CategoryName
+                    ,EG.StyleCategoryName
+                HAVING  SUM ( ERG.Quantity ) <> 0
+        ";
+
+        $select = $this->db_sqlsrv->query($sql);
+        // dump($select);die;
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE retail_2week_by_wangwei;');
+
+            $select_chunk = array_chunk($select, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_bi->table('retail_2week_by_wangwei')->insertAll($val);
+            }
+            // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'retail_2week_by_wangwei 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'retail_2week_by_wangwei 更新失败！'
+            ]);   
+        }
+    }
+
     // 更新 sp_custoemr_weishouhou_diaobo
     public function update_weishouhou_diaobo() {
         // echo 111; die;
