@@ -149,7 +149,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                        export_url: 'system.code.index/index_export'
                     },
                     where:{filter:[]},
-                    height:'full-15',
+                    height: 760,
                     toolbar:[],
                     limit:40,
                     size:'sm',
@@ -215,7 +215,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                        export_url: 'system.code.index/index_export'
                     },
                     where:{filter:[]},
-                    height:'full-15',
+                    height: 760,
                     toolbar:[],
                     limit:20,
                     limits:[15,20,50,100,200,1000],

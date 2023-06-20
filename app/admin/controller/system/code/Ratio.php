@@ -576,7 +576,7 @@ class Ratio extends AdminController
                       foreach ($item2 as $vk => $val){
 
                           $vk_key = mb_substr($vk , 3);
-                          if(empty($val)){
+                          if(empty($val) || $val == '0.00'){
                               $item2[$vk] = '';
                           }else if(!empty($val) && is_numeric($val) && in_array($vk_key,$size) && in_array($item2['广州_字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
                               $item2[$vk] = $val.'%';
