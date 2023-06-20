@@ -466,7 +466,7 @@ class Tableupdate extends BaseController
     public function retail_2week_by_wangwei() {
         $sql = "
             SELECT TOP
-                    30
+                    3000000
                     EC.State AS 省份,
                     EBC.Mathod AS 渠道属性,
                     EC.CustomItem15 AS 店铺云仓,
