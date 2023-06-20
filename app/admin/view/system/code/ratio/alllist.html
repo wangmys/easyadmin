@@ -1,32 +1,42 @@
-<!--<style>-->
-<!--    .table-header-fixed {-->
-<!--        top: 0;-->
-<!--        position: fixed;-->
-<!--        z-index: 999;-->
-<!--    }-->
-<!--    th.layui-table-patch{padding: 0 !important;}-->
-<!--    .layui-card .layui-card-body .layui-table td { max-width: 100%;}-->
-<!--    .layuimini-main tr td{-->
-<!--        margin: 0px;-->
-<!--        padding: 0px 0;-->
-<!--    }-->
+<style>
+    /*.table-header-fixed {*/
+    /*    top: 0;*/
+    /*    position: fixed;*/
+    /*    z-index: 999;*/
+    /*}*/
+    /*th.layui-table-patch{padding: 0 !important;}*/
+    /*.layui-card .layui-card-body .layui-table td { max-width: 100%;}*/
+    /*.layuimini-main tr td{*/
+    /*    margin: 0px;*/
+    /*    padding: 0px 0;*/
+    /*}*/
 
-<!--    .layui-table-cell {-->
-<!--        font-size: 13px;-->
-<!--        color: #606266;-->
-<!--        padding: 0 0px;-->
-<!--    }-->
-<!--    .layui-table-view .layui-table td {-->
-<!--        padding: 0px 0;-->
-<!--    }-->
-<!--    .layui-table, .layui-table-view {-->
-<!--        margin: 0px 0;-->
-<!--    }-->
-<!--    .layui-table tr:nth-child(14n) td {-->
-<!--        border-bottom: 2px solid red;-->
-<!--        box-sizing: content-box;-->
-<!--    }-->
-<!--</style>-->
+    /*.layui-table-cell {*/
+    /*    font-size: 13px;*/
+    /*    color: #606266;*/
+    /*    padding: 0 0px;*/
+    /*}*/
+    /*.layui-table-view .layui-table td {*/
+    /*    padding: 0px 0;*/
+    /*}*/
+    /*.layui-table, .layui-table-view {*/
+    /*    margin: 0px 0;*/
+    /*}*/
+    .layui-table tr:nth-child(14n) td {
+        border-bottom: 2px solid red;
+        box-sizing: content-box;
+    }
+    td[data-field="图片"] {
+        border-bottom: 1px solid red;
+        box-sizing: border-box;
+    }
+    td[data-field="图片"] img {
+        margin: 0px;
+        padding: 0px;
+        max-height: 60px !important;
+        box-sizing: content-box;
+    }
+</style>
 <div class="layuimini-container">
     <div class="layuimini-main">
         <table id="currentTable" class="layui-table text-center layui-hide" lay-filter="currentTable">
