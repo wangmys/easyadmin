@@ -128,6 +128,341 @@ class Tableupdate extends BaseController
 
     }
 
+    // 店铺预计库存到尺码齐码率
+    public function customer_kc_sk_by_wangwei() {
+        $sql = "
+        --仓库可用库存数量到尺码齐码率
+                SELECT 
+                    EC.State 省份,
+                    EC.CustomItem15,
+                    EC.CustomItem17,
+                    EC.CustomerName,
+                    EG.TimeCategoryName1,
+                    EG.TimeCategoryName2,
+                    EG.CategoryName1 AS 一级分类,
+                    EG.CategoryName2 AS 二级分类,
+                    EG.CategoryName AS 分类,
+                    EG.GoodsName,
+                    EG.StyleCategoryName,
+                    EG.GoodsNo,
+                    EG.StyleCategoryName1,
+                    EG.StyleCategoryName2,
+                    EGPT.UnitPrice 零售价,
+                    ISNULL(TT.Price,EGPT.UnitPrice) 当前零售价,
+                    SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END) AS  [预计库存_00/28/37/44/100/160/S],
+                    SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0 END) AS  [预计库存_29/38/46/105/165/M],
+                    SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0 END) AS  [预计库存_30/39/48/110/170/L],
+                    SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0 END) AS  [预计库存_31/40/50/115/175/XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0 END) AS  [预计库存_32/41/52/120/180/2XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0 END) AS  [预计库存_33/42/54/125/185/3XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0 END) AS  [预计库存_34/43/56/190/4XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0 END) AS  [预计库存_35/44/58/195/5XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0 END) AS  [预计库存_36/6XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END) AS [预计库存_38/7XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END) AS [预计库存_40],
+                    SUM(T.Quantity) AS 预计库存Quantity,
+                    CASE WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%11111111111%' THEN 11 
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%1111111111%' THEN 10 
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%111111111%' THEN 9
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%11111111%' THEN 8
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%1111111%' THEN 7
+                        WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%111111%' THEN 6
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%11111%' THEN 5
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%1111%' THEN 4
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%111%' THEN 3
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%11%' THEN 2
+                            WHEN CONCAT(CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE 0  END)>0 THEN 1 ELSE 0 END , 
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ,
+                                CASE WHEN SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE 0 END)>0 THEN 1 ELSE 0 END ) LIKE '%1%' THEN 1
+                            ELSE 0
+                        END AS 齐码情况
+                FROM 
+                (
+                -- 店铺库存
+                SELECT 
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    ECS.GoodsId,
+                    ECSD.SizeId,
+                    SUM(ECSD.Quantity) AS Quantity
+                FROM ErpCustomerStock ECS 
+                LEFT JOIN ErpCustomerStockDetail ECSD ON ECS.StockId = ECSD.StockId
+                LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+                LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                WHERE EC.MathodId IN (4,7)
+                AND EC.ShutOut=0
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                AND EG.CategoryName1 = '鞋履'
+                GROUP BY 
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    ECS.GoodsId,
+                    ECSD.SizeId
+                HAVING SUM(ECSD.Quantity)!=0
+
+                UNION ALL 
+
+                --仓库发货在途
+                SELECT  
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EDG.GoodsId,
+                    EDGD.SizeId,
+                    SUM(EDGD.Quantity) AS Quantity
+                FROM ErpDelivery ED 
+                LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+                LEFT JOIN ErpDeliveryGoodsDetail EDGD ON EDG.DeliveryGoodsID=EDGD.DeliveryGoodsID
+                LEFT JOIN ErpCustomer EC ON ED.CustomerId=EC.CustomerId
+                LEFT JOIN ErpGoods EG ON EDG.GoodsId=EG.GoodsId
+                WHERE ED.CodingCodeText='已审结'
+                    AND ED.IsCompleted=0
+                    AND ED.DeliveryID NOT IN (SELECT ERG.DeliveryId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' 
+                                                                        AND ERG.DeliveryId IS	NOT NULL AND ERG.DeliveryId!='' GROUP BY ERG.DeliveryId)
+                    AND EC.MathodId IN (4,7)
+                    AND EC.ShutOut=0
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.CategoryName1 = '鞋履'
+                GROUP BY  
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EDG.GoodsId,
+                    EDGD.SizeId
+                    
+                UNION ALL
+
+                --店店调拨在途
+
+                SELECT 
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EIG.GoodsId,
+                    EIGD.SizeId,
+                    SUM(EIGD.Quantity) AS Quantity
+                FROM ErpCustOutbound EI 
+                LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+                LEFT JOIN ErpCustOutboundGoodsDetail EIGD ON EIG.CustOutboundGoodsId=EIGD.CustOutboundGoodsId
+                LEFT JOIN ErpCustomer EC ON EI.InCustomerId=EC.CustomerId
+                LEFT JOIN ErpGoods EG ON EIG.GoodsId=EG.GoodsId
+                WHERE EI.CodingCodeText='已审结'
+                    AND EI.IsCompleted=0
+                    AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
+                    AND EC.MathodId IN (4,7)
+                    AND EC.ShutOut=0
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.CategoryName1 = '鞋履'
+                GROUP BY  
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EIG.GoodsId,
+                    EIGD.SizeId
+
+                UNION ALL
+
+                -- 已配未发
+                SELECT  
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    ESG.GoodsId,
+                    ESGD.SizeId,
+                    SUM(ESGD.Quantity) AS Quantity
+                FROM ErpSorting ES 
+                LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+                LEFT JOIN ErpSortingGoodsDetail ESGD ON ESG.SortingGoodsID=ESGD.SortingGoodsID
+                LEFT JOIN ErpCustomer EC ON EC.CustomerId=ES.CustomerId
+                LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+                WHERE ES.IsCompleted=0
+                    AND EC.MathodId IN (4,7)
+                    AND EC.ShutOut=0
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.CategoryName1 = '鞋履'
+                GROUP BY	 
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    ESG.GoodsId,
+                    ESGD.SizeId
+
+                ) T
+                LEFT JOIN ErpBaseGoodsSize EBGS ON T.SizeId=EBGS.SizeId
+                LEFT JOIN ErpGoods EG ON T.GoodsId=EG.GoodsId
+                LEFT JOIN 
+                (
+                SELECT 
+                                EC.CustomerId,
+                                EC.CustomerCode,
+                                EC.CustomerName,
+                                EG.GoodsNo,
+                                EG.GoodsId,
+                                EPT.Price,
+                                EPTT.BDate,
+                                CONVERT(VARCHAR(10),EP.CreateTime,23) AS CreateTime,
+                                Row_Number() OVER (partition by EPC.CustomerId,EPT.GoodsId ORDER BY EP.CreateTime desc) RN
+                        FROM ErpPromotion EP
+                        LEFT JOIN ErpPromotionCustomer EPC ON EP.PromotionId=EPC.PromotionId
+                        LEFT JOIN ErpCustomer EC ON EPC.CustomerId=EC.CustomerId
+                        LEFT JOIN ErpPromotionTypeEx1 EPT ON EP.PromotionId=EPT.PromotionId
+                        LEFT JOIN ErpGoods EG ON EPT.GoodsId=EG.GoodsId
+                        LEFT JOIN ErpPromotionTime  EPTT ON EP.PromotionId=EPTT.PromotionId 
+                        WHERE  EP.PromotionTypeId=1
+                            AND EP.IsDisable=0
+                            AND EP.CodingCodeText='已审结'
+                            AND EC.MathodId IN (7,4)
+                            AND EC.ShutOut=0
+                            AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                            AND EG.CategoryName1 = '鞋履'
+                            AND CONVERT(VARCHAR,GETDATE(),23) BETWEEN EPTT.BDate AND EPTT.EDate
+                            -- AND EG.GoodsNo='B12612015'
+                ) TT ON T.CustomerId=TT.CustomerId  AND T.GoodsId=TT.GoodsId AND TT.RN= 1
+                LEFT JOIN ErpGoodsPriceType EGPT ON T.GoodsId=EGPT.GoodsId
+                LEFT JOIN ErpCustomer EC ON T.CustomerId = EC.CustomerId
+                WHERE EGPT.PriceId=1
+                -- AND TT.RN= 1
+                GROUP BY 
+                    EC.State,
+                    EC.CustomItem15,
+                    EC.CustomItem17,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    EG.TimeCategoryName1,
+                    EG.TimeCategoryName2,
+                    EG.CategoryName1,
+                    EG.CategoryName2,
+                    EG.CategoryName,
+                    EG.GoodsName,
+                    EG.StyleCategoryName,
+                    EG.GoodsNo,
+                    EG.StyleCategoryName1,
+                    EG.StyleCategoryName2,
+                    EGPT.UnitPrice ,
+                    TT.Price 
+                ;
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE customer_kc_sk_by_wangwei;');
+            $this->db_bi->table('customer_kc_sk_by_wangwei')->insertAll($select);
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'customer_kc_sk_by_wangwei 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'customer_kc_sk_by_wangwei 更新失败！'
+            ]);   
+        }
+    }
+
     // 更新 sp_custoemr_weishouhou_diaobo
     public function update_weishouhou_diaobo() {
         // echo 111; die;
