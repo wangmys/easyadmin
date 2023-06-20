@@ -1126,15 +1126,15 @@ class Duanmalv extends AdminController
         $dayLast30 = date('Y-m-d', strtotime('-1 month'));
         $sql1= "
             SELECT
-                * 
-            FROM
-                cwl_duanmalv_week 
-            WHERE
-                更新日期 >= '{$dayLast30}' 
-                AND 更新日期 <= '{$today}' 
-            ORDER BY
-                更新日期 ASC
-        ";
+                    * 
+                FROM
+                    cwl_duanmalv_week 
+                WHERE
+                    更新日期 >= '{$dayLast30}' 
+                    AND 更新日期 <= '{$today}' 
+                ORDER BY
+                    更新日期 ASC
+            ";
         $select_date = $this->db_easyA->query($sql1);
     
         if (request()->isAjax()) {
@@ -1160,32 +1160,37 @@ class Duanmalv extends AdminController
             $sql2 = "
                 SELECT  
                     t0.商品负责人,t0.云仓,t0.省份,t0.店铺名称,t0.经营模式,
-                    t1.`单店排名` as `单店排名-t1`,
-                    t1.`SKC数-整体` as `SKC数-整体-t1`,
                     concat(round(t1.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t1`,
-                    t1.`SKC数-TOP实际` as `SKC数-TOP实际-t1`,
                     concat(round(t1.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t1`,
-                    t1.`SKC数-TOP考核` as `SKC数-TOP考核-t1`,
                     concat(round(t1.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t1`,
-                    t1.`更新日期` as `更新日期-t1`,
-
-                    t2.`单店排名` as `单店排名-t2`,
-                    t2.`SKC数-整体` as `SKC数-整体-t2`,
+    
                     concat(round(t2.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t2`,
-                    t2.`SKC数-TOP实际` as `SKC数-TOP实际-t2`,
                     concat(round(t2.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t2`,
-                    t2.`SKC数-TOP考核` as `SKC数-TOP考核-t2`,
                     concat(round(t2.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t2`,
-                    t2.`更新日期` as `更新日期-t2`,
 
-                    t3.`单店排名` as `单店排名-t3`,
-                    t3.`SKC数-整体` as `SKC数-整体-t3`,
                     concat(round(t3.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t3`,
-                    t3.`SKC数-TOP实际` as `SKC数-TOP实际-t3`,
                     concat(round(t3.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t3`,
-                    t3.`SKC数-TOP考核` as `SKC数-TOP考核-t3`,
                     concat(round(t3.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t3`,
-                    t3.`更新日期` as `更新日期-t3`
+
+                    concat(round(t4.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t4`,
+                    concat(round(t4.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t4`,
+                    concat(round(t4.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t4`,
+
+                    concat(round(t5.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t5`,
+                    concat(round(t5.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t5`,
+                    concat(round(t5.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t5`,
+
+                    concat(round(t6.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t6`,
+                    concat(round(t6.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t6`,
+                    concat(round(t6.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t6`,
+
+                    concat(round(t7.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t7`,
+                    concat(round(t7.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t7`,
+                    concat(round(t7.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t7`,
+
+                    concat(round(t8.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t8`,
+                    concat(round(t8.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t8`,
+                    concat(round(t8.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t8`
 
                     {$count9_field}
                 FROM
@@ -1211,8 +1216,10 @@ class Duanmalv extends AdminController
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
+            foreach ($select_date as $key => $val) {
+                $select_date[$key]['weekStr'] = date_to_week($val['更新日期']);
+            }
             return View('table1_month', [
-                'limitDate' => $limitDate,
                 'select_date' => $select_date,
             ]);
         }
