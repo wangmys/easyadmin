@@ -927,6 +927,7 @@ class CodeService
     {
         // 查询仓库采购数据
         $sql = "SELECT
+        CAST(GETDATE() AS DATE) as Date,
         sp.TimeCategoryName1,
         sp.TimeCategoryName2,
         sp.CategoryName1,

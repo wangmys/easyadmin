@@ -426,10 +426,25 @@ class Ratio extends AdminController
 
 
             // 查询货号列表排名
-            $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->page($page, $limit)->select();
+            $list = $list->where(['Date' => date('Y-m-d')])->withoutField('上柜家数')->order('日均销','desc')->page($page, $limit)->select();
             $count = $model->where(['Date' => date('Y-m-d')])->count();
             $allList = [];
             $init = ($page - 1) * $limit;
+
+            $size = [
+                '库存_00/28/37/44/100/160/S',
+                '库存_29/38/46/105/165/M',
+                '库存_30/39/48/110/170/L',
+                '库存_31/40/50/115/175/XL',
+                '库存_32/41/52/120/180/2XL',
+                '库存_33/42/54/125/185/3XL',
+                '库存_34/43/56/190/4XL',
+                '库存_35/44/58/195/5XL',
+                '库存_36/6XL',
+                '库存_38/7XL',
+                '库存_40/8XL',
+                '合计'
+            ];
             foreach ($list as $key => &$value){
                   $value['近三天折率'] = '100%';
                   $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
@@ -440,13 +455,25 @@ class Ratio extends AdminController
                       ->order('ra.id')
                       ->select()
                       ->toArray();
-                  foreach ($item as $k =>$v){
+                  foreach ($item as $k => &$v){
+
                       foreach (['偏码','单码缺量'] as $kk => $vv){
                           if(($v_key = array_search($vv,$v)) !== false){
                             $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
                           }
                       }
-                      $allList[] = $value->toArray() + $v;
+
+
+                      $item2 = $value->toArray() + $v;
+                      foreach ($item2 as $vk => $val){
+                          if(empty($val)){
+                              $item2[$vk] = '';
+                          }else if(!empty($val) && is_numeric($val) && in_array($vk,$size) && in_array($item2['字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
+                              $item2[$vk] = $val.'%';
+                          }
+                      }
+                      
+                      $allList[] = $item2;
                   }
             }
             // 返回数据
@@ -510,7 +537,20 @@ class Ratio extends AdminController
                 $model = $model->where(['领型' => $filters['collar']]);
             }
 
-
+            $size = [
+                '00/28/37/44/100/160/S',
+                '29/38/46/105/165/M',
+                '30/39/48/110/170/L',
+                '31/40/50/115/175/XL',
+                '32/41/52/120/180/2XL',
+                '33/42/54/125/185/3XL',
+                '34/43/56/190/4XL',
+                '35/44/58/195/5XL',
+                '36/6XL',
+                '38/7XL',
+                '40/8XL',
+                '总计'
+            ];
             // 查询货号列表排名
             $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->page($page, $limit)->select();
             $count = $model->where(['Date' => date('Y-m-d')])->count();
@@ -518,7 +558,7 @@ class Ratio extends AdminController
             $init = ($page - 1) * $limit;
             foreach ($list as $key => &$value){
                   $value['近三天折率'] = '100%';
-                  $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
+                  $value['图片'] = $value['图片']?$value['图片']."?id={$value['id']}":'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg'."?id={$value['id']}";
                   $value['全国排名'] = $init + $key+1;
                   // 查询码比数据
                   $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号']);
@@ -528,7 +568,22 @@ class Ratio extends AdminController
                             $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
                           }
                       }
-                      $allList[] = $value->toArray() + $v;
+
+
+                      $item2 = $value->toArray() + $v;
+                      
+
+                      foreach ($item2 as $vk => $val){
+
+                          $vk_key = mb_substr($vk , 3);
+                          if(empty($val)){
+                              $item2[$vk] = '';
+                          }else if(!empty($val) && is_numeric($val) && in_array($vk_key,$size) && in_array($item2['广州_字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
+                              $item2[$vk] = $val.'%';
+                          }
+                      }
+
+                      $allList[] = $item2;
                   }
             }
             // 返回数据
