@@ -158,20 +158,36 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.skc_config-select'), function (key, element) {
 
+                var gender = $(element).find('.skc_sz_nostore')[0];
+                var data = JSON.parse($(element).attr('lay-data'));
+                // console.log(data);
+                var data = data.skc_sz_nostore;
+                var genderSelect = xmSelect.render({
+                    el: gender,
+                    filterable: true,
+                    data: function(){
+                        return data
+                    }
+                })
+
+
                 $(element).find('.get_skc_config').on('click', function(){
                     var _url = url.save_skc_config_url;
                     var dt_price = $(element).find('input[name="dt_price"]').val();
                     var dc_price = $(element).find('input[name="dc_price"]').val();
                     var sign_id = $(element).find('input[name="sign_id"]').val();
+                    var skc_sz_nostore = $(element).find('.skc_sz_nostore .label-content').attr('title');
+
                     var _data = {
                         dt_price:dt_price,
                         dc_price:dc_price,
-                        sign_id:sign_id
+                        sign_id:sign_id,
+                        skc_sz_nostore:skc_sz_nostore
                     }
                     // console.log(_data);
                     // 保存配置
                     that.saveSkcConfig($(element), _url, _data);
-                })
+                }.bind(genderSelect))
 
             });
                 
