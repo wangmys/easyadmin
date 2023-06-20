@@ -1049,7 +1049,7 @@ class Duanmalv extends BaseController
     // 6.单店品类断码情况（商品专员可看）
     public function table6() {
         $sql = "
-                SELECT
+            SELECT
                 云仓,
                 省份,
                 商品负责人,

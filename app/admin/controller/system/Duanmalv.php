@@ -1120,6 +1120,105 @@ class Duanmalv extends AdminController
         }  
     }
 
+    // table1 整月数据版本
+    public function table1_month() {
+        $today = date('Y-m-d');
+        $dayLast30 = date('Y-m-d', strtotime('-1 month'));
+        $sql1= "
+            SELECT
+                * 
+            FROM
+                cwl_duanmalv_week 
+            WHERE
+                更新日期 >= '{$dayLast30}' 
+                AND 更新日期 <= '{$today}' 
+            ORDER BY
+                更新日期 ASC
+        ";
+        $select_date = $this->db_easyA->query($sql1);
+    
+        if (request()->isAjax()) {
+            // dump($select_date);
+            // 9个展示
+            if (count($select_date) == 9) {
+                $count9_join = "left join cwl_duanmalv_table1_1 t9 ON t0.店铺名称=t9.店铺名称 and t9.更新日期 = '{$select_date[8]["更新日期"]}'";
+                $count9_field = "
+                    , t9.`单店排名` as `单店排名-t9`
+                    , t9.`SKC数-整体`as `SKC数-整体-t9`
+                    , concat(round(t9.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t9`
+                    , t9.`SKC数-TOP实际` as `SKC数-TOP实际-t9`
+                    , concat(round(t9.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t9`
+                    , t9.`SKC数-TOP考核` as `SKC数-TOP考核-t9`
+                    , concat(round(t9.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t9`
+                    , t9.`更新日期` as `更新日期-t9`
+                ";
+            } else {
+                $count9_join = "";
+                $count9_field = "";
+            }
+
+            $sql2 = "
+                SELECT  
+                    t0.商品负责人,t0.云仓,t0.省份,t0.店铺名称,t0.经营模式,
+                    t1.`单店排名` as `单店排名-t1`,
+                    t1.`SKC数-整体` as `SKC数-整体-t1`,
+                    concat(round(t1.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t1`,
+                    t1.`SKC数-TOP实际` as `SKC数-TOP实际-t1`,
+                    concat(round(t1.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t1`,
+                    t1.`SKC数-TOP考核` as `SKC数-TOP考核-t1`,
+                    concat(round(t1.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t1`,
+                    t1.`更新日期` as `更新日期-t1`,
+
+                    t2.`单店排名` as `单店排名-t2`,
+                    t2.`SKC数-整体` as `SKC数-整体-t2`,
+                    concat(round(t2.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t2`,
+                    t2.`SKC数-TOP实际` as `SKC数-TOP实际-t2`,
+                    concat(round(t2.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t2`,
+                    t2.`SKC数-TOP考核` as `SKC数-TOP考核-t2`,
+                    concat(round(t2.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t2`,
+                    t2.`更新日期` as `更新日期-t2`,
+
+                    t3.`单店排名` as `单店排名-t3`,
+                    t3.`SKC数-整体` as `SKC数-整体-t3`,
+                    concat(round(t3.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t3`,
+                    t3.`SKC数-TOP实际` as `SKC数-TOP实际-t3`,
+                    concat(round(t3.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t3`,
+                    t3.`SKC数-TOP考核` as `SKC数-TOP考核-t3`,
+                    concat(round(t3.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP考核-t3`,
+                    t3.`更新日期` as `更新日期-t3`
+
+                    {$count9_field}
+                FROM
+                    cwl_duanmalv_table1_1 t0 
+                    left join cwl_duanmalv_table1_1 t1 ON t0.店铺名称=t1.店铺名称 and t1.更新日期 = '{$select_date[0]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t2 ON t0.店铺名称=t2.店铺名称 and t2.更新日期 = '{$select_date[1]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t3 ON t0.店铺名称=t3.店铺名称 and t3.更新日期 = '{$select_date[2]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t4 ON t0.店铺名称=t4.店铺名称 and t4.更新日期 = '{$select_date[3]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t5 ON t0.店铺名称=t5.店铺名称 and t5.更新日期 = '{$select_date[4]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t6 ON t0.店铺名称=t6.店铺名称 and t6.更新日期 = '{$select_date[5]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t7 ON t0.店铺名称=t7.店铺名称 and t7.更新日期 = '{$select_date[6]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t8 ON t0.店铺名称=t8.店铺名称 and t8.更新日期 = '{$select_date[7]["更新日期"]}'
+                    {$count9_join}
+                WHERE 1
+
+                GROUP BY
+                    t0.店铺名称
+                ORDER BY t2.商品负责人 DESC, t2.`单店排名` ASC
+            ";
+
+            $select = $this->db_easyA->query($sql2);
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+        } else {
+            // 目前时间该展示的两个时间 
+            $limitDate = $this->duanmalvDateHandle(true);
+            return View('table1_month', [
+                'limitDate' => $limitDate,
+                'select_date' => $select_date,
+            ]);
+        }
+
+    }
+
     // 整体 1_2
     public function table1_2() {
         if (request()->isAjax()) {
