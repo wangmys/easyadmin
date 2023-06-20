@@ -18,7 +18,8 @@ class SkcService
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
 
-        $list = SpSkcSzDetailModel::where([])->paginate([
+        $skc_sz_nostore = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('skc_sz_nostore')->find();
+        $list = SpSkcSzDetailModel::where([['store_name', 'not in', $skc_sz_nostore['skc_sz_nostore']]])->paginate([
             'list_rows'=> $pageLimit,
             'page' => $page,
         ]);
@@ -474,8 +475,25 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
      */
     public function get_skc_config() {
 
-        $list = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('config_str,dt_price,dc_price')->find();
+        $list = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('config_str,dt_price,dc_price,skc_sz_nostore')->find();
         $list = $list ? $list->toArray() : [];
+        $skc_sz_nostore = $list['skc_sz_nostore'] ? explode(',', $list['skc_sz_nostore']) : [];
+        //skc上装 不考核店铺处理
+        $all_customers = Db::connect("mysql2")->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $all_customers = array_column($all_customers, 'CustomerName');
+        $all_customers = array_combine($all_customers, $all_customers) ;
+        $arr = [];
+        foreach ($all_customers as $v_customer) {
+            $tmp_arr = [];
+            $tmp_arr['name'] = $v_customer;
+            $tmp_arr['value'] = $v_customer;
+            if (in_array($v_customer, $skc_sz_nostore)) {
+                $tmp_arr['selected'] = true;
+            }
+            $arr[] = $tmp_arr;
+        }
+        $list['skc_sz_nostore'] = $arr;
+
         return $list;
 
     }

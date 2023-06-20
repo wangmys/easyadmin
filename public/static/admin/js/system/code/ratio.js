@@ -126,166 +126,192 @@ define(["jquery", "easy-admin"], function ($, ea) {
         },
         alllist: function () {
 
-            // 风格
-            var Style = JSON.parse($("#Style").val());
-            var CategoryName1 = JSON.parse($("#CategoryName1").val());
-            var CategoryName2 = JSON.parse($("#CategoryName2").val());
-            var Collar = JSON.parse($("#Collar").val());
+            // 自定义模块
+            layui.config({
+                base: '/static/ok/layuiadmin/modules/'
+            }).extend({
+                tableMerge: 'tableMerge'
+            });
 
-            console.log(Style,CategoryName1,CategoryName2,Collar)
-            ea.table.render({
-                init:{
-                   table_elem: '#currentTable',
-                   table_render_id: 'currentTableRenderId',
-                   index_url: 'system.code.ratio/alllist',
-                   export_url: 'system.code.index/index_export'
-                },
-                where:{filter:[]},
-                height:'full-15',
-                toolbar:[],
-                limit:40,
-                size:'sm',
-                limits:[40,50,100,200,1000],
-                cols: [[
-                    {field: '全国排名', width: 80, title: '全国排名',search:false,fixed:'left'},
-                    {field: '货号', width: 100, title: '货号',search:false,fixed:'left'},
-                    {field: '风格', width: 80, title: '风格',search:'select',selectList:Style,fixed:'left'},
-                    {field: '一级分类', width: 80, title: '一级分类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
-                    {field: '二级分类', width: 80, title: '二级分类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left'},
-                    {field: '领型', width: 80, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},
-                    {field: '近三天折率', width: 80, title: '近三天折率',search:false},
-                    {field: '货品等级', width: 80, title: '货品等级',search:false},
-                    {field: '上柜家数', width: 80, title: '上柜家数',search:false},
-                    // {field: '上市天数', width: 80, title: '上市天数',search:false},
-                    // {field: '日均销', width: 80, title: '日均销',search:false},
-                    {field: '图片', width: 80, title: '图片', search: false, templet: ea.table.image,imageHeight:30},
-                    {field: '字段', width: 115, title: '字段', search: false},
-                    {field: '合计', width: 100, title: '合计', search: false},
-                    {field: '库存_00/28/37/44/100/160/S', width: 140, title: '00/28/37/44/100/160/S', search: false},
-                    {field: '库存_29/38/46/105/165/M', width: 140, title: '29/38/46/105/165/M', search: false},
-                    {field: '库存_30/39/48/110/170/L', width: 140, title: '30/39/48/110/170/L', search: false},
-                    {field: '库存_31/40/50/115/175/XL', width: 140, title: '31/40/50/115/175/XL', search: false},
-                    {field: '库存_32/41/52/120/180/2XL', width: 140, title: '32/41/52/120/180/2XL', search: false},
-                    {field: '库存_33/42/54/125/185/3XL', width: 140, title: '33/42/54/125/185/3XL', search: false},
-                    {field: '库存_34/43/56/190/4XL', width: 140, title: '34/43/56/190/4XL', search: false},
-                    {field: '库存_35/44/58/195/5XL', width: 140, title: '35/44/58/195/5XL', search: false},
-                    {field: '库存_36/6XL', width: 110, title: '36/6XL', search: false},
-                    {field: '库存_38/7XL', width: 110, title: '38/7XL', search: false},
-                    {field: '库存_40/8XL', width: 110, title: '40/8XL', search: false}
-                ]]
+            layui.use(['form', 'table','tableMerge'], function () {
+                tableMerge = layui.tableMerge;
+                // 风格
+                var Style = JSON.parse($("#Style").val());
+                var CategoryName1 = JSON.parse($("#CategoryName1").val());
+                var CategoryName2 = JSON.parse($("#CategoryName2").val());
+                var Collar = JSON.parse($("#Collar").val());
+
+                ea.table.render({
+                    init:{
+                       table_elem: '#currentTable',
+                       table_render_id: 'currentTableRenderId',
+                       index_url: 'system.code.ratio/alllist',
+                       export_url: 'system.code.index/index_export'
+                    },
+                    where:{filter:[]},
+                    height:'full-15',
+                    toolbar:[],
+                    limit:40,
+                    size:'sm',
+                    limits:[40,50,100,200,1000],
+                    cols: [
+                        [
+                        {field: '全国排名', width: 80, title: '全国排名',search:false,fixed:'left'},
+                        {field: '货号', width: 100, title: '货号',search:false,fixed:'left'},
+                        {field: '风格', width: 80, title: '风格',search:'select',selectList:Style,fixed:'left'},
+                        {field: '一级分类', width: 80, title: '一级分类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
+                        {field: '二级分类', width: 80, title: '二级分类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left'},
+                        {field: '领型', width: 80, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},
+                        {field: '近三天折率', width: 90, title: '近三天折率',search:false},
+                        {field: '货品等级', width: 80, title: '货品等级',search:false},
+                        {field: '上柜家数', width: 80, title: '上柜家数',search:false},
+                        // {field: '上市天数', width: 80, title: '上市天数',search:false},
+                        // {field: '日均销', width: 80, title: '日均销',search:false},
+                        {field: '图片', width: 80, title: '图片', search: false, templet: ea.table.image,imageHeight:30,merge: true},
+                        {field: '字段', width: 115, title: '字段', search: false},
+                        {field: '合计', width: 100, title: '合计', search: false},
+                        {field: '库存_00/28/37/44/100/160/S', width: 140, title: '00/28/37/44/100/160/S', search: false},
+                        {field: '库存_29/38/46/105/165/M', width: 140, title: '29/38/46/105/165/M', search: false},
+                        {field: '库存_30/39/48/110/170/L', width: 140, title: '30/39/48/110/170/L', search: false},
+                        {field: '库存_31/40/50/115/175/XL', width: 140, title: '31/40/50/115/175/XL', search: false},
+                        {field: '库存_32/41/52/120/180/2XL', width: 140, title: '32/41/52/120/180/2XL', search: false},
+                        {field: '库存_33/42/54/125/185/3XL', width: 140, title: '33/42/54/125/185/3XL', search: false},
+                        {field: '库存_34/43/56/190/4XL', width: 140, title: '34/43/56/190/4XL', search: false},
+                        {field: '库存_35/44/58/195/5XL', width: 140, title: '35/44/58/195/5XL', search: false},
+                        {field: '库存_36/6XL', width: 110, title: '36/6XL', search: false},
+                        {field: '库存_38/7XL', width: 110, title: '38/7XL', search: false},
+                        {field: '库存_40/8XL', width: 110, title: '40/8XL', search: false}
+                    ]
+                    ],done: function(){
+                        tableMerge.render(this)
+                    }
+                });
             });
 
             ea.listen();
         },
         warehouseList: function () {
 
-            // 风格
-            var Style = JSON.parse($("#Style").val());
-            var CategoryName1 = JSON.parse($("#CategoryName1").val());
-            var CategoryName2 = JSON.parse($("#CategoryName2").val());
-            var Collar = JSON.parse($("#Collar").val());
-            ea.table.render({
-                init:{
-                   table_elem: '#currentTable',
-                   table_render_id: 'currentTableRenderId',
-                   index_url: 'system.code.ratio/warehouseList',
-                   export_url: 'system.code.index/index_export'
-                },
-                where:{filter:[]},
-                height: 760,
-                toolbar:[],
-                limit:20,
-                limits:[15,20,50,100,200,1000],
-                cols: [
-                    [
-                        {field: '全国排名', width: 80, title: '全国排名',search:false,rowspan: 2},
-                        {field: '货号', width: 110, title: '货号',search:false,rowspan: 2},
-                        {field: '风格', width: 80, title: '风格',search:'select',selectList:Style,rowspan: 2},
-                        {field: '一级分类', width: 110, title: '一级分类',fieldAlias:'cate',search:'select',selectList:CategoryName1,rowspan: 2},
-                        {field: '二级分类', width: 110, title: '二级分类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,rowspan: 2},
-                        {field: '领型', width: 110, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,rowspan: 2},
-                        {field: '近三天折率', width: 110, title: '近三天折率',search:false,rowspan: 2},
-                        {field: '货品等级', width: 110, title: '货品等级',search:false,rowspan: 2},
-                        {field: '上柜家数', width: 110, title: '上柜家数',search:false,rowspan: 2},
-                        // {field: '上市天数', width: 110, title: '上市天数',search:false,rowspan: 2},
-                        // {field: '日均销', width: 110, title: '日均销',search:false,rowspan: 2},
-                        {field: '图片', width: 80, title: '图片', search: false, templet: ea.table.image,imageHeight:30,rowspan: 2},
-                        {title: '广州云仓',colspan: 13},
-                        {title: '南昌云仓',colspan: 13},
-                        {title: '武汉云仓',colspan: 13},
-                        {title: '长沙云仓',colspan: 13},
-                        {title: '贵阳云仓',colspan: 13}
-                    ],
-                    [
-                        {field: '广州_字段', width: 115, title: '字段', search: false},
-                        {field: '广州_总计', width: 90, title: '总计', search: false},
-                        {field: '广州_00/28/37/44/100/160/S', width: 145, title: '00/28/37/44/100/160/S', search: false},
-                        {field: '广州_29/38/46/105/165/M', width: 145, title: '29/38/46/105/165/M', search: false},
-                        {field: '广州_30/39/48/110/170/L', width: 145, title: '30/39/48/110/170/L', search: false},
-                        {field: '广州_31/40/50/115/175/XL', width: 145, title: '31/40/50/115/175/XL', search: false},
-                        {field: '广州_32/41/52/120/180/2XL', width: 145, title: '32/41/52/120/180/2XL', search: false},
-                        {field: '广州_33/42/54/125/185/3XL', width: 145, title: '33/42/54/125/185/3XL', search: false},
-                        {field: '广州_34/43/56/190/4XL', width: 145, title: '34/43/56/190/4XL', search: false},
-                        {field: '广州_35/44/58/195/5XL', width: 145, title: '35/44/58/195/5XL', search: false},
-                        {field: '广州_36/6XL', width: 110, title: '36/6XL', search: false},
-                        {field: '广州_38/7XL', width: 110, title: '38/7XL', search: false},
-                        {field: '广州_40/8XL', width: 110, title: '40/8XL', search: false},
-                        {field: '南昌_字段', width: 115, title: '字段', search: false},
-                        {field: '南昌_总计', width: 90, title: '总计', search: false},
-                        {field: '南昌_00/28/37/44/100/160/S', width: 145, title: '00/28/37/44/100/160/S', search: false},
-                        {field: '南昌_29/38/46/105/165/M', width: 145, title: '29/38/46/105/165/M', search: false},
-                        {field: '南昌_30/39/48/110/170/L', width: 145, title: '30/39/48/110/170/L', search: false},
-                        {field: '南昌_31/40/50/115/175/XL', width: 145, title: '31/40/50/115/175/XL', search: false},
-                        {field: '南昌_32/41/52/120/180/2XL', width: 145, title: '32/41/52/120/180/2XL', search: false},
-                        {field: '南昌_33/42/54/125/185/3XL', width: 145, title: '33/42/54/125/185/3XL', search: false},
-                        {field: '南昌_34/43/56/190/4XL', width: 145, title: '34/43/56/190/4XL', search: false},
-                        {field: '南昌_35/44/58/195/5XL', width: 145, title: '35/44/58/195/5XL', search: false},
-                        {field: '南昌_36/6XL', width: 110, title: '36/6XL', search: false},
-                        {field: '南昌_38/7XL', width: 110, title: '38/7XL', search: false},
-                        {field: '南昌_40/8XL', width: 110, title: '40/8XL', search: false},
-                        {field: '武汉_字段', width: 115, title: '字段', search: false},
-                        {field: '武汉_总计', width: 90, title: '总计', search: false},
-                        {field: '武汉_00/28/37/44/100/160/S', width: 145, title: '00/28/37/44/100/160/S', search: false},
-                        {field: '武汉_29/38/46/105/165/M', width: 145, title: '29/38/46/105/165/M', search: false},
-                        {field: '武汉_30/39/48/110/170/L', width: 145, title: '30/39/48/110/170/L', search: false},
-                        {field: '武汉_31/40/50/115/175/XL', width: 145, title: '31/40/50/115/175/XL', search: false},
-                        {field: '武汉_32/41/52/120/180/2XL', width: 145, title: '32/41/52/120/180/2XL', search: false},
-                        {field: '武汉_33/42/54/125/185/3XL', width: 145, title: '33/42/54/125/185/3XL', search: false},
-                        {field: '武汉_34/43/56/190/4XL', width: 145, title: '34/43/56/190/4XL', search: false},
-                        {field: '武汉_35/44/58/195/5XL', width: 145, title: '35/44/58/195/5XL', search: false},
-                        {field: '武汉_36/6XL', width: 110, title: '36/6XL', search: false},
-                        {field: '武汉_38/7XL', width: 110, title: '38/7XL', search: false},
-                        {field: '武汉_40/8XL', width: 110, title: '40/8XL', search: false},
-                        {field: '长沙_字段', width: 115, title: '字段', search: false},
-                        {field: '长沙_总计', width: 90, title: '总计', search: false},
-                        {field: '长沙_00/28/37/44/100/160/S', width: 145, title: '00/28/37/44/100/160/S', search: false},
-                        {field: '长沙_29/38/46/105/165/M', width: 145, title: '29/38/46/105/165/M', search: false},
-                        {field: '长沙_30/39/48/110/170/L', width: 145, title: '30/39/48/110/170/L', search: false},
-                        {field: '长沙_31/40/50/115/175/XL', width: 145, title: '31/40/50/115/175/XL', search: false},
-                        {field: '长沙_32/41/52/120/180/2XL', width: 145, title: '32/41/52/120/180/2XL', search: false},
-                        {field: '长沙_33/42/54/125/185/3XL', width: 145, title: '33/42/54/125/185/3XL', search: false},
-                        {field: '长沙_34/43/56/190/4XL', width: 145, title: '34/43/56/190/4XL', search: false},
-                        {field: '长沙_35/44/58/195/5XL', width: 145, title: '35/44/58/195/5XL', search: false},
-                        {field: '长沙_36/6XL', width: 110, title: '36/6XL', search: false},
-                        {field: '长沙_38/7XL', width: 110, title: '38/7XL', search: false},
-                        {field: '长沙_40/8XL', width: 110, title: '40/8XL', search: false},
-                        {field: '贵阳_字段', width: 115, title: '字段', search: false},
-                        {field: '贵阳_总计', width: 90, title: '总计', search: false},
-                        {field: '贵阳_00/28/37/44/100/160/S', width: 145, title: '00/28/37/44/100/160/S', search: false},
-                        {field: '贵阳_29/38/46/105/165/M', width: 145, title: '29/38/46/105/165/M', search: false},
-                        {field: '贵阳_30/39/48/110/170/L', width: 145, title: '30/39/48/110/170/L', search: false},
-                        {field: '贵阳_31/40/50/115/175/XL', width: 145, title: '31/40/50/115/175/XL', search: false},
-                        {field: '贵阳_32/41/52/120/180/2XL', width: 145, title: '32/41/52/120/180/2XL', search: false},
-                        {field: '贵阳_33/42/54/125/185/3XL', width: 145, title: '33/42/54/125/185/3XL', search: false},
-                        {field: '贵阳_34/43/56/190/4XL', width: 145, title: '34/43/56/190/4XL', search: false},
-                        {field: '贵阳_35/44/58/195/5XL', width: 145, title: '35/44/58/195/5XL', search: false},
-                        {field: '贵阳_36/6XL', width: 110, title: '36/6XL', search: false},
-                        {field: '贵阳_38/7XL', width: 110, title: '38/7XL', search: false},
-                        {field: '贵阳_40/8XL', width: 110, title: '40/8XL', search: false}
-                    ]
-                ]
+            // 自定义模块
+            layui.config({
+                base: '/static/ok/layuiadmin/modules/'
+            }).extend({
+                tableMerge: 'tableMerge'
             });
 
+            layui.use(['form', 'table','tableMerge'], function () {
+
+                tableMerge = layui.tableMerge;
+                // 风格
+                var Style = JSON.parse($("#Style").val());
+                var CategoryName1 = JSON.parse($("#CategoryName1").val());
+                var CategoryName2 = JSON.parse($("#CategoryName2").val());
+                var Collar = JSON.parse($("#Collar").val());
+                ea.table.render({
+                    init:{
+                       table_elem: '#currentTable',
+                       table_render_id: 'currentTableRenderId',
+                       index_url: 'system.code.ratio/warehouseList',
+                       export_url: 'system.code.index/index_export'
+                    },
+                    where:{filter:[]},
+                    height:'full-15',
+                    toolbar:[],
+                    limit:20,
+                    limits:[15,20,50,100,200,1000],
+                    size:'sm',
+                    cols: [
+                        [
+                            {field: '全国排名', width: 60, title: '排名',search:false,rowspan: 2,fixed:'left'},
+                            {field: '货号', width: 100, title: '货号',search:false,rowspan: 2,fixed:'left'},
+                            {field: '风格', width: 80, title: '风格',search:'select',selectList:Style,rowspan: 2,fixed:'left'},
+                            {field: '一级分类', width: 80, title: '一级分类',fieldAlias:'cate',search:'select',selectList:CategoryName1,rowspan: 2,fixed:'left'},
+                            {field: '二级分类', width: 80, title: '二级分类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,rowspan: 2,fixed:'left'},
+                            {field: '领型', width: 80, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,rowspan: 2,fixed:'left'},
+                            {field: '近三天折率', width: 90, title: '近三天折率',search:false,rowspan: 2},
+                            {field: '货品等级', width: 80, title: '货品等级',search:false,rowspan: 2},
+                            {field: '上柜家数', width: 80, title: '上柜家数',search:false,rowspan: 2},
+                            // {field: '上市天数', width: 110, title: '上市天数',search:false,rowspan: 2},
+                            // {field: '日均销', width: 110, title: '日均销',search:false,rowspan: 2},
+                            {field: '图片', width: 80, title: '图片', search: false,rowspan: 2, templet: ea.table.image,imageHeight:30,merge: true},
+                            {title: '广州云仓',colspan: 13},
+                            {title: '南昌云仓',colspan: 13},
+                            {title: '武汉云仓',colspan: 13},
+                            {title: '长沙云仓',colspan: 13},
+                            {title: '贵阳云仓',colspan: 13}
+                        ],
+                        [
+                            {field: '广州_字段', width: 115, title: '字段', search: false},
+                            {field: '广州_总计', width: 90, title: '总计', search: false},
+                            {field: '广州_00/28/37/44/100/160/S', width: 155, title: '00/28/37/44/100/160/S', search: false},
+                            {field: '广州_29/38/46/105/165/M', width: 155, title: '29/38/46/105/165/M', search: false},
+                            {field: '广州_30/39/48/110/170/L', width: 155, title: '30/39/48/110/170/L', search: false},
+                            {field: '广州_31/40/50/115/175/XL', width: 155, title: '31/40/50/115/175/XL', search: false},
+                            {field: '广州_32/41/52/120/180/2XL', width: 155, title: '32/41/52/120/180/2XL', search: false},
+                            {field: '广州_33/42/54/125/185/3XL', width: 155, title: '33/42/54/125/185/3XL', search: false},
+                            {field: '广州_34/43/56/190/4XL', width: 155, title: '34/43/56/190/4XL', search: false},
+                            {field: '广州_35/44/58/195/5XL', width: 155, title: '35/44/58/195/5XL', search: false},
+                            {field: '广州_36/6XL', width: 110, title: '36/6XL', search: false},
+                            {field: '广州_38/7XL', width: 110, title: '38/7XL', search: false},
+                            {field: '广州_40/8XL', width: 110, title: '40/8XL', search: false},
+                            {field: '南昌_字段', width: 115, title: '字段', search: false},
+                            {field: '南昌_总计', width: 90, title: '总计', search: false},
+                            {field: '南昌_00/28/37/44/100/160/S', width: 155, title: '00/28/37/44/100/160/S', search: false},
+                            {field: '南昌_29/38/46/105/165/M', width: 155, title: '29/38/46/105/165/M', search: false},
+                            {field: '南昌_30/39/48/110/170/L', width: 155, title: '30/39/48/110/170/L', search: false},
+                            {field: '南昌_31/40/50/115/175/XL', width: 155, title: '31/40/50/115/175/XL', search: false},
+                            {field: '南昌_32/41/52/120/180/2XL', width: 155, title: '32/41/52/120/180/2XL', search: false},
+                            {field: '南昌_33/42/54/125/185/3XL', width: 155, title: '33/42/54/125/185/3XL', search: false},
+                            {field: '南昌_34/43/56/190/4XL', width: 155, title: '34/43/56/190/4XL', search: false},
+                            {field: '南昌_35/44/58/195/5XL', width: 155, title: '35/44/58/195/5XL', search: false},
+                            {field: '南昌_36/6XL', width: 110, title: '36/6XL', search: false},
+                            {field: '南昌_38/7XL', width: 110, title: '38/7XL', search: false},
+                            {field: '南昌_40/8XL', width: 110, title: '40/8XL', search: false},
+                            {field: '武汉_字段', width: 115, title: '字段', search: false},
+                            {field: '武汉_总计', width: 90, title: '总计', search: false},
+                            {field: '武汉_00/28/37/44/100/160/S', width: 155, title: '00/28/37/44/100/160/S', search: false},
+                            {field: '武汉_29/38/46/105/165/M', width: 155, title: '29/38/46/105/165/M', search: false},
+                            {field: '武汉_30/39/48/110/170/L', width: 155, title: '30/39/48/110/170/L', search: false},
+                            {field: '武汉_31/40/50/115/175/XL', width: 155, title: '31/40/50/115/175/XL', search: false},
+                            {field: '武汉_32/41/52/120/180/2XL', width: 155, title: '32/41/52/120/180/2XL', search: false},
+                            {field: '武汉_33/42/54/125/185/3XL', width: 155, title: '33/42/54/125/185/3XL', search: false},
+                            {field: '武汉_34/43/56/190/4XL', width: 155, title: '34/43/56/190/4XL', search: false},
+                            {field: '武汉_35/44/58/195/5XL', width: 155, title: '35/44/58/195/5XL', search: false},
+                            {field: '武汉_36/6XL', width: 110, title: '36/6XL', search: false},
+                            {field: '武汉_38/7XL', width: 110, title: '38/7XL', search: false},
+                            {field: '武汉_40/8XL', width: 110, title: '40/8XL', search: false},
+                            {field: '长沙_字段', width: 115, title: '字段', search: false},
+                            {field: '长沙_总计', width: 90, title: '总计', search: false},
+                            {field: '长沙_00/28/37/44/100/160/S', width: 155, title: '00/28/37/44/100/160/S', search: false},
+                            {field: '长沙_29/38/46/105/165/M', width: 155, title: '29/38/46/105/165/M', search: false},
+                            {field: '长沙_30/39/48/110/170/L', width: 155, title: '30/39/48/110/170/L', search: false},
+                            {field: '长沙_31/40/50/115/175/XL', width: 155, title: '31/40/50/115/175/XL', search: false},
+                            {field: '长沙_32/41/52/120/180/2XL', width: 155, title: '32/41/52/120/180/2XL', search: false},
+                            {field: '长沙_33/42/54/125/185/3XL', width: 155, title: '33/42/54/125/185/3XL', search: false},
+                            {field: '长沙_34/43/56/190/4XL', width: 155, title: '34/43/56/190/4XL', search: false},
+                            {field: '长沙_35/44/58/195/5XL', width: 155, title: '35/44/58/195/5XL', search: false},
+                            {field: '长沙_36/6XL', width: 110, title: '36/6XL', search: false},
+                            {field: '长沙_38/7XL', width: 110, title: '38/7XL', search: false},
+                            {field: '长沙_40/8XL', width: 110, title: '40/8XL', search: false},
+                            {field: '贵阳_字段', width: 115, title: '字段', search: false},
+                            {field: '贵阳_总计', width: 90, title: '总计', search: false},
+                            {field: '贵阳_00/28/37/44/100/160/S', width: 155, title: '00/28/37/44/100/160/S', search: false},
+                            {field: '贵阳_29/38/46/105/165/M', width: 155, title: '29/38/46/105/165/M', search: false},
+                            {field: '贵阳_30/39/48/110/170/L', width: 155, title: '30/39/48/110/170/L', search: false},
+                            {field: '贵阳_31/40/50/115/175/XL', width: 155, title: '31/40/50/115/175/XL', search: false},
+                            {field: '贵阳_32/41/52/120/180/2XL', width: 155, title: '32/41/52/120/180/2XL', search: false},
+                            {field: '贵阳_33/42/54/125/185/3XL', width: 155, title: '33/42/54/125/185/3XL', search: false},
+                            {field: '贵阳_34/43/56/190/4XL', width: 155, title: '34/43/56/190/4XL', search: false},
+                            {field: '贵阳_35/44/58/195/5XL', width: 155, title: '35/44/58/195/5XL', search: false},
+                            {field: '贵阳_36/6XL', width: 110, title: '36/6XL', search: false},
+                            {field: '贵阳_38/7XL', width: 110, title: '38/7XL', search: false},
+                            {field: '贵阳_40/8XL', width: 110, title: '40/8XL', search: false}
+                        ]
+                    ],done: function(){
+                        tableMerge.render(this)
+                    }
+                });
+            })
             ea.listen();
         }
     };
