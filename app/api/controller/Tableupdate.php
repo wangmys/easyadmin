@@ -543,7 +543,13 @@ class Tableupdate extends BaseController
         // dump($select);die;
         if ($select) {
             $this->db_bi->execute('TRUNCATE retail_2week_by_wangwei;');
-            $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
+
+            $select_chunk = array_chunk($select, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_bi->table('retail_2week_by_wangwei')->insertAll($val);
+            }
+            // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
             return json([
                 'status' => 1,
                 'msg' => 'success',
