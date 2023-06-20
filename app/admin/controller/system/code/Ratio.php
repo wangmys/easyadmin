@@ -499,6 +499,105 @@ class Ratio extends AdminController
 
 
     /**
+     * 总体偏码导出
+     * @return mixed|\think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function alllist_export()
+    {
+        // 筛选
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
+
+        // 获取参数
+        $get = $this->request->get();
+
+        $page = isset($get['page']) && !empty($get['page']) ? $get['page'] : 1;
+        $limit = isset($get['limit']) && !empty($get['limit']) ? $get['limit'] : 15000;
+
+        $where = [];
+
+        $list = new SizeRanking;
+        $model = new SizeRanking;
+        if(isset($filters['风格']) && !empty($filters['风格'])){
+            $list = $list->where(['风格' => $filters['风格']]);
+            $model = $model->where(['风格' => $filters['风格']]);
+        }
+
+        if(isset($filters['cate']) && !empty($filters['cate'])){
+            $list = $list->where(['一级分类' => $filters['cate']]);
+            $model = $model->where(['一级分类' => $filters['cate']]);
+        }
+
+        if(isset($filters['cate2']) && !empty($filters['cate2'])){
+            $list = $list->where(['二级分类' => $filters['cate2']]);
+            $model = $model->where(['二级分类' => $filters['cate2']]);
+        }
+
+        if(isset($filters['collar']) && !empty($filters['collar'])){
+            $list = $list->where(['领型' => $filters['collar']]);
+            $model = $model->where(['领型' => $filters['collar']]);
+        }
+
+
+        // 查询货号列表排名
+        $list = $list->where(['Date' => date('Y-m-d')])->withoutField('上柜家数')->order('日均销','desc')->page($page, $limit)->select();
+        $count = $model->where(['Date' => date('Y-m-d')])->count();
+        $allList = [];
+        $init = ($page - 1) * $limit;
+
+        $size = [
+            '库存_00/28/37/44/100/160/S',
+            '库存_29/38/46/105/165/M',
+            '库存_30/39/48/110/170/L',
+            '库存_31/40/50/115/175/XL',
+            '库存_32/41/52/120/180/2XL',
+            '库存_33/42/54/125/185/3XL',
+            '库存_34/43/56/190/4XL',
+            '库存_35/44/58/195/5XL',
+            '库存_36/6XL',
+            '库存_38/7XL',
+            '库存_40/8XL',
+            '合计'
+        ];
+
+        foreach ($list as $key => &$value){
+              $value['近三天折率'] = '100%';
+              $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
+              $value['全国排名'] = $init + $key+1;
+              $item = $value->alias('r')
+                  ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo and r.Date = ra.Date')
+                  ->where(['ra.GoodsNo' => $value['货号'],'ra.Date' => date('Y-m-d')])
+                  ->order('ra.id')
+                  ->select()
+                  ->toArray();
+              foreach ($item as $k => &$v){
+
+                  foreach (['偏码','单码缺量'] as $kk => $vv){
+                      if(($v_key = array_search($vv,$v)) !== false){
+                        $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
+                      }
+                  }
+
+
+                  $item2 = $value->toArray() + $v;
+                  foreach ($item2 as $vk => $val){
+                      if(empty($val)){
+                          $item2[$vk] = '';
+                      }else if(!empty($val) && is_numeric($val) && in_array($vk,$size) && in_array($item2['字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
+                          $item2[$vk] = $val.'%';
+                      }
+                  }
+                  $allList[] = $item2;
+              }
+        }
+
+
+    }
+
+
+    /**
      * @NodeAnotation(title="展示所有货号云仓偏码")
      */
     public function warehouseList()
@@ -629,10 +728,5 @@ class Ratio extends AdminController
             '二级分类' => $cate2
         ])->column('领型','领型');
         return $this->success('成功',$collar);
-    }
-    
-    public function sss()
-    {
-        return $this->fetch();
     }
 }
