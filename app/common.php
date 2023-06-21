@@ -27,6 +27,57 @@ if (!function_exists('pullLog')){
 }
 
 
+if (!function_exists('getColor')){
+
+    /**
+     * 获取颜色
+     * @param $type
+     * @return array
+     */
+    function getColor($type)
+    {
+        $color = 'red';
+       switch ($type){
+           case '当前库存尺码比':
+               $color = 'rgb(180,198,231)';
+               break;
+           case '总库存尺码比':
+               $color = 'rgb(180,198,231)';
+               break;
+           case '累销尺码比':
+               $color = 'rgb(255,199,206)';
+               break;
+       }
+       return $color;
+    }
+}
+
+
+if (!function_exists('getArray')){
+
+    /**
+     * 获取数组前几个元素
+     * @param $array
+     * @param $num
+     * @return array
+     */
+    function getArray($array,$num)
+    {
+        $arr = [];
+        $i = 1;
+        foreach ($array as $k=>$v){
+            if($i <= $num && !empty($v)){
+                $arr[] = $v;
+            }else{
+                return $arr;
+            }
+            $i++;
+        }
+        return $arr;
+    }
+}
+
+
 if (!function_exists('__url')) {
 
     /**

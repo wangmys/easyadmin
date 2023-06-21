@@ -445,6 +445,9 @@ class Ratio extends AdminController
                 '库存_40/8XL',
                 '合计'
             ];
+
+            // 货品等级
+            $config = sysconfig('site');
             foreach ($list as $key => &$value){
                   $value['近三天折率'] = '100%';
                   $value['图片'] = $value['图片']?:'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg';
@@ -455,6 +458,15 @@ class Ratio extends AdminController
                       ->order('ra.id')
                       ->select()
                       ->toArray();
+
+                  // 单码缺量判断数值
+                  $level_rate = 0;
+                  if($value['货品等级']=='B级'){
+                      $level_rate = $config['level_b'];
+                  }else{
+                      $level_rate = $config['level_other'];
+                  }
+
                   foreach ($item as $k => &$v){
 
                       foreach (['偏码','单码缺量'] as $kk => $vv){
@@ -463,8 +475,37 @@ class Ratio extends AdminController
                           }
                       }
 
-
                       $item2 = $value->toArray() + $v;
+
+                      if(in_array($item2['字段'],['当前库存尺码比','总库存尺码比','累销尺码比','单码售罄','单码售罄比'])){
+                        $r_size = array_slice($size,0,-1);
+                        $temp_arr = [];
+                        foreach ($r_size as $k => $v){
+                            $temp_arr[$v] = $item2[$v];
+
+//                            if($item2['字段'] == '单码售罄' && $item2[$v] > $item2['合计']){
+//                                $item2[$v] = "<span style='width: 100%;display: block; background:rgb(255,199,206);color:white;margin: 0px;padding: 0px' >{$item2[$v]}%</span>";
+//                            }
+
+                            if($item2['字段'] == '单码售罄比' && $item2[$v] > $level_rate){
+                                $item2[$v] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$item2[$v]}%</span>";
+                            }
+
+                        }
+                        if(in_array($item2['字段'],['当前库存尺码比','总库存尺码比','累销尺码比'])){
+                            rsort($temp_arr);
+                            // 获取数组前三的元素值
+                            $in_arr = getArray($temp_arr,3);
+                            // 值等于前三的元素都标红
+                            foreach ($r_size as $k => $v){
+                                if(in_array($item2[$v],$in_arr)){
+                                    $color = getColor($item2['字段']);
+                                    $item2[$v] = "<span style='width: 100%;display: block; background:{$color};color:white;margin: 0px;padding: 0px' >{$item2[$v]}%</span>";
+                                }
+                            }
+                        }
+                      }
+
                       foreach ($item2 as $vk => $val){
                           if(empty($val)){
                               $item2[$vk] = '';
@@ -650,6 +691,8 @@ class Ratio extends AdminController
                 '40/8XL',
                 '总计'
             ];
+            // 偏码判断设置
+            $config = sysconfig('site');
             // 查询货号列表排名
             $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->page($page, $limit)->select();
             $count = $model->where(['Date' => date('Y-m-d')])->count();
@@ -661,6 +704,15 @@ class Ratio extends AdminController
                   $value['全国排名'] = $init + $key+1;
                   // 查询码比数据
                   $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号']);
+
+                  // 单码缺量判断数值
+                  $level_rate = 0;
+                  if($value['货品等级']=='B级'){
+                      $level_rate = $config['level_b'];
+                  }else{
+                      $level_rate = $config['level_other'];
+                  }
+
                   foreach ($item as $k =>$v){
                       foreach (['偏码','单码缺量','偏码','单码缺量','偏码','单码缺量','偏码','单码缺量','偏码','单码缺量'] as $kk => $vv){
                           if(($v_key = array_search($vv,$v)) !== false){
@@ -670,7 +722,42 @@ class Ratio extends AdminController
 
 
                       $item2 = $value->toArray() + $v;
-                      
+
+                      // 云仓判断
+                      foreach (['广州','南昌','武汉','长沙','贵阳'] as $wk => $wv){
+
+                          // 给部分记录设置背景标红
+                          if(in_array($item2["{$wv}_".'字段'],['当前库存尺码比','累销尺码比','单码售罄','单码售罄比'])){
+                            $r_size = array_slice($size,0,-1);
+                            $temp_arr = [];
+                            foreach ($r_size as $k => $v){
+                                $temp_arr["{$wv}_".$v] = $item2["{$wv}_".$v];
+
+//                                if($item2["{$wv}_".'字段'] == '单码售罄' && $item2["{$wv}_".$v] > $item2["{$wv}_".'总计']){
+//                                    $item2["{$wv}_".$v] = "<span style='width: 100%;display: block; background:rgb(255,199,206);color:white;margin: 0px;padding: 0px' >{$item2["{$wv}_".$v]}%</span>";
+//                                }
+
+                                if($item2["{$wv}_".'字段'] == '单码售罄比' && $item2["{$wv}_".$v] > $level_rate){
+                                    $item2["{$wv}_".$v] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$item2["{$wv}_".$v]}%</span>";
+                                }
+
+                            }
+                            if(in_array($item2["{$wv}_".'字段'],['当前库存尺码比','累销尺码比'])){
+                                rsort($temp_arr);
+                                // 获取数组前三的元素值
+                                $in_arr = getArray($temp_arr,3);
+                                // 值等于前三的元素都标红
+                                foreach ($r_size as $k => $v){
+                                    if(in_array($item2["{$wv}_".$v],$in_arr)){
+                                        $color = getColor($item2["{$wv}_".'字段']);
+                                        $item2["{$wv}_".$v] = "<span style='width: 100%;display: block; background:{$color};color:white;margin: 0px;padding: 0px' >{$item2["{$wv}_".$v]}%</span>";
+                                    }
+                                }
+                            }
+                          }
+
+                      }
+
 
                       foreach ($item2 as $vk => $val){
 
