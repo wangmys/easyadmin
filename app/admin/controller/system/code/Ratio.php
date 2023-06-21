@@ -500,7 +500,7 @@ class Ratio extends AdminController
                             foreach ($r_size as $k => $v){
                                 if(in_array($item2[$v],$in_arr)){
                                     $color = getColor($item2['字段']);
-                                    $item2[$v] = "<span style='width: 100%;display: block; background:{$color};color:white;margin: 0px;padding: 0px' >{$item2[$v]}%</span>";
+                                    $item2[$v] = "<span style='width: 100%;display: block; background:{$color};color:brown;margin: 0px;padding: 0px' >{$item2[$v]}%</span>";
                                 }
                             }
                         }
@@ -750,7 +750,7 @@ class Ratio extends AdminController
                                 foreach ($r_size as $k => $v){
                                     if(in_array($item2["{$wv}_".$v],$in_arr)){
                                         $color = getColor($item2["{$wv}_".'字段']);
-                                        $item2["{$wv}_".$v] = "<span style='width: 100%;display: block; background:{$color};color:white;margin: 0px;padding: 0px' >{$item2["{$wv}_".$v]}%</span>";
+                                        $item2["{$wv}_".$v] = "<span style='width: 100%;display: block; background:{$color};color:brown;margin: 0px;padding: 0px' >{$item2["{$wv}_".$v]}%</span>";
                                     }
                                 }
                             }

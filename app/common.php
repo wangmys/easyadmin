@@ -42,7 +42,7 @@ if (!function_exists('getColor')){
                $color = 'rgb(180,198,231)';
                break;
            case '总库存尺码比':
-               $color = 'rgb(180,198,231)';
+               $color = 'rgb(255,235,156)';
                break;
            case '累销尺码比':
                $color = 'rgb(255,199,206)';
