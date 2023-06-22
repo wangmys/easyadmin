@@ -144,131 +144,118 @@ class CommandService
         $date = date('Y-m-d');
         $start = date('Y-01-01');
         $sql = "SELECT
-            A.*
-            ,
-        CASE
-
-                WHEN A.[单据类型] = '店铺收货单' THEN
-                NULL ELSE ROW_NUMBER ( ) OVER ( PARTITION BY A.店铺名称, A.货号, A.清空操作 ORDER BY A.清空时间 )
-            END 清空次数,
-        CASE
-
-            WHEN A.[单据类型] = '店铺调出单' THEN
-            NULL ELSE ROW_NUMBER ( ) OVER ( PARTITION BY A.店铺名称, A.货号, A.清空操作 ORDER BY A.清空时间 )
-            END 七天内收货次数
-        FROM
-            (
-            SELECT
-                TT.CustomItem17 AS 商品负责人,
-                TT.CustomerName AS 店铺名称,
-                TT.GoodsNo AS 货号,
-                TT.[单据类型],
-                TT.Quantity AS 变动数量,
-                TT.[库存数量],
-                TT.CreateTime AS 变动时间,
-                TT.[清空操作],
-                TT.[清空时间],
-                TT.[清空货号],
-                COUNT ( 1 ) OVER ( PARTITION BY TT.CustomerName, TT.GoodsNo ) 次数,
-                TT.[收货来源]
-            FROM
-                (
-                SELECT
-                    T.CustomerName,
-                    T.CustomItem17,
-                    T.GoodsNo,
-                    T.[单据类型],
-                    T.Quantity,
-                    T.[库存数量],
-                    T.CreateTime,
-                    T.[清空操作],
-                CASE
-
-                        WHEN T.[清空操作] = '调出清空' THEN
-                        T.CreateTime
-                        WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空'
-                        AND T.CreateTime> MAX ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) THEN
-                            MAX ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo )
-                            WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空' THEN
-                            MIN ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo )
-                        END AS 清空时间,
-                    CASE
-
-                            WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空' THEN
-                            MIN ( T.清空货号 ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo )
-                        END AS 清空货号,
-                        T.[收货来源]
-                    FROM
-                        (
-                        SELECT
-                            EC.CustomerName,
-                            EC.CustomItem17,
-                            ECS.BillId,
-                        CASE
-
-                                WHEN ECS.BillType= 'ErpCustOutbound' THEN
-                                '店铺调出单'
-                                WHEN ECS.BillType= 'ErpCustReceipt' THEN
-                                '店铺收货单'
-                                WHEN ECS.BillType= 'ErpRetail' THEN
-                                '零售核销单' ELSE '其他'
-                            END AS 单据类型,
-                            ECS.GoodsId,
-                            EG.GoodsNo,
-                            ECS.Quantity,
-                            SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) AS 库存数量,
-                            ECS.CreateTime,
-                        CASE
-
-                                WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0
-                                AND ECS.BillType= 'ErpCustOutbound'
-                                AND ECS.Quantity<=- 2 THEN
-                                    '调出清空'
-                                END AS 清空操作,
-                            CASE
-
-                                    WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0
-                                    AND ECS.BillType= 'ErpCustOutbound'
-                                    AND ECS.Quantity<=- 2 THEN
-                                        ECS.CreateTime
-                                    END AS 清空时间,
-                                CASE
-
-                                        WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0
-                                        AND ECS.BillType= 'ErpCustOutbound'
-                                        AND ECS.Quantity<=- 2 THEN
-                                            EG.GoodsNo
-                                        END AS 清空货号,
-                                    CASE
-
-                                            WHEN ECR.Type= 1 THEN
-                                            '仓库发出'
-                                            WHEN ECR.Type= 2 THEN
-                                            '店铺调拨'
-                                        END 收货来源
-        FROM
-            ErpCustomer EC
-            LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId= ECS.CustomerId
-            LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
-            LEFT JOIN ErpCustReceipt ECR ON ECS.BillId= ECR.ReceiptID
-        WHERE
-            EG.TimeCategoryName1= 2023
-            ) T
-            ) TT
-        WHERE
-            TT.[清空时间] IS NOT NULL
-            AND TT.CreateTime>= TT.[清空时间]
-            AND TT.CreateTime<= DATEADD( DAY, 7, TT.[清空时间] )
-            AND TT.[单据类型] NOT IN ( '零售核销单', '其他' )
-            ) A
-        WHERE
-            A.[次数] >= 2 and A.[变动时间] >='{$start}' and A.[变动时间] <= '{$date}'
-            AND CONCAT ( A.[单据类型], A.[库存数量] ) != '店铺收货单0'
-        ORDER BY
-            A.[商品负责人],
-            A.[店铺名称],
-            A.[清空货号],
-            A.[变动时间]";
+	A.*
+	,
+CASE WHEN A.[单据类型] = '店铺收货单' THEN
+		NULL ELSE ROW_NUMBER ( ) OVER ( PARTITION BY A.店铺名称, A.货号, A.清空操作 ORDER BY A.清空时间 ) 
+	END 清空次数,
+CASE WHEN A.[单据类型] = '店铺调出单' THEN
+	NULL ELSE ROW_NUMBER ( ) OVER ( PARTITION BY A.店铺名称, A.货号, A.清空操作 ORDER BY A.清空时间 ) 
+	END 七天内收货次数 
+FROM
+	(
+	SELECT
+		TT.CustomItem17 AS 商品负责人,
+		TT.CustomerName AS 店铺名称,
+		TT.GoodsNo AS 货号,
+		TT.[单据类型],
+		TT.BillId,
+		TT.Quantity AS 变动数量,
+		TT.[库存数量],
+		TT.CreateTime AS 变动时间,
+		TT.[清空操作],
+		TT.[清空时间],
+		TT.[清空货号],
+		COUNT ( 1 ) OVER ( PARTITION BY TT.CustomerName, TT.GoodsNo ) 次数,
+		TT.[收货来源] ,
+		TT.[分拣单]
+	FROM
+		(
+		SELECT
+			T.CustomerName,
+			T.CustomItem17,
+			T.GoodsNo,
+			T.[单据类型],
+			T.BillId,
+			T.Quantity,
+			T.[库存数量],
+			T.CreateTime,
+			T.[清空操作],
+			CASE WHEN T.[清空操作] = '调出清空' THEN T.CreateTime 
+					 WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空' 
+							  AND T.CreateTime> MAX ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) THEN
+							  MAX ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) 
+					 WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空' THEN
+							  MIN ( T.[清空时间] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) 
+			END AS 清空时间,
+			CASE WHEN MAX ( T.[清空操作] ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) = '调出清空' THEN
+					 MIN ( T.清空货号 ) OVER ( PARTITION BY T.CustomerName, T.GoodsNo ) 
+			END AS 清空货号,
+			T.[收货来源] ,
+			T.[分拣单]
+			FROM
+				(
+				SELECT
+					EC.CustomerName,
+					EC.CustomItem17,
+					ECS.BillId,
+					CASE WHEN ECS.BillType= 'ErpCustOutbound' THEN '店铺调出单' 
+							 WHEN ECS.BillType= 'ErpCustReceipt' THEN '店铺收货单' 
+							 WHEN ECS.BillType= 'ErpRetail' THEN '零售核销单' ELSE '其他' 
+					END AS 单据类型,
+					ECS.GoodsId,
+					EG.GoodsNo,
+					ECS.Quantity,
+					ISNULL(ECO.ManualNo,ECOO.ManualNo) 分拣单,
+					SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) AS 库存数量,
+					ECS.CreateTime,
+					CASE WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0 
+							AND ECS.BillType= 'ErpCustOutbound' 
+							AND ECS.Quantity<=- 2
+							AND (ECO.ManualNo IS NOT NULL AND ECO.ManualNo!='') THEN '调出清空' 
+					END AS 清空操作,
+					CASE WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0 
+							AND ECS.BillType= 'ErpCustOutbound' 
+							AND ECS.Quantity<=- 2
+							AND (ECO.ManualNo IS NOT NULL AND ECO.ManualNo!='') THEN ECS.CreateTime 
+					END AS 清空时间,
+					CASE WHEN SUM ( ECS.Quantity ) OVER ( PARTITION BY EC.CustomerId, ECS.GoodsId ORDER BY ECS.CreateTime ) <= 0 
+							AND ECS.BillType= 'ErpCustOutbound' 
+							AND ECS.Quantity<=- 2
+							AND (ECO.ManualNo IS NOT NULL AND ECO.ManualNo!='') THEN EG.GoodsNo 
+								END AS 清空货号,
+					CASE WHEN ECR.Type= 1 THEN '仓库发出' 
+							 WHEN ECR.Type= 2 THEN '店铺调拨' 
+					END 收货来源 
+				FROM ErpCustomer EC
+				LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId= ECS.CustomerId
+				LEFT JOIN ErpGoods EG ON ECS.GoodsId= EG.GoodsId
+				LEFT JOIN ErpCustReceipt ECR ON ECS.BillId= ECR.ReceiptID 
+				LEFT JOIN ErpCustReceiptGoods ECRG ON ECS.BillId =ECRG.ReceiptID AND ECS.GoodsId=ECRG.GoodsId
+				LEFT JOIN ErpCustOutbound ECO ON ECS.BillId=ECO.CustOutboundId
+				LEFT JOIN ErpCustOutbound ECOO ON ECRG.CustOutboundId=ECOO.CustOutboundId -- 关联调出单，判断店铺调入是店铺自己做的还是商品专员
+				
+				WHERE
+					EG.TimeCategoryName1= 2023 
+				-- AND EC.CustomerName='亳州一店'
+			) T 
+	) TT 
+WHERE
+	TT.[清空时间] IS NOT NULL 
+	AND TT.CreateTime>= TT.[清空时间] 
+	AND TT.CreateTime<= DATEADD( DAY, 7, TT.[清空时间] ) 
+	AND (TT.[单据类型] NOT IN ( '零售核销单', '其他' )  AND  ( TT.[分拣单] IS NOT NULL AND TT.[分拣单] !='' OR TT.[单据类型]='店铺调出单' OR TT.[收货来源]='仓库发出'))
+	) A 
+WHERE
+	A.[次数] >= 2 
+	AND A.[变动时间] >= '{$start}' 
+	AND A.[变动时间] <= '{$date}' 
+	AND CONCAT ( A.[单据类型], A.[库存数量] ) != '店铺收货单0' 
+ORDER BY
+	A.[商品负责人],
+	A.[店铺名称],
+	A.[清空货号],
+	A.[变动时间]";
 
         return $sql;
     }
