@@ -48,13 +48,13 @@
 </style>
 <div class="layuimini-container">
 
-    <div style="display: flex;flex-direction:row-reverse">
-        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position7">贵阳云仓</span>
-        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position6">长沙云仓</span>
-        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position5">武汉云仓</span>
-        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position4">南昌云仓</span>
-        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position3">广州云仓</span>
-    </div>
+<!--    <div style="display: flex;flex-direction:row-reverse">-->
+<!--        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position7">贵阳云仓</span>-->
+<!--        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position6">长沙云仓</span>-->
+<!--        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position5">武汉云仓</span>-->
+<!--        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position4">南昌云仓</span>-->
+<!--        <span class="layui-btn layui-btn-sm layui-btn-normal div-right" id="position3">广州云仓</span>-->
+<!--    </div>-->
 
     <div class="layuimini-main">
         <table id="currentTable" class="layui-table text-center layui-hide" lay-filter="currentTable">
@@ -149,26 +149,6 @@ layui.use(['form', 'jquery', 'layer'], function () {
         });
 
     });
-
-    $('#position3').click(function() {
-            $('.layui-table-main').animate({'scrollLeft': 340}, 400);
-    });
-    $('#position4').click(function() {
-
-        $('.layui-table-main').animate({'scrollLeft':1450}, 400);
-    });
-    $('#position5').click(function() {
-
-        $('.layui-table-main').animate({'scrollLeft': 2581}, 400);
-    });
-    $('#position6').click(function() {
-        position = 0;
-        $('.layui-table-main').animate({'scrollLeft': 3690}, 400);
-    });
-    $('#position7').click(function() {
-        $('.layui-table-main').animate({'scrollLeft': 5000}, 400);
-    });
-
 });
 
 </script>

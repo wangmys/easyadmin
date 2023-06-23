@@ -215,7 +215,45 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     },
                     where:{filter:[]},
                     height: 760,
-                    toolbar:[],
+                    toolbar:[
+                        [
+                            {
+                                text: '广州云仓',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-sm guangzhou',
+                                event:'guangzhou'
+                            },
+                            {
+                                text: '南昌云仓',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-sm nanchang',
+                                event:'nanchang'
+                            },
+                            {
+                                text: '武汉云仓',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-sm wuhan',
+                                event:'wuhan'
+                            },
+                            {
+                                text: '长沙云仓',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-sm changsha',
+                                event:'changsha'
+                            },
+                            {
+                                text: '贵阳云仓',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-btn layui-btn-normal layui-btn-sm guiyang',
+                                event:'guiyang'
+                            }
+                        ]
+                    ],
                     limit:20,
                     limits:[15,20,50,100,200,1000],
                     size:'sm',
@@ -307,11 +345,28 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             {field: '贵阳_40/8XL', width: 60, title: '40/8XL', search: false}
                         ]
                     ],done: function(){
-                        tableMerge.render(this)
+                        tableMerge.render(this);
+
+                        $('.guangzhou').click(function() {
+                            $('.layui-table-main').animate({'scrollLeft': 340}, 400);
+                        });
+                        $('.nanchang').click(function() {
+                            $('.layui-table-main').animate({'scrollLeft':1450}, 400);
+                        });
+
+                        $('.wuhan').click(function() {
+                            $('.layui-table-main').animate({'scrollLeft': 2581}, 400);
+                        });
+                        $('.changsha').click(function() {
+                            $('.layui-table-main').animate({'scrollLeft': 3690}, 400);
+                        });
+                        $('.guiyang').click(function() {
+                            $('.layui-table-main').animate({'scrollLeft': 5000}, 400);
+                        });
+
                     }
                 });
             })
-            $('.layui-table-main').animate({'scrollLeft': 400}, 400);
             ea.listen();
         }
     };
