@@ -200,7 +200,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
             });
 
             layui.use(['form', 'table','tableMerge'], function () {
-
                 tableMerge = layui.tableMerge;
                 // 风格
                 var Style = JSON.parse($("#Style").val());
@@ -312,6 +311,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     }
                 });
             })
+            $('.layui-table-main').animate({'scrollLeft': 400}, 400);
             ea.listen();
         }
     };
