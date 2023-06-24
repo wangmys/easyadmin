@@ -663,7 +663,7 @@ class Tableupdate extends BaseController
             echo '没有数据更新';
             die;
         } 
-        echo $this->db_bi->getLastSql();die;
+        $this->db_bi->getLastSql();
 
         $handle = $this->db_easyA->table('customer')->where(1)->delete();
 
