@@ -547,6 +547,7 @@ class Ratio extends AdminController
                 'code'  => 0,
                 'msg'   => '',
                 'count' => $count,
+                'showType' => $filters['showType']??0,
                 'data'  => $allList
             ];
             return json($data);
