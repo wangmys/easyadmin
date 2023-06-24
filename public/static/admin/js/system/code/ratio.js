@@ -140,6 +140,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var CategoryName1 = JSON.parse($("#CategoryName1").val());
                 var CategoryName2 = JSON.parse($("#CategoryName2").val());
                 var Collar = JSON.parse($("#Collar").val());
+                console.log(Collar)
 
                 ea.table.render({
                     init:{
@@ -157,18 +158,20 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     cols: [
                         [
                         {field: '全国排名', width: 60, title: '排名',search:false,fixed:'left'},
-                        {field: '货号', width: 90, title: '货号',search:false,fixed:'left'},
+                        {field: '货号', width: 90, title: '货号',search:true,fixed:'left'},
                         {field: '风格', width: 60, title: '风格',search:'select',selectList:Style,fixed:'left'},
                         {field: '一级分类', width: 60, title: '大类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
-                        {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left'},
+                        {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left',hide:true},
                         {field: '领型', width: 70, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},
                         {field: '近三天折率', width: 60, title: '折率',search:false},
                         {field: '货品等级', width: 60, title: '等级',search:false},
                         {field: '上柜家数', width: 60, title: '上柜数',search:false},
+                        {field: '总库存',width: 60, title: '总库存 >=',search:true,hide: true},
+                        // {field: 'showType',width: 60, title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'}},
                         // {field: '上市天数', width: 80, title: '上市天数',search:false},
                         // {field: '日均销', width: 80, title: '日均销',search:false},
                         {field: '图片', width: 110, title: '图片', search: false, templet: ea.table.image,imageHeight:30,merge: true},
-                        {field: '字段', width: 95, title: '字段', search: false},
+                        {field: '字段', width: 95, title: '字段', search: 'xmSelect'},
                         {field: '合计', width: 60, title: '合计', search: false},
                         {field: '库存_00/28/37/44/90/160/S', width: 70, title: '28/37/44/S', search: false},
                         {field: '库存_29/38/46/105/165/M', width: 70, title: '29/38/46/M', search: false},

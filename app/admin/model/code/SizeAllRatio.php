@@ -113,84 +113,98 @@ class SizeAllRatio extends TimeModel
         // 单货号数据
         $data = [
             '单码售罄比' => [
+                'SortNum' => 1,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '单码售罄比'
             ],
             '当前库存尺码比' => [
+                'SortNum' => 2,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '当前库存尺码比'
             ],
             '总库存尺码比' => [
+                'SortNum' => 3,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '总库存尺码比'
             ],
             '累销尺码比' => [
+                'SortNum' => 4,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '累销尺码比'
             ],
             '单码售罄' => [
+                'SortNum' => 5,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '单码售罄'
             ],
             '周转' => [
+                'SortNum' => 6,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '周转'
             ],
             '当前总库存量' => [
+                'SortNum' => 7,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '当前总库存量'
             ],
             '未入量' => [
+                'SortNum' => 8,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '未入量'
             ],
             '累销' => [
+                'SortNum' => 9,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '累销'
             ],
             '周销' => [
+                'SortNum' => 10,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '周销'
             ],
             '店铺库存' => [
+                'SortNum' => 11,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '店铺库存'
             ],
             '云仓库存' => [
+                'SortNum' => 12,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '云仓库存'
             ],
             '云仓在途' => [
+                'SortNum' => 13,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),
                 '字段' => '云仓在途'
             ],
             '当前单店均深' => [
+                'SortNum' => 14,
                 'GoodsNo' => $goodsno,
                 '上柜家数' => $size_up_total['Quantity']??0,
                 'Date' => date('Y-m-d'),

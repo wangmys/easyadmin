@@ -419,11 +419,15 @@ class Ratio extends AdminController
                 $model = $model->where(['二级分类' => $filters['cate2']]);
             }
 
+            if(isset($filters['货号']) && !empty($filters['货号'])){
+                $list = $list->where(['货号' => $filters['货号']]);
+                $model = $model->where(['货号' => $filters['货号']]);
+            }
+
             if(isset($filters['collar']) && !empty($filters['collar'])){
                 $list = $list->where(['领型' => $filters['collar']]);
                 $model = $model->where(['领型' => $filters['collar']]);
             }
-
 
             // 查询货号列表排名
             $list = $list->where(['Date' => date('Y-m-d')])->withoutField('上柜家数')->order('日均销','desc')->page($page, $limit)->select();
@@ -455,7 +459,14 @@ class Ratio extends AdminController
                   $item = $value->alias('r')
                       ->leftJoin('ea_size_all_ratio ra','r.`货号`=ra.GoodsNo and r.Date = ra.Date')
                       ->where(['ra.GoodsNo' => $value['货号'],'ra.Date' => date('Y-m-d')])
-                      ->order('ra.id')
+                      ->where(function ($q)use($filters){
+                          // 全部展示-部分展示
+                          if(isset($filters['showType']) && !empty($filters['showType'])){
+                             if($filters['showType'] == 2){
+                                 $q->whereIn('字段',['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄','周转','当前总库存量','未入量']);
+                             }
+                          }
+                      })->order('ra.id')
                       ->select()
                       ->toArray();
 
@@ -469,11 +480,25 @@ class Ratio extends AdminController
 
                   foreach ($item as $k => &$v){
 
-                      foreach (['偏码','单码缺量'] as $kk => $vv){
-                          if(($v_key = array_search($vv,$v)) !== false){
-                            $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
-                          }
+                      if($v['合计'] == '单码缺量'){
+                          $v['合计'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >单码缺量</span>";
                       }
+
+                      if($v['合计'] == '偏码'){
+                          $v['合计'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >偏码</span>";
+                      }
+
+                      if($v['合计'] == '偏码'){
+                          $v['合计'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >偏码</span>";
+                      }
+
+//                      foreach (['偏码','单码缺量'] as $kk => $vv){
+//                          if(($v_key = array_search($vv,$v)) !== false){
+//                            if($v[$v_key] == $vv && $v[$v_key] != '0'){
+//                                 $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
+//                            }
+//                          }
+//                      }
 
                       $item2 = $value->toArray() + $v;
 
@@ -507,7 +532,7 @@ class Ratio extends AdminController
                       }
 
                       foreach ($item2 as $vk => $val){
-                          if(empty($val)){
+                          if(empty($val) && $vk!='上柜家数'){
                               $item2[$vk] = '';
                           }else if(!empty($val) && is_numeric($val) && in_array($vk,$size) && in_array($item2['字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
                               $item2[$vk] = $val.'%';
