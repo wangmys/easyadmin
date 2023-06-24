@@ -458,8 +458,17 @@ class SizeWarehouseRatio extends TimeModel
      * @param $goodsno
      * @return mixed
      */
-    public static function selectWarehouseRatio($goodsno)
+    public static function selectWarehouseRatio($goodsno,$where)
     {
+
+        $str = '';
+        // 全部展示-部分展示
+        if(isset($where['showType']) && !empty($where['showType'])){
+           if($where['showType'] == 2){
+               $str = " and r1.`字段` in ('单码售罄比','当前库存尺码比','累销尺码比','单码售罄','周转','当前总库存量','单码上柜数')";
+           }
+        }
+
         // 查询时间
         $Date = date('Y-m-d');
         $sql = "
@@ -572,7 +581,8 @@ class SizeWarehouseRatio extends TimeModel
         left join 
         ea_size_warehouse_ratio as r6 on r1.GoodsNo=r6.GoodsNo and r1.`字段`=r6.`字段` and r6.`云仓`='贵阳云仓' and r6.Date = '{$Date}'
         
-        where r1.Date = '{$Date}' and r1.GoodsNo = '{$goodsno}'  and r1.`云仓`='广州云仓'  GROUP BY r1.`字段`,r1.GoodsNo  ORDER BY r1.id asc ";
+        where r1.Date = '{$Date}' and r1.GoodsNo = '{$goodsno}'  and r1.`云仓`='广州云仓' {$str}  GROUP BY r1.`字段`,r1.GoodsNo  ORDER BY r1.id asc ";
+
         // 执行查询
         $list = Db::query($sql);
         return $list;

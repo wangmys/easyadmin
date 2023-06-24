@@ -405,33 +405,49 @@ class Ratio extends AdminController
             $list = new SizeRanking;
             $model = new SizeRanking;
             if(isset($filters['风格']) && !empty($filters['风格'])){
-                $list = $list->where(['风格' => $filters['风格']]);
-                $model = $model->where(['风格' => $filters['风格']]);
+                $list = $list->where(['s.风格' => $filters['风格']]);
+                $model = $model->where(['s.风格' => $filters['风格']]);
             }
 
             if(isset($filters['cate']) && !empty($filters['cate'])){
-                $list = $list->where(['一级分类' => $filters['cate']]);
-                $model = $model->where(['一级分类' => $filters['cate']]);
+                $list = $list->where(['s.一级分类' => $filters['cate']]);
+                $model = $model->where(['s.一级分类' => $filters['cate']]);
             }
 
             if(isset($filters['cate2']) && !empty($filters['cate2'])){
-                $list = $list->where(['二级分类' => $filters['cate2']]);
-                $model = $model->where(['二级分类' => $filters['cate2']]);
-            }
-
-            if(isset($filters['货号']) && !empty($filters['货号'])){
-                $list = $list->where(['货号' => $filters['货号']]);
-                $model = $model->where(['货号' => $filters['货号']]);
+                $list = $list->where(['s.二级分类' => $filters['cate2']]);
+                $model = $model->where(['s.二级分类' => $filters['cate2']]);
             }
 
             if(isset($filters['collar']) && !empty($filters['collar'])){
-                $list = $list->where(['领型' => $filters['collar']]);
-                $model = $model->where(['领型' => $filters['collar']]);
+                $list = $list->where(['s.领型' => $filters['collar']]);
+                $model = $model->where(['s.领型' => $filters['collar']]);
+            }
+
+            if(isset($filters['货号']) && !empty($filters['货号'])){
+                $list = $list->where(['s.货号' => $filters['货号']]);
+                $model = $model->where(['s.货号' => $filters['货号']]);
+            }
+
+            if(isset($filters['总库存']) && !empty($filters['总库存'])){
+                $list = $list->where(' CAST(r.合计 AS UNSIGNED) >=  '.$filters['总库存']);
+                $model = $model->where(' CAST(r.合计 AS UNSIGNED) >=  '.$filters['总库存']);
+            }
+
+            // 是否偏码
+            if(isset($filters['isDanger']) && !empty($filters['isDanger'])){
+                $goodsnoList = SizeAllRatio::where(['合计'=>'偏码','Date' => date('Y-m-d')])->where(function ($q){
+                    $q->where(['字段' => '当前库存尺码比'])->whereOr(['字段' => '总库存尺码比']);
+                })->group('GoodsNo')->column('GoodsNo');
+                $list = $list->whereIn('s.货号',$goodsnoList);
+                $model = $model->whereIn('s.货号',$goodsnoList);
             }
 
             // 查询货号列表排名
-            $list = $list->where(['Date' => date('Y-m-d')])->withoutField('上柜家数')->order('日均销','desc')->page($page, $limit)->select();
-            $count = $model->where(['Date' => date('Y-m-d')])->count();
+            $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where(['s.Date' => date('Y-m-d')])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
+            // 分组后的数量
+            $count = $model->alias('s')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where(['s.Date' => date('Y-m-d')])->group('s.货号')->count();
+
             $allList = [];
             $init = ($page - 1) * $limit;
 
@@ -469,7 +485,7 @@ class Ratio extends AdminController
                       })->order('ra.id')
                       ->select()
                       ->toArray();
-
+                  if(isset($value['上柜家数'])) unset($value['上柜家数']);
                   // 单码缺量判断数值
                   $level_rate = 0;
                   if($value['货品等级']=='B级'){
@@ -491,14 +507,6 @@ class Ratio extends AdminController
                       if($v['合计'] == '偏码'){
                           $v['合计'] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >偏码</span>";
                       }
-
-//                      foreach (['偏码','单码缺量'] as $kk => $vv){
-//                          if(($v_key = array_search($vv,$v)) !== false){
-//                            if($v[$v_key] == $vv && $v[$v_key] != '0'){
-//                                 $v[$v_key] = "<span style='width: 100%;display: block; background:red;color:white;margin: 0px;padding: 0px' >{$vv}</span>";
-//                            }
-//                          }
-//                      }
 
                       $item2 = $value->toArray() + $v;
 
@@ -540,7 +548,9 @@ class Ratio extends AdminController
                       }
                       
                       $allList[] = $item2;
+                      unset($v);
                   }
+                  unset($value);
             }
             // 返回数据
             $data = [
@@ -703,6 +713,11 @@ class Ratio extends AdminController
                 $model = $model->where(['领型' => $filters['collar']]);
             }
 
+            if(isset($filters['货号']) && !empty($filters['货号'])){
+                $list = $list->where(['货号' => $filters['货号']]);
+                $model = $model->where(['货号' => $filters['货号']]);
+            }
+
             $size = [
                 '00/28/37/44/100/160/S',
                 '29/38/46/105/165/M',
@@ -729,8 +744,7 @@ class Ratio extends AdminController
                   $value['图片'] = $value['图片']?$value['图片']."?id={$value['id']}":'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg'."?id={$value['id']}";
                   $value['全国排名'] = $init + $key+1;
                   // 查询码比数据
-                  $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号']);
-
+                  $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号'],$filters);
                   // 单码缺量判断数值
                   $level_rate = 0;
                   if($value['货品等级']=='B级'){
@@ -803,7 +817,8 @@ class Ratio extends AdminController
                 'code'  => 0,
                 'msg'   => '',
                 'count' => $count,
-                'data'  => $allList
+                'data'  => $allList,
+                'showType' => $filters['showType']??0
             ];
             return json($data);
         }
