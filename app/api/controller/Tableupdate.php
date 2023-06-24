@@ -725,6 +725,7 @@ class Tableupdate extends BaseController
                     SELECT TOP 1 RetailDate FROM
                         ErpRetail  
                     WHERE CustomerName = ER.CustomerName
+                    ORDER BY RetailDate ASC
                 ) AS 首单日期,
                 EC.RegionId
             FROM
