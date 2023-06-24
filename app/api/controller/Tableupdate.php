@@ -663,7 +663,7 @@ class Tableupdate extends BaseController
             echo '没有数据更新';
             die;
         } 
-        echo $this->db_bi->getLastSql();die;
+        $this->db_bi->getLastSql();
 
         $handle = $this->db_easyA->table('customer')->where(1)->delete();
 
@@ -725,6 +725,7 @@ class Tableupdate extends BaseController
                     SELECT TOP 1 RetailDate FROM
                         ErpRetail  
                     WHERE CustomerName = ER.CustomerName
+                    ORDER BY RetailDate ASC
                 ) AS 首单日期,
                 EC.RegionId
             FROM
