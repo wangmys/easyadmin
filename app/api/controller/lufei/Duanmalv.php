@@ -39,7 +39,7 @@ class Duanmalv extends BaseController
         // 康雷查询周销
         $sql = "   
             SELECT TOP
-                200000 EC.CustomItem17 AS 商品负责人,
+                300000 EC.CustomItem17 AS 商品负责人,
         -- 		ER.RetailID,
         -- 		ER.RetailDate,
                 EC.State AS 省份,

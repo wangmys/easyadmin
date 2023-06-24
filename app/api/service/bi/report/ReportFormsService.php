@@ -2356,6 +2356,291 @@ class ReportFormsService
         }
     }
 
+    // 端午节统计 ABCD
+    public function create_table_s115A($type = "加盟") {
+        // 编号
+        $code = 'S115A';
+        if (date('Y-m-d') == '2023-06-22') {
+            $fday = 1;
+        } elseif (date('Y-m-d') == '2023-06-23') {
+            $fday = 2;
+        } elseif (date('Y-m-d') == '2023-06-24') {
+            $fday = 3;
+        } else {
+            echo '活动已结束';
+            die;
+        }
+
+        $sql = "
+            select 
+            省份,店铺名称,
+            concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
+            concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
+            concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
+            concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
+            round(销售金额2021, 1) as 前年同日销额,
+            round(销售金额2022, 1) as 去年同日销额,
+            round(销售金额2023, 1) as 今日销额,
+            round(前年累销额, 1) as 前年累销额,
+            round(去年累销额, 1) as 去年累销额,
+            round(今年累销额, 1) as 今年累销额
+            from cwl_festival_statistics WHERE 节日天数='{$fday}' AND 经营属性='{$type}' order by 省份 DESC
+        ";
+        $list = $this->db_easyA->query($sql);
+        // dump($list);die;
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 100;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 50;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => "【{$type}】"
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "{$type}老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '          编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
+    // 端午节统计 ABCD
+    public function create_table_s115B() {
+        // 编号
+        $code = 'S115B';
+        if (date('Y-m-d') == '2023-06-22') {
+            $fday = 1;
+        } elseif (date('Y-m-d') == '2023-06-23') {
+            $fday = 2;
+        } elseif (date('Y-m-d') == '2023-06-24') {
+            $fday = 3;
+        } else {
+            echo '活动已结束';
+            die;
+        }
+
+        $sql = "
+            select 
+                省份,经营属性 as 性质,
+                concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
+                concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
+                concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
+                concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
+                round(前年同日销额, 1) as 前年同日销额,
+                round(去年同日销额, 1) as 去年同日销额,
+                round(今日销额, 1) as 今日销额,
+                round(前年累销额, 1) as 前年累销额,
+                round(去年累销额, 1) as 去年累销额,
+                round(今年累销额, 1) as 今年累销额
+            from cwl_festival_statistics_province 
+            WHERE 
+                节日天数='{$fday}' 
+        ";
+        $list = $this->db_easyA->query($sql);
+        // dump($list);die;
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 100;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 50;
+            $field_width[2] = 50;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => "  "
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "省份老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '          编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
+    // 端午节统计 ABCD 端午节平均单店流水对比-单日
+    public function create_table_s115C() {
+        // 编号
+        $code = 'S115C';
+        if (date('Y-m-d') == '2023-06-22') {
+            $fday = 1;
+        } elseif (date('Y-m-d') == '2023-06-23') {
+            $fday = 2;
+        } elseif (date('Y-m-d') == '2023-06-24') {
+            $fday = 3;
+        } else {
+            echo '活动已结束';
+            die;
+        }
+
+        $sql = "
+            select 
+                经营属性 as 性质,
+                23VS22,
+                23VS21,
+                今日流水,
+                22年同期,
+                21年同期
+            from cwl_festival_duanwu_table3 
+            WHERE 
+                节日天数='{$fday}' 
+        ";
+        $list = $this->db_easyA->query($sql);
+        // dump($list);die;
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 125;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 80;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => "  "
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "【端午假期】平均单店流水对比-单日 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '          编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
+    // 端午节统计 ABCD 端午节平均单店流水对比-累计
+    public function create_table_s115D() {
+        // 编号
+        $code = 'S115D';
+        if (date('Y-m-d') == '2023-06-22') {
+            $fday = 1;
+        } elseif (date('Y-m-d') == '2023-06-23') {
+            $fday = 2;
+        } elseif (date('Y-m-d') == '2023-06-24') {
+            $fday = 3;
+        } else {
+            echo '活动已结束';
+            die;
+        }
+
+        $sql = "
+            select 
+                经营属性 as 性质,
+                23VS22,
+                23VS21,
+                今日流水,
+                22年同期,
+                21年同期
+            from cwl_festival_duanwu_table4 
+            WHERE 
+                节日天数='{$fday}' 
+        ";
+        $list = $this->db_easyA->query($sql);
+        // dump($list);die;
+
+        if ($list) {
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 125;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 80;
+    
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => "  "
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "【端午假期】平均单店流水对比-累计 [" . date("Y-m-d") . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '          编号: ' . $code ,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            return false;
+        }
+    }
+
     public function create_image($params)
     {
         $base = [
@@ -2429,6 +2714,8 @@ class ReportFormsService
         foreach ($params['data'] as $key => $item) {
             if (isset($item['省份']) && $item['省份'] == '合计') {
                 imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+            } elseif (isset($item['省份']) && $item['省份'] == '总计') {
+                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
             }
 
             if ($params['banben'] == '图片报表编号: S107') {
@@ -2471,6 +2758,21 @@ class ReportFormsService
                 if (isset($item['经营属性']) && $item['经营属性'] == '总计') {
                     
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S115B') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['省份']) && $item['省份'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S115C' || @$params['code'] == 'S115D') {
+                if (isset($item['性质']) && $item['性质'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
                 }
             }
         }
