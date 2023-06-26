@@ -163,129 +163,136 @@ class Duanmalv extends AdminController
             if (!empty($input['商品负责人'])) {
                 // echo $input['商品负责人'];
                 $map1Str = $this->xmSelectInput($input['商品负责人']);
-                $map1 = " AND 商品负责人 IN ({$map1Str})";
+                $map1 = " AND sk.商品负责人 IN ({$map1Str})";
             } else {
                 $map1 = "";
             }
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $map2Str = $this->xmSelectInput($input['云仓']);
-                $map2 = " AND 云仓 IN ({$map2Str})";
+                $map2 = " AND sk.云仓 IN ({$map2Str})";
             } else {
                 $map2 = "";
             }
             if (!empty($input['省份'])) {
                 // echo $input['商品负责人'];
                 $map3Str = $this->xmSelectInput($input['省份']);
-                $map3 = " AND 省份 IN ({$map3Str})";
+                $map3 = " AND sk.省份 IN ({$map3Str})";
             } else {
                 $map3 = "";
             }   
             if (!empty($input['经营模式'])) {
                 // echo $input['商品负责人'];
                 $map4Str = $this->xmSelectInput($input['经营模式']);
-                $map4 = " AND 经营模式 IN ({$map4Str})";
+                $map4 = " AND sk.经营模式 IN ({$map4Str})";
             } else {
                 $map4 = "";
             }
             if (!empty($input['店铺名称'])) {
                 // echo $input['商品负责人'];
                 $map5Str = $this->xmSelectInput($input['店铺名称']);
-                $map5 = " AND 店铺名称 IN ({$map5Str})";
+                $map5 = " AND sk.店铺名称 IN ({$map5Str})";
             } else {
                 $map5 = "";
             }
             if (!empty($input['大类'])) {
                 // echo $input['商品负责人'];
                 $map6Str = $this->xmSelectInput($input['大类']);
-                $map6 = " AND 一级分类 IN ({$map6Str})";
+                $map6 = " AND sk.一级分类 IN ({$map6Str})";
             } else {
                 $map6 = "";
             }
             if (!empty($input['中类'])) {
                 // echo $input['商品负责人'];
                 $map7Str = $this->xmSelectInput($input['中类']);
-                $map7 = " AND 二级分类 IN ({$map7Str})";
+                $map7 = " AND sk.二级分类 IN ({$map7Str})";
             } else {
                 $map7 = "";
             }
             if (!empty($input['领型'])) {
                 // echo $input['商品负责人'];
                 $map8Str = $this->xmSelectInput($input['领型']);
-                $map8 = " AND 领型 IN ({$map8Str})";
+                $map8 = " AND sk.领型 IN ({$map8Str})";
             } else {
                 $map8 = "";
             }
             if (!empty($input['货号'])) {
                 // echo $input['商品负责人'];
                 $map9Str = $this->xmSelectInput($input['货号']);
-                $map9 = " AND 货号 IN ({$map9Str})";
+                $map9 = " AND sk.货号 IN ({$map9Str})";
             } else {
                 $map9 = "";
             }
             if (!empty($input['风格'])) {
                 // echo $input['商品负责人'];
                 $map10Str = $this->xmSelectInput($input['风格']);
-                $map10 = " AND 风格 IN ({$map10Str})";
+                $map10 = " AND sk.风格 IN ({$map10Str})";
             } else {
                 $map10 = "";
             }
             if (!empty($input['是否TOP60'])) {
                 // echo $input['商品负责人'];
                 $map11Str = $this->xmSelectInput($input['是否TOP60']);
-                $map11 = " AND 是否TOP60 IN ({$map11Str})";
+                $map11 = " AND sk.是否TOP60 IN ({$map11Str})";
             } else {
                 $map11 = "";
             }
             if (!empty($input['是否TOP60考核款'])) {
                 // echo $input['商品负责人'];
                 $map12Str = $this->xmSelectInput($input['是否TOP60考核款']);
-                $map12 = " AND 是否TOP60考核款 IN ({$map12Str})";
+                $map12 = " AND sk.是否TOP60考核款 IN ({$map12Str})";
             } else {
                 $map12 = "";
             }
 
             $sql = "
                 SELECT 
-                    云仓,
-                    店铺名称,
-                    商品负责人,
-                    省份,
-                    经营模式,
-                    年份,
-                    店铺等级,
-                    季节,
-                    一级分类,
-                    二级分类,
-                    分类,
-                    领型,
-                    风格,
-                    货号,
-                    `预计00/28/37/44/100/160/S`,
-                    `预计29/38/46/105/165/M`,
-                    `预计30/39/48/110/170/L`,
-                    `预计31/40/50/115/175/XL`,
-                    `预计32/41/52/120/180/2XL`,
-                    `预计33/42/54/125/185/3XL`,
-                    `预计34/43/56/190/4XL`,
-                    `预计35/44/58/195/5XL`,
-                    `预计36/6XL`,
-                    `预计38/7XL`,
-                    `预计_40`,
-                    预计库存数量,
-                    预计库存连码个数,
-                    标准齐码识别修订,
-                    店铺SKC计数,
-                    店铺近一周排名,
-                    是否TOP60考核款,
-                    是否TOP60,
-                    零售价,
-                    当前零售价,
-                    折率,
-                    销售金额,
-                    总入量数量,
-                    累销数量                
-                FROM cwl_duanmalv_sk WHERE 1
+                    left(sk.云仓, 2) as 云仓,
+                    sk.店铺名称,
+                    sk.商品负责人,
+                    left(sk.省份, 2) as 省份,
+                    sk.经营模式,
+                    sk.年份,
+                    sk.店铺等级,
+                    sk.季节,
+                    sk.一级分类,
+                    sk.二级分类,
+                    sk.分类,
+                    sk.领型,
+                    sk.风格,
+                    sk.货号,
+                    sk.`预计00/28/37/44/100/160/S`,
+                    sk.`预计29/38/46/105/165/M`,
+                    sk.`预计30/39/48/110/170/L`,
+                    sk.`预计31/40/50/115/175/XL`,
+                    sk.`预计32/41/52/120/180/2XL`,
+                    sk.`预计33/42/54/125/185/3XL`,
+                    sk.`预计34/43/56/190/4XL`,
+                    sk.`预计35/44/58/195/5XL`,
+                    sk.`预计36/6XL`,
+                    sk.`预计38/7XL`,
+                    sk.`预计_40`,
+                    sk.预计库存数量,
+                    sk.预计库存连码个数,
+                    sk.标准齐码识别修订,
+                    sk.店铺SKC计数,
+                    sk.店铺近一周排名,
+                    sk.是否TOP60考核款,
+                    sk.是否TOP60,
+                    sk.零售价,
+                    sk.当前零售价,
+                    sk.折率,
+                    sk.销售金额,
+                    sk.总入量数量,
+                    sk.累销数量,
+                    h.`实际分配TOP`                
+                FROM cwl_duanmalv_sk AS sk
+                RIGHT JOIN cwl_duanmalv_handle_1 h ON sk.店铺名称 = h.`店铺名称`
+                WHERE 1
+                    AND sk.`一级分类` = h.`一级分类` 
+                    AND sk.`二级分类` = h.`二级分类` 
+                    AND sk.领型 = h.领型 
+                    AND sk.风格 = h.风格 
                     {$map1}
                     {$map2}
                     {$map3}
@@ -299,15 +306,16 @@ class Duanmalv extends AdminController
                     {$map11}
                     {$map12}
                 ORDER BY 
-                    云仓, `商品负责人` desc, 店铺名称, 风格, 季节, 一级分类, 二级分类, 分类, 领型
+                    sk.云仓, sk.`商品负责人` desc, sk.店铺名称, sk.风格, sk.季节, sk.一级分类, sk.二级分类, sk.分类, sk.领型
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
+            
             $select = $this->db_easyA->query($sql);
 
             $sql2 = "
                 SELECT 
                     count(*) as total
-                FROM cwl_duanmalv_sk
+                FROM cwl_duanmalv_sk as sk
                 WHERE  1
                     {$map1}
                     {$map2}
@@ -532,7 +540,7 @@ class Duanmalv extends AdminController
             $sql = "
                 SELECT 
                     云仓,
-                    省份,
+                    left(省份, 2) as 省份,
                     商品负责人,
                     店铺名称,
                     经营模式,
