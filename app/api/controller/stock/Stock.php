@@ -22,6 +22,8 @@ class Stock extends BaseController
     //创建一周库存数据json返回给肖甜使用
     public function create_stock_json() {
 
+        ini_set('memory_limit','2048M');
+
         $start_date = input('start_date');
         $end_date = input('end_date');
         if (!$start_date || !$end_date) {
@@ -30,8 +32,8 @@ class Stock extends BaseController
         if ($start_date > $end_date) {
             return json(['开始日期不能大于结束日期'], 400);
         }
-        if ( (strtotime($end_date)-strtotime($start_date))/(24*60*60) > 6 ) {
-            return json(['仅限于查询一周数据'], 400);
+        if ( (strtotime($end_date)-strtotime($start_date))/(24*60*60) > 13 ) {
+            return json(['仅限于查询两周数据'], 400);
         }
 
         $data = Db::connect("mysql2")->Query($this->get_sql2($start_date, $end_date));

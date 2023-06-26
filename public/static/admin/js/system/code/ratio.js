@@ -166,8 +166,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         {field: '近三天折率', width: 60, title: '折率',search:false},
                         {field: '货品等级', width: 60, title: '等级',search:false},
                         {field: '上柜家数', width: 60, title: '上柜数',search:false},
-                        {field: '总库存',width: 60, title: '总库存 >=',search:true,hide: true},
-                        {field: 'showType',width: 60, title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'},searchValue:'1'},
+                        {field: '总库存', title: '总库存 >=',search:true,hide: true},
+                        {field: 'showType', title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'},searchValue:'1'},
+                        {field: 'isDanger', title: '是否偏码', search: 'select',hide: true,selectList:{1: '展示偏码'}},
                         // {field: '上市天数', width: 80, title: '上市天数',search:false},
                         // {field: '日均销', width: 80, title: '日均销',search:false},
                         {field: '图片', width: 110, title: '图片', search: false, templet: ea.table.image,imageHeight:30,merge: true},
@@ -228,7 +229,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                        export_url: 'system.code.index/index_export'
                     },
                     where:{filter:[]},
-                    height: 760,
+                    height: 700,
                     toolbar:[
                         [
                             {
@@ -268,22 +269,23 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             }
                         ]
                     ],
-                    limit:20,
-                    limits:[15,20,50,100,200,1000],
+                    limit:40,
+                    limits:[40,50,100,200,1000],
                     size:'sm',
                     cols: [
                         [
                             {field: '全国排名', width: 60, title: '排名',search:false,rowspan: 2,fixed:'left'},
-                            {field: '货号', width: 100, title: '货号',search:false,rowspan: 2,fixed:'left'},
+                            {field: '货号', width: 100, title: '货号',search:true,rowspan: 2,fixed:'left'},
                             {field: '风格', width: 70, title: '风格',search:'select',selectList:Style,rowspan: 2,fixed:'left'},
                             {field: '一级分类', width: 70, title: '大类',fieldAlias:'cate',search:'select',selectList:CategoryName1,rowspan: 2,fixed:'left'},
                             {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,rowspan: 2,fixed:'left'},
                             {field: '领型', width: 70, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,rowspan: 2,fixed:'left'},
                             {field: '近三天折率', width: 70, title: '折率',search:false,rowspan: 2},
                             {field: '货品等级', width: 65, title: '等级',search:false,rowspan: 2},
-                            {field: '上柜家数', width: 70, title: '上柜数',search:false,rowspan: 2},
+                            // {field: '上柜家数', width: 70, title: '上柜数',search:false,rowspan: 2},
                             // {field: '上市天数', width: 110, title: '上市天数',search:false,rowspan: 2},
                             // {field: '日均销', width: 110, title: '日均销',search:false,rowspan: 2},
+                            {field: 'showType', title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'},searchValue:'1'},
                             {field: '图片', width: 120, title: '图片', search: false,rowspan: 2, templet: ea.table.image,imageHeight:30,merge: true},
                             {title: '广州云仓',colspan: 13},
                             {title: '南昌云仓',colspan: 13},
@@ -358,25 +360,37 @@ define(["jquery", "easy-admin"], function ($, ea) {
                             {field: '贵阳_38/7XL', width: 60, title: '38/7XL', search: false},
                             {field: '贵阳_40/8XL', width: 60, title: '40/8XL', search: false}
                         ]
-                    ],done: function(){
+                    ],done: function(res){
                         tableMerge.render(this);
 
                         $('.guangzhou').click(function() {
-                            $('.layui-table-main').animate({'scrollLeft': 335}, 400);
+                            $('.layui-table-main').animate({'scrollLeft': 265}, 400);
                         });
                         $('.nanchang').click(function() {
-                            $('.layui-table-main').animate({'scrollLeft':1332}, 400);
+                            $('.layui-table-main').animate({'scrollLeft':1262}, 400);
                         });
 
                         $('.wuhan').click(function() {
-                            $('.layui-table-main').animate({'scrollLeft': 2335}, 400);
+                            $('.layui-table-main').animate({'scrollLeft': 2265}, 400);
                         });
                         $('.changsha').click(function() {
-                            $('.layui-table-main').animate({'scrollLeft': 3338}, 400);
+                            $('.layui-table-main').animate({'scrollLeft': 3268}, 400);
                         });
                         $('.guiyang').click(function() {
                             $('.layui-table-main').animate({'scrollLeft': 5000}, 400);
                         });
+
+                        if(res.showType==2){
+                            $('.layui-table tr:nth-child(7n) td').css({
+                                'border-bottom':'1px solid red',
+                                'box-sizing':'border-box',
+                            })
+                        }else{
+                            $('.layui-table tr:nth-child(13n) td').css({
+                                'border-bottom':'1px solid red',
+                                'box-sizing':'border-box',
+                            })
+                        }
 
                     }
                 });

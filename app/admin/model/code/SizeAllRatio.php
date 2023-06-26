@@ -258,6 +258,7 @@ class SizeAllRatio extends TimeModel
         }
         // 单款未入量 = 采购库存 - 累销 - 当前总库存
         $not_total_stock = $all_purchase_stock - $sale_total_sum - $all_total_stock;
+        if($not_total_stock < 0) $not_total_stock = 0;
 
         // 单款售罄 = 单款累销 / (单款当前总库存量 + 单款累销)
         $all_size_sell_out = 0;
@@ -339,6 +340,7 @@ class SizeAllRatio extends TimeModel
             }
             // 单码未入量 = 单码采购库存 - 单码累销 - 单码当前总库存量
             $not_stock = $purchase_stock - $size_sale_total - $this_total_stock;
+            if($not_stock < 0) $not_stock = 0;
 
             // 累销尺码比 = (单码累销 / 单款累销)
             $sale_total_ratio = 0;
