@@ -99,7 +99,7 @@
             background-color: #2e9574 !important;
             color:#ffffff;
         }
-        th[data-field="6"][data-key="1-0-6"], th[data-field="8"][data-key="1-0-8"] ,th[data-field="10"][data-key="1-0-10"], th[data-field="12"][data-key="1-0-12"]{
+        th[data-field="6"][data-key="1-0-6"], th[data-field="8"][data-key="1-0-8"] ,th[data-field="10"][data-key="1-0-10"], th[data-field="12"][data-key="1-0-12"], th[data-field="14"][data-key="1-0-14"]{
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
@@ -180,6 +180,9 @@
             , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table1')}" 
             , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
             , url_setTime = "{:url('admin/system.Duanmalv/duanmalvDateHandle')}"
+            , select_date_num = "{:count($select_date)}" // 显示的日期数
+
+            console.log(select_date_num);
 
         initFn();
         startTable();
@@ -342,6 +345,174 @@
         });
 
         function startTable() {
+            let cols = '';
+            if (select_date_num == 9) {
+
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { title: '【{$select_date[8]["weekStr"]}】 {$select_date[8]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t9', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t9', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t9', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]
+            } else if (select_date_num == 10) {
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { title: '【{$select_date[9]["weekStr"]}】 {$select_date[9]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[8]["weekStr"]}】 {$select_date[8]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t10', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t10', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t10', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        ,{ field: '齐码率-整体-t9', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t9', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t9', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]
+            } else {
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]                
+            }
             table.render({
                 elem: '#table'
                 ,url: url1
@@ -353,60 +524,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: 750
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , cols: [[
-                    { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
-                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
-                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[8]["weekStr"]}】 {$select_date[8]["更新日期"]}', align: 'center' ,colspan: 3}
-                    ],
-                    [ 
-                     { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
-                    , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
-
-                    , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
-
-                    , { field: '齐码率-整体-t9', title: '整体齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP实际-t9', title: 'TOP实际齐码率', align: 'center' , width:100}
-                    , { field: '齐码率-TOP考核-t9', title: 'TOP考核齐码率', align: 'center' , width:100}
-                    ],
-                ]
+                , cols: cols
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
                 }

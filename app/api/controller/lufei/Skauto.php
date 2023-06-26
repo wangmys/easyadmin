@@ -96,33 +96,83 @@ class Skauto extends BaseController
     }   
 
     // 销售天数 = 卖的第一天开始算，到截止那天。例如前天开始卖，昨天不管有没有卖，都算作 2天
-    public function skauto_2() {
-        $select_skauto = $this->db_easyA->table('cwl_skauto')->field('id,店铺名称,货号')->where([
-            ['status', '=', 1]
-        ])->limit(300000)->select();
+    public function skauto_first() {
+        // $select_skauto = $this->db_easyA->table('cwl_skauto')->field('id,店铺名称,货号')->where([
+        //     ['status', '=', 1]
+        // ])->limit(300000)->select();
 
-        if ($select_skauto) {
-            // dump($select_skauto);
-            foreach ($select_skauto as $key => $val) {
-                $getXiaoshouDay = $this->getXiaoshouDay($val['店铺名称'], $val['货号']);
-                // dump($getXiaoshouDay);
-                if ($getXiaoshouDay) {
-                    $updateData = [];
-                    $updateData['首单日期'] = $getXiaoshouDay['首单日期'];
-                    $updateData['销售天数'] = $getXiaoshouDay['销售天数'];
-                    $updateData['status'] = 2;
-                    
-                } else {
-                    $updateData = [];
-                    $updateData['status'] = 2;
-                }
+        // if ($select_skauto) {
+        //     // dump($select_skauto);
+        //     foreach ($select_skauto as $key => $val) {
+        //         $getXiaoshouDay = $this->getXiaoshouDay($val['店铺名称'], $val['货号']);
+        //         // dump($getXiaoshouDay);
+        //         if ($getXiaoshouDay) {
+        //             $updateData = [];
+        //             $updateData['首单日期'] = $getXiaoshouDay['首单日期'];
+        //             $updateData['销售天数'] = $getXiaoshouDay['销售天数'];
+        //             $updateData['status'] = 2;
+        
+        //         } else {
+        //             $updateData = [];
+        //             $updateData['status'] = 2;
+        //         }
 
+        //         // dump($updateData);
+        //         $this->db_easyA->table('cwl_skauto')->where([
+        //             ['id', '=', $val['id']]
+        //         ])->save($updateData);
+        //     }
+        // }
 
-                // dump($updateData);
-                $this->db_easyA->table('cwl_skauto')->where([
-                    ['id', '=', $val['id']]
-                ])->save($updateData);
+        $sql = "
+            SELECT
+                TOP 20000000
+                ER.CustomerName AS 店铺名称,
+                EG.GoodsNo AS 货号
+                ,
+                MIN(FORMAT(ER.RetailDate, 'yyyy-MM-dd')) AS 首单日期,
+                DATEDIFF(day, MIN(ER.RetailDate), DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) + 1 AS 销售天数
+            FROM ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpGoods AS EG ON EG.GoodsId = ERG.GoodsId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND EC.ShutOut = 0	
+                AND EC.RegionId <> 55
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 = 2023
+                AND EG.TimeCategoryName2 in ('初夏', '夏季', '盛夏')
+                AND EG.CategoryName1 IN ('外套', '内搭','鞋履', '下装')
+    -- 			AND EC.CustomerName in ('东至一店')
+    -- 			AND EG.GoodsNo like 'B%'
+    -- 			AND EG.GoodsNo = 'B12203002'
+            GROUP BY 
+                    ER.CustomerName
+                    ,EG.GoodsNo
+                    ,FORMAT(ER.RetailDate, 'yyyy-MM-dd')
+                -- ORDER BY ER.RetailDate ASC        
+        ";
+
+        $select = $this->db_sqlsrv->query($sql);
+        $count = count($select);
+
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_first;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_first')->strict(false)->insertAll($val);
             }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_first 更新成功，数量：{$count}！"
+            ]);
         }
     }
 
