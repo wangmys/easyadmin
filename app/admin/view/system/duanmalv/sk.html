@@ -469,7 +469,7 @@
                     , { field: '领型', title: '领型' ,fixed:'left', align: 'center', width:35}
                     , { field: '风格', title: '风格' ,fixed:'left', align: 'center'} 
                     , { field: '货号', title: '货号' ,fixed:'left', width: 80 , align: 'center'}
-                    ,{ field: '预计00/28/37/44/100/160/S', title: '预计00/28/37/44/100/160/S', width: 165, align: 'center' , hide: false,
+                    ,{ field: '预计00/28/37/44/100/160/S', title: '预计28/37/44/S', width: 90, align: 'center' , hide: false,
                     templet: function (data) {
                         // console.log(data['预计00/28/37/44/100/160/S'])
                         if (data['预计00/28/37/44/100/160/S'] > 0) {
@@ -480,7 +480,7 @@
                             return ''    
                         }
                     }}
-                    ,{ field: '预计29/38/46/105/165/M', title: '预计29/38/46/105/165/M' , width: 165, align: 'center', hide: false,
+                    ,{ field: '预计29/38/46/105/165/M', title: '预计29/38/46/M' , width: 90, align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计29/38/46/105/165/M'] > 0) {
                             return data['预计29/38/46/105/165/M'] 
@@ -490,7 +490,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计30/39/48/110/170/L', title: '预计30/39/48/110/170/L' , width: 165, align: 'center', hide: false,
+                    ,{ field: '预计30/39/48/110/170/L', title: '预计30/39/48/L' , width: 90, align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计30/39/48/110/170/L'] > 0) {
                             return data['预计30/39/48/110/170/L'] 
@@ -500,7 +500,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计31/40/50/115/175/XL', title: '预计31/40/50/115/175/XL', width: 165 , align: 'center', hide: false,
+                    ,{ field: '预计31/40/50/115/175/XL', title: '预计31/40/50/XL', width: 95 , align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计31/40/50/115/175/XL'] > 0) {
                             return data['预计31/40/50/115/175/XL'] 
@@ -510,7 +510,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计32/41/52/120/180/2XL', title: '预计32/41/52/120/180/2XL' , width: 165, align: 'center', hide: false,
+                    ,{ field: '预计32/41/52/120/180/2XL', title: '预计32/41/52/2XL' , width: 100, align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计32/41/52/120/180/2XL'] > 0) {
                             return data['预计32/41/52/120/180/2XL'] 
@@ -520,7 +520,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计33/42/54/125/185/3XL', title: '预计33/42/54/125/185/3XL' , width: 165, align: 'center', hide: false,
+                    ,{ field: '预计33/42/54/125/185/3XL', title: '预计33/42/54/3XL' , width: 105, align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计33/42/54/125/185/3XL'] > 0) {
                             return data['预计33/42/54/125/185/3XL'] 
@@ -530,7 +530,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计34/43/56/190/4XL', title: '预计34/43/56/190/4XL' , width: 165, align: 'center', hide: false,
+                    ,{ field: '预计34/43/56/190/4XL', title: '预计34/43/56/4XL' , width: 100, align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计34/43/56/190/4XL'] > 0) {
                             return data['预计34/43/56/190/4XL'] 
@@ -540,7 +540,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计35/44/58/195/5XL', title: '预计35/44/58/195/5XL', width: 165 , align: 'center', hide: false,
+                    ,{ field: '预计35/44/58/195/5XL', title: '预计35/44/58/5XL', width: 100 , align: 'center', hide: false,
                     templet: function (data) {
                         if (data['预计35/44/58/195/5XL'] > 0) {
                             return data['预计35/44/58/195/5XL'] 
@@ -570,7 +570,7 @@
                             return ''
                         }
                     }}
-                    ,{ field: '预计_40', title: '预计_40', align: 'center' , hide: false,
+                    ,{ field: '预计_40', title: '预计40', align: 'center' , width: 60, hide: false,
                     templet: function (data) {
                         if (data['预计_40'] > 0) {
                             return data['预计_40'] 
@@ -591,29 +591,7 @@
                     , { field: '当前零售价', title: '当前零售价', width: 80, align: 'center'}
                     , { field: '折率', title: '折率', align: 'center'}
                     , { field: '销售金额', title: '销售金额' , align: 'center'}
-                    , { field: '总入量00/28/37/44/100/160/S', title: '总入量00/28/37/44/100/160/S', width: 165 , align: 'center', hide: true},
-                    , { field: '总入量29/38/46/105/165/M', title: '总入量29/38/46/105/165/M', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量30/39/48/110/170/L', title: '总入量30/39/48/110/170/L', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量31/40/50/115/175/XL', title: '总入量31/40/50/115/175/XL', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量32/41/52/120/180/2XL', title: '总入量32/41/52/120/180/2XL', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量33/42/54/125/185/3XL', title: '总入量33/42/54/125/185/3XL', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量34/43/56/190/4XL', title: '总入量34/43/56/190/4XL', width: 165, align: 'center', hide: true}
-                    , { field: '总入量35/44/58/195/5XL', title: '总入量35/44/58/195/5XL', width: 165 , align: 'center', hide: true}
-                    , { field: '总入量36/6XL', title: '总入量36/6XL' , width: 100, align: 'center', hide: true}
-                    , { field: '总入量38/7XL', title: '总入量38/7XL', width: 100 , align: 'center', hide: true}
-                    , { field: '总入量_40', title: '总入量_40' , align: 'center', hide: true}
                     , { field: '总入量数量', title: '总入量数量', width: 80, align: 'center' , hide:false}
-                    , { field: '累销00/28/37/44/100/160/S', title: '累销00/28/37/44/100/160/S', width: 165, align: 'center' , hide: true}
-                    ,{ field: '累销29/38/46/105/165/M', title: '累销29/38/46/105/165/M' , width: 165, align: 'center', hide: true}
-                    ,{ field: '累销30/39/48/110/170/L', title: '累销30/39/48/110/170/L' , width: 165, align: 'center', hide: true}
-                    ,{ field: '累销31/40/50/115/175/XL', title: '累销31/40/50/115/175/XL', width: 165 , align: 'center', hide: true}
-                    ,{ field: '累销32/41/52/120/180/2XL', title: '累销32/41/52/120/180/2XL' , width: 165, align: 'center', hide: true}
-                    ,{ field: '累销33/42/54/125/185/3XL', title: '累销33/42/54/125/185/3XL' , width: 165, align: 'center', hide: true}
-                    ,{ field: '累销34/43/56/190/4XL', title: '累销34/43/56/190/4XL', width: 165, align: 'center' , hide: true}
-                    ,{ field: '累销35/44/58/195/5XL', title: '累销35/44/58/195/5XL', width: 165, align: 'center' , hide: true}
-                    ,{ field: '累销36/6XL', title: '累销36/6XL', align: 'center' , hide: true}
-                    ,{ field: '累销38/7XL', title: '累销38/7XL', align: 'center' , hide: true}
-                    ,{ field: '累销_40', title: '累销_40', align: 'center' , hide: true}
                     ,{ field: '累销数量', title: '累销数量', align: 'center', hide: false}
                     ,{ field: '实际分配TOP', title: '实际分配TOP', align: 'center',width: 80, hide: false}
                 ]]
