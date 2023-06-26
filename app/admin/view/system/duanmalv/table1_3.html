@@ -116,11 +116,11 @@
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                     <div class="layui-form-item">
-                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">自定义时间1</label>
+                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">左侧日期</label>
                         <div class="layui-input-inline" style="width: 130px !important;">
                             <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$limitDate['newDate']}" placeholder="yyyy-MM-dd" lay-verify="required">
                         </div>
-                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">自定义时间2</label>
+                        <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">右侧日期</label>
                         <div class="layui-input-inline" style="width: 130px !important;">
                             <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$limitDate['oldDate']}" placeholder="yyyy-MM-dd" lay-verify="required">
                         </div>
@@ -212,7 +212,7 @@
                     , limit: data.field.limit
                     , cols: [[
                     { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width:110, rowspan: 3}
-                        , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 3}
+                        , { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
                         , { title: `${newDateStr}`, align: 'center' ,colspan: 10}
                         , { title: `${oldDateStr}`, align: 'center' ,colspan: 10}
                         , { field: '差值', title: '差值', align: 'center' ,rowspan: 3}
@@ -266,8 +266,8 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width:110, rowspan: 3}
-                    , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 3}
+                    { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , rowspan: 3}
+                    , { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
                     , { title: '【{$limitDate["newDateStr"]}】 {$limitDate["newDate"]}', align: 'center' ,colspan: 10}
                     , { title: '【{$limitDate["oldDateStr"]}】 {$limitDate["oldDate"]}', align: 'center' ,colspan: 10}
                     , { field: '差值', title: '差值', align: 'center' ,rowspan: 3}

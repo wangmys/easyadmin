@@ -1136,20 +1136,36 @@ class Duanmalv extends AdminController
                     更新日期 ASC
             ";
         $select_date = $this->db_easyA->query($sql1);
+
+        // die;
     
         if (request()->isAjax()) {
             // dump($select_date);
             // 9个展示
             if (count($select_date) == 9) {
-                $count9_join = "left join cwl_duanmalv_table1_1 t9 ON t0.店铺名称=t9.店铺名称 and t9.更新日期 = '{$select_date[8]["更新日期"]}'";
-                $count9_field = "
+                $count_more_join = "left join cwl_duanmalv_table1_1 t9 ON t0.店铺名称=t9.店铺名称 and t9.更新日期 = '{$select_date[8]["更新日期"]}'";
+                $count_more_field = "
                     , concat(round(t9.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t9`
                     , concat(round(t9.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t9`
                     , concat(round(t9.`齐码率-TOP考核` * 100, 1), '%') as `齐码率-TOP考核-t9`
                 ";
+            } elseif (count($select_date) == 10) {
+                $count_more_join = "
+                    left join cwl_duanmalv_table1_1 t9 ON t0.店铺名称=t9.店铺名称 and t9.更新日期 = '{$select_date[8]["更新日期"]}'
+                    left join cwl_duanmalv_table1_1 t10 ON t0.店铺名称=t10.店铺名称 and t10.更新日期 = '{$select_date[9]["更新日期"]}'
+                ";
+                $count_more_field = "
+                    , concat(round(t9.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t9`
+                    , concat(round(t9.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t9`
+                    , concat(round(t9.`齐码率-TOP考核` * 100, 1), '%') as `齐码率-TOP考核-t9`
+
+                    , concat(round(t10.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t10`
+                    , concat(round(t10.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t10`
+                    , concat(round(t10.`齐码率-TOP考核` * 100, 1), '%') as `齐码率-TOP考核-t10`
+                ";
             } else {
-                $count9_join = "";
-                $count9_field = "";
+                $count_more_join = "";
+                $count_more_field = "";
             }
 
             $sql2 = "
@@ -1187,7 +1203,7 @@ class Duanmalv extends AdminController
                     concat(round(t8.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t8`,
                     concat(round(t8.`齐码率-TOP考核` * 100, 1), '%') as `齐码率-TOP考核-t8`
 
-                    {$count9_field}
+                    {$count_more_field}
                 FROM
                     cwl_duanmalv_table1_1 t0 
                     left join cwl_duanmalv_table1_1 t1 ON t0.店铺名称=t1.店铺名称 and t1.更新日期 = '{$select_date[0]["更新日期"]}'
@@ -1198,13 +1214,15 @@ class Duanmalv extends AdminController
                     left join cwl_duanmalv_table1_1 t6 ON t0.店铺名称=t6.店铺名称 and t6.更新日期 = '{$select_date[5]["更新日期"]}'
                     left join cwl_duanmalv_table1_1 t7 ON t0.店铺名称=t7.店铺名称 and t7.更新日期 = '{$select_date[6]["更新日期"]}'
                     left join cwl_duanmalv_table1_1 t8 ON t0.店铺名称=t8.店铺名称 and t8.更新日期 = '{$select_date[7]["更新日期"]}'
-                    {$count9_join}
+                    {$count_more_join}
                 WHERE 1
 
                 GROUP BY
                     t0.店铺名称
                 ORDER BY t2.商品负责人 DESC, t2.`单店排名` ASC
             ";
+
+            // die;
 
             $select = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
@@ -1746,7 +1764,8 @@ class Duanmalv extends AdminController
 
             $sql = "
                 SELECT
-                    t1.省份,t1.商品负责人,
+                    left(t1.省份, 2) as 省份,
+                    t1.商品负责人,
                     t2.`齐码排名` as `齐码排名-新`,
                     t2.`直营-整体` as `直营-整体-新`,
                     t2.`加盟-整体` as `加盟-整体-新`,
