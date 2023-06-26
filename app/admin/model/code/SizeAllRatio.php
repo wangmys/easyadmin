@@ -24,7 +24,7 @@ class SizeAllRatio extends TimeModel
 
 
     /**
-     * 新判断
+     * 统计单个货号码比数据(偏码判断  [新算法])
      * @param $goodsno
      * @return bool
      * @throws \think\db\exception\DataNotFoundException

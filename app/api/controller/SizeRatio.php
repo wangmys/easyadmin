@@ -13,6 +13,8 @@ use voku\helper\HtmlDomParser;
 use app\admin\model\weather\Customers;
 use app\api\service\ratio\CodeService;
 use think\facade\Log;
+use app\admin\model\code\SizeWarehouseRatio;
+use app\admin\model\code\SizeRanking;
 
 /**
  * 码比-偏码数据处理
@@ -204,5 +206,75 @@ class SizeRatio
     {
         $res = \app\admin\model\code\SizeWarehouseRatio::saveData();
         print_r($res);die;
+    }
+
+    /**
+     * 同步至BI云仓偏码
+     */
+    public function syntoBiYuncangOffsetCode()
+    {
+        $list = new SizeRanking;
+        $field = array_column(Db::connect("mysql2")->query("SHOW FULL COLUMNS FROM yuncang_offset_code;"),'Field');
+        // 查询货号列表排名
+        $list = $list->where(['Date' => date('Y-m-d')])->order('日均销','desc')->select();
+        $allList = [];
+        $size = [
+            '00/28/37/44/100/160/S',
+            '29/38/46/105/165/M',
+            '30/39/48/110/170/L',
+            '31/40/50/115/175/XL',
+            '32/41/52/120/180/2XL',
+            '33/42/54/125/185/3XL',
+            '34/43/56/190/4XL',
+            '35/44/58/195/5XL',
+            '36/6XL',
+            '38/7XL',
+            '40/8XL',
+            '总计'
+        ];
+        foreach ($list as $key => &$value){
+              $value['近三天折率'] = '100%';
+              $value['图片'] = $value['图片']?$value['图片']."?id={$value['id']}":'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/B31101454.jpg'."?id={$value['id']}";
+              $value['全国排名'] = $key+1;
+              // 查询码比数据
+              $item = SizeWarehouseRatio::selectWarehouseRatio($value['货号'],[]);
+
+              foreach ($item as $k =>$v){
+
+                  $item2 = $value->toArray() + $v;
+                  foreach ($item2 as $vk => $val){
+                      if(!in_array($vk,$field)){
+                         unset($item2[$vk]);
+                         continue;
+                      }
+                      $vk_key = mb_substr($vk , 3);
+                      if(empty($val) || $val == '0.00'){
+                          $item2[$vk] = '';
+                      }else if(!empty($val) && is_numeric($val) && in_array($vk_key,$size) && in_array($item2['广州_字段'],['单码售罄比','当前库存尺码比','总库存尺码比','累销尺码比','单码售罄'])){
+                          $item2[$vk] = $val.'%';
+                      }
+                  }
+                  $allList[] = $item2;
+              }
+        }
+        try {
+            $code_count = Db::connect("mysql2")->table('yuncang_offset_code')->count();
+            if($code_count > 0){
+                Db::connect("mysql2")->query("truncate table yuncang_offset_code");
+            }
+            if(count($allList) > 0){
+                $data_list = array_chunk($allList,200);
+                foreach ($data_list as $k=>$v){
+                    Db::connect("mysql2")->table('yuncang_offset_code')->insertAll($v);
+                }
+            }
+            // 提交
+            Db::commit();
+        }catch (\Exception $e){
+            // 回滚
+            Db::rollback();
+            return $e->getMessage();
+        }
+        return 'success';
     }
 }
