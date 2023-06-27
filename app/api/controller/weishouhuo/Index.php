@@ -35,7 +35,7 @@ class Index
             EW.WarehouseCode AS 出货仓库编号,
             ED.DeliveryID AS 单号,
             ED.UpdateTime AS 发货单审批时间,
-            EI.CreateTime AS 单据日期,
+            ED.CreateTime AS 单据日期,
             DATEDIFF(DAY, ED.UpdateTime, GETDATE()) AS 未收天数,
             SUM(EDG.Quantity) AS 数量
         FROM ErpDelivery ED 
@@ -58,7 +58,7 @@ class Index
             EW.WarehouseName,
             EW.WarehouseCode,
             ED.DeliveryID,
-            EI.CreateTime,
+            ED.CreateTime,
             ED.UpdateTime
         ORDER BY ED.UpdateTime,EC.CustomerName";
         $is_true = $req->get('is_true');
