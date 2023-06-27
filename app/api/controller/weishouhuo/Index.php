@@ -34,7 +34,7 @@ class Index
             EW.WarehouseName AS 出货仓库,
             EW.WarehouseCode AS 出货仓库编号,
             ED.DeliveryID AS 单号,
-            ED.UpdateTime AS 发货单审批时间,
+            ED.CreateTime AS 单据日期,
             DATEDIFF(DAY, ED.UpdateTime, GETDATE()) AS 未收天数,
             SUM(EDG.Quantity) AS 数量
         FROM ErpDelivery ED 
@@ -92,7 +92,7 @@ class Index
         ECC.CustomerName AS 调出店铺,
         ECC.CustomerCode AS 调出店铺编号,
         EI.CustOutboundId AS 单号,
-        EI.UpdateTime AS 调出单审批时间,
+        EI.CreateTime AS 单据日期,
         DATEDIFF(DAY, EI.UpdateTime, GETDATE()) AS 发出天数,
         SUM(EIG.Quantity) AS 数量
     FROM ErpCustOutbound EI 
