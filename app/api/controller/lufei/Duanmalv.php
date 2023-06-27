@@ -171,7 +171,7 @@ class Duanmalv extends BaseController
         // 计算折率
         $sql1 = "
             UPDATE cwl_duanmalv_retail 
-            SET 折率= ROUND(`当前零售价` / 零售价, 2)
+            SET 折率= ROUND(`当前零售价` / 零售价, 4)
             WHERE 
             `折率` IS NULL
         ";
@@ -852,7 +852,7 @@ class Duanmalv extends BaseController
                 round(m1.销售金额 / m1.店铺总销售金额, 4) AS 销售占比,
                 round(m1.SKC数 / m1.店铺总SKC数 * 60, 4) AS SKC数TOP分配,
                 round(m1.销售金额 / m1.店铺总销售金额 * 60, 4) AS 销售TOP分配,
-                round((m1.SKC数 / m1.店铺总SKC数 * 60 + m1.销售金额 / m1.店铺总销售金额 * 60) / 2, 0) AS 实际分配TOP
+                round((m1.SKC数 / m1.店铺总SKC数 * 60 + m1.销售金额 / m1.店铺总销售金额 * 60) / 4, 0) AS 实际分配TOP
             FROM
                 (SELECT sk.经营模式,
                     sk.商品负责人,
@@ -1102,9 +1102,9 @@ class Duanmalv extends BaseController
                 h.经营模式,
                 h.店铺总SKC数,
                 SUM( h.TOP断码SKC数 ) AS TOP断码SKC数,
-                ROUND( SUM(h.TOP断码SKC数) / h.店铺总SKC数, 2 ) AS TOP断码率,
+                ROUND( SUM(h.TOP断码SKC数) / h.店铺总SKC数, 4 ) AS TOP断码率,
                 SUM(h.全部断码SKC数) AS 全部断码SKC数,
-                ROUND( SUM(h.全部断码SKC数) / h.店铺总SKC数, 2 ) AS 全部断码率
+                ROUND( SUM(h.全部断码SKC数) / h.店铺总SKC数, 4 ) AS 全部断码率
             from cwl_duanmalv_handle_1 as h
             left join customer as c on h.店铺名称 = c.CustomerName
             GROUP BY h.店铺名称
@@ -1287,7 +1287,7 @@ class Duanmalv extends BaseController
                     sk.货号,
                     sum( sk.`店铺SKC计数` ) AS 上柜数,
                     sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) AS 断码家数,
-                    round(sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) / sum( sk.`店铺SKC计数` ), 2) AS 断码率
+                    round(sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) / sum( sk.`店铺SKC计数` ), 4) AS 断码率
                 FROM
                     cwl_duanmalv_sk AS sk 
                 GROUP BY
@@ -1320,7 +1320,7 @@ class Duanmalv extends BaseController
                     AND A.中类 = B.中类 
                     AND A.领型 = B.领型 
                     SET A.排名率 = ROUND(
-                        A.单款排名 / B.最后排名, 2)
+                        A.单款排名 / B.最后排名, 4)
             ";
             $this->db_easyA->execute($sql2);
 
@@ -1346,8 +1346,8 @@ class Duanmalv extends BaseController
                 h1.*,
                 -- (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码') AS '断码数-整体',
                 1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
-                1 - ROUND(`SKC数-TOP实际` / 60, 2)AS '齐码率-TOP实际',
-                1 - ROUND(`SKC数-TOP考核` / 60, 2)AS '齐码率-TOP考核',
+                1 - ROUND(`SKC数-TOP实际` / 60, 4)AS '齐码率-TOP实际',
+                1 - ROUND(`SKC数-TOP考核` / 60, 4)AS '齐码率-TOP考核',
                 date_format(now(),'%Y-%m-%d') AS 更新日期
                 FROM 
                         (SELECT
@@ -1572,62 +1572,7 @@ class Duanmalv extends BaseController
                 ) AS t1                                               
         ";
 
-        $sql_bak = "
-                SELECT
-                    t1.*,
-                    case
-                        when t1.`直营-整体` > 0 AND t1.`加盟-整体` > 0 then round((t1.`直营-整体` + t1.`加盟-整体`) / 2, 4)
-                        when t1.`直营-整体` > 0 AND (t1.`加盟-整体` <= 0 || t1.`加盟-整体` is null) then round((t1.`直营-整体`), 4)
-                        when (t1.`直营-整体` >= 0 || t1.`直营-整体` is null) AND t1.`加盟-整体` > 0 then round((t1.`加盟-整体`), 4)
-                        else 0
-                    end as 	`合计-整体`,
-                    case
-                        when t1.`直营-TOP实际` > 0 AND t1.`加盟-TOP实际` > 0 then round((t1.`直营-TOP实际` + t1.`加盟-TOP实际`) / 2, 4)
-                        when t1.`直营-TOP实际` > 0 AND (t1.`加盟-TOP实际` <= 0 || t1.`加盟-TOP实际` is null) then round((t1.`直营-TOP实际`), 4)
-                        when (t1.`直营-TOP实际` >= 0 || t1.`直营-TOP实际` is null) AND t1.`加盟-TOP实际` > 0 then round((t1.`加盟-TOP实际`), 4)
-                        else 0
-                    end as 	`合计-TOP实际`,
-                    case
-                        when t1.`直营-TOP考核` > 0 AND t1.`加盟-TOP考核` > 0 then round((t1.`直营-TOP考核` + t1.`加盟-TOP考核`) / 2, 4)
-                        when t1.`直营-TOP考核` > 0 AND (t1.`加盟-TOP考核` <= 0 || t1.`加盟-TOP考核` is null) then round((t1.`直营-TOP考核`), 4)
-                        when (t1.`直营-TOP考核` >= 0 || t1.`直营-TOP考核` is null) AND t1.`加盟-TOP考核` > 0 then round((t1.`加盟-TOP考核`), 4)
-                        else 0
-                    end as 	`合计-TOP考核`,
-                    date_format(now(),'%Y-%m-%d') as 更新日期
-                FROM
-                    (
-                    SELECT
-                        zy.云仓,
-                        zy.商品负责人,
-                        ROUND( AVG( zy.`齐码率-整体` ), 4 ) AS `直营-整体`,
-                        jm.`加盟-整体`,
-                        ROUND( AVG( zy.`齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
-                        jm.`加盟-TOP实际`,
-                        ROUND( AVG( zy.`齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`,
-                        jm.`加盟-TOP考核` 
-                    FROM
-                        cwl_duanmalv_table1_1 AS zy
-                        LEFT JOIN (
-                        SELECT
-                            云仓,商品负责人,
-                            ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
-                            ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
-                            ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核` 
-                        FROM
-                            cwl_duanmalv_table1_1 
-                        WHERE
-                            经营模式 = '加盟' 
-                            AND `更新日期` = date_format(now(),'%Y-%m-%d')
-                        GROUP BY
-                            商品负责人 
-                        ) AS jm ON zy.商品负责人 = jm.`商品负责人` 
-                    WHERE
-                        zy.经营模式 = '直营' 
-                        AND zy.`更新日期` = date_format(now(),'%Y-%m-%d')
-                    GROUP BY
-                    zy.商品负责人 
-                    ) AS t1                                               
-            ";
+
         $select = $this->db_easyA->query($sql);
         // dump($select); die;
         if ($select) {
@@ -1755,70 +1700,7 @@ class Duanmalv extends BaseController
             ) AS t2                                          
         ";
 
-        $sql_bak = "
-                SELECT 
-                    t2.*,
-                case
-                    when t2.`直营-整体` > 0 AND t2.`加盟-整体` > 0 then round((t2.`直营-整体` + t2.`加盟-整体`) / 2, 4)
-                    when t2.`直营-整体` > 0 AND (t2.`加盟-整体` <= 0 || t2.`加盟-整体` is null) then round((t2.`直营-整体`), 4)
-                    when (t2.`直营-整体` >= 0 || t2.`直营-整体` is null) AND t2.`加盟-整体` > 0 then round((t2.`加盟-整体`), 4)
-                    else 0
-                end as 	`合计-整体`,
-                case
-                    when t2.`直营-TOP实际` > 0 AND t2.`加盟-TOP实际` > 0 then round((t2.`直营-TOP实际` + t2.`加盟-TOP实际`) / 2, 4)
-                    when t2.`直营-TOP实际` > 0 AND (t2.`加盟-TOP实际` <= 0 || t2.`加盟-TOP实际` is null) then round((t2.`直营-TOP实际`), 4)
-                    when (t2.`直营-TOP实际` >= 0 || t2.`直营-TOP实际` is null) AND t2.`加盟-TOP实际` > 0 then round((t2.`加盟-TOP实际`), 4)
-                    else 0
-                end as 	`合计-TOP实际`,
-                case
-                    when t2.`直营-TOP考核` > 0 AND t2.`加盟-TOP考核` > 0 then round((t2.`直营-TOP考核` + t2.`加盟-TOP考核`) / 2, 4)
-                    when t2.`直营-TOP考核` > 0 AND (t2.`加盟-TOP考核` <= 0 || t2.`加盟-TOP考核` is null) then round((t2.`直营-TOP考核`), 4)
-                    when (t2.`直营-TOP考核` >= 0 || t2.`直营-TOP考核` is null) AND t2.`加盟-TOP考核` > 0 then round((t2.`加盟-TOP考核`), 4)
-                    else 0
-                end as 	`合计-TOP考核`,
-                date_format(now(),'%Y-%m-%d') as 更新日期
-                FROM (
-                SELECT
-                    t1.省份,
-                    t1.商品负责人,
-                    zy.`直营-整体`,
-                    zy.`直营-TOP实际`,
-                    zy.`直营-TOP考核`,
-                    jm.`加盟-整体`,
-                    jm.`加盟-TOP实际`,
-                    jm.`加盟-TOP考核`
-                FROM
-                    cwl_duanmalv_table1_1 t1
-                LEFT JOIN (
-                SELECT
-                    省份,
-                    商品负责人,
-                    ROUND( AVG( `齐码率-整体` ), 4 ) AS `直营-整体`,
-                    ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `直营-TOP实际`,
-                    ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `直营-TOP考核`
-                FROM
-                    cwl_duanmalv_table1_1 
-                where 
-                    经营模式 = '直营' 
-                    AND 更新日期 = date_format(now(),'%Y-%m-%d')
-                GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
-                LEFT JOIN (
-                    SELECT
-                        省份,
-                        商品负责人,
-                        ROUND( AVG( `齐码率-整体` ), 4 ) AS `加盟-整体`,
-                        ROUND( AVG( `齐码率-TOP实际` ), 4 ) AS `加盟-TOP实际`,
-                        ROUND( AVG( `齐码率-TOP考核` ), 4 ) AS `加盟-TOP考核`
-                    FROM
-                        cwl_duanmalv_table1_1 
-                    where 
-                        经营模式 = '加盟' 
-                        AND 更新日期 = date_format(now(),'%Y-%m-%d')
-                    GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
-                GROUP BY
-                        t1.省份, t1.商品负责人 
-            ) AS t2                                          
-        ";
+        
         $select = $this->db_easyA->query($sql);
         // dump($select); die;
         if ($select) {
