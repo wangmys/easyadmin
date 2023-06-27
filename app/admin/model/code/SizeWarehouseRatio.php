@@ -458,7 +458,7 @@ class SizeWarehouseRatio extends TimeModel
      * @param $goodsno
      * @return mixed
      */
-    public static function selectWarehouseRatio($goodsno,$where)
+    public static function selectWarehouseRatio($goodsno,$where = [])
     {
 
         $str = '';
