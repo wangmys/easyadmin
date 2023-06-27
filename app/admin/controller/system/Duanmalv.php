@@ -31,13 +31,37 @@ class Duanmalv extends AdminController
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
-    // 更新周推条件
-    protected function updateWeekpushMap() {
-        $this->db_easyA->table('cwl_budongxiao_weekpush_map')->insert([
-            'create_time' => date('Y-m-d H:i:s', time()),
-            'update_time' => date('Y-m-d H:i:s', time()),
-            'map' => json_encode($this->params),
-        ]); 
+    /**
+     * @NodeAnotation(title="断码率系统配置")
+     */
+    public function config() {
+        // $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
+        
+        // // 商品负责人
+        // $people = SpWwBudongxiaoDetail::getPeople([
+        //     ['商品负责人', 'exp', new Raw('IS NOT NULL')]
+        // ]);
+
+        // // 
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        
+        // dump($select_config );die;
+
+        return View('config', [
+            'config' => $select_config,
+        ]);
+    }
+
+    public function saveMap() {
+        if (request()->isAjax() && checkAdmin()) {
+            $params = input();
+
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
+
+            return json(['status' => 1, 'msg' => '操作成功']);
+        } else {
+            return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
+        }   
     }
 
     /**
@@ -529,6 +553,71 @@ class Duanmalv extends AdminController
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
 
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map1Str = $this->xmSelectInput($input['商品负责人']);
+                $map1 = " AND 商品负责人 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map2Str = $this->xmSelectInput($input['云仓']);
+                $map2 = " AND 云仓 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map3Str = $this->xmSelectInput($input['省份']);
+                $map3 = " AND 省份 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }   
+            if (!empty($input['经营模式'])) {
+                // echo $input['商品负责人'];
+                $map4Str = $this->xmSelectInput($input['经营模式']);
+                $map4 = " AND 经营模式 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+            if (!empty($input['店铺名称'])) {
+                // echo $input['商品负责人'];
+                $map5Str = $this->xmSelectInput($input['店铺名称']);
+                $map5 = " AND 店铺名称 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+            if (!empty($input['大类'])) {
+                // echo $input['商品负责人'];
+                $map6Str = $this->xmSelectInput($input['大类']);
+                $map6 = " AND 一级分类 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+            if (!empty($input['中类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = $this->xmSelectInput($input['中类']);
+                $map7 = " AND 二级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+            if (!empty($input['领型'])) {
+                // echo $input['商品负责人'];
+                $map8Str = $this->xmSelectInput($input['领型']);
+                $map8 = " AND 领型 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+
+            if (!empty($input['风格'])) {
+                // echo $input['商品负责人'];
+                $map10Str = $this->xmSelectInput($input['风格']);
+                $map10 = " AND 风格 IN ({$map10Str})";
+            } else {
+                $map10 = "";
+            }
+
             if (!empty($input['领型齐码率'])) {
                 // echo $input['商品负责人'];
                 $map13Str = $this->xmSelectInput($input['领型齐码率']);
@@ -537,6 +626,8 @@ class Duanmalv extends AdminController
                 $map13 = "";
             }
 
+            $map13 = " AND 领型齐码率 >= " . $input['qimalvStart'] / 100 . ' AND 领型齐码率 <= ' . $input['qimalvEnd'] / 100 ;
+            
             $sql = "
                 SELECT 
                     云仓,
@@ -552,9 +643,18 @@ class Duanmalv extends AdminController
                     领型断码数,
                     concat(round(领型齐码率 * 100, 1), '%') as 领型齐码率
                 FROM cwl_duanmalv_table6 WHERE 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
+                    {$map10}
                     {$map13}
                 LIMIT {$pageParams1}, {$pageParams2}  
-            ";
+            "; 
             $select = $this->db_easyA->query($sql);
 
             $sql2 = "
@@ -563,6 +663,15 @@ class Duanmalv extends AdminController
                 FROM cwl_duanmalv_table6
                 WHERE 
                     1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
+                    {$map10}
                     {$map13}
             ";
             $count = $this->db_easyA->query($sql2);
@@ -1006,6 +1115,20 @@ class Duanmalv extends AdminController
         }
         return Excel::exportData($select, $header, '单店单款断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }    
+
+    public function seasionHandle($seasion = "春季") {
+        $seasionStr = "";
+        if ($seasion == '春季') {
+            $seasionStr = "'初春','正春','春季'";
+        } elseif ($seasion == '夏季') {
+            $seasionStr = "'初夏','盛夏','夏季'";
+        } elseif ($seasion == '秋季') {
+            $seasionStr = "'初秋','深秋','秋季'";
+        } elseif ($seasion == '冬季') {
+            $seasionStr = "'初冬','深冬','冬季'";
+        }
+        return $seasionStr;
+    }
 
     // 多选提交参数处理
     public function xmSelectInput($str = "") {

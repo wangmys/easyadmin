@@ -34,9 +34,24 @@ class Duanmalv extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    public function seasionHandle($seasion = "春季") {
+        $seasionStr = "";
+        if ($seasion == '春季') {
+            $seasionStr = "'初春','正春','春季'";
+        } elseif ($seasion == '夏季') {
+            $seasionStr = "'初夏','盛夏','夏季'";
+        } elseif ($seasion == '秋季') {
+            $seasionStr = "'初秋','深秋','秋季'";
+        } elseif ($seasion == '冬季') {
+            $seasionStr = "'初冬','深冬','冬季'";
+        }
+        return $seasionStr;
+    }
+
     // 更新周销 断码率专用 初步加工康雷表 groub by合并插入自己的retail表里
     public function retail_first() {
-        // 康雷查询周销
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $seasion = $this->seasionHandle($select_config['季节归集']); 
         $sql = "   
             SELECT TOP
                 300000 EC.CustomItem17 AS 商品负责人,
@@ -103,7 +118,7 @@ class Duanmalv extends BaseController
                 AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.TimeCategoryName2 IN ( {$seasion} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
@@ -130,6 +145,8 @@ class Duanmalv extends BaseController
         --      ,ERG.UnitPrice
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
+
+        die;
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
         // if (! cache('duanmalv_retail_data')) {
@@ -257,6 +274,8 @@ class Duanmalv extends BaseController
 
     public function sk_first()
     {
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $seasion = $this->seasionHandle($select_config['季节归集']); 
         $sql = "
             SELECT 
                 sk.云仓,
@@ -477,7 +496,7 @@ class Duanmalv extends BaseController
                 LEFT JOIN customer as c ON sk.店铺名称=c.CustomerName
 
                 WHERE
-                    sk.季节 IN ('初夏', '盛夏', '夏季') 
+                    sk.季节 IN ({$seasion}) 
                     AND c.Region <> '闭店区'
                 --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
@@ -570,7 +589,10 @@ class Duanmalv extends BaseController
 
     // 断码 无效库存判定
     public function sk_third() {
-        $sql1 = "set @内搭 = 4, @外套=4, @鞋履=4, @松紧长裤=5, @松紧短裤=5, @下装=6;";
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        // $sql1 = "set @内搭 = 4, @外套=4, @鞋履=4, @松紧长裤=5, @松紧短裤=5, @下装=6;";
+        $sql1 = "set @内搭 = {$select_config['内搭']}, @外套={$select_config['外套']}, @鞋履={$select_config['鞋履']}, @松紧长裤={$select_config['松紧长裤']}, @松紧短裤={$select_config['松紧短裤']}, @下装={$select_config['下装']};";
+        
         $this->db_easyA->execute($sql1);
 
         $sql2 = "
@@ -801,14 +823,14 @@ class Duanmalv extends BaseController
         // echo '<pre>';
         // print_r($select);
         if ($select) {
-
+            $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             $qimaArr = [
-                '内搭' => '4',
-                '外套' => '4',
-                '鞋履' => '4',
-                '松紧长裤' => '5',
-                '松紧短裤' => '5',
-                '下装' => '6',
+                '内搭' => "{$select_config['内搭']}",
+                '外套' => "{$select_config['外套']}",
+                '鞋履' => "{$select_config['鞋履']}",
+                '松紧长裤' => "{$select_config['松紧长裤']}",
+                '松紧短裤' => "{$select_config['松紧短裤']}",
+                '下装' => "{$select_config['下装']}",
             ];
             foreach ($select as $key => $val) {
                 if ($val['二级分类'] == '松紧长裤' || $val['二级分类'] == '松紧短裤') {
