@@ -1178,7 +1178,9 @@ class Duanmalv extends AdminController
 
             $sql2 = "
                 SELECT  
-                    t0.商品负责人,t0.云仓,t0.省份,t0.店铺名称,t0.经营模式,
+                    t0.商品负责人,t0.云仓,
+                    left(t0.省份, 2) as 省份,
+                    t0.店铺名称,t0.经营模式,
                     concat(round(t1.`齐码率-整体` * 100, 1), '%') as `齐码率-整体-t1`,
                     concat(round(t1.`齐码率-TOP实际` * 100, 1), '%') as `齐码率-TOP实际-t1`,
                     concat(round(t1.`齐码率-TOP考核` * 100, 1), '%') as `齐码率-TOP考核-t1`,
