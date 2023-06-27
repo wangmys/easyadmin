@@ -1237,6 +1237,7 @@ class Duanmalv extends AdminController
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
+            // dump(count($select_date));die;
             foreach ($select_date as $key => $val) {
                 $select_date[$key]['weekStr'] = date_to_week($val['更新日期']);
             }
