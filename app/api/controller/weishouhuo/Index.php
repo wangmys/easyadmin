@@ -35,6 +35,7 @@ class Index
             EW.WarehouseCode AS 出货仓库编号,
             ED.DeliveryID AS 单号,
             ED.UpdateTime AS 发货单审批时间,
+            ED.CreateTime AS 单据日期,
             DATEDIFF(DAY, ED.UpdateTime, GETDATE()) AS 未收天数,
             SUM(EDG.Quantity) AS 数量
         FROM ErpDelivery ED 
@@ -57,6 +58,7 @@ class Index
             EW.WarehouseName,
             EW.WarehouseCode,
             ED.DeliveryID,
+            ED.CreateTime,
             ED.UpdateTime
         ORDER BY ED.UpdateTime,EC.CustomerName";
         $is_true = $req->get('is_true');
@@ -93,6 +95,7 @@ class Index
         ECC.CustomerCode AS 调出店铺编号,
         EI.CustOutboundId AS 单号,
         EI.UpdateTime AS 调出单审批时间,
+        EI.CreateTime AS 单据日期,
         DATEDIFF(DAY, EI.UpdateTime, GETDATE()) AS 发出天数,
         SUM(EIG.Quantity) AS 数量
     FROM ErpCustOutbound EI 
@@ -114,6 +117,7 @@ class Index
         ECC.CustomerName,
         ECC.CustomerCode,
         EI.CustOutboundId,
+        EI.CreateTime,     
         EI.UpdateTime";
          $is_true = $req->get('is_true');
          if(empty($res = Cache::get('weishouhuo_index2')) || $is_true){
