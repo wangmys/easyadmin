@@ -100,7 +100,7 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: auto;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -123,10 +123,14 @@
                                 <div id="xm-huohao" class="xm-select-demo"></div>
                             </div>
                         </div>
+
                     </div>
-                    <div class="" style="width:5%;">
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
                         </button>
                     </div>
                 </div>  
@@ -162,7 +166,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Duanmalv/table4')}" 
-            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table4')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_table4')}" 
             , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
 
         initFn();
@@ -297,17 +301,35 @@
             return false; 
         });
 
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+            })
+
+            return false; 
+        });
+
         function startTable() {
             table.render({
                 elem: '#table'
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: '#toolbar1'
+                // , toolbar: '#toolbar1'
+                , toolbar: 'true'
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 780
+                , height: 730
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                      { field: '风格', title: '风格', align: 'center', rowspan: 2, fixed:'left'}

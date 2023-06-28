@@ -154,12 +154,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="" style="width:5%; height:70px;">
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(25, 172, 25));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
                         </button>
                     </div>
                 </div>  
@@ -195,7 +195,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Duanmalv/sk')}" 
-            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_sk')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_sk')}" 
             , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
 
         initFn();
@@ -334,6 +334,7 @@
         //触发事件
         table.on('toolbar(table)', function(obj) {
             var checkStatus = table.checkStatus(obj.config.id);
+            console.log(obj)
             switch(obj.event){
                 case 'download':
                     location.href = url_download_history_area
@@ -442,15 +443,35 @@
             return false; 
         });
 
+        // location.href = url_download_history_area
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+
+            return false; 
+        });
+
         function startTable() {
             table.render({
                 elem: '#table'
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: '#toolbar1'
+                // , toolbar: '#toolbar1'
+                , toolbar: 'true'
                 , page: true
-                , limit: 1000
+                , limit: 500
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: 720
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
