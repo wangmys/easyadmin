@@ -146,7 +146,6 @@ class Duanmalv extends BaseController
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
 
-        die;
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
         // if (! cache('duanmalv_retail_data')) {
