@@ -8,6 +8,7 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use jianyan\excel\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 /**
     断码率相关下载
@@ -356,6 +357,15 @@ class DuanmalvExcel extends AdminController
             foreach($select[0] as $key => $val) {
                 $header[] = [$key, $key];
             }
+
+            $spreadsheet = new Spreadsheet();
+            $worksheet = $spreadsheet->getActiveSheet();
+            $styleArray = [
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+            ];
+            $worksheet->getStyle('A1')->applyFromArray($styleArray);
             return Excel::exportData($select, $header, '单店品类断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
 
             // 下载
