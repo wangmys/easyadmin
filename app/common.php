@@ -466,3 +466,16 @@ function xmSelectInput($str = "") {
     $map = mb_substr($map, 0, -1, "UTF-8");
     return $map;
 }
+
+// 随机字符串
+function rand_code($randLength=6,$chars="0123456789"){
+    $randStr = '';
+    $strLen = strlen($chars);
+    // 循环输出没一个随机字符
+    for($i=0;$i<$randLength;$i++){
+        $randStr .= $chars[rand(0,$strLen-1)];
+    }
+    // tokenvalue=随机字符串+时间戳
+    $tokenvalue = $randStr;
+    return $tokenvalue;
+}

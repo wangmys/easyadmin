@@ -157,9 +157,12 @@
                             </div> 
                         </div>
                     </div>
-                    <div class="" style="width:5%; height:70px;">
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
                         </button>
                     </div>
                 </div>  
@@ -195,7 +198,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Duanmalv/table6')}" 
-            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table6')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_table6')}" 
             , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
 
         initFn();
@@ -419,6 +422,23 @@
             return false; 
         });
 
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+
+            return false; 
+        });
 
         //触发事件
         table.on('toolbar(table)', function(obj) {
@@ -443,7 +463,8 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: '#toolbar1'
+                // , toolbar: '#toolbar1'
+                , toolbar: true
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
