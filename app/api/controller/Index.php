@@ -13,6 +13,7 @@ use voku\helper\HtmlDomParser;
 use app\admin\model\weather\Customers;
 use app\api\service\ratio\CodeService;
 use app\admin\model\code\SizeAllRatio;
+use app\admin\model\code\SizeWarehouseRatio;
 
 class Index
 {
@@ -83,7 +84,8 @@ class Index
     
     public function pull()
     {
-        $res = SizeAllRatio::newSaveSizeRatio('B32502005');
+//        $res = SizeAllRatio::saveSizeRatio('B32502028');
+        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
 //        $res = SizeAllRatio::newSaveSizeRatio('B41101028');
 //        echo '<pre>';
 //        print_r($res);
