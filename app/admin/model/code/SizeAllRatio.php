@@ -399,9 +399,28 @@ class SizeAllRatio extends TimeModel
             $data['当前单店均深'][$vv] = $shop_mean;
         }
 
+        // 当前库存尺码比有效数据
+        $thisTotalRatio = [];
+        // 总库存尺码比有效数据
+        $stockTotalRatio = [];
+        // 累销尺码比有效数据
+        $saleTotalRatio = [];
         // 1.对数据进行排序
         foreach (['当前库存尺码比','总库存尺码比','累销尺码比'] as $key => $val){
-            asort($data[$val]);
+            foreach ($size as $k => $v){
+                if($val == '当前库存尺码比'){
+                   $thisTotalRatio[$v] = $data[$val][$v]??0;
+                   asort($thisTotalRatio);
+                }
+                if($val == '总库存尺码比'){
+                    $stockTotalRatio[$v] = $data[$val][$v]??0;
+                    asort($stockTotalRatio);
+                }
+                if($val == '累销尺码比'){
+                    $saleTotalRatio[$v] = $data[$val][$v]??0;
+                    asort($saleTotalRatio);
+                }
+            }
         }
 
         // 2.获取前多少名尺码个数,如果大于等于配置数,则使用配置数,如果小于配置数,则使用尺码数
@@ -412,9 +431,9 @@ class SizeAllRatio extends TimeModel
 
         // 3.对取好的库存尺码比排序,并截取排名前三的数值
         // 取出每个尺码指定前几名的当前库存尺码比数据
-        $this_stock_size_ratio = array_slice($data['当前库存尺码比'],-$_count,null,true);
+        $this_stock_size_ratio = array_slice($thisTotalRatio,-$_count,null,true);
         // 取出每个尺码指定前几名的累销尺码比数据
-        $accumulated_sale_ratio = array_slice($data['累销尺码比'],-$_count,null,true);
+        $accumulated_sale_ratio = array_slice($saleTotalRatio,-$_count,null,true);
         // 4.使用当前库存尺码比与累销尺码比对比,两组尺码数据是否一致,不一致则判断单码售罄比是否为单码缺量,是的情况下,则标识偏码
         $current_inventory_1 = array_diff_key($this_stock_size_ratio,$accumulated_sale_ratio);
         $current_inventory_2 = array_diff_key($accumulated_sale_ratio,$this_stock_size_ratio);
@@ -430,9 +449,9 @@ class SizeAllRatio extends TimeModel
 
         // 3.1对取好的库存尺码比排序,并截取排名前三的数值
         // 取出每个尺码指定前几名的当前库存尺码比数据
-        $total_stock_size_ratio = array_slice($data['总库存尺码比'],-$_count,null,true);
+        $total_stock_size_ratio = array_slice($stockTotalRatio,-$_count,null,true);
         // 取出每个尺码指定前几名的累销尺码比数据
-        $total_sale_ratio = array_slice($data['累销尺码比'],-$_count,null,true);
+        $total_sale_ratio = array_slice($saleTotalRatio,-$_count,null,true);
         // 4.1使用总库存尺码比与累销尺码比对比,两组尺码数据是否一致,不一致则判断单码售罄比是否为单码缺量,是的情况下,则标识偏码
         $total_inventory_1 = array_diff_key($total_stock_size_ratio,$total_sale_ratio);
         $total_inventory_2 = array_diff_key($total_sale_ratio,$total_stock_size_ratio);
