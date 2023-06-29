@@ -53,6 +53,7 @@ class Tiaojia extends BaseController
             RIGHT JOIN customer AS c ON c.CustomerName = scs.店铺名称
             WHERE 
                 scs.货号 is not null
+                AND scs.季节 IN ('初夏', '盛夏', '夏季')
         ";
 
         $select = $this->db_bi->query($sql);
