@@ -9,6 +9,7 @@ use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 /**
     断码率相关下载
@@ -358,14 +359,25 @@ class DuanmalvExcel extends AdminController
                 $header[] = [$key, $key];
             }
 
-            $spreadsheet = new Spreadsheet();
-            $worksheet = $spreadsheet->getActiveSheet();
-            $styleArray = [
-                'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                ],
-            ];
-            $worksheet->getStyle('A1')->applyFromArray($styleArray);
+            // $spreadsheet = new Spreadsheet();
+            // $worksheet = $spreadsheet->getActiveSheet();
+            // $styleArray = [
+            //     'alignment' => [
+            //         'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            //     ],
+            // ];
+            // $worksheet->getStyle('A1')->applyFromArray($styleArray);
+
+
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename='.'单店品类断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() . '.xlsx');
+            // header('Cache-Control: max-age=0');
+            // $writer = new Xlsx($spreadsheet);
+            // $writer->save('php://output');
+            // exit;
+
+
             return Excel::exportData($select, $header, '单店品类断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
 
             // 下载
