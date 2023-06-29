@@ -425,6 +425,11 @@ class SizeAllRatio extends TimeModel
 
         // 2.获取前多少名尺码个数,如果大于等于配置数,则使用配置数,如果小于配置数,则使用尺码数
         $_count = 3;
+        if($info['一级分类'] == '下装' && (strpos($info['二级分类'],'松紧') !== false)){
+            $_count = 4;
+        }elseif($info['一级分类'] == '下装'){
+            $_count = 5;
+        }
         if($n = count($data[$val]) < $_count){
             $_count = $n;
         }
