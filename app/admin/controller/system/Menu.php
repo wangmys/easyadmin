@@ -20,6 +20,7 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
+use jianyan\excel\Excel;
 
 /**
  * Class Menu
@@ -216,4 +217,158 @@ class Menu extends AdminController
         ]);
     }
 
+    /**
+     * 展示业绩对比
+     */
+    public function list()
+    {
+        // 本期时间
+        $current_time_1 = date('Y-m-d',strtotime(date('Y-m-d').'-4day'));
+        $current_time_2 = date('Y-m-d 23:59:59',strtotime(date('Y-m-d').'-4day'));
+        // 查询本期数据
+        $current_data = $this->model->getPerformanceData($current_time_1,$current_time_2);
+
+        // 对比时间
+        $contrast_time_1 = date('Y-m-d',strtotime(date('Y-m-d').'-3day'));
+        $contrast_time_2 = date('Y-m-d 23:59:59',strtotime(date('Y-m-d').'-2day'));
+
+        // 查询对比数据
+        $contrast_data = $this->model->getPerformanceData($contrast_time_1,$contrast_time_2);
+
+        // 对比值数据
+        $contrast_value_data = [];
+        // 对比数据
+        foreach ($contrast_data as $k => $v){
+
+            // 本期数据
+            $current_item = $current_data[$k]??[];
+            if($current_item){
+
+                // 公共数据
+                $contrast_value_data[$k]['State'] = $v['State'];
+                $contrast_value_data[$k]['CustomerName'] = $v['CustomerName'];
+                $contrast_value_data[$k]['CustomerCode'] = $v['CustomerCode'];
+                $contrast_value_data[$k]['CustomItem19'] = $v['CustomItem19'];
+                $contrast_value_data[$k]['CustomItem18'] = $v['CustomItem18'];
+                $contrast_value_data[$k]['StoreArea'] = $v['StoreArea'];
+
+                // 本期数据
+                $contrast_value_data[$k]['current_ranking'] = $current_item['ranking'];
+                $contrast_value_data[$k]['current_num'] = $current_item['有效件量'];
+                $contrast_value_data[$k]['current_singular'] = $current_item['有效单数'];
+                $contrast_value_data[$k]['current_performance'] = $current_item['有效业绩'];
+                $contrast_value_data[$k]['current_performance_total'] = $current_item['总业绩'];
+                $contrast_value_data[$k]['current_unitprice'] = round($current_item['件单价'],2);
+                $contrast_value_data[$k]['current_customerprice'] = round($current_item['客单价'],2);
+                $contrast_value_data[$k]['current_joint_rate'] = round($current_item['连带率'],2);
+                $contrast_value_data[$k]['current_efficiency'] = round( $current_item['人效'] * 0.01,2) * 100;;
+
+                // 对比数据
+                $contrast_value_data[$k]['contrast_ranking'] = $v['ranking'];
+                $contrast_value_data[$k]['contrast_num'] = $v['有效件量'];
+                $contrast_value_data[$k]['contrast_singular'] = $v['有效单数'];
+                $contrast_value_data[$k]['contrast_performance'] = $v['有效业绩'];
+                $contrast_value_data[$k]['contrast_performance_total'] = $v['总业绩'];
+                $contrast_value_data[$k]['contrast_unitprice'] = round($v['件单价'],2);
+                $contrast_value_data[$k]['contrast_customerprice'] = round($v['客单价'],2);
+                $contrast_value_data[$k]['contrast_joint_rate'] = round($v['连带率'],2);
+                $contrast_value_data[$k]['contrast_efficiency'] = round( $v['人效'] * 0.01,2) * 100;
+
+                // 对比值
+                $contrast_value_data[$k]['ranking'] = $current_item['ranking'] - $v['ranking'];
+                $contrast_value_data[$k]['num'] = $current_item['有效件量'] - $v['有效件量'];
+                $contrast_value_data[$k]['singular'] =  $current_item['有效单数'] - $v['有效单数'];
+                $contrast_value_data[$k]['performance'] = $current_item['有效业绩'] - $v['有效业绩'];
+                $contrast_value_data[$k]['performance_total'] = round(($current_item['总业绩'] - $v['总业绩']) / $v['总业绩'] * 100,2).'%';
+                $contrast_value_data[$k]['unitprice'] = round($contrast_value_data[$k]['current_unitprice'] - $contrast_value_data[$k]['contrast_unitprice'],2);
+                $contrast_value_data[$k]['customerprice'] = round($contrast_value_data[$k]['current_customerprice'] - $contrast_value_data[$k]['contrast_customerprice'],2);
+                $contrast_value_data[$k]['joint_rate'] = round($contrast_value_data[$k]['current_joint_rate'] - $contrast_value_data[$k]['contrast_joint_rate'],2);
+                $contrast_value_data[$k]['efficiency'] = round(($contrast_value_data[$k]['current_efficiency'] - $contrast_value_data[$k]['contrast_efficiency']) / $contrast_value_data[$k]['contrast_efficiency'] * 100 ,2).'%';
+            }
+//            $contrast_value_data['sum']['State'] = '';
+//            $contrast_value_data['sum']['CustomerName'] = '';
+//            $contrast_value_data['sum']['CustomerCode'] = '';
+//            $contrast_value_data['sum']['CustomItem19'] = '';
+//            $contrast_value_data['sum']['CustomItem18'] = '';
+//            $contrast_value_data['sum']['StoreArea'] = round(array_sum(array_column($contrast_value_data,'StoreArea')) / count($contrast_value_data),2);
+//            $contrast_value_data['sum']['current_ranking'] = '-';
+//            $contrast_value_data['sum']['current_num'] = '-';
+//            $contrast_value_data['sum']['current_singular'] = array_sum(array_column($contrast_value_data,'current_singular'));
+//            $contrast_value_data['sum']['current_performance'] = array_sum(array_column($contrast_value_data,'current_performance'));
+//            $contrast_value_data['sum']['current_performance_total'] = array_sum(array_column($contrast_value_data,'current_performance_total'));
+//            $contrast_value_data['sum']['current_unitprice'] = array_sum(array_column($contrast_value_data,'current_unitprice'));
+//            $contrast_value_data['sum']['current_customerprice'] = array_sum(array_column($contrast_value_data,'current_customerprice'));
+//            $contrast_value_data['sum']['current_joint_rate'] = array_sum(array_column($contrast_value_data,'current_joint_rate'));
+//            $contrast_value_data['sum']['current_efficiency'] = array_sum(array_column($contrast_value_data,'current_efficiency'));
+//
+//            $contrast_value_data['sum']['contrast_ranking'] = '-';
+//            $contrast_value_data['sum']['contrast_num'] = array_sum(array_column($contrast_value_data,'contrast_num'));
+//            $contrast_value_data['sum']['contrast_singular'] = array_sum(array_column($contrast_value_data,'contrast_singular'));
+//            $contrast_value_data['sum']['contrast_performance'] = array_sum(array_column($contrast_value_data,'contrast_performance'));
+//            $contrast_value_data['sum']['contrast_performance_total'] = array_sum(array_column($contrast_value_data,'contrast_performance_total'));
+//            $contrast_value_data['sum']['contrast_unitprice'] = array_sum(array_column($contrast_value_data,'contrast_unitprice'));
+//            // 平均件单价
+//            $contrast_value_data['sum']['contrast_customerprice'] = array_sum(array_column($contrast_value_data,'contrast_customerprice')) / count($contrast_value_data);
+//            // 平均连带率
+//            $contrast_value_data['sum']['contrast_joint_rate'] = array_sum(array_column($contrast_value_data,'contrast_joint_rate'));
+//            // 总人效
+//            $contrast_value_data['sum']['contrast_efficiency'] = array_sum(array_column($contrast_value_data,'contrast_efficiency'));
+//
+//            // 对比值
+//            // 排名
+//            $contrast_value_data['sum']['ranking'] = '-';
+//            // 有效件单量
+//            $contrast_value_data['sum']['num'] = array_sum(array_column($contrast_value_data,'num'));
+//            // 有效单数
+//            $contrast_value_data['sum']['singular'] =  array_sum(array_column($contrast_value_data,'singular'));
+//            // 有效业绩
+//            $contrast_value_data['sum']['performance'] = array_sum(array_column($contrast_value_data,'performance')) / count($contrast_value_data);
+//            // 平均总流水
+//            $contrast_value_data['sum']['performance_total'] = array_sum(array_column($contrast_value_data,'performance_total')) / count($contrast_value_data);
+//            // 平均件单价
+//            $contrast_value_data['sum']['unitprice'] = array_sum(array_column($contrast_value_data,'unitprice')) / count($contrast_value_data);
+//            // 平均客单价
+//            $contrast_value_data['sum']['customerprice'] = array_sum(array_column($contrast_value_data,'customerprice')) / count($contrast_value_data);
+//            // 平均连带率
+//            $contrast_value_data['sum']['joint_rate'] = array_sum(array_column($contrast_value_data,'joint_rate')) / count($contrast_value_data);
+//            // 平均人效
+//            $contrast_value_data['sum']['efficiency'] = array_sum(array_column($contrast_value_data,'efficiency')) / count($contrast_value_data);
+        }
+
+         // 设置标题头
+         $header = [];
+         if($contrast_value_data){
+              $header = [
+                  ['省份' , 'State'],
+                  ['店铺名称' , 'CustomerName'],
+                  ['店铺代码' , 'CustomerCode'],
+                  ['店铺负责人' , 'CustomItem19'],
+                  ['督导负责人' , 'CustomItem18'],
+                  ['面积' , 'StoreArea'],
+                  ['业绩排名' , 'current_ranking'],
+                  ['业绩' , 'current_performance_total'],
+                  ['单数' , 'current_singular'],
+                  ['连带率' , 'current_joint_rate'],
+                  ['客单价' , 'current_customerprice'],
+                  ['件单价' , 'current_unitprice'],
+                  ['人效' , 'current_efficiency'],
+                  ['业绩排名' , 'contrast_ranking'],
+                  ['业绩' , 'contrast_performance_total'],
+                  ['单数' , 'contrast_singular'],
+                  ['连带率' , 'contrast_joint_rate'],
+                  ['客单价' , 'contrast_customerprice'],
+                  ['件单价' , 'contrast_unitprice'],
+                  ['人效' , 'contrast_efficiency'],
+                  ['排名' , 'ranking'],
+                  ['流水' , 'performance_total'],
+                  ['单数' , 'singular'],
+                  ['连带率' , 'joint_rate'],
+                  ['客单价' , 'customerprice'],
+                  ['件单价' , 'unitprice'],
+                  ['人效' , 'efficiency']
+              ];
+         }
+         $fileName = '店铺业绩对比';
+         return Excel::exportData($contrast_value_data, $header, $fileName, 'xlsx');
+    }
 }
