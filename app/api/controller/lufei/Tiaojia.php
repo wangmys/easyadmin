@@ -41,7 +41,7 @@ class Tiaojia extends BaseController
         $sql = "
             SELECT
                 scs.*,
-                折率= ROUND(scs.`当前零售价` / scs.零售价, 2)
+                ROUND(scs.`当前零售价` / scs.零售价, 2) as 折率,
                 sg.一级分类,
                 sg.二级分类, 
                 sg.分类,
