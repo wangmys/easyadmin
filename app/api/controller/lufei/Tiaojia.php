@@ -86,7 +86,7 @@ class Tiaojia extends BaseController
     }   
 
     // 日销
-    public function retail_1day_by_wangwei() {
+    public function yinliuzhanbi_retail_1day() {
         $sql = "
             SELECT TOP
                     3000000
@@ -167,38 +167,38 @@ class Tiaojia extends BaseController
         $select = $this->db_sqlsrv->query($sql);
         // dump($select);die;
         if ($select) {
-            $this->db_bi->execute('TRUNCATE retail_1day_by_wangwei;');
+            $this->db_bi->execute('TRUNCATE cwl_yinliuzhanbi_retail_1day;');
 
             $select_chunk = array_chunk($select, 500);
     
             foreach($select_chunk as $key => $val) {
-                $status = $this->db_bi->table('retail_1day_by_wangwei')->insertAll($val);
+                $status = $this->db_bi->table('cwl_yinliuzhanbi_retail_1day')->insertAll($val);
             }
-            // $this->db_bi->table('retail_1day_by_wangwei')->insertAll($select);
+            // $this->db_bi->table('cwl_yinliuzhanbi_retail_1day')->insertAll($select);
 
             // 零售价
             $sql2 = "
-                update retail_1day_by_wangwei as r left join sjp_goods as g on r.货号 = g.货号 
+                update cwl_yinliuzhanbi_retail_1day as r left join sjp_goods as g on r.货号 = g.货号 
                     set r.零售价 = g.零售价
                 where r.零售价 is null";
             $this->db_bi->execute($sql2);
 
             // 折率
             $sql3 = "
-                update retail_1day_by_wangwei 
+                update cwl_yinliuzhanbi_retail_1day 
                     set 折率 = ROUND(`当前零售价` / 零售价, 2)
                 where 折率 is null";
             $this->db_bi->execute($sql3);
 
              // 引流款
             $sql4 = "
-                update retail_1day_by_wangwei set 是否调价款 = '是' where 风格='引流款' AND 是否调价款 is null
+                update cwl_yinliuzhanbi_retail_1day set 是否调价款 = '是' where 风格='引流款' AND 是否调价款 is null
             ";
             $this->db_bi->execute($sql4);
 
             // 基本款
             $sql5 = "
-                UPDATE retail_1day_by_wangwei 
+                UPDATE cwl_yinliuzhanbi_retail_1day 
                 SET 是否调价款 = '是' 
                 WHERE
                     风格 = '基本款' 
@@ -210,20 +210,20 @@ class Tiaojia extends BaseController
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'retail_1day_by_wangwei 更新成功！'
+                'content' => 'cwl_yinliuzhanbi_retail_1day 更新成功！'
             ]);
         } else {
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'retail_1day_by_wangwei 更新失败！'
+                'content' => 'cwl_yinliuzhanbi_retail_1day 更新失败！'
             ]);   
         }
     }
 
     // 数据源加工1
     // 引流款不管打不打折全算调价，基本款折率<1并且低于以上标准的才算调价
-    public function sjp_customer_stock_cwl_1() {
+    public function yinliuzhanbi_data_1() {
         $sql = "
             SELECT
                 scs.*,
@@ -234,7 +234,7 @@ class Tiaojia extends BaseController
                 sg.风格,
                 c.State as 省份
             FROM
-                sjp_customer_stock AS scs
+                cwl_yinliuzhanbi_data AS scs
             RIGHT JOIN sjp_goods AS sg ON sg.货号=scs.`货号`
             RIGHT JOIN customer AS c ON c.CustomerName = scs.店铺名称
             WHERE 
@@ -245,34 +245,34 @@ class Tiaojia extends BaseController
         $select = $this->db_bi->query($sql);
         $count = count($select);
         if ($select) {
-            $this->db_bi->execute('TRUNCATE sjp_customer_stock_cwl;');
+            $this->db_bi->execute('TRUNCATE cwl_yinliuzhanbi_data;');
 
             $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_bi->table('sjp_customer_stock_cwl')->strict(false)->insertAll($val);
+                $insert = $this->db_bi->table('cwl_yinliuzhanbi_data')->strict(false)->insertAll($val);
             }
 
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => "sjp_customer_stock_cwl_1 更新成功，数量：{$count}！"
+                'content' => "cwl_yinliuzhanbi_data 1 更新成功，数量：{$count}！"
             ]);
         }
     }   
 
     // 数据源加工2 是否调价款 调价金额
     // 引流款不管打不打折全算调价，基本款折率<1并且低于以上标准的才算调价
-    public function sjp_customer_stock_cwl_2() {
+    public function yinliuzhanbi_data_2() {
         // 引流款
         $sql1 = "
-            update sjp_customer_stock_cwl set 是否调价款 = '是' where 风格='引流款' AND 是否调价款 is null
+            update cwl_yinliuzhanbi_data set 是否调价款 = '是' where 风格='引流款' AND 是否调价款 is null
         ";
         $update = $this->db_bi->execute($sql1);
         // 基本款
         $sql2 = "
-            UPDATE sjp_customer_stock_cwl 
+            UPDATE cwl_yinliuzhanbi_data 
             SET 是否调价款 = '是' 
             WHERE
                 风格 = '基本款' 
@@ -284,7 +284,7 @@ class Tiaojia extends BaseController
         // 调价金额
         $sql3 = "
             UPDATE 
-                sjp_customer_stock_cwl 
+                cwl_yinliuzhanbi_data 
             SET 
                 调价金额 = round(当前零售价 * 合计) 
             WHERE
@@ -297,14 +297,114 @@ class Tiaojia extends BaseController
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => "sjp_customer_stock_cwl_2 更新成功！"
+                'content' => "cwl_yinliuzhanbi_data 更新成功！"
             ]);
         } else {
             return json([
                 'status' => 2,
                 'msg' => 'success',
-                'content' => "sjp_customer_stock_cwl_2 更新失败！"
+                'content' => "cwl_yinliuzhanbi_data 更新失败！"
             ]);           
         }
     }  
+
+    // 表1 店铺
+    public function yinliuzhanbi_customer() {
+        $sql = "
+            SELECT 
+                m.*,
+                concat(round((m.引流款_库存 / m.总额_库存 * 100), 2), '%') as 引流占比_库存,
+                concat(round((m.引流款_销售 / m.总额_销售 * 100), 2), '%') as 引流占比_销售,
+                date_format(now(),'%Y-%m-%d') AS 更新日期
+            FROM
+            (SELECT
+                d.省份,
+                d.店铺名称,
+                d.一级分类,
+                d.二级分类,
+                d.分类,
+                d.折率,
+                d.货号,
+                (select sum(t1.调价金额)  from cwl_yinliuzhanbi_data t1 where t1.店铺名称=d.店铺名称 and t1.一级分类=d.一级分类 and t1.二级分类=d.二级分类 and t1.分类=d.分类 and t1.是否调价款='是' ) as 引流款_库存,
+                sum(调价金额) as 总额_库存,
+                (select sum(t2.销售金额)  from cwl_yinliuzhanbi_retail_1day t2 where t2.店铺名称=d.店铺名称 and t2.一级分类=d.一级分类 and t2.二级分类=d.二级分类 and t2.分类=d.分类 and t2.是否调价款='是' ) as 引流款_销售,
+                sum(r.销售金额) as 总额_销售  
+            FROM
+                cwl_yinliuzhanbi_data as d LEFT JOIN cwl_yinliuzhanbi_retail_1day as r on d.店铺名称 = r.店铺名称 and d.货号=r.货号
+            WHERE 1
+            --    AND d.店铺名称 = '大石二店'
+            group by d.店铺名称, d.一级分类, d.二级分类, d.分类) as m        
+        ";
+
+        $select = $this->db_bi->query($sql);
+        $count = count($select);
+        if ($select) {
+            $this->db_bi->table('cwl_yinliuzhanbi_customer')->where([
+                ['更新日期', '=', date('Y-m-d')]
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_bi->table('cwl_yinliuzhanbi_customer')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_yinliuzhanbi_customer 更新成功，数量：{$count}！"
+            ]);
+        }
+    }
+
+    // 表2 省份
+    public function yinliuzhanbi_province() {
+        $sql = "
+            SELECT 
+                m.*,
+                concat(round((m.引流款_库存 / m.总额_库存 * 100), 2), '%') as 引流占比_库存,
+                concat(round((m.引流款_销售 / m.总额_销售 * 100), 2), '%') as 引流占比_销售,
+                date_format(now(),'%Y-%m-%d') AS 更新日期
+            FROM
+            (SELECT
+                d.省份,
+            -- 	d.店铺名称,
+                d.一级分类,
+                d.二级分类,
+                d.分类,
+                d.折率,
+                d.货号,
+                (select sum(t1.调价金额)  from cwl_yinliuzhanbi_data t1 where t1.省份=d.省份 and t1.一级分类=d.一级分类 and t1.二级分类=d.二级分类 and t1.分类=d.分类 and t1.是否调价款='是' ) as 引流款_库存,
+                sum(调价金额) as 总额_库存,
+                (select sum(t2.销售金额)  from cwl_yinliuzhanbi_retail_1day t2 where t2.省份=d.省份 and t2.一级分类=d.一级分类 and t2.二级分类=d.二级分类 and t2.分类=d.分类 and t2.是否调价款='是' ) as 引流款_销售,
+                sum(r.销售金额) as 总额_销售
+                
+            FROM
+                cwl_yinliuzhanbi_data as d LEFT JOIN cwl_yinliuzhanbi_retail_1day as r on d.店铺名称 = r.店铺名称 and d.货号=r.货号
+            WHERE 1
+            group by d.省份, d.一级分类, d.二级分类, d.分类) as m    
+        ";
+
+        $select = $this->db_bi->query($sql);
+        $count = count($select);
+        if ($select) {
+            $this->db_bi->table('cwl_yinliuzhanbi_province')->where([
+                ['更新日期', '=', date('Y-m-d')]
+            ])->delete();
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_bi->table('cwl_yinliuzhanbi_province')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_yinliuzhanbi_province 更新成功，数量：{$count}！"
+            ]);
+        }
+    }
 }
