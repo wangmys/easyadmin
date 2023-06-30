@@ -97,33 +97,6 @@ class Skauto extends BaseController
 
     // 销售天数 = 卖的第一天开始算，到截止那天。例如前天开始卖，昨天不管有没有卖，都算作 2天
     public function skauto_first() {
-        // $select_skauto = $this->db_easyA->table('cwl_skauto')->field('id,店铺名称,货号')->where([
-        //     ['status', '=', 1]
-        // ])->limit(300000)->select();
-
-        // if ($select_skauto) {
-        //     // dump($select_skauto);
-        //     foreach ($select_skauto as $key => $val) {
-        //         $getXiaoshouDay = $this->getXiaoshouDay($val['店铺名称'], $val['货号']);
-        //         // dump($getXiaoshouDay);
-        //         if ($getXiaoshouDay) {
-        //             $updateData = [];
-        //             $updateData['首单日期'] = $getXiaoshouDay['首单日期'];
-        //             $updateData['销售天数'] = $getXiaoshouDay['销售天数'];
-        //             $updateData['status'] = 2;
-        
-        //         } else {
-        //             $updateData = [];
-        //             $updateData['status'] = 2;
-        //         }
-
-        //         // dump($updateData);
-        //         $this->db_easyA->table('cwl_skauto')->where([
-        //             ['id', '=', $val['id']]
-        //         ])->save($updateData);
-        //     }
-        // }
-
         $sql = "
             SELECT
                 TOP 20000000
@@ -177,7 +150,7 @@ class Skauto extends BaseController
     }
 
     // 获取销售天数
-    protected function getXiaoshouDay($customer, $goodsNo) {
+    public function getXiaoshouDay($customer, $goodsNo) {
         if (! empty($customer) && ! empty($goodsNo)) {
             // 康雷查首单日期，计算销售天数
             $sql = "
