@@ -72,9 +72,10 @@ class Skauto extends BaseController
                 sk.风格,
                 --      SUBSTRING(sk.分类, 1, 2) as 领型,
                 sk.货号,
-                        st.零售价,
-                        st.当前零售价,
-                        bu.上市天数,
+                st.零售价,
+                st.当前零售价,
+                round(st.当前零售价 / st.零售价, 2) as 折率,
+                bu.上市天数,
                 sk.`总入量数量` AS 总入量,
                 bu.累销量 as 累销数量,
                 date_format(now(),'%Y-%m-%d') AS 更新日期
@@ -490,6 +491,32 @@ class Skauto extends BaseController
         ]);
     }  
 
+    // 更新云仓可用
+    public function getYuncangkeyong() {
+        $sql = "
+            select 
+                仓库名称 as 云仓,
+                季节,
+                货号,
+                合计 as 云仓数量
+            from sjp_warehouse_stock
+        ";
+        $select = $this->db_bi->query($sql);
+        $this->db_easyA->execute('TRUNCATE cwl_skauto_ycky;');
+
+        $chunk_list = array_chunk($select, 500);
+        foreach($chunk_list as $key => $val) {
+            // 基础结果 
+            $insert = $this->db_easyA->table('cwl_skauto_ycky')->strict(false)->insertAll($val);
+        }
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_skauto_ycky 更新成功！"
+        ]);
+    }
+
     public function updateSkauto_1() {
         // 更新销售天数
         $sql1 = "
@@ -550,6 +577,46 @@ class Skauto extends BaseController
             where s.在途库存 is null
         ";
         $this->db_easyA->execute($sql4);
+
+        // 更新一周销
+        $sql5 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_retail7 as z
+                on s.`省份`=z.省份
+                and s.`店铺名称` = z.店铺名称 
+                and s.`一级分类`= z.`一级分类` 
+                and s.`二级分类`= z.`二级分类`
+                and s.`分类`= z.`分类`
+                and s.`货号`= z.`货号`
+            set s.近一周销 = z.销售金额
+            where s.近一周销 is null        
+        ";
+        $this->db_easyA->execute($sql5);
+
+        // 更新两周销
+        $sql6 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_retail14 as z
+                on s.`省份`=z.省份
+                and s.`店铺名称` = z.店铺名称 
+                and s.`一级分类`= z.`一级分类` 
+                and s.`二级分类`= z.`二级分类`
+                and s.`分类`= z.`分类`
+                and s.`货号`= z.`货号`
+            set s.近两周销 = z.销售金额
+            where s.近两周销 is null      
+        ";
+        $this->db_easyA->execute($sql6);
+
+        // 更云仓可用
+        $sql7 = "
+            update cwl_skauto as s 
+            right join cwl_skauto_ycky as y
+                on s.`云仓`=y.云仓
+                and s.`货号` = y.货号
+            set s.云仓数量 = y.云仓数量
+            where s.云仓数量 is null        
+        ";
 
         return json([
             'status' => 1,
