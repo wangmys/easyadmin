@@ -68,6 +68,8 @@ class CusWeatherService
         $yuncang = $params['yuncang'] ?? '';
         $store_level = $params['store_level'] ?? '';
         $nanzhongbei = $params['nanzhongbei'] ?? '';
+        $setTime1 = $params['setTime1'] ?? '';
+        $setTime2 = $params['setTime2'] ?? '';
 
         $where = [];
         $where[] = ['cwb.weather_prefix', '<>', ''];
@@ -104,11 +106,15 @@ class CusWeatherService
         if ($nanzhongbei) {
             $where[] = ['cwb.nanzhongbei', 'in', $nanzhongbei];
         }
+        if ($setTime1 && $setTime2) {
+            $where[] = ['cwd.weather_time', 'between', [$setTime1, $setTime2]];
+        }
+        // print_r($where);die;
         return $where;
 
     }
 
-    public function get_cus_weather($params, $field='cwb.weather_prefix, cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time') {
+    public function get_cus_weather($params, $field='cwb.weather_prefix, cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, SUBSTRING(cwd.weather_time, 1, 10) as weather_time') {
 
         $pageLimit = $params['limit'] ?? 1000;//每页条数
         $page = $params['page'] ?? 1;//当前页

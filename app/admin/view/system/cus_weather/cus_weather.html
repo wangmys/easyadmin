@@ -150,6 +150,16 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-nanzhongbei" class="xm-select-demo"></div>
                             </div>
+
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$setTime1}" placeholder="yyyy-MM-dd">
+                            </div>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">结束日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$setTime2}" placeholder="yyyy-MM-dd">
+                            </div>
+
                         </div>
                     </div>
                     <div class="flex col between" style="width:5%; height: 70px;">
@@ -307,7 +317,11 @@
 
         // 日期选择器
         laydate.render({
-            elem: '#shangshiriqi'
+            elem: '#setTime1'
+        });
+
+        laydate.render({
+            elem: '#setTime2'
         });
 
         //触发事件
@@ -464,6 +478,17 @@
                     name:'nanzhongbei',
                     data: res.data.nanzhongbei
                 })
+                // 日期选择器
+                laydate.render({
+                    name:'setTime1',
+                    elem: '#setTime1'
+                });
+                laydate.render({
+                    name:'setTime2',
+                    elem: '#setTime2'
+                });
+
+
             }, 'json')
         }
 
@@ -512,7 +537,7 @@
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 780
+                , height: 730
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                      { field: 'customer_name', title: '店铺名称', align: 'center', rowspan: 1, fixed:'left'}
