@@ -116,7 +116,7 @@ class CusWeather extends AdminController
             ];
 
             $params['limit'] = 100000000;
-            $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
+            $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, SUBSTRING(cwd.weather_time, 1, 10) as weather_time');
             if ($select['sign'] == 'normal') {
                 return Excel::exportData($select['data'], $header, 'customer_weather_' .$select['count'] , 'xlsx');
             } else {//其他方案导出

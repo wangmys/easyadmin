@@ -39,7 +39,7 @@ class Cus_weather_output extends Command
 
             $params['limit'] = 100000000;
 
-            $select = $service->get_cus_weather($params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
+            $select = $service->get_cus_weather($params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, SUBSTRING(cwd.weather_time, 1, 10) as weather_time');
 
 			$title_arr = [
 				'customer_name' => '店铺名称',
