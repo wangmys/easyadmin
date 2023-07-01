@@ -46,7 +46,7 @@ class CusWeather extends AdminController
         $nanzhongbei = $this->db_cus_weather->query("select nanzhongbei as name, nanzhongbei as value from cus_weather_base where weather_prefix!='' and nanzhongbei<>'' group by nanzhongbei;");
 
         return json(["code" => "0", "msg" => "", "data" => ['customer_name' => $customer_name, 'province' => $province, 'city' => $city, 'area' => $area, 'store_type' => $store_type,
-        'wendai' => $wendai, 'wenqu' => $wenqu, 'goods_manager' => $goods_manager, 'yuncang' => $yuncang, 'store_level' => $store_level, 'nanzhongbei' => $nanzhongbei
+        'wendai' => $wendai, 'wenqu' => $wenqu, 'goods_manager' => $goods_manager, 'yuncang' => $yuncang, 'store_level' => $store_level, 'nanzhongbei' => $nanzhongbei,
         ]]);
         
     }
@@ -64,7 +64,7 @@ class CusWeather extends AdminController
             return json(["code" => "0", "msg" => "", "count" => $data['count'], "data" => $data['data'],  'create_time' => date('Y-m-d')]);
         } else {
             return View('system/cus_weather/cus_weather', [
-
+                'setTime1' => '2021-01-01', 'setTime2' => date('Y-m-d')
             ]);
         }        
     }

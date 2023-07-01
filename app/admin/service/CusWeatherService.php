@@ -68,6 +68,8 @@ class CusWeatherService
         $yuncang = $params['yuncang'] ?? '';
         $store_level = $params['store_level'] ?? '';
         $nanzhongbei = $params['nanzhongbei'] ?? '';
+        $setTime1 = $params['setTime1'] ?? '';
+        $setTime2 = $params['setTime2'] ?? '';
 
         $where = [];
         $where[] = ['cwb.weather_prefix', '<>', ''];
@@ -104,6 +106,10 @@ class CusWeatherService
         if ($nanzhongbei) {
             $where[] = ['cwb.nanzhongbei', 'in', $nanzhongbei];
         }
+        if ($setTime1 && $setTime2) {
+            $where[] = ['cwd.weather_time', 'between', [$setTime1, $setTime2]];
+        }
+        // print_r($where);die;
         return $where;
 
     }
