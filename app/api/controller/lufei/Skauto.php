@@ -397,7 +397,7 @@ class Skauto extends BaseController
                     on s.`省份`=f.省份
                     and s.`店铺名称` = f.店铺名称 
                     and s.`一级分类`=f.`一级分类` 
-                    and  s.`二级分类`=f.`二级分类`
+                    and s.`二级分类`=f.`二级分类`
                     and s.`分类`=f.`分类`
                     and s.`货号`=f.`货号`
                 set s.销售天数=f.销售天数, s.首单日期=f.首单日期 
@@ -409,7 +409,11 @@ class Skauto extends BaseController
         $sql2 = "
             update cwl_skauto as s 
             left join cwl_skauto_kucun as k 
-                on s.店铺名称=k.店铺名称
+                on s.`省份`= k.`省份` 
+                and s.店铺名称= k.店铺名称
+                and s.`一级分类`=k.`一级分类` 
+                and  s.`二级分类`=k`二级分类`
+                and s.`分类`=k.`分类`
                 and s.`货号`=k.`货号`
             set s.店铺库存=k.店铺库存
             where s.店铺库存 is null
@@ -420,7 +424,7 @@ class Skauto extends BaseController
         $sql3 = "
             update cwl_skauto as s 
             left join cwl_skauto_weifa as w 
-                on s.`省份`=w.省份
+                on s.`省份`= w.省份
                 and s.`店铺名称` = w.店铺名称 
                 and s.`一级分类`=w.`一级分类` 
                 and  s.`二级分类`=w.`二级分类`
