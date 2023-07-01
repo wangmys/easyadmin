@@ -26,11 +26,11 @@ class Cus_weather_output extends Command
     public function execute(Input $input, Output $output)
     {
 
-		ini_set('memory_limit','3072M');
-		$service = new CusWeatherService();
-
 		$out = CusWeatherOutput::where([['current_status', '=', CusWeatherOutput::CURRENT_STATUS['DEFAULT']]])->find();
 		if ($out && $out['current_status']==CusWeatherOutput::CURRENT_STATUS['DEFAULT']) {
+
+			ini_set('memory_limit','3072M');
+			$service = new CusWeatherService();
 
 			$id = $out['id'];
 			CusWeatherOutput::where([['id', '=', $id]])->update(['current_status' => CusWeatherOutput::CURRENT_STATUS['RUNNING']]);
