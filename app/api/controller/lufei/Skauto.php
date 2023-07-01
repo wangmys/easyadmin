@@ -517,7 +517,7 @@ class Skauto extends BaseController
         ]);
     }
 
-    public function updateSkauto_1() {
+    public function updateSkauto() {
         // 更新销售天数
         $sql1 = "
             update cwl_skauto as s 
@@ -617,6 +617,7 @@ class Skauto extends BaseController
             set s.云仓数量 = y.云仓数量
             where s.云仓数量 is null        
         ";
+        $this->db_easyA->execute($sql7);
 
         return json([
             'status' => 1,
@@ -625,5 +626,57 @@ class Skauto extends BaseController
         ]);
     }
 
+    public function updateSkautoRes() {
+        $sql = "
+            select 
+                t1.*,
+                case
+                    when t1.总入量 - t1.累销数量 <=0 then '售空'
+                    when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
+                            and t1.店铺库存>0 then '即将售空'
+                end as 售空提醒
+                from  
+                (select * from cwl_skauto 
+                where 
+                `销售天数`<=25 
+                and 总入量 > 2
+                and ( 折率 >= 1 || (折率 < 1 AND 
+                                (
+                                        (二级分类 = '短T' AND 当前零售价 > 50) 
+                                    OR (二级分类 = '休闲短衬' AND 当前零售价 > 80)
+                                    OR (二级分类 = '休闲短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '松紧短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '牛仔短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '休闲长裤' AND 当前零售价 > 100) 
+                                    OR (二级分类 = '牛仔长裤' AND 当前零售价 > 100) 
+                                    OR (二级分类 = '松紧长裤' AND 当前零售价 > 100) 
+                                ))
+                    )
+                ) as t1        
+        "; 
+        $select = $this->db_easyA->query($sql);
+        $count = count($select);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_res;');
 
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_res  更新成功，数量：{$count}！"
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => "cwl_skauto_res  更新失败，数量：{$count}！"
+            ]);
+        }       
+    }
 }
