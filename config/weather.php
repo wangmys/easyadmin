@@ -6,5 +6,5 @@
 use think\facade\Env;
 
 return [
-    'init_output_num' => 150000,
+    'init_output_num' => 180000,
 ];
