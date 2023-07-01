@@ -8,7 +8,6 @@
     <title>断码率-单省单款断码情况</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
-    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
             overflow: hidden;
@@ -97,13 +96,13 @@
         /*  border-right: 2px solid red; !* 从第 7 列以后，每 6 列的右边框为红色实线，可以根据需要调整颜色和样式 *!*/
         /*}*/
 
-        td:nth-child(6) {
+        #table td:nth-child(6) {
           border-right: 1px solid red; /* 从第 7 列以后，每 6 列的右边框为红色实线，可以根据需要调整颜色和样式 */
         }
-        td:nth-child(13) {
+        #table td:nth-child(13) {
           border-right: 1px solid red; /* 从第 7 列以后，每 6 列的右边框为红色实线，可以根据需要调整颜色和样式 */
         }
-        td:nth-child(20) {
+        #table td:nth-child(20) {
           border-right: 1px solid red; /* 从第 7 列以后，每 6 列的右边框为红色实线，可以根据需要调整颜色和样式 */
         }
         th[data-key="1-0-6"] {
@@ -123,32 +122,28 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                    <div class="flex col between al-start" style="width:95%;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-fengge" class="xm-select-demo"></div>
-                            </div>
 
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">本期日期</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$limitDate['newDate']}">
+                            <label class="layui-form-label">本期日期</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$limitDate['setTime1']}" readonly  style="cursor: pointer">
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">对比日期</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$limitDate['oldDate']}">
+                            <label class="layui-form-label">对比日期</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$limitDate['setTime2']}" readonly  style="cursor: pointer">
                             </div>
 
                         </div>
 
                     </div>
-                    <div class="flex col between" style="width:5%; height:70px;">
+                    <div class="flex col between" style="width:5%;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
                         </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
-                        </button>
+<!--                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"-->
+<!--                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部-->
+<!--                        </button>-->
                     </div>
                 </div>
             </form>
@@ -164,11 +159,12 @@
 
 </html>
 <script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
+      <button class="layui-btn layui-btn-sm" lay-event="download">导出</button>
     </div>
 </script>
 <script>
@@ -182,34 +178,19 @@
             , url1 = "{:url('admin/operate.performance/list')}"
             , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_table4')}"
             , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
-        // initFn();
+
         startTable();
 
          // 日期选择器
         laydate.render({
             elem: '#setTime1',
-            range: true
+            range: '~'
         });
 
         laydate.render({
             elem: '#setTime2',
-            range: true
+            range: '~'
         });
-
-        // 选择风格
-        xmSelect.render({
-            el: '#xm-fengge',
-            filterable: true,
-            toolbar: {show: true},
-            name: '风格',
-            theme: {
-                color: '#1cbbb4',
-            },
-            data: [
-                {name: "基本款", value: "基本款", selected: ""},
-                {name: "引流款", value: "引流款", selected: ""},
-            ]
-        })
 
         //触发事件
         table.on('toolbar(table)', function(obj) {
@@ -227,45 +208,6 @@
                 break;
             };
         });
-
-        function initFn() {
-            $.get(url_getXmMapSelect, {}, function(res) {
-
-                // 渲染所有中类
-                xmSelect.render({
-                    el: '#xm-zhonglei',
-                    filterable: true,
-                    toolbar: {show: true},
-                    theme: {
-                        color: '#1cbbb4',
-                    },
-                    name:'中类',
-                    data: res.data.zhonglei
-                })
-                // 渲染所有领型
-                xmSelect.render({
-                    el: '#xm-lingxing',
-                    filterable: true,
-                    toolbar: {show: true},
-                    theme: {
-                        color: '#1cbbb4',
-                    },
-                    name:'领型',
-                    data: res.data.lingxing
-                })
-                // 渲染所有货号
-                xmSelect.render({
-                    el: '#xm-huohao',
-                    filterable: true,
-                    toolbar: {show: true},
-                    theme: {
-                        color: '#1cbbb4',
-                    },
-                    name:'货号',
-                    data: res.data.huohao
-                })
-            }, 'json')
-        }
 
         //监听保存
         form.on('submit(mapBtn)', function (data) {
@@ -303,7 +245,6 @@
                 , loading: true
                 , method: 'post'
                 // , toolbar: '#toolbar1'
-                , toolbar: 'true'
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
@@ -329,8 +270,8 @@
                     , { field: 'current_performance_total', title: '业绩', align: 'center'}
                     , { field: 'current_singular', title: '单数' , align: 'center'}
                     , { field: 'current_joint_rate', title: '连带率' , align: 'center'}
-                    , { field: 'current_unitprice', title: '件单价', align: 'center'}
                     , { field: 'current_customerprice', title: '客单价' , align: 'center'}
+                    , { field: 'current_unitprice', title: '件单价', align: 'center'}
                     , { field: 'current_efficiency', title: '人效' , align: 'center'}
 
                     // 对比数据
@@ -338,8 +279,8 @@
                     , { field: 'contrast_performance_total', title: '业绩', align: 'center'}
                     , { field: 'contrast_singular', title: '单数' , align: 'center'}
                     , { field: 'contrast_joint_rate', title: '连带率' , align: 'center'}
-                    , { field: 'contrast_unitprice', title: '件单价', align: 'center'}
                     , { field: 'contrast_customerprice', title: '客单价' , align: 'center'}
+                    , { field: 'contrast_unitprice', title: '件单价', align: 'center'}
                     , { field: 'contrast_efficiency', title: '人效' , align: 'center'}
 
                     // 对比值
@@ -347,8 +288,8 @@
                     , { field: 'performance_total', title: '流水', align: 'center'}
                     , { field: 'singular', title: '单数' , align: 'center'}
                     , { field: 'joint_rate', title: '连带率' , align: 'center'}
-                    , { field: 'unitprice', title: '件单价', align: 'center'}
                     , { field: 'customerprice', title: '客单价' , align: 'center'}
+                    , { field: 'unitprice', title: '件单价', align: 'center'}
                     , { field: 'efficiency', title: '人效' , align: 'center'}
                     ]
                 ]
@@ -363,7 +304,7 @@
                         tr.each(function (i,value) {
                             var key = $(value).data('field');
 
-                            if(arr.indexOf(key) != -1 && parseInt(item[key]) < 0){
+                            if(arr.indexOf(key) != -1 && parseFloat(item[key]) < 0){
                                 $(this).css("background-color", "yellow");
                                 $(this).css("color", "rgba(208,2,0,27)");
                             }
