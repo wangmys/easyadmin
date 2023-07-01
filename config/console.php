@@ -18,5 +18,6 @@ return [
         'skc_sz_detail' => 'app\command\Skc_sz_detail',
         'skc_shoe_detail' => 'app\command\Skc_shoe_detail',
         'skc_kz_detail' => 'app\command\Skc_kz_detail',
+        'cus_weather_output' => 'app\command\Cus_weather_output',
     ],
 ];

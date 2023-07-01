@@ -26,14 +26,35 @@ class Skauto extends BaseController
     protected $rand_code = '';
     // 创建时间
     protected $create_time = '';
+    // 季节
+    protected $seasion = '';
+    protected $seasionStr = '';
 
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+
+        $this->seasion = '夏季';
+        $this->seasionStr = $this->seasionHandle($this->seasion);
     }
 
+    public function seasionHandle($seasion = "夏季") {
+        $seasionStr = "";
+        if ($seasion == '春季') {
+            $seasionStr = "'初春','正春','春季'";
+        } elseif ($seasion == '夏季') {
+            $seasionStr = "'初夏','盛夏','夏季'";
+        } elseif ($seasion == '秋季') {
+            $seasionStr = "'初秋','深秋','秋季'";
+        } elseif ($seasion == '冬季') {
+            $seasionStr = "'初冬','深冬','冬季'";
+        }
+        return $seasionStr;
+    }
+
+    
     public function skauto() {
         $sql = "
             SELECT 
@@ -62,7 +83,7 @@ class Skauto extends BaseController
             LEFT JOIN sp_ww_chunxia_stock as st ON sk.省份=st.省份 AND sk.店铺名称=st.店铺名称 AND sk.分类=st.分类 AND sk.货号 = st.货号
             LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
             WHERE
-                sk.季节 IN ('初夏', '盛夏', '夏季') 
+                sk.季节 IN ({$this->seasionStr}) 
                 AND c.Region <> '闭店区'
                 -- AND sk.商品负责人='曹太阳'
                 -- AND sk.店铺名称 IN ('东至一店')
@@ -99,10 +120,13 @@ class Skauto extends BaseController
     public function skauto_first() {
         $sql = "
             SELECT
-                TOP 20000000
+                TOP 3000000
+                EC.State AS 省份,
                 ER.CustomerName AS 店铺名称,
-                EG.GoodsNo AS 货号
-                ,
+                EG.GoodsNo AS 货号,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
                 MIN(FORMAT(ER.RetailDate, 'yyyy-MM-dd')) AS 首单日期,
                 DATEDIFF(day, MIN(ER.RetailDate), DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) + 1 AS 销售天数
             FROM ErpRetail AS ER 
@@ -116,16 +140,20 @@ class Skauto extends BaseController
                 AND EC.RegionId <> 55
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 = 2023
-                AND EG.TimeCategoryName2 in ('初夏', '夏季', '盛夏')
+                AND EG.TimeCategoryName2 in ( {$this->seasionStr} )
                 AND EG.CategoryName1 IN ('外套', '内搭','鞋履', '下装')
-    -- 			AND EC.CustomerName in ('东至一店')
-    -- 			AND EG.GoodsNo like 'B%'
-    -- 			AND EG.GoodsNo = 'B12203002'
+        -- 			AND EC.CustomerName in ('东至一店')
+        -- 			AND EG.GoodsNo like 'B%'
+        -- 			AND EG.GoodsNo = 'B12203002'
             GROUP BY 
-                    ER.CustomerName
+                    EC.State
+                    ,ER.CustomerName
+                    ,EG.CategoryName1
+                    ,EG.CategoryName2
+                    ,EG.CategoryName
                     ,EG.GoodsNo
                     ,FORMAT(ER.RetailDate, 'yyyy-MM-dd')
-                -- ORDER BY ER.RetailDate ASC        
+            -- ORDER BY ER.RetailDate ASC  
         ";
 
         $select = $this->db_sqlsrv->query($sql);
@@ -149,43 +177,285 @@ class Skauto extends BaseController
         }
     }
 
-    // 获取销售天数
-    public function getXiaoshouDay($customer, $goodsNo) {
-        if (! empty($customer) && ! empty($goodsNo)) {
-            // 康雷查首单日期，计算销售天数
-            $sql = "
-                SELECT
-                    TOP 1
-                    ER.CustomerName AS 店铺名称,
-                    EG.GoodsNo AS 货号,
-                    FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 首单日期,
-                    DATEDIFF(day, ER.RetailDate, DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) + 1 AS 销售天数
-                FROM
-                    ErpRetail AS ER 
-                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                LEFT JOIN ErpGoods AS EG ON EG.GoodsId = ERG.GoodsId
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                WHERE
-                    ER.CodingCodeText = '已审结'
-                    AND EC.ShutOut = 0	
-                    AND EC.RegionId <> 55
-                    AND EBC.Mathod IN ('直营', '加盟')
-                    AND EC.CustomerName in ('{$customer}')
-                    AND EG.GoodsNo = '{$goodsNo}'
-                GROUP BY 
-                    ER.CustomerName,EG.GoodsNo,ER.RetailDate
-                ORDER BY 
-                    ER.RetailDate ASC            
-            ";
-            $select = $this->db_sqlsrv->query($sql);
-            if ($select) {
-                return $select[0];
-            } else {
-                return false;
+    // 获取销售天数  废除
+    // public function getXiaoshouDay($customer, $goodsNo) {
+    //     if (! empty($customer) && ! empty($goodsNo)) {
+    //         // 康雷查首单日期，计算销售天数
+    //         $sql = "
+    //             SELECT
+    //                 TOP 1
+    //                 ER.CustomerName AS 店铺名称,
+    //                 EG.GoodsNo AS 货号,
+    //                 FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 首单日期,
+    //                 DATEDIFF(day, ER.RetailDate, DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) + 1 AS 销售天数
+    //             FROM
+    //                 ErpRetail AS ER 
+    //             LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+    //             LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+    //             LEFT JOIN ErpGoods AS EG ON EG.GoodsId = ERG.GoodsId
+    //             LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+    //             WHERE
+    //                 ER.CodingCodeText = '已审结'
+    //                 AND EC.ShutOut = 0	
+    //                 AND EC.RegionId <> 55
+    //                 AND EBC.Mathod IN ('直营', '加盟')
+    //                 AND EC.CustomerName in ('{$customer}')
+    //                 AND EG.GoodsNo = '{$goodsNo}'
+    //             GROUP BY 
+    //                 ER.CustomerName,EG.GoodsNo,ER.RetailDate
+    //             ORDER BY 
+    //                 ER.RetailDate ASC            
+    //         ";
+    //         $select = $this->db_sqlsrv->query($sql);
+    //         if ($select) {
+    //             return $select[0];
+    //         } else {
+    //             return false;
+    //         }
+    //     } else {
+    //         return false;
+    //     }
+    // }
+
+    // 获取店铺库存
+    public function getKucun() {
+        $sql = "
+            SELECT
+                TOP 1000000
+                EC.State AS 省份,
+                EC.CustomerName As 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EG.GoodsNo AS 货号,
+                SUM(ECS.Quantity) AS 店铺库存
+                FROM ErpCustomerStock ECS 
+            LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                WHERE  EC.ShutOut=0
+            AND EG.TimeCategoryName1 in (2023)
+                    AND EC.MathodId IN (4,7)
+            GROUP BY 
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.GoodsNo 
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_kucun;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_kucun')->strict(false)->insertAll($val);
             }
-        } else {
-            return false;
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_kucun 更新成功！"
+            ]);
         }
     }
+
+    // 已配未发
+    public function getWeifa() {
+        $sql = "
+            SELECT 
+                EC.CustomItem15,
+                EC.State AS 省份,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName as 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo as 货号,
+                NULL AS 店铺库存,
+                NULL AS 在途库存,
+                SUM(ESG.Quantity) 已配未发,
+                SUM(ESG.Quantity) 在途量合计,
+                SUM(ESG.Quantity) 预计库存
+            FROM ErpCustomer EC
+            LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+            LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+            LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+            WHERE	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND eg.TimeCategoryName1 = '2023'
+                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+                AND ES.IsCompleted=0
+            GROUP BY 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_weifa;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_weifa')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_weifa 更新成功！"
+            ]);
+        }
+    }
+
+    // 已配未发
+    public function getZaitu() {
+        $sql = "
+            SELECT
+                EC.CustomItem15,
+                EC.State  AS 省份,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName as 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo as 货号,
+                NULL AS 店铺库存,
+                SUM(EIG.Quantity) AS 在途库存,
+                NULL 已配未发数量,
+                SUM(EIG.Quantity) 在途量合计,
+                SUM(EIG.Quantity) 预计库存
+            FROM ErpCustOutbound EI 
+            LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+            LEFT JOIN ErpCustomer EC ON EI.InCustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON EIG.GoodsId=EG.GoodsId
+            WHERE EI.CodingCodeText='已审结'
+                AND EI.IsCompleted=0
+                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
+                AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND eg.TimeCategoryName1 = '2023'
+                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+            GROUP BY 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EC.MathodId,
+                EC.CustomerGrade,
+            EG.GoodsNo
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_zaitu;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_zaitu')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_zaitu 更新成功！"
+            ]);
+        }
+    }
+
+    public function updateSkauto_1() {
+        // 更新销售天数
+        $sql1 = "
+            update cwl_skauto as s 
+                left join cwl_skauto_first as f 
+                    on s.`省份`=f.省份
+                    and s.`店铺名称` = f.店铺名称 
+                    and s.`一级分类`=f.`一级分类` 
+                    and s.`二级分类`=f.`二级分类`
+                    and s.`分类`=f.`分类`
+                    and s.`货号`=f.`货号`
+                set s.销售天数=f.销售天数, s.首单日期=f.首单日期 
+                where s.销售天数 is null
+        ";
+        $this->db_easyA->execute($sql1);
+
+        // 更新库存
+        $sql2 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_kucun as k 
+                on s.`省份`= k.`省份` 
+                and s.店铺名称= k.店铺名称
+                and s.`一级分类`=k.`一级分类` 
+                and  s.`二级分类`=k`二级分类`
+                and s.`分类`=k.`分类`
+                and s.`货号`=k.`货号`
+            set s.店铺库存=k.店铺库存
+            where s.店铺库存 is null
+        ";
+        $this->db_easyA->execute($sql2);
+
+        // 更新已配未发
+        $sql3 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_weifa as w 
+                on s.`省份`= w.省份
+                and s.`店铺名称` = w.店铺名称 
+                and s.`一级分类`=w.`一级分类` 
+                and  s.`二级分类`=w.`二级分类`
+                and s.`分类`=w.`分类`
+                and s.`货号`=w.`货号`
+            set s.已配未发=w.已配未发
+            where s.已配未发 is null
+        ";
+        $this->db_easyA->execute($sql3);
+
+        // 更新已配未发
+        $sql4 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_zaitu as z
+                on s.`省份`=z.省份
+                and s.`店铺名称` = z.店铺名称 
+                and s.`一级分类`= z.`一级分类` 
+                and  s.`二级分类`= z.`二级分类`
+                and s.`分类`= z.`分类`
+                and s.`货号`= z.`货号`
+            set s.在途库存 = z.在途库存
+            where s.在途库存 is null
+        ";
+        $this->db_easyA->execute($sql4);
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "updateSkauto_1 更新成功！"
+        ]);
+    }
+
+
 }

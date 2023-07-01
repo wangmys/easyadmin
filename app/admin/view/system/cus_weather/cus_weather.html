@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>店铺天气</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-customer_name" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">市</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-city" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">区</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-area" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营模式</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_type" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">温带</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-wendai" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">温区</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-wenqu" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品负责人</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-goods_manager" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yuncang" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺等级</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_level" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">南中北</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-nanzhongbei" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex col between" style="width:5%; height: 70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            // , url1 = "{:url('admin/system.Duanmalv/table4')}" 
+            , url1 = "{:url('admin/system.CusWeather/cus_weather')}" 
+            // , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table4')}" 
+            , url_download_history_area = "{:url('admin/system.CusWeather/excel_cus_weather')}" 
+            // , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
+            , url_getXmMapSelect = "{:url('admin/system.CusWeather/getXmMapSelect')}"
+
+        initFn();
+        startTable();
+
+        //店铺名称
+        xmSelect.render({
+            el: '#xm-customer_name', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'customer_name',
+            data: []
+        })
+
+        //省
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            name: '省',
+            // showCount: 1,
+            data: []
+        })
+
+        //市
+        xmSelect.render({
+            el: '#xm-city', 
+            filterable: true,
+            name: '市',
+            // showCount: 1,
+            data: []
+        })
+
+        //区
+        xmSelect.render({
+            el: '#xm-area', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '区',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "外套", value: "外套", selected: ""},
+                {name: "内搭", value: "内搭", selected: ""},
+                {name: "下装", value: "下装", selected: ""},
+                {name: "鞋履", value: "鞋履", selected: ""},
+            ]
+        })
+
+
+        //经营模式
+        xmSelect.render({
+            el: '#xm-store_type', 
+            filterable: true,
+            name: '经营模式',
+            // showCount: 1,
+            data: []
+        })
+        //温带
+        xmSelect.render({
+            el: '#xm-wendai', 
+            filterable: true,
+            name: '温带',
+            // showCount: 1,
+            data: []
+        })
+        //温区
+        xmSelect.render({
+            el: '#xm-wenqu', 
+            filterable: true,
+            name: '温区',
+            // showCount: 1,
+            data: []
+        })
+        //商品负责人
+        xmSelect.render({
+            el: '#xm-goods_manager', 
+            filterable: true,
+            name: '商品负责人',
+            // showCount: 1,
+            data: []
+        })
+        //云仓
+        xmSelect.render({
+            el: '#xm-yuncang', 
+            filterable: true,
+            name: '云仓',
+            // showCount: 1,
+            data: []
+        })
+        //店铺等级
+        xmSelect.render({
+            el: '#xm-store_level', 
+            filterable: true,
+            name: '店铺等级',
+            // showCount: 1,
+            data: []
+        })
+        //南中北
+        xmSelect.render({
+            el: '#xm-nanzhongbei', 
+            filterable: true,
+            name: '南中北',
+            // showCount: 1,
+            data: []
+        })
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                console.log(res);
+
+                //店铺名称
+                xmSelect.render({
+                    el: '#xm-customer_name', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'customer_name',
+                    data: res.data.customer_name
+                })
+                //省
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'province',
+                    data: res.data.province
+                })
+                //市
+                xmSelect.render({
+                    el: '#xm-city', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'city',
+                    data: res.data.city
+                })
+                //区
+                xmSelect.render({
+                    el: '#xm-area', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'area',
+                    data: res.data.area
+                })
+
+                //经营模式
+                xmSelect.render({
+                    el: '#xm-store_type', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_type',
+                    data: res.data.store_type
+                })
+                //温带
+                xmSelect.render({
+                    el: '#xm-wendai', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'wendai',
+                    data: res.data.wendai
+                })
+                //温区
+                xmSelect.render({
+                    el: '#xm-wenqu', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'wenqu',
+                    data: res.data.wenqu
+                })
+                //商品负责人
+                xmSelect.render({
+                    el: '#xm-goods_manager', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'goods_manager',
+                    data: res.data.goods_manager
+                })
+                //云仓
+                xmSelect.render({
+                    el: '#xm-yuncang', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'yuncang',
+                    data: res.data.yuncang
+                })
+                //店铺等级
+                xmSelect.render({
+                    el: '#xm-store_level', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_level',
+                    data: res.data.store_level
+                })
+                //南中北
+                xmSelect.render({
+                    el: '#xm-nanzhongbei', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'nanzhongbei',
+                    data: res.data.nanzhongbei
+                })
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        //导出全部
+        form.on('submit(downloadBtn)', function (data) {
+
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                console.log(res) 
+                if (res.status == 1) {
+                    if (res.count <= res.init_output_num) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了，请保存以下链接，稍后通过该链接下载吧：'+res.app_domain+'/upload/weather/customer_weather_'+res.code+'.csv');
+                        // location.href = url_download_history_area + '?code=' + res.code
+                    }
+                }
+            })
+
+            return false; 
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                // , toolbar: true
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 780
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                     { field: 'customer_name', title: '店铺名称', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'province', title: '省', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'city', title: '市', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'area', title: '区', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'store_type', title: '经营模式', align: 'center', rowspan: 1, width: 80, fixed:'left'} 
+                    , { field: 'wendai', title: '温带', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'wenqu', title: '温区', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'goods_manager', title: '商品负责人', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'yuncang', title: '云仓', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'store_level', title: '店铺等级', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'nanzhongbei', title: '南中北', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'min_c', title: '最低温', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'max_c', title: '最高温', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'weather_time', title: '日期', align: 'center', rowspan: 1, fixed:'left'}
+                    ]
+                ]
+                ,done: function (res, curr, count) {
+                    // $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
