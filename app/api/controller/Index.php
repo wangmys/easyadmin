@@ -85,8 +85,8 @@ class Index
     public function pull()
     {
 //        $res = SizeAllRatio::saveSizeRatio('B32502028');
-        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
-//        $res = SizeAllRatio::newSaveSizeRatio('B41101028');
+//        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
+        $res = SizeAllRatio::newSaveSizeRatio('B42513009');
 //        echo '<pre>';
 //        print_r($res);
 //        die;

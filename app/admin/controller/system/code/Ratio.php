@@ -527,8 +527,14 @@ class Ratio extends AdminController
                         }
                         if(in_array($item2['字段'],['当前库存尺码比','总库存尺码比','累销尺码比'])){
                             rsort($temp_arr);
+                            $_count = 3;
+                            if($item2['一级分类'] == '下装' && (strpos($item2['二级分类'],'松紧') !== false)){
+                                $_count = 4;
+                            }elseif($item2['一级分类'] == '下装'){
+                                $_count = 5;
+                            }
                             // 获取数组前三的元素值
-                            $in_arr = getArray($temp_arr,3);
+                            $in_arr = getArray($temp_arr,$_count);
                             // 值等于前三的元素都标红
                             foreach ($r_size as $k => $v){
                                 if(in_array($item2[$v],$in_arr)){
@@ -784,8 +790,14 @@ class Ratio extends AdminController
                             }
                             if(in_array($item2["{$wv}_".'字段'],['当前库存尺码比','累销尺码比'])){
                                 rsort($temp_arr);
+                                $_count = 3;
+                                if($item2['一级分类'] == '下装' && (strpos($item2['二级分类'],'松紧') !== false)){
+                                    $_count = 4;
+                                }elseif($item2['一级分类'] == '下装'){
+                                    $_count = 5;
+                                }
                                 // 获取数组前三的元素值
-                                $in_arr = getArray($temp_arr,3);
+                                $in_arr = getArray($temp_arr,$_count);
                                 // 值等于前三的元素都标红
                                 foreach ($r_size as $k => $v){
                                     if(in_array($item2["{$wv}_".$v],$in_arr)){
