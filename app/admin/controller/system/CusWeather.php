@@ -78,9 +78,9 @@ class CusWeather extends AdminController
             $code = rand_code(6);
             cache($code, json_encode($params), 36000);
             $count = $this->service->get_cus_weather_count($params);
-            if ($count > config('weather.init_output_num')) {
-                $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
-            }
+            // if ($count > config('weather.init_output_num')) {
+            //     $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
+            // }
 
             return json([
                 'app_domain' => env('app.APP_DOMAIN'),
@@ -92,7 +92,7 @@ class CusWeather extends AdminController
 
         } else {
 
-            ini_set('memory_limit','1024M');
+            ini_set('memory_limit','2048M');
 
             $code = input('code');
             $params = cache($code);
