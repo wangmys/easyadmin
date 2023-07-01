@@ -389,6 +389,107 @@ class Skauto extends BaseController
         }
     }
 
+    // 7周销 14周销
+    public function getRetail() {
+        $sql = "
+            SELECT TOP
+                1000000
+                EC.State AS 省份,
+                ER.CustomerName AS 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EG.GoodsNo  AS 货号,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+        -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023')
+            GROUP BY
+                ER.CustomerName
+                ,EG.GoodsNo
+                ,EC.State
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING  SUM ( ERG.Quantity ) <> 0
+        ";
+
+        $sql2 = "
+            SELECT TOP
+                1000000
+                EC.State AS 省份,
+                ER.CustomerName AS 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EG.GoodsNo  AS 货号,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+        -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023')
+            GROUP BY
+                ER.CustomerName
+                ,EG.GoodsNo
+                ,EC.State
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING  SUM ( ERG.Quantity ) <> 0
+        ";
+        // 7
+        $select = $this->db_sqlsrv->query($sql);
+        // 14
+        $select2 = $this->db_sqlsrv->query($sql2);
+
+        $this->db_easyA->execute('TRUNCATE cwl_skauto_retail7;');
+        $this->db_easyA->execute('TRUNCATE cwl_skauto_retail14;');
+        $chunk_list = array_chunk($select, 500);
+        foreach($chunk_list as $key => $val) {
+            // 基础结果 
+            $insert = $this->db_easyA->table('cwl_skauto_retail7')->strict(false)->insertAll($val);
+        }
+
+        $chunk_list2 = array_chunk($select2, 500);
+        foreach($chunk_list2 as $key2 => $val2) {
+            // 基础结果 
+            $insert = $this->db_easyA->table('cwl_skauto_retail14')->strict(false)->insertAll($val2);
+        }
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_skauto_retail7、cwl_skauto_retail14 更新成功！"
+        ]);
+    }  
+
     public function updateSkauto_1() {
         // 更新销售天数
         $sql1 = "
@@ -412,9 +513,9 @@ class Skauto extends BaseController
                 on s.`省份`= k.`省份` 
                 and s.店铺名称= k.店铺名称
                 and s.`一级分类`=k.`一级分类` 
-                and  s.`二级分类`=k`二级分类`
-                and s.`分类`=k.`分类`
-                and s.`货号`=k.`货号`
+                and s.`二级分类`=k.`二级分类`
+                and s.`分类` = k.`分类`
+                and s.`货号` = k.`货号`
             set s.店铺库存=k.店铺库存
             where s.店铺库存 is null
         ";

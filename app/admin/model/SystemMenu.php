@@ -89,9 +89,9 @@ class SystemMenu extends TimeModel
          SUM(T.[count]) AS 有效单数,
          SUM(T.[sales_f]) 有效业绩,
          T1.[sales_all] AS 总业绩,
-         SUM(T.[sales_f]) / SUM(T.[quantity]) AS 件单价,
-         SUM(T.[sales_f]) / SUM(T.[count]) AS 客单价,
-         SUM(T.[quantity]) / SUM(T.[count]) AS 连带率,
+         SUM(T.[sales_f]) / (CASE WHEN SUM(T.[quantity]) = 0 THEN 1 ELSE SUM(T.[quantity]) END) AS 件单价,
+         SUM(T.[sales_f]) / (CASE WHEN SUM(T.[count]) = 0 THEN 1 ELSE SUM(T.[count]) END) AS 客单价,
+         SUM(T.[quantity]) / (CASE WHEN SUM(T.[count]) = 0 THEN 1 ELSE SUM(T.[count]) END) AS 连带率,
          T1.[sales_all] / T1.业绩贡献人数 AS 人效,
          CASE WHEN T1.[sales_all]=0 THEN NULL ELSE CONVERT(DECIMAL(10,2), (T1.sales_all - T1.cost_all) / T1.sales_all * 100) END AS profit_estimate -- 毛利率=（主营业务收入-主营业务成本）/主营业务收入×100%
         FROM 

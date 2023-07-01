@@ -16,7 +16,8 @@ return [
     'no_login_controller' => [
         'login',
         'system.dress.inventory',
-        'system.dress.dress'
+        'system.dress.dress',
+        'operate.performance',
     ],
 
     // 不需要验证登录的节点
@@ -34,7 +35,8 @@ return [
         'system.dress.dress/index',
         'system.dress.dress/index_export',
         'system.weather/index',
-        'system.weather/getWeatherField'
+        'system.weather/getWeatherField',
+        'operate.performance/list',
     ],
 
     // 不需要验证权限的控制器
@@ -44,7 +46,8 @@ return [
         'index',
         'system.dress.inventory',
         'system.dress.dress',
-        'system.weather'
+        'system.weather',
+        'operate.performance'
     ],
 
     // 不需要验证权限的节点
@@ -66,6 +69,7 @@ return [
         'system.dress.index/index_export',
         'system.dress.index/list_export',
         'system.weather/index',
-        'system.weather/getWeatherField'
+        'system.weather/getWeatherField',
+        'operate.performance/list',
     ],
 ];
