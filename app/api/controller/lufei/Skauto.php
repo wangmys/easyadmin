@@ -401,7 +401,7 @@ class Skauto extends BaseController
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
                 EG.GoodsNo  AS 货号,
-                ERG.Quantity AS 销量,
+                SUM(ERG.Quantity) AS 销量,
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
@@ -427,7 +427,6 @@ class Skauto extends BaseController
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
-                ,ERG.Quantity
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
 
@@ -440,7 +439,7 @@ class Skauto extends BaseController
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
                 EG.GoodsNo  AS 货号,
-                ERG.Quantity AS 销量
+                SUM(ERG.Quantity) AS 销量,
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
@@ -466,7 +465,6 @@ class Skauto extends BaseController
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
-                ,ERG.Quantity
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
         // 7
