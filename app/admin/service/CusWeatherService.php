@@ -148,4 +148,20 @@ class CusWeatherService
 
     }
 
+    //获取新店数据
+    public function get_customer_list() {
+
+        $customer_list = CusWeatherBase::field('id, weather_prefix, customer_name, province, city, area')->where([['weather_prefix', '=', '']])->select();
+        $customer_list = $customer_list ? $customer_list->toArray() : [];
+        return $customer_list;
+
+    }
+
+    //保存新店数据
+    public function save_customer_info($post) {
+
+        return CusWeatherBase::where([['id', '=', $post['id']]])->update(['weather_prefix' => $post['weather_prefix']]);
+
+    }
+
 }

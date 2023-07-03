@@ -1,0 +1,55 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-win_num-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">拼音</th>
+                <th style="width: 120px;">店铺名称</th>
+                <th style="width: 120px;">省</th>
+                <th style="width: 120px;">市</th>
+                <th style="width: 150px;">区</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+                <td colspan="6">
+                    <span>添加操作</span>
+                </td>
+                <td colspan="1">
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn add_win_num">增加</button>
+                    </div>
+                </td>
+            </tr> -->
+        {foreach $customer_list as $vo}
+        <tr class="pinyin-select" lay-data="{:htmlspecialchars(json_encode($vo['id'].$vo['customer_name']))}">
+            <td class="weather_prefix">
+                <input type="text" name="weather_prefix[]" lay-verify="required" placeholder="请输入" value="{$vo.weather_prefix}" class="layui-input">
+            </td>
+
+            <td class="customer_name">
+                {$vo.customer_name}
+            </td>
+            <td class="province">
+                {$vo.province}
+            </td>
+            <td class="city">
+                {$vo.city}
+            </td>
+            <td class="area">
+                {$vo.area}
+            </td>
+
+            <td class="handler">
+                <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                <button type="button" class="layui-btn layui-btn-normal get">保存</button>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="customer_list" class="layui-hide" value="{:htmlspecialchars(json_encode($customer_list))}">
