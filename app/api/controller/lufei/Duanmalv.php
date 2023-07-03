@@ -947,11 +947,11 @@ class Duanmalv extends BaseController
                 ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 AND
                 sk.领型=领型 and 店铺SKC计数=1) AS SKC数,
                 ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 ) AS 店铺总SKC数,
-                                    ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '基本款' ) AS 店铺SKC数_基本款,
-                                    ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '引流款' ) AS 店铺SKC数_引流款,
+                ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '基本款' ) AS 店铺SKC数_基本款,
+                ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '引流款' ) AS 店铺SKC数_引流款,
                 sum(dr.销售金额) AS 销售金额,
-                                    (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='基本款') AS 店铺总销售金额_基本款,	
-                                    (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='引流款') AS 店铺总销售金额_引流款,
+                (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='基本款') AS 店铺总销售金额_基本款,	
+                (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='引流款') AS 店铺总销售金额_引流款,
                 (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格 in ('基本款', '引流款')) AS 店铺总销售金额
                 from cwl_duanmalv_sk as sk
                 LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
