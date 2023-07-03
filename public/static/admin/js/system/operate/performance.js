@@ -15,11 +15,9 @@ define(["jquery", "easy-admin", "treetable", "iconPickerFa", "autocomplete"], fu
         iconPickerFa = layui.iconPickerFa,
         autocomplete = layui.autocomplete;
 
-    console.log(66)
-
     var Controller = {
 
-        list: function () {
+        list2: function () {
           console.log('66666')
           ea.listen();
         }
