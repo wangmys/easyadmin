@@ -84,6 +84,7 @@ class Index
     
     public function pull()
     {
+        echo phpinfo();die;
 //        $res = SizeAllRatio::saveSizeRatio('B32502028');
 //        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
         $res = SizeAllRatio::newSaveSizeRatio('B42513009');
