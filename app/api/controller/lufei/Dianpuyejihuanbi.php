@@ -443,11 +443,11 @@ class Dianpuyejihuanbi extends BaseController
         // 31号特殊处理
         if (date('d', strtotime($date)) == 31) {
             $this->dianpuyejihuanbi_handle_31($date);
-            echo 31;
+            // echo 31;
             return;
         } else {
-            echo 'else';
-            echo $ym = date("Y-m", strtotime('-1month', strtotime($date)));
+            // echo 'else';
+            $ym = date("Y-m", strtotime('-1month', strtotime($date)));
         }
         // die;
 
@@ -475,6 +475,19 @@ class Dianpuyejihuanbi extends BaseController
             $today_date = date("Y-m-d", time());
         }
 
+        echo $today;
+        echo '<br>';
+        echo $last_month;
+        echo '<br>';
+        echo $last_month_today;
+        echo '<br>';
+        echo $current_month;
+        echo '<br>';
+        echo $today_date;
+        echo '<br>';
+
+        // die;
+
         $sql1 = "
             SELECT
                 a.省份,
@@ -493,16 +506,14 @@ class Dianpuyejihuanbi extends BaseController
                 a.店铺名称
         ";
         // 数据初始化开始
-        $select_1 = $this->db_easyA->query($sql1);
-
-        // echo "<pre>";
-        // print_r($select_1); die;
-        $delete_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
-            ['更新日期', '=', $today_date]
-        ])->delete();
-        $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->insertAll($select_1);
+        // $select_1 = $this->db_easyA->query($sql1);
+        // $delete_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
+        //     ['更新日期', '=', $today_date]
+        // ])->delete();
+        // $insert_1 = $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->insertAll($select_1);
         // 数据初始化结束
  
+        // die;
         // echo $ym;die;
         // $ym = date("Y-m", strtotime('-1month'));
         // $ym = date("Y-m", strtotime('-' . date('d', time()) . 'day'));
@@ -602,7 +613,8 @@ class Dianpuyejihuanbi extends BaseController
 
             // dump($updateData);die;
             $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
-                ['店铺名称', '=', $updateData['店铺名称']]
+                ['店铺名称', '=', $updateData['店铺名称']],
+                ['更新日期', '=', $date]
             ])->strict(false)->update($updateData);
         }
     }
