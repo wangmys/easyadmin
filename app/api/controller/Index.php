@@ -84,6 +84,10 @@ class Index
     
     public function pull()
     {
+        $redis = new Redis;
+        echo '<pre>';
+        print_r($redis);
+        echo phpinfo();die;
 //        $res = SizeAllRatio::saveSizeRatio('B32502028');
 //        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
         $res = SizeAllRatio::newSaveSizeRatio('B42513009');
