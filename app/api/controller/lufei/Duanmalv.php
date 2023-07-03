@@ -146,6 +146,7 @@ class Duanmalv extends BaseController
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
 
+        
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
         // if (! cache('duanmalv_retail_data')) {
@@ -866,7 +867,7 @@ class Duanmalv extends BaseController
     }
 
     public function handle_1_new() {
-        $sql1 = "
+        $sql1_old = "
              SELECT 
                 m1.*,
                 m1.SKC数 / m1.店铺总SKC数 AS SKC占比,
@@ -900,7 +901,66 @@ class Duanmalv extends BaseController
                     GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
                     order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
         ";
-        $select = $this->db_easyA->query($sql1);
+
+        $sql2 = "
+        SELECT 
+            m1.*,
+            case
+                m1.风格
+                when '基本款' then m1.SKC数 / m1.店铺SKC数_基本款
+                when '引流款' then m1.SKC数 / m1.店铺SKC数_引流款
+            end as SKC占比,
+            case
+                m1.风格
+                when '基本款' then m1.销售金额 / m1.店铺总销售金额_基本款
+                when '引流款' then m1.销售金额 / m1.店铺总销售金额_引流款
+            end as 销售占比,
+            case
+                m1.风格
+                when '基本款' then round(m1.SKC数 / m1.店铺SKC数_基本款 * 60, 4)
+                when '引流款' then round(m1.SKC数 / m1.店铺SKC数_引流款 * 60, 4)
+            end as SKC数TOP分配,
+            case
+                m1.风格
+                when '基本款' then round(m1.销售金额 / m1.店铺总销售金额_基本款 * 60, 4)
+                when '引流款' then round(m1.销售金额 / m1.店铺总销售金额_引流款 * 60, 4)
+            end as 销售TOP分配,
+            case
+                m1.风格
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * 60 + m1.销售金额 / m1.店铺总销售金额_基本款 * 60) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * 60 + m1.销售金额 / m1.店铺总销售金额_引流款 * 60) / 2, 0)
+            end as 实际分配TOP
+        FROM
+            (SELECT sk.经营模式,
+                sk.商品负责人,
+                sk.云仓,
+                sk.省份,
+                sk.店铺名称,
+                sk.风格,
+                sk.一级分类,
+                sk.二级分类,
+                sk.领型,
+                sum(case 
+                    sk.`标准齐码识别修订`
+                    when '断码' then 1 else 0
+                end) as 总断码数, 	
+                ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 AND
+                sk.领型=领型 and 店铺SKC计数=1) AS SKC数,
+                ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 ) AS 店铺总SKC数,
+                ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '基本款' ) AS 店铺SKC数_基本款,
+                ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk WHERE 店铺名称 = sk.店铺名称 AND 风格 = '引流款' ) AS 店铺SKC数_引流款,
+                sum(dr.销售金额) AS 销售金额,
+                (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='基本款') AS 店铺总销售金额_基本款,	
+                (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格='引流款') AS 店铺总销售金额_引流款,
+                (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail where 店铺名称=sk.店铺名称 AND 风格 in ('基本款', '引流款')) AS 店铺总销售金额
+                from cwl_duanmalv_sk as sk
+                LEFT JOIN cwl_duanmalv_retail as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
+            where 1
+                AND sk.风格 IN ('基本款', '引流款')
+                GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
+                order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
+        ";
+        $select = $this->db_easyA->query($sql2);
         if ($select) {
             // 删除 需要计算排名的
             // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
