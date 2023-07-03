@@ -401,6 +401,7 @@ class Skauto extends BaseController
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
                 EG.GoodsNo  AS 货号,
+                ERG.Quantity AS 销量,
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
@@ -426,6 +427,7 @@ class Skauto extends BaseController
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
+                ,ERG.Quantity
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
 
@@ -438,6 +440,7 @@ class Skauto extends BaseController
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
                 EG.GoodsNo  AS 货号,
+                ERG.Quantity AS 销量
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
@@ -463,6 +466,7 @@ class Skauto extends BaseController
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
+                ,ERG.Quantity
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
         // 7
@@ -588,7 +592,7 @@ class Skauto extends BaseController
                 and s.`二级分类`= z.`二级分类`
                 and s.`分类`= z.`分类`
                 and s.`货号`= z.`货号`
-            set s.近一周销 = z.销售金额
+            set s.近一周销 = z.销量
             where s.近一周销 is null        
         ";
         $this->db_easyA->execute($sql5);
@@ -603,7 +607,7 @@ class Skauto extends BaseController
                 and s.`二级分类`= z.`二级分类`
                 and s.`分类`= z.`分类`
                 and s.`货号`= z.`货号`
-            set s.近两周销 = z.销售金额
+            set s.近两周销 = z.销量
             where s.近两周销 is null      
         ";
         $this->db_easyA->execute($sql6);
