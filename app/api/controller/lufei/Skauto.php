@@ -72,9 +72,10 @@ class Skauto extends BaseController
                 sk.风格,
                 --      SUBSTRING(sk.分类, 1, 2) as 领型,
                 sk.货号,
-                        st.零售价,
-                        st.当前零售价,
-                        bu.上市天数,
+                st.零售价,
+                st.当前零售价,
+                round(st.当前零售价 / st.零售价, 2) as 折率,
+                bu.上市天数,
                 sk.`总入量数量` AS 总入量,
                 bu.累销量 as 累销数量,
                 date_format(now(),'%Y-%m-%d') AS 更新日期
@@ -490,7 +491,33 @@ class Skauto extends BaseController
         ]);
     }  
 
-    public function updateSkauto_1() {
+    // 更新云仓可用
+    public function getYuncangkeyong() {
+        $sql = "
+            select 
+                仓库名称 as 云仓,
+                季节,
+                货号,
+                合计 as 云仓数量
+            from sjp_warehouse_stock
+        ";
+        $select = $this->db_bi->query($sql);
+        $this->db_easyA->execute('TRUNCATE cwl_skauto_ycky;');
+
+        $chunk_list = array_chunk($select, 500);
+        foreach($chunk_list as $key => $val) {
+            // 基础结果 
+            $insert = $this->db_easyA->table('cwl_skauto_ycky')->strict(false)->insertAll($val);
+        }
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_skauto_ycky 更新成功！"
+        ]);
+    }
+
+    public function updateSkauto() {
         // 更新销售天数
         $sql1 = "
             update cwl_skauto as s 
@@ -551,6 +578,47 @@ class Skauto extends BaseController
         ";
         $this->db_easyA->execute($sql4);
 
+        // 更新一周销
+        $sql5 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_retail7 as z
+                on s.`省份`=z.省份
+                and s.`店铺名称` = z.店铺名称 
+                and s.`一级分类`= z.`一级分类` 
+                and s.`二级分类`= z.`二级分类`
+                and s.`分类`= z.`分类`
+                and s.`货号`= z.`货号`
+            set s.近一周销 = z.销售金额
+            where s.近一周销 is null        
+        ";
+        $this->db_easyA->execute($sql5);
+
+        // 更新两周销
+        $sql6 = "
+            update cwl_skauto as s 
+            left join cwl_skauto_retail14 as z
+                on s.`省份`=z.省份
+                and s.`店铺名称` = z.店铺名称 
+                and s.`一级分类`= z.`一级分类` 
+                and s.`二级分类`= z.`二级分类`
+                and s.`分类`= z.`分类`
+                and s.`货号`= z.`货号`
+            set s.近两周销 = z.销售金额
+            where s.近两周销 is null      
+        ";
+        $this->db_easyA->execute($sql6);
+
+        // 更云仓可用
+        $sql7 = "
+            update cwl_skauto as s 
+            right join cwl_skauto_ycky as y
+                on s.`云仓`=y.云仓
+                and s.`货号` = y.货号
+            set s.云仓数量 = y.云仓数量
+            where s.云仓数量 is null        
+        ";
+        $this->db_easyA->execute($sql7);
+
         return json([
             'status' => 1,
             'msg' => 'success',
@@ -558,5 +626,57 @@ class Skauto extends BaseController
         ]);
     }
 
+    public function updateSkautoRes() {
+        $sql = "
+            select 
+                t1.*,
+                case
+                    when t1.总入量 - t1.累销数量 <=0 then '售空'
+                    when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
+                            and t1.店铺库存>0 then '即将售空'
+                end as 售空提醒
+                from  
+                (select * from cwl_skauto 
+                where 
+                `销售天数`<=25 
+                and 总入量 > 2
+                and ( 折率 >= 1 || (折率 < 1 AND 
+                                (
+                                        (二级分类 = '短T' AND 当前零售价 > 50) 
+                                    OR (二级分类 = '休闲短衬' AND 当前零售价 > 80)
+                                    OR (二级分类 = '休闲短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '松紧短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '牛仔短裤' AND 当前零售价 > 70) 
+                                    OR (二级分类 = '休闲长裤' AND 当前零售价 > 100) 
+                                    OR (二级分类 = '牛仔长裤' AND 当前零售价 > 100) 
+                                    OR (二级分类 = '松紧长裤' AND 当前零售价 > 100) 
+                                ))
+                    )
+                ) as t1        
+        "; 
+        $select = $this->db_easyA->query($sql);
+        $count = count($select);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_skauto_res;');
 
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_skauto_res  更新成功，数量：{$count}！"
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => "cwl_skauto_res  更新失败，数量：{$count}！"
+            ]);
+        }       
+    }
 }

@@ -46,7 +46,7 @@ class CusWeather extends AdminController
         $nanzhongbei = $this->db_cus_weather->query("select nanzhongbei as name, nanzhongbei as value from cus_weather_base where weather_prefix!='' and nanzhongbei<>'' group by nanzhongbei;");
 
         return json(["code" => "0", "msg" => "", "data" => ['customer_name' => $customer_name, 'province' => $province, 'city' => $city, 'area' => $area, 'store_type' => $store_type,
-        'wendai' => $wendai, 'wenqu' => $wenqu, 'goods_manager' => $goods_manager, 'yuncang' => $yuncang, 'store_level' => $store_level, 'nanzhongbei' => $nanzhongbei
+        'wendai' => $wendai, 'wenqu' => $wenqu, 'goods_manager' => $goods_manager, 'yuncang' => $yuncang, 'store_level' => $store_level, 'nanzhongbei' => $nanzhongbei,
         ]]);
         
     }
@@ -64,7 +64,7 @@ class CusWeather extends AdminController
             return json(["code" => "0", "msg" => "", "count" => $data['count'], "data" => $data['data'],  'create_time' => date('Y-m-d')]);
         } else {
             return View('system/cus_weather/cus_weather', [
-
+                'setTime1' => '2021-01-01', 'setTime2' => date('Y-m-d')
             ]);
         }        
     }
@@ -78,9 +78,9 @@ class CusWeather extends AdminController
             $code = rand_code(6);
             cache($code, json_encode($params), 36000);
             $count = $this->service->get_cus_weather_count($params);
-            if ($count > config('weather.init_output_num')) {
-                $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
-            }
+            // if ($count > config('weather.init_output_num')) {
+            //     $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
+            // }
 
             return json([
                 'app_domain' => env('app.APP_DOMAIN'),
@@ -92,7 +92,7 @@ class CusWeather extends AdminController
 
         } else {
 
-            ini_set('memory_limit','1024M');
+            ini_set('memory_limit','2048M');
 
             $code = input('code');
             $params = cache($code);
