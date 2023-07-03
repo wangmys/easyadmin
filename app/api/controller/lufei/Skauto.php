@@ -415,7 +415,7 @@ class Skauto extends BaseController
                 AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
@@ -453,7 +453,7 @@ class Skauto extends BaseController
                 AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' )
+                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
