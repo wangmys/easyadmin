@@ -4,6 +4,7 @@
 namespace app\admin\service;
 use app\admin\model\weather\CusWeatherBase;
 use app\admin\model\weather\CusWeatherData;
+use app\admin\model\weather\CusWeatherDataCapital;
 use app\admin\model\weather\CusWeatherUrl;
 use app\admin\model\weather\CusWeatherOutput;
 use app\common\traits\Singleton;
@@ -25,7 +26,7 @@ class CusWeatherService
 
         if ($count > config('weather.init_output_num')) {
 
-            CusWeatherOutput::create(['code' => $code]);
+            // CusWeatherOutput::create(['code' => $code]);
 
             //采用其他方案生成得到excel
             $data = [
@@ -114,6 +115,29 @@ class CusWeatherService
 
     }
 
+    protected function return_where_capital($params) {
+
+        $province = $params['province'] ?? '';
+        $yuncang = $params['yuncang'] ?? '';
+        $setTime1 = $params['setTime1'] ?? '';
+        $setTime2 = $params['setTime2'] ?? '';
+
+        $where = [];
+        $where[] = ['cwbc.weather_prefix', '<>', ''];
+        if ($province) {
+            $where[] = ['cwbc.province', 'in', $province];
+        }
+        if ($yuncang) {
+            $where[] = ['cwbc.yuncang', 'in', $yuncang];
+        }
+        if ($setTime1 && $setTime2) {
+            $where[] = ['cwdc.weather_time', 'between', [$setTime1, $setTime2]];
+        }
+        // print_r($where);die;
+        return $where;
+
+    }
+
     public function get_cus_weather($params, $field='cwb.weather_prefix, cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, SUBSTRING(cwd.weather_time, 1, 10) as weather_time') {
 
         $pageLimit = $params['limit'] ?? 1000;//每页条数
@@ -161,6 +185,82 @@ class CusWeatherService
     public function save_customer_info($post) {
 
         return CusWeatherBase::where([['id', '=', $post['id']]])->update(['weather_prefix' => $post['weather_prefix']]);
+
+    }
+
+
+    public function get_capital_weather($params, $field='cwbc.weather_prefix, cwbc.yuncang, cwbc.province, cwbc.city, cwdc.min_c, cwdc.max_c, SUBSTRING(cwdc.weather_time, 1, 10) as weather_time') {
+
+        $pageLimit = $params['limit'] ?? 1000;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $where = $this->return_where_capital($params);
+
+        $list = CusWeatherDataCapital::field($field)->alias('cwdc')->
+        join('cus_weather_base_capital cwbc', 'cwdc.weather_prefix=cwbc.weather_prefix', 'LEFT')->where($where)->order('cwdc.id asc')
+        ->paginate([
+            'list_rows'=> $pageLimit,
+            'page' => $page,
+        ]);
+        $list = $list ? $list->toArray() : [];
+        $data = [
+            'count' => $list ? $list['total'] : 0,
+            'data'  => $list ? $list['data'] : 0,
+        ];
+        return $data;
+
+    }
+
+    //获取统计数(省会)
+    public function get_capital_weather_count($params) {
+
+        $pageLimit = $params['limit'] ?? 1000;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $where = $this->return_where_capital($params);
+
+        $count = CusWeatherDataCapital::field('cwbc.id')->alias('cwdc')->
+        join('cus_weather_base_capital cwbc', 'cwdc.weather_prefix=cwbc.weather_prefix', 'LEFT')->where($where)->order('cwdc.id asc')->count();
+        return $count;
+
+    }
+
+    public function get_capital_weather_excel($code, $params, $field='cwbc.province, cwbc.yuncang, cwdc.min_c, cwdc.max_c, cwdc.weather_time') {
+
+        $pageLimit = $params['limit'] ?? 1000;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $where = $this->return_where_capital($params);
+
+        $count = CusWeatherDataCapital::field($field)->alias('cwdc')->
+        join('cus_weather_base_capital cwbc', 'cwdc.weather_prefix=cwbc.weather_prefix', 'LEFT')->where($where)->order('cwdc.id asc')->count();
+
+        if ($count > config('weather.init_output_num')) {
+
+            // CusWeatherOutput::create(['code' => $code]);
+
+            //采用其他方案生成得到excel
+            $data = [
+                'count' => $count,
+                'data'  => [],
+                'sign'  => 'other',
+            ];
+
+        } else {
+
+            $list = CusWeatherDataCapital::field($field)->alias('cwdc')->
+            join('cus_weather_base_capital cwbc', 'cwdc.weather_prefix=cwbc.weather_prefix', 'LEFT')->where($where)->order('cwdc.id asc')
+            ->paginate([
+                'list_rows'=> $pageLimit,
+                'page' => $page,
+            ]);
+            $list = $list ? $list->toArray() : [];
+            $data = [
+                'count' => $list ? $list['total'] : 0,
+                'data'  => $list ? $list['data'] : 0,
+                'sign'  => 'normal',
+            ];
+
+        }
+        
+        return $data;
 
     }
 

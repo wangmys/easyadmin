@@ -126,4 +126,78 @@ class CusWeather extends AdminController
 
     }
 
+    /**
+     * @NodeAnotation(title="省会天气") 
+     */
+    public function capital_weather() {
+
+        if (request()->isAjax()) {
+
+            $params = input();
+            $data = $this->service->get_capital_weather($params);
+            // print_r($data);die;
+
+            return json(["code" => "0", "msg" => "", "count" => $data['count'], "data" => $data['data'],  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('system/cusweather/capital_weather', [
+                'setTime1' => '2021-01-01', 'setTime2' => date('Y-m-d')
+            ]);
+        }        
+    }
+
+    // 获取筛选栏多选参数 省会
+    public function getCapitalXmMapSelect() {
+
+        $province = $this->db_cus_weather->query("select province as name, province as value from cus_weather_base_capital where weather_prefix!='' group by province;");
+        $yuncang = $this->db_cus_weather->query("select yuncang as name, yuncang as value from cus_weather_base_capital where weather_prefix!='' and yuncang<>'' group by yuncang;");
+
+        return json(["code" => "0", "msg" => "", "data" => ['province' => $province, 'yuncang' => $yuncang]]);
+        
+    }
+
+    //excel导出 (省会)
+    public function excel_capital_weather() {
+
+        if (request()->isAjax()) {
+            
+            $params = input();
+            $code = rand_code(6);
+            cache($code.'capital', json_encode($params), 36000);
+            $count = $this->service->get_capital_weather_count($params);
+
+            return json([
+                'app_domain' => env('app.APP_DOMAIN'),
+                'init_output_num' => config('weather.init_output_num'),
+                'status' => 1,
+                'code' => $code,
+                'count' => $count
+            ]);
+
+        } else {
+
+            ini_set('memory_limit','2048M');
+
+            $code = input('code');
+            $params = cache($code.'capital');
+            $params = $params ? json_decode($params, true) : [];
+
+            $header = [
+                ['省', 'province'],
+                ['云仓', 'yuncang'],
+                ['最低温', 'min_c'],
+                ['最高温', 'max_c'],
+                ['日期', 'weather_time'],
+            ];
+
+            $params['limit'] = 100000000;
+            $select = $this->service->get_capital_weather_excel($code, $params, 'cwbc.province, cwbc.yuncang, cwdc.min_c, cwdc.max_c, SUBSTRING(cwdc.weather_time, 1, 10) as weather_time');
+            if ($select['sign'] == 'normal') {
+                return Excel::exportData($select['data'], $header, 'capital_weather_' .$select['count'] , 'xlsx');
+            } else {//其他方案导出
+            }
+            
+        }
+
+    }
+
 }
