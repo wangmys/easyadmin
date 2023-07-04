@@ -218,7 +218,7 @@ class Skauto extends BaseController
     // }
 
     // 获取店铺库存
-    public function getKucun() {
+    public function getKuchun() {
         $sql = "
             SELECT
                 TOP 1000000
@@ -232,9 +232,9 @@ class Skauto extends BaseController
                 FROM ErpCustomerStock ECS 
             LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
-                WHERE  EC.ShutOut=0
-            AND EG.TimeCategoryName1 in (2023)
-                    AND EC.MathodId IN (4,7)
+            WHERE  EC.ShutOut=0
+                AND EG.TimeCategoryName1 in (2023)
+                AND EC.MathodId IN (4,7)
             GROUP BY 
                 EC.State,
                 EC.CustomItem17,
@@ -244,7 +244,36 @@ class Skauto extends BaseController
                 EG.CategoryName,
                 EG.GoodsNo 
         ";
-        $select = $this->db_sqlsrv->query($sql);
+
+        $sql2 = "
+            SELECT
+                -- TOP 1000000
+                EC.State AS 省份,
+                EC.CustomerName As 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EG.GoodsNo AS 货号,
+                SUM(ECSD.Quantity) AS 店铺库存
+                        FROM ErpCustomerStock ECS 
+                        left join ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
+            LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                        WHERE  EC.ShutOut=0
+                                AND EG.TimeCategoryName1 in (2023)
+                                    AND EC.MathodId IN (4,7)
+        -- 								AND EC.CustomerName IN ('宁德一店')
+        -- 								AND EG.GoodsNo = 'B42503007'
+            GROUP BY 
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerName,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.GoodsNo      
+        ";
+        $select = $this->db_sqlsrv->query($sql2);
         if ($select) {
             $this->db_easyA->execute('TRUNCATE cwl_skauto_kucun;');
 
@@ -325,9 +354,9 @@ class Skauto extends BaseController
         }
     }
 
-    // 已配未发
+    // 在途
     public function getZaitu() {
-        $sql = "
+        $sql_old = "
             SELECT
                 EC.CustomItem15,
                 EC.State  AS 省份,
@@ -351,7 +380,8 @@ class Skauto extends BaseController
             LEFT JOIN ErpGoods EG ON EIG.GoodsId=EG.GoodsId
             WHERE EI.CodingCodeText='已审结'
                 AND EI.IsCompleted=0
-                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
+                -- 排除店铺调入单 ErpCustReceipt
+                 AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
                 AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                 AND eg.TimeCategoryName1 = '2023'
                 AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
@@ -370,7 +400,113 @@ class Skauto extends BaseController
                 EC.CustomerGrade,
             EG.GoodsNo
         ";
-        $select = $this->db_sqlsrv->query($sql);
+
+        $sql2 = "
+            SELECT
+                T.State AS 省份,
+                T.CustomItem17 AS 商品负责人,
+                T.CustomerName AS 店铺名称,
+                T.CategoryName1 AS 一级分类,
+                T.CategoryName2 AS 二级分类,
+                T.CategoryName AS 分类,
+                T.GoodsNo AS 货号,
+                SUM ( T.intransit_quantity ) AS 在途数量 
+            FROM
+                (
+                SELECT
+                    EC.State,
+                    EC.CustomItem17,
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EG.CategoryName1,
+                    EG.CategoryName2,
+                    EG.CategoryName,
+                    EG.GoodsNo,
+                    SUM ( EDG.Quantity ) AS intransit_quantity 
+                FROM
+                    ErpDelivery ED
+                    LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID= EDG.DeliveryID
+                    LEFT JOIN ErpCustomer EC ON ED.CustomerId= EC.CustomerId
+                    LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId 
+                WHERE
+                    ED.CodingCode= 'EndNode2' 
+                    AND ED.IsCompleted= 0 --AND ED.IsReceipt IS NULL
+                    
+                    AND ED.DeliveryID NOT IN (
+                    SELECT
+                        ERG.DeliveryId 
+                    FROM
+                        ErpCustReceipt ER
+                        LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID= ERG.ReceiptID 
+                    WHERE
+                        ER.CodingCodeText= '已审结' 
+                        AND ERG.DeliveryId IS NOT NULL 
+                        AND ERG.DeliveryId!= '' 
+                    GROUP BY
+                        ERG.DeliveryId 
+                    ) 
+                GROUP BY
+                    EC.State,
+                    EC.CustomItem17,
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EG.CategoryName1,
+                    EG.CategoryName2,
+                    EG.CategoryName,
+                    EG.GoodsNo UNION ALL--店店调拨在途
+                SELECT
+                    EC.State,
+                    EC.CustomItem17,
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EG.CategoryName1,
+                    EG.CategoryName2,
+                    EG.CategoryName,
+                    EG.GoodsNo,
+                    SUM ( EIG.Quantity ) AS intransit_quantity 
+                FROM
+                    ErpCustOutbound EI
+                    LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId= EIG.CustOutboundId
+                    LEFT JOIN ErpCustomer EC ON EI.InCustomerId= EC.CustomerId
+                    LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId 
+                WHERE
+                    EI.CodingCodeText= '已审结' 
+                    AND EI.IsCompleted= 0 
+                    AND EI.CustOutboundId NOT IN (
+                    SELECT
+                        ERG.CustOutboundId 
+                    FROM
+                        ErpCustReceipt ER
+                        LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID= ERG.ReceiptID 
+                    WHERE
+                        ER.CodingCodeText= '已审结' 
+                        AND ERG.CustOutboundId IS NOT NULL 
+                        AND ERG.CustOutboundId!= '' 
+                    GROUP BY
+                        ERG.CustOutboundId 
+                    ) 
+                    AND EC.ShutOut= 0 
+                GROUP BY
+                    EC.State,
+                    EC.CustomItem17,
+                    EC.CustomerId,
+                    EC.CustomerName,
+                    EG.CategoryName1,
+                    EG.CategoryName2,
+                    EG.CategoryName,
+                    EG.GoodsNo 
+                ) T 
+            WHERE T.State IS NOT NULL
+            GROUP BY
+                T.State,
+                T.CustomItem17,
+                T.CustomerName,
+                T.CategoryName1,
+                T.CategoryName2,
+                T.CategoryName,
+                T.GoodsNo;  
+        ";
+        $select = $this->db_sqlsrv->query($sql2);
         if ($select) {
             $this->db_easyA->execute('TRUNCATE cwl_skauto_zaitu;');
 
@@ -629,31 +765,36 @@ class Skauto extends BaseController
 
     public function updateSkautoRes() {
         $sql = "
-            select 
-                t1.*,
-                case
-                    when t1.总入量 - t1.累销数量 <=0 then '售空'
-                    when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
-                            and t1.店铺库存>0 then '即将售空'
-                end as 售空提醒
-                from  
-                (select * from cwl_skauto 
-                where 
-                `销售天数`<=25 
-                and 总入量 > 2
-                and ( 折率 >= 1 || (折率 < 1 AND 
-                                (
-                                        (二级分类 = '短T' AND 当前零售价 > 50) 
-                                    OR (二级分类 = '休闲短衬' AND 当前零售价 > 80)
-                                    OR (二级分类 = '休闲短裤' AND 当前零售价 > 70) 
-                                    OR (二级分类 = '松紧短裤' AND 当前零售价 > 70) 
-                                    OR (二级分类 = '牛仔短裤' AND 当前零售价 > 70) 
-                                    OR (二级分类 = '休闲长裤' AND 当前零售价 > 100) 
-                                    OR (二级分类 = '牛仔长裤' AND 当前零售价 > 100) 
-                                    OR (二级分类 = '松紧长裤' AND 当前零售价 > 100) 
-                                ))
-                    )
-                ) as t1        
+        select 
+            (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) as test,
+            t1.*,
+            case
+            when t1.总入量 - t1.累销数量 <=0 then '售空'
+            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
+                and t1.店铺库存>0 then '即将售空'
+            end as 售空提醒
+            from  
+            (select 
+                    云仓,商品负责人,省份,经营模式,店铺名称,一级分类,二级分类,分类,风格,货号,零售价,当前零售价,折率,上市天数,销售天数,总入量,累销数量,店铺库存,近一周销,近两周销,云仓数量,首单日期,更新日期,
+                    IFNULL(在途库存, 0) as 在途库存,
+                    IFNULL(已配未发, 0) as 已配未发
+                    from cwl_skauto 
+            where 
+            `销售天数`<=25 
+            and 总入量 > 2
+            and ( 折率 >= 1 || (折率 < 1 AND 
+                    (
+                            (二级分类 = '短T' AND 当前零售价 > 50) 
+                        OR (二级分类 = '休闲短衬' AND 当前零售价 > 80)
+                        OR (二级分类 = '休闲短裤' AND 当前零售价 > 70) 
+                        OR (二级分类 = '松紧短裤' AND 当前零售价 > 70) 
+                        OR (二级分类 = '牛仔短裤' AND 当前零售价 > 70) 
+                        OR (二级分类 = '休闲长裤' AND 当前零售价 > 100) 
+                        OR (二级分类 = '牛仔长裤' AND 当前零售价 > 100) 
+                        OR (二级分类 = '松紧长裤' AND 当前零售价 > 100) 
+                    ))
+                )
+            ) as t1   
         "; 
         $select = $this->db_easyA->query($sql);
         $count = count($select);

@@ -364,7 +364,7 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpInstructionApply EIA ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
             WHERE
                 EC.ShutOut= 0 
-                AND EC.CustomItem17 = '{$diaochufuzheren}' 
+                -- AND EC.CustomItem17 = '{$diaochufuzheren}' 
                                 AND EC.CustomerName = '{$CustomerName}' 
                                 AND EG.GoodsNo = '{$GoodsNo}' 
                 AND EG.TimeCategoryName1= {$year} 
@@ -487,7 +487,6 @@ class ShopbuhuoB extends AdminController
             LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
             WHERE  EC.ShutOut=0
-                AND EC.CustomItem17 = '{$diaochufuzheren}' 
                 AND EG.GoodsNo = '{$GoodsNo}'
                 AND EC.CustomerName = '{$CustomerName}'
                 AND EG.TimeCategoryName1 in (2021,2022,2023)
@@ -869,6 +868,214 @@ class ShopbuhuoB extends AdminController
             } 
         }
     }
+    
+    // 上传excel 店铺补货
+    public function uploadExcel_buhuo() {
+        if (request()->isAjax()) {
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $new_name = "补货申请_". $this->authInfo['name'] . '_' . rand(100, 999) . time() . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+            // dump($info);die;
+            if($info) {
+                //成功上传后 获取上传的数据
+                //要获取的数据字段
+                $read_column = [
+                    'A' => '原单编号',
+                    'B' => '手工单号',
+                    'C' => '单据日期',
+                    'D' => '审结日期',
+                    'E' => '仓库编号',
+                    'F' => '店铺编号',
+                    'G' => '订货类型',
+                    'H' => '订单编号',
+                    'I' => '货号',
+                    'J' => '颜色编号',
+                    'K' => '规格',
+                    'L' => '尺码',
+                    'M' => '数量',
+                    'N' => '订货价格',
+                    'O' => '是否完成',
+                    'P' => '备注',
+                ];
+                //读取数据
+                $data = $this->readExcel1($info, $read_column);
+
+                // echo '<pre>';
+                // print_r($data);die;
+
+                // 店铺信息
+                $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
+                // $data = array_filter($data);
+                foreach ($data as $key => $val) {
+                    // if ( empty($val['店铺编号']) || empty($val['货号']) ) {
+                    //     unset($data[$key]);
+                    // } else {
+                    //     $data[$key]['aname'] = $this->authInfo['name'];
+                    //     $data[$key]['aid'] = $this->authInfo['id'];
+                    //     $data[$key]['create_time'] = $this->create_time;
+                    // }
+                    $data[$key]['aname'] = $this->authInfo['name'];
+                    $data[$key]['aid'] = $this->authInfo['id'];
+                    $data[$key]['create_time'] = $this->create_time;
+                    // a.店铺编号 = b.CustomerCode 
+                    foreach ($select_customer as $key2 => $val2) {
+                        if ($val['店铺编号'] == $val2['CustomerCode']) {
+                            $data[$key]['店铺名称'] = $val2['CustomerName'];
+                            $data[$key]['商品负责人'] = $val2['CustomItem17'];
+                            break;
+                        } 
+                        if ($key2 == count($select_customer) -1) {
+                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
+                        }
+                    }
+                }
+
+                // $this->db_easyA->startTrans();
+                $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
+                    ['aid', '=', $this->authInfo['id']]
+                ])->delete();
+                $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->where([
+                    ['aid', '=', $this->authInfo['id']]
+                ])->delete();    
+
+                // 同步康雷最新在途
+                $sql = "
+                SELECT
+                    TOP 20000
+                    EC.CustomItem17,
+                    EC.CustomerName ,
+                    EIA.InstructionApplyId,
+                    EG.GoodsNo ,
+                    SUM ( EIAG.Quantity ) AS 调拨未完成数,
+                    '{$this->authInfo['id']}' as aid,
+                    '{$this->authInfo['name']}' as aname
+                    FROM
+                    ErpCustomer EC 
+                    LEFT JOIN ErpInstructionApply EIA ON EC.CustomerId = EIA.OutItemId
+                    LEFT JOIN ErpInstructionApplyGoods EIAG ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
+                    LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
+                    WHERE
+                    EC.ShutOut= 0 
+                    AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
+                    AND EIA.CodingCodeText='已审结'
+                    AND EIA.IsCompleted=0
+                    GROUP BY
+                    EC.CustomItem17,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    EIA.InstructionApplyId
+            ";
+            $select_zaitu = $this->db_sqlsrv->query($sql);
+
+
+            // 先别删
+            $del3 = $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->where([
+                ['aid', '=', $this->authInfo['id']]
+            ])->delete(); 
+            // // 康雷在途入库
+            $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->insertAll($select_zaitu);
+
+            // 批量切割插入
+            $chunk_list = array_chunk($data, 1000);
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_chuhuozhilingdan_3')->insertAll($val);
+            }
+
+            // 7天清空库存数据 
+            $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
+                ['aid', '=', $this->authInfo['id']]
+            ])->find();
+            // echo $find_fuzheren['商品负责人']; die;
+            $day7 = $this->day7($find_fuzheren['商品负责人']);
+
+            $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->insertAll($day7);
+            $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
+                UPDATE cwl_chuhuozhilingdan_7dayclean_3 AS a
+                LEFT JOIN cwl_chuhuozhilingdan_3 AS b ON a.店铺名称 = b.店铺名称 
+                AND a.货号 = b.货号 
+                AND b.aid = '{$this->authInfo["id"]}'
+                SET b.清空时间 = a.清空时间,
+                    b.调出数量 = a.调出数量,
+                    b.库存数量 = a.库存数量 
+                WHERE
+                    a.aid = '{$this->authInfo["id"]}'
+            ");
+
+            // echo 222;die;
+
+            // 未完成
+            $select_chuhuozhiling_weiwancheng = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
+                ['aid', '=', $this->authInfo['id']],
+                ['清空时间', 'exp', new Raw('IS NULL')]
+            ])->order('create_time DESC')
+            ->select()->toArray();
+
+            $select_chuhuozhiling_weiwancheng = $this->db_easyA->query("
+                SELECT
+                    a.店铺名称 ,
+                    a.商品负责人,
+                    a.货号,
+                    zt.*
+                FROM
+                    `cwl_chuhuozhilingdan_3` as a right join cwl_chuhuozhilingdan_zaitu as zt
+                    on a.店铺名称=zt.CustomerName and a.`商品负责人`= zt.CustomItem17 and a.货号=zt.GoodsNo and a.aid = zt.aid
+                WHERE
+                    a.`aid` = '{$this->authInfo['id']}' 
+                    AND ( `清空时间` IS NULL ) 
+                ORDER BY
+                    `create_time` DESC
+            ");
+
+            // echo $this->db_easyA->getLastSql();die;
+
+            // dump($select_chuhuozhiling_weiwancheng);    
+            if ($select_chuhuozhiling_weiwancheng) {
+                foreach ($select_chuhuozhiling_weiwancheng as $key => $val) {
+                    // 在途未完成 - 库存 <= 0
+                    // $zaitu_kucun_0 = $this->buhuo_weiwancheng_handle($val['商品负责人'], $val['店铺名称'], $val['货号']);
+                    // if ($zaitu_kucun_0) {
+                    //     $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
+                    //         ['商品负责人', '=', $val['商品负责人']],
+                    //         ['店铺名称', '=', $val['店铺名称']],
+                    //         ['货号', '=', $val['货号']],
+                    //         ['aid', '=', $this->authInfo['id']],
+                    //     ])->update([
+                    //         '调拨未完成数' => $zaitu_kucun_0['调拨未完成数'],
+                    //         '库存数量' => $zaitu_kucun_0['库存数量']
+                    //     ]);
+                    // }
+
+                    $kucun = $this->qudaodiaobo_kucun($val['商品负责人'], $val['店铺名称'], $val['货号']);
+            
+                    // 库存 - 调拨未完成
+                    if ($kucun[0]['actual_quantity'] - $val['调拨未完成数'] <= 0) {
+                        $data['调拨未完成数'] = $val['调拨未完成数'];
+                        $data['库存数量'] = $kucun[0]['actual_quantity']; 
+                        $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
+                            ['商品负责人', '=', $val['商品负责人']],
+                            ['店铺名称', '=', $val['店铺名称']],
+                            ['货号', '=', $val['货号']],
+                            ['aid', '=', $this->authInfo['id']],
+                        ])->update([
+                            '调拨未完成数' => $val['调拨未完成数'],
+                            '库存数量' => $data['库存数量'] 
+                        ]);
+                    }
+                }
+            }
+
+            $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
+                'option' => '店铺补货',
+                'aid' => $this->authInfo['id'],
+                'aname' => $this->authInfo['name'],
+                'create_time' => date("Y-m-d H:i:s"),
+            ]);
+            return json(['code' => 0, 'msg' => '上传成功']);
+
+            }
+        }
+    }
 
     // 调拨测试
     public function redExcel_test_diaobo() {
@@ -1148,7 +1355,7 @@ class ShopbuhuoB extends AdminController
                 // }
 
                 $kucun = $this->qudaodiaobo_kucun($val['商品负责人'], $val['店铺名称'], $val['货号']);
-           
+            
                 // 库存 - 调拨未完成
                 if ($kucun[0]['actual_quantity'] - $val['调拨未完成数'] <= 0) {
                     $data['调拨未完成数'] = $val['调拨未完成数'];
@@ -1174,213 +1381,5 @@ class ShopbuhuoB extends AdminController
         ]);
         return json(['code' => 0, 'msg' => '上传成功']);
     } 
-    
-    // 上传excel 店铺补货
-    public function uploadExcel_buhuo() {
-        if (request()->isAjax()) {
-            $file = request()->file('file');  //这里‘file’是你提交时的name
-            $new_name = "补货申请_". $this->authInfo['name'] . '_' . rand(100, 999) . time() . '.' . $file->getOriginalExtension();
-            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
-            $info = $file->move($save_path, $new_name);
-            // dump($info);die;
-            if($info) {
-                //成功上传后 获取上传的数据
-                //要获取的数据字段
-                $read_column = [
-                    'A' => '原单编号',
-                    'B' => '手工单号',
-                    'C' => '单据日期',
-                    'D' => '审结日期',
-                    'E' => '仓库编号',
-                    'F' => '店铺编号',
-                    'G' => '订货类型',
-                    'H' => '订单编号',
-                    'I' => '货号',
-                    'J' => '颜色编号',
-                    'K' => '规格',
-                    'L' => '尺码',
-                    'M' => '数量',
-                    'N' => '订货价格',
-                    'O' => '是否完成',
-                    'P' => '备注',
-                ];
-                //读取数据
-                $data = $this->readExcel1($info, $read_column);
-
-                // echo '<pre>';
-                // print_r($data);die;
-
-                // 店铺信息
-                $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
-                // $data = array_filter($data);
-                foreach ($data as $key => $val) {
-                    // if ( empty($val['店铺编号']) || empty($val['货号']) ) {
-                    //     unset($data[$key]);
-                    // } else {
-                    //     $data[$key]['aname'] = $this->authInfo['name'];
-                    //     $data[$key]['aid'] = $this->authInfo['id'];
-                    //     $data[$key]['create_time'] = $this->create_time;
-                    // }
-                    $data[$key]['aname'] = $this->authInfo['name'];
-                    $data[$key]['aid'] = $this->authInfo['id'];
-                    $data[$key]['create_time'] = $this->create_time;
-                    // a.店铺编号 = b.CustomerCode 
-                    foreach ($select_customer as $key2 => $val2) {
-                        if ($val['店铺编号'] == $val2['CustomerCode']) {
-                            $data[$key]['店铺名称'] = $val2['CustomerName'];
-                            $data[$key]['商品负责人'] = $val2['CustomItem17'];
-                            break;
-                        } 
-                        if ($key2 == count($select_customer) -1) {
-                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
-                        }
-                    }
-                }
-
-                // $this->db_easyA->startTrans();
-                $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
-                    ['aid', '=', $this->authInfo['id']]
-                ])->delete();
-                $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->where([
-                    ['aid', '=', $this->authInfo['id']]
-                ])->delete();    
-
-                // 同步康雷最新在途
-                $sql = "
-                SELECT
-                    TOP 20000
-                    EC.CustomItem17,
-                    EC.CustomerName ,
-                    EIA.InstructionApplyId,
-                    EG.GoodsNo ,
-                    SUM ( EIAG.Quantity ) AS 调拨未完成数,
-                    '{$this->authInfo['id']}' as aid,
-                    '{$this->authInfo['name']}' as aname
-                    FROM
-                    ErpCustomer EC 
-                    LEFT JOIN ErpInstructionApply EIA ON EC.CustomerId = EIA.OutItemId
-                    LEFT JOIN ErpInstructionApplyGoods EIAG ON EIA.InstructionApplyId= EIAG.InstructionApplyId 
-                    LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
-                    WHERE
-                    EC.ShutOut= 0 
-                    AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
-                    AND EIA.CodingCodeText='已审结'
-                    AND EIA.IsCompleted=0
-                    GROUP BY
-                    EC.CustomItem17,
-                    EC.CustomerName,
-                    EG.GoodsNo,
-                    EIA.InstructionApplyId
-            ";
-            $select_zaitu = $this->db_sqlsrv->query($sql);
-
-
-            // 先别删
-            $del3 = $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->where([
-                ['aid', '=', $this->authInfo['id']]
-            ])->delete(); 
-            // // 康雷在途入库
-            $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->insertAll($select_zaitu);
-
-            // 批量切割插入
-            $chunk_list = array_chunk($data, 1000);
-            foreach($chunk_list as $key => $val) {
-                $this->db_easyA->table('cwl_chuhuozhilingdan_3')->insertAll($val);
-            }
-
-            // 7天清空库存数据 
-            $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
-                ['aid', '=', $this->authInfo['id']]
-            ])->find();
-            // echo $find_fuzheren['商品负责人']; die;
-            $day7 = $this->day7($find_fuzheren['商品负责人']);
-
-            $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->insertAll($day7);
-            $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
-                UPDATE cwl_chuhuozhilingdan_7dayclean_3 AS a
-                LEFT JOIN cwl_chuhuozhilingdan_3 AS b ON a.店铺名称 = b.店铺名称 
-                AND a.货号 = b.货号 
-                AND b.aid = '{$this->authInfo["id"]}'
-                SET b.清空时间 = a.清空时间,
-                    b.调出数量 = a.调出数量,
-                    b.库存数量 = a.库存数量 
-                WHERE
-                    a.aid = '{$this->authInfo["id"]}'
-            ");
-
-            // echo 222;die;
-
-            // 未完成
-            $select_chuhuozhiling_weiwancheng = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
-                ['aid', '=', $this->authInfo['id']],
-                ['清空时间', 'exp', new Raw('IS NULL')]
-            ])->order('create_time DESC')
-            ->select()->toArray();
-
-            $select_chuhuozhiling_weiwancheng = $this->db_easyA->query("
-                SELECT
-                    a.店铺名称 ,
-                    a.商品负责人,
-                    a.货号,
-                    zt.*
-                FROM
-                    `cwl_chuhuozhilingdan_3` as a right join cwl_chuhuozhilingdan_zaitu as zt
-                    on a.店铺名称=zt.CustomerName and a.`商品负责人`= zt.CustomItem17 and a.货号=zt.GoodsNo and a.aid = zt.aid
-                WHERE
-                    a.`aid` = '{$this->authInfo['id']}' 
-                    AND ( `清空时间` IS NULL ) 
-                ORDER BY
-                    `create_time` DESC
-            ");
-
-            // echo $this->db_easyA->getLastSql();die;
-
-            // dump($select_chuhuozhiling_weiwancheng);    
-            if ($select_chuhuozhiling_weiwancheng) {
-                foreach ($select_chuhuozhiling_weiwancheng as $key => $val) {
-                    // 在途未完成 - 库存 <= 0
-                    // $zaitu_kucun_0 = $this->buhuo_weiwancheng_handle($val['商品负责人'], $val['店铺名称'], $val['货号']);
-                    // if ($zaitu_kucun_0) {
-                    //     $this->db_easyA->table('cwl_chuhuozhilingdan_2')->where([
-                    //         ['商品负责人', '=', $val['商品负责人']],
-                    //         ['店铺名称', '=', $val['店铺名称']],
-                    //         ['货号', '=', $val['货号']],
-                    //         ['aid', '=', $this->authInfo['id']],
-                    //     ])->update([
-                    //         '调拨未完成数' => $zaitu_kucun_0['调拨未完成数'],
-                    //         '库存数量' => $zaitu_kucun_0['库存数量']
-                    //     ]);
-                    // }
-
-                    $kucun = $this->qudaodiaobo_kucun($val['商品负责人'], $val['店铺名称'], $val['货号']);
-            
-                    // 库存 - 调拨未完成
-                    if ($kucun[0]['actual_quantity'] - $val['调拨未完成数'] <= 0) {
-                        $data['调拨未完成数'] = $val['调拨未完成数'];
-                        $data['库存数量'] = $kucun[0]['actual_quantity']; 
-                        $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
-                            ['商品负责人', '=', $val['商品负责人']],
-                            ['店铺名称', '=', $val['店铺名称']],
-                            ['货号', '=', $val['货号']],
-                            ['aid', '=', $this->authInfo['id']],
-                        ])->update([
-                            '调拨未完成数' => $val['调拨未完成数'],
-                            '库存数量' => $data['库存数量'] 
-                        ]);
-                    }
-                }
-            }
-
-            $this->db_easyA->table('cwl_shopbuhuo_log')->insert([
-                'option' => '店铺补货',
-                'aid' => $this->authInfo['id'],
-                'aname' => $this->authInfo['name'],
-                'create_time' => date("Y-m-d H:i:s"),
-            ]);
-            return json(['code' => 0, 'msg' => '上传成功']);
-
-            }
-        }
-    }
 
 }
