@@ -60,6 +60,16 @@
             text-align: right;
         }
 
+        xm-select {
+            min-height: 32px;
+            line-height: 32px;
+        }
+
+        xm-select > .xm-label .scroll .label-content{
+            padding: 0px 5px;
+            overflow: hidden;
+        }
+
         .layui-laypage .layui-laypage-curr .layui-laypage-em {
             background-color: #ffcc00;
             color: #666
@@ -125,6 +135,11 @@
                     <div class="flex col between al-start" style="width:95%;">
                         <div class="layui-form-item">
 
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fengge" class="xm-select-demo"></div>
+                            </div>
+
                             <label class="layui-form-label">本期日期</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$limitDate['setTime1']}" readonly  style="cursor: pointer">
@@ -159,7 +174,6 @@
 
 </html>
 <script src="__STATIC__/ok/lib/layui/layui.js"></script>
-<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
@@ -310,6 +324,22 @@
                             }
                         })
                     }
+
+                    // 选择风格
+                    xmSelect.render({
+                        el: '#xm-fengge',
+                        filterable: true,
+                        toolbar: {show: true},
+                        name: '风格',
+                        // showCount: 1,
+                        theme: {
+                            color: '#1cbbb4',
+                        },
+                        data: [
+                            {name: "基本款", value: "基本款", selected: ""},
+                            {name: "引流款", value: "引流款", selected: ""},
+                        ]
+                    })
                 }
             });
         }

@@ -17,9 +17,24 @@ define(["jquery", "easy-admin", "treetable", "iconPickerFa", "autocomplete"], fu
 
     var Controller = {
 
-        list2: function () {
-          console.log('66666')
-          ea.listen();
+        list: function () {
+
+            // 选择风格
+            xmSelect.render({
+                el: '#xm-fengge',
+                filterable: true,
+                toolbar: {show: true},
+                name: '风格',
+                // showCount: 1,
+                theme: {
+                    color: '#1cbbb4',
+                },
+                data: [
+                    {name: "基本款", value: "基本款", selected: ""},
+                    {name: "引流款", value: "引流款", selected: ""},
+                ]
+            })
+
         }
     };
     return Controller;

@@ -86,8 +86,11 @@ class Index
     {
         $redis = new Redis;
         echo '<pre>';
-        print_r($redis);
-        echo phpinfo();die;
+        print_r($redis->set('x',111));
+        die;
+        echo '<pre>';
+        print_r($redis);die;
+//        echo phpinfo();die;
 //        $res = SizeAllRatio::saveSizeRatio('B32502028');
 //        $res = SizeWarehouseRatio::saveSizeRatio('B32502028');
         $res = SizeAllRatio::newSaveSizeRatio('B42513009');
