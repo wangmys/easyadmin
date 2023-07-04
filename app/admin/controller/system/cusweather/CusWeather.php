@@ -182,8 +182,8 @@ class CusWeather extends AdminController
             $params = $params ? json_decode($params, true) : [];
 
             $header = [
-                ['省', 'province'],
                 ['云仓', 'yuncang'],
+                ['省', 'province'],
                 ['最低温', 'min_c'],
                 ['最高温', 'max_c'],
                 ['日期', 'weather_time'],

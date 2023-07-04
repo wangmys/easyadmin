@@ -102,13 +102,13 @@
                 <div class="flex row end between">
                     <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-province" class="xm-select-demo"></div>
-                            </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-yuncang" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -300,8 +300,8 @@
                 , height: 730
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                      { field: 'province', title: '省', align: 'center', rowspan: 1, fixed:'left'}
-                    , { field: 'yuncang', title: '云仓', align: 'center', rowspan: 1, fixed:'left'}
+                    { field: 'yuncang', title: '云仓', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'province', title: '省', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'min_c', title: '最低温', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'max_c', title: '最高温', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'weather_time', title: '日期', align: 'center', rowspan: 1, fixed:'left'}
