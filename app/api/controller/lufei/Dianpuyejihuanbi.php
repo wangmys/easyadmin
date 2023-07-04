@@ -475,16 +475,16 @@ class Dianpuyejihuanbi extends BaseController
             $today_date = date("Y-m-d", time());
         }
 
-        echo $today;
-        echo '<br>';
-        echo $last_month;
-        echo '<br>';
-        echo $last_month_today;
-        echo '<br>';
-        echo $current_month;
-        echo '<br>';
-        echo $today_date;
-        echo '<br>';
+        // echo $today;
+        // echo '<br>';
+        // echo $last_month;
+        // echo '<br>';
+        // echo $last_month_today;
+        // echo '<br>';
+        // echo $current_month;
+        // echo '<br>';
+        // echo $today_date;
+        // echo '<br>';
 
         // die;
 

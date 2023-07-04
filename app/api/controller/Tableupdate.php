@@ -663,31 +663,32 @@ class Tableupdate extends BaseController
             echo '没有数据更新';
             die;
         } 
-        $this->db_bi->getLastSql();
-
-        $handle = $this->db_easyA->table('customer')->where(1)->delete();
-
-        $select_customer = array_chunk($select_customer, 500);
-
-        foreach($select_customer as $key => $val) {
-            $insert = $this->db_easyA->table('customer')->insertAll($val);
-        }
-
-
+        // $this->db_bi->getLastSql();
         if ($select_customer) {
-            // $this->db_bi->commit();    
-            return json([
-                'status' => 1,
-                'msg' => 'success',
-                'content' => 'easyadmin2 customer 更新成功！'
-            ]);
-        } else {
-            // $this->db_bi->rollback();   
-            return json([
-                'status' => 0,
-                'msg' => 'error',
-                'content' => 'easyadmin2 customer 更新失败！'
-            ]);
+            $this->db_easyA->table('customer')->where(1)->delete();
+
+            $select_customer = array_chunk($select_customer, 500);
+    
+            foreach($select_customer as $key => $val) {
+                $insert = $this->db_easyA->table('customer')->strict(false)->insertAll($val);
+            }
+    
+    
+            if ($select_customer) {
+                // $this->db_bi->commit();    
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'easyadmin2 customer 更新成功！'
+                ]);
+            } else {
+                // $this->db_bi->rollback();   
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'easyadmin2 customer 更新失败！'
+                ]);
+            }   
         }
     }
 

@@ -172,7 +172,7 @@ class Tiaojia extends BaseController
             $select_chunk = array_chunk($select, 500);
     
             foreach($select_chunk as $key => $val) {
-                $status = $this->db_bi->table('cwl_yinliuzhanbi_retail_1day')->insertAll($val);
+                $status = $this->db_bi->table('cwl_yinliuzhanbi_retail_1day')->strict(false)->insertAll($val);
             }
             // $this->db_bi->table('cwl_yinliuzhanbi_retail_1day')->insertAll($select);
 

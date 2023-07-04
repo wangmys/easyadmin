@@ -153,7 +153,6 @@ class Skauto extends BaseController
                     ,EG.CategoryName2
                     ,EG.CategoryName
                     ,EG.GoodsNo
-                    ,FORMAT(ER.RetailDate, 'yyyy-MM-dd')
             -- ORDER BY ER.RetailDate ASC  
         ";
 
