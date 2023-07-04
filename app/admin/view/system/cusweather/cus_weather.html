@@ -185,7 +185,6 @@
 </html>
 <script src="__STATIC__/ok/lib/layui/layui.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
-<!-- 单店不动销 -->
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
       <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
@@ -202,11 +201,8 @@
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
-            // , url1 = "{:url('admin/system.Duanmalv/table4')}" 
             , url1 = "{:url('admin/system.cusweather.cusWeather/cus_weather')}" 
-            // , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table4')}" 
             , url_download_history_area = "{:url('admin/system.cusweather.cusWeather/excel_cus_weather')}" 
-            // , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
             , url_getXmMapSelect = "{:url('admin/system.cusweather.cusWeather/getXmMapSelect')}"
 
         initFn();

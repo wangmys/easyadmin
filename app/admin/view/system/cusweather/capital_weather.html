@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>省会天气</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yuncang" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$setTime1}" placeholder="yyyy-MM-dd">
+                            </div>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">结束日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$setTime2}" placeholder="yyyy-MM-dd">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex col between" style="width:5%; height: 70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.cusweather.cusWeather/capital_weather')}" 
+            , url_download_history_area = "{:url('admin/system.cusweather.cusWeather/excel_capital_weather')}" 
+            , url_getXmMapSelect = "{:url('admin/system.cusweather.cusWeather/getCapitalXmMapSelect')}"
+
+        initFn();
+        startTable();
+
+        //省
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            name: '省',
+            // showCount: 1,
+            data: []
+        })
+
+        //云仓
+        xmSelect.render({
+            el: '#xm-yuncang', 
+            filterable: true,
+            name: '云仓',
+            // showCount: 1,
+            data: []
+        })
+
+        // 日期选择器
+        laydate.render({
+            elem: '#setTime1'
+        });
+
+        laydate.render({
+            elem: '#setTime2'
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                console.log(res);
+
+                //省
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'province',
+                    data: res.data.province
+                })
+                //云仓
+                xmSelect.render({
+                    el: '#xm-yuncang', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'yuncang',
+                    data: res.data.yuncang
+                })
+                // 日期选择器
+                laydate.render({
+                    name:'setTime1',
+                    elem: '#setTime1'
+                });
+                laydate.render({
+                    name:'setTime2',
+                    elem: '#setTime2'
+                });
+
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        //导出全部
+        form.on('submit(downloadBtn)', function (data) {
+
+            $.post(url_download_history_area, data.field, function(res) {
+                // console.log(res) 
+                if (res.status == 1) {
+                    if (res.count <= res.init_output_num) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        // alert('数据量太大了，请保存以下链接，稍后通过该链接下载吧：'+res.app_domain+'/upload/weather/customer_weather_'+res.code+'.csv');
+                        // location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+            })
+
+            return false; 
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                // , toolbar: true
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 730
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: 'yuncang', title: '云仓', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'province', title: '省', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'min_c', title: '最低温', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'max_c', title: '最高温', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: 'weather_time', title: '日期', align: 'center', rowspan: 1, fixed:'left'}
+                    ]
+                ]
+                ,done: function (res, curr, count) {
+                    // $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
