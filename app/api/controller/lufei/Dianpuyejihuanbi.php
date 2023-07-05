@@ -748,9 +748,16 @@ class Dianpuyejihuanbi extends BaseController
                     ['日期', '<=', $last_month_today],
                     ['店铺名称', '=', $val['店铺名称']]
                 ])->group('店铺名称')->find();
-                $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
-                // 月度环比： (本月累计流水 /环比累计流水 )- 1
-                $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2);
+                // $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
+                // // 月度环比： (本月累计流水 /环比累计流水 )- 1
+                // $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2);
+                if ($huanbiliushui) {
+                    $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
+                    $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2); 
+                } else {
+                    $updateData['环比累计流水'] = 0;
+                    $updateData['月度环比'] = 0; 
+                }
             // 第5-22天 
             } elseif (strtotime($val['首单日期']) > strtotime($last_month) && strtotime($val['首单日期']) <= strtotime($last_month_today)) {
                 $current_month_start = date("Y-m-", time()) . date('d', strtotime($val['首单日期']));
@@ -769,9 +776,16 @@ class Dianpuyejihuanbi extends BaseController
                     ['日期', '<=', $last_month_today],
                     ['店铺名称', '=', $val['店铺名称']]
                 ])->group('店铺名称')->find();
-                $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
-                // 月度环比： (本月累计流水 /环比累计流水 )- 1
-                $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2);
+                // $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
+                // // 月度环比： (本月累计流水 /环比累计流水 )- 1
+                // $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2);
+                if ($huanbiliushui) {
+                    $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
+                    $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2); 
+                } else {
+                    $updateData['环比累计流水'] = 0;
+                    $updateData['月度环比'] = 0; 
+                }
             } else {
                 // echo '其他情况';
             }    
@@ -784,7 +798,8 @@ class Dianpuyejihuanbi extends BaseController
 
             // dump($updateData);die;
             $this->db_easyA->table('cwl_dianpuyejihuanbi_handle')->where([
-                ['店铺名称', '=', $updateData['店铺名称']]
+                ['店铺名称', '=', $updateData['店铺名称']],
+                ['更新日期', '=', $date]
             ])->strict(false)->update($updateData);
         }
     }
