@@ -2309,8 +2309,8 @@ class Duanmalv extends AdminController
             SELECT 领型 as name, 领型 as value FROM cwl_duanmalv_sk WHERE  领型 IS NOT NULL GROUP BY 领型
         ");
         $huohao = $this->db_easyA->query("
-        SELECT 货号 as name, 货号 as value FROM cwl_duanmalv_sk WHERE  货号 IS NOT NULL GROUP BY 货号
-    ");
+            SELECT 货号 as name, 货号 as value FROM cwl_duanmalv_sk WHERE  货号 IS NOT NULL GROUP BY 货号
+        ");
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();

@@ -132,29 +132,22 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-zhonglei" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">分类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fenlei" class="xm-select-demo"></div>
+                            </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-fengge" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">领型</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-lingxing" class="xm-select-demo"></div>
+                                <div id="xm-huohao" class="xm-select-demo"></div>
                             </div>
-                            <!-- <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">领型齐码率</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">售空提醒</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-lingxingqima" class="xm-select-demo"></div>
-                            </div> -->
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">领型齐码率% >=</label>
-                            <div class="layui-input-inline" style="width: 100px !important;">
-                                <input type="number" name='qimalvStart' autocomplete="off" value="0" maxlength="6" placeholder="0"
-                                    class="layui-input" lay-verify="required">
-                            </div> 
-
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">领型齐码率% <=</label>
-                            <div class="layui-input-inline" style="width: 100px !important;">
-                                <input type="number" name='qimalvEnd' autocomplete="off" value="99.9" maxlength="6" placeholder="99.9"
-                                    class="layui-input" lay-verify="required">
-                            </div> 
+                                <div id="xm-tips" class="xm-select-demo"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="flex col between" style="width:5%; height:70px;">
@@ -198,8 +191,8 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Skauto/skauto')}" 
-            , url_download_history_area = "{:url('admin/system.skauto/excel_skauto')}" 
-            , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
+            , url_download_history_area = "{:url('admin/system.Skauto/excel_skauto')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Skauto/getXmMapSelect')}"
 
         initFn();
         startTable();
@@ -271,15 +264,6 @@
             data: []
         })
 
-        // 选择领型
-        xmSelect.render({
-            el: '#xm-lingxing', 
-            filterable: true,
-            name: '领型',
-            // showCount: 1,
-            data: []
-        })
-
         xmSelect.render({
             el: '#xm-dalei', 
             filterable: true,
@@ -308,12 +292,47 @@
         })
 
         xmSelect.render({
+            el: '#xm-fenlei', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '分类',
+            // showCount: 1,
+            data: [
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-huohao', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '货号',
+            // showCount: 1,
+            data: [
+            ]
+        })
+
+        xmSelect.render({
             el: '#xm-customer17', 
             filterable: true,
             toolbar: {show: true},
             name: '商品专员',
             // showCount: 1,
             data: [
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-tips', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '售空提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "即将售空", value: "即将售空", selected: true},
+                {name: "售空", value: "售空", selected: ""},
             ]
         })
 
@@ -393,17 +412,29 @@
                     name:'中类',
                     data: res.data.zhonglei
                 })
-                // 渲染所有领型
+
+                // 渲染所有中类
                 xmSelect.render({
-                    el: '#xm-lingxing', 
+                    el: '#xm-fenlei', 
                     filterable: true,
                     toolbar: {show: true},
                     theme: {
                         color: '#1cbbb4',
                     },
                     // showCount: 1,
-                    name:'领型',
-                    data: res.data.lingxing
+                    name:'分类',
+                    data: res.data.fenlei
+                })
+                xmSelect.render({
+                    el: '#xm-huohao', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.huohao
                 })
             }, 'json')
         }
@@ -436,7 +467,6 @@
                 }
 
             })
-
             return false; 
         });
 
@@ -475,12 +505,12 @@
                      { field: '云仓', title: '云仓', fixed: 'left', align: 'center'}
                     , { field: '省份', title: '省份', fixed: 'left', align: 'center', width: 35}
                     , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center'}
-                    , { field: '经营模式', title: '性质', fixed: 'left', align: 'center'}
+                    , { field: '经营模式', title: '性质', fixed: 'left', align: 'center', width: 35}
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left' , align: 'center'}
-                    , { field: '一级分类', title: '大类', fixed: 'left' , align: 'center'}
+                    , { field: '一级分类', title: '大类', fixed: 'left' , align: 'center', width: 35}
                     , { field: '二级分类', title: '中类', fixed: 'left' , align: 'center'}
-                    , { field: '分类', title: '分类', fixed: 'left' , align: 'center'}
-                    , { field: '风格', title: '风格' ,fixed:'left', align: 'center'} 
+                    , { field: '分类', title: '分类', fixed: 'left' , align: 'center',width: 85}
+                    , { field: '风格', title: '风格' ,fixed:'left', align: 'center', width: 45} 
                     , { field: '货号', title: '货号' ,fixed:'left', align: 'center'}
                     , { field: '零售价', title: '零售价', align: 'center'}
                     , { field: '当前零售价', title: '当前零售价', fixed: 'left' , align: 'center'}
@@ -499,9 +529,9 @@
                     , { field: '售空提醒', title: '售空提醒', align: 'center', templet: function (data) {
                         if (data['售空提醒'] == '即将售空') {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<span style="color: red;">${data['售空提醒']}</span>`;
+                            return `<div style='color:red; font-weight:bold; background:yellow;'>${data['售空提醒']}</div>`;
                         } else if (data['售空提醒'] == '售空') {
-                            return `<span style="color: blue;">${data['售空提醒']}</span>`;
+                            return `<span style="color: red;">${data['售空提醒']}</span>`;
                         } else {
                             return '';
                         }

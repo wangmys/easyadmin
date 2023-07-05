@@ -14,7 +14,7 @@ use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Class Budongxiao
+ * Class ShopbuhuoB
  * @package app\admin\controller\system
  * @ControllerAnnotation(title="店铺补货2.0")
  */
