@@ -423,6 +423,9 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
 
     }
 
+    /**
+     * 获取窗数陈列标准配置
+     */
     public function get_skc_win_num() {
 
         $list = SpSkcWinNumModel::where([])->field('area_range,win_num,skc_fl,skc_yl,skc_xxdc,skc_num')->select();
@@ -923,6 +926,88 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
             'store_statistic_80' => $store_statistic_80,
             'store_statistic_80_less' => $store_statistic_80_less,
         ];
+
+    }
+
+    /**
+     * 获取裤台陈列标准配置
+     */
+    public function get_skc_kz_num() {
+
+        $list = SpSkcKzNumModel::where([])->field('id,kt_num,skc_cknz,skc_ckxx,skc_cksj')->select();
+        $list = $list ? $list->toArray() : [];
+        return $list;
+
+    }
+
+    /**
+     * 保存裤台陈列标准配置
+     */
+    public function save_skc_kz_num($data) {
+
+        $id = null;
+        if ($data) {
+            $id = $data['id'];
+            if ($id != '') {//更新
+
+                $data['skc_ckxj'] =  $data['skc_cknz']+$data['skc_ckxx']+$data['skc_cksj'];
+                SpSkcKzNumModel::where([['id', '=', $id]])->update($data);
+
+            } else {//插入
+
+                $data['skc_ckxj'] =  $data['skc_cknz']+$data['skc_ckxx']+$data['skc_cksj'];
+                $id = SpSkcKzNumModel::create($data);
+                $id = $id->id;
+
+            }
+        }
+        return $id;
+
+    }
+
+    /**
+     * 检测是否已存在
+     */
+    public function check_skc_kz_num($kt_num) {
+
+        return SpSkcKzNumModel::where([['kt_num', '=', $kt_num]])->field('id')->find();
+
+    }
+
+    /**
+     * 删除裤台陈列标准配置
+     */
+    public function del_skc_kz_num($id) {
+
+        return SpSkcKzNumModel::where([['id', '=', $id]])->delete();
+
+    }
+
+    /**
+     * 获取skc价格配置(裤子)
+     */
+    public function get_skc_kz_config() {
+
+        $list = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('config_str,dk_price,ck_price,skc_kz_nostore')->find();
+        $list = $list ? $list->toArray() : [];
+        $skc_kz_nostore = $list['skc_kz_nostore'] ? explode(',', $list['skc_kz_nostore']) : [];
+        //skc上装 不考核店铺处理
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $all_customers = array_column($all_customers, 'CustomerName');
+        $all_customers = array_combine($all_customers, $all_customers) ;
+        $arr = [];
+        foreach ($all_customers as $v_customer) {
+            $tmp_arr = [];
+            $tmp_arr['name'] = $v_customer;
+            $tmp_arr['value'] = $v_customer;
+            if (in_array($v_customer, $skc_kz_nostore)) {
+                $tmp_arr['selected'] = true;
+            }
+            $arr[] = $tmp_arr;
+        }
+        $list['skc_kz_nostore'] = $arr;
+
+        return $list;
 
     }
 
