@@ -78,6 +78,9 @@ class Duanmalv extends AdminController
     public function saveMap() {
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
+            if ($params['折率'] > 1.5) return json(['status' => 0, 'msg' => '折率设置不能大于1.5']);
+            if ($params['折率'] < 0.5) return json(['status' => 0, 'msg' => '折率设置不能小于0.5']);
+
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {

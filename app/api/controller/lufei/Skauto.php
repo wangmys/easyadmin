@@ -410,7 +410,7 @@ class Skauto extends BaseController
                 T.CategoryName2 AS 二级分类,
                 T.CategoryName AS 分类,
                 T.GoodsNo AS 货号,
-                SUM ( T.intransit_quantity ) AS 在途数量 
+                SUM ( T.intransit_quantity ) AS 在途库存
             FROM
                 (
                 SELECT
