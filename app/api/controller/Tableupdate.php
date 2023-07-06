@@ -673,7 +673,6 @@ class Tableupdate extends BaseController
                 $insert = $this->db_easyA->table('customer')->strict(false)->insertAll($val);
             }
     
-    
             if ($select_customer) {
                 // $this->db_bi->commit();    
                 return json([
@@ -706,7 +705,7 @@ class Tableupdate extends BaseController
         $select = array_chunk($select, 1000);
 
         foreach($select as $key => $val) {
-            $insert = $this->db_easyA->table('sjp_goods')->insertAll($val);
+            $insert = $this->db_easyA->table('sjp_goods')->strict(false)->insertAll($val);
         }
 
 
@@ -723,23 +722,34 @@ class Tableupdate extends BaseController
             SELECT
                 ER.CustomerName AS 店铺名称,
                 (
-                    SELECT TOP 1 RetailDate FROM
-                        ErpRetail  
-                    WHERE CustomerName = ER.CustomerName
-                    ORDER BY RetailDate ASC
+                SELECT TOP
+                    1 t1.RetailDate 
+                FROM
+                    ErpRetail t1
+                    LEFT JOIN ErpCustomer AS t2 ON t1.CustomerId = t2.CustomerId 
+                WHERE
+                    t1.CustomerName = ER.CustomerName 
+                    AND t2.CustomerCode = EC.CustomerCode 
+                ORDER BY
+                    t1.RetailDate ASC 
                 ) AS 首单日期,
                 EC.RegionId
+                ,
+                EC.CustomerCode 
             FROM
-                ErpRetail AS ER 
-            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                ErpRetail AS ER
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
             WHERE
-                ER.CodingCodeText = '已审结'
-                AND EC.ShutOut = 0	
-                AND EC.RegionId <> 55
-                AND EBC.Mathod IN ('直营', '加盟')
-            GROUP BY ER.CustomerName,EC.RegionId
+                ER.CodingCodeText = '已审结' 
+                AND EC.ShutOut = 0 
+                AND EC.RegionId <> 55 
+                AND EBC.Mathod IN ( '直营', '加盟' )    
+            GROUP BY
+                ER.CustomerName,
+                EC.RegionId,
+                EC.CustomerCode
         ";
         // 首单日期
         $select_firstDate = $this->db_sqlsrv->query($sql2);
@@ -748,8 +758,8 @@ class Tableupdate extends BaseController
         $this->db_easyA->execute('TRUNCATE customer_first;');
         $this->db_bi->execute('TRUNCATE customer_regionid;');
         
-        $insert_all = $this->db_easyA->table('customer_first')->insertAll($select_firstDate);
-        $insert_all2 = $this->db_bi->table('customer_regionid')->insertAll($select_firstDate);
+        $insert_all = $this->db_easyA->table('customer_first')->strict(false)->insertAll($select_firstDate);
+        $insert_all2 = $this->db_bi->table('customer_regionid')->strict(false)->insertAll($select_firstDate);
         if ($insert_all || $insert_all2) {
             // $this->db_bi->commit();    
             return json([

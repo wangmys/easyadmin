@@ -177,7 +177,7 @@ class Duanmalv extends BaseController
         }
     }
 
-    // 更新周销 进行排名
+    // 更新周销 进行排名  折率0.9
     public function retail_second() {
         // 更新零售价
         $sql0 = "update cwl_duanmalv_retail as r left join sjp_goods as g on r.`商品代码` = g.货号 
@@ -193,6 +193,9 @@ class Duanmalv extends BaseController
             `折率` IS NULL
         ";
         $this->db_easyA->execute($sql1);
+
+        // 获取配置项的折率
+        $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         
         // 分组排名
         $select = $this->db_easyA->query("
@@ -231,8 +234,8 @@ class Duanmalv extends BaseController
                     cwl_duanmalv_retail a,
                     ( SELECT @中类 := null,  @风格 := null,  @领型 := null, @rank := 0 ) T
                 WHERE
-                    折率 >= 0.9
-
+                    折率 >= {$find_config['折率']}
+                --  折率 >= 0.9    
                 -- 	AND 中类='休闲长裤'
                 -- 	AND 店铺名称 = '三江一店'
                 ORDER BY
@@ -247,7 +250,8 @@ class Duanmalv extends BaseController
 
             // 删除 需要计算排名的
             $this->db_easyA->table('cwl_duanmalv_retail')->where([
-                ['折率', '>=', 0.9]
+                // ['折率', '>=', 0.9]
+                ['折率', '>=', $find_config['折率']]
             ])->delete();
 
             $chunk_list = array_chunk($select, 500);
@@ -1101,6 +1105,9 @@ class Duanmalv extends BaseController
                     h.TOP断码SKC数 IS NULL
             ";
             $status = $this->db_easyA->execute($sql2);
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'sk_updatetime' => date('Y-m-d H:i:s')
+            ]);  
 
             if ($status) {
                 // $this->db_easyA->commit();
@@ -1157,6 +1164,9 @@ class Duanmalv extends BaseController
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table6')->strict(false)->insertAll($val);
             }
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'table6_updatetime' => date('Y-m-d H:i:s')
+            ]);  
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -1326,6 +1336,10 @@ class Duanmalv extends BaseController
                 $this->db_easyA->table('cwl_duanmalv_table4')->strict(false)->insertAll($val);
             }
 
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'table4_updatetime' => date('Y-m-d H:i:s')
+            ]);  
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -1473,6 +1487,11 @@ class Duanmalv extends BaseController
             $this->table1_1_sort();   
 
             $this->table1_avg();
+
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'table1_updatetime' => date('Y-m-d H:i:s'),
+                'table1_month_updatetime' => date('Y-m-d H:i:s'),
+            ]);  
         }
     }
 
@@ -1669,6 +1688,9 @@ class Duanmalv extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_2')->strict(false)->insertAll($val);
             }
             $this->table1_2_sort();   
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'table1_2_updatetime' => date('Y-m-d H:i:s')
+            ]);  
         }
     }
 
@@ -1797,6 +1819,10 @@ class Duanmalv extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
             }
             $this->table1_3_sort();   
+
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+                'table1_3_updatetime' => date('Y-m-d H:i:s')
+            ]); 
         }
     }
 

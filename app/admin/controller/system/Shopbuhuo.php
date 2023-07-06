@@ -14,11 +14,11 @@ use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Class Budongxiao
+ * Class Shopbuhuo
  * @package app\admin\controller\system
- * @ControllerAnnotation(title="店铺补货2.0")
+ * @ControllerAnnotation(title="店铺补货1.0")
  */
-class ShopbuhuoB extends AdminController
+class Shopbuhuo extends AdminController
 {
     // 接收筛选参数
     public $params = [];
