@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>夏季裤装满足情况</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">夏季裤装满足情况 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.skc.Skc/get_kz_statistic')}" 
+
+        startTable();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                , toolbar: '#toolbar1'
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 780
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                     { field: 'goods_manager', title: '负责人', align: 'center', rowspan: 2,fixed:'left'}
+                    , { title: '裤柜个数', colspan: 10, align: 'center' } 
+                    , { title: '满足率100%', colspan: 10, align: 'center' } 
+                    , { title: '满足率90%', colspan: 10, align: 'center' } 
+                    , { title: '满足率80%', colspan: 10, align: 'center' } 
+                    , { title: '满足率80%以下', colspan: 10, align: 'center' } 
+                    ],
+
+                    [ 
+                    { field: '1_kthj_num', title: '1', align: 'center'}
+                    , { field: '2_kthj_num', title: '2', align: 'center'}
+                    , { field: '3_kthj_num', title: '3', align: 'center'}
+                    , { field: '4_kthj_num', title: '4' , align: 'center'}
+                    , { field: '5_kthj_num', title: '5' , align: 'center'}
+                    , { field: '6_kthj_num', title: '6' , align: 'center'}
+                    , { field: '7_kthj_num', title: '7' , align: 'center'}
+                    , { field: '8_kthj_num', title: '8' , align: 'center'}
+                    , { field: '9_kthj_num', title: '9以上' , align: 'center'}
+                    , { field: 'manager_store_num', title: '合计' , align: 'center'}
+
+                    , { field: '1_kthj_num_100', title: '1', align: 'center'}
+                    , { field: '2_kthj_num_100', title: '2' , align: 'center'}
+                    , { field: '3_kthj_num_100', title: '3', align: 'center'}
+                    , { field: '4_kthj_num_100', title: '4' , align: 'center'}
+                    , { field: '5_kthj_num_100', title: '5' , align: 'center'}
+                    , { field: '6_kthj_num_100', title: '6' , align: 'center'}
+                    , { field: '7_kthj_num_100', title: '7' , align: 'center'}
+                    , { field: '8_kthj_num_100', title: '8' , align: 'center'}
+                    , { field: '9_kthj_num_100', title: '9以上' , align: 'center'}
+                    , { field: 'manager_store_num_100', title: '合计' , align: 'center'}
+
+                    , { field: '1_kthj_num_90', title: '1' , align: 'center'}
+                    , { field: '2_kthj_num_90', title: '2' , align: 'center'}
+                    , { field: '3_kthj_num_90', title: '3', align: 'center'}
+                    , { field: '4_kthj_num_90', title: '4' , align: 'center'}
+                    , { field: '5_kthj_num_90', title: '5' , align: 'center'}
+                    , { field: '6_kthj_num_90', title: '6' , align: 'center'}
+                    , { field: '7_kthj_num_90', title: '7' , align: 'center'}
+                    , { field: '8_kthj_num_90', title: '8' , align: 'center'}
+                    , { field: '9_kthj_num_90', title: '9以上' , align: 'center'}
+                    , { field: 'manager_store_num_90', title: '合计' , align: 'center'}
+                    
+                    , { field: '1_kthj_num_80', title: '1' , align: 'center', width: 100}
+                    , { field: '2_kthj_num_80', title: '2' , align: 'center'}
+                    , { field: '3_kthj_num_80', title: '3', align: 'center'}
+                    , { field: '4_kthj_num_80', title: '4' , align: 'center'}
+                    , { field: '5_kthj_num_80', title: '5' , align: 'center'}
+                    , { field: '6_kthj_num_80', title: '6' , align: 'center'}
+                    , { field: '7_kthj_num_80', title: '7' , align: 'center'}
+                    , { field: '8_kthj_num_80', title: '8' , align: 'center'}
+                    , { field: '9_kthj_num_80', title: '9以上' , align: 'center'}
+                    , { field: 'manager_store_num_80', title: '合计' , align: 'center'}
+
+                    , { field: '1_kthj_num_80_less', title: '1' , align: 'center'}
+                    , { field: '2_kthj_num_80_less', title: '2' , align: 'center'}
+                    , { field: '3_kthj_num_80_less', title: '3', align: 'center'}
+                    , { field: '4_kthj_num_80_less', title: '4' , align: 'center'}
+                    , { field: '5_kthj_num_80_less', title: '5' , align: 'center'}
+                    , { field: '6_kthj_num_80_less', title: '6' , align: 'center'}
+                    , { field: '7_kthj_num_80_less', title: '7' , align: 'center'}
+                    , { field: '8_kthj_num_80_less', title: '8' , align: 'center'}
+                    , { field: '9_kthj_num_80_less', title: '9以上' , align: 'center'}
+                    , { field: 'manager_store_num_80_less', title: '合计' , align: 'center'}
+                    ]
+                ]
+                ,done: function (res, curr, count) {
+                    //$('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
