@@ -1,0 +1,35 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-kzskc_config-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">短裤价格</th>
+                <th style="width: 120px;">长裤价格</th>
+                <th style="width: 300px;">不展示店铺数据</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="kzskc_config-select" lay-data="{:htmlspecialchars(json_encode($kzskc_config))}">
+                <td class="dk_price">
+                    <input type="text" name="dk_price" lay-verify="required" placeholder="请输入" value="{$kzskc_config['dk_price']}" class="layui-input">
+                </td>
+                <td class="ck_price">
+                    <input type="text" name="ck_price" lay-verify="required" placeholder="请输入" value="{$kzskc_config['ck_price']}" class="layui-input">
+                </td>
+
+                <td class="skc_kz_nostore"></td>
+
+                <td class="handler">
+                    <input type="text" name="sign_id" class="layui-hide" value="{$kzskc_config['config_str']}">
+                    <button type="button" class="layui-btn layui-btn-normal get_kzskc_config">保存</button>
+                    <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                </td>
+            </tr>
+       
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="kzskc_config" class="layui-hide" value="{:htmlspecialchars(json_encode($kzskc_config))}">

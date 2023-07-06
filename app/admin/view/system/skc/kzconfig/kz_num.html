@@ -1,0 +1,46 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-kz_num-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">裤台</th>
+                <th style="width: 120px;">长裤品类需求-牛仔</th>
+                <th style="width: 120px;">长裤品类需求-休闲</th>
+                <th style="width: 120px;">长裤品类需求-松紧</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4">
+                    <span>添加操作</span>
+                </td>
+                <td colspan="1">
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn add_kz_num">增加</button>
+                    </div>
+                </td>
+            </tr>
+        {foreach $kz_num_list as $vo}
+        <tr class="skc_kz_num-select" lay-data="{:htmlspecialchars(json_encode($vo['id']))}">
+            {foreach $vo as $key => $val}
+            {if ($key!='id')}
+            <td class="{$key}">
+                <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入" value="{$val}" class="layui-input">
+            </td>
+            {/if}
+            {/foreach}
+            <td class="handler">
+                <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                <button type="button" class="layui-btn layui-btn-normal get">保存</button>
+                <button type="button" class="layui-btn layui-btn-danger del">删除</button>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="kz_num_head" class="layui-hide" value="{:htmlspecialchars(json_encode($kz_num_head))}">
+<input type="text" id="kz_num_list" class="layui-hide" value="{:htmlspecialchars(json_encode($kz_num_list))}">
