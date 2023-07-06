@@ -1106,7 +1106,7 @@ class Duanmalv extends BaseController
             ";
             $status = $this->db_easyA->execute($sql2);
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['sk_updatetime', '=', date('Y-m-d H:i:s')]
+                'sk_updatetime' => date('Y-m-d H:i:s')
             ]);  
 
             if ($status) {
@@ -1165,7 +1165,7 @@ class Duanmalv extends BaseController
                 $this->db_easyA->table('cwl_duanmalv_table6')->strict(false)->insertAll($val);
             }
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['table6_updatetime', '=', date('Y-m-d H:i:s')]
+                'table6_updatetime' => date('Y-m-d H:i:s')
             ]);  
             return json([
                 'status' => 1,
@@ -1337,7 +1337,7 @@ class Duanmalv extends BaseController
             }
 
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['table4_updatetime', '=', date('Y-m-d H:i:s')]
+                'table4_updatetime' => date('Y-m-d H:i:s')
             ]);  
 
             return json([
@@ -1489,7 +1489,8 @@ class Duanmalv extends BaseController
             $this->table1_avg();
 
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['table1_updatetime', '=', date('Y-m-d H:i:s')]
+                'table1_updatetime' => date('Y-m-d H:i:s'),
+                'table1_month_updatetime' => date('Y-m-d H:i:s'),
             ]);  
         }
     }
@@ -1688,7 +1689,7 @@ class Duanmalv extends BaseController
             }
             $this->table1_2_sort();   
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['table1_2_updatetime', '=', date('Y-m-d H:i:s')]
+                'table1_2_updatetime' => date('Y-m-d H:i:s')
             ]);  
         }
     }
@@ -1820,7 +1821,7 @@ class Duanmalv extends BaseController
             $this->table1_3_sort();   
 
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
-                ['table1_3_updatetime', '=', date('Y-m-d H:i:s')]
+                'table1_3_updatetime' => date('Y-m-d H:i:s')
             ]); 
         }
     }
