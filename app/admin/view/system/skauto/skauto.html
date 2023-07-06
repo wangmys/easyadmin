@@ -521,11 +521,32 @@
                     , { field: '总入量', title: '总入量', align: 'center'}
                     , { field: '累销数量', title: '累销数量', align: 'center'}
                     , { field: '店铺库存', title: '店铺库存', align: 'center'}
-                    , { field: '在途库存', title: '在途库存', align: 'center'}
-                    , { field: '已配未发', title: '已配未发', align: 'center'}
+                    , { field: '在途库存', title: '在途库存', align: 'center', templet: function (data) {
+                        if (data['在途库存']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return data['在途库存'];
+                        } else {
+                            return '';
+                        }
+                    }}
+                    , { field: '已配未发', title: '已配未发', align: 'center', templet: function (data) {
+                        if (data['已配未发']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return data['已配未发'];
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: '近一周销', title: '近一周销', align: 'center'}
                     , { field: '近两周销', title: '近两周销', align: 'center'}
-                    , { field: '云仓数量', title: '云仓数量', align: 'center'}
+                    , { field: '云仓数量', title: '云仓数量', align: 'center', templet: function (data) {
+                        if (data['云仓数量']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return data['云仓数量'];
+                        } else {
+                            return '';
+                        }
+                    }}
                     , { field: '售空提醒', title: '售空提醒', align: 'center', templet: function (data) {
                         if (data['售空提醒'] == '即将售空') {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
