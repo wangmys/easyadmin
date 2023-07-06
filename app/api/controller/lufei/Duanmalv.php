@@ -52,6 +52,9 @@ class Duanmalv extends BaseController
     public function retail_first() {
         $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         $seasion = $this->seasionHandle($select_config['季节归集']); 
+        // 不考核门店
+        $noCustomer = xmSelectInput($select_config['不考核门店']);
+
         $sql = "   
             SELECT TOP
                 300000 EC.CustomItem17 AS 商品负责人,
@@ -123,6 +126,7 @@ class Duanmalv extends BaseController
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('2023')
+                AND ER.CustomerName NOT IN ( {$noCustomer} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
@@ -280,6 +284,9 @@ class Duanmalv extends BaseController
     {
         $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         $seasion = $this->seasionHandle($select_config['季节归集']); 
+        // 不考核门店
+        $noCustomer = xmSelectInput($select_config['不考核门店']);
+
         $sql = "
             SELECT 
                 sk.云仓,
@@ -502,6 +509,7 @@ class Duanmalv extends BaseController
                 WHERE
                     sk.季节 IN ({$seasion}) 
                     AND c.Region <> '闭店区'
+                    AND sk.店铺名称 NOT IN ({$noCustomer})
                 --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'

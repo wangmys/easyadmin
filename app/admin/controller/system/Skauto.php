@@ -52,6 +52,10 @@ class Skauto extends AdminController
         ]);
     }
 
+    public function getMapData() {
+        // guojingli_shujuyuan_all
+    }
+
     public function saveMap() {
         if (request()->isAjax() && checkAdmin()) {
             $params = input();

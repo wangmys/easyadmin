@@ -169,6 +169,11 @@
                                     <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" maxlength="4" placeholder="0"
                                         class="layui-input" lay-verify="required">
                                 </div> 
+
+                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核门店</label>
+                                <div class="layui-input-inline" style="width: 600px !important;">
+                                    <div id="xm-no-customer" class="xm-select-demo"></div>
+                                </div>
                             </div>  
                         </div>
                     </div>
@@ -197,9 +202,19 @@
             , table = layui.table
             , laydate = layui.laydate
             , url_saveMap = "{:url('admin/system.Duanmalv/saveMap')}"  
+            , getConfigMapData = "{:url('admin/system.Duanmalv/getConfigMapData')}"
 
         // 数据初始化
         initFn(); 
+
+        // 选择店铺
+        xmSelect.render({
+            el: '#xm-no-customer', 
+            filterable: true,
+            name: '不考核门店',
+            // showCount: 1,
+            data: []
+        })
 
 
         //监听保存
@@ -215,6 +230,27 @@
         });
 
         function initFn() {
+            $.get(getConfigMapData, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                // storeData = res.data.storeAll
+                // provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+
+                xmSelect.render({
+                    el: '#xm-no-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'不考核门店',
+                    data: res.data.customer
+                })
+                // console.log(res.data.customer);
+
+                
+            })
             $("#season_id").val("{$config['季节归集']}");
             form.render();
         }

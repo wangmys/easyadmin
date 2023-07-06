@@ -52,12 +52,33 @@ class Duanmalv extends AdminController
         ]);
     }
 
+    public function getConfigMapData() {
+        $customer_all = $this->db_easyA->query("
+            SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
+        ");
+
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店')->where('id=1')->find();
+        $select_noCustomer = explode(',', $select_config['不考核门店']);
+
+        // 不考核门店选中
+        foreach ($select_noCustomer as $key => $val) {
+            foreach ($customer_all as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $customer_all[$key2]['selected'] = true;
+                }
+            } 
+        }
+        
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all]]);
+    }
+
     public function saveMap() {
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
-
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
-
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {
             return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
