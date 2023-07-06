@@ -1133,6 +1133,7 @@ class Duanmalv extends AdminController
             ";
         $select_date = $this->db_easyA->query($sql1);
 
+        dump($select_date);die;
         // die;
     
         if (request()->isAjax()) {

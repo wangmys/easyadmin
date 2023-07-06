@@ -354,7 +354,7 @@
                     , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
                     , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { title: '【{$select_date[8]["weekStr"]}】 {$select_date[8]["更新日期"]}', align: 'center' ,colspan: 3, myData:111}
+                    , { title: '【{!empty($select_date[8]["weekStr"]) ? $select_date[8]["weekStr"] : ""}】 {!empty($select_date[9]["weekStr"]) ? $select_date[9]["更新日期"] : ""}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
@@ -409,8 +409,8 @@
                     , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
                     , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
-                    , { title: '【{!empty($select_date[9]["weekStr"]) ? $select_date[9]["weekStr"] : ""}】 {!empty($select_date[9]["weekStr"]) ? $select_date[9]["weekStr"] : ""}', align: 'center' ,colspan: 3}
-                    , { title: '【{$select_date[8]["weekStr"]}】 {$select_date[8]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{!empty($select_date[9]["weekStr"]) ? $select_date[9]["weekStr"] : ""}】 {!empty($select_date[9]["weekStr"]) ? $select_date[9]["更新日期"] : ""}', align: 'center' ,colspan: 3}
+                    , { title: '【{!empty($select_date[8]["weekStr"]) ? $select_date[8]["weekStr"] : ""}】 {!empty($select_date[8]["weekStr"]) ? $select_date[8]["更新日期"] : ""}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
                     , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
