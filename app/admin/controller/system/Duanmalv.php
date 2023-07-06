@@ -10,7 +10,7 @@ use app\common\controller\AdminController;
 use jianyan\excel\Excel;
 
 /**
- * Class Budongxiao
+ * Class Duanmalv
  * @package app\admin\controller\system
  * @ControllerAnnotation(title="断码率")
  */
@@ -191,10 +191,11 @@ class Duanmalv extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="单店断码明细") 表7
+     * @NodeAnotation(title="sk") 
      */
     public function sk() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -377,18 +378,18 @@ class Duanmalv extends AdminController
             ";
             $count = $this->db_easyA->query($sql2);
 
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => $find_config['sk_updatetime']]);
         } else {
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('sk', [
-
+                'admin' => $admin
             ]);
         }
-    }
-
-    public function test() {
-        return View('test', [
-
-        ]); 
     }
 
     /**
@@ -445,10 +446,11 @@ class Duanmalv extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="单店品类断码情况") 
+     * @NodeAnotation(title="单店品类断码情况table6") 
      */
     public function table6() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -577,10 +579,16 @@ class Duanmalv extends AdminController
             ";
             $count = $this->db_easyA->query($sql2);
 
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => $find_config['table6_updatetime']]);
         } else {
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('table6', [
-
+                'admin' => $admin
             ]);
         }        
     }
@@ -639,10 +647,11 @@ class Duanmalv extends AdminController
     }
 
      /**
-     * @NodeAnotation(title="单店单款断码情况") 
+     * @NodeAnotation(title="单省单款断码情况table4") 
      */
     public function table4() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -849,158 +858,19 @@ class Duanmalv extends AdminController
             ";
             $count = $this->db_easyA->query($sql2);
 
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => $find_config['table4_updatetime']]);
         } else {
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('table4', [
-
+                'admin' => $admin
             ]);
         }        
-    }
-
-    // 下载单店单款断码情况
-    public function excel_table4() {
-        $sql = "
-            SELECT
-                t4.风格,
-                t4.大类,
-                t4.中类,
-                t4.领型,
-                t4.货号,
-                yn.省份 as '省份-滇',
-                yn.上柜数 as '上柜数-滇',
-                yn.断码家数 as '断码家数-滇',
-                yn.断码率 as '断码率-滇',
-                yn.周转 as '周转-滇',
-                sc.省份 as '省份-蜀',
-                sc.上柜数 as '上柜数-蜀',
-                sc.断码家数 as '断码家数-蜀',
-                sc.断码率 as '断码率-蜀',
-                sc.周转 as '周转-蜀',
-                tj.省份 as '省份-津',
-                tj.上柜数 as '上柜数-津',
-                tj.断码家数 as '断码家数-津',
-                tj.断码率 as '断码率-津',
-                tj.周转 as '周转-津',
-                nx.省份 as '省份-宁',
-                nx.上柜数 as '上柜数-宁',
-                nx.断码家数 as '断码家数-宁',
-                nx.断码率 as '断码率-宁',
-                nx.周转 as '周转-宁',
-                ah.省份 as '省份-皖',
-                ah.上柜数 as '上柜数-皖',
-                ah.断码家数 as '断码家数-皖',
-                ah.断码率 as '断码率-皖',
-                ah.周转 as '周转-皖',
-                gd.省份 as '省份-粤',
-                gd.上柜数 as '上柜数-粤',
-                gd.断码家数 as '断码家数-粤',
-                gd.断码率 as '断码率-粤',
-                gd.周转 as '周转-粤',
-                gx.省份 as '省份-桂',
-                gx.上柜数 as '上柜数-桂',
-                gx.断码家数 as '断码家数-桂',
-                gx.断码率 as '断码率-桂',
-                gx.周转 as '周转-桂',
-                xj.省份 as '省份-新',
-                xj.上柜数 as '上柜数-新',
-                xj.断码家数 as '断码家数-新',
-                xj.断码率 as '断码率-新',
-                xj.周转 as '周转-新',
-                jx.省份 as '省份-赣',
-                jx.上柜数 as '上柜数-赣',
-                jx.断码家数 as '断码家数-赣',
-                jx.断码率 as '断码率-赣',
-                jx.周转 as '周转-赣',
-                henan.省份 as '省份-豫',
-                henan.上柜数 as '上柜数-豫',
-                henan.断码家数 as '断码家数-豫',
-                henan.断码率 as '断码率-豫',
-                henan.周转 as '周转-豫',
-                zj.省份 as '省份-浙',
-                zj.上柜数 as '上柜数-浙',
-                zj.断码家数 as '断码家数-浙',
-                zj.断码率 as '断码率-浙',
-                zj.周转 as '周转-浙',
-                hainan.省份 as '省份-琼',
-                hainan.上柜数 as '上柜数-琼',
-                hainan.断码家数 as '断码家数-琼',
-                hainan.断码率 as '断码率-琼',
-                hainan.周转 as '周转-琼',
-                hb.省份 as '省份-鄂',
-                hb.上柜数 as '上柜数-鄂',
-                hb.断码家数 as '断码家数-鄂',
-                hb.断码率 as '断码率-鄂',
-                hb.周转 as '周转-鄂',
-                hunan.省份 as '省份-湘',
-                hunan.上柜数 as '上柜数-湘',
-                hunan.断码家数 as '断码家数-湘',
-                hunan.断码率 as '断码率-湘',
-                hunan.周转 as '周转-湘',
-                gs.省份 as '省份-甘',
-                gs.上柜数 as '上柜数-甘',
-                gs.断码家数 as '断码家数-甘',
-                gs.断码率 as '断码率-甘',
-                gs.周转 as '周转-甘',
-                fj.省份 as '省份-闽',
-                fj.上柜数 as '上柜数-闽',
-                fj.断码家数 as '断码家数-闽',
-                fj.断码率 as '断码率-闽',
-                fj.周转 as '周转-闽',
-                gz.省份 as '省份-贵',
-                gz.上柜数 as '上柜数-贵',
-                gz.断码家数 as '断码家数-贵',
-                gz.断码率 as '断码率-贵',
-                gz.周转 as '周转-贵',
-                cq.省份 as '省份-渝',
-                cq.上柜数 as '上柜数-渝',
-                cq.断码家数 as '断码家数-渝',
-                cq.断码率 as '断码率-渝',
-                cq.周转 as '周转-渝',
-                xx.省份 as '省份-陕',
-                xx.上柜数 as '上柜数-陕',
-                xx.断码家数 as '断码家数-陕',
-                xx.断码率 as '断码率-陕',
-                xx.周转 as '周转-陕',
-                qh.省份 as '省份-青',
-                qh.上柜数 as '上柜数-青',
-                qh.断码家数 as '断码家数-青',
-                qh.断码率 as '断码率-青',
-                qh.周转 as '周转-青'
-            FROM
-                cwl_duanmalv_table4 AS t4
-                left join cwl_duanmalv_table4 as yn on t4.货号=yn.货号 and yn.省份='云南省'
-                left join cwl_duanmalv_table4 as sc on t4.货号=sc.货号 and sc.省份='四川省'
-                left join cwl_duanmalv_table4 as tj on t4.货号=tj.货号 and tj.省份='天津'
-                left join cwl_duanmalv_table4 as nx on t4.货号=nx.货号 and nx.省份='宁夏回族自治区'
-                left join cwl_duanmalv_table4 as ah on t4.货号=ah.货号 and ah.省份='安徽省'
-                left join cwl_duanmalv_table4 as gd on t4.货号=gd.货号 and gd.省份='广东省'
-                left join cwl_duanmalv_table4 as gx on t4.货号=gx.货号 and gx.省份='广西壮族自治区'
-                left join cwl_duanmalv_table4 as xj on t4.货号=xj.货号 and xj.省份='新疆维吾尔自治区'
-                left join cwl_duanmalv_table4 as jx on t4.货号=jx.货号 and jx.省份='江西省'
-                left join cwl_duanmalv_table4 as henan on t4.货号=henan.货号 and henan.省份='河南省'
-                left join cwl_duanmalv_table4 as zj on t4.货号=zj.货号 and zj.省份='浙江省'
-                left join cwl_duanmalv_table4 as hainan on t4.货号=hainan.货号 and hainan.省份='海南省'
-                left join cwl_duanmalv_table4 as hb on t4.货号=hb.货号 and hb.省份='湖北省'
-                left join cwl_duanmalv_table4 as hunan on t4.货号=hunan.货号 and hunan.省份='湖南省'
-                left join cwl_duanmalv_table4 as gs on t4.货号=gs.货号 and gs.省份='甘肃省'
-                left join cwl_duanmalv_table4 as fj on t4.货号=fj.货号 and fj.省份='福建省'
-                left join cwl_duanmalv_table4 as gz on t4.货号=gz.货号 and gz.省份='贵州省'
-                left join cwl_duanmalv_table4 as cq on t4.货号=cq.货号 and cq.省份='重庆'
-                left join cwl_duanmalv_table4 as xx on t4.货号=xx.货号 and xx.省份='陕西省'
-                left join cwl_duanmalv_table4 as qh on t4.货号=qh.货号 and qh.省份='青海省'
-            --  where sk.省份='浙江省'
-            --  and sk.货号='B32502003'
-            GROUP BY
-            t4.风格, t4.大类, t4.中类, t4.货号
-            ORDER BY t4.风格
-        ";
-        $select = $this->db_easyA->query($sql);
-        $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
-        }
-        return Excel::exportData($select, $header, '单店单款断码情况_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
-    }    
+    }  
 
     public function seasionHandle($seasion = "春季") {
         $seasionStr = "";
@@ -1031,9 +901,12 @@ class Duanmalv extends AdminController
         return $map;
     }
 
-    // 整体 1_1
+     /**
+     * @NodeAnotation(title="整体-单店 统计table1") 
+     */
     public function table1() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);  
             // 筛选条件
@@ -1127,18 +1000,28 @@ class Duanmalv extends AdminController
  
             $select = $this->db_easyA->query($sql);
 
-            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => $find_config['table1_updatetime']]);
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('table1', [
-                'limitDate' => $limitDate
+                'limitDate' => $limitDate,
+                'admin' => $admin
             ]);
         }  
     }
 
-    // table1 整月数据版本
+    /**
+     * @NodeAnotation(title="整体-单店月份 统计 table1_month") 
+     */
     public function table1_month() {
+        $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         $today = date('Y-m-d');
         $dayLast30 = date('Y-m-d', strtotime('-1 month'));
         $sql1= "
@@ -1245,7 +1128,7 @@ class Duanmalv extends AdminController
             // die;
 
             $select = $this->db_easyA->query($sql2);
-            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => $find_config['table1_month_updatetime']]);
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
@@ -1260,9 +1143,12 @@ class Duanmalv extends AdminController
 
     }
 
-    // 整体 1_2
+     /**
+     * @NodeAnotation(title="整体-负责人 统计table1_2") 
+     */
     public function table1_2() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         // if (1) {
             // 筛选条件
             $input = input();
@@ -1719,12 +1605,19 @@ class Duanmalv extends AdminController
             // print_r($select);die;
 
             // die;
-            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select, 'avg' => $select2, 'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select, 'avg' => $select2, 'create_time' => $find_config['table1_2_updatetime']]);
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('table1_2', [
-                'limitDate' => $limitDate
+                'limitDate' => $limitDate,
+                'admin' => $admin
             ]);
         }  
     }
@@ -1761,9 +1654,12 @@ class Duanmalv extends AdminController
 
     }
 
-    // 整体 1_3
+     /**
+     * @NodeAnotation(title="整体-省份 统计table1_3") 
+     */
      public function table1_3() {
         if (request()->isAjax()) {
+            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -2301,12 +2197,19 @@ class Duanmalv extends AdminController
             // 合并
             array_push($select, $select2[0]);
 
-            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => count($select),  "data" => $select,  'create_time' => $find_config['table1_3_updatetime']]);
         } else {
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $admin = session('admin.name');       
+            } else {
+                $admin = '';
+            }
             return View('table1_3', [
-                'limitDate' => $limitDate
+                'limitDate' => $limitDate,
+                'admin' => $admin
             ]);
         }  
     }
@@ -2314,10 +2217,37 @@ class Duanmalv extends AdminController
 
     // 获取筛选栏多选参数
     public function getXmMapSelect() {
+        // $customer_all = $this->db_easyA->query("
+        //     SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
+        // ");
+
+        // $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店')->where('id=1')->find();
+        // $select_noCustomer = explode(',', $select_config['不考核门店']);
+
+        // // 不考核门店选中
+        // foreach ($select_noCustomer as $key => $val) {
+        //     foreach ($customer_all as $key2 => $val2) {
+        //         if ($val == $val2['name']) {
+        //             $customer_all[$key2]['selected'] = true;
+        //         }
+        //     } 
+        // }
+
         // 商品负责人
         $customer17 = $this->db_easyA->query("
             SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_duanmalv_sk WHERE 商品负责人 IS NOT NULL GROUP BY 商品负责人
         ");
+        // 商品负责人
+        if (! checkAdmin()) { 
+            // $admin = session('admin.name');
+            // 不考核门店选中
+            foreach ($customer17 as $key => $val) {
+                if ($val['name'] == session('admin.name')) {
+                    $customer17[$key]['selected'] = true;
+                    break;
+                }
+            }            
+        }
         $province = $this->db_easyA->query("
             SELECT 省份 as name, 省份 as value FROM cwl_duanmalv_sk WHERE 省份 IS NOT NULL GROUP BY 省份
         ");
