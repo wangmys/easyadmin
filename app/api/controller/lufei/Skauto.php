@@ -769,9 +769,9 @@ class Skauto extends BaseController
             (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) as test,
             t1.*,
             case
-            when t1.总入量 - t1.累销数量 <=0 then '售空'
+            when t1.总入量 - t1.累销数量 <=0 and t1.店铺库存 <=0 then '售空'
             when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
-                and t1.店铺库存>0 and t1.店铺库存<=5 then '即将售空'
+                and t1.店铺库存>0 and t1.店铺库存 <=5 then '即将售空'
             end as 售空提醒
             from  
             (select 
