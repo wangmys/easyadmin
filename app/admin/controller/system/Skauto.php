@@ -35,20 +35,12 @@ class Skauto extends AdminController
      * 
      */
     public function config() {
-        // $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
-        
-        // // 商品负责人
-        // $people = SpWwBudongxiaoDetail::getPeople([
-        //     ['商品负责人', 'exp', new Raw('IS NOT NULL')]
-        // ]);
-
-        // // 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
         
         // dump($select_config );die;
 
         return View('config', [
-            'config' => $select_config,
+            'config' => $find_config,
         ]);
     }
 
@@ -60,7 +52,7 @@ class Skauto extends AdminController
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
 
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
+            $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update($params);     
 
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {
