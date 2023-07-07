@@ -215,8 +215,8 @@ class Skauto extends AdminController
                     {$map11}
             ";
             $count = $this->db_easyA->query($sql2);
-
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => date('Y-m-d')]);
+            $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['skauto_res_updatetime']]);
         } else {
             return View('skauto', [
 

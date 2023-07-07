@@ -763,14 +763,16 @@ class Skauto extends BaseController
         ]);
     }
 
+    // 店留量 30%
     public function updateSkautoRes() {
+        $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
         $sql = "
         select 
             (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) as test,
             t1.*,
             case
             when t1.总入量 - t1.累销数量 <=0 and t1.店铺库存 <=0 then '售空'
-            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
+            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= {$find_config['店留量']}
                 and t1.店铺库存>0 and t1.店铺库存 <=5 then '即将售空'
             end as 售空提醒
             from  
@@ -780,18 +782,18 @@ class Skauto extends BaseController
                     IFNULL(已配未发, 0) as 已配未发
                     from cwl_skauto 
             where 
-            `销售天数`<=25 
-            and 总入量 > 2
-            and ( 折率 >= 1 || (折率 < 1 AND 
+            `销售天数`<= {$find_config['销售天数']} 
+            and 总入量 > {$find_config['总入量']} 
+            and ( 折率 >= {$find_config['折率']} || (折率 < {$find_config['折率']} AND 
                     (
-                            (二级分类 = '短T' AND 当前零售价 > 50) 
-                        OR (二级分类 = '休闲短衬' AND 当前零售价 > 80)
-                        OR (二级分类 = '休闲短裤' AND 当前零售价 > 70) 
-                        OR (二级分类 = '松紧短裤' AND 当前零售价 > 70) 
-                        OR (二级分类 = '牛仔短裤' AND 当前零售价 > 70) 
-                        OR (二级分类 = '休闲长裤' AND 当前零售价 > 100) 
-                        OR (二级分类 = '牛仔长裤' AND 当前零售价 > 100) 
-                        OR (二级分类 = '松紧长裤' AND 当前零售价 > 100) 
+                            (二级分类 = '短T' AND 当前零售价 > {$find_config['短T']}) 
+                        OR (二级分类 = '休闲短衬' AND 当前零售价 > {$find_config['休闲短衬']})
+                        OR (二级分类 = '休闲短裤' AND 当前零售价 > {$find_config['休闲短裤']}) 
+                        OR (二级分类 = '松紧短裤' AND 当前零售价 > {$find_config['松紧短裤']}) 
+                        OR (二级分类 = '牛仔短裤' AND 当前零售价 > {$find_config['牛仔短裤']}) 
+                        OR (二级分类 = '休闲长裤' AND 当前零售价 > {$find_config['休闲长裤']}) 
+                        OR (二级分类 = '牛仔长裤' AND 当前零售价 > {$find_config['牛仔长裤']}) 
+                        OR (二级分类 = '松紧长裤' AND 当前零售价 > {$find_config['松紧长裤']}) 
                     ))
                 )
             ) as t1   
@@ -808,6 +810,9 @@ class Skauto extends BaseController
                 $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
             }
 
+            $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update([
+                'skauto_res_updatetime' => date('Y-m-d H:i:s')
+            ]);  
             return json([
                 'status' => 1,
                 'msg' => 'success',
