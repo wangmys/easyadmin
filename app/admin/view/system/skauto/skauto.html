@@ -539,10 +539,10 @@
                     }}
                     , { field: '近一周销', title: '近一周销', align: 'center'}
                     , { field: '近两周销', title: '近两周销', align: 'center'}
-                    , { field: '云仓数量', title: '云仓数量', align: 'center', templet: function (data) {
-                        if (data['云仓数量']) {
+                    , { field: '云仓可用', title: '云仓可用', align: 'center', templet: function (data) {
+                        if (data['云仓可用']) {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return data['云仓数量'];
+                            return data['云仓可用'];
                         } else {
                             return '';
                         }

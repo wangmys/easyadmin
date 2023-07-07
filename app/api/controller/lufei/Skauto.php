@@ -635,7 +635,7 @@ class Skauto extends BaseController
                 仓库名称 as 云仓,
                 季节,
                 货号,
-                合计 as 云仓数量
+                合计 as 云仓可用
             from sjp_warehouse_stock
         ";
         $select = $this->db_bi->query($sql);
@@ -751,8 +751,8 @@ class Skauto extends BaseController
             right join cwl_skauto_ycky as y
                 on s.`云仓`=y.云仓
                 and s.`货号` = y.货号
-            set s.云仓数量 = y.云仓数量
-            where s.云仓数量 is null        
+            set s.云仓可用 = y.云仓可用
+            where s.云仓可用 is null        
         ";
         $this->db_easyA->execute($sql7);
 
@@ -771,7 +771,7 @@ class Skauto extends BaseController
             case
             when t1.总入量 - t1.累销数量 <=0 then '售空'
             when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= 0.3
-                and t1.店铺库存>0 then '即将售空'
+                and t1.店铺库存>0 and t1.店铺库存<=5 then '即将售空'
             end as 售空提醒
             from  
             (select 

@@ -1139,6 +1139,8 @@ class Duanmalv extends AdminController
             foreach ($select_date as $key => $val) {
                 $select_date[$key]['weekStr'] = date_to_week($val['更新日期']);
             }
+
+            // dump($select_date,);die;
             return View('table1_month', [
                 'select_date' => $select_date,
             ]);
