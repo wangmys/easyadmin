@@ -16,6 +16,7 @@ use app\admin\model\bi\SpWwXiaStock2022Model;
 use app\admin\model\bi\SpSkcShoeNumModel;
 use app\admin\model\bi\SpSkcShoeDetailModel;
 use app\admin\model\bi\SpSkcConfigModel;
+use app\admin\model\bi\CustomerKcSkByWangweiModel;
 use app\api\model\kl\ErpRetailModel;
 
 class Skc_shoe_detail extends Command
@@ -44,11 +45,9 @@ class Skc_shoe_detail extends Command
             foreach ($all_customers as $v_customer) {
                 // print_r($v_customer);die;
                 //test....
-                $v_customer['CustomerName'] = '龙南一店';
-                // $v_customer['店铺ID'] = 'C991000005';
-                $v_customer['Mathod'] = '直营';
-                $v_customer['State'] = '江西省';
-
+                // $v_customer['CustomerName'] = '龙南一店';
+                // $v_customer['Mathod'] = '直营';
+                // $v_customer['State'] = '江西省';
 
                 $arr['area_range'] = (strstr($v_customer['State'], '广东') || strstr($v_customer['State'], '广西')) ? '二广' : '内陆';
                 $arr['province'] = $v_customer['State'] ?: '';
@@ -63,50 +62,85 @@ class Skc_shoe_detail extends Command
                 $arr['xg_num'] = $v_customer['CustomItem13'] ?: '0';
                 $arr['xq_num'] = $v_customer['CustomItem38'] ?: '0';
                 $arr['xzd_num'] = $v_customer['CustomItem37'] ?: '0';
-                $arr['xjxj_num'] = $arr['xg_num']+$arr['xq_num']+$arr['xzd_num'];
+                $arr['xjxj_num'] = $arr['xg_num']+$arr['xq_num'];
 
                 $require_num = $this->get_require_num($skc_shoe_nums, $arr['warehouse_square'], $arr['xjxj_num']);
                 $arr['require_zt'] = $require_num['skc_zt'] ?: '0';
                 $arr['require_xx'] = $require_num['skc_xx'] ?: '0';
                 $arr['require_ydx'] = $require_num['skc_ydx'] ?: '0';
                 $arr['require_lx'] = $require_num['skc_lx'] ?: '0';
+                $require_total = $arr['require_zt'] + $arr['require_xx'] + $arr['require_ydx'] + $arr['require_lx'];
                 // print_r($arr);die;
 
                 //总：
                 $all_sum = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '鞋履']])->sum('销售金额');
-                $week_sales_new_ztpx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '正统皮鞋']])->sum('销售金额');
-                $week_sales_new_xxx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '休闲鞋']])->sum('销售金额');
-                $week_sales_new_ydx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '运动鞋']])->sum('销售金额');
-                $week_sales_new_lx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '凉鞋']])->sum('销售金额');
+                $week_sales_new_ztpx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '正统皮鞋']])->sum('销售金额');
+                $week_sales_new_xxx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '休闲鞋']])->sum('销售金额');
+                $week_sales_new_ydx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '运动鞋']])->sum('销售金额');
+                $week_sales_new_lx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '=', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '凉鞋']])->sum('销售金额');
                 $week_sales_new_xj = $week_sales_new_ztpx + $week_sales_new_xxx + $week_sales_new_ydx + $week_sales_new_lx;
-                $week_sales_old_ztpx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '正统皮鞋']])->sum('销售金额');
-                $week_sales_old_xxx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '休闲鞋']])->sum('销售金额');
-                $week_sales_old_ydx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '运动鞋']])->sum('销售金额');
-                $week_sales_old_lx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.year')], ['大类', '=', '鞋履'], ['中类', '=', '凉鞋']])->sum('销售金额');
+                $week_sales_old_ztpx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '正统皮鞋']])->sum('销售金额');
+                $week_sales_old_xxx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '休闲鞋']])->sum('销售金额');
+                $week_sales_old_ydx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '运动鞋']])->sum('销售金额');
+                $week_sales_old_lx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['年份', '<>', config('skc.shoe_year')], ['大类', '=', '鞋履'], ['中类', '=', '凉鞋']])->sum('销售金额');
                 $week_sales_old_xj = $week_sales_old_ztpx + $week_sales_old_xxx + $week_sales_old_ydx + $week_sales_old_lx;
-                // print_r([$week_sales_old_ztpx, $week_sales_old_xxx, $week_sales_old_ydx, $week_sales_old_lx, $week_sales_old_xj]);die;
                 //预计在店skc
-                $skc_new_ztpx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->sum('库存SKC数');
-                $skc_new_xxx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->sum('库存SKC数');
-                $skc_new_ydx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->sum('库存SKC数');
-                $skc_new_lx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->sum('库存SKC数');
+                $skc_new_ztpx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->sum('库存SKC数');
+                $skc_new_xxx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->sum('库存SKC数');
+                $skc_new_ydx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->sum('库存SKC数');
+                $skc_new_lx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->sum('库存SKC数');
                 $skc_new_xj = $skc_new_ztpx + $skc_new_xxx + $skc_new_ydx + $skc_new_lx;
-                $skc_old_ztpx = SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '<>', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->sum('库存SKC数');
-                $skc_old_xxx = SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '<>', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->sum('库存SKC数');
-                $skc_old_ydx = SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '<>', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->sum('库存SKC数');
-                $skc_old_lx = SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级时间分类', '<>', config('skc.year')], ['当前零售价', '>', $shoe_price], ['预计库存', '>', config('skc.expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->sum('库存SKC数');
+                $skc_old_ztpx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->count();
+                $skc_old_xxx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->count();
+                $skc_old_ydx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->count();
+                $skc_old_lx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->count();
                 $skc_old_xj = $skc_old_ztpx + $skc_old_xxx + $skc_old_ydx + $skc_old_lx;
                 $skc_zj = $skc_new_xj + $skc_old_xj;
                 $skc_fill_rate = 0;
                 if ($v_customer['Mathod'] == '直营') {
-                    $skc_fill_rate = round( $skc_new_xj/($arr['require_zt'] + $arr['require_xx'] + $arr['require_ydx'] + $arr['require_lx']), 2 );
+                    $skc_fill_rate = $require_total ? round( $skc_new_xj/$require_total, 2 ) : 0;
                 } else {
-                    $skc_fill_rate = round( $skc_zj/($arr['require_zt'] + $arr['require_xx'] + $arr['require_ydx'] + $arr['require_lx']), 2 );
+                    $skc_fill_rate = $require_total ? round( $skc_zj/$require_total, 2 ) : 0;
                 }
-                echo $skc_fill_rate;die;
 
+                //预计在店断码个数
+                $duanma_new_ztpx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->count();
+                $duanma_new_xxx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->count();
+                $duanma_new_ydx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->count();
+                $duanma_new_lx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->count();
+                $duanma_new_xj = $duanma_new_ztpx + $duanma_new_xxx + $duanma_new_ydx + $duanma_new_lx;
+                $duanma_old_ztpx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->count();
+                $duanma_old_xxx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->count();
+                $duanma_old_ydx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->count();
+                $duanma_old_lx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->count();
+                $duanma_old_xj = $duanma_old_ztpx + $duanma_old_xxx + $duanma_old_ydx + $duanma_old_lx;
+                $duanma_zsl = $duanma_new_xj + $duanma_old_xj;
 
+                //预计在店数量
+                $instore_new_ztpx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->sum('预计库存Quantity');
+                $instore_new_xxx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->sum('预计库存Quantity');
+                $instore_new_ydx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->sum('预计库存Quantity');
+                $instore_new_lx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '=', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->sum('预计库存Quantity');
+                $instore_new_xj = $instore_new_ztpx + $instore_new_xxx + $instore_new_ydx + $instore_new_lx;
+                $instore_old_ztpx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '正统皮鞋']])->sum('预计库存Quantity');
+                $instore_old_xxx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '休闲鞋']])->sum('预计库存Quantity');
+                $instore_old_ydx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '运动鞋']])->sum('预计库存Quantity');
+                $instore_old_lx = CustomerKcSkByWangweiModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')],   ['CustomerName', '=', $v_customer['CustomerName']], ['TimeCategoryName1', '<>', config('skc.shoe_year')], ['当前零售价', '>', $shoe_price], ['预计库存Quantity', '>', config('skc.shoe_expect_stock')], ['齐码情况', '<', config('skc.shoe_lianma_num')], ['一级分类', '=', '鞋履'], ['二级分类', '=', '凉鞋']])->sum('预计库存Quantity');
+                $instore_old_xj = $instore_old_ztpx + $instore_old_xxx + $instore_old_ydx + $instore_old_lx;
+                $instore_zsl = $instore_new_xj + $instore_old_xj;
+                $instore_dksd = $skc_zj ? round($instore_zsl/$skc_zj, 0) : 0;
 
+                //溢出提醒
+                if ($v_customer['Mathod'] == '直营') {
+                    $overflow_ztpx = $arr['require_zt'] - $skc_new_ztpx;
+                    $overflow_xxx = $arr['require_xx'] - $skc_new_xxx;
+                    $overflow_ydx = $arr['require_ydx'] - $skc_new_ydx;
+                } else {
+                    $overflow_ztpx = $arr['require_zt'] - ($skc_new_ztpx + $skc_old_ztpx);
+                    $overflow_xxx = $arr['require_xx'] - ($skc_new_xxx + $skc_old_xxx);
+                    $overflow_ydx = $arr['require_ydx'] - ($skc_new_ydx + $skc_old_ydx);
+                }
+                $overflow_zj = $overflow_ztpx + $overflow_xxx + $overflow_ydx;
 
                 //统一赋值：
                 $arr['week_sales_new_ztpx'] = $all_sum ? round($week_sales_new_ztpx/$all_sum, 3) * 100 : 0;
@@ -133,19 +167,43 @@ class Skc_shoe_detail extends Command
                 $arr['skc_old_xj'] = $skc_old_xj;
                 $arr['skc_zj'] = $skc_zj;
                 $arr['skc_fill_rate'] = $skc_fill_rate;
-                $arr['skc_new_ztpx'] = $skc_new_ztpx;
 
-
-                // $arr['overflow_fl'] = $overflow_fl;
-                // $arr['overflow_yl'] = $overflow_yl;
-                // $arr['overflow_xxdc'] = $overflow_xxdc;
-                // $arr['overflow_dxxj'] = $overflow_dxxj;
+                //预计在点断码个数
+                $arr['duanma_new_ztpx'] = $duanma_new_ztpx;
+                $arr['duanma_new_xxx'] = $duanma_new_xxx;
+                $arr['duanma_new_ydx'] = $duanma_new_ydx;
+                $arr['duanma_new_lx'] = $duanma_new_lx;
+                $arr['duanma_new_xj'] = $duanma_new_xj;
+                $arr['duanma_old_ztpx'] = $duanma_old_ztpx;
+                $arr['duanma_old_xxx'] = $duanma_old_xxx;
+                $arr['duanma_old_ydx'] = $duanma_old_ydx;
+                $arr['duanma_old_lx'] = $duanma_old_lx;
+                $arr['duanma_old_xj'] = $duanma_old_xj;
+                $arr['duanma_zsl'] = $duanma_zsl;
                 
-                // $arr['fill_rate'] = round($arr['win_num_dxxj']/$arr['five_item_num'], 2);
-                // // print_r($arr);die;
+                //预计在店数量
+                $arr['instore_new_ztpx'] = $instore_new_ztpx;
+                $arr['instore_new_xxx'] = $instore_new_xxx;
+                $arr['instore_new_ydx'] = $instore_new_ydx;
+                $arr['instore_new_lx'] = $instore_new_lx;
+                $arr['instore_new_xj'] = $instore_new_xj;
+                $arr['instore_old_ztpx'] = $instore_old_ztpx;
+                $arr['instore_old_xxx'] = $instore_old_xxx;
+                $arr['instore_old_ydx'] = $instore_old_ydx;
+                $arr['instore_old_lx'] = $instore_old_lx;
+                $arr['instore_old_xj'] = $instore_old_xj;
+                $arr['instore_zsl'] = $instore_zsl;
+                $arr['instore_dksd'] = $instore_dksd;
+                
+                //溢出
+                $arr['overflow_ztpx'] = $overflow_ztpx;
+                $arr['overflow_xxx'] = $overflow_xxx;
+                $arr['overflow_ydx'] = $overflow_ydx;
+                $arr['overflow_zj'] = $overflow_zj;
 
+                // print_r($arr);die;
                 // //入库
-                // SpSkcShoeDetailModel::create($arr);
+                SpSkcShoeDetailModel::create($arr);
                 // echo 'okk';die;
             }
         }
@@ -162,7 +220,7 @@ class Skc_shoe_detail extends Command
             'skc_ydx' => '0',
             'skc_lx' => '0',
         ];
-        $key_str = config('skc.max_warehouse_square').$xjxj_num;
+        $key_str = config('skc.shoe_max_warehouse_square').$xjxj_num;
         if ($warehouse_square) {
             $warehouse_square = trim($warehouse_square);
             if (preg_match("/[\x7f-\xff]/", $warehouse_square)) {//包含中文的，按最大仓库面积算
@@ -230,27 +288,6 @@ class Skc_shoe_detail extends Command
             $res['skc_lx'] = $skc_shoe_nums[$key_str]['skc_lx'];
         }
         return $res;
-
-    }
-
-
-    protected function return_right_num($num) {
-
-        $ex = explode('.', $num);
-        $return = 0;
-        if ($ex && count($ex)>1) {
-            if (strlen($ex[1]) == 1) {
-                $ex[1] = $ex[1]*10;
-            }
-            if ($ex[1] >= 30) {
-                $return = $ex[0]+1;
-            } else {
-                $return = $ex[0];
-            }
-        } else {
-            $return = $ex[0];
-        }
-        return $return;
 
     }
 
