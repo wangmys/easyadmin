@@ -35,20 +35,12 @@ class Skauto extends AdminController
      * 
      */
     public function config() {
-        // $typeQima = $this->getTypeQiMa('in ("下装","内搭","外套","鞋履","松紧长裤","松紧短裤")');
-        
-        // // 商品负责人
-        // $people = SpWwBudongxiaoDetail::getPeople([
-        //     ['商品负责人', 'exp', new Raw('IS NOT NULL')]
-        // ]);
-
-        // // 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
         
         // dump($select_config );die;
 
         return View('config', [
-            'config' => $select_config,
+            'config' => $find_config,
         ]);
     }
 
@@ -60,7 +52,7 @@ class Skauto extends AdminController
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
 
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
+            $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update($params);     
 
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {
@@ -176,7 +168,7 @@ class Skauto extends AdminController
                     一级分类,
                     二级分类,
                     分类,风格,货号,零售价,当前零售价,折率,上市天数,
-                    首单日期,销售天数,总入量,累销数量,店铺库存,在途库存,已配未发,近一周销,近两周销,云仓数量,售空提醒
+                    首单日期,销售天数,总入量,累销数量,店铺库存,在途库存,已配未发,近一周销,近两周销,云仓可用,售空提醒
                 from cwl_skauto_res 
                 where 1
                     {$map1}
@@ -215,8 +207,8 @@ class Skauto extends AdminController
                     {$map11}
             ";
             $count = $this->db_easyA->query($sql2);
-
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select,  'create_time' => date('Y-m-d')]);
+            $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['skauto_res_updatetime']]);
         } else {
             return View('skauto', [
 
@@ -381,7 +373,7 @@ class Skauto extends AdminController
                     一级分类,
                     二级分类,
                     分类,风格,货号,零售价,当前零售价,折率,上市天数,
-                    首单日期,销售天数,总入量,累销数量,店铺库存,在途库存,已配未发,近一周销,近两周销,云仓数量,售空提醒
+                    首单日期,销售天数,总入量,累销数量,店铺库存,在途库存,已配未发,近一周销,近两周销,云仓可用,售空提醒
                 from cwl_skauto_res 
                 where 1
                     {$map}

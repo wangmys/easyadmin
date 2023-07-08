@@ -78,6 +78,9 @@ class Duanmalv extends AdminController
     public function saveMap() {
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
+            if ($params['折率'] > 1.5) return json(['status' => 0, 'msg' => '折率设置不能大于1.5']);
+            if ($params['折率'] < 0.5) return json(['status' => 0, 'msg' => '折率设置不能小于0.5']);
+
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {
@@ -1136,6 +1139,8 @@ class Duanmalv extends AdminController
             foreach ($select_date as $key => $val) {
                 $select_date[$key]['weekStr'] = date_to_week($val['更新日期']);
             }
+
+            // dump($select_date,);die;
             return View('table1_month', [
                 'select_date' => $select_date,
             ]);
