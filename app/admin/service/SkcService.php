@@ -4,8 +4,10 @@
 namespace app\admin\service;
 use app\admin\model\bi\SpSkcSzDetailModel;
 use app\admin\model\bi\SpSkcKzDetailModel;
+use app\admin\model\bi\SpSkcShoeDetailModel;
 use app\admin\model\bi\SpSkcWinNumModel;
 use app\admin\model\bi\SpSkcKzNumModel;
+use app\admin\model\bi\SpSkcShoeNumModel;
 use app\admin\model\bi\SpSkcConfigModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
@@ -1008,6 +1010,388 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list['skc_kz_nostore'] = $arr;
 
         return $list;
+
+    }
+
+    #########################鞋履##############################
+
+    //鞋履
+    public function get_shoe_index($params) {
+
+        $pageLimit = $params['limit'] ?? 15;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+
+        $skc_shoe_nostore = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('skc_shoe_nostore')->find();
+        $list = SpSkcShoeDetailModel::where([['store_name', 'not in', $skc_shoe_nostore['skc_shoe_nostore']]])->paginate([
+            'list_rows'=> $pageLimit,
+            'page' => $page,
+        ]);
+        $list = $list ? $list->toArray() : [];
+        $data = [
+            'count' => $list ? $list['total'] : 0,
+            'data'  => $list ? $list['data'] : 0,
+        ];
+        return $data;
+
+    }
+
+    //鞋履
+    public function get_shoe_statistic() {
+
+        $all_goods_manager = SpSkcShoeDetailModel::where([])->group('goods_manager')->field("count(*) as manager_store_num,goods_manager")->select();
+        $all_goods_manager = $all_goods_manager ? $all_goods_manager->toArray() : [];
+        $res_arr = [];
+        if ($all_goods_manager) {
+
+            $stores_statistic = $this->get_store_shoe_statistic();
+        
+            //满足率总占比
+            $res_arr[] = [
+                
+                'goods_manager' => '-',
+        
+                '1_xjxj_num' => '',
+                '2_xjxj_num' => '',
+                '3_xjxj_num' => '',
+                '4_xjxj_num' => '',
+                '5_xjxj_num' => '',
+                '6_xjxj_num' => '',
+                '7_xjxj_num' => '',
+                '8_xjxj_num' => '',
+                'manager_store_num' => '总占比：',
+        
+                '1_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['1_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['1_xjxj_num_100']/$stores_statistic['store_statistic'][0]['1_xjxj_num'], 2)*100 ).'%' : '',
+                '2_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['2_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['2_xjxj_num_100']/$stores_statistic['store_statistic'][0]['2_xjxj_num'], 2)*100 ).'%' : '',
+                '3_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['3_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['3_xjxj_num_100']/$stores_statistic['store_statistic'][0]['3_xjxj_num'], 2)*100 ).'%' : '',
+                '4_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['4_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['4_xjxj_num_100']/$stores_statistic['store_statistic'][0]['4_xjxj_num'], 2)*100 ).'%' : '',
+                '5_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['5_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['5_xjxj_num_100']/$stores_statistic['store_statistic'][0]['5_xjxj_num'], 2)*100 ).'%' : '',
+                '6_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['6_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['6_xjxj_num_100']/$stores_statistic['store_statistic'][0]['6_xjxj_num'], 2)*100 ).'%' : '',
+                '7_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['7_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['7_xjxj_num_100']/$stores_statistic['store_statistic'][0]['7_xjxj_num'], 2)*100 ).'%' : '',
+                '8_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['8_xjxj_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['8_xjxj_num_100']/$stores_statistic['store_statistic'][0]['8_xjxj_num'], 2)*100 ).'%' : '',
+                'manager_store_num_100' => $stores_statistic['store_statistic_100'][0]['manager_store_num_100'] ? ( round($stores_statistic['store_statistic_100'][0]['manager_store_num_100']/$stores_statistic['store_statistic'][0]['manager_store_num'], 2)*100 ).'%' : '',
+        
+                '1_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['1_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['1_xjxj_num_90']/$stores_statistic['store_statistic'][0]['1_xjxj_num'], 2)*100 ).'%' : '',
+                '2_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['2_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['2_xjxj_num_90']/$stores_statistic['store_statistic'][0]['2_xjxj_num'], 2)*100 ).'%' : '',
+                '3_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['3_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['3_xjxj_num_90']/$stores_statistic['store_statistic'][0]['3_xjxj_num'], 2)*100 ).'%' : '',
+                '4_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['4_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['4_xjxj_num_90']/$stores_statistic['store_statistic'][0]['4_xjxj_num'], 2)*100 ).'%' : '',
+                '5_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['5_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['5_xjxj_num_90']/$stores_statistic['store_statistic'][0]['5_xjxj_num'], 2)*100 ).'%' : '',
+                '6_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['6_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['6_xjxj_num_90']/$stores_statistic['store_statistic'][0]['6_xjxj_num'], 2)*100 ).'%' : '',
+                '7_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['7_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['7_xjxj_num_90']/$stores_statistic['store_statistic'][0]['7_xjxj_num'], 2)*100 ).'%' : '',
+                '8_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['8_xjxj_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['8_xjxj_num_90']/$stores_statistic['store_statistic'][0]['8_xjxj_num'], 2)*100 ).'%' : '',
+                'manager_store_num_90' => $stores_statistic['store_statistic_90'][0]['manager_store_num_90'] ? ( round($stores_statistic['store_statistic_90'][0]['manager_store_num_90']/$stores_statistic['store_statistic'][0]['manager_store_num'], 2)*100 ).'%' : '',
+        
+                '1_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['1_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['1_xjxj_num_80']/$stores_statistic['store_statistic'][0]['1_xjxj_num'], 2)*100 ).'%' : '',
+                '2_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['2_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['2_xjxj_num_80']/$stores_statistic['store_statistic'][0]['2_xjxj_num'], 2)*100 ).'%' : '',
+                '3_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['3_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['3_xjxj_num_80']/$stores_statistic['store_statistic'][0]['3_xjxj_num'], 2)*100 ).'%' : '',
+                '4_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['4_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['4_xjxj_num_80']/$stores_statistic['store_statistic'][0]['4_xjxj_num'], 2)*100 ).'%' : '',
+                '5_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['5_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['5_xjxj_num_80']/$stores_statistic['store_statistic'][0]['5_xjxj_num'], 2)*100 ).'%' : '',
+                '6_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['6_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['6_xjxj_num_80']/$stores_statistic['store_statistic'][0]['6_xjxj_num'], 2)*100 ).'%' : '',
+                '7_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['7_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['7_xjxj_num_80']/$stores_statistic['store_statistic'][0]['7_xjxj_num'], 2)*100 ).'%' : '',
+                '8_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['8_xjxj_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['8_xjxj_num_80']/$stores_statistic['store_statistic'][0]['8_xjxj_num'], 2)*100 ).'%' : '',
+                'manager_store_num_80' => $stores_statistic['store_statistic_80'][0]['manager_store_num_80'] ? ( round($stores_statistic['store_statistic_80'][0]['manager_store_num_80']/$stores_statistic['store_statistic'][0]['manager_store_num'], 2)*100 ).'%' : '',
+        
+                '1_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['1_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['1_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['1_xjxj_num'], 2)*100 ).'%' : '',
+                '2_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['2_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['2_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['2_xjxj_num'], 2)*100 ).'%' : '',
+                '3_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['3_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['3_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['3_xjxj_num'], 2)*100 ).'%' : '',
+                '4_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['4_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['4_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['4_xjxj_num'], 2)*100 ).'%' : '',
+                '5_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['5_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['5_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['5_xjxj_num'], 2)*100 ).'%' : '',
+                '6_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['6_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['6_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['6_xjxj_num'], 2)*100 ).'%' : '',
+                '7_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['7_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['7_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['7_xjxj_num'], 2)*100 ).'%' : '',
+                '8_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['8_xjxj_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['8_xjxj_num_80_less']/$stores_statistic['store_statistic'][0]['8_xjxj_num'], 2)*100 ).'%' : '',
+                'manager_store_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['manager_store_num_80_less'] ? ( round($stores_statistic['store_statistic_80_less'][0]['manager_store_num_80_less']/$stores_statistic['store_statistic'][0]['manager_store_num'], 2)*100 ).'%' : '',
+        
+            ];
+        
+            foreach ($all_goods_manager as $v_goods_manager) {
+        
+                $stores_num = $this->get_stores_shoe_num($v_goods_manager['goods_manager']);
+                
+                $arr['goods_manager'] = $v_goods_manager['goods_manager'];
+        
+                $arr['1_xjxj_num'] = $stores_num['stores_num'][0]['1_xjxj_num'] ?: '';
+                $arr['2_xjxj_num'] = $stores_num['stores_num'][0]['2_xjxj_num'] ?: '';
+                $arr['3_xjxj_num'] = $stores_num['stores_num'][0]['3_xjxj_num'] ?: '';
+                $arr['4_xjxj_num'] = $stores_num['stores_num'][0]['4_xjxj_num'] ?: '';
+                $arr['5_xjxj_num'] = $stores_num['stores_num'][0]['5_xjxj_num'] ?: '';
+                $arr['6_xjxj_num'] = $stores_num['stores_num'][0]['6_xjxj_num'] ?: '';
+                $arr['7_xjxj_num'] = $stores_num['stores_num'][0]['7_xjxj_num'] ?: '';
+                $arr['8_xjxj_num'] = $stores_num['stores_num'][0]['8_xjxj_num'] ?: '';
+                $arr['manager_store_num'] = $stores_num['stores_num'][0]['manager_store_num'] ?: '';
+        
+                $arr['1_xjxj_num_100'] = $stores_num['stores_num_100'][0]['1_xjxj_num_100'] ?: '';
+                $arr['2_xjxj_num_100'] = $stores_num['stores_num_100'][0]['2_xjxj_num_100'] ?: '';
+                $arr['3_xjxj_num_100'] = $stores_num['stores_num_100'][0]['3_xjxj_num_100'] ?: '';
+                $arr['4_xjxj_num_100'] = $stores_num['stores_num_100'][0]['4_xjxj_num_100'] ?: '';
+                $arr['5_xjxj_num_100'] = $stores_num['stores_num_100'][0]['5_xjxj_num_100'] ?: '';
+                $arr['6_xjxj_num_100'] = $stores_num['stores_num_100'][0]['6_xjxj_num_100'] ?: '';
+                $arr['7_xjxj_num_100'] = $stores_num['stores_num_100'][0]['7_xjxj_num_100'] ?: '';
+                $arr['8_xjxj_num_100'] = $stores_num['stores_num_100'][0]['8_xjxj_num_100'] ?: '';
+                $arr['manager_store_num_100'] = $stores_num['stores_num_100'][0]['manager_store_num_100'] ?: '';
+                
+                $arr['1_xjxj_num_90'] = $stores_num['stores_num_90'][0]['1_xjxj_num_90'] ?: '';
+                $arr['2_xjxj_num_90'] = $stores_num['stores_num_90'][0]['2_xjxj_num_90'] ?: '';
+                $arr['3_xjxj_num_90'] = $stores_num['stores_num_90'][0]['3_xjxj_num_90'] ?: '';
+                $arr['4_xjxj_num_90'] = $stores_num['stores_num_90'][0]['4_xjxj_num_90'] ?: '';
+                $arr['5_xjxj_num_90'] = $stores_num['stores_num_90'][0]['5_xjxj_num_90'] ?: '';
+                $arr['6_xjxj_num_90'] = $stores_num['stores_num_90'][0]['6_xjxj_num_90'] ?: '';
+                $arr['7_xjxj_num_90'] = $stores_num['stores_num_90'][0]['7_xjxj_num_90'] ?: '';
+                $arr['8_xjxj_num_90'] = $stores_num['stores_num_90'][0]['8_xjxj_num_90'] ?: '';
+                $arr['manager_store_num_90'] = $stores_num['stores_num_90'][0]['manager_store_num_90'] ?: '';
+                
+                $arr['1_xjxj_num_80'] = $stores_num['stores_num_80'][0]['1_xjxj_num_80'] ?: '';
+                $arr['2_xjxj_num_80'] = $stores_num['stores_num_80'][0]['2_xjxj_num_80'] ?: '';
+                $arr['3_xjxj_num_80'] = $stores_num['stores_num_80'][0]['3_xjxj_num_80'] ?: '';
+                $arr['4_xjxj_num_80'] = $stores_num['stores_num_80'][0]['4_xjxj_num_80'] ?: '';
+                $arr['5_xjxj_num_80'] = $stores_num['stores_num_80'][0]['5_xjxj_num_80'] ?: '';
+                $arr['6_xjxj_num_80'] = $stores_num['stores_num_80'][0]['6_xjxj_num_80'] ?: '';
+                $arr['7_xjxj_num_80'] = $stores_num['stores_num_80'][0]['7_xjxj_num_80'] ?: '';
+                $arr['8_xjxj_num_80'] = $stores_num['stores_num_80'][0]['8_xjxj_num_80'] ?: '';
+                $arr['manager_store_num_80'] = $stores_num['stores_num_80'][0]['manager_store_num_80'] ?: '';
+                
+                $arr['1_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['1_xjxj_num_80_less'] ?: '';
+                $arr['2_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['2_xjxj_num_80_less'] ?: '';
+                $arr['3_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['3_xjxj_num_80_less'] ?: '';
+                $arr['4_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['4_xjxj_num_80_less'] ?: '';
+                $arr['5_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['5_xjxj_num_80_less'] ?: '';
+                $arr['6_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['6_xjxj_num_80_less'] ?: '';
+                $arr['7_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['7_xjxj_num_80_less'] ?: '';
+                $arr['8_xjxj_num_80_less'] = $stores_num['stores_num_80_less'][0]['8_xjxj_num_80_less'] ?: '';
+                $arr['manager_store_num_80_less'] = $stores_num['stores_num_80_less'][0]['manager_store_num_80_less'] ?: '';
+        
+                $res_arr[] = $arr;
+                
+            }
+        
+            //总计：
+            $res_arr[] = [
+                
+                'goods_manager' => '总计',
+        
+                '1_xjxj_num' => $stores_statistic['store_statistic'][0]['1_xjxj_num'] ?: '',
+                '2_xjxj_num' => $stores_statistic['store_statistic'][0]['2_xjxj_num'] ?: '',
+                '3_xjxj_num' => $stores_statistic['store_statistic'][0]['3_xjxj_num'] ?: '',
+                '4_xjxj_num' => $stores_statistic['store_statistic'][0]['4_xjxj_num'] ?: '',
+                '5_xjxj_num' => $stores_statistic['store_statistic'][0]['5_xjxj_num'] ?: '',
+                '6_xjxj_num' => $stores_statistic['store_statistic'][0]['6_xjxj_num'] ?: '',
+                '7_xjxj_num' => $stores_statistic['store_statistic'][0]['7_xjxj_num'] ?: '',
+                '8_xjxj_num' => $stores_statistic['store_statistic'][0]['8_xjxj_num'] ?: '',
+                'manager_store_num' => $stores_statistic['store_statistic'][0]['manager_store_num'] ?: '',
+        
+                '1_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['1_xjxj_num_100'] ?: '',
+                '2_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['2_xjxj_num_100'] ?: '',
+                '3_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['3_xjxj_num_100'] ?: '',
+                '4_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['4_xjxj_num_100'] ?: '',
+                '5_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['5_xjxj_num_100'] ?: '',
+                '6_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['6_xjxj_num_100'] ?: '',
+                '7_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['7_xjxj_num_100'] ?: '',
+                '8_xjxj_num_100' => $stores_statistic['store_statistic_100'][0]['8_xjxj_num_100'] ?: '',
+                'manager_store_num_100' => $stores_statistic['store_statistic_100'][0]['manager_store_num_100'] ?: '',
+        
+                '1_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['1_xjxj_num_90'] ?: '',
+                '2_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['2_xjxj_num_90'] ?: '',
+                '3_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['3_xjxj_num_90'] ?: '',
+                '4_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['4_xjxj_num_90'] ?: '',
+                '5_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['5_xjxj_num_90'] ?: '',
+                '6_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['6_xjxj_num_90'] ?: '',
+                '7_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['7_xjxj_num_90'] ?: '',
+                '8_xjxj_num_90' => $stores_statistic['store_statistic_90'][0]['8_xjxj_num_90'] ?: '',
+                'manager_store_num_90' => $stores_statistic['store_statistic_90'][0]['manager_store_num_90'] ?: '',
+        
+                '1_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['1_xjxj_num_80'] ?: '',
+                '2_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['2_xjxj_num_80'] ?: '',
+                '3_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['3_xjxj_num_80'] ?: '',
+                '4_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['4_xjxj_num_80'] ?: '',
+                '5_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['5_xjxj_num_80'] ?: '',
+                '6_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['6_xjxj_num_80'] ?: '',
+                '7_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['7_xjxj_num_80'] ?: '',
+                '8_xjxj_num_80' => $stores_statistic['store_statistic_80'][0]['8_xjxj_num_80'] ?: '',
+                'manager_store_num_80' => $stores_statistic['store_statistic_80'][0]['manager_store_num_80'] ?: '',
+        
+                '1_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['1_xjxj_num_80_less'] ?: '',
+                '2_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['2_xjxj_num_80_less'] ?: '',
+                '3_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['3_xjxj_num_80_less'] ?: '',
+                '4_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['4_xjxj_num_80_less'] ?: '',
+                '5_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['5_xjxj_num_80_less'] ?: '',
+                '6_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['6_xjxj_num_80_less'] ?: '',
+                '7_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['7_xjxj_num_80_less'] ?: '',
+                '8_xjxj_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['8_xjxj_num_80_less'] ?: '',
+                'manager_store_num_80_less' => $stores_statistic['store_statistic_80_less'][0]['manager_store_num_80_less'] ?: '',
+        
+            ];
+        
+        }
+        // print_r($res_arr);die;
+        $data = [
+                'count' => count($all_goods_manager),
+                'data'  => $res_arr
+        ];
+        return $data;
+
+    }
+
+    /**
+     * 门店数 && 各个满足率家数 (鞋履)
+     */
+    public function get_stores_shoe_num($goods_manager) {
+
+        ##每个商品负责人的门店数统计
+        $sql_stores_num = "select count(*) as 
+        manager_store_num,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num, 
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num, 
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num
+        from sp_skc_shoe_detail where goods_manager='{$goods_manager}';";
+
+        ##每个商品负责人的满足率100%统计
+        $sql_stores_num_100 = "select count(*) as 
+        manager_store_num_100,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_100, 
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_100, 
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_100,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_100,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_100,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_100,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_100,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_100
+        from sp_skc_shoe_detail where goods_manager='{$goods_manager}' and skc_fill_rate>=1;";
+
+        ##每个商品负责人的满足率90%统计
+        $sql_stores_num_90 = "select count(*) as 
+        manager_store_num_90,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_90,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_90,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_90,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_90,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_90,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_90,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_90,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_90
+        from sp_skc_shoe_detail where goods_manager='{$goods_manager}' and skc_fill_rate>=0.9 and skc_fill_rate<1;";
+
+        ##每个商品负责人的满足率80%统计
+        $sql_stores_num_80 = "select count(*) as 
+        manager_store_num_80,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_80,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_80,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_80,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_80,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_80,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_80,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_80,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_80
+        from sp_skc_shoe_detail where goods_manager='{$goods_manager}' and skc_fill_rate>=0.8 and skc_fill_rate<0.9;";
+
+        ##每个商品负责人的满足率80%以下统计
+        $sql_stores_num_80_less = "select count(*) as 
+        manager_store_num_80_less,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_80_less,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_80_less,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_80_less,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_80_less,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_80_less,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_80_less,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_80_less,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_80_less
+        from sp_skc_shoe_detail where goods_manager='{$goods_manager}' and skc_fill_rate<0.8;";
+
+        $stores_num = $this->bi_db->Query($sql_stores_num);
+        $stores_num_100 = $this->bi_db->Query($sql_stores_num_100);
+        $stores_num_90 = $this->bi_db->Query($sql_stores_num_90);
+        $stores_num_80 = $this->bi_db->Query($sql_stores_num_80);
+        $stores_num_80_less = $this->bi_db->Query($sql_stores_num_80_less);
+
+        return [
+            'stores_num' => $stores_num,
+            'stores_num_100' => $stores_num_100,
+            'stores_num_90' => $stores_num_90,
+            'stores_num_80' => $stores_num_80,
+            'stores_num_80_less' => $stores_num_80_less,
+        ];
+
+    }
+
+    /**
+     * 获取总计统计数 (鞋履)
+     */
+    public function get_store_shoe_statistic() {
+
+        $sql_store_statistic = "select count(*) as 
+        manager_store_num,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num, 
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num, 
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num
+        from sp_skc_shoe_detail where 1;";
+
+        $sql_store_statistic_100 = "select count(*) as 
+        manager_store_num_100,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_100, 
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_100, 
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_100,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_100,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_100,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_100,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_100,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_100
+        from sp_skc_shoe_detail where skc_fill_rate>=1;";
+
+        $sql_store_statistic_90 = "select count(*) as 
+        manager_store_num_90,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_90,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_90,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_90,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_90,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_90,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_90,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_90,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_90
+        from sp_skc_shoe_detail where skc_fill_rate>=0.9 and skc_fill_rate<1;";
+
+        $sql_store_statistic_80 = "select count(*) as 
+        manager_store_num_80,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_80,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_80,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_80,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_80,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_80,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_80,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_80,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_80
+        from sp_skc_shoe_detail where skc_fill_rate>=0.8 and skc_fill_rate<0.9;";
+
+        $sql_store_statistic_80_less = "select count(*) as 
+        manager_store_num_80_less,
+        sum(case when xjxj_num=1 then 1 else 0 END) as 1_xjxj_num_80_less,
+        sum(case when xjxj_num=2 then 1 else 0 END) as 2_xjxj_num_80_less,
+        sum(case when xjxj_num=3 then 1 else 0 END) as 3_xjxj_num_80_less,
+        sum(case when xjxj_num=4 then 1 else 0 END) as 4_xjxj_num_80_less,
+        sum(case when xjxj_num=5 then 1 else 0 END) as 5_xjxj_num_80_less,
+        sum(case when xjxj_num=6 then 1 else 0 END) as 6_xjxj_num_80_less,
+        sum(case when xjxj_num=7 then 1 else 0 END) as 7_xjxj_num_80_less,
+        sum(case when xjxj_num=8 then 1 else 0 END) as 8_xjxj_num_80_less
+        from sp_skc_shoe_detail where skc_fill_rate<0.8;";
+
+        $store_statistic = $this->bi_db->Query($sql_store_statistic);
+        $store_statistic_100 = $this->bi_db->Query($sql_store_statistic_100);
+        $store_statistic_90 = $this->bi_db->Query($sql_store_statistic_90);
+        $store_statistic_80 = $this->bi_db->Query($sql_store_statistic_80);
+        $store_statistic_80_less = $this->bi_db->Query($sql_store_statistic_80_less);
+        return [
+            'store_statistic' => $store_statistic,
+            'store_statistic_100' => $store_statistic_100,
+            'store_statistic_90' => $store_statistic_90,
+            'store_statistic_80' => $store_statistic_80,
+            'store_statistic_80_less' => $store_statistic_80_less,
+        ];
 
     }
 
