@@ -232,52 +232,54 @@ class Skc extends AdminController
 
                 foreach ($res['data'] as &$v_data) {
 
-                    $v_data['week_sales_ck_nz'] = $v_data['week_sales_ck_nz']>0 ? $v_data['week_sales_ck_nz'].'%' : '';
-                    $v_data['week_sales_ck_sw'] = $v_data['week_sales_ck_sw']>0 ? $v_data['week_sales_ck_sw'].'%' : '';
-                    $v_data['week_sales_ck_ckxj'] = $v_data['week_sales_ck_ckxj']>0 ? $v_data['week_sales_ck_ckxj'].'%' : '';
-                    $v_data['week_sales_ck_xx'] = $v_data['week_sales_ck_xx']>0 ? $v_data['week_sales_ck_xx'].'%' : '';
-                    $v_data['week_sales_ck_xxsw'] = $v_data['week_sales_ck_xxsw']>0 ? $v_data['week_sales_ck_xxsw'].'%' : '';
-                    $v_data['week_sales_ck_hx'] = $v_data['week_sales_ck_hx']>0 ? $v_data['week_sales_ck_hx'].'%' : '';
-                    $v_data['week_sales_ck_xxxj'] = $v_data['week_sales_ck_xxxj']>0 ? $v_data['week_sales_ck_xxxj'].'%' : '';
-                    $v_data['week_sales_ck_gz'] = $v_data['week_sales_ck_gz']>0 ? $v_data['week_sales_ck_gz'].'%' : '';
-                    $v_data['week_sales_ck_kk'] = $v_data['week_sales_ck_kk']>0 ? $v_data['week_sales_ck_kk'].'%' : '';
-                    $v_data['week_sales_ck_sj'] = $v_data['week_sales_ck_sj']>0 ? $v_data['week_sales_ck_sj'].'%' : '';
-                    $v_data['week_sales_ck_wk'] = $v_data['week_sales_ck_wk']>0 ? $v_data['week_sales_ck_wk'].'%' : '';
-                    $v_data['week_sales_ck_sjsj'] = $v_data['week_sales_ck_sjsj']>0 ? $v_data['week_sales_ck_sjsj'].'%' : '';
-                    $v_data['week_sales_ck_lw'] = $v_data['week_sales_ck_lw']>0 ? $v_data['week_sales_ck_lw'].'%' : '';
-                    $v_data['week_sales_ck_sjxj'] = $v_data['week_sales_ck_sjxj']>0 ? $v_data['week_sales_ck_sjxj'].'%' : '';
-                    $v_data['week_sales_ck_zj'] = $v_data['week_sales_ck_zj']>0 ? $v_data['week_sales_ck_zj'].'%' : '';
-                    $v_data['week_sales_dk_nz'] = $v_data['week_sales_dk_nz']>0 ? $v_data['week_sales_dk_nz'].'%' : '';
-                    $v_data['week_sales_dk_sw'] = $v_data['week_sales_dk_sw']>0 ? $v_data['week_sales_dk_sw'].'%' : '';
-                    $v_data['week_sales_dk_sj'] = $v_data['week_sales_dk_sj']>0 ? $v_data['week_sales_dk_sj'].'%' : '';
-                    $v_data['week_sales_dk_sjgz'] = $v_data['week_sales_dk_sjgz']>0 ? $v_data['week_sales_dk_sjgz'].'%' : '';
-                    $v_data['week_sales_dk_xxgz'] = $v_data['week_sales_dk_xxgz']>0 ? $v_data['week_sales_dk_xxgz'].'%' : '';
-                    $v_data['week_sales_dk_xx'] = $v_data['week_sales_dk_xx']>0 ? $v_data['week_sales_dk_xx'].'%' : '';
-                    $v_data['week_sales_dk_zj'] = $v_data['week_sales_dk_zj']>0 ? $v_data['week_sales_dk_zj'].'%' : '';
+                    $v_data['week_sales_new_ztpx'] = $v_data['week_sales_new_ztpx']>0 ? $v_data['week_sales_new_ztpx'].'%' : '';
+                    $v_data['week_sales_new_xxx'] = $v_data['week_sales_new_xxx']>0 ? $v_data['week_sales_new_xxx'].'%' : '';
+                    $v_data['week_sales_new_ydx'] = $v_data['week_sales_new_ydx']>0 ? $v_data['week_sales_new_ydx'].'%' : '';
+                    $v_data['week_sales_new_lx'] = $v_data['week_sales_new_lx']>0 ? $v_data['week_sales_new_lx'].'%' : '';
+                    $v_data['week_sales_new_xj'] = $v_data['week_sales_new_xj']>0 ? $v_data['week_sales_new_xj'].'%' : '';
+                    $v_data['week_sales_old_ztpx'] = $v_data['week_sales_old_ztpx']>0 ? $v_data['week_sales_old_ztpx'].'%' : '';
+                    $v_data['week_sales_old_xxx'] = $v_data['week_sales_old_xxx']>0 ? $v_data['week_sales_old_xxx'].'%' : '';
+                    $v_data['week_sales_old_ydx'] = $v_data['week_sales_old_ydx']>0 ? $v_data['week_sales_old_ydx'].'%' : '';
+                    $v_data['week_sales_old_lx'] = $v_data['week_sales_old_lx']>0 ? $v_data['week_sales_old_lx'].'%' : '';
+                    $v_data['week_sales_old_xj'] = $v_data['week_sales_old_xj']>0 ? $v_data['week_sales_old_xj'].'%' : '';                
 
-                    $v_data['skc_ck_nz'] = $v_data['skc_ck_nz'] ?: '';
-                    $v_data['skc_ck_sw'] = $v_data['skc_ck_sw'] ?: '';
-                    $v_data['skc_ck_nzxj'] = $v_data['skc_ck_nzxj'] ?: '';
-                    $v_data['skc_ck_xx'] = $v_data['skc_ck_xx'] ?: '';
-                    $v_data['skc_ck_xxsw'] = $v_data['skc_ck_xxsw'] ?: '';
-                    $v_data['skc_ck_hx'] = $v_data['skc_ck_hx'] ?: '';
-                    $v_data['skc_ck_xxxj'] = $v_data['skc_ck_xxxj'] ?: '';
-                    $v_data['skc_ck_gz'] = $v_data['skc_ck_gz'] ?: '';
-                    $v_data['skc_ck_kk'] = $v_data['skc_ck_kk'] ?: '';
-                    $v_data['skc_ck_sjsj'] = $v_data['skc_ck_sjsj'] ?: '';
-                    $v_data['skc_ck_wk'] = $v_data['skc_ck_wk'] ?: '';
-                    $v_data['skc_ck_sj'] = $v_data['skc_ck_sj'] ?: '';
-                    $v_data['skc_ck_lw'] = $v_data['skc_ck_lw'] ?: '';
-                    $v_data['skc_ck_sjxj'] = $v_data['skc_ck_sjxj'] ?: '';
-                    $v_data['skc_ck_zj'] = $v_data['skc_ck_zj'] ?: '';
-                    $v_data['skc_dk_nz'] = $v_data['skc_dk_nz'] ?: '';
-                    $v_data['skc_dk_sw'] = $v_data['skc_dk_sw'] ?: '';
-                    $v_data['skc_dk_sj'] = $v_data['skc_dk_sj'] ?: '';
-                    $v_data['skc_dk_sjgz'] = $v_data['skc_dk_sjgz'] ?: '';
-                    $v_data['skc_dk_xxgz'] = $v_data['skc_dk_xxgz'] ?: '';
-                    $v_data['skc_dk_xx'] = $v_data['skc_dk_xx'] ?: '';
-                    $v_data['skc_dk_zj'] = $v_data['skc_dk_zj'] ?: '';
+                    $v_data['skc_new_ztpx'] = $v_data['skc_new_ztpx'] ?: '';
+                    $v_data['skc_new_xxx'] = $v_data['skc_new_xxx'] ?: '';
+                    $v_data['skc_new_ydx'] = $v_data['skc_new_ydx'] ?: '';
+                    $v_data['skc_new_lx'] = $v_data['skc_new_lx'] ?: '';
+                    $v_data['skc_new_xj'] = $v_data['skc_new_xj'] ?: '';
+                    $v_data['skc_old_ztpx'] = $v_data['skc_old_ztpx'] ?: '';
+                    $v_data['skc_old_xxx'] = $v_data['skc_old_xxx'] ?: '';
+                    $v_data['skc_old_ydx'] = $v_data['skc_old_ydx'] ?: '';
+                    $v_data['skc_old_lx'] = $v_data['skc_old_lx'] ?: '';
+                    $v_data['skc_old_xj'] = $v_data['skc_old_xj'] ?: '';
                     $v_data['skc_zj'] = $v_data['skc_zj'] ?: '';
+                    $v_data['skc_fill_rate'] = $v_data['skc_fill_rate'] ?: '';
+
+                    $v_data['duanma_new_ztpx'] = $v_data['duanma_new_ztpx'] ?: '';
+                    $v_data['duanma_new_xxx'] = $v_data['duanma_new_xxx'] ?: '';
+                    $v_data['duanma_new_ydx'] = $v_data['duanma_new_ydx'] ?: '';
+                    $v_data['duanma_new_lx'] = $v_data['duanma_new_lx'] ?: '';
+                    $v_data['duanma_new_xj'] = $v_data['duanma_new_xj'] ?: '';
+                    $v_data['duanma_old_ztpx'] = $v_data['duanma_old_ztpx'] ?: '';
+                    $v_data['duanma_old_xxx'] = $v_data['duanma_old_xxx'] ?: '';
+                    $v_data['duanma_old_ydx'] = $v_data['duanma_old_ydx'] ?: '';
+                    $v_data['duanma_old_lx'] = $v_data['duanma_old_lx'] ?: '';
+                    $v_data['duanma_old_xj'] = $v_data['duanma_old_xj'] ?: '';
+                    $v_data['duanma_zsl'] = $v_data['duanma_zsl'] ?: '';
+                    
+                    $v_data['instore_new_ztpx'] = $v_data['instore_new_ztpx'] ?: '';
+                    $v_data['instore_new_xxx'] = $v_data['instore_new_xxx'] ?: '';
+                    $v_data['instore_new_ydx'] = $v_data['instore_new_ydx'] ?: '';
+                    $v_data['instore_new_lx'] = $v_data['instore_new_lx'] ?: '';
+                    $v_data['instore_new_xj'] = $v_data['instore_new_xj'] ?: '';
+                    $v_data['instore_old_ztpx'] = $v_data['instore_old_ztpx'] ?: '';
+                    $v_data['instore_old_xxx'] = $v_data['instore_old_xxx'] ?: '';
+                    $v_data['instore_old_ydx'] = $v_data['instore_old_ydx'] ?: '';
+                    $v_data['instore_old_lx'] = $v_data['instore_old_lx'] ?: '';
+                    $v_data['instore_old_xj'] = $v_data['instore_old_xj'] ?: '';
+                    $v_data['instore_zsl'] = $v_data['instore_zsl'] ?: '';
+                    $v_data['instore_dksd'] = $v_data['instore_dksd'] ?: '';
 
                 }
 
@@ -297,9 +299,6 @@ class Skc extends AdminController
      * 鞋履-总计
      */
     public function get_shoe_statistic() {
-        // test...
-        // $res = $this->service->get_shoe_statistic();
-        // print_r($res);die;
 
         if (request()->isAjax()) {
 
