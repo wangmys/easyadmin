@@ -395,6 +395,22 @@ class Duanmalv extends AdminController
         }
     }
 
+    // 
+    public function test() {
+        return View('test', [
+
+        ]);
+    }
+
+    /**
+     * @NodeAnotation(title="报表规则提醒") 
+     */
+    public function tips() {
+        return View('tips', [
+
+        ]);
+    }
+
     /**
      * @NodeAnotation(title="单店TOP60及断码数") 
      */
@@ -1637,13 +1653,6 @@ class Duanmalv extends AdminController
         // die;
         return $arr;
     }
-
-    public function test3() {
-        $age=array("Peter"=>"35","Ben"=>"37","Joe"=>"43");
-        arsort($age);
-
-    }
-
 
     // 保留1位小数不进位
     public function float1($num = 0) {

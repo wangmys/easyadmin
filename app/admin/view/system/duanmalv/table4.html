@@ -92,6 +92,19 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        th[data-field="5"][data-key="1-0-5"],th[data-field="7"][data-key="1-0-7"],th[data-field="9"][data-key="1-0-9"],th[data-field="11"][data-key="1-0-11"],th[data-field="13"][data-key="1-0-13"] 
+        ,th[data-field="15"][data-key="1-0-15"],th[data-field="17"][data-key="1-0-17"],th[data-field="19"][data-key="1-0-19"],th[data-field="21"][data-key="1-0-21"]
+        ,th[data-field="23"][data-key="1-0-23"]{
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="6"][data-key="1-0-6"],th[data-field="8"][data-key="1-0-8"],th[data-field="10"][data-key="1-0-10"],th[data-field="12"][data-key="1-0-12"],th[data-field="14"][data-key="1-0-14"] 
+        ,th[data-field="16"][data-key="1-0-16"],th[data-field="18"][data-key="1-0-18"],th[data-field="20"][data-key="1-0-20"],th[data-field="22"][data-key="1-0-22"]
+        ,th[data-field="24"][data-key="1-0-24"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
     </style>
 </head>
 
@@ -325,7 +338,7 @@
                 , loading: true
                 , method: 'post'
                 // , toolbar: '#toolbar1'
-                , toolbar: 'true'
+                , toolbar: false
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]

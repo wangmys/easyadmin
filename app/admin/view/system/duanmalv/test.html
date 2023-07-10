@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+
+        .cima {
+            height:18px; 
+            line-height:18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex row end between test" style="display: none;">
+        <div class="flex col test" style="width:200px; height: 300px;">
+            <div class="test1">11</div>
+            <div class="test2">22</div>
+        </div>
+        <div class="test2" style="width:200px;">222</div>
+        <div class="test3" style="width:200px;">333</div>
+    </div> 
+
+    <!-- 内容 -->
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 20px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">整体-单店 统计 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+</html>
+
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】整体情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Duanmalv/table1')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_table1')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Duanmalv/getXmMapSelect')}"
+            , url_setTime = "{:url('admin/system.Duanmalv/duanmalvDateHandle')}"
+
+        startTable();
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                , toolbar: true
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 750
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center' ,rowspan: 5}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 5}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 5}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 5}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 5}
+                    , { title: '预计库存量', align: 'center' ,colspan: 12}
+                    , { title: '预计库存量2', align: 'center' ,colspan: 12}
+                    , { title: '预计库存量3', align: 'center' ,colspan: 12}
+                    ],
+                    [{ title:  `<div class="flex col around">
+                                 <div class="cima">28</div>
+                                 <div class="cima">44</div>
+                                 <div class="cima">37</div>
+                                 <div class="cima">S</div>
+                               </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                 <div class="cima">29</div>
+                                 <div class="cima">46</div>
+                                 <div class="cima">38</div>
+                                 <div class="cima">S</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">30</div>
+                                 <div class="cima">48</div>
+                                 <div class="cima">39</div>
+                                 <div class="cima">L</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                <div class="cima">31</div>
+                                <div class="cima">50</div>
+                                <div class="cima">40</div>
+                                <div class="cima">XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">32</div>
+                                <div class="cima">52</div>
+                                <div class="cima">41</div>
+                                <div class="cima">2XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">33</div>
+                                <div class="cima">54</div>
+                                <div class="cima">42</div>
+                                <div class="cima">3XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">34</div>
+                                <div class="cima">56</div>
+                                <div class="cima">43</div>
+                                <div class="cima">4XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">35</div>
+                                <div class="cima">58</div>
+                                <div class="cima">44</div>
+                                <div class="cima">5XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">36</div>
+                                <div class="cima">60</div>
+                                <div class="cima">00</div>
+                                <div class="cima">6XL</div> 
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">38</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima">7XL</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">40</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: '合计', align: 'center',rowspan: 2, width: 45}
+
+
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">28</div>
+                                 <div class="cima">44</div>
+                                 <div class="cima">37</div>
+                                 <div class="cima">S</div>
+                               </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                 <div class="cima">29</div>
+                                 <div class="cima">46</div>
+                                 <div class="cima">38</div>
+                                 <div class="cima">S</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">30</div>
+                                 <div class="cima">48</div>
+                                 <div class="cima">39</div>
+                                 <div class="cima">L</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                <div class="cima">31</div>
+                                <div class="cima">50</div>
+                                <div class="cima">40</div>
+                                <div class="cima">XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">32</div>
+                                <div class="cima">52</div>
+                                <div class="cima">41</div>
+                                <div class="cima">2XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">33</div>
+                                <div class="cima">54</div>
+                                <div class="cima">42</div>
+                                <div class="cima">3XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">34</div>
+                                <div class="cima">56</div>
+                                <div class="cima">43</div>
+                                <div class="cima">4XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">35</div>
+                                <div class="cima">58</div>
+                                <div class="cima">44</div>
+                                <div class="cima">5XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">36</div>
+                                <div class="cima">60</div>
+                                <div class="cima">00</div>
+                                <div class="cima">6XL</div> 
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">38</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima">7XL</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">40</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: '合计', align: 'center',rowspan: 2, width: 45}
+
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">28</div>
+                                 <div class="cima">44</div>
+                                 <div class="cima">37</div>
+                                 <div class="cima">S</div>
+                               </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                 <div class="cima">29</div>
+                                 <div class="cima">46</div>
+                                 <div class="cima">38</div>
+                                 <div class="cima">S</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">30</div>
+                                 <div class="cima">48</div>
+                                 <div class="cima">39</div>
+                                 <div class="cima">L</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title:  `<div class="flex col around">
+                                <div class="cima">31</div>
+                                <div class="cima">50</div>
+                                <div class="cima">40</div>
+                                <div class="cima">XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">32</div>
+                                <div class="cima">52</div>
+                                <div class="cima">41</div>
+                                <div class="cima">2XL</div>    
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">33</div>
+                                <div class="cima">54</div>
+                                <div class="cima">42</div>
+                                <div class="cima">3XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">34</div>
+                                <div class="cima">56</div>
+                                <div class="cima">43</div>
+                                <div class="cima">4XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">35</div>
+                                <div class="cima">58</div>
+                                <div class="cima">44</div>
+                                <div class="cima">5XL</div>  
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">36</div>
+                                <div class="cima">60</div>
+                                <div class="cima">00</div>
+                                <div class="cima">6XL</div> 
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">38</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima">7XL</div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">40</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                </div>`, align: 'center',colspan: 1, rowspan: 1, width: 35}
+                    ,{ title: '合计', align: 'center',rowspan: 2, width: 45}
+                    ],
+                ]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
