@@ -37,7 +37,7 @@ class Skc_sz_detail extends Command
 
         $skc_win_nums = SpSkcWinNumModel::where([])->column('*', 'key_str');
 
-        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from sp_ww_customer c inner join customer_regionid cr on c.店铺名称=cr.店铺名称 where c.经营模式 in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from sp_ww_customer c inner join customer_regionid cr on c.店铺名称=cr.店铺名称 where c.经营模式 in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96', '98');");
         $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('dt_price,dc_price')->find();
         $dt_price = $skc_config ? $skc_config['dt_price'] : 50;
         $dc_price = $skc_config ? $skc_config['dc_price'] : 80;

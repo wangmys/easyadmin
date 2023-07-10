@@ -13,6 +13,7 @@ use app\admin\model\bi\SpWwCustomerModel;
 use app\admin\model\bi\SpWwChunxiaSalesModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 use app\admin\model\bi\SpWwXiaStock2022Model;
+use app\admin\model\bi\SpWwXiaJiamengStock2022Model;
 use app\admin\model\bi\SpSkcKzNumModel;
 use app\admin\model\bi\SpSkcKzDetailModel;
 use app\admin\model\bi\SpSkcConfigModel;
@@ -37,7 +38,7 @@ class Skc_kz_detail extends Command
 
         $skc_kt_nums = SpSkcKzNumModel::where([])->column('*', 'kt_num');
 
-        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96', '98');");
         $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('dk_price,ck_price')->find();
         $dk_price = $skc_config ? $skc_config['dk_price'] : 70;//短裤
         $ck_price = $skc_config ? $skc_config['ck_price'] : 100;//长裤
@@ -80,12 +81,12 @@ class Skc_kz_detail extends Command
                 $week_sales_ck_hx = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '西裤']])->sum('销售金额');
                 $week_sales_ck_xxxj = $week_sales_ck_xxck_sum + $week_sales_ck_hx;
                 //松紧长裤
-                $week_sales_ck_gz = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '工装长裤']])->sum('销售金额');
-                $week_sales_ck_kk = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '宽口松紧长裤']])->sum('销售金额');
-                $week_sales_ck_sj = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '束脚松紧长裤']])->sum('销售金额');
-                $week_sales_ck_wk = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '卫裤']])->sum('销售金额');
+                $week_sales_ck_gz = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', 'like', '%工装%']])->sum('销售金额');
+                $week_sales_ck_kk = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', 'like', '%宽口%']])->sum('销售金额');
+                $week_sales_ck_sj = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', 'like', '%束脚%']])->sum('销售金额');
+                $week_sales_ck_wk = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', 'like', '%卫裤%']])->sum('销售金额');
                 $week_sales_ck_sjsj = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '松紧长裤']])->sum('销售金额');
-                $week_sales_ck_lw = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', '=', '罗纹松紧长裤']])->sum('销售金额');
+                $week_sales_ck_lw = SpWwChunxiaSalesModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['大类', '=', '下装'], ['中类', '=', '松紧长裤'], ['小类', 'like', '%罗纹%']])->sum('销售金额');
                 $week_sales_ck_sjxj = $week_sales_ck_gz + $week_sales_ck_kk + $week_sales_ck_sj + $week_sales_ck_wk + $week_sales_ck_sjsj + $week_sales_ck_lw;
                 //长裤总计
                 $week_sales_ck_zj = $week_sales_ck_ckxj + $week_sales_ck_xxxj + $week_sales_ck_sjxj;
@@ -101,33 +102,33 @@ class Skc_kz_detail extends Command
 
                 //skc
                 //skc-牛仔长裤
-                $skc_ck_nzxj = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_sw = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_nzxj = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_sw = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
                 $skc_ck_nz = $skc_ck_nzxj - $skc_ck_sw;
                 //skc-休闲长裤
-                $skc_ck_xxck_sum = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_xxsw = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_xxck_sum = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_xxsw = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
                 $skc_ck_xx = $skc_ck_xxck_sum - $skc_ck_xxsw;
                 //skc-西裤
-                $skc_ck_hx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_hx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
                 $skc_ck_xxxj = $skc_ck_xxck_sum + $skc_ck_hx;
                 //skc-松紧长裤
-                $skc_ck_gz = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '工装长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_kk = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '宽口松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_sjsj = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '束脚松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_wk = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '卫裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_sj = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_ck_lw = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '罗纹松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_gz = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_kk = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%宽口%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_sjsj = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%束脚%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_wk = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%卫裤%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_sj = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_ck_lw = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%罗纹%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
                 $skc_ck_sjxj = $skc_ck_gz + $skc_ck_kk + $skc_ck_sjsj + $skc_ck_wk + $skc_ck_sj + $skc_ck_lw;
                 //skc-长裤总计
                 $skc_ck_zj = $skc_ck_nzxj + $skc_ck_xxxj + $skc_ck_sjxj;
                 //skc-短裤
-                $skc_dk_nz = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_dk_sw = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_dk_sj = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_dk_sjgz = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_dk_xxgz = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
-                $skc_dk_xx = SpWwChunxiaStockModel::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_nz = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_sw = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_sj = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_sjgz = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_xxgz = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                $skc_dk_xx = SpWwChunxiaStockModel::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
                 $skc_dk_zj = $skc_dk_nz + $skc_dk_sw + $skc_dk_sj + $skc_dk_sjgz + $skc_dk_xxgz + $skc_dk_xx;
                 //skc-总计（长裤+短裤）
                 $skc_zj = $skc_ck_zj + $skc_dk_zj;
@@ -136,85 +137,85 @@ class Skc_kz_detail extends Command
 
                     //skc-牛仔长裤
                     $skc_ck_nzxj = $skc_ck_nzxj 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_sw = $skc_ck_sw 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔长裤'], ['分类', '=', '商务牛仔长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_nz = $skc_ck_nzxj - $skc_ck_sw;
 
                     //skc-休闲长裤
                     $skc_ck_xxck_sum = $skc_ck_xxck_sum
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_xxsw = $skc_ck_xxsw 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲长裤'], ['分类', '=', '商务休闲长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_xx = $skc_ck_xxck_sum - $skc_ck_xxsw;
 
                     //skc-西裤
                     $skc_ck_hx = $skc_ck_hx 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '西裤'], ['分类', '=', '化纤西裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_xxxj = $skc_ck_xxck_sum + $skc_ck_hx;
 
                     //skc-松紧长裤
                     $skc_ck_gz = $skc_ck_gz 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '工装长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '工装长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_kk = $skc_ck_kk 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '宽口松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '宽口松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%宽口%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%宽口%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_sjsj = $skc_ck_sjsj 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '束脚松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '束脚松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%束脚%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%束脚%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_wk = $skc_ck_wk 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '卫裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '卫裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%卫裤%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%卫裤%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_sj = $skc_ck_sj 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_lw = $skc_ck_lw 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '罗纹松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', '=', '罗纹松紧长裤'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%罗纹%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧长裤'], ['分类', 'like', '%罗纹%'], ['当前零售价', '>', $ck_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_ck_sjxj = $skc_ck_gz + $skc_ck_kk + $skc_ck_sjsj + $skc_ck_wk + $skc_ck_sj + $skc_ck_lw;
                     //skc-长裤总计
                     $skc_ck_zj = $skc_ck_nzxj + $skc_ck_xxxj + $skc_ck_sjxj;
                     //skc-短裤
                     $skc_dk_nz = $skc_dk_nz 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%牛仔%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_sw = $skc_dk_sw 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '牛仔短裤'], ['分类', 'like', '%商务%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_sj = $skc_dk_sj 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%松紧%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_sjgz = $skc_dk_sjgz 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '松紧短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_xxgz = $skc_dk_xxgz 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%工装%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_xx = $skc_dk_xx 
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
-                    + SpWwXiaStock2022Model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '春季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_chun]])->sum('库存SKC数')
+                    + SpWwXiaJiamengStock2022Model::where([['`当前零售价`'.'/'.'`零售价`', '>=', config('skc.shoe_proportion')], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', '下装'],  ['风格', '=', '基本款'], ['季节归集', '=', '夏季'], ['二级分类', '=', '休闲短裤'], ['分类', 'like', '%休闲%'], ['当前零售价', '>', $dk_price], ['预计库存', '>', $stock_year_22_23]])->sum('库存SKC数');
 
                     $skc_dk_zj = $skc_dk_nz + $skc_dk_sw + $skc_dk_sj + $skc_dk_sjgz + $skc_dk_xxgz + $skc_dk_xx;
                     //skc-总计（长裤+短裤）

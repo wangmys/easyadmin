@@ -219,4 +219,98 @@ class Skc extends AdminController
 
     }
 
+    /**
+     * 单店鞋履明细
+     */
+    public function get_shoe_index() {
+
+        if (request()->isAjax()) {
+
+            $params = $this->request->param();
+            $res = $this->service->get_shoe_index($params);
+            if ($res['data']) {
+
+                foreach ($res['data'] as &$v_data) {
+
+                    $v_data['week_sales_new_ztpx'] = $v_data['week_sales_new_ztpx']>0 ? $v_data['week_sales_new_ztpx'].'%' : '';
+                    $v_data['week_sales_new_xxx'] = $v_data['week_sales_new_xxx']>0 ? $v_data['week_sales_new_xxx'].'%' : '';
+                    $v_data['week_sales_new_ydx'] = $v_data['week_sales_new_ydx']>0 ? $v_data['week_sales_new_ydx'].'%' : '';
+                    $v_data['week_sales_new_lx'] = $v_data['week_sales_new_lx']>0 ? $v_data['week_sales_new_lx'].'%' : '';
+                    $v_data['week_sales_new_xj'] = $v_data['week_sales_new_xj']>0 ? $v_data['week_sales_new_xj'].'%' : '';
+                    $v_data['week_sales_old_ztpx'] = $v_data['week_sales_old_ztpx']>0 ? $v_data['week_sales_old_ztpx'].'%' : '';
+                    $v_data['week_sales_old_xxx'] = $v_data['week_sales_old_xxx']>0 ? $v_data['week_sales_old_xxx'].'%' : '';
+                    $v_data['week_sales_old_ydx'] = $v_data['week_sales_old_ydx']>0 ? $v_data['week_sales_old_ydx'].'%' : '';
+                    $v_data['week_sales_old_lx'] = $v_data['week_sales_old_lx']>0 ? $v_data['week_sales_old_lx'].'%' : '';
+                    $v_data['week_sales_old_xj'] = $v_data['week_sales_old_xj']>0 ? $v_data['week_sales_old_xj'].'%' : '';                
+
+                    $v_data['skc_new_ztpx'] = $v_data['skc_new_ztpx'] ?: '';
+                    $v_data['skc_new_xxx'] = $v_data['skc_new_xxx'] ?: '';
+                    $v_data['skc_new_ydx'] = $v_data['skc_new_ydx'] ?: '';
+                    $v_data['skc_new_lx'] = $v_data['skc_new_lx'] ?: '';
+                    $v_data['skc_new_xj'] = $v_data['skc_new_xj'] ?: '';
+                    $v_data['skc_old_ztpx'] = $v_data['skc_old_ztpx'] ?: '';
+                    $v_data['skc_old_xxx'] = $v_data['skc_old_xxx'] ?: '';
+                    $v_data['skc_old_ydx'] = $v_data['skc_old_ydx'] ?: '';
+                    $v_data['skc_old_lx'] = $v_data['skc_old_lx'] ?: '';
+                    $v_data['skc_old_xj'] = $v_data['skc_old_xj'] ?: '';
+                    $v_data['skc_zj'] = $v_data['skc_zj'] ?: '';
+                    $v_data['skc_fill_rate'] = $v_data['skc_fill_rate'] ?: '';
+
+                    $v_data['duanma_new_ztpx'] = $v_data['duanma_new_ztpx'] ?: '';
+                    $v_data['duanma_new_xxx'] = $v_data['duanma_new_xxx'] ?: '';
+                    $v_data['duanma_new_ydx'] = $v_data['duanma_new_ydx'] ?: '';
+                    $v_data['duanma_new_lx'] = $v_data['duanma_new_lx'] ?: '';
+                    $v_data['duanma_new_xj'] = $v_data['duanma_new_xj'] ?: '';
+                    $v_data['duanma_old_ztpx'] = $v_data['duanma_old_ztpx'] ?: '';
+                    $v_data['duanma_old_xxx'] = $v_data['duanma_old_xxx'] ?: '';
+                    $v_data['duanma_old_ydx'] = $v_data['duanma_old_ydx'] ?: '';
+                    $v_data['duanma_old_lx'] = $v_data['duanma_old_lx'] ?: '';
+                    $v_data['duanma_old_xj'] = $v_data['duanma_old_xj'] ?: '';
+                    $v_data['duanma_zsl'] = $v_data['duanma_zsl'] ?: '';
+                    
+                    $v_data['instore_new_ztpx'] = $v_data['instore_new_ztpx'] ?: '';
+                    $v_data['instore_new_xxx'] = $v_data['instore_new_xxx'] ?: '';
+                    $v_data['instore_new_ydx'] = $v_data['instore_new_ydx'] ?: '';
+                    $v_data['instore_new_lx'] = $v_data['instore_new_lx'] ?: '';
+                    $v_data['instore_new_xj'] = $v_data['instore_new_xj'] ?: '';
+                    $v_data['instore_old_ztpx'] = $v_data['instore_old_ztpx'] ?: '';
+                    $v_data['instore_old_xxx'] = $v_data['instore_old_xxx'] ?: '';
+                    $v_data['instore_old_ydx'] = $v_data['instore_old_ydx'] ?: '';
+                    $v_data['instore_old_lx'] = $v_data['instore_old_lx'] ?: '';
+                    $v_data['instore_old_xj'] = $v_data['instore_old_xj'] ?: '';
+                    $v_data['instore_zsl'] = $v_data['instore_zsl'] ?: '';
+                    $v_data['instore_dksd'] = $v_data['instore_dksd'] ?: '';
+
+                }
+
+            }
+            // print_r($res);die;
+
+            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'],  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('system/skc/get_shoe_index', [
+
+            ]);
+        }        
+
+    }
+
+    /**
+     * 鞋履-总计
+     */
+    public function get_shoe_statistic() {
+
+        if (request()->isAjax()) {
+
+            $res = $this->service->get_shoe_statistic();
+
+            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'],  'create_time' => date('Y-m-d')]);
+        } else {
+            return View('system/skc/get_shoe_statistic', [
+
+            ]);
+        }        
+
+    }
+
 }
