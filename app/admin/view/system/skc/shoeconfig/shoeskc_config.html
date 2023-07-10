@@ -1,0 +1,31 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-shoeskc_config-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">鞋履价格</th>
+                <th style="width: 300px;">不展示店铺数据</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="shoeskc_config-select" lay-data="{:htmlspecialchars(json_encode($shoeskc_config))}">
+                <td class="shoe_price">
+                    <input type="text" name="shoe_price" lay-verify="required" placeholder="请输入" value="{$shoeskc_config['shoe_price']}" class="layui-input">
+                </td>
+
+                <td class="skc_shoe_nostore"></td>
+
+                <td class="handler">
+                    <input type="text" name="sign_id" class="layui-hide" value="{$shoeskc_config['config_str']}">
+                    <button type="button" class="layui-btn layui-btn-normal get_shoeskc_config">保存</button>
+                    <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                </td>
+            </tr>
+       
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="shoeskc_config" class="layui-hide" value="{:htmlspecialchars(json_encode($shoeskc_config))}">

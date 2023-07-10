@@ -491,7 +491,8 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list = $list ? $list->toArray() : [];
         $skc_sz_nostore = $list['skc_sz_nostore'] ? explode(',', $list['skc_sz_nostore']) : [];
         //skc上装 不考核店铺处理
-        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $customer_regionid = config('skc.customer_regionid');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
         $all_customers = array_column($all_customers, 'CustomerName');
         $all_customers = array_combine($all_customers, $all_customers) ;
         $arr = [];
@@ -994,7 +995,8 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list = $list ? $list->toArray() : [];
         $skc_kz_nostore = $list['skc_kz_nostore'] ? explode(',', $list['skc_kz_nostore']) : [];
         //skc上装 不考核店铺处理
-        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96');");
+        $customer_regionid = config('skc.customer_regionid');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
         $all_customers = array_column($all_customers, 'CustomerName');
         $all_customers = array_combine($all_customers, $all_customers) ;
         $arr = [];
@@ -1392,6 +1394,92 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
             'store_statistic_80' => $store_statistic_80,
             'store_statistic_80_less' => $store_statistic_80_less,
         ];
+
+    }
+
+    /**
+     * 获取鞋架陈列标准配置
+     */
+    public function get_skc_shoe_num() {
+
+        $list = SpSkcShoeNumModel::where([])->field('id,key_str,area_range,shoe_num,skc_zt,skc_xx,skc_ydx,skc_lx')->select();
+        $list = $list ? $list->toArray() : [];
+        return $list;
+
+    }
+
+    /**
+     * 保存鞋架陈列标准配置
+     */
+    public function save_skc_shoe_num($data) {
+
+        $id = null;
+        if ($data) {
+            $id = $data['id'];
+            if ($id != '') {//更新
+
+                $data['total_num'] =  $data['skc_zt']+$data['skc_xx']+$data['skc_ydx']+$data['skc_lx'];
+                $data['key_str'] =  $data['area_range'].$data['shoe_num'];
+                SpSkcShoeNumModel::where([['id', '=', $id]])->update($data);
+
+            } else {//插入
+
+                $data['total_num'] =  $data['skc_zt']+$data['skc_xx']+$data['skc_ydx']+$data['skc_lx'];
+                $data['key_str'] =  $data['area_range'].$data['shoe_num'];
+                $id = SpSkcShoeNumModel::create($data);
+                $id = $id->id;
+
+            }
+        }
+        return $id;
+
+    }
+
+    /**
+     * 检测是否已存在
+     */
+    public function check_skc_shoe_num($key_str) {
+
+        return SpSkcShoeNumModel::where([['key_str', '=', $key_str]])->field('id')->find();
+
+    }
+
+    /**
+     * 删除鞋架陈列标准配置
+     */
+    public function del_skc_shoe_num($id) {
+
+        return SpSkcShoeNumModel::where([['id', '=', $id]])->delete();
+
+    }
+
+    /**
+     * 获取skc价格配置(鞋子)
+     */
+    public function get_skc_shoe_config() {
+
+        $list = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('config_str,shoe_price,skc_shoe_nostore')->find();
+        $list = $list ? $list->toArray() : [];
+        $skc_shoe_nostore = $list['skc_shoe_nostore'] ? explode(',', $list['skc_shoe_nostore']) : [];
+        //不考核店铺处理
+        $customer_regionid = config('skc.customer_regionid');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
+        $all_customers = array_column($all_customers, 'CustomerName');
+        $all_customers = array_combine($all_customers, $all_customers) ;
+
+        $arr = [];
+        foreach ($all_customers as $v_customer) {
+            $tmp_arr = [];
+            $tmp_arr['name'] = $v_customer;
+            $tmp_arr['value'] = $v_customer;
+            if (in_array($v_customer, $skc_shoe_nostore)) {
+                $tmp_arr['selected'] = true;
+            }
+            $arr[] = $tmp_arr;
+        }
+        $list['skc_shoe_nostore'] = $arr;
+
+        return $list;
 
     }
 

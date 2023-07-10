@@ -11,5 +11,6 @@ return [
     'shoe_expect_stock' => '2',
     'shoe_lianma_num' => 3,
     'shoe_proportion' => 1,
+    'customer_regionid' => "'91', '92', '93', '94', '95', '96', '98'",
 
 ];

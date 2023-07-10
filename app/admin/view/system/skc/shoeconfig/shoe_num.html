@@ -1,0 +1,48 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-shoe_num-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">仓库面积划分</th>
+                <th style="width: 120px;">鞋柜/墙</th>
+                <th style="width: 120px;">正统</th>
+                <th style="width: 120px;">休闲</th>
+                <th style="width: 120px;">运动鞋</th>
+                <th style="width: 120px;">凉鞋</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="6">
+                    <span>添加操作</span>
+                </td>
+                <td colspan="1">
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn add_shoe_num">增加</button>
+                    </div>
+                </td>
+            </tr>
+        {foreach $shoe_num_list as $vo}
+        <tr class="skc_shoe_num-select" lay-data="{:htmlspecialchars(json_encode($vo['id']))}">
+            {foreach $vo as $key => $val}
+            {if ($key!='id' && $key!='key_str')}
+            <td class="{$key}">
+                <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入" value="{$val}" class="layui-input">
+            </td>
+            {/if}
+            {/foreach}
+            <td class="handler">
+                <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                <button type="button" class="layui-btn layui-btn-normal get">保存</button>
+                <button type="button" class="layui-btn layui-btn-danger del">删除</button>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="shoe_num_head" class="layui-hide" value="{:htmlspecialchars(json_encode($shoe_num_head))}">
+<input type="text" id="shoe_num_list" class="layui-hide" value="{:htmlspecialchars(json_encode($shoe_num_list))}">
