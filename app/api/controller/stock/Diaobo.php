@@ -13,7 +13,7 @@ class Diaobo extends BaseController
     //调拨前后json导出
     public function create_diaobo_json() {
         
-        ini_set('memory_limit','500M');
+        ini_set('memory_limit','1024M');
         
         $start_date = input('start_date');
         $end_date = input('end_date');
