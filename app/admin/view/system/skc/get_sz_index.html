@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>单店上装明细</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
@@ -95,9 +96,53 @@
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营性质</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_type" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品负责人</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-goods_manager" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_name" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">窗数 <=</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <input type="number" name='five_item_num' autocomplete="off" value="0" maxlength="6" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height: 70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">单店上装明细 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -123,9 +168,43 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.skc.Skc/get_sz_index')}" 
-            // , url_download_history_area = "{:url('admin/system.Skc/excel_table4')}" 
+            , url_getXmMapSelect = "{:url('admin/system.skc.Skc/getXmMapSelect')}"
 
+        initFn();
         startTable();
+
+        //省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'province',
+            data: []
+        })
+        //经营性质
+        xmSelect.render({
+            el: '#xm-store_type', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_type',
+            data: []
+        })
+        //商品负责人
+        xmSelect.render({
+            el: '#xm-goods_manager', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'goods_manager',
+            data: []
+        })
+        //店铺名称
+        xmSelect.render({
+            el: '#xm-store_name', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_name',
+            data: []
+        })
 
         // 日期选择器
         laydate.render({
@@ -149,6 +228,78 @@
         //     };
         // });
 
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // console.log(res);
+
+                //省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'province',
+                    data: res.data.province
+                })
+                //经营性质
+                xmSelect.render({
+                    el: '#xm-store_type', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_type',
+                    data: res.data.store_type
+                })
+                //商品负责人
+                xmSelect.render({
+                    el: '#xm-goods_manager', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'goods_manager',
+                    data: res.data.goods_manager
+                })
+                //店铺名称
+                xmSelect.render({
+                    el: '#xm-store_name', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_name',
+                    data: res.data.store_name
+                })
+
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+
         function startTable() {
             table.render({
                 elem: '#table'
@@ -163,16 +314,16 @@
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                     { field: 'area_range', title: '标准划分', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'province', title: '省份', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 4,fixed:'left'}
+                    //  { field: 'area_range', title: '标准划分', align: 'center', rowspan: 4,fixed:'left'}
+                      { field: 'province', title: '省份', align: 'center', rowspan: 4,fixed:'left', width: 35}
+                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 4,fixed:'left', width: 55}
                      , { field: 'goods_manager', title: '商品负责人', align: 'center', rowspan: 4,fixed:'left'}
                      , { field: 'store_name', title: '店铺名称', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 4,fixed:'left', width: 80}
-                     , { field: 'store_level', title: '店铺等级', align: 'center', rowspan: 4,fixed:'left', width: 55}
-                     , { field: 'store_square', title: '店铺面积', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'five_item_num', title: '5件窗个数', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'total_require', title: '总需求', align: 'center', rowspan: 4,fixed:'left'}
+                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 4,fixed:'left', width: 70}
+                     , { field: 'store_level', title: '等级', align: 'center', rowspan: 4,fixed:'left', width: 30}
+                     , { field: 'store_square', title: '面积', align: 'center', rowspan: 4,fixed:'left', width: 30}
+                     , { field: 'five_item_num', title: '窗数', align: 'center', rowspan: 4,fixed:'left', width: 30}
+                     , { field: 'total_require', title: '需求', align: 'center', rowspan: 4,fixed:'left', width: 30}
                     , { title: '近一周零售占比%', colspan: 21, align: 'center' } 
                     , { title: '预计在途SKC数（含在途及已配未发）', colspan: 20, align: 'center' } 
                     , { title: '预计窗数', colspan: 17, align: 'center' } 
