@@ -20,7 +20,7 @@ class AddHistoryData
     public function __construct()
     {
         // 初始化
-        $this->redis = new Redis();
+        $this->redis = new Redis(['password' => 'sg2023-07']);
         // 初始化任务
         $this->setTaskQueue();
         // 初始化连接康雷数据库
