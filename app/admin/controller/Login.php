@@ -17,6 +17,7 @@ use app\admin\model\SystemAdmin;
 use app\common\controller\AdminController;
 use think\captcha\facade\Captcha;
 use think\facade\Env;
+use app\admin\service\LoginService;
 
 /**
  * Class Login
@@ -71,6 +72,14 @@ class Login extends AdminController
             unset($admin['password']);
             $admin['expire_time'] = $post['keep_login'] == 1 ? true : time() + 7200;
             session('admin', $admin);
+            //登录计数
+            $if_exist = LoginService::getInstance()->get_login_count(['username' => $post['username']]);
+            if ($if_exist) {
+                $login_count = $if_exist['login_count'] + 1;
+                LoginService::getInstance()->add_login_count([['username', '=', $post['username']]], ['login_count' => $login_count]);
+            } else {
+                LoginService::getInstance()->save_login_count(['username'=>$post['username'], 'name'=>$admin['name'], 'login_count'=>1]);
+            }
             $this->success('登录成功');
         }
         $this->assign('captcha', $captcha);
