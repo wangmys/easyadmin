@@ -26,9 +26,32 @@ class SkcService
 
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
+        $province = $params['province'] ?? '';
+        $store_type = $params['store_type'] ?? '';
+        $goods_manager = $params['goods_manager'] ?? '';
+        $store_name = $params['store_name'] ?? '';
+        $five_item_num = $params['five_item_num'] ?? '';
 
         $skc_sz_nostore = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('skc_sz_nostore')->find();
-        $list = SpSkcSzDetailModel::where([['store_name', 'not in', $skc_sz_nostore['skc_sz_nostore']]])->paginate([
+        $where[] = ['store_name', 'not in', $skc_sz_nostore['skc_sz_nostore']];
+        
+        if ($province) {
+            $where[] = ['province', 'in', $province];
+        }
+        if ($store_type) {
+            $where[] = ['store_type', 'in', $store_type];
+        }
+        if ($goods_manager) {
+            $where[] = ['goods_manager', 'in', $goods_manager];
+        }
+        if ($store_name) {
+            $where[] = ['store_name', 'in', $store_name];
+        }
+        if ($five_item_num) {
+            $where[] = ['five_item_num', '<=', $five_item_num];
+        }
+
+        $list = SpSkcSzDetailModel::where($where)->paginate([
             'list_rows'=> $pageLimit,
             'page' => $page,
         ]);
@@ -1480,6 +1503,18 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list['skc_shoe_nostore'] = $arr;
 
         return $list;
+
+    }
+
+    public function getXmMapSelect() {
+
+        $province = $this->bi_db->query("select province as name, province as value from sp_skc_sz_detail where province!='' group by province;");
+        $store_type = $this->bi_db->query("select store_type as name, store_type as value from sp_skc_sz_detail where store_type!='' group by store_type;");
+        $goods_manager = $this->bi_db->query("select goods_manager as name, goods_manager as value from sp_skc_sz_detail where goods_manager!='' group by goods_manager;");
+        $store_name = $this->bi_db->query("select store_name as name, store_name as value from sp_skc_sz_detail where store_name!='' group by store_name;");
+
+        return ['province' => $province, 'store_type' => $store_type, 'goods_manager' => $goods_manager, 'store_name' => $store_name,
+    ];
 
     }
 

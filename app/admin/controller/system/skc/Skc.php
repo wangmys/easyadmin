@@ -33,6 +33,7 @@ class Skc extends AdminController
             if ($res['data']) {
 
                 foreach ($res['data'] as &$v_data) {
+                    $v_data['province'] = mb_substr($v_data['province'], 0, 2);
 
                     $v_data['week_sales_fl'] = $v_data['week_sales_fl']>0 ? $v_data['week_sales_fl'].'%' : '';
                     $v_data['week_sales_yl'] = $v_data['week_sales_yl']>0 ? $v_data['week_sales_yl'].'%' : '';
@@ -311,6 +312,13 @@ class Skc extends AdminController
             ]);
         }        
 
+    }
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect() {
+        
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
+        
     }
 
 }
