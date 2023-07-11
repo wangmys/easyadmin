@@ -58,7 +58,7 @@ class CodeService
         // 码比-仓库采购表
         $this->sizePurchaseStockModel = new SizePurchaseStock;
         // 实例化redis客户端
-        $this->redis = new Redis();
+        $this->redis = new Redis(['password' => 'sg2023-07']);
     }
 
     /**
