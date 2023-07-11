@@ -281,7 +281,7 @@ class Chaoliang extends BaseController
     }
 
     public function test() {
-        $this->db_easyA->name('cwl_chaoliang_test')->insert([
+        $this->db_easyA->table('cwl_chaoliang_test')->insert([
             '更新时间' => date('Y-m-d H:i:s', time())
         ]);
     }
