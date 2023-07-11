@@ -144,6 +144,10 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-huohao" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">在途库存</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-zt" class="xm-select-demo"></div>
+                            </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">售空提醒</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-tips" class="xm-select-demo"></div>
@@ -318,6 +322,20 @@
             name: '商品专员',
             // showCount: 1,
             data: [
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-zt', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '在途库存',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "没有在途", value: "0", selected: true},
             ]
         })
 
@@ -500,7 +518,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: 720
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: { "售空提醒" : '即将售空'}
+                , where: { "售空提醒" : '即将售空', '在途库存': '0'}
                 , cols: [[
                      { field: '云仓', title: '云仓', fixed: 'left', align: 'center'}
                     , { field: '省份', title: '省份', fixed: 'left', align: 'center', width: 40}
