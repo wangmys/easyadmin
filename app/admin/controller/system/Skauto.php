@@ -72,10 +72,15 @@ class Skauto extends AdminController
             $pageParams2 = input('limit');
 
             foreach ($input as $key => $val) {
-                if (empty($val)) {
-                    unset($input[$key]);
+                // echo $val;
+                if ( $key != '在途库存') {
+                    if (empty($val)) {
+                        unset($input[$key]);
+                    }
                 }
             }
+
+            // dump($input);die;
             if (checkAdmin()) {
                 if (!empty($input['商品负责人'])) {
                     // echo $input['商品负责人'];
@@ -159,6 +164,13 @@ class Skauto extends AdminController
             } else {
                 $map11 = "";
             }
+            if ($input['在途库存'] === '0') {
+                // echo $input['商品负责人'];
+                $map12Str = xmSelectInput($input['在途库存']);
+                $map12 = " AND 在途库存 + 已配未发 <= {$map12Str}";
+            } else {
+                $map12 = "";
+            }
 
             $sql = "
                 SELECT
@@ -182,11 +194,13 @@ class Skauto extends AdminController
                     {$map9}
                     {$map10}
                     {$map11}
+                    {$map12}
                 order by 
                     省份 asc
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
-            
+            // die;
+
             $select = $this->db_easyA->query($sql);
 
             $sql2 = "
@@ -205,6 +219,7 @@ class Skauto extends AdminController
                     {$map9}
                     {$map10}
                     {$map11}
+                    {$map12}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();

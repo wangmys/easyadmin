@@ -84,7 +84,7 @@ class Index
     
     public function pull()
     {
-        $redis = new Redis;
+        $redis = new Redis(['password' => 'sg2023-07']);
         echo '<pre>';
         print_r($redis->set('x',111));
         die;
