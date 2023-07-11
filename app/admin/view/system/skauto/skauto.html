@@ -533,7 +533,14 @@
                     , { field: '零售价', title: '零售价', align: 'center'}
                     , { field: '当前零售价', title: '当前零售价' , align: 'center'}
                     , { field: '折率', title: '折率' , align: 'center', hide: true}
-                    , { field: '上市天数', title: '上市天数', align: 'center'}
+                    , { field: '上市天数', title: '上市天数', align: 'center', templet: function (data) {
+                        if (data['上市天数'] < 10) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<span style="color: red;">${data['上市天数']}</span>`;
+                        } else {
+                            return data['上市天数'];
+                        }
+                    }}
                     , { field: '首单日期', title: '首单日期', align: 'center', hide: true}
                     , { field: '销售天数', title: '销售天数', align: 'center'}
                     , { field: '总入量', title: '总入量', align: 'center'}
