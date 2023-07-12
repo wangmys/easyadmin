@@ -47,7 +47,7 @@ class SkcService
         if ($store_name) {
             $where[] = ['store_name', 'in', $store_name];
         }
-        if ($five_item_num) {
+        if (is_numeric($five_item_num)) {
             $where[] = ['five_item_num', '<=', $five_item_num];
         }
 
@@ -559,6 +559,7 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $store_type = $params['store_type'] ?? '';
         $goods_manager = $params['goods_manager'] ?? '';
         $store_name = $params['store_name'] ?? '';
+        $skc_ck_zj = $params['skc_ck_zj'] ?? '';
 
         $skc_kz_nostore = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('skc_kz_nostore')->find();
 
@@ -575,6 +576,9 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         }
         if ($store_name) {
             $where[] = ['store_name', 'in', $store_name];
+        }
+        if (is_numeric($skc_ck_zj)) {
+            $where[] = ['skc_ck_zj', '<=', $skc_ck_zj];
         }
 
         $list = SpSkcKzDetailModel::where($where)->paginate([
