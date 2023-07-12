@@ -601,6 +601,7 @@ class ShopbuhuoB extends AdminController
                 调出价格类型,调入价格类型,
                 a.货号,
                 sum(数量) AS 总数量,
+                (select sum(数量) from cwl_qudaodiaobo_2 as t where t.调出店铺名称 = a.调出店铺名称 and t.货号 = a.货号) as 调拨总量,
                 b.`上市天数`,
                 create_time,
                 aid,
@@ -635,7 +636,7 @@ class ShopbuhuoB extends AdminController
     
             $store_in_map = substr($store_in_map, 0, -1);
 
-            // 查询调入店铺7天内是否有情况过
+            // 查询调入店铺7天内是否有清空过
             $store_in_data = $this->db_sqlsrv->query("
                 SELECT
                     T.CustomItem17 商品专员,
@@ -704,9 +705,8 @@ class ShopbuhuoB extends AdminController
 
                 // 调出店铺调拨未完成
                 if ($weiwancheng) {
-
                     // 现有库存 - 调拨未完成数 - 调入店所需数量 
-                    if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] - $val['总数量'] <= 0) {
+                    if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] - $val['调拨总量'] <= 0) {
                         // 1.调出店是否有在途
                         $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
                         if ($diaochu_zaitu) {
@@ -727,7 +727,7 @@ class ShopbuhuoB extends AdminController
                     }
                 // 调出店没有调拨记录    
                 } else {
-                    if ($kucun[0]['actual_quantity'] - $val['总数量'] <= 0) {
+                    if ($kucun[0]['actual_quantity'] - $val['调拨总量'] <= 0) {
                         // 1.调出店是否有在途
                         $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
                         if ($diaochu_zaitu) {

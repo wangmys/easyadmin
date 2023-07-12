@@ -851,6 +851,13 @@ class ReportFormsService
         ";
         $list = Db::connect("sqlsrv")->query($sql);
 
+        // 入库记录
+        $list2 = $list;
+        foreach ($list2 as $key => $val) {
+            $list2[$key]['更新日期'] = date('Y-m-d H:i:s');
+        }
+        $status = $this->db_easyA->table('cwl_table_yeji')->strict(false)->insertAll($list2);
+
         $newList = [];
         foreach ($list as $key => $val) {
             $newList[$key]['日期'] =  date('m-d', strtotime($val['日期'])) . ' ' . date_to_week($val['日期']);
