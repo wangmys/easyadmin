@@ -34,6 +34,100 @@ class Tableupdate extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    public function s108A() {
+        $sql3 = "
+            SELECT
+                IFNULL(SCL.`督导`,'总计') AS 督导,
+                IFNULL(SCL.`省份`,'合计') AS 省份,
+                CONCAT(ROUND(SUM(SCL.`今天流水`)/SUM(SCM.`今日目标`)*100,2),'%') AS 今日达成率,
+                CONCAT(ROUND(SUM(SCL.`本月流水`)/SUM(SCM.`本月目标`)*100,2),'%') AS 本月达成率,
+                SUM(SCM.`今日目标`) AS 今日目标,
+                SUM(SCL.`今天流水`) AS 今天流水,
+                SUM(SCM.`本月目标`) 本月目标,
+                SUM(SCL.`本月流水`) 本月流水,
+                SUM(SCL.`近七天日均`) AS 近七天日均,
+                ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均,
+                date_format(now(),'%Y-%m-%d %H:%i:%s') as 更新日期
+                FROM sp_customer_liushui SCL
+                LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+                where SCL.`经营模式`='直营'
+                GROUP BY
+                SCL.`督导`,
+                SCL.`省份`
+            WITH ROLLUP
+        ";
+        $select = $this->db_bi->query($sql3);
+
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE sp_ww_s108a;');
+
+            $select_chunk = array_chunk($select, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_bi->table('sp_ww_s108a')->strict(false)->insertAll($val);
+            }
+            // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'sp_ww_s108a 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'sp_ww_s108a 更新失败！'
+            ]);   
+        }
+    }
+
+    public function s110A() {
+        $sql3 = "
+            SELECT
+            SCL.`省份`,
+            SCL.`督导`,
+            SCL.`店铺名称`,
+            CONCAT(ROUND(SCL.`今天流水`/SCM.`今日目标`*100,2),'%') AS 今日达成率,
+            CONCAT(ROUND(SCL.`本月流水`/SCM.`本月目标`*100,2),'%') AS 本月达成率,
+            SCM.`今日目标`,
+            SCL.`今天流水`,
+            SCM.`本月目标`,
+            SCL.`本月流水`,
+            SCL.`近七天日均`,
+            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  DATEDIFF(LAST_DAY(CURDATE()),CURDATE()),2) AS 剩余目标日均,
+            date_format(now(),'%Y-%m-%d %H:%i:%s') as 更新日期
+            FROM sp_customer_liushui SCL
+            LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
+            WHERE SCL.`经营模式`='直营'
+            ORDER BY
+            SCL.`省份`,
+            SCL.`督导`,
+            SCL.`店铺名称`
+        ";
+        $select = $this->db_bi->query($sql3);
+
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE sp_ww_s110a;');
+
+            $select_chunk = array_chunk($select, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_bi->table('sp_ww_s110a')->strict(false)->insertAll($val);
+            }
+            // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'sp_ww_s110a 更新成功！'
+            ]);
+        } else {
+            return json([
+                'status' => 0,
+                'msg' => 'error',
+                'content' => 'sp_ww_s110a 更新失败！'
+            ]);   
+        }
+    }
 
     // 更新 sp_custoemr_weishouhou
     public function update_weishouhou() {
