@@ -442,20 +442,34 @@ class Chaoliang extends BaseController
                     AND sk.二级分类 IN ('松紧长裤', '松紧短裤')
         ";
 
-        // 内搭 外套 鞋履
+        // 超量提醒 
+        $sql4 = "
+            UPDATE 
+                cwl_chaoliang_sk 
+            SET
+                提醒备注 = '请注意'
+            WHERE 1
+                AND 一级分类 IN ('内搭','外套','下装', '鞋履')
+                AND (`提醒00/28/37/44/100/160/S` = '超' OR `提醒29/38/46/105/165/M` = '超' OR `提醒30/39/48/110/170/L` = '超' OR `提醒31/40/50/115/175/XL` = '超' OR `提醒32/41/52/120/180/2XL` = '超'
+                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40`)         
+        ";
+
+        // 1 内搭 外套 鞋履
         $status1 = $this->db_easyA->execute($sql1);
-        // 下装
+        // 2 下装
         $status2 = $this->db_easyA->execute($sql2);
-        // 下装 松紧长短
+        // 3下装 松紧长短
         $status3 = $this->db_easyA->execute($sql3);
+        // 4 超强提醒
+        $status4 = $this->db_easyA->execute($sql4);
 
         $total = $status1 + $status2 + $status3;
-        if ($status1 || $status2 || $status3) {
+        if (($status1 || $status2 || $status3) && $status4) {
             // $this->db_easyA->commit();
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => "cwl_chaoliang_sk 超量更新1 更新成功，数量：{$total}！"
+                'content' => "cwl_chaoliang_sk 超量更新1 更新成功，数量：{$status4}！"
             ]);
         } else {
             // $this->db_easyA->rollback();
