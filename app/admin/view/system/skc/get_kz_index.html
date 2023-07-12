@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>单店裤子明细</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
@@ -95,9 +96,47 @@
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 40px;">
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营性质</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_type" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品负责人</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-goods_manager" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_name" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height: 40px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">单店裤子明细 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -109,8 +148,9 @@
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
-      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+      <button class="layui-btn layui-btn-sm zhouxiao" lay-event="delete">周销</button>
+      <button class="layui-btn layui-btn-sm yujiskc" lay-event="update">预计在途skc</button>
+      <button class="layui-btn layui-btn-sm overflow" lay-event="update">溢出提醒</button>
     </div>
 </script>
 <script>
@@ -123,12 +163,117 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.skc.Skc/get_kz_index')}" 
+            , url_getXmMapSelect = "{:url('admin/system.skc.Skc/getXmMapSelectKz')}"
 
+        initFn();
         startTable();
+
+        //省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'province',
+            data: []
+        })
+        //经营性质
+        xmSelect.render({
+            el: '#xm-store_type', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_type',
+            data: []
+        })
+        //商品负责人
+        xmSelect.render({
+            el: '#xm-goods_manager', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'goods_manager',
+            data: []
+        })
+        //店铺名称
+        xmSelect.render({
+            el: '#xm-store_name', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_name',
+            data: []
+        })
 
         // 日期选择器
         laydate.render({
             elem: '#shangshiriqi'
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+
+                //省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'province',
+                    data: res.data.province
+                })
+                //经营性质
+                xmSelect.render({
+                    el: '#xm-store_type', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_type',
+                    data: res.data.store_type
+                })
+                //商品负责人
+                xmSelect.render({
+                    el: '#xm-goods_manager', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'goods_manager',
+                    data: res.data.goods_manager
+                })
+                //店铺名称
+                xmSelect.render({
+                    el: '#xm-store_name', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_name',
+                    data: res.data.store_name
+                })
+
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
         });
 
         function startTable() {
@@ -141,21 +286,21 @@
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 780
+                , height: 790
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                     { field: 'area_range', title: '标准划分', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'province', title: '省份', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 4,fixed:'left'}
+                    //  { field: 'area_range', title: '标准划分', align: 'center', rowspan: 4,fixed:'left'}
+                      { field: 'province', title: '省份', align: 'center', rowspan: 4,fixed:'left', width: 35}
+                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 4,fixed:'left', width: 55}
                      , { field: 'goods_manager', title: '商品负责人', align: 'center', rowspan: 4,fixed:'left'}
                      , { field: 'store_name', title: '店铺名称', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 4,fixed:'left', width: 80}
-                     , { field: 'store_level', title: '店铺等级', align: 'center', rowspan: 4,fixed:'left', width: 55}
-                     , { field: 'store_square', title: '店铺面积', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'xxkg_num', title: '休闲裤柜个数', align: 'center', rowspan: 4,fixed:'left', width: 80}
-                     , { field: 'nzkg_num', title: '牛仔裤柜个数', align: 'center', rowspan: 4,fixed:'left', width: 80}
-                     , { field: 'kthj_num', title: '裤台合计', align: 'center', rowspan: 4,fixed:'left'}
+                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 4,fixed:'left', width: 70}
+                     , { field: 'store_level', title: '等级', align: 'center', rowspan: 4,fixed:'left', width: 30}
+                     , { field: 'store_square', title: '面积', align: 'center', rowspan: 4,fixed:'left', width: 40}
+                     , { field: 'xxkg_num', title: '休闲裤柜数', align: 'center', rowspan: 4,fixed:'left', width: 65}
+                     , { field: 'nzkg_num', title: '牛仔裤柜数', align: 'center', rowspan: 4,fixed:'left', width: 65}
+                     , { field: 'kthj_num', title: '裤台合计', align: 'center', rowspan: 4,fixed:'left', width: 55}
                     , { title: '长裤品类需求', colspan: 3, align: 'center' } 
                     , { title: '近一周零售占比%', colspan: 22, align: 'center' } 
                     , { title: '预计在途SKC数（含在途及已配未发）', colspan: 23, align: 'center' } 
@@ -164,9 +309,9 @@
 
                     //二级表头
                     [
-                    { field: 'require_nz', title: '牛仔', rowspan: 3,  align: 'center' } 
-                    , { field: 'require_xx', title: '休闲', rowspan: 3,  align: 'center' } 
-                    , { field: 'require_sj', title: '松紧', rowspan: 3,  align: 'center' } 
+                    { field: 'require_nz', title: '牛仔', rowspan: 3,  align: 'center' , width: 30} 
+                    , { field: 'require_xx', title: '休闲', rowspan: 3,  align: 'center' , width: 30} 
+                    , { field: 'require_sj', title: '松紧', rowspan: 3,  align: 'center' , width: 30} 
 
                     , { title: '长裤', colspan: 14, align: 'center' } 
                     , { title: '长裤总计', field: 'week_sales_ck_zj',   rowspan: 3, align: 'center' } 
@@ -197,8 +342,8 @@
 
                      , { title: '牛仔长裤', colspan: 3, align: 'center' } 
                      , { title: '休闲长裤', colspan: 2, align: 'center' } 
-                     , { field: 'skc_ck_hx', title: '西裤(化纤)', rowspan: 2, align: 'center' , width: 80}
-                     , { title: '小计', field: 'skc_ck_xxxj',  rowspan: 2, align: 'center' } 
+                     , { field: 'skc_ck_hx', title: '西裤(化纤)', rowspan: 2, align: 'center' , width: 60}
+                     , { title: '小计', field: 'skc_ck_xxxj',  rowspan: 2, align: 'center' , width: 40} 
                      , { title: '松紧长裤', colspan: 6, align: 'center' } 
                      , { title: '松紧小计', field: 'skc_ck_sjxj',  rowspan: 2, align: 'center' } 
                      , { title: '牛仔短裤', colspan: 2, align: 'center' } 
@@ -211,17 +356,17 @@
 
                     //四级表头
                     [ 
-                    { field: 'week_sales_ck_nz', title: '牛仔', align: 'center'}
-                    , { field: 'week_sales_ck_sw', title: '商务', align: 'center'}
-                    , { field: 'week_sales_ck_ckxj', title: '小计', align: 'center'}
+                    { field: 'week_sales_ck_nz', title: '牛仔', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_sw', title: '商务', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_ckxj', title: '小计', align: 'center', width: 40}
                     , { field: 'week_sales_ck_xx', title: '休闲', align: 'center'}
                     , { field: 'week_sales_ck_xxsw', title: '商务', align: 'center'}
-                    , { field: 'week_sales_ck_gz', title: '工装', align: 'center'}
-                    , { field: 'week_sales_ck_kk', title: '宽口', align: 'center'}
-                    , { field: 'week_sales_ck_sj', title: '束脚', align: 'center'}
-                    , { field: 'week_sales_ck_wk', title: '卫裤', align: 'center'}
-                    , { field: 'week_sales_ck_sjsj', title: '松紧', align: 'center'}
-                    , { field: 'week_sales_ck_lw', title: '螺纹', align: 'center'}
+                    , { field: 'week_sales_ck_gz', title: '工装', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_kk', title: '宽口', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_sj', title: '束脚', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_wk', title: '卫裤', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_sjsj', title: '松紧', align: 'center', width: 40}
+                    , { field: 'week_sales_ck_lw', title: '螺纹', align: 'center', width: 40}
                     
                     , { field: 'week_sales_dk_nz', title: '牛仔', align: 'center'}
                     , { field: 'week_sales_dk_sw', title: '商务', align: 'center'}
@@ -231,25 +376,25 @@
                     , { field: 'week_sales_dk_xx', title: '休闲', align: 'center'}
 
                     // //skc
-                    , { field: 'skc_ck_nz', title: '牛仔', align: 'center'}
-                    , { field: 'skc_ck_sw', title: '商务', align: 'center'}
-                    , { field: 'skc_ck_nzxj', title: '小计', align: 'center'}
-                    , { field: 'skc_ck_xx', title: '休闲', align: 'center'}
-                    , { field: 'skc_ck_xxsw', title: '商务', align: 'center'}
+                    , { field: 'skc_ck_nz', title: '牛仔', align: 'center', width: 35}
+                    , { field: 'skc_ck_sw', title: '商务', align: 'center', width: 35}
+                    , { field: 'skc_ck_nzxj', title: '小计', align: 'center', width: 35}
+                    , { field: 'skc_ck_xx', title: '休闲', align: 'center', width: 35}
+                    , { field: 'skc_ck_xxsw', title: '商务', align: 'center', width: 35}
 
-                    , { field: 'skc_ck_gz', title: '工装', align: 'center'}
-                    , { field: 'skc_ck_kk', title: '宽口', align: 'center'}
-                    , { field: 'skc_ck_sjsj', title: '束脚', align: 'center'}
-                    , { field: 'skc_ck_wk', title: '卫裤', align: 'center'}
-                    , { field: 'skc_ck_sj', title: '松紧', align: 'center'}
-                    , { field: 'skc_ck_lw', title: '螺纹', align: 'center'}
+                    , { field: 'skc_ck_gz', title: '工装', align: 'center', width: 35}
+                    , { field: 'skc_ck_kk', title: '宽口', align: 'center', width: 35}
+                    , { field: 'skc_ck_sjsj', title: '束脚', align: 'center', width: 35}
+                    , { field: 'skc_ck_wk', title: '卫裤', align: 'center', width: 35}
+                    , { field: 'skc_ck_sj', title: '松紧', align: 'center', width: 35}
+                    , { field: 'skc_ck_lw', title: '螺纹', align: 'center', width: 35}
 
-                    , { field: 'skc_dk_nz', title: '牛仔', align: 'center'}
-                    , { field: 'skc_dk_sw', title: '商务', align: 'center'}
-                    , { field: 'skc_dk_sj', title: '松紧', align: 'center'}
-                    , { field: 'skc_dk_sjgz', title: '工装', align: 'center'}
-                    , { field: 'skc_dk_xxgz', title: '工装', align: 'center'}
-                    , { field: 'skc_dk_xx', title: '休闲', align: 'center'}
+                    , { field: 'skc_dk_nz', title: '牛仔', align: 'center', width: 35}
+                    , { field: 'skc_dk_sw', title: '商务', align: 'center', width: 35}
+                    , { field: 'skc_dk_sj', title: '松紧', align: 'center', width: 35}
+                    , { field: 'skc_dk_sjgz', title: '工装', align: 'center', width: 35}
+                    , { field: 'skc_dk_xxgz', title: '工装', align: 'center', width: 35}
+                    , { field: 'skc_dk_xx', title: '休闲', align: 'center', width: 35}
 
                     //溢出
                     , { field: 'overflow_nzck', title: '牛仔长裤', align: 'center'}
@@ -259,6 +404,63 @@
                 ]
                 ,done: function (res, curr, count) {
                     //$('.dateStr').text(res.create_time);
+
+                    $('.zhouxiao').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 0}, 400);
+                    });
+                    $('.yujiskc').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 1200}, 400);
+                    });
+                    $('.overflow').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 3000}, 400);
+                    });
+
+                    //表格颜色处理
+                    //周销 
+                    $('th[data-key="1-0-11"]').css({
+                        'background-color': 'rgb(70 133 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-3"]').css({
+                        'background-color': 'rgb(140 180 226)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-4"]').css({
+                        'background-color': 'rgb(140 180 226)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-5"]').css({
+                        'background-color': 'rgb(184 204 228)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-6"]').css({
+                        'background-color': 'rgb(184 204 228)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //预计在途skc 
+                    $('th[data-key="1-0-12"]').css({
+                        'background-color': 'rgb(110 136 56)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-7"]').css({
+                        'background-color': 'rgb(110 170 46)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-8"]').css({
+                        'background-color': 'rgb(110 170 46)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-9"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-10"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-11"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //溢出提醒  
+                    $('th[data-key="1-0-13"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-12"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+
                 }
             });
         }

@@ -109,8 +109,11 @@
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
-      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+      <button class="layui-btn layui-btn-sm store_num" >门店数</button>
+      <button class="layui-btn layui-btn-sm fill_rate_100" >满足率100%</button>
+      <button class="layui-btn layui-btn-sm fill_rate_90" >满足率90%</button>
+      <button class="layui-btn layui-btn-sm fill_rate_80" >满足率80%</button>
+      <button class="layui-btn layui-btn-sm fill_rate_80_less" >满足率80%以下</button>
     </div>
 </script>
 <script>
@@ -211,6 +214,40 @@
                 ]
                 ,done: function (res, curr, count) {
                     //$('.dateStr').text(res.create_time);
+
+                    $('.store_num').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 0}, 400);
+                    });
+                    $('.fill_rate_100').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 0}, 400);
+                    });
+                    $('.fill_rate_90').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 1000}, 400);
+                    });
+                    $('.fill_rate_80').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 3000}, 400);
+                    });
+                    $('.fill_rate_80_less').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 3000}, 400);
+                    });
+
+                    //表格颜色处理
+                    $('th[data-key="1-0-1"]').css({
+                        'background-color': 'rgb(70 133 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-2"]').css({
+                        'background-color': 'rgb(110 136 56)', 'color': '#000', 'font-weight':'bold'
+                    });            
+                    $('th[data-key="1-0-3"]').css({
+                        'background-color': 'rgb(98 92 174)', 'color': '#000', 'font-weight':'bold'
+                    });		
+                    $('th[data-key="1-0-4"]').css({
+                        'background-color': 'rgb(198 192 174)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-5"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+
                 }
             });
         }

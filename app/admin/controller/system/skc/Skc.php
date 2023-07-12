@@ -140,6 +140,7 @@ class Skc extends AdminController
             if ($res['data']) {
 
                 foreach ($res['data'] as &$v_data) {
+                    $v_data['province'] = mb_substr($v_data['province'], 0, 2);
 
                     $v_data['week_sales_ck_nz'] = $v_data['week_sales_ck_nz']>0 ? $v_data['week_sales_ck_nz'].'%' : '';
                     $v_data['week_sales_ck_sw'] = $v_data['week_sales_ck_sw']>0 ? $v_data['week_sales_ck_sw'].'%' : '';
@@ -232,6 +233,7 @@ class Skc extends AdminController
             if ($res['data']) {
 
                 foreach ($res['data'] as &$v_data) {
+                    $v_data['province'] = mb_substr($v_data['province'], 0, 2);
 
                     $v_data['week_sales_new_ztpx'] = $v_data['week_sales_new_ztpx']>0 ? $v_data['week_sales_new_ztpx'].'%' : '';
                     $v_data['week_sales_new_xxx'] = $v_data['week_sales_new_xxx']>0 ? $v_data['week_sales_new_xxx'].'%' : '';
@@ -316,8 +318,22 @@ class Skc extends AdminController
 
     // 获取筛选栏多选参数
     public function getXmMapSelect() {
-        
+
         return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
+        
+    }
+
+    // 获取筛选栏多选参数(裤子)
+    public function getXmMapSelectKz() {
+
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelectKz()]);
+        
+    }
+
+    // 获取筛选栏多选参数(鞋履)
+    public function getXmMapSelectShoe() {
+
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelectShoe()]);
         
     }
 
