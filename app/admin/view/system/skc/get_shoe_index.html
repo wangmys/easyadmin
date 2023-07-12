@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>单店鞋履明细</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
@@ -95,9 +96,47 @@
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 40px;">
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营性质</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_type" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品负责人</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-goods_manager" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-store_name" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height: 40px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">单店鞋履明细 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -109,8 +148,11 @@
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
-      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+      <button class="layui-btn layui-btn-sm zhouxiao" lay-event="delete">周销</button>
+      <button class="layui-btn layui-btn-sm yujiskc" lay-event="update">预计在途skc数</button>
+      <button class="layui-btn layui-btn-sm yujiduanma" lay-event="update">预计在途断码个数</button>
+      <button class="layui-btn layui-btn-sm yujiinstore" lay-event="update">预计在店数量</button>
+      <button class="layui-btn layui-btn-sm overflow" lay-event="update">溢出提醒</button>
     </div>
 </script>
 <script>
@@ -123,12 +165,117 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.skc.Skc/get_shoe_index')}" 
+            , url_getXmMapSelect = "{:url('admin/system.skc.Skc/getXmMapSelectShoe')}"
 
+        initFn();
         startTable();
+
+        //省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'province',
+            data: []
+        })
+        //经营性质
+        xmSelect.render({
+            el: '#xm-store_type', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_type',
+            data: []
+        })
+        //商品负责人
+        xmSelect.render({
+            el: '#xm-goods_manager', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'goods_manager',
+            data: []
+        })
+        //店铺名称
+        xmSelect.render({
+            el: '#xm-store_name', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'store_name',
+            data: []
+        })
 
         // 日期选择器
         laydate.render({
             elem: '#shangshiriqi'
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+
+                //省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'province',
+                    data: res.data.province
+                })
+                //经营性质
+                xmSelect.render({
+                    el: '#xm-store_type', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_type',
+                    data: res.data.store_type
+                })
+                //商品负责人
+                xmSelect.render({
+                    el: '#xm-goods_manager', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'goods_manager',
+                    data: res.data.goods_manager
+                })
+                //店铺名称
+                xmSelect.render({
+                    el: '#xm-store_name', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'store_name',
+                    data: res.data.store_name
+                })
+
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
         });
 
         function startTable() {
@@ -141,18 +288,18 @@
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 780
+                , height: 790
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                      { field: 'province', title: '省份', align: 'center', rowspan: 3,fixed:'left'}
-                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 3,fixed:'left'}
+                      { field: 'province', title: '省份', align: 'center', rowspan: 3,fixed:'left', width: 35}
+                     , { field: 'store_type', title: '经营性质', align: 'center', rowspan: 3,fixed:'left', width: 55}
                      , { field: 'goods_manager', title: '商品负责人', align: 'center', rowspan: 3,fixed:'left'}
                      , { field: 'store_name', title: '店铺名称', align: 'center', rowspan: 3,fixed:'left'}
-                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 3,fixed:'left', width: 80}
-                     , { field: 'store_nature', title: '店铺性质', align: 'center', rowspan: 3,fixed:'left', width: 80}
-                     , { field: 'store_level', title: '店铺等级', align: 'center', rowspan: 3,fixed:'left', width: 55}
-                     , { field: 'store_square', title: '店铺面积', align: 'center', rowspan: 3,fixed:'left'}
+                     , { field: 'start_date', title: '开业日期', align: 'center', rowspan: 3,fixed:'left', width: 70}
+                     , { field: 'store_nature', title: '店铺性质', align: 'center', rowspan: 3,fixed:'left', width: 55}
+                     , { field: 'store_level', title: '等级', align: 'center', rowspan: 3,fixed:'left', width: 30}
+                     , { field: 'store_square', title: '面积', align: 'center', rowspan: 3,fixed:'left', width: 40}
                      , { field: 'warehouse_square', title: '仓库面积', align: 'center', rowspan: 3,fixed:'left', width: 120}
                      , { title: '鞋架个数', align: 'center', colspan: 2}
                      , { field: 'xjxj_num', title: '鞋架小计', align: 'center', rowspan: 3}
@@ -166,13 +313,13 @@
 
                     //二级表头
                     [
-                     { field: 'xg_num', title: '鞋柜', rowspan: 2, align: 'center' } 
-                    , { field: 'xq_num', title: '鞋墙', rowspan: 2, align: 'center' } 
+                     { field: 'xg_num', title: '鞋柜', rowspan: 2, align: 'center' , width: 35} 
+                    , { field: 'xq_num', title: '鞋墙', rowspan: 2, align: 'center' , width: 35} 
 
-                    ,{ field: 'require_zt', title: '正统', rowspan: 2, align: 'center' } 
-                    , { field: 'require_xx', title: '休闲', rowspan: 2, align: 'center' } 
-                    , { field: 'require_ydx', title: '运动鞋', rowspan: 2, align: 'center' } 
-                    , { field: 'require_lx', title: '凉鞋', rowspan: 2, align: 'center' } 
+                    ,{ field: 'require_zt', title: '正统', rowspan: 2, align: 'center' , width: 35} 
+                    , { field: 'require_xx', title: '休闲', rowspan: 2, align: 'center' , width: 35} 
+                    , { field: 'require_ydx', title: '运动鞋', rowspan: 2, align: 'center' , width: 45} 
+                    , { field: 'require_lx', title: '凉鞋', rowspan: 2, align: 'center' , width: 35} 
 
                     ,{ title: '新品', colspan: 5, align: 'center' } 
                     , { title: '旧品', colspan: 5, align: 'center' } 
@@ -219,16 +366,16 @@
                      , { title: '凉鞋', field: 'skc_old_lx', align: 'center' } 
                      , { title: '小计', field: 'skc_old_xj', align: 'center' } 
 
-                     , { title: '正统皮鞋', field: 'duanma_new_ztpx', align: 'center' } 
-                     , { title: '休闲鞋', field: 'duanma_new_xxx', align: 'center' } 
-                     , { title: '运动鞋', field: 'duanma_new_ydx', align: 'center' } 
-                     , { title: '凉鞋', field: 'duanma_new_lx', align: 'center' } 
-                     , { title: '小计', field: 'duanma_new_xj', align: 'center' } 
+                     , { title: '正统皮鞋', field: 'duanma_new_ztpx', align: 'center' , width: 55} 
+                     , { title: '休闲鞋', field: 'duanma_new_xxx', align: 'center' , width: 45} 
+                     , { title: '运动鞋', field: 'duanma_new_ydx', align: 'center' , width: 45} 
+                     , { title: '凉鞋', field: 'duanma_new_lx', align: 'center' , width: 35} 
+                     , { title: '小计', field: 'duanma_new_xj', align: 'center' , width: 35} 
                      , { title: '正统皮鞋', field: 'duanma_old_ztpx', align: 'center' } 
-                     , { title: '休闲鞋', field: 'duanma_old_xxx', align: 'center' } 
-                     , { title: '运动鞋', field: 'duanma_old_ydx', align: 'center' } 
-                     , { title: '凉鞋', field: 'duanma_old_lx', align: 'center' } 
-                     , { title: '小计', field: 'duanma_old_xj', align: 'center' } 
+                     , { title: '休闲鞋', field: 'duanma_old_xxx', align: 'center' , width: 45} 
+                     , { title: '运动鞋', field: 'duanma_old_ydx', align: 'center' , width: 45} 
+                     , { title: '凉鞋', field: 'duanma_old_lx', align: 'center' , width: 35} 
+                     , { title: '小计', field: 'duanma_old_xj', align: 'center' , width: 35} 
 
                      , { title: '正统皮鞋', field: 'instore_new_ztpx', align: 'center' } 
                      , { title: '休闲鞋', field: 'instore_new_xxx', align: 'center' } 
@@ -248,6 +395,94 @@
                 ]
                 ,done: function (res, curr, count) {
                     //$('.dateStr').text(res.create_time);
+
+                    $('.zhouxiao').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 0}, 400);
+                    });
+                    $('.yujiskc').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 800}, 400);
+                    });
+                    $('.yujiduanma').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 1500}, 400);
+                    });
+                    $('.yujiinstore').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 2600}, 400);
+                    });
+                    $('.overflow').click(function() {
+                        $('.layui-table-main').animate({'scrollLeft': 2600}, 400);
+                    });
+
+                    //表格颜色处理
+                    //周销  data-key="1-0-12"  data-key="1-1-6"  data-key="1-1-7"
+                    $('th[data-key="1-0-12"]').css({
+                        'background-color': 'rgb(70 133 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-6"]').css({
+                        'background-color': 'rgb(140 180 226)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-7"]').css({
+                        'background-color': 'rgb(184 204 228)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //预计在途skc  data-key="1-0-13"   data-key="1-1-8"   data-key="1-1-9"   data-key="1-1-10"  data-key="1-1-11"
+                    $('th[data-key="1-0-13"]').css({
+                        'background-color': 'rgb(110 136 56)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-8"]').css({
+                        'background-color': 'rgb(110 170 46)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-9"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-10"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-11"]').css({
+                        'background-color': 'rgb(196 215 155)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //预计在店断码个数   data-key="1-0-14"  data-key="1-1-12"  data-key="1-1-13"   data-key="1-1-14"
+                    $('th[data-key="1-0-14"]').css({
+                        'background-color': 'rgb(98 92 174)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-12"]').css({
+                        'background-color': 'rgb(160 127 197)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-13"]').css({
+                        'background-color': 'rgb(185 171 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-14"]').css({
+                        'background-color': 'rgb(185 171 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //预计在店数量   data-key="1-0-15" data-key="1-1-15"  data-key="1-1-16"    data-key="1-1-17" data-key="1-1-18"
+                    $('th[data-key="1-0-15"]').css({
+                        'background-color': 'rgb(98 92 174)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-15"]').css({
+                        'background-color': 'rgb(160 127 197)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-16"]').css({
+                        'background-color': 'rgb(185 171 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-17"]').css({
+                        'background-color': 'rgb(185 171 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-18"]').css({
+                        'background-color': 'rgb(185 171 210)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //溢出提醒    data-key="1-0-16"  data-key="1-1-19"  data-key="1-1-20"
+                    $('th[data-key="1-0-16"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-19"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-1-20"]').css({
+                        'background-color': 'rgb(225 225 0)', 'color': '#000', 'font-weight':'bold'
+                    });
+
                 }
             });
         }
