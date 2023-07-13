@@ -28,15 +28,24 @@ class Logincount extends AdminController
         
         if (request()->isAjax()) {
 
-            $res = $this->service->get_login_count_list([]);
+            $params = $this->request->param();
+            $res = $this->service->get_login_count_list($params);
 
-            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'],  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'], 'month_field' => json_encode($res['month_field']),  'create_time' => date('Y-m-d')]);
         } else {
+            $res = $this->service->get_login_count_list([]);
             return View('system/logincount/login_count', [
-
+                'month_field' => $res['month_field'],
             ]);
         }        
 
+    }
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect() {
+
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
+        
     }
 
 }

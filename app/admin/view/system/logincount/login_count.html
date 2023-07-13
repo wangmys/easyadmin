@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>登录计数</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
     <style>
         body {
@@ -91,10 +92,39 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        .layui-show .flex .col {
+            --flex-direction: column;
+        }
     </style>
 </head>
 
 <body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:15%; height: 36px;">
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">姓名</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-name" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex row between" style="width:85%; height: 40px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
             <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
@@ -102,6 +132,7 @@
         <div id="page"></div>
     </div>
 </body>
+<input type="text" id="month_field" class="layui-hide" value="{:htmlspecialchars(json_encode($month_field))}">
 
 </html>
 <script src="__STATIC__/ok/lib/layui/layui.js"></script>
@@ -123,15 +154,70 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.logincount.Logincount/login_count')}" 
+            , url_getXmMapSelect = "{:url('admin/system.logincount.Logincount/getXmMapSelect')}" 
 
+        initFn();
         startTable();
 
-        // 日期选择器
-        laydate.render({
-            elem: '#shangshiriqi'
+        //姓名
+        xmSelect.render({
+            el: '#xm-name', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'name',
+            data: []
+        })
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+
+                //姓名
+                xmSelect.render({
+                    el: '#xm-name', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'name',
+                    data: res.data.name
+                })
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
         });
 
         function startTable() {
+
+            var cols = [
+                { field: 'username', title: '登录账号', align: 'center', rowspan: 4,fixed:'left'}
+                , { field: 'name', title: '姓名', align: 'center', rowspan: 4,fixed:'left'}
+            ];
+
+            var month_field = JSON.parse($("#month_field").val());         
+            month_field.forEach(function (i, value) {
+                cols.push({
+                    'field': ''+i+'',
+                    'title': ''+i+'',
+                    'align': 'center', 'rowspan': 4, 'fixed':'left'
+                })
+            })
+            // console.log(cols);
+
             table.render({
                 elem: '#table'
                 ,url: url1
@@ -144,17 +230,12 @@
                 , height: 780
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
-                    [
-                     { field: 'username', title: '登录账号', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'name', title: '真实名', align: 'center', rowspan: 4,fixed:'left'}
-                     , { field: 'login_count', title: '登录次数', align: 'center', rowspan: 4,fixed:'left'}
-                    ]
+                    cols
                 ]
                 ,done: function (res, curr, count) {
-                    //$('.dateStr').text(res.create_time);
+                    // console.log(res);
                 }
             });
         }
     });
-
 </script>

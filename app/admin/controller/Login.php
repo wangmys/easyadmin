@@ -72,14 +72,21 @@ class Login extends AdminController
             unset($admin['password']);
             $admin['expire_time'] = $post['keep_login'] == 1 ? true : time() + 7200;
             session('admin', $admin);
-            //登录计数
-            $if_exist = LoginService::getInstance()->get_login_count(['username' => $post['username']]);
-            if ($if_exist) {
-                $login_count = $if_exist['login_count'] + 1;
-                LoginService::getInstance()->add_login_count([['username', '=', $post['username']]], ['login_count' => $login_count]);
-            } else {
-                LoginService::getInstance()->save_login_count(['username'=>$post['username'], 'name'=>$admin['name'], 'login_count'=>1]);
+            $login_cache = cache($post['username']);
+            if (!$login_cache) {
+                //登录计数
+                $month = date('Y-m');
+                $if_exist = LoginService::getInstance()->get_login_count([['username', '=', $post['username']], ['month', '=', $month]]);
+                if ($if_exist) {
+                    $login_count = $if_exist['login_count'] + 1;
+                    LoginService::getInstance()->add_login_count([['username', '=', $post['username']], ['month', '=', $month]], ['login_count' => $login_count]);
+                } else {
+                    LoginService::getInstance()->save_login_count(['username'=>$post['username'], 'name'=>$admin['name'], 'login_count'=>1, 'month'=>$month]);
+                }
+                //记录登录缓存计数
+                cache($post['username'], json_encode($post['username']), strtotime(date('Y-m-d').' 23:59:59')-time());
             }
+
             $this->success('登录成功');
         }
         $this->assign('captcha', $captcha);
