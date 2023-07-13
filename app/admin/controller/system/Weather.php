@@ -62,6 +62,7 @@ class Weather extends AdminController
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 $query->where(1);
             })
+            ->where(['c.ShutOut' => 0])
             ->where('c.RegionId','<>',55)->count();
 
             $list = $this->customers
@@ -80,6 +81,7 @@ class Weather extends AdminController
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                 $query->where(1);
             })
+            ->where(['c.ShutOut' => 0])
             ->where('c.RegionId','<>',55)
             ->order('State asc,Region asc')
             ->page($page, $limit)

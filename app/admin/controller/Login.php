@@ -73,7 +73,7 @@ class Login extends AdminController
             $admin['expire_time'] = $post['keep_login'] == 1 ? true : time() + 7200;
             session('admin', $admin);
             $login_cache = cache($post['username']);
-            $APP_DOMAIN = Env::get('app.APP_DOMAIN', '');
+            $APP_DOMAIN = $_SERVER['SERVER_NAME'];
             if (!$login_cache && strstr($APP_DOMAIN, 'im.babiboy.com')) {//只在线上环境作统计
                 //登录计数
                 $month = date('Y-m');

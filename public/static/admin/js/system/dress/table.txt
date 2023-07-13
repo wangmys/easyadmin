@@ -1,0 +1,11 @@
+salary_post
+dept 
+dept_staff_change_record
+apply_for_job_record
+user_dept_relation
+hr_train_type_info
+hr_oa_apply_info
+hr_train_item_info
+hr_demoted_transfer_item_info
+role
+user
