@@ -60,11 +60,10 @@ class LoginService
         $list = $list ? $list->toArray() : [];
         $all_month = [];
         if ($list && $list['data']) {
-            $all_month = LoginCountModel::where($where)->field('month')->distinct(true)->select();
-            $all_month = $all_month ? $all_month->toArray() : [];
+            $all_month = $this->get_month_field();
             $list_data = $list['data'];
             foreach ($list_data as &$v_list_data) {
-                foreach ($all_month as $v_month) $v_list_data[$v_month['month']] = '';
+                foreach ($all_month as $v_month) $v_list_data[$v_month] = '';
             }
             foreach ($list_data as &$v_data) {
                 $each_login_count = $v_data['login_count_str'] ? explode(',', $v_data['login_count_str']) : [];
@@ -86,7 +85,6 @@ class LoginService
         $data = [
             'count' => $list ? $list['total'] : 0,
             'data'  => $list ? $list['data'] : [],
-            'month_field'  => array_column($all_month, 'month'),
         ];
         return $data;
 
@@ -97,6 +95,15 @@ class LoginService
         $name = LoginCountModel::where([])->field('name as name, name as value')->group('username')->select();
         $name = $name ? $name->toArray() : [];
         return ['name' => $name];
+
+    }
+
+    public function get_month_field() {
+
+        $all_month = LoginCountModel::where([])->field('month')->distinct(true)->select();
+        $all_month = $all_month ? $all_month->toArray() : [];
+        $all_month = $all_month ? array_column($all_month, 'month') : [];
+        return $all_month;
 
     }
 
