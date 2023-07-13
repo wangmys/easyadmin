@@ -54,6 +54,8 @@ class Duanmalv extends BaseController
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
+        // 不考核货号
+        $noGoodsNo = xmSelectInput($select_config['不考核货号']);
 
         $sql = "   
             SELECT TOP
@@ -127,6 +129,7 @@ class Duanmalv extends BaseController
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('2023')
                 AND ER.CustomerName NOT IN ( {$noCustomer} )
+                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
@@ -286,7 +289,7 @@ class Duanmalv extends BaseController
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
-
+        $noGoodsNo = xmSelectInput($select_config['不考核货号']);
         $sql = "
             SELECT 
                 sk.云仓,
@@ -510,6 +513,7 @@ class Duanmalv extends BaseController
                     sk.季节 IN ({$seasion}) 
                     AND c.Region <> '闭店区'
                     AND sk.店铺名称 NOT IN ({$noCustomer})
+                    AND sk.货号 NOT IN ({$noGoodsNo})
                 --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                 -- 	AND sk.年份 = 2023
                 -- 	AND sk.省份='广东省'

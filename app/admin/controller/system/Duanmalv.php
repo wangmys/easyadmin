@@ -57,7 +57,7 @@ class Duanmalv extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号')->where('id=1')->find();
         $select_noCustomer = explode(',', $select_config['不考核门店']);
 
         // 不考核门店选中
@@ -68,11 +68,31 @@ class Duanmalv extends AdminController
                 }
             } 
         }
+
+        $goodsNo_all = $this->db_bi->query("
+            SELECT
+                货号 as name,
+                货号 as value
+            FROM
+                sp_sk 
+            GROUP BY
+                货号
+        ");
+        $select_noGoodsNo = explode(',', $select_config['不考核货号']);
+
+        // 不考核货号选中
+        foreach ($select_noGoodsNo as $key => $val) {
+            foreach ($goodsNo_all as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all[$key2]['selected'] = true;
+                }
+            } 
+        }
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all]]);
     }
 
     public function saveMap() {

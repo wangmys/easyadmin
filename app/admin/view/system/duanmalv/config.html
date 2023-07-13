@@ -112,7 +112,7 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start " style="width:95%; height: 110px;">
+                    <div class="flex col between al-start " style="width:95%; height: 150px;">
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
                                 <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">下装连码数</label>
@@ -162,6 +162,14 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
                                 <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
                                 <div class="layui-input-inline" style="width: 100px !important;">
                                     <select id="season_id" name="季节归集" lay-verify="required">
@@ -180,7 +188,7 @@
                             </div>  
                         </div>
                     </div>
-                    <div class="" style="width:5%; height:110px;">
+                    <div class="" style="width:5%; height:150px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
                         </button>
@@ -219,6 +227,15 @@
             data: []
         })
 
+        // 选择货号
+        xmSelect.render({
+            el: '#xm-nohuohao', 
+            filterable: true,
+            name: '不考核货号',
+            // showCount: 1,
+            data: []
+        })
+
 
         //监听保存
         form.on('submit(saveMap)', function (res) {
@@ -251,6 +268,19 @@
                     data: res.data.customer
                 })
                 // console.log(res.data.customer);
+
+                // 渲染所有货号
+                xmSelect.render({
+                    el: '#xm-nohuohao', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'不考核货号',
+                    data: res.data.goodsNo
+                })
 
                 
             })
