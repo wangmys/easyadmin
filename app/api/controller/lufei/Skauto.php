@@ -12,7 +12,7 @@ use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
 
 /**
- * @ControllerAnnotation(title="断码率")
+ * @ControllerAnnotation(title="售空提醒")
  */
 class Skauto extends BaseController
 {

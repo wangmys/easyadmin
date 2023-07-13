@@ -215,6 +215,14 @@ class Chaoliang extends BaseController
 
     // 更新超量提醒1 
     public function handle_1() {
+        // 周转合计
+        $sql0 = "
+            UPDATE 
+                cwl_chaoliang_sk
+            SET 
+                周转合计 = `周转00/28/37/44/100/160/S` + `周转29/38/46/105/165/M` + `周转30/39/48/110/170/L` + `周转31/40/50/115/175/XL` + `周转32/41/52/120/180/2XL` +
+                `周转33/42/54/125/185/3XL` + `周转34/43/56/190/4XL` + `周转35/44/58/195/5XL` + `周转36/6XL` + `周转38/7XL` + `周转_40`;
+        ";
         // 更新超量提醒1  内搭 外套 鞋履
         $sql1 = "
             UPDATE cwl_chaoliang_sk as sk 
@@ -454,6 +462,8 @@ class Chaoliang extends BaseController
                 OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40`)         
         ";
 
+        // 周转累计
+        $status0 = $this->db_easyA->execute($sql0);  
         // 1 内搭 外套 鞋履
         $status1 = $this->db_easyA->execute($sql1);
         // 2 下装
