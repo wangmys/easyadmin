@@ -51,12 +51,13 @@ class Index
         // 查询所有门店ID
         $ids = Customers::where('CustomItem30','=','')->column('CustomerId');
         // 根据所有门店ID查询所属温带 + 气温区域
-        $data = Db::connect("sqlsrv")->table('ErpCustomer')->whereIn('CustomerId',$ids)->column('CustomItem30,CustomItem36','CustomerId');
+        $data = Db::connect("sqlsrv")->table('ErpCustomer')->whereIn('CustomerId',$ids)->column('CustomItem30,CustomItem36,ShutOut','CustomerId');
         $update_data = [];
         foreach ($data as $k => $v){
             $update_data[$v['CustomerId']] = [
                 'CustomItem30' => $v['CustomItem30'],
                 'CustomItem36' => $v['CustomItem36'],
+                'ShutOut' => $v['ShutOut']
             ];
         }
         Db::startTrans();
