@@ -38,7 +38,8 @@ class Skc_shoe_detail extends Command
 
         $skc_shoe_nums = SpSkcShoeNumModel::where([])->column('*', 'key_str');
 
-        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96', '98');");
+        $customer_regionid_notin = config('skc.customer_regionid_notin');
+        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId not in ($customer_regionid_notin);");
         $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('shoe_price')->find();
         $shoe_price = $skc_config ? $skc_config['shoe_price'] : 120;
         if ($all_customers) {
