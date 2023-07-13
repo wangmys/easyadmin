@@ -31,11 +31,10 @@ class Logincount extends AdminController
             $params = $this->request->param();
             $res = $this->service->get_login_count_list($params);
 
-            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'], 'month_field' => json_encode($res['month_field']),  'create_time' => date('Y-m-d')]);
+            return json(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'], 'create_time' => date('Y-m-d')]);
         } else {
-            $res = $this->service->get_login_count_list([]);
             return View('system/logincount/login_count', [
-                'month_field' => $res['month_field'],
+                'month_field' => $this->service->get_month_field(),
             ]);
         }        
 
