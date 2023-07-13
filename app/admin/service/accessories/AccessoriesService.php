@@ -96,7 +96,7 @@ class AccessoriesService
             '店铺ID' => 'CustomerId',
             '商品负责人' =>'CustomItem17',
             '店铺名称' =>'CustomerName',
-            '店铺等级' => 'CustomItem16',
+            '店铺等级' => 'CustomerGrade',
             '省份' =>'State',
             '运营模式' =>'Mathod'
         ];
@@ -212,12 +212,12 @@ class AccessoriesService
      */
     public function setStyle(&$list,$config,&$new_list)
     {
-        if(empty($list) || empty($list['CustomItem16'])) return $list;
+        if(empty($list) || empty($list['CustomerGrade'])) return $list;
         $isWarning = 0;
         foreach ($list as $k => $v){
             if((strpos($k,'_') === false)){
                 // 等级配置
-                $item = $config[trim($list['CustomItem16'])."_库存"];
+                $item = $config[trim($list['CustomerGrade'])."_库存"];
                 // 具体配置
                 $_data = $item['_data'];
                 if(isset($_data[$k]) && !empty($_data[$k])){
@@ -229,7 +229,7 @@ class AccessoriesService
                 }
             }else{
                 // 等级配置
-                $item = $config[trim($list['CustomItem16'])."_周转"];
+                $item = $config[trim($list['CustomerGrade'])."_周转"];
                 $key = str_replace('_','',$k);
                 // 具体配置
                 $_data = $item['_data'];
