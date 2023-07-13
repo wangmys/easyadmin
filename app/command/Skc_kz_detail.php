@@ -38,7 +38,8 @@ class Skc_kz_detail extends Command
 
         $skc_kt_nums = SpSkcKzNumModel::where([])->column('*', 'kt_num');
 
-        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ('91', '92', '93', '94', '95', '96', '98');");
+        $customer_regionid_notin = config('skc.customer_regionid_notin');
+        $all_customers = Db::connect("mysql2")->Query("select c.*,cr.首单日期 from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId not in ($customer_regionid_notin);");
         $skc_config = SpSkcConfigModel::where([['config_str', '=', 'skc_price_config']])->field('dk_price,ck_price')->find();
         $dk_price = $skc_config ? $skc_config['dk_price'] : 70;//短裤
         $ck_price = $skc_config ? $skc_config['ck_price'] : 100;//长裤

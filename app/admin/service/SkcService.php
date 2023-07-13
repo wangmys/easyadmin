@@ -514,8 +514,8 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list = $list ? $list->toArray() : [];
         $skc_sz_nostore = $list['skc_sz_nostore'] ? explode(',', $list['skc_sz_nostore']) : [];
         //skc上装 不考核店铺处理
-        $customer_regionid = config('skc.customer_regionid');
-        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
+        $customer_regionid_notin = config('skc.customer_regionid_notin');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId not in ($customer_regionid_notin);");
         $all_customers = array_column($all_customers, 'CustomerName');
         $all_customers = array_combine($all_customers, $all_customers) ;
         $arr = [];
@@ -1042,8 +1042,8 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list = $list ? $list->toArray() : [];
         $skc_kz_nostore = $list['skc_kz_nostore'] ? explode(',', $list['skc_kz_nostore']) : [];
         //skc上装 不考核店铺处理
-        $customer_regionid = config('skc.customer_regionid');
-        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
+        $customer_regionid_notin = config('skc.customer_regionid_notin');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId not in ($customer_regionid_notin);");
         $all_customers = array_column($all_customers, 'CustomerName');
         $all_customers = array_combine($all_customers, $all_customers) ;
         $arr = [];
@@ -1529,8 +1529,8 @@ from sp_skc_sz_detail where goods_manager='{$goods_manager}' and fill_rate<0.8;"
         $list = $list ? $list->toArray() : [];
         $skc_shoe_nostore = $list['skc_shoe_nostore'] ? explode(',', $list['skc_shoe_nostore']) : [];
         //不考核店铺处理
-        $customer_regionid = config('skc.customer_regionid');
-        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId in ($customer_regionid);");
+        $customer_regionid_notin = config('skc.customer_regionid_notin');
+        $all_customers = $this->bi_db->Query("select c.CustomerName from customer c inner join customer_regionid cr on c.CustomerName=cr.店铺名称 where c.Mathod in ('直营', '加盟') and cr.RegionId not in ($customer_regionid_notin);");
         $all_customers = array_column($all_customers, 'CustomerName');
         $all_customers = array_combine($all_customers, $all_customers) ;
 
