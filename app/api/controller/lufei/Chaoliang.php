@@ -215,6 +215,21 @@ class Chaoliang extends BaseController
 
     // 更新超量提醒1 
     public function handle_1() {
+        // 更新零售当前零售折率
+        $sql = "
+            UPDATE cwl_chaoliang_sk AS sk
+            LEFT JOIN sp_ww_chunxia_stock AS st ON sk.省份 = st.省份 
+                AND sk.店铺名称 = st.店铺名称 
+                AND sk.一级分类 = st.一级分类 
+                AND sk.二级分类 = st.二级分类 
+                AND sk.分类 = st.分类 
+                AND sk.货号 = st.货号
+            SET sk.当前零售价 = st.当前零售价,
+                    sk.零售价 = st.零售价,
+                    sk.折率 = round(st.当前零售价 / st.零售价, 2)
+            WHERE 1        
+        ";
+
         // 周转合计
         $sql0 = "
             UPDATE 
@@ -474,6 +489,8 @@ class Chaoliang extends BaseController
                 OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40`)         
         ";
 
+        // 折率 当前零售 零售
+        $status = $this->db_easyA->execute($sql);  
         // 周转累计
         $status0 = $this->db_easyA->execute($sql0);  
         // 1 内搭 外套 鞋履

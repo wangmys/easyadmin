@@ -35,12 +35,12 @@ class Chaoliang extends AdminController
      * 
      */
     public function config() {
-        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        // $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
         
         // dump($select_config );die;
 
         return View('config', [
-            'config' => $find_config,
+            // 'config' => $find_config,
         ]);
     }
 
@@ -69,7 +69,31 @@ class Chaoliang extends AdminController
             // 筛选条件
             $sql = "
                 SELECT
-                    *
+                    *,
+
+                    IFNULL(`单码量00/28/37/44/100/160/S`, 0) + 
+                    IFNULL(`单码量29/38/46/105/165/M`, 0) + 
+                    IFNULL(`单码量30/39/48/110/170/L`, 0) + 
+                    IFNULL(`单码量31/40/50/115/175/XL`, 0) + 
+                    IFNULL(`单码量32/41/52/120/180/2XL`, 0) +
+                    IFNULL(`单码量33/42/54/125/185/3XL`, 0) + 
+                    IFNULL(`单码量34/43/56/190/4XL`, 0) + 
+                    IFNULL(`单码量35/44/58/195/5XL`, 0) + 
+                    IFNULL(`单码量36/6XL`, 0) + 
+                    IFNULL(`单码量38/7XL`, 0) + 
+                    IFNULL(`单码量_40`, 0) AS 单码量合计,
+
+                    IFNULL(`周转00/28/37/44/100/160/S`, 0) + 
+                    IFNULL(`周转29/38/46/105/165/M`, 0) + 
+                    IFNULL(`周转30/39/48/110/170/L`, 0) + 
+                    IFNULL(`周转31/40/50/115/175/XL`, 0) + 
+                    IFNULL(`周转32/41/52/120/180/2XL`, 0) +
+                    IFNULL(`周转33/42/54/125/185/3XL`, 0) + 
+                    IFNULL(`周转34/43/56/190/4XL`, 0) + 
+                    IFNULL(`周转35/44/58/195/5XL`, 0) + 
+                    IFNULL(`周转36/6XL`, 0) + 
+                    IFNULL(`周转38/7XL`, 0) + 
+                    IFNULL(`周转_40`, 0) AS 周转合计
                 from cwl_chaoliang_biaozhun 
                 where 1
             ";
