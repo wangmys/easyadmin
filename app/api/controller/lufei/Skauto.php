@@ -97,7 +97,7 @@ class Skauto extends BaseController
             sk.货号
         ";
 
-        $select = $this->db_bi->query($sql);
+        $select = $this->db_easyA->query($sql);
         $count = count($select);
         if ($select) {
             $this->db_easyA->execute('TRUNCATE cwl_skauto;');
