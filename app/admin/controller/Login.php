@@ -83,8 +83,6 @@ class Login extends AdminController
             } else {
                 LoginService::getInstance()->save_login_count(['username'=>$post['username'], 'name'=>$admin['name'], 'login_count'=>1, 'month'=>$month]);
             }
-            //记录登录缓存计数
-            cache($post['username'], json_encode($post['username']), strtotime(date('Y-m-d').' 23:59:59')-time());
 
             $this->success('登录成功');
         }
