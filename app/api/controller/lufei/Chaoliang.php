@@ -256,7 +256,31 @@ class Chaoliang extends BaseController
 
     // 修正风格
     public function handle_1() {
-
+        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        $sql = "
+            UPDATE 
+                cwl_chaoliang_sk 
+            SET 
+                风格修订 = '引流款'
+            WHERE 1
+                AND 风格 = '基本款'
+                AND (
+                    折率 < 1
+                    AND (
+                        (二级分类 = '短T' AND 当前零售价 <=  50.00) OR
+                        (二级分类 = '休闲短衬' AND 当前零售价 <=  80.00) OR
+                        (二级分类 = '休闲短裤' AND 当前零售价 <=  70.00) OR
+                        (二级分类 = '松紧短裤' AND 当前零售价 <=  70.00) OR
+                        (二级分类 = '牛仔短裤' AND 当前零售价 <=  70.00) OR
+                        (二级分类 = '休闲长裤' AND 当前零售价 <=  100.00) OR
+                        (二级分类 = '牛仔长裤' AND 当前零售价 <=  100.00) OR
+                        (二级分类 = '松紧长裤' AND 当前零售价 <=  100.00)
+                    )
+                ) OR (
+                    折率 < 1 
+                    AND 二级分类 NOT IN('短T', '休闲短衬', '休闲短裤', '松紧短裤', '牛仔短裤', '休闲长裤', '牛仔长裤', '松紧长裤')
+                )
+        ";
     }
 
     // 更新超量提醒1 

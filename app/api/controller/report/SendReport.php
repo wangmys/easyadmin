@@ -43,7 +43,11 @@ class SendReport extends BaseController
     public function create_test() {
         $name = input('param.name') ? input('param.name') : 'S101'; 
         $date = input('param.date') ? input('param.date') : '';
-        if ($name =='S101') {
+        if ($name =='S009') {
+            $this->service->create_table_s009();
+        } elseif ($name =='S010') {
+            $this->service->create_table_s010();
+        } elseif ($name =='S101') {
             $this->service->create_table_s101('S101', $date);
         } elseif ($name =='S102') {
             $this->service->create_table_s102($date);
