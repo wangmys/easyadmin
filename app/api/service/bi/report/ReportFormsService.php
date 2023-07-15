@@ -44,10 +44,304 @@ class ReportFormsService
     {
         switch ($number) {
             case 100:
-
-
                 break;
         }
+    }
+
+    //2023 秋季货品销售报表
+    public function create_table_s009()
+    {
+        $code = 'S009';
+        $date = date('Y-m-d');
+        $sql = "select 性质,风格,一级分类 as 大类,二级分类 as 中类,采购入库数,仓库库存,仓库可用库存,仓库库存成本,收仓在途,收仓在途成本,已配未发,最后一周销,昨天销,累计销售,累销成本,在途库存数量,店库存数量,合计库存数,合计库存数占比,合计库存成本,数量售罄率,成本售罄率,前四周销量,前三周销量,前两周销量,前一周销量,周转周 from autumn_report where 更新日期 = '$date'";
+        $data = $this->db_bi->Query($sql);
+
+        // echo '<pre>';
+        // print_r($data); die;
+        // $table_header = ['ID'];
+        // $title = ['性质','风格','二级分类','采购入库数','累计销售','数量售罄率','合计库存数','合计库存成本','周转周','仓库库存','仓库可用库存',
+        //     '仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累销成本','在途库存数量','店库存数量','前四周销量','前三周销量'
+        //     ,'前两周销量','前一周销量','成本售罄率'];
+
+        // $table_header = array_merge($table_header, $title);
+
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 100;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 45;
+        $field_width[2] = 55;
+        $field_width[3] = 45;
+        $field_width[4] = 70;
+        $field_width[5] = 90;
+        $field_width[6] = 70;
+        $field_width[9] = 70;
+        $field_width[11] = 70;
+        $field_width[12] = 82;
+        $field_width[13] = 55;
+        $field_width[14] = 70;
+        $field_width[15] = 70;
+        $field_width[17] = 82;
+        $field_width[18] = 82;
+        $field_width[19] = 120;
+        $field_width[21] = 82;
+        $field_width[22] = 82;
+        $field_width[23] = 82;
+        $field_width[24] = 82;
+        $field_width[25] = 82;
+        $field_width[26] = 82;
+        $field_width[27] = 70;
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+        ];
+
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "2023 秋季货品销售报表 [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '二级分类',
+            'color'=>16711877,
+            'field' => ['合计'],
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $this->create_image($params);
+    }
+
+    //2022 冬季货品销售报表
+    public function create_table_s010()
+    {
+        $code = 'S010';
+        $date = date('Y-m-d');
+        $sql = "
+            select 
+                性质,
+                风格,
+                一级分类,
+                二级分类,
+                采购入库数,
+                仓库库存,
+                仓库可用库存,
+                仓库库存成本,
+                收仓在途,
+                收仓在途成本,
+                已配未发,
+                最后一周销,
+                昨天销,
+                累计销售,
+                累销成本,
+                在途库存数量,
+                店库存数量,
+                合计库存数,
+                合计库存数占比,
+                合计库存成本,
+                数量售罄率,
+                成本售罄率,
+                前四周销量,
+                前三周销量,
+                前两周销量,
+                前一周销量,
+                周转周 
+            from winter_report 
+            WHERE 1
+                -- AND 更新日期 = '{$date}'
+                AND 更新日期 = '2023-01-08'
+            LIMIT 10    
+            ";
+        $data = $this->db_bi->Query($sql);
+        echo '<pre>';
+        print_r($data);die;
+
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 100;
+        }
+
+        $field_width[0] = 40;
+        $field_width[1] = 80;
+        $field_width[2] = 80;
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $table_data= [];
+
+
+
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today, 
+        ];
+
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "2023 冬季货品销售报表  [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '风格',
+            'field' => '合计',
+            'color'=>16711877,
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $this->create_image($params);
+
+    }
+
+    public function arr_add_member($arr,$add,$members){
+        foreach ($members as $k){
+            if(isset($arr[$k])){
+                $arr[$k] +=$add[$k];
+            }else{
+                $arr[$k]  =$add[$k];
+            }
+        }
+        return $arr;
+    }
+
+    public function S015()
+    {
+        $code = 'S015';
+        $date = date('Y-m-d');
+        $sql = "select 风格,一级分类,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,sum(前一周销量) as 前一周销量 from autumn_report where 更新日期 = '$date' and  一级分类 <> '合计' group by 风格,一级分类,二级分类  order by 风格,一级分类,二级分类";
+        $data = Db::connect("bi")->Query($sql);
+        $arr =  array_column($data, '合计库存数');
+        $sum = array_sum($arr);
+        $cols = array_column($data, '风格');
+        $styles = array_values( array_unique($cols));
+
+        $arr_counts =  array_count_values($cols);
+        $arr = [];
+        $all['风格'] = '汇总合计';
+        $all['一级分类'] = '';
+        $all['二级分类'] = '合计';
+        foreach ($data as $v=>$k){
+            foreach ($styles as $sv=>$sk){
+                if($k['风格'] === $sk){
+                    $arr[$sv]['风格'] =$sk;
+                    $arr[$sv]['一级分类'] =$sk.'合计';
+                    $arr[$sv]['二级分类'] ='合计';
+                    $arr[$sv] = $this->arr_add_member($arr[$sv],$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
+                }
+            }
+
+            $all = $this->arr_add_member($all,$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
+        }
+        $ls[0] = $arr[0];
+
+        array_splice($data,13,0,$ls);
+        $ls[0] = $arr[1];
+        $length = count($data);
+        array_splice($data,$length,0,$ls);
+        $ls[0] = $all;
+        array_splice($data,$length+1,0,$ls);
+
+        foreach ($data as $v=>$k){
+            $data[$v]['合计库存占比'] =number_format(round( $k['合计库存数'] / $sum,4)*100,2).'%';
+            if($k['累计销售']  + $k['合计库存数'] >0 ){
+                $data[$v]['数量售罄率'] =  number_format(round( $k['累计销售'] /( $k['累计销售']  + $k['合计库存数']) ,4)*100,2).'%';
+            }else{
+                $data[$v]['数量售罄率'] = '';
+            }
+//            $data[$v]['数量售罄率'] =  number_format(round( $k['累计销售'] /( $k['累计销售']  + $k['合计库存数']) ,4)*100,2).'%';
+
+            if( $k['累销成本']  + $k['合计库存成本'] > 0){
+                $data[$v]['成本售罄率'] =  number_format(round( $k['累销成本'] /( $k['累销成本']  + $k['合计库存成本']) ,4)*100,2).'%';
+            }else{
+                $data[$v]['成本售罄率'] ='';
+            }
+
+            if($k['合计库存数'] > 0 &&$k['前一周销量'] >0){
+                $data[$v]['周转周'] =  number_format(round( $k['合计库存数'] /( ($k['前一周销量'] +$k['前两周销量'] +$k['前三周销量'])/3) ,4),2);
+            }else{
+                $data[$v]['周转周'] = 0;
+            }
+        }
+        $table_header = ['行号'];
+        $title = ['风格','二级分类','采购入库数','累计销售','数量售罄率','合计库存数','合计库存成本','周转周','仓库库存','仓库可用库存',
+            '仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累销成本','在途库存数量','店库存数量','前四周销量','前三周销量'
+            ,'前两周销量','前一周销量','合计库存占比','成本售罄率'];
+
+        $table_header = array_merge($table_header, $title);
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 100;
+        }
+        $field_width[0] = 100;
+        $field_width[1] = 80;
+        $field_width[2] = 80;
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        $table_data= [];
+        foreach ($data as $V=>$k){
+            $new = [
+                '风格'=>$k['风格'],
+                '二级分类'=>$k['二级分类'],
+                '采购入库数'=>$k['采购入库数'],
+                '累计销售'=>$k['累计销售'],
+                '数量售罄率'=>$k['数量售罄率'],
+                '合计库存数'=>$k['合计库存数'],
+                '合计库存成本'=>$k['合计库存成本'],
+                '周转周'=>$k['周转周'],
+                '仓库库存'=>$k['仓库库存'],
+                '仓库可用库存'=>$k['仓库可用库存'],
+                '仓库库存成本'=>$k['仓库库存成本'],
+                '收仓在途'=>$k['收仓在途'],
+                '收仓在途成本'=>$k['收仓在途成本'],
+                '已配未发'=>$k['已配未发'],
+                '最后一周销'=>$k['最后一周销'],
+                '昨天销'=>$k['昨天销'],
+                '累销成本'=>$k['累销成本'],
+                '在途库存数量'=>$k['在途库存数量'],
+                '店库存数量'=>$k['店库存数量'],
+                '前四周销量'=>$k['前四周销量'],
+                '前三周销量'=>$k['前三周销量'],
+                '前两周销量'=>$k['前两周销量'],
+                '前一周销量'=>$k['前一周销量'],
+                '合计库存占比'=>$k['合计库存占比'],
+                '成本售罄率'=>$k['成本售罄率'],
+            ];
+
+            $table_data[]=$new;
+
+        }
+
+
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+        ];
+        $params = [
+            'row' => count($table_data),          //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "数据更新时间 [". date("Y-m-d", strtotime("-1 day")) ."]- 2022秋季货品零售汇总表",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $table_data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '二级分类',
+            'color'=>16711877,
+            'field' => '合计',
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $res = table_pic_new($params);
+        halt($res);
     }
 
     public function create_table_s023()
@@ -86,7 +380,7 @@ class ReportFormsService
             $params = [
                 'row' => count($data),          //数据的行数
                 'file_name' =>$code.'.jpg',      //保存的文件名
-                'title' => "数据更新时间 [". date("Y-m-d", strtotime("-1 day")) ."] 商品部-所有年份各品类销售占比",
+                'title' => "商品部-所有年份各品类销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $data,
                 'table_explain' => $table_explain,
@@ -171,6 +465,87 @@ class ReportFormsService
             return false;
         }
 
+    }
+
+    // 商品部直营春夏老店库存结构报表
+    public function create_table_s016()
+    {
+        $code = 'S016';
+        $date = date('Y-m-d');
+        $sql = "select 
+            性质,
+            一级分类 as 大类,
+            二级分类 as 中类,
+            _2023春 as `2023春`,
+            _2023夏 as `2023夏`,
+            _2023汇总 as `2023汇总`,
+            _2022春 as `2022春`,
+            _2022夏 as `2022夏`,
+            _2022汇总 as `2022汇总`,
+            _2021春 as `2021春`,
+            _2021夏 as `2021夏`,
+            _2021汇总 as `2021汇总`,
+            _2020春 as `2020春`,
+            _2020夏 as `2020夏`,
+            _2020汇总 as `2020汇总`,
+            _2019春 as `2019春`,
+            _2019夏 as `2019夏`,
+            _2019汇总 as `2019汇总`,
+            _2018春 as `2018春`,
+            _2018夏 as `2018夏`,
+            _2018汇总 as `2018汇总`,
+            _2017春 as `2017春`,
+            _2017夏 as `2017夏`,
+            _2017汇总 as `2017汇总`,
+            合计库存数
+        from sp_zy_spring_and_summer_stock where 更新日期 = '$date'";
+        $data = $this->db_bi->query($sql);
+        
+        // foreach ($data as $key => $val) {
+        //     $data[$key]['省份'] = province2zi($val['省份']);
+        // }
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 70;
+        }
+        $field_width[0] = 35;
+        $field_width[1] = 45;
+        $field_width[2] = 45;
+        $field_width[3] = 80;
+        $field_width[25] = 90;
+        // // $field_width[2] = 140;
+        // $field_width[11] = 60;
+        // $field_width[12] = 60;
+        // $field_width[13] = 60;
+        // $field_width[14] = 60;
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            //    0 => "昨天:".$week. " 去年昨天:".$last_year_week_today,
+            //            1 => '[类型]：说明8 说明16 ',
+            //            2 => '[类型]：说明8 说明16 ',
+            0 => ' '
+        ];
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' => $code . '.jpg',      //保存的文件名
+            'title' => "商品部-直营春夏老品库存结构报表 [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '省份',
+            'color' => 16711877,
+            'field' => '合计',
+            'banben' => '  图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
+        ];
+        $this->create_image($params);
     }
 
     public function create_table_s030()
@@ -2234,7 +2609,7 @@ class ReportFormsService
         $date = $date ? $date : date('Y-m-d');
         $sql = "
             SELECT
-                IFNULL(经营属性, '总计') AS 经营属性,
+                IFNULL(经营属性, '总计') AS 性质,
                 IFNULL(省份, '合计') AS 省份,
                 concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
                 concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
@@ -2254,6 +2629,18 @@ class ReportFormsService
         $list = $this->db_easyA->query($sql);
 
         if ($list) {
+            // $insertData = $list;
+            // foreach ($insertData as $key => $val) {
+            //     $insertData[$key]['更新日期'] = $date;
+            // }
+            // // 清空同一天
+            // $this->db_bi->table('sp_ww_s113')->where([
+            //     ['更新日期', '=', $date]
+            // ])->delete();
+            
+            // // 入库
+            // $this->db_bi->table('sp_ww_s113')->strict(false)->insertAll($insertData);
+
             $table_header = ['ID'];
             $field_width = [];
             $table_header = array_merge($table_header, array_keys($list[0]));
@@ -2262,8 +2649,8 @@ class ReportFormsService
                 $field_width[] = 100;
             }
             $field_width[0] = 30;
-            $field_width[1] = 80;
-            $field_width[2] = 80;
+            $field_width[1] = 50;
+            $field_width[2] = 50;
             $field_width[3] = 80;
             $field_width[4] = 80;
             $field_width[7] = 110;
@@ -2734,6 +3121,30 @@ class ReportFormsService
                 }
             }
 
+            if (@$params['code'] == 'S009') {
+                if (isset($item['中类']) && $item['中类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['风格']) && $item['风格'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['性质']) && $item['性质'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S016') {
+                if (isset($item['中类']) && $item['中类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['大类']) && $item['大类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['性质']) && $item['性质'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
             if (@$params['code'] == 'S030' || @$params['code'] == 'S031') {
                 if (isset($item['省份']) && $item['省份'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
@@ -2762,7 +3173,7 @@ class ReportFormsService
                 if (isset($item['省份']) && $item['省份'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
                 }
-                if (isset($item['经营属性']) && $item['经营属性'] == '总计') {
+                if (isset($item['性质']) && $item['性质'] == '总计') {
                     
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }

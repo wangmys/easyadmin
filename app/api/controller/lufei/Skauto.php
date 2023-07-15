@@ -58,7 +58,6 @@ class Skauto extends BaseController
     public function skauto() {
         $sql = "
             SELECT 
-                '1' as status,
                 sk.云仓,
                 sk.商品负责人,
                 sk.省份,
@@ -81,8 +80,8 @@ class Skauto extends BaseController
                 date_format(now(),'%Y-%m-%d') AS 更新日期
             FROM `sp_sk` as sk
             LEFT JOIN customer as c ON sk.店铺名称=c.CustomerName
-            LEFT JOIN sp_ww_chunxia_stock as st ON sk.省份=st.省份 AND sk.店铺名称=st.店铺名称 AND sk.分类=st.分类 AND sk.货号 = st.货号
-            LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
+            LEFT JOIN sp_ww_chunxia_stock as st ON sk.省份=st.省份 AND sk.店铺名称=st.店铺名称 AND sk.一级分类=st.一级分类 AND sk.二级分类=st.二级分类 AND sk.分类=st.分类 AND sk.货号 = st.货号
+            LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.一级分类=bu.大类 AND sk.二级分类=bu.中类 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
             WHERE
                 sk.季节 IN ({$this->seasionStr}) 
                 AND c.Region <> '闭店区'
@@ -97,7 +96,7 @@ class Skauto extends BaseController
             sk.货号
         ";
 
-        $select = $this->db_bi->query($sql);
+        $select = $this->db_easyA->query($sql);
         $count = count($select);
         if ($select) {
             $this->db_easyA->execute('TRUNCATE cwl_skauto;');
