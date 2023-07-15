@@ -173,6 +173,87 @@ class ReportFormsService
 
     }
 
+    // 商品部直营春夏老店库存结构报表
+    public function create_table_s016()
+    {
+        $code = 'S016';
+        $date = date('Y-m-d');
+        $sql = "select 
+            性质,
+            一级分类 as 大类,
+            二级分类 as 中类,
+            _2023春 as `2023春`,
+            _2023夏 as `2023夏`,
+            _2023汇总 as `2023汇总`,
+            _2022春 as `2022春`,
+            _2022夏 as `2022夏`,
+            _2022汇总 as `2022汇总`,
+            _2021春 as `2021春`,
+            _2021夏 as `2021夏`,
+            _2021汇总 as `2021汇总`,
+            _2020春 as `2020春`,
+            _2020夏 as `2020夏`,
+            _2020汇总 as `2020汇总`,
+            _2019春 as `2019春`,
+            _2019夏 as `2019夏`,
+            _2019汇总 as `2019汇总`,
+            _2018春 as `2018春`,
+            _2018夏 as `2018夏`,
+            _2018汇总 as `2018汇总`,
+            _2017春 as `2017春`,
+            _2017夏 as `2017夏`,
+            _2017汇总 as `2017汇总`,
+            合计库存数
+        from sp_zy_spring_and_summer_stock where 更新日期 = '$date'";
+        $data = $this->db_bi->query($sql);
+        
+        // foreach ($data as $key => $val) {
+        //     $data[$key]['省份'] = province2zi($val['省份']);
+        // }
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 70;
+        }
+        $field_width[0] = 35;
+        $field_width[1] = 45;
+        $field_width[2] = 45;
+        $field_width[3] = 80;
+        $field_width[25] = 90;
+        // // $field_width[2] = 140;
+        // $field_width[11] = 60;
+        // $field_width[12] = 60;
+        // $field_width[13] = 60;
+        // $field_width[14] = 60;
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            //    0 => "昨天:".$week. " 去年昨天:".$last_year_week_today,
+            //            1 => '[类型]：说明8 说明16 ',
+            //            2 => '[类型]：说明8 说明16 ',
+            0 => ' '
+        ];
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' => $code . '.jpg',      //保存的文件名
+            'title' => "商品部-直营春夏老品库存结构报表 [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '省份',
+            'color' => 16711877,
+            'field' => '合计',
+            'banben' => '  图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
+        ];
+        $this->create_image($params);
+    }
+
     public function create_table_s030()
     {
         $code = 'S030';
@@ -2730,6 +2811,18 @@ class ReportFormsService
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['新老品']) && $item['新老品'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S016') {
+                if (isset($item['中类']) && $item['中类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['大类']) && $item['大类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['性质']) && $item['性质'] == '总计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
             }

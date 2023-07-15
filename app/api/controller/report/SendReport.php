@@ -81,6 +81,8 @@ class SendReport extends BaseController
             $this->service->create_table_s023();
         } elseif ($name =='S025') {
             $this->service->create_table_s025();
+        } elseif ($name =='S016') {
+            $this->service->create_table_s016();
         } elseif ($name =='S030') {
             $this->service->create_table_s030();
         } elseif ($name =='S031') {
@@ -307,6 +309,31 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    // 推送到打群 0：45
+    public function send5()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S016' => [
+                'title' => '商品部-直营春夏老品库存结构报表 表号:S023',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
+            ]
+        ];
+        $res = [];
+
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+        }
+        return json($res);
+    }
+
 
     public function send_caigoudingtui()
     {
@@ -502,6 +529,15 @@ class SendReport extends BaseController
 
         // 发送数据报表
         $this->send4();
+    }
+
+    // 00:45
+    public function run5()
+    {
+        $this->service->create_table_s016();
+
+        // 发送数据报表
+        $this->send5();
     }
 
     // 51 推送 11：46
