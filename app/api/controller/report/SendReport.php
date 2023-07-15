@@ -274,6 +274,10 @@ class SendReport extends BaseController
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
+            'S016' => [
+                'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
+            ],
             'S023' => [
                 'title' => '商品部-所有年份各品类销售占比 表号:S023',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S023.jpg'
@@ -309,7 +313,7 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 推送到打群 0：45
+    // 测试用的
     public function send5()
     {
         $name = '\app\api\service\DingdingService';
@@ -521,6 +525,7 @@ class SendReport extends BaseController
     // 00:45
     public function run4()
     {
+        $this->service->create_table_s016();
         $this->service->create_table_s023();
         $this->service->create_table_s025();
         $this->service->create_table_s030();
@@ -531,13 +536,13 @@ class SendReport extends BaseController
         $this->send4();
     }
 
-    // 00:45
+    // 测试用的 00:45
     public function run5()
     {
-        $this->service->create_table_s016();
+        // $this->service->create_table_s016();
 
         // 发送数据报表
-        $this->send5();
+        // $this->send5();
     }
 
     // 51 推送 11：46
