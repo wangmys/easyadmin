@@ -34,6 +34,86 @@ class Tableupdate extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // 门店业绩环比报表  http://www.easyadmin1.com/api/tableupdate/s113?date=2023-07-14
+    public function s113($date = '')
+    {
+        // 编号
+        $code = 'S113';
+        echo $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
+        $sql = "
+            SELECT
+                IFNULL(经营属性, '总计') AS 性质,
+                IFNULL(省份, '合计') AS 省份,
+                店铺名称,
+                concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
+                concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
+                ROUND( SUM( 今日流水 ), 2 ) AS 今日流水,
+                ROUND( SUM( `环比流水` ), 2 ) AS 环比流水,
+                ROUND( SUM( `本月累计流水` ), 2 ) AS 本月累计流水,
+                ROUND( SUM( `环比累计流水` ), 2 ) AS 环比累计流水,
+                '{$date}' AS 更新日期 
+            FROM
+                cwl_dianpuyejihuanbi_handle 
+            WHERE
+                `use` = 1 
+                AND 更新日期='{$date}'
+            GROUP BY
+                省份 
+                WITH ROLLUP
+        ";
+        $list = $this->db_easyA->query($sql);
+
+        if ($list) {
+            // $insertData = $list;
+            // foreach ($insertData as $key => $val) {
+            //     $insertData[$key]['更新日期'] = $date;
+            // }
+            // 清空同一天
+            $this->db_bi->table('sp_ww_s113')->where([
+                ['更新日期', '=', $date]
+            ])->delete();
+
+            // 入库
+            $this->db_bi->table('sp_ww_s113')->strict(false)->insertAll($list);
+        }
+
+        $sql2 = "
+            SELECT
+                IFNULL(经营属性, '总计') AS 经营属性,
+                IFNULL(省份, '合计') AS 省份,
+                IFNULL(店铺名称, '合计') AS 店铺名称,
+                concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
+                concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
+                ROUND( SUM( 今日流水 ), 2 ) AS 今日流水,
+                ROUND( SUM( `环比流水` ), 2 ) AS 环比流水,
+                ROUND( SUM( `本月累计流水` ), 2 ) AS 本月累计流水,
+                ROUND( SUM( `环比累计流水` ), 2 ) AS 环比累计流水,
+                '{$date}' AS 更新日期
+            FROM
+                cwl_dianpuyejihuanbi_handle 
+            WHERE
+                `use` = 1 
+                AND 更新日期='{$date}'
+            GROUP BY
+                经营属性,省份,店铺名称 
+                WITH ROLLUP
+        ";
+        $list2 = $this->db_easyA->query($sql2);
+        if ($list2) {
+            // $insertData = $list;
+            // foreach ($insertData as $key => $val) {
+            //     $insertData[$key]['更新日期'] = $date;
+            // }
+            // 清空同一天
+            $this->db_bi->table('sp_ww_s113b')->where([
+                ['更新日期', '=', $date]
+            ])->delete();
+
+            // 入库
+            $this->db_bi->table('sp_ww_s113b')->strict(false)->insertAll($list2);
+        }
+    }
+
     public function s108A() {
         $sql3 = "
             SELECT

@@ -2335,16 +2335,17 @@ class ReportFormsService
         $list = $this->db_easyA->query($sql);
 
         if ($list) {
-            $insertData = $list;
-            foreach ($insertData as $key => $val) {
-                $insertData[$key]['更新日期'] = $date;
-            }
-            // 清空同一天
-            $this->db_bi->table('sp_ww_s113')->where([
-                ['更新日期', '=', $date]
-            ])->delete();
-            // 入库
-            $this->db_bi->table('sp_ww_s113')->strict(false)->insertAll($insertData);
+            // $insertData = $list;
+            // foreach ($insertData as $key => $val) {
+            //     $insertData[$key]['更新日期'] = $date;
+            // }
+            // // 清空同一天
+            // $this->db_bi->table('sp_ww_s113')->where([
+            //     ['更新日期', '=', $date]
+            // ])->delete();
+            
+            // // 入库
+            // $this->db_bi->table('sp_ww_s113')->strict(false)->insertAll($insertData);
 
             $table_header = ['ID'];
             $field_width = [];
