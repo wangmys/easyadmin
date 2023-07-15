@@ -316,7 +316,7 @@ class SendReport extends BaseController
         $model = new $name;
         $send_data = [
             'S016' => [
-                'title' => '商品部-直营春夏老品库存结构报表 表号:S023',
+                'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
             ]
         ];
