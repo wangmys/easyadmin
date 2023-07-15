@@ -2315,7 +2315,7 @@ class ReportFormsService
         $date = $date ? $date : date('Y-m-d');
         $sql = "
             SELECT
-                IFNULL(经营属性, '总计') AS 经营属性,
+                IFNULL(经营属性, '总计') AS 性质,
                 IFNULL(省份, '合计') AS 省份,
                 concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
                 concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
@@ -2335,6 +2335,17 @@ class ReportFormsService
         $list = $this->db_easyA->query($sql);
 
         if ($list) {
+            $insertData = $list;
+            foreach ($insertData as $key => $val) {
+                $insertData[$key]['更新日期'] = $date;
+            }
+            // 清空同一天
+            $this->db_bi->table('sp_ww_s113')->where([
+                ['更新日期', '=', $date]
+            ])->delete();
+            // 入库
+            $this->db_bi->table('sp_ww_s113')->strict(false)->insertAll($insertData);
+
             $table_header = ['ID'];
             $field_width = [];
             $table_header = array_merge($table_header, array_keys($list[0]));
@@ -2343,8 +2354,8 @@ class ReportFormsService
                 $field_width[] = 100;
             }
             $field_width[0] = 30;
-            $field_width[1] = 80;
-            $field_width[2] = 80;
+            $field_width[1] = 50;
+            $field_width[2] = 50;
             $field_width[3] = 80;
             $field_width[4] = 80;
             $field_width[7] = 110;
@@ -2855,7 +2866,7 @@ class ReportFormsService
                 if (isset($item['省份']) && $item['省份'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
                 }
-                if (isset($item['经营属性']) && $item['经营属性'] == '总计') {
+                if (isset($item['性质']) && $item['性质'] == '总计') {
                     
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
