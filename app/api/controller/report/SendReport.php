@@ -47,6 +47,10 @@ class SendReport extends BaseController
             $this->service->create_table_s009();
         } elseif ($name =='S010') {
             $this->service->create_table_s010();
+        } elseif ($name =='S016') {
+            $this->service->create_table_s016();
+        } elseif ($name =='S018') {
+            $this->service->create_table_s018();
         } elseif ($name =='S101') {
             $this->service->create_table_s101('S101', $date);
         } elseif ($name =='S102') {
@@ -56,7 +60,7 @@ class SendReport extends BaseController
         } elseif ($name =='S103B') {
             $this->service->create_table_s103B($date);
         } elseif ($name =='S104') {
-            $this->service->create_table_s101('S104', '2023-05-04');
+            $this->service->create_table_s101('S104', $date);
         } elseif ($name =='S106') {
             $this->service->create_table_s106();
         } elseif ($name =='S107') {
@@ -85,8 +89,6 @@ class SendReport extends BaseController
             $this->service->create_table_s023();
         } elseif ($name =='S025') {
             $this->service->create_table_s025();
-        } elseif ($name =='S016') {
-            $this->service->create_table_s016();
         } elseif ($name =='S030') {
             $this->service->create_table_s030();
         } elseif ($name =='S031') {
@@ -282,6 +284,10 @@ class SendReport extends BaseController
                 'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
             ],
+            'S018' => [
+                'title' => '商品部-加盟春夏老品库存结构报表 表号:S018',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S018.jpg'
+            ],
             'S023' => [
                 'title' => '商品部-所有年份各品类销售占比 表号:S023',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S023.jpg'
@@ -317,16 +323,16 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 测试用的
+    // 推送到打群 0：45
     public function send5()
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-            'S016' => [
-                'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
-            ]
+            'S009' => [
+                'title' => '商品部-直营春夏老品库存结构报表 表号:S009',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S009.jpg'
+            ],
         ];
         $res = [];
 
@@ -341,7 +347,6 @@ class SendReport extends BaseController
         }
         return json($res);
     }
-
 
     public function send_caigoudingtui()
     {
@@ -482,10 +487,10 @@ class SendReport extends BaseController
     public function run()
     {
         // 生成图片 s101
-        $this->service->create_table_s101('S101');
-        $this->service->create_table_s102();
-        $this->service->create_table_s103();
-        $this->service->create_table_s101('S104');
+        $this->service->create_table_s101('S101', '2023-07-17');
+        $this->service->create_table_s102('2023-07-17');
+        $this->service->create_table_s103('2023-07-17');
+        $this->service->create_table_s101('S104','2023-07-17');
 
         // 108-110
         $this->service->create_table_s108A();
@@ -529,7 +534,9 @@ class SendReport extends BaseController
     // 00:45
     public function run4()
     {
+        
         $this->service->create_table_s016();
+        $this->service->create_table_s018();
         $this->service->create_table_s023();
         $this->service->create_table_s025();
         $this->service->create_table_s030();
@@ -540,13 +547,12 @@ class SendReport extends BaseController
         $this->send4();
     }
 
-    // 测试用的 00:45
+    // 测试用的 00:40
     public function run5()
     {
-        // $this->service->create_table_s016();
-
+        $this->service->create_table_s009();
         // 发送数据报表
-        // $this->send5();
+        $this->send5();
     }
 
     // 51 推送 11：46
