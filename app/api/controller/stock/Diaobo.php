@@ -109,18 +109,18 @@ class Diaobo extends BaseController
         -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND EBGS.ViewOrder=11 THEN ECSD.Quantity END ) 累销数量,*/
         -SUM(CASE WHEN ECS.BillType = 'ErpRetail' THEN ECSD.Quantity END ) 累销总数量,
         
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=1 THEN ECSD.Quantity END ) [调拨后两周销量_00/28/37/44/100/160/S],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=2 THEN ECSD.Quantity END ) 	[调拨后两周销量_29/38/46/105/165/M],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=3 THEN ECSD.Quantity END ) 	[调拨后两周销量_30/39/48/110/170/L],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=4 THEN ECSD.Quantity END ) 	[调拨后两周销量_31/40/50/115/175/XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=5 THEN ECSD.Quantity END ) 	[调拨后两周销量_32/41/52/120/180/2XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=6 THEN ECSD.Quantity END ) 	[调拨后两周销量_33/42/54/125/185/3XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=7 THEN ECSD.Quantity END ) 	[调拨后两周销量_34/43/56/190/4XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=8 THEN ECSD.Quantity END ) 	[调拨后两周销量_35/44/58/195/5XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=9 THEN ECSD.Quantity END ) 	[调拨后两周销量_36/6XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=10 THEN ECSD.Quantity END ) [调拨后两周销量_38/7XL],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') AND EBGS.ViewOrder=11 THEN ECSD.Quantity END ) [调拨后两周销量_40],
-        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, 1, '{$end_date}') AND DATEADD(DAY, 14, '{$end_date}') THEN ECSD.Quantity END ) 调拨后两周总销量
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND  DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=1 THEN ECSD.Quantity END ) [调拨后两周销量_00/28/37/44/100/160/S],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=2 THEN ECSD.Quantity END ) 	[调拨后两周销量_29/38/46/105/165/M],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=3 THEN ECSD.Quantity END ) 	[调拨后两周销量_30/39/48/110/170/L],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=4 THEN ECSD.Quantity END ) 	[调拨后两周销量_31/40/50/115/175/XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=5 THEN ECSD.Quantity END ) 	[调拨后两周销量_32/41/52/120/180/2XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=6 THEN ECSD.Quantity END ) 	[调拨后两周销量_33/42/54/125/185/3XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=7 THEN ECSD.Quantity END ) 	[调拨后两周销量_34/43/56/190/4XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=8 THEN ECSD.Quantity END ) 	[调拨后两周销量_35/44/58/195/5XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=9 THEN ECSD.Quantity END ) 	[调拨后两周销量_36/6XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=10 THEN ECSD.Quantity END ) [调拨后两周销量_38/7XL],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') AND EBGS.ViewOrder=11 THEN ECSD.Quantity END ) [调拨后两周销量_40],
+        -SUM(CASE WHEN ECS.BillType = 'ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN DATEADD(DAY, -13, '{$end_date}') AND DATEADD(DAY, 0, '{$end_date}') THEN ECSD.Quantity END ) 调拨后两周总销量
         -- COUNT(EC.CustomerName ) OVER (PARTITION BY EC.State)
         FROM ErpCustomer EC 
         LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
