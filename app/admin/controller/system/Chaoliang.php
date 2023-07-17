@@ -268,6 +268,8 @@ class Chaoliang extends AdminController
                     `提醒36/6XL`,
                     `提醒38/7XL`,
                     `提醒_40`,
+                    当前零售价,
+                    零售价,
                     提醒备注
                 FROM
                     cwl_chaoliang_sk 
