@@ -557,6 +557,7 @@ class SendReport extends BaseController
     public function run5()
     {
         $this->service->create_table_s009();
+        $this->service->create_table_s015();
         // 发送数据报表
         $this->send5();
     }
