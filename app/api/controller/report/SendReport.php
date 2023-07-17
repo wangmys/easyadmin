@@ -325,7 +325,7 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 推送到打群 0：45
+    // 推送到打群 0：40
     public function send5()
     {
         $name = '\app\api\service\DingdingService';
@@ -347,8 +347,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
                 // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
         }
         return json($res);
