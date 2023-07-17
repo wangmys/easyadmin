@@ -8,6 +8,7 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use jianyan\excel\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
  * Class Chaoliang
@@ -35,12 +36,12 @@ class Chaoliang extends AdminController
      * 
      */
     public function config() {
-        // $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
         
         // dump($select_config );die;
 
         return View('config', [
-            // 'config' => $find_config,
+            'config' => $find_config,
         ]);
     }
 
@@ -58,6 +59,150 @@ class Chaoliang extends AdminController
         } else {
             return json(['status' => 0, 'msg' => '权限不足，请勿非法访问']);
         }   
+    }
+
+    // 上传excel
+    public function upload() {
+        if (request()->isAjax()) {
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $new_name = "超量标准修改_". session('admin.name')  . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+
+            if($info) {
+                //成功上传后 获取上传的数据
+                //要获取的数据字段
+                $read_column = [
+                    'A' => '风格',
+                    'B' => '店铺等级',
+                    'C' => '一级分类',
+                    'D' => '二级分类',
+                    'E' => '单码量00/28/37/44/100/160/S',
+                    'F' => '单码量29/38/46/105/165/M',
+                    'G' => '单码量30/39/48/110/170/L',
+                    'H' => '单码量31/40/50/115/175/XL',
+                    'I' => '单码量32/41/52/120/180/2XL',
+                    'J' => '单码量33/42/54/125/185/3XL',
+                    'K' => '单码量34/43/56/190/4XL',
+                    'L' => '单码量35/44/58/195/5XL',
+                    'M' => '单码量36/6XL',
+                    'N' => '单码量38/7XL',
+                    'O' => '单码量_40',
+                    'P' => '周转00/28/37/44/100/160/S',
+                    'Q' => '周转29/38/46/105/165/M',
+                    'R' => '周转30/39/48/110/170/L',
+                    'S' => '周转31/40/50/115/175/XL',
+                    'T' => '周转32/41/52/120/180/2XL',
+                    'U' => '周转33/42/54/125/185/3XL',
+                    'V' => '周转34/43/56/190/4XL',
+                    'W' => '周转35/44/58/195/5XL',
+                    'X' => '周转36/6XL',
+                    'Y' => '周转38/7XL',
+                    'Z' => '周转_40',
+
+                ];
+                // $read_column = [
+                //     'A' => '原单编号',
+                //     'B' => '调出店铺编号',
+                //     'C' => '调入店铺编号',
+                //     'D' => '货号',
+                //     'E' => '尺码',
+                //     'F' => '颜色编号',
+                //     'G' => '数量',
+                // ];
+
+                // 店铺信息
+                $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
+                // dump($select_customer);
+                //读取数据
+                $data = $this->readExcel($info, $read_column);
+
+                // echo '<pre>';
+                // print_r($data);
+                foreach ($data as $key => $val) {
+                    $this->db_easyA->table('cwl_chaoliang_biaozhun')->where([
+                        ['风格', '=', $val['风格']],
+                        ['店铺等级', '=', $val['店铺等级']],
+                        ['一级分类', '=', $val['一级分类']],
+                        ['二级分类', '=', $val['二级分类']],
+                    ])->save([
+                        '单码量00/28/37/44/100/160/S' => $val['单码量00/28/37/44/100/160/S'],
+                        '单码量29/38/46/105/165/M' => $val['单码量29/38/46/105/165/M'],
+                        '单码量30/39/48/110/170/L' => $val['单码量30/39/48/110/170/L'],
+                        '单码量31/40/50/115/175/XL' => $val['单码量31/40/50/115/175/XL'],
+                        '单码量32/41/52/120/180/2XL' => $val['单码量32/41/52/120/180/2XL'],
+                        '单码量33/42/54/125/185/3XL' => $val['单码量33/42/54/125/185/3XL'],
+                        '单码量34/43/56/190/4XL' => $val['单码量34/43/56/190/4XL'],
+                        '单码量35/44/58/195/5XL' => $val['单码量35/44/58/195/5XL'],
+                        '单码量36/6XL' => $val['单码量36/6XL'],
+                        '单码量38/7XL' => $val['单码量38/7XL'],
+                        '单码量_40' => $val['单码量_40'],
+                        '周转00/28/37/44/100/160/S' => $val['周转00/28/37/44/100/160/S'],
+                        '周转29/38/46/105/165/M' => $val['周转29/38/46/105/165/M'],
+                        '周转30/39/48/110/170/L' => $val['周转30/39/48/110/170/L'],
+                        '周转31/40/50/115/175/XL' => $val['周转31/40/50/115/175/XL'],
+                        '周转32/41/52/120/180/2XL' => $val['周转32/41/52/120/180/2XL'],
+                        '周转33/42/54/125/185/3XL' => $val['周转33/42/54/125/185/3XL'],
+                        '周转34/43/56/190/4XL' => $val['周转34/43/56/190/4XL'],
+                        '周转35/44/58/195/5XL' => $val['周转35/44/58/195/5XL'],
+                        '周转36/6XL' => $val['周转36/6XL'],
+                        '周转38/7XL' => $val['周转38/7XL'],
+                        '周转_40' => $val['周转_40'],
+                    ]);
+                }
+
+
+                return json(['code' => 0, 'msg' => '上传成功']);
+            } 
+        }
+    }
+
+    public function readExcel($file_path = '/', $read_column = array())
+    {
+        $reader = IOFactory::createReader('Xlsx');
+    
+        $reader->setReadDataOnly(TRUE);
+    
+        //载入excel表格
+        $spreadsheet = $reader->load($file_path);
+    
+        // 读取第一個工作表
+        $sheet = $spreadsheet->getSheet(0);
+    
+        // 取得总行数
+        $highest_row = $sheet->getHighestRow();
+    
+        // 取得总列数
+        $highest_column = $sheet->getHighestColumn();
+    
+        //读取内容
+        $data_origin = array();
+        $data = array();
+        for ($row = 2; $row <= $highest_row; $row++) { //行号从2开始
+            for ($column = 'A'; $column <= $highest_column; $column++) { //列数是以A列开始
+                $str = $sheet->getCell($column . $row)->getValue();
+                //保存该行的所有列
+                $data_origin[$column] = $str;
+                // if ($column == "B" || $column == "C") {
+                //     if (is_numeric($data_origin[$column])) {
+                //         $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
+                //         $data_origin[$column] = gmdate('Y/m/d',$t1);
+                //     } else {
+                //         $data_origin[$column] = $data_origin[$column];
+                //     }
+                // }
+            }
+            // 删除空行，好用的很
+            if(!implode('', $data_origin)){
+                //删除空行
+                continue;
+            }
+            //取出指定的数据
+            foreach ($read_column as $key => $val) {
+                $data[$row - 2][$val] = $data_origin[$key];
+            }
+        }
+        return $data;
     }
 
     /**
@@ -484,4 +629,38 @@ class Chaoliang extends AdminController
             
         }
     }
+
+    // 下载模板
+    public function downloadDefault() {
+        $sql = "
+            SELECT
+                *
+            from cwl_chaoliang_biaozhun_default
+            where 1
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '超量参数标准默认值_' . date('Ymd') . '_' . time() , 'xlsx');
+
+    }
+
+    // 下载模板
+    public function downloadCurrent() {
+        $sql = "
+            SELECT
+                *
+            from cwl_chaoliang_biaozhun
+            where 1
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '超量参数标准当前值_' . date('Ymd') . '_' . time() , 'xlsx');
+
+        }
 }

@@ -116,14 +116,86 @@
     </style>
 </head>
 <body>
-    <div class="flex row end between test" style="display: none;">
-        <div class="flex col test" style="width:200px; height: 300px;">
-            <div class="test1">11</div>
-            <div class="test2">22</div>
-        </div>
-        <div class="test2" style="width:200px;">222</div>
-        <div class="test3" style="width:200px;">333</div>
-    </div> 
+    <div style="height:3px; width:100%;"></div>
+    <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8">
+            <div class="flex row end between">
+                <div class="flex col between al-start " style="width:95%; height: 70px;">
+                    <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">折率</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" placeholder="1"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">短T 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='短T' autocomplete="off" value="{$config['短T']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲短衬 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='休闲短衬' autocomplete="off" value="{$config['休闲短衬']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲短裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='休闲短裤' autocomplete="off" value="{$config['休闲短裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">松紧短裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='松紧短裤' autocomplete="off" value="{$config['松紧短裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                        </div>  
+                    </div>
+
+                    <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">牛仔短裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='牛仔短裤' autocomplete="off" value="{$config['牛仔短裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲长裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='休闲长裤' autocomplete="off" value="{$config['休闲长裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">牛仔长裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='牛仔长裤' autocomplete="off" value="{$config['牛仔长裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">松紧长裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='松紧长裤' autocomplete="off" value="{$config['松紧长裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                        </div>  
+                    </div>
+                </div>
+                <div class="flex col between al-end" style="width:18%; height:70px;">
+                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
+                    </button>
+                    <div class="flex row between" style="width: 240px;">
+                        <!-- <button id="importExcel" style="display:none;">【导入】调拨申请单</button> -->
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadDefault"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(233, 16, 45));letter-spacing:1px;color: #f5f6f7; line-height: 25px; float:right;">下载模板
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadCurrent"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(41, 87, 240));letter-spacing:1px;color: #f5f6f7; line-height: 25px; float:right;">导出当前
+                        </button>
+                        <button id="importExcel" lay-submit class="layui-btn layui-btn-sm" lay-filter="uploadExcel"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导入模板
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <!-- 内容 -->
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 20px;">
@@ -147,18 +219,94 @@
 </script>
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
-    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage', 'upload'], function () {
         let form = layui.form
             , $ = layui.$
             , layer = layui.layer
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
+            , upload = layui.upload
             , url1 = "{:url('admin/system.Chaoliang/biaozhun')}" 
-            // , url_download_history_area = "{:url('admin/system.Chaoliang/excel_table1')}" 
+            , url_upload = "{:url('admin/system.Chaoliang/upload')}" 
+            , url_saveMap = "{:url('admin/system.Chaoliang/saveMap')}"  
+            , url_download_default = "{:url('admin/system.Chaoliang/downloadDefault')}" 
+            , url_download_current = "{:url('admin/system.Chaoliang/downloadCurrent')}" 
             , url_getXmMapSelect = "{:url('admin/system.Chaoliang/getXmMapSelect')}"
 
         startTable();
+        //监听保存
+        form.on('submit(saveMap)', function (res) {
+            $.post(url_saveMap, res.field, function(res) {
+                if (res.status) {
+                    layer.msg(res.msg, {time: 2000, icon:1});
+                } else {
+                    layer.msg(res.msg, {time: 2000, icon:2});
+                }
+            }, 'json');
+            return false;
+        });
+        // 上传
+        $("#importExcel").click(function() {
+            // console.log(111);
+            return false;
+        });
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#importExcel'
+            ,url: url_upload //此处配置你自己的上传接口即可
+            ,accept: 'file' //普通文件
+            ,before: function () {
+            //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
+            ,done: function(res) {
+                table.reload('table', {
+                    method: 'get'
+                    , url: url1
+                    , loading: true
+                    , page: false
+                    // , limit: data.field.limit
+                })
+
+                // layer.msg(res.msg);
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    alert('上传成功，请校验调拨检核表');
+                }
+            }
+        });
+        form.on('submit(downloadDefault)', function (data) {
+            location.href = url_download_default;
+            return false; 
+        });
+        form.on('submit(downloadCurrent)', function (data) {
+            location.href = url_download_current;
+            return false; 
+        });
         function startTable() {
             table.render({
                 elem: '#table'
@@ -170,7 +318,7 @@
                 , page: false
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 750
+                , height: 710
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '风格', title: '风格', fixed: 'left', align: 'center' ,rowspan: 5, width: '5%'}
