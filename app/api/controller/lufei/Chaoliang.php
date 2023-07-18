@@ -540,6 +540,26 @@ class Chaoliang extends BaseController
                 AND (`提醒00/28/37/44/100/160/S` = '超' OR `提醒29/38/46/105/165/M` = '超' OR `提醒30/39/48/110/170/L` = '超' OR `提醒31/40/50/115/175/XL` = '超' OR `提醒32/41/52/120/180/2XL` = '超'
                 OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40`)         
         ";
+
+        // 超量个数
+        $sql5 = "
+            UPDATE cwl_chaoliang_sk
+            SET 超量个数 = CHAR_LENGTH(
+                CONCAT(
+                        ifnull( `提醒00/28/37/44/100/160/S`, '' ),
+                        ifnull( `提醒29/38/46/105/165/M`, '' ),
+                        ifnull( `提醒30/39/48/110/170/L`, '' ),
+                        ifnull( `提醒31/40/50/115/175/XL`, '' ),
+                        ifnull( `提醒32/41/52/120/180/2XL`, '' ),
+                        ifnull( `提醒33/42/54/125/185/3XL`, '' ),
+                        ifnull( `提醒34/43/56/190/4XL`, '' ),
+                        ifnull( `提醒35/44/58/195/5XL`, '' ),
+                        ifnull( `提醒36/6XL`, '' ),
+                        ifnull( `提醒38/7XL`, '' ),
+                        ifnull( `提醒_40`, '' )) 
+            ) 
+            WHERE 超量个数 is null        
+        ";
         
         // 1 内搭 外套 鞋履
         $status1 = $this->db_easyA->execute($sql1);
@@ -547,11 +567,12 @@ class Chaoliang extends BaseController
         $status2 = $this->db_easyA->execute($sql2);
         // 3下装 松紧长短
         $status3 = $this->db_easyA->execute($sql3);
-        // 4 超强提醒
+        // 4 超量提醒
         $status4 = $this->db_easyA->execute($sql4);
-
+        // 5 超量提醒
+        $status5 = $this->db_easyA->execute($sql5);
         $total = $status1 + $status2 + $status3;
-        if (($status1 || $status2 || $status3) && $status4) {
+        if (($status1 || $status2 || $status3) && $status4 && $status5) {
             // $this->db_easyA->commit();
             return json([
                 'status' => 1,
