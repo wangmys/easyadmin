@@ -257,7 +257,7 @@ class Chaoliang extends BaseController
     // 修正风格
     public function handle_1() {
         $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
-        $sql = "
+        $sql1 = "
             UPDATE 
                 cwl_chaoliang_sk 
             SET 
@@ -265,22 +265,39 @@ class Chaoliang extends BaseController
             WHERE 1
                 AND 风格 = '基本款'
                 AND (
-                    折率 < 1
+                    折率 < {$find_config['折率']}
                     AND (
-                        (二级分类 = '短T' AND 当前零售价 <=  50.00) OR
-                        (二级分类 = '休闲短衬' AND 当前零售价 <=  80.00) OR
-                        (二级分类 = '休闲短裤' AND 当前零售价 <=  70.00) OR
-                        (二级分类 = '松紧短裤' AND 当前零售价 <=  70.00) OR
-                        (二级分类 = '牛仔短裤' AND 当前零售价 <=  70.00) OR
-                        (二级分类 = '休闲长裤' AND 当前零售价 <=  100.00) OR
-                        (二级分类 = '牛仔长裤' AND 当前零售价 <=  100.00) OR
-                        (二级分类 = '松紧长裤' AND 当前零售价 <=  100.00)
+                        (二级分类 = '短T' AND 当前零售价 <= {$find_config['短T']}) OR
+                        (二级分类 = '休闲短衬' AND 当前零售价 <= {$find_config['休闲短衬']}) OR
+                        (二级分类 = '休闲短裤' AND 当前零售价 <= {$find_config['休闲短裤']}) OR
+                        (二级分类 = '松紧短裤' AND 当前零售价 <= {$find_config['松紧短裤']}) OR
+                        (二级分类 = '牛仔短裤' AND 当前零售价 <= {$find_config['牛仔短裤']}) OR
+                        (二级分类 = '休闲长裤' AND 当前零售价 <= {$find_config['休闲长裤']}) OR
+                        (二级分类 = '牛仔长裤' AND 当前零售价 <= {$find_config['牛仔长裤']}) OR
+                        (二级分类 = '松紧长裤' AND 当前零售价 <= {$find_config['松紧长裤']})
                     )
                 ) OR (
-                    折率 < 1 
+                    折率 < {$find_config['折率']} 
                     AND 二级分类 NOT IN('短T', '休闲短衬', '休闲短裤', '松紧短裤', '牛仔短裤', '休闲长裤', '牛仔长裤', '松紧长裤')
                 )
         ";
+        $this->db_easyA->execute($sql1);
+
+        $sql2 = "
+            UPDATE 
+                cwl_chaoliang_sk 
+            SET 
+                风格修订 = `风格`
+            WHERE 
+                风格修订 IS NULL    
+        "; 
+        $this->db_easyA->execute($sql2);  
+        
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_chaoliang_sk 风格修订 更新成功！"
+        ]);
     }
 
     // 更新超量提醒1 
@@ -288,7 +305,7 @@ class Chaoliang extends BaseController
         // 更新超量提醒1  内搭 外套 鞋履
         $sql1 = "
             UPDATE cwl_chaoliang_sk as sk 
-                LEFT JOIN cwl_chaoliang_biaozhun as bz ON sk.风格 = bz.风格 AND sk.店铺等级 = bz.店铺等级 AND sk.一级分类 = bz.一级分类 AND bz.二级分类 IS NULL
+                LEFT JOIN cwl_chaoliang_biaozhun as bz ON sk.风格修订 = bz.风格 AND sk.店铺等级 = bz.店铺等级 AND sk.一级分类 = bz.一级分类 AND bz.二级分类 IS NULL
                 SET
                     `提醒00/28/37/44/100/160/S` =  
                     CASE

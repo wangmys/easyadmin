@@ -98,7 +98,7 @@
             line-height:18px;
         }
 
-        th[data-field="13"][data-key="1-0-13"] {
+        th[data-field="15"][data-key="1-0-15"] {
             background-color: #2e9574 !important;
             color:#ffffff;
         }
@@ -106,7 +106,7 @@
             background-color: #2e9574 !important;
             color:#ffffff;
         }
-        th[data-field="14"][data-key="1-0-14"] {
+        th[data-field="16"][data-key="1-0-16"] {
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
@@ -114,7 +114,7 @@
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-field="15"][data-key="1-0-15"] {
+        th[data-field="17"][data-key="1-0-17"] {
             background-color: #ff3c00 !important;
             color:#ffffff;
         }
@@ -531,39 +531,51 @@
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , where: { "提醒备注" : '请注意'}
                 , cols: [[
-                    { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 35, rowspan: 5}
-                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 35, rowspan: 5}
+                    { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
                     , { title: `<div class="flex col around">
                                  <div class="cima"></div>
                                  <div class="cima">商品</div>
                                  <div class="cima">专员</div>
                                  <div class="cima"></div>
-                                </div>`, field: '商品专员', fixed: 'left', align: 'center' , width: 45, rowspan: 5}
+                                </div>`, field: '商品专员', fixed: 'left', align: 'center' , width: 42, rowspan: 5}
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center', width: 70, rowspan: 5}
                     , { title: `<div class="flex col around">
                                  <div class="cima">店</div>
                                  <div class="cima">铺</div>
                                  <div class="cima">等</div>
                                  <div class="cima">级</div>
-                                </div>`, field: '店铺等级', fixed: 'left', width: 30, align: 'center', rowspan: 5}
+                                </div>`, field: '店铺等级', fixed: 'left', width: 22, align: 'center', rowspan: 5}
                     , { title: `<div class="flex col around">
                                  <div class="cima"></div>
                                  <div class="cima">经营</div>
                                  <div class="cima">模式</div>
                                  <div class="cima"></div>
-                                </div>`,field: '经营模式', fixed: 'left', align: 'center', width: 35,rowspan: 5}
-                    , { field: '风格', title: '风格', fixed: 'left', align: 'center', width: 45, rowspan: 5}
+                                </div>`,field: '经营模式', fixed: 'left', align: 'center', width: 32,rowspan: 5}
+                    , { field: '风格', title: '风格', fixed: 'left', align: 'center', width: 42, rowspan: 5}
                     , { field: '大类', title: '大类', fixed: 'left', align: 'center', width: 35, rowspan: 5}
-                    , { field: '中类', title: '中类', fixed: 'left', align: 'center', width: 80, rowspan: 5}
+                    , { field: '中类', title: '中类', fixed: 'left', align: 'center', width: 55, rowspan: 5}
                     , { field: '分类', title: '分类', fixed: 'left', align: 'center', width: 90, rowspan: 5, hide: true}
-                    , { field: '领型', title: '领型', fixed: 'left', align: 'center', width: 35, rowspan: 5}
+                    , { field: '领型', title: '领型', fixed: 'left', align: 'center', width: 32, rowspan: 5}
                     , { field: '货号', title: '货号', fixed: 'left', align: 'center', width: 70, rowspan: 5}
                     , { title: `<div class="flex col around">
                                  <div class="cima">上</div>
                                  <div class="cima">市</div>
                                  <div class="cima">天</div>
                                  <div class="cima">数</div>
-                                </div>`, field: '上市天数', fixed: 'left', width: 30, align: 'center' ,rowspan: 5}
+                                </div>`, field: '上市天数', fixed: 'left', width: 30, align: 'center' ,rowspan: 5, hide: true}
+                    , {title: `<div class="flex col around">
+                                 <div class="cima">零</div>
+                                 <div class="cima">售</div>
+                                 <div class="cima">价</div>
+                                </div>`,  field: '零售价',  fixed: 'left', align: 'center', width: 42, rowspan: 5}
+                    , {title: `<div class="flex col around">
+                                 <div class="cima">当</div>
+                                 <div class="cima">前</div>
+                                 <div class="cima">零</div>
+                                 <div class="cima">售</div>
+                                 <div class="cima">价</div>
+                                </div>`,  field: '当前零售价',  fixed: 'left', align: 'center', width: 42, rowspan: 5}
                     , { title: '预计库存量', align: 'center' ,colspan: 12}
                     , { title: '周转', align: 'center' ,colspan: 12}
                     , { title: '提醒', align: 'center' ,colspan: 12}

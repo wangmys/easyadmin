@@ -28,7 +28,7 @@ return [
              // 用户名
              'username'          => Env::get('database3.username', 'reader'),
              // 密码
-             'password'          => Env::get('database3.password', 'suoge@2023'),
+             'password'          => Env::get('database3.password', 'soko2023'),
              // 端口
              'hostport'          => Env::get('database3.hostport', '19122'),
              // 数据库连接参数
