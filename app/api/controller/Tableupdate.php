@@ -918,7 +918,7 @@ class Tableupdate extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结' 
                 AND EC.ShutOut = 0 
-                AND EC.RegionId <> 55 
+                -- AND EC.RegionId <> 55 
                 AND EBC.Mathod IN ( '直营', '加盟' )    
             GROUP BY
                 ER.CustomerName,

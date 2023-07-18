@@ -111,8 +111,6 @@ class Chaoliang extends AdminController
                 //     'G' => '数量',
                 // ];
 
-                // 店铺信息
-                $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
                 // dump($select_customer);
                 //读取数据
                 $data = $this->readExcel($info, $read_column);

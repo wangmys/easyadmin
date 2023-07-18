@@ -94,7 +94,7 @@ class ShopbuhuoB extends AdminController
 
             //取出指定的数据
             foreach ($read_column as $key => $val) {
-                $data[$row - 2][$val] = $data_origin[$key];
+                $data[$row - 2][$val] = @$data_origin[$key] ? $data_origin[$key] : '';
             }
         }
         return $data;
@@ -1180,7 +1180,7 @@ class ShopbuhuoB extends AdminController
     // 补货测试
     public function redExcel_test_buhuo() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/222出货指令单0614武汉.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/test.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -1207,10 +1207,10 @@ class ShopbuhuoB extends AdminController
         //     $data = cache('test_date'); 
         // }
         $data = $this->readExcel1($save_path, $read_column);
-        // echo '<pre>';
-        // print_r($data);
+        echo '<pre>';
+        print_r($data);
 
-        // die;
+        die;
 
         // 店铺信息
         $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
