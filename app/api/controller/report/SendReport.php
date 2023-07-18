@@ -493,10 +493,10 @@ class SendReport extends BaseController
     public function run()
     {
         // 生成图片 s101
-        $this->service->create_table_s101('S101', '2023-07-17');
-        $this->service->create_table_s102('2023-07-17');
-        $this->service->create_table_s103('2023-07-17');
-        $this->service->create_table_s101('S104','2023-07-17');
+        $this->service->create_table_s101('S101');
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
+        $this->service->create_table_s101('S104');
 
         // 108-110
         $this->service->create_table_s108A();
