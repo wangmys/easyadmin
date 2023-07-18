@@ -60,13 +60,14 @@ class Weather extends AdminController
                 if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
+                if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
             ->where('c.RegionId','<>',55)->count();
 
             $list = $this->customers
-            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid,c.liable')
+            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid,c.liable,c.Mathod')
             ->field(['cu.City'=>'BdCity'])
             ->alias('c')
             ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
@@ -79,6 +80,7 @@ class Weather extends AdminController
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
+                if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
@@ -183,7 +185,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('RegionId','<>',55)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable');
+        $info_list = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable,Mathod');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -192,6 +194,7 @@ class Weather extends AdminController
         $store_list = [];
         // 城市列表
         $city_list = [];
+        $mathod = [];
         // 分别取出,省列表,区域列表,城市列表用作筛选条件
         if(!empty($info_list)){
             $area_list_temp = array_unique(array_column($info_list,'RegionId'));
@@ -212,6 +215,9 @@ class Weather extends AdminController
             $liable_list_temp = array_unique(array_column($info_list,'liable'));
             $liable_list = array_combine($liable_list_temp,$liable_list_temp);
             $liable_list = array_filter($liable_list, function($value) {return !is_null($value) && !empty($value);});
+            //经营模式
+            $mathod = array_unique(array_column($info_list,'Mathod'));
+            $mathod = array_combine($mathod, $mathod);
         }
 
         //获取 绑定城市 字段权限
@@ -236,6 +242,7 @@ class Weather extends AdminController
                 'wenqu_list'  => $wenqu_list,
                 'liable_list'  => $liable_list,
                 'if_can_see'  => $if_can_see,
+                'mathod'  => $mathod,
                 'data'  => $list
             ];
         return json($data);

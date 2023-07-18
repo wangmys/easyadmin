@@ -34,6 +34,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var store_list = res.store_list;
                 //绑定城市 字段权限
                 var if_can_see = res.if_can_see;
+                var mathod = res.mathod;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
@@ -42,6 +43,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     {field: 'liable', width: 100, title: '商品负责人',fixed:'left',search: 'xmSelect',selectList:liable_list},
+                    {hide:true, field: 'Mathod', width: 50, title: '经营模式',fixed:'left',search: 'xmSelect',selectList:mathod},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     // {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
