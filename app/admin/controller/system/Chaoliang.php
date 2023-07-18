@@ -365,6 +365,11 @@ class Chaoliang extends AdminController
             } else {
                 $map11 = "";
             }
+            if (!empty($input['超量个数'])) {
+                $map12 = " AND 超量个数 = {$input['超量个数']}";
+            } else {
+                $map12 = "";
+            }
 
             $sql = "
                 SELECT
@@ -430,6 +435,7 @@ class Chaoliang extends AdminController
                     {$map9}
                     {$map10}
                     {$map11}
+                    {$map12}
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
 
@@ -451,6 +457,7 @@ class Chaoliang extends AdminController
                     {$map9}
                     {$map10}
                     {$map11}
+                    {$map12}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
@@ -582,9 +589,14 @@ class Chaoliang extends AdminController
             } else {
                 $map11 = "";
             }
+            if (!empty($input['超量个数'])) {
+                $map12 = " AND 超量个数 = {$input['超量个数']}";
+            } else {
+                $map12 = "";
+            }
 
 
-            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}";
+            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}{$map12}";
             $code = rand_code(6);
             cache($code, $map, 3600);
 
