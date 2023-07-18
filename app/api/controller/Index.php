@@ -49,17 +49,25 @@ class Index
     public function updateWeatherInfo()
     {
         // 查询所有门店ID
-        $ids = Customers::where('CustomItem30','=','')->column('CustomerId');
+        $ids = Customers::column('CustomerId');
+        $ids = implode("','", $ids);
+        $ids = "'".$ids."'";
         // 根据所有门店ID查询所属温带 + 气温区域
-        $data = Db::connect("sqlsrv")->table('ErpCustomer')->whereIn('CustomerId',$ids)->column('CustomItem30,CustomItem36,ShutOut','CustomerId');
+        // $data = Db::connect("sqlsrv")->table('ErpCustomer')->column('CustomItem30,CustomItem36,ShutOut','CustomerId');
+        $data = Db::connect("sqlsrv")->query("select ec.CustomerId,ec.CustomItem30,ec.CustomItem36,ec.ShutOut,ebcm.Mathod from 
+        ErpCustomer ec 
+        left join ErpBaseCustomerMathod ebcm on ec.MathodId = ebcm.MathodId 
+        where ec.CustomerId in ($ids);");
         $update_data = [];
         foreach ($data as $k => $v){
             $update_data[$v['CustomerId']] = [
                 'CustomItem30' => $v['CustomItem30'],
                 'CustomItem36' => $v['CustomItem36'],
-                'ShutOut' => $v['ShutOut']
+                'ShutOut' => $v['ShutOut'],
+                'Mathod' => $v['Mathod'],
             ];
         }
+        // print_r($update_data);die;
         Db::startTrans();
         $result = [];
         try {
