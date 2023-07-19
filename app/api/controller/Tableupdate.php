@@ -473,7 +473,7 @@ class Tableupdate extends BaseController
                 LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
                 WHERE EC.MathodId IN (4,7)
                 AND EC.ShutOut=0
-                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','初秋', '深秋','秋季', '初冬', '深冬', '冬季')
                 AND EG.CategoryName1 = '鞋履'
                 GROUP BY 
                     EC.CustomerId,
