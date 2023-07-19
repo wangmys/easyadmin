@@ -87,7 +87,7 @@ class Dianpuyejihuanbi extends BaseController
                 AND ER.RetailDate < DATEADD( DAY, +1, @retail_date ) 
                 AND ER.CodingCodeText = '已审结'
                 AND EC.ShutOut = 0
-                AND EC.RegionId NOT IN ('8', '40', '55', '84', '85',  '97')
+                AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
             GROUP BY 
                 ER.CustomerName,
