@@ -502,7 +502,7 @@ class Tableupdate extends BaseController
                                                                         AND ERG.DeliveryId IS	NOT NULL AND ERG.DeliveryId!='' GROUP BY ERG.DeliveryId)
                     AND EC.MathodId IN (4,7)
                     AND EC.ShutOut=0
-                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','初秋', '深秋','秋季', '初冬', '深冬', '冬季')
                     AND EG.CategoryName1 = '鞋履'
                 GROUP BY  
                     EC.CustomerId,
@@ -530,7 +530,7 @@ class Tableupdate extends BaseController
                     AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
                     AND EC.MathodId IN (4,7)
                     AND EC.ShutOut=0
-                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','初秋', '深秋','秋季', '初冬', '深冬', '冬季')
                     AND EG.CategoryName1 = '鞋履'
                 GROUP BY  
                     EC.CustomerId,
@@ -555,7 +555,7 @@ class Tableupdate extends BaseController
                 WHERE ES.IsCompleted=0
                     AND EC.MathodId IN (4,7)
                     AND EC.ShutOut=0
-                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                    AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','初秋', '深秋','秋季', '初冬', '深冬', '冬季')
                     AND EG.CategoryName1 = '鞋履'
                 GROUP BY	 
                     EC.CustomerId,
@@ -589,7 +589,7 @@ class Tableupdate extends BaseController
                             AND EP.CodingCodeText='已审结'
                             AND EC.MathodId IN (7,4)
                             AND EC.ShutOut=0
-                            AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春')
+                            AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','初秋', '深秋','秋季', '初冬', '深冬', '冬季')
                             AND EG.CategoryName1 = '鞋履'
                             AND CONVERT(VARCHAR,GETDATE(),23) BETWEEN EPTT.BDate AND EPTT.EDate
                             -- AND EG.GoodsNo='B12612015'
