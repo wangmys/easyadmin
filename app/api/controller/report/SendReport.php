@@ -230,8 +230,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -493,11 +493,29 @@ class SendReport extends BaseController
      */
     public function run()
     {
+        // // 生成图片 s101
+        // $this->service->create_table_s101('S101', '2023-07-19');
+        // $this->service->create_table_s102('2023-07-19');
+        // $this->service->create_table_s103('2023-07-19');
+        // $this->service->create_table_s101('S104', '2023-07-19');
+
+        // // 108-110
+        // $this->service->create_table_s108A();
+        // $this->service->create_table_s108B();
+        // $this->service->create_table_s109();
+        // $this->service->create_table_s110A();
+        // $this->service->create_table_s110B();
+        // // 发送数据报表
+        // $this->send();
+    }
+
+    public function run_pro()
+    {
         // 生成图片 s101
-        $this->service->create_table_s101('S101', '2023-07-19');
-        $this->service->create_table_s102('2023-07-19');
-        $this->service->create_table_s103('2023-07-19');
-        $this->service->create_table_s101('S104', '2023-07-19');
+        $this->service->create_table_s101('S101');
+        $this->service->create_table_s102();
+        $this->service->create_table_s103();
+        $this->service->create_table_s101('S104');
 
         // 108-110
         $this->service->create_table_s108A();
