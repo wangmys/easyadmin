@@ -96,6 +96,6 @@ class Weathertips extends BaseController
 
     // 店铺库存
     public function customerStock() {
-
+        echo 222;
     }
 }
