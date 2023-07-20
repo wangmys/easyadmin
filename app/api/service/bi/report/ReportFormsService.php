@@ -859,15 +859,14 @@ class ReportFormsService
         }
     }
 
-
     public function create_table_s101($code = 'S101', $date = '')
     {
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
-
+        $dingName = '_' . cache('dingding_table_name');
         switch ($code) {
             case 'S101':
                 // $sql = "select 经营模式,省份,店铺名称,首单日期 as 开店日期,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
-                $title = "加盟老店业绩同比 [" . date("Y-m-d") . ']';
+                $title = "加盟老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
                 $jingyingmoshi = '【加盟】';
                 $sql = "
                 SELECT
@@ -885,7 +884,7 @@ class ReportFormsService
                     from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
                 break;
             default:
-                $title = "直营老店业绩同比 [" . date("Y-m-d") . ']';
+                $title = "直营老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
                 $jingyingmoshi = '【直营】';
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
@@ -949,7 +948,7 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($data),          //数据的行数
-            'file_name' =>  $code . '.jpg',      //保存的文件名
+            'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
             'title' => $title,
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data,
@@ -981,6 +980,7 @@ class ReportFormsService
         // 编号
         $code = 'S102';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
         // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,省份,前年同日,去年同日,
         // 昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,
         // 去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,
@@ -1032,8 +1032,8 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' =>  "省份老店业绩同比 [" . date("Y-m-d") . ']',
+            'file_name' => $code . $dingName  .'.jpg',   //保存的文件名
+            'title' =>  "省份老店业绩同比 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1061,6 +1061,7 @@ class ReportFormsService
         // 编号
         $code = 'S103';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
         // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
         $sql = "select
             经营模式 as 经营,
@@ -1114,8 +1115,8 @@ class ReportFormsService
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "省份老店业绩同比-分经营模式 [" . date("Y-m-d") . ']',
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'title' => "省份老店业绩同比-分经营模式 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1765,6 +1766,7 @@ class ReportFormsService
         // 编号
         $code = 'S108A';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
 
         $sql2 = "
         select * from (
@@ -1845,8 +1847,8 @@ class ReportFormsService
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "督导挑战目标完成率 [" . date("Y-m-d") . "]",
+            'file_name' => $code .$dingName . '.jpg',   //保存的文件名
+            'title' => "督导挑战目标完成率 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1870,6 +1872,7 @@ class ReportFormsService
         // 编号
         $code = 'S108B';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
         $sql3 = "
                 SELECT
                 IFNULL(SCL.`省份`,'合计') AS 省份,
@@ -1925,8 +1928,8 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "区域挑战目标完成率 [". date("Y-m-d") ."]",
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'title' => "区域挑战目标完成率 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -1949,6 +1952,7 @@ class ReportFormsService
         // 编号
         $code = 'S109';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
 
         $sql2 = "
             SELECT
@@ -2016,8 +2020,8 @@ class ReportFormsService
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "各省挑战目标完成情况 [" . date("Y-m-d") . ']',
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'title' => "各省挑战目标完成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -2041,6 +2045,7 @@ class ReportFormsService
         // 编号
         $code = 'S109B';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
 
         $sql2 = "
             SELECT
@@ -2104,8 +2109,8 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "各省挑战目标完成情况-加盟 [" . date("Y-m-d") . "]",
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'title' => "各省挑战目标完成情况-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -2128,6 +2133,7 @@ class ReportFormsService
         // 编号
         $code = 'S110A';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = '_' . cache('dingding_table_name');
 
         $sql3 = "
             SELECT
@@ -2188,8 +2194,8 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "直营单店目标达成情况 [" . date("Y-m-d") . ']',
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'title' => "直营单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
@@ -2271,7 +2277,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "加盟单店目标达成情况 [" . date("Y-m-d") . ']',
+            'title' => "加盟单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
