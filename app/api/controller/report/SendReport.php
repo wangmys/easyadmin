@@ -187,7 +187,7 @@ class SendReport extends BaseController
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
-        $dingName = '_' . cache('dingding_table_name');
+        $dingName = cache('dingding_table_name');
         $send_data = [
             'S101' => [
                 'title' => '加盟老店同比环比递增及完成率 表号:S101',
