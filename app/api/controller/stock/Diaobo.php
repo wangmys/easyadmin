@@ -6,14 +6,16 @@ use app\api\constants\ApiConstant;
 use app\BaseController;
 use think\Request;
 use think\facade\Db;
+use app\admin\model\wwdata\LypWwDataModel;
 
 class Diaobo extends BaseController
 {
 
     public function create_ww_json() {
 
-        ini_set('memory_limit','2048M');
-        $data = Db::connect("sqlsrv")->Query($this->get_ww_sql());
+        ini_set('memory_limit','1024M');
+        $data = LypWwDataModel::where([])->withoutField('id',false)->select();
+        $data = $data ? $data->toArray() : [];
         return json($data);
 
     }

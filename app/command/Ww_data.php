@@ -9,6 +9,7 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
 use think\facade\Db;
+use app\admin\model\wwdata\LypWwDataModel;
 
 class Ww_data extends Command
 {
@@ -26,8 +27,13 @@ class Ww_data extends Command
 		//生成json文件
 		$data = Db::connect("sqlsrv")->Query($this->get_sql());
 		// print_r($data);die;
-		@file_put_contents(app()->getRootPath().'/public'.'/img/ww_shou_json.txt', json_encode($data));
-
+        if ($data) {
+            //先清空旧数据再跑
+            Db::connect("mysql")->Query("truncate table ea_lyp_ww_data;");
+            foreach ($data as $v_data) {
+                LypWwDataModel::create($v_data);
+            }
+        }
         echo 'okk';die;
     }
 
