@@ -26,12 +26,14 @@ class Ww_data extends Command
 
 		//生成json文件
 		$data = Db::connect("sqlsrv")->Query($this->get_sql());
-		// print_r($data);die;
+        $db = Db::connect("mysql");
         if ($data) {
             //先清空旧数据再跑
-            Db::connect("mysql")->Query("truncate table ea_lyp_ww_data;");
-            foreach ($data as $v_data) {
-                LypWwDataModel::create($v_data);
+            $db->Query("truncate table ea_lyp_ww_data;");
+            $chunk_list = array_chunk($data, 500);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $db->table('ea_lyp_ww_data')->strict(false)->insertAll($val);
             }
         }
         echo 'okk';die;
