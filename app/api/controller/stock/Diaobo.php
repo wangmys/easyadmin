@@ -12,6 +12,7 @@ class Diaobo extends BaseController
 
     public function create_ww_json() {
 
+        ini_set('memory_limit','2048M');
         $data = Db::connect("sqlsrv")->Query($this->get_ww_sql());
         return json($data);
 
