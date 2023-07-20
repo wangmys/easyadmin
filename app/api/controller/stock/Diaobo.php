@@ -6,9 +6,20 @@ use app\api\constants\ApiConstant;
 use app\BaseController;
 use think\Request;
 use think\facade\Db;
+use app\admin\model\wwdata\LypWwDataModel;
 
 class Diaobo extends BaseController
 {
+
+    public function create_ww_json() {
+
+        ini_set('memory_limit','1024M');
+        $table = input('table');
+        $data = LypWwDataModel::table($table)->where([])->withoutField('id',false)->select();
+        $data = $data ? $data->toArray() : [];
+        return json($data);
+
+    }
 
     //调拨前后json导出
     public function create_diaobo_json() {
@@ -176,6 +187,42 @@ class Diaobo extends BaseController
         T.Price
         HAVING SUM(CASE WHEN ECS.BillType = 'ErpCustReceipt' AND ECR.Type=2 AND (ECO.ManualNo IS NOT NULL AND ECO.ManualNo!='') AND CONVERT(VARCHAR(10),ECS.StockDate,23) BETWEEN '{$start_date}' AND '{$end_date}' THEN ECSD.Quantity END ) > 0
         ;";
+
+    }
+
+    protected function get_ww_sql() {
+
+        return "SELECT 
+        CONVERT(VARCHAR(10),ER.RetailDate,23) 日期,
+        EC.State 省份,
+        EC.CustomerName 店铺名称,
+        EM.Mathod 经营模式,
+        ERG.Status 销售方式,
+        EG.CategoryName1 一级分类,
+        SUM(ERG.Quantity) 数量,
+        SUM(ERG.Quantity * ERG.DiscountPrice) 金额
+    FROM ErpCustomer EC
+    LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
+    LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+    LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+    LEFT JOIN ErpBaseCustomerMathod EM ON EC.MathodId=EM.MathodId
+    WHERE ER.RetailDate>DATEADD(month, DATEDIFF(month, 0, GETDATE())-2, 0)
+        AND ERG.Status IN ('售','促')
+        AND ER.CodingCodeText='已审结'
+    GROUP BY 
+        CONVERT(VARCHAR(10),ER.RetailDate,23),
+        EC.State,
+        EC.CustomerName,
+        EM.Mathod,
+        ERG.Status,
+        EG.CategoryName1
+    ORDER BY 
+     CONVERT(VARCHAR(10),ER.RetailDate,23),
+     EC.State,
+     EM.Mathod,
+     ERG.Status,
+     EG.CategoryName1
+    ;";
 
     }
 
