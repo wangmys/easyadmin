@@ -2225,6 +2225,7 @@ class ReportFormsService
         // 编号
         $code = 'S110B';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = cache('dingding_table_name');
 
         $sql3 = "
             SELECT
@@ -2283,7 +2284,7 @@ class ReportFormsService
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
+            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
             'title' => "加盟单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,

@@ -234,8 +234,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -278,10 +278,10 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送 测试
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
 
                 // 推送 加盟
-                // $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
         }
         return json($res);
@@ -545,7 +545,7 @@ class SendReport extends BaseController
     public function run2()
     {
         $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
-        // echo rand_code(5);die;
+
         cache('dingding_table_name', rand_code(5), 3600);
         // 生成图片 s101
         $this->service->create_table_s101('S101', $date);
