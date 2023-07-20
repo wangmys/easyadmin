@@ -191,6 +191,7 @@ class Diaobo extends BaseController
         return "SELECT 
         CONVERT(VARCHAR(10),ER.RetailDate,23) 日期,
         EC.State 省份,
+        EC.CustomerName 店铺名称,
         EM.Mathod 经营模式,
         ERG.Status 销售方式,
         EG.CategoryName1 一级分类,
@@ -207,6 +208,7 @@ class Diaobo extends BaseController
     GROUP BY 
         CONVERT(VARCHAR(10),ER.RetailDate,23),
         EC.State,
+        EC.CustomerName,
         EM.Mathod,
         ERG.Status,
         EG.CategoryName1
