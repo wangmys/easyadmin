@@ -30,13 +30,10 @@ class Ww_data extends Command
         if ($data) {
             //先清空旧数据再跑
             $db->Query("truncate table ea_lyp_ww_data;");
-            foreach ($data as $v_data) {
-                $chunk_list = array_chunk($data, 500);
-                foreach($chunk_list as $key => $val) {
-                    // 基础结果 
-                    $insert = $db->table('ea_lyp_ww_data')->strict(false)->insertAll($val);
-                }
-                // LypWwDataModel::create($v_data);
+            $chunk_list = array_chunk($data, 500);
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $db->table('ea_lyp_ww_data')->strict(false)->insertAll($val);
             }
         }
         echo 'okk';die;
