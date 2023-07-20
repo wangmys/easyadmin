@@ -69,7 +69,7 @@ class Duanmalv extends BaseController
             --  DATEPART( yy, ER.RetailDate ) AS 年份,
             --  DATEPART( yy, GETDATE() ) AS 年份,
                 EG.TimeCategoryName1 as 年份,
-            CASE
+                CASE
                     EG.TimeCategoryName2
                     WHEN '初春' THEN
                     '春季'
