@@ -14,7 +14,8 @@ class Diaobo extends BaseController
     public function create_ww_json() {
 
         ini_set('memory_limit','1024M');
-        $data = LypWwDataModel::where([])->withoutField('id',false)->select();
+        $table = input('table');
+        $data = LypWwDataModel::table($table)->where([])->withoutField('id',false)->select();
         $data = $data ? $data->toArray() : [];
         return json($data);
 
