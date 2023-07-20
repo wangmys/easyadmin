@@ -187,51 +187,55 @@ class SendReport extends BaseController
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
+        $dingName = cache('dingding_table_name');
         $send_data = [
             'S101' => [
                 'title' => '加盟老店同比环比递增及完成率 表号:S101',
-                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S101.jpg'
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day'))."/S101{$dingName}.jpg"
             ],
             'S104' => [
                 'title' => '直营老店同比环比递增及完成率 表号:S104',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S104.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S104{$dingName}.jpg"
             ],
             'S102' => [
                 'title' => '省份老店业绩同比 表号:S102',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S102.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S102{$dingName}.jpg"
             ],
             'S103' => [
                 'title' => '省份老店业绩同比-分经营模式 表号:S103',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S103{$dingName}.jpg"
             ],
             'S108A' => [
                 'title' => '督导挑战目标完成率 表号:S108A',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108A.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S108A{$dingName}.jpg"
             ],
             'S108B' => [
                 'title' => '区域挑战目标完成率 表号:S108B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S108B{$dingName}.jpg"
             ],
             'S109' => [
                 'title' => '各省挑战目标完成情况 表号:S109',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S109{$dingName}.jpg"
             ],
             'S110A' => [
                 'title' => '直营单店目标达成情况 表号:S110A',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110A.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S110A{$dingName}.jpg"
             ],
             'S110B' => [
                 'title' => '加盟单店目标达成情况 表号:S110B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S110B{$dingName}.jpg"
             ],
         ];
+
+        // dump($send_data);
+        // die;
         $res = [];
         foreach ($send_data as $k=>$v){
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                $res[] = $model->send($v['title'],$v['jpg_url']);
-                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -511,18 +515,21 @@ class SendReport extends BaseController
 
     public function run_pro()
     {
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+        // echo rand_code(5);die;
+        cache('dingding_table_name', rand_code(5), 3600);
         // 生成图片 s101
-        $this->service->create_table_s101('S101');
-        $this->service->create_table_s102();
-        $this->service->create_table_s103();
-        $this->service->create_table_s101('S104');
+        $this->service->create_table_s101('S101', $date);
+        $this->service->create_table_s102($date);
+        $this->service->create_table_s103($date);
+        $this->service->create_table_s101('S104', $date);
 
         // 108-110
-        $this->service->create_table_s108A();
-        $this->service->create_table_s108B();
-        $this->service->create_table_s109();
-        $this->service->create_table_s110A();
-        $this->service->create_table_s110B();
+        $this->service->create_table_s108A($date);
+        $this->service->create_table_s108B($date);
+        $this->service->create_table_s109($date);
+        $this->service->create_table_s110A($date);
+        $this->service->create_table_s110B($date);
         // 发送数据报表
         $this->send();
     }
