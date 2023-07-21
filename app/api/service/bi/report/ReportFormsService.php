@@ -1772,7 +1772,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S108A';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
 
         $sql2 = "
@@ -1878,7 +1878,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S108B';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
         $sql3 = "
                 SELECT
@@ -1958,7 +1958,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S109';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
 
         $sql2 = "
@@ -2051,7 +2051,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S109B';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
 
         $sql2 = "
@@ -2139,7 +2139,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S110A';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
 
         $sql3 = "
@@ -2224,7 +2224,7 @@ class ReportFormsService
     {
         // 编号
         $code = 'S110B';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $date = $date ?: date('Y-m-d');
         $dingName = cache('dingding_table_name');
 
         $sql3 = "
