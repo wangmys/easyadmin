@@ -95,7 +95,101 @@ class Weathertips extends BaseController
     }
 
     // 店铺库存
-    public function customerStock() {
-        echo 222;
+    public function customerStock_1() {
+        $sql = "
+            SELECT 
+            -- 	TOP 10000
+                EBR.Region AS 区域,
+                EC.RegionId,
+                EC.CustomerName AS 店铺名称,
+                EC.CustomerCode,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                EG.GoodsName AS 货品名称,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo AS 货号,
+                EC.CustomItem17 AS 商品负责人,
+                SUM(ECS.Quantity) AS 店铺库存,
+                FORMAT(EC.OpeningDate, 'yyyy-MM-dd') as 开业日期,
+                EG.TimeCategoryName2 AS 季节,
+                CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN
+                    '春季'
+                    WHEN '正春' THEN
+                    '春季'
+                    WHEN '春季' THEN
+                    '春季'
+                    WHEN '初秋' THEN
+                    '秋季'
+                    WHEN '深秋' THEN
+                    '秋季'
+                    WHEN '秋季' THEN
+                    '秋季'
+                    WHEN '初夏' THEN
+                    '夏季'
+                    WHEN '盛夏' THEN
+                    '夏季'
+                    WHEN '夏季' THEN
+                    '夏季'
+                    WHEN '冬季' THEN
+                    '冬季'
+                    WHEN '初冬' THEN
+                    '冬季'
+                    WHEN '深冬' THEN
+                    '冬季'
+            END AS 季节归集,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpCustomer EC
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            Right JOIN ErpBaseCustomerRegion AS EBR ON EC.RegionId = EBR.RegionId
+            LEFT JOIN ErpCustomerStock AS ECS ON EC.CustomerId = ECS.CustomerId
+            LEFT JOIN ErpGoods AS EG ON EG.GoodsId = ECS.GoodsId
+            WHERE 
+                EC.RegionId NOT IN ('8','40', '55', '84', '85',  '97')
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EC.ShutOut = 0
+                AND EC.CustomerName = '亳州一店'
+                AND EG.TimeCategoryName1 IN ('2023')
+                AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季' )
+                AND EG.CategoryName1 IN ('内搭', '外套', '下装')
+            GROUP BY 
+                EC.CustomerName,
+                EG.GoodsNo,
+                EBR.Region,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.TimeCategoryName2,
+                EC.CustomerCode,
+                EC.RegionId,
+                EC.CustomItem17,
+                EG.StyleCategoryName,
+                EG.GoodsName,
+                FORMAT(EC.OpeningDate, 'yyyy-MM-dd')       
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        $count = count($select);
+
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_stock;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_weathertips_stock')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_stock 1 更新成功，数量：{$count}！"
+            ]);
+
+        }
     }
 }

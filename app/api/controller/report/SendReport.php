@@ -43,6 +43,7 @@ class SendReport extends BaseController
     public function create_test() {
         $name = input('param.name') ? input('param.name') : 'S101'; 
         $date = input('param.date') ? input('param.date') : '';
+        cache('dingding_table_name', rand_code(5), 3600);
         if ($name =='S009') {
             $this->service->create_table_s009();
         } elseif ($name =='S010') {
@@ -234,8 +235,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -248,33 +249,39 @@ class SendReport extends BaseController
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
+        $dingName = cache('dingding_table_name');
         $send_data = [
             'S101' => [
                 'title' => '加盟老店同比环比递增及完成率 表号:S101',
-                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day')).'/S101.jpg'
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd',strtotime('+1day'))."/S101{$dingName}.jpg"
             ],
             'S103B' => [
                 'title' => '省份老店业绩同比-加盟 表号:S103B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S103B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S103B{$dingName}.jpg"
             ],
             'S108B' => [
                 'title' => '区域挑战目标完成率 表号:S108B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S108B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S108B{$dingName}.jpg"
             ],
             'S109B' => [
                 'title' => '各省挑战目标完成情况-加盟 表号:S109B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S109B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S109B{$dingName}.jpg"
             ],
             'S110B' => [
                 'title' => '加盟单店目标达成情况 表号:S110B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S110B.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S110B{$dingName}.jpg"
             ],
         ];
+        // dump($send_data);
+        // die;
         $res = [];
         foreach ($send_data as $k=>$v){
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
-                // 推送
+                // 推送 测试
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 加盟
                 $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
         }
@@ -513,6 +520,7 @@ class SendReport extends BaseController
         // $this->send();
     }
 
+    // 报表主群
     public function run_pro()
     {
         $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
@@ -534,17 +542,19 @@ class SendReport extends BaseController
         $this->send();
     }
 
-    /**
-     * 执行指定任务 只创建不发送
-     * @return \think\response\Json
-     */
+    // 加盟群
     public function run2()
     {
-        // 生成图片 s101
-        $this->service->create_table_s103B();
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
 
-        // 108-110
-        $this->service->create_table_s109B();
+        cache('dingding_table_name', rand_code(5), 3600);
+        // 生成图片 s101
+        $this->service->create_table_s101('S101', $date);
+        $this->service->create_table_s103B($date);
+        $this->service->create_table_s108B($date);
+        $this->service->create_table_s109B($date);
+        $this->service->create_table_s110B($date);
+
         // https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754
 
         // 发送数据报表
