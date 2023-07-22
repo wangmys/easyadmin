@@ -98,6 +98,8 @@ class SendReport extends BaseController
             $this->service->create_table_s031();
         } elseif ($name =='S043') {
             $this->service->create_table_s043();
+        } elseif ($name =='S045') {
+            $this->service->create_table_s045();
         } elseif ($name =='S111' || $name == 'S112') {
             $res = http_get('http://im.babiboy.com//api/Tableupdate/receipt_receiptNotice');
             // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
@@ -371,6 +373,10 @@ class SendReport extends BaseController
             'S043' => [
                 'title' => '各省7天季节占比（粤/桂/贵/鄂/湘/赣） 表号:S043',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S043.jpg'
+            ],
+            'S045' => [
+                'title' => '其他省份7天季节占比 表号:S045',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S045.jpg'
             ],
         ];
         $res = [];
@@ -650,6 +656,7 @@ class SendReport extends BaseController
         $this->service->create_table_s030();
         $this->service->create_table_s031();
         $this->service->create_table_s043();
+        $this->service->create_table_s045();
 
         // 发送数据报表
         $this->send4();

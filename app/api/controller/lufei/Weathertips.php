@@ -101,18 +101,18 @@ class Weathertips extends BaseController
             -- 	TOP 10000
                 EBR.Region AS 区域,
                 EC.RegionId,
-                EC.State AS 省份,
                 EC.CustomerName AS 店铺名称,
                 EC.CustomerCode AS 店铺编码,
+                EC.State AS 省份,
                 EG.CategoryName1 AS 一级分类,
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
                 EG.GoodsName AS 货品名称,
-                EG.StyleCategoryName AS 风格,
                 EG.GoodsNo AS 货号,
+            -- 	EG.GoodsId AS 货品ID,
+                EG.UnitPrice / 2 AS 零售价,
                 EC.CustomItem17 AS 商品负责人,
                 SUM(ECS.Quantity) AS 店铺库存,
-                FORMAT(EC.OpeningDate, 'yyyy-MM-dd') as 开业日期,
                 EG.TimeCategoryName2 AS 季节,
                 CASE
                     EG.TimeCategoryName2
@@ -140,7 +140,8 @@ class Weathertips extends BaseController
                     '冬季'
                     WHEN '深冬' THEN
                     '冬季'
-            END AS 季节归集,
+                END AS 季节归集,
+                FORMAT(EC.OpeningDate, 'yyyy-MM-dd') as 开业日期,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
                 ErpCustomer EC
@@ -159,18 +160,20 @@ class Weathertips extends BaseController
             GROUP BY 
                 EC.CustomerName,
                 EG.GoodsNo,
+            -- 	EG.GoodsId,
+                EG.UnitPrice,
                 EBR.Region,
                 EC.State,
                 EG.CategoryName1,
                 EG.CategoryName2,
                 EG.CategoryName,
-                EG.TimeCategoryName2,
                 EC.CustomerCode,
                 EC.RegionId,
                 EC.CustomItem17,
-                EG.StyleCategoryName,
                 EG.GoodsName,
-                FORMAT(EC.OpeningDate, 'yyyy-MM-dd')       
+                FORMAT(EC.OpeningDate, 'yyyy-MM-dd'),
+                EG.TimeCategoryName2
+            -- HAVING  SUM ( ECS.Quantity ) > 0               
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -395,24 +398,6 @@ class Weathertips extends BaseController
         ";
         $this->db_easyA->execute($sql0);  
 
-        // 更新零售价 当前零售价
-        // $sql1 = "
-        //     UPDATE cwl_weathertips_stock AS st1
-        //     LEFT JOIN sp_ww_chunxia_stock AS st2 ON st1.省份 = st2.省份 
-        //         AND st1.店铺名称 = st2.店铺名称 
-        //         AND st1.一级分类 = st2.一级分类
-        //         AND st1.二级分类 = st2.二级分类
-        //         AND st1.分类 = st2.分类
-        //         AND st1.货号 = st2.货号
-        //     SET 
-        //         st1.零售价 = st2.零售价,
-        //         st1.当前零售价 = st2.当前零售价
-        //     WHERE 
-        //         st1.零售价 IS NULL
-        //         OR st1.当前零售价 IS NULL        
-        // ";
-        // $this->db_easyA->execute($sql1);
-
         // 更新调价款
         $sql2 = "
             UPDATE cwl_weathertips_stock AS st1
@@ -420,11 +405,12 @@ class Weathertips extends BaseController
                 ON st1.店铺编码 = rn.店铺编码
                 AND st1.货号 = rn.货号 
             SET 
-                st1.调价款价格 = rn.价格,
                 st1.是否调价款 = case
-                    when rn.是否调价款 = 1 then '是' else '否'
+                        when rn.是否调价款 = 1 then '是' else '否'
                 end,
-                st1.当前零售价 = rn.价格
+                st1.当前零售价 = case
+                    when rn.是否调价款 = 1 then rn.价格 else st1.零售价
+                end
             WHERE 
                 st1.是否调价款 IS NULL  
         ";
@@ -447,5 +433,240 @@ class Weathertips extends BaseController
                 or s.预计库存 is null
         ";
          $this->db_easyA->execute($sql3);
+    }
+
+    // 3天销售
+    public function retail_1() {
+        $sql = "
+            SELECT
+                EC.State AS 省份,
+                ER.CustomerName AS 店铺名称,
+                EC.CustomItem17 AS 商品负责人,
+                CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN '春季'
+                    WHEN '正春' THEN '春季'
+                    WHEN '春季' THEN '春季'
+                    WHEN '初秋' THEN '秋季'
+                    WHEN '深秋' THEN '秋季'
+                    WHEN '秋季' THEN '秋季'
+                    WHEN '初夏' THEN '夏季'
+                    WHEN '盛夏' THEN '夏季'
+                    WHEN '夏季' THEN '夏季'
+                    WHEN '冬季' THEN '冬季'
+                    WHEN '初冬' THEN '冬季'
+                    WHEN '深冬' THEN '冬季'
+                END AS 季节归集,
+                CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN '春秋季'
+                    WHEN '正春' THEN '春秋季'
+                    WHEN '春季' THEN '春秋季'
+                    WHEN '初秋' THEN '春秋季'
+                    WHEN '深秋' THEN '春秋季'
+                    WHEN '秋季' THEN '春秋季'
+                    WHEN '初夏' THEN '夏季'
+                    WHEN '盛夏' THEN '夏季'
+                    WHEN '夏季' THEN '夏季'
+                    WHEN '冬季' THEN '冬季'
+                    WHEN '初冬' THEN '冬季'
+                    WHEN '深冬' THEN '冬季'
+                END AS 季节修订,
+                EBC.Mathod AS 经营属性,
+                EG.CategoryName1 AS 一级分类,
+                EG.CategoryName2 AS 二级分类,
+                EG.CategoryName AS 分类,
+                SUM(ERG.Quantity) AS 销售数量,
+                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
+                FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期,   
+                CASE
+                    WHEN DATEADD(DAY, -3, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN '大前天'
+                    WHEN DATEADD(DAY, -2, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN '前天'
+                    WHEN DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN '昨天'
+                END 日期识别,
+                CASE
+                    WHEN DATEADD(DAY, -3, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN 3
+                    WHEN DATEADD(DAY, -2, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN 2
+                    WHEN DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN 1
+                END 日期识别B,
+                CASE
+                    WHEN EG.CategoryName2 NOT IN ('正统长衬', '套西', '套西裤') THEN '是' ELSE '否'
+                END AS 是否计算SKC, 
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.RetailDate >= DATEADD(DAY, -3, CAST(GETDATE() AS DATE)) 
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE)) 
+                AND ER.CodingCodeText = '已审结'
+                AND EC.ShutOut = 0
+                AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
+                AND EG.CategoryName1 IN ('内搭', '外套','下装')
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EC.CustomerName = '亳州一店'
+            GROUP BY 
+                ER.CustomerName,
+                EC.State,
+                EC.CustomItem17,
+                EBC.Mathod,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.TimeCategoryName2,
+                FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
+            ORDER BY EC.State ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_retail_1;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_weathertips_retail_1')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_retail_1 更新成功！"
+            ]);
+        }
+    }
+
+    // 3天销售 计算销售占比
+    public function retail_2() {
+        $sql = "
+            SELECT 
+                t.*,
+                round(t.销售金额 / t.销售总金额, 2) AS 销售占比
+            FROM (
+                SELECT
+                    省份,
+                    商品负责人,
+                    经营属性,
+                    是否计算SKC,
+                    更新日期,
+                    日期识别,
+                    日期识别B,
+                    销售日期,
+                    店铺名称,
+                    季节修订,
+                    一级分类,
+                    SUM(销售数量) AS 销售数量,
+                    SUM(销售金额) AS 销售金额,
+                    (SELECT SUM(销售金额) FROM cwl_weathertips_retail_1 AS m2 WHERE m1.省份=m2.省份 AND m1.店铺名称=m2.店铺名称 AND m1.销售日期 = m2.销售日期) 销售总金额
+                FROM
+                    `cwl_weathertips_retail_1` AS m1
+                WHERE 
+                    1
+                GROUP BY 
+                    店铺名称,
+                    季节修订,
+                    一级分类,
+                    日期识别
+                ORDER BY 日期识别B DESC
+            ) AS t
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_retail_2;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_weathertips_retail_2')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_retail_2 更新成功！"
+            ]);
+        }
+    }
+
+    // 历史销售启动数据
+    public function retail_customer_history() {
+        $sql = "
+            SELECT
+                EC.State AS 省份,
+                ER.CustomerName AS 店铺名称,
+                CASE
+                    EG.TimeCategoryName2
+                    WHEN '初春' THEN
+                    '春季'
+                    WHEN '正春' THEN
+                    '春季'
+                    WHEN '春季' THEN
+                    '春季'
+                    WHEN '初秋' THEN
+                    '秋季'
+                    WHEN '深秋' THEN
+                    '秋季'
+                    WHEN '秋季' THEN
+                    '秋季'
+                    WHEN '初夏' THEN
+                    '夏季'
+                    WHEN '盛夏' THEN
+                    '夏季'
+                    WHEN '夏季' THEN
+                    '夏季'
+                    WHEN '冬季' THEN
+                    '冬季'
+                    WHEN '初冬' THEN
+                    '冬季'
+                    WHEN '深冬' THEN
+                    '冬季'
+                END AS 季节归集,
+                EG.CategoryName1 AS 一级分类,
+                SUM(ERG.Quantity) AS 销售数量,
+                FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期
+            FROM
+                ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.RetailDate >= '2022-07-01'
+                AND ER.RetailDate < '2023-01-01' 
+                AND ER.CodingCodeText = '已审结'
+                AND EC.ShutOut = 0
+                AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
+                AND EG.CategoryName1 IN ('内搭', '外套','下装')
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EC.CustomerName = '亳州一店'
+            GROUP BY 
+                ER.CustomerName,
+                EC.State,
+                EG.TimeCategoryName2,
+                EG.CategoryName1,
+                FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
+            ORDER BY EC.State ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_retail_customer_history;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_weathertips_retail_customer_history')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_retail_customer_history 更新成功！"
+            ]);
+        }
     }
 }

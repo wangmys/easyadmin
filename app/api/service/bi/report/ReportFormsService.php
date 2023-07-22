@@ -859,6 +859,76 @@ class ReportFormsService
         }
     }
 
+    public function create_table_s045(){
+        // $arr = '广东省','广西壮族自治区','江西省','湖北省','湖南省','贵州省';
+        $code ='S045';
+        $date_ = date('Y-m-d');
+        $start = date("Y-m-d", strtotime( "$date_ -1 day"));
+        $data_date = date("Y-m-d", strtotime( "-7 day"));
+        $date_arr = getDateFromRange_m($data_date,$start);
+        $date_arr = array_reverse($date_arr);
+        $table_header = array_merge(['ID','省份','季节'],$date_arr);
+
+        // $res = self::where('更新日期',$date_)
+        //     ->whereNotIn('省份',$arr)
+        //     ->where('ID','<>',0)
+        //     ->select()
+        //     ->toArray();
+        $res = $this->db_bi->query("
+            SELECT 
+                left(省份, 2),
+                二级时间分类 AS 季节,
+                前一天,
+                前二天,
+                前三天,
+                前四天,
+                前五天,
+                前六天,
+                前七天
+            FROM sp_time_proportion_state
+            WHERE 
+                省份 NOT IN ('广东省','广西壮族自治区','江西省','湖北省','湖南省','贵州省')
+                AND ID <> 0
+                AND 更新日期 = '{$date_}'
+        ");    
+        // foreach ($res as $v=>$k){
+        //     unset($res[$v]['ID']);
+        //     unset($res[$v]['更新日期']);
+        // }
+        // dump($res);die;
+
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 140;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 45;
+        $field_width[2] = 40;
+//        $field_width[4] = 260;
+//        $field_width[7] = 260;
+        $table_explain = [
+            // 0 => "报表更新日期".$data_date,
+            0 => ' '
+        ];
+        $params = [
+            'code' => $code,
+            'row'=>count($res), //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "其他省份7天季节占比 [" . date("Y-m-d", strtotime(date('Y-m-d') . '-1day')) . ']',
+            'table_time' => date("Y-m-d H:i:s"),
+            'data'=>$res,
+            'table_explain'=>$table_explain,
+            'table_header'=>$table_header,
+            'field_width'=>$field_width,
+            'col' => '省份',
+            'color'=>16711877,
+            'field' =>[''],
+            'banben' => '图片报表编号: '.$code,
+            'last' => 'no',
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $this->create_image($params);
+    }
+
     public function create_table_s101($code = 'S101', $date = '')
     {
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
