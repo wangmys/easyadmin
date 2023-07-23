@@ -34,6 +34,85 @@ class Tableupdate extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
+    public function bi_dianpuyejihuanbi_data()
+    {
+        $date = date('Y-m-d', strtotime('-1 day'));
+
+        $sql = "
+            declare @retail_date DATE
+            set @retail_date = '{$date}'
+
+            SELECT
+                SUBSTRING(EC.State, 1, 2)  AS 省份,
+                ER.CustomerName AS 店铺名称,
+                EBC.Mathod AS 经营属性,
+                @retail_date AS 日期,   
+            CASE
+                DATEPART( weekday, @retail_date )
+                WHEN 1 THEN
+                '星期日'
+                WHEN 2 THEN
+                '星期一'
+                WHEN 3 THEN
+                '星期二'
+                WHEN 4 THEN
+                '星期三'
+                WHEN 5 THEN
+                '星期四'
+                WHEN 6 THEN
+                '星期五'
+                WHEN 7 THEN
+                '星期六'
+                END AS 星期,
+                SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额
+            FROM
+                ErpRetail AS ER 
+            LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+            LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+            LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+            WHERE
+                ER.RetailDate >= @retail_date 
+                AND ER.RetailDate < DATEADD( DAY, +1, @retail_date ) 
+                AND ER.CodingCodeText = '已审结'
+                AND EC.ShutOut = 0
+                AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
+                AND EBC.Mathod IN ('直营', '加盟')
+            GROUP BY 
+                ER.CustomerName,
+                EC.State,
+                EBC.Mathod	
+            ORDER BY EC.State ASC
+        ";
+        // 查康雷
+        $select_data = $this->db_sqlsrv->query($sql);
+        if ($select_data) {
+            // dump($select_data);
+            // 删 easyadmin2
+            $this->db_bi->table('cwl_dianpuyejihuanbi_data')->where([
+                ['日期', '=', $date]
+            ])->delete();
+
+            $this->db_bi->startTrans();
+            $insertAll = $this->db_bi->table('cwl_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
+            if ($insertAll) {
+                $this->db_bi->commit();
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => "店铺业绩环比数据源 更新成功，{$date}！"
+                ]);
+            } else {
+                $this->db_bi->rollback();
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => "店铺业绩环比数据源 更新失败，{$date}！"
+                ]);
+            }   
+        }
+    }
+
     // 门店业绩环比报表  http://www.easyadmin1.com/api/tableupdate/s113?date=2023-07-14
     public function s113($date = '')
     {
