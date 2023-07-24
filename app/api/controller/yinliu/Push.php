@@ -106,6 +106,54 @@ class Push extends BaseController
     }
 
     /**
+     * 提送每日零售核销单
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function pushHexiao()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            // [
+            //     'name' => '杨岳敏',
+            //     'tel' => '13362067222',
+            //     'userid' => '131255621326201188'
+            // ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
+            // [
+            //     'name' => '杨剑',
+            //     'tel' => '15200838578',
+            //     'userid' => '1369166106841705'
+            // ]
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        // 创建图
+        $reportFormsService->create_table_s116($date);
+        $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S116.jpg';
+
+        // 上传图 
+        echo $media_id = $model->uploadDingFile($path, "零售核销单报表 {$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_id);
+            dump($res);
+        }  
+    }
+
+    /**
      * 推送消息至至管理者
      */
    public function pushToManage()

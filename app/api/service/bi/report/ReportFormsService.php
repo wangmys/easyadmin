@@ -2289,6 +2289,82 @@ class ReportFormsService
         ]);
     }
 
+    // s116 零售核销单
+    public function create_table_s116($date = '')
+    {
+        // 编号
+        $code = 'S116';
+        $date = $date ?: date('Y-m-d');
+        // $dingName = cache('dingding_table_name');
+
+        $sql = "
+            SELECT
+                t1.省份,
+                concat(round(zy.毛利率 * 100, 1), '%') AS 直营_毛利率,
+                zy.毛利 AS 直营_毛利,
+                concat(round(jm.毛利率 * 100, 1), '%') AS 加盟_毛利率,
+                jm.毛利 AS 加盟_毛利,
+                concat(round(hj.毛利率 * 100, 1), '%') AS 合计_毛利率,
+                hj.毛利 AS 合计_毛利
+            FROM
+                `cwl_hexiao_res_day` AS t1
+            LEFT JOIN `cwl_hexiao_res_day` AS zy ON zy.省份 = t1.省份 AND zy.经营属性 = '直营' AND zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS jm ON jm.省份 = t1.省份 AND jm.经营属性 = '加盟' AND jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS hj ON hj.省份 = t1.省份 AND hj.经营属性 = '合计' AND hj.销售日期 = t1.销售日期
+            WHERE 
+                t1.销售日期 ='{$date}'
+            GROUP BY t1.省份
+            ORDER BY t1.`index` ASC, t1.省份 ASC
+            ;
+        ";
+        $list = $this->db_easyA->query($sql);
+        foreach ($list as $key => $val) {
+            if ($val['省份'] != '单日总计' && $val['省份'] != '本月总计') {
+                $list[$key]['省份'] = province2zi($val['省份']);
+            }
+        }
+
+        $table_header = ['ID'];
+        $field_width = [];
+        $table_header = array_merge($table_header, array_keys($list[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[] = 95;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        // $field_width[2] = 75;
+        // $field_width[3] = 90;
+
+
+
+        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+            0 => ' ',
+        ];
+
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($list),          //数据的行数
+            'file_name' => $code . '.jpg',   //保存的文件名
+            'title' => "零售核销报表 [" . $date . ']',
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $list,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'banben' => '  图片报表编号: ' . $code,
+            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+        ];
+
+        // 生成图片
+        return $this->create_image($params);
+    }
+
     // s110 单店目标达成情况
     public function create_table_s110B($date = '')
     {
@@ -3377,6 +3453,16 @@ class ReportFormsService
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
                 }
                 if (isset($item['性质']) && $item['性质'] == '总计') {
+                    
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S116') {
+                if (isset($item['省份']) && $item['省份'] == '单日总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['省份']) && $item['省份'] == '本月总计') {
                     
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
