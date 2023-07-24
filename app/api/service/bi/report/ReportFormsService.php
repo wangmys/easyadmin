@@ -2318,51 +2318,56 @@ class ReportFormsService
             ;
         ";
         $list = $this->db_easyA->query($sql);
-        foreach ($list as $key => $val) {
-            if ($val['省份'] != '单日总计' && $val['省份'] != '本月总计') {
-                $list[$key]['省份'] = province2zi($val['省份']);
+        if ($list) {
+            foreach ($list as $key => $val) {
+                if ($val['省份'] != '单日总计' && $val['省份'] != '本月总计') {
+                    $list[$key]['省份'] = province2zi($val['省份']);
+                }
             }
+    
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 95;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 70;
+            // $field_width[2] = 75;
+            // $field_width[3] = 90;
+    
+    
+    
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => ' ',
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "零售核销报表 [" . $date . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '  图片报表编号: ' . $code,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            echo '没有数据,请稍后再试';
         }
-
-        $table_header = ['ID'];
-        $field_width = [];
-        $table_header = array_merge($table_header, array_keys($list[0]));
-        foreach ($table_header as $v => $k) {
-            $field_width[] = 95;
-        }
-        $field_width[0] = 30;
-        $field_width[1] = 70;
-        // $field_width[2] = 75;
-        // $field_width[3] = 90;
-
-
-
-        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
-        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
-        //图片左上角汇总说明数据，可为空
-        $table_explain = [
-            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => ' ',
-        ];
-
-        //参数
-        $params = [
-            'code' => $code,
-            'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "零售核销报表 [" . $date . ']',
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $list,
-            'table_explain' => $table_explain,
-            'table_header' => $table_header,
-            'field_width' => $field_width,
-            'banben' => '  图片报表编号: ' . $code,
-            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
-        ];
-
-        // 生成图片
-        return $this->create_image($params);
+ 
     }
 
     // s110 单店目标达成情况
