@@ -2404,9 +2404,9 @@ class ReportFormsService
             LEFT JOIN `cwl_hexiao_res_day` AS left_jm ON left_jm.省份 = '单日总计' AND left_jm.经营属性 = '加盟' AND left_jm.销售日期 = t1.销售日期
             LEFT JOIN `cwl_hexiao_res_day` AS left_hj ON left_hj.省份 = '单日总计' AND left_hj.经营属性 = '合计' AND left_hj.销售日期 = t1.销售日期
             
-            LEFT JOIN `cwl_hexiao_res_day` AS right_zy ON right_zy.省份 = '单日总计' AND right_zy.经营属性 = '直营' AND right_zy.销售日期 = t1.销售日期
-            LEFT JOIN `cwl_hexiao_res_day` AS right_jm ON right_jm.省份 = '单日总计' AND right_jm.经营属性 = '加盟' AND right_jm.销售日期 = t1.销售日期
-            LEFT JOIN `cwl_hexiao_res_day` AS right_hj ON right_hj.省份 = '单日总计' AND right_hj.经营属性 = '合计' AND right_hj.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_zy ON right_zy.省份 = '本月总计' AND right_zy.经营属性 = '直营' AND right_zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_jm ON right_jm.省份 = '本月总计' AND right_jm.经营属性 = '加盟' AND right_jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_hj ON right_hj.省份 = '本月总计' AND right_hj.经营属性 = '合计' AND right_hj.销售日期 = t1.销售日期
             
             where
             t1.销售日期>= '{$current_month}'
