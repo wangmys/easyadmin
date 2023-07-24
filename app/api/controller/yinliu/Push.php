@@ -120,41 +120,46 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            // [
-            //     'name' => '王威',
-            //     'tel' => '15880012590',
-            //     'userid' => '0812473564939990'
-            // ],
-            // [
-            //     'name' => '陈子文',
-            //     'tel' => '13925028633',
-            //     'userid' => '130821405237722239'
-            // ],
-            // [
-            //     'name' => '谷冬冬',
-            //     'tel' => '18557705286',
-            //     'userid' => '1302252256669056'
-            // ],
-            // [
-            //     'name' => '俞有岳',
-            //     'tel' => '13757775761',
-            //     'userid' => '051218272920490024'
-            // ],
-            // [
-            //     'name' => '周欢',
-            //     'tel' => '13576147826',
-            //     'userid' => '0427616739697274'
-            // ],
-            // [
-            //     'name' => '杨梦晓',
-            //     'tel' => '18858012505',
-            //     'userid' => '16205553134591457'
-            // ],
-            // [
-            //     'name' => '徐亮滨',
-            //     'tel' => '13799884322',
-            //     'userid' => '16085153953415770'
-            // ],
+            [
+                'name' => '王威',
+                'tel' => '15880012590',
+                'userid' => '0812473564939990'
+            ],
+            [
+                'name' => '陈子文',
+                'tel' => '13925028633',
+                'userid' => '130821405237722239'
+            ],
+            [
+                'name' => '谷冬冬',
+                'tel' => '18557705286',
+                'userid' => '1302252256669056'
+            ],
+            [
+                'name' => '俞有岳',
+                'tel' => '13757775761',
+                'userid' => '051218272920490024'
+            ],
+            [
+                'name' => '周欢',
+                'tel' => '13576147826',
+                'userid' => '0427616739697274'
+            ],
+            [
+                'name' => '杨梦晓',
+                'tel' => '18858012505',
+                'userid' => '16205553134591457'
+            ],
+            [
+                'name' => '徐亮滨',
+                'tel' => '13799884322',
+                'userid' => '16085153953415770'
+            ],
+            [
+                'name' => '辛斌',
+                'tel' => '13387007546',
+                'userid' => '12525915671165649'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -164,12 +169,12 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S116.jpg';
 
         // 上传图 
-        echo $media_id = $model->uploadDingFile($path, "零售核销单报表 {$date}");
+        $media_id = $model->uploadDingFile($path, "零售核销单报表日统计{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
             $res = $model->sendImageMsg($val['userid'], $media_id);
-            dump($res);
+            
         }  
     }
 
@@ -193,36 +198,41 @@ class Push extends BaseController
                 'tel' => '15880012590',
                 'userid' => '0812473564939990'
             ],
-            // [
-            //     'name' => '陈子文',
-            //     'tel' => '13925028633',
-            //     'userid' => '130821405237722239'
-            // ],
-            // [
-            //     'name' => '谷冬冬',
-            //     'tel' => '18557705286',
-            //     'userid' => '1302252256669056'
-            // ],
-            // [
-            //     'name' => '俞有岳',
-            //     'tel' => '13757775761',
-            //     'userid' => '051218272920490024'
-            // ],
-            // [
-            //     'name' => '周欢',
-            //     'tel' => '13576147826',
-            //     'userid' => '0427616739697274'
-            // ],
-            // [
-            //     'name' => '杨梦晓',
-            //     'tel' => '18858012505',
-            //     'userid' => '16205553134591457'
-            // ],
-            // [
-            //     'name' => '徐亮滨',
-            //     'tel' => '13799884322',
-            //     'userid' => '16085153953415770'
-            // ],
+            [
+                'name' => '陈子文',
+                'tel' => '13925028633',
+                'userid' => '130821405237722239'
+            ],
+            [
+                'name' => '谷冬冬',
+                'tel' => '18557705286',
+                'userid' => '1302252256669056'
+            ],
+            [
+                'name' => '俞有岳',
+                'tel' => '13757775761',
+                'userid' => '051218272920490024'
+            ],
+            [
+                'name' => '周欢',
+                'tel' => '13576147826',
+                'userid' => '0427616739697274'
+            ],
+            [
+                'name' => '杨梦晓',
+                'tel' => '18858012505',
+                'userid' => '16205553134591457'
+            ],
+            [
+                'name' => '徐亮滨',
+                'tel' => '13799884322',
+                'userid' => '16085153953415770'
+            ],
+            [
+                'name' => '辛斌',
+                'tel' => '13387007546',
+                'userid' => '12525915671165649'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -232,12 +242,12 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S117.jpg';
 
         // 上传图 
-        echo $media_id = $model->uploadDingFile($path, "零售核销单报表 {$date}");
+        $media_id = $model->uploadDingFile($path, "零售核销单报表月统计{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
             $res = $model->sendImageMsg($val['userid'], $media_id);
-            dump($res);
+            // dump($res);
         }  
     }
 
