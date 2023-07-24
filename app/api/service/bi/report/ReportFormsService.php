@@ -2352,7 +2352,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "零售核销报表 [" . $date . ']',
+                'title' => "零售核销报表日统计 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -2369,6 +2369,112 @@ class ReportFormsService
         }
  
     }
+
+    // s117 零售核销单
+    public function create_table_s117($date = '')
+    {
+        // 编号
+        $code = 'S117';
+        $date = $date ?: date('Y-m-d');
+        // $dingName = cache('dingding_table_name');
+        // 本月开始
+        $current_month  = date("Y-m-01", time()); 
+        $today  = date("Y-m-d", time()); 
+        $sql = "
+            SELECT 
+            t1.销售日期 as 日期,
+            '' as 星期,
+            left_zy.毛利率 AS 直营_毛利率,
+            left_zy.毛利 AS 直营_毛利,
+            left_jm.毛利率 AS 加盟_毛利率,
+            left_jm.毛利 AS 加盟_毛利,
+            left_hj.毛利率 AS 合计_毛利率,
+            left_hj.毛利 AS 合计_毛利,
+            
+            right_zy.毛利率 AS 直营累计_毛利率,
+            right_zy.毛利 AS 直营累计_毛利,
+            right_jm.毛利率 AS 加盟累计_毛利率,
+            right_jm.毛利 AS 加盟累计_毛利,
+            right_hj.毛利率 AS 合计累计_毛利率,
+            right_hj.毛利 AS 合计累计_毛利
+            
+            FROM cwl_hexiao_res_day as t1
+            
+            LEFT JOIN `cwl_hexiao_res_day` AS left_zy ON left_zy.省份 = '单日总计' AND left_zy.经营属性 = '直营' AND left_zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS left_jm ON left_jm.省份 = '单日总计' AND left_jm.经营属性 = '加盟' AND left_jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS left_hj ON left_hj.省份 = '单日总计' AND left_hj.经营属性 = '合计' AND left_hj.销售日期 = t1.销售日期
+            
+            LEFT JOIN `cwl_hexiao_res_day` AS right_zy ON right_zy.省份 = '单日总计' AND right_zy.经营属性 = '直营' AND right_zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_jm ON right_jm.省份 = '单日总计' AND right_jm.经营属性 = '加盟' AND right_jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_hj ON right_hj.省份 = '单日总计' AND right_hj.经营属性 = '合计' AND right_hj.销售日期 = t1.销售日期
+            
+            where
+            t1.销售日期>= '{$current_month}'
+            AND t1.销售日期 <= '{$today}'
+
+            group by t1.销售日期
+            order by t1.销售日期 asc
+            ;
+        ";
+        $list = $this->db_easyA->query($sql);
+        if ($list) {
+            foreach ($list as $key => $val) {
+                $list[$key]['星期'] = date_to_week2($val['日期']);
+                // if ($val['省份'] != '单日总计' && $val['省份'] != '本月总计') {
+                //     $list[$key]['省份'] = province2zi($val['省份']);
+                // }
+            }
+    
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 95;
+            }
+            $field_width[0] = 30;
+            $field_width[2] = 70;
+            $field_width[8] = 85;
+            $field_width[9] = 130;
+            $field_width[10] = 130;
+            $field_width[11] = 130;
+            $field_width[12] = 130;
+            $field_width[13] = 130;
+            $field_width[14] = 130;
+            // $field_width[3] = 90;
+    
+    
+    
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => ' ',
+            ];
+    
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "零售核销报表月统计 [" . $date . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '  图片报表编号: ' . $code,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        } else {
+            echo '没有数据,请稍后再试';
+        }
+ 
+    }    
 
     // s110 单店目标达成情况
     public function create_table_s110B($date = '')
