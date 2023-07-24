@@ -196,8 +196,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按5000条数据切割
-        $res = array_chunk($list,5000);
+        // 将结果集按3000条数据切割
+        $res = array_chunk($list,3000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[0];
         // 循环存入缓存
         foreach ($res as $k => $v){
@@ -284,8 +284,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按5000条数据切割
-        $res = array_chunk($list,5000);
+        // 将结果集按3000条数据切割
+        $res = array_chunk($list,3000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[1];
 
         // 循环存入缓存
@@ -514,8 +514,8 @@ class CodeService
         ";
         // 查询数据并保存缓存
         $list = Db::connect("sqlsrv")->query($sql);
-        // 将结果集按5000条数据切割
-        $res = array_chunk($list,5000);
+        // 将结果集按3000条数据切割
+        $res = array_chunk($list,3000);
         $redisKey = ApiConstant::RATIO_PULL_REDIS_KEY[2];
         // 循环存入缓存
         foreach ($res as $k => $v){

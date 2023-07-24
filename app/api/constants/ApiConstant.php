@@ -129,16 +129,16 @@ class ApiConstant
      */
     const RATIO_PULL_REDIS_KEY = [
         // 周销
-        '7DaySale',
+        0 => '7DaySale',
         // 累销
-        'AccumulatedSale',
+        1 => 'AccumulatedSale',
         // 店铺预计库存
-        'ShopEstimatedStock',
+        2 => 'ShopEstimatedStock',
         // 云仓可用库存
-        'WarehouseAvailableStock',
+        3 => 'WarehouseAvailableStock',
         // 云仓在途库存
-        'WarehouseTransitStock',
+        4 => 'WarehouseTransitStock',
         // 云仓采购库存
-        'PurchaseStock'
+        5 => 'PurchaseStock'
     ];
 }
