@@ -2373,7 +2373,7 @@ class ReportFormsService
     // s117 零售核销单
     public function create_table_s117($date = '')
     {
-        // 编号
+        // 编号  concat(round(zy.毛利率 * 100, 1), '%') AS 直营_毛利率,
         $code = 'S117';
         $date = $date ?: date('Y-m-d');
         // $dingName = cache('dingding_table_name');
@@ -2384,18 +2384,18 @@ class ReportFormsService
             SELECT 
             t1.销售日期 as 日期,
             '' as 星期,
-            left_zy.毛利率 AS 直营_毛利率,
+            concat(round(left_zy.毛利率 * 100, 1), '%') AS 直营_毛利率,
             left_zy.毛利 AS 直营_毛利,
-            left_jm.毛利率 AS 加盟_毛利率,
+            concat(round(left_jm.毛利率 * 100, 1), '%') AS 加盟_毛利率,
             left_jm.毛利 AS 加盟_毛利,
-            left_hj.毛利率 AS 合计_毛利率,
+            concat(round(left_hj.毛利率 * 100, 1), '%') AS 合计_毛利率,
             left_hj.毛利 AS 合计_毛利,
             
-            right_zy.毛利率 AS 直营累计_毛利率,
+            concat(round(right_zy.毛利率 * 100, 1), '%') AS 直营累计_毛利率,
             right_zy.毛利 AS 直营累计_毛利,
-            right_jm.毛利率 AS 加盟累计_毛利率,
+            concat(round(right_jm.毛利率 * 100, 1), '%') AS 加盟累计_毛利率,
             right_jm.毛利 AS 加盟累计_毛利,
-            right_hj.毛利率 AS 合计累计_毛利率,
+            concat(round(right_hj.毛利率 * 100, 1), '%') AS 合计累计_毛利率,
             right_hj.毛利 AS 合计累计_毛利
             
             FROM cwl_hexiao_res_day as t1
