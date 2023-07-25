@@ -153,7 +153,7 @@ class Weathertips extends BaseController
                 EC.RegionId NOT IN ('8','40', '55', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EC.ShutOut = 0
-                AND EC.CustomerName = '亳州一店'
+                -- AND EC.CustomerName = '亳州一店'
                 AND EG.TimeCategoryName1 IN ('2023')
                 AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季' )
                 AND EG.CategoryName1 IN ('内搭', '外套', '下装')
@@ -507,7 +507,7 @@ class Weathertips extends BaseController
                 AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
                 AND EG.CategoryName1 IN ('内搭', '外套','下装')
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EC.CustomerName = '亳州一店'
+            --    AND EC.CustomerName = '亳州一店'
             GROUP BY 
                 ER.CustomerName,
                 EC.State,
