@@ -257,7 +257,7 @@ class ShopbuhuoB extends AdminController
                 GROUP BY
                     ERG.DeliveryId 
                 ) 
-                AND EC.CustomItem17 = '{$diaochufuzheren}' AND EC.CustomerName = '{$CustomerName}' AND EG.GoodsNo = '{$GoodsNo}'
+                AND EC.CustomerName = '{$CustomerName}' AND EG.GoodsNo = '{$GoodsNo}'
             GROUP BY
                 EC.CustomItem17,
                 EC.CustomerId,
@@ -310,6 +310,46 @@ class ShopbuhuoB extends AdminController
         return $zaitu;
     }
 
+    // 已备未发
+    public function qudaodiaobo_weifa($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
+        $sql = "
+            SELECT 
+                EC.State AS 省份,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerCode,
+                EC.CustomerName as 店铺名称,
+                EG.CategoryName1 AS 一级分类,
+                EC.MathodId,
+                EG.GoodsNo as 货号,
+                SUM(ESG.Quantity) 已配未发
+            FROM ErpCustomer EC
+            LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+            LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+            LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+            WHERE	
+                -- EG.CategoryName1 IN ('内搭','外套','下装','鞋履','配饰')
+                EC.ShutOut=0  
+                AND EC.MathodId IN (4,7)
+                AND ES.IsCompleted=0
+                AND EG.GoodsNo='{$GoodsNo}'
+                AND EC.CustomerName='{$CustomerName}'
+                -- AND EC.CustomerCode='Y0535'
+            GROUP BY 
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerCode,
+                EC.CustomerName,
+                EG.CategoryName1,
+                EC.MathodId,
+            EG.GoodsNo
+        ";
+        // 在途 调出店铺是不能有在途的，这样没意义
+        $zaitu = $this->db_sqlsrv->query($sql);
+        return $zaitu;
+    }
+
     // 康雷在途 调出店铺 调拨未完成计算 actual_quantity
     public function qudaodiaobo_weiwancheng($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
         // 调拨未完成数量
@@ -327,7 +367,6 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
             WHERE
                 EC.ShutOut= 0 
-                AND EC.CustomItem17 = '{$diaochufuzheren}' 
                 AND EC.CustomerName = '{$CustomerName}' 
                 AND EG.GoodsNo = '{$GoodsNo}' 
                 AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
@@ -697,10 +736,6 @@ class ShopbuhuoB extends AdminController
 
                 // 1 调出店调拨未完成，调空，并且有在途
                 $weiwancheng = $this->qudaodiaobo_weiwancheng($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
-                // $weiwancheng = $this->qudaodiaobo_weiwancheng('曹太阳', '甘谷一店', 'B12501003');
-                // $diaochu_zaitu = $this->qudaodiaobo_zaitu_new('曹太阳', '兰州二店', 'B11501001');
-                // dump($weiwancheng);
-                // dump($diaochu_zaitu);die;
 
 
                 // 调出店铺调拨未完成
@@ -709,6 +744,7 @@ class ShopbuhuoB extends AdminController
                     if ($kucun[0]['actual_quantity'] - $weiwancheng[0]['调拨未完成数'] - $val['调拨总量'] <= 0) {
                         // 1.调出店是否有在途
                         $diaochu_zaitu = $this->qudaodiaobo_zaitu_new($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        
                         if ($diaochu_zaitu) {
                             $select_qudaodiaobo[$key]['调出店在途量'] = $diaochu_zaitu[0]['在途数量']; 
                             $select_qudaodiaobo[$key]['未完成调拨量'] = $weiwancheng[0]['调拨未完成数'];
@@ -717,7 +753,16 @@ class ShopbuhuoB extends AdminController
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
-                        // 2.上市天数不足8天
+                        // 2.调出店是否有已配未发 
+                        $weifa = $this->qudaodiaobo_weifa($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        if ($weifa) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = $weifa[0]['已配未发']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有已配未发";
+                            $wrongData[] = $select_qudaodiaobo[$key];    
+                        }
+                        // 3.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
@@ -738,7 +783,17 @@ class ShopbuhuoB extends AdminController
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
-                        // 2.上市天数不足8天
+                        // 2.调出店是否有已配未发 
+                        $weifa = $this->qudaodiaobo_weifa($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
+                        if ($weifa) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = $weifa[0]['已配未发']; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有已配未发";
+                            $wrongData[] = $select_qudaodiaobo[$key];    
+                        }
+
+                        // 3.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
