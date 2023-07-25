@@ -44,10 +44,18 @@ class SendReport extends BaseController
         $name = input('param.name') ? input('param.name') : 'S101'; 
         $date = input('param.date') ? input('param.date') : '';
         cache('dingding_table_name', rand_code(5), 3600);
-        if ($name =='S009') {
+        if ($name =='S007') {
+            $this->service->create_table_s007();
+        } elseif ($name =='S008') {
+            $this->service->create_table_s008();
+        } elseif ($name =='S009') {
             $this->service->create_table_s009();
         } elseif ($name =='S010') {
             $this->service->create_table_s010();
+        } elseif ($name =='S013') {
+            $this->service->create_table_s013();
+        } elseif ($name =='S014') {
+            $this->service->create_table_s014();
         } elseif ($name =='S015') {
             $this->service->create_table_s015();
         } elseif ($name =='S016') {
@@ -426,6 +434,43 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    // 推送到打群 0：42
+    public function send6()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S007' => [
+                'title' => '2023 春季货品销售报表 表号:S007',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S007.jpg'
+            ],
+            'S008' => [
+                'title' => '2023 夏季货品销售报表 表号:S008',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S008.jpg'
+            ],
+            'S013' => [
+                'title' => '2023 春季货品零售汇总报表 表号:S013',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S013.jpg'
+            ],
+            'S014' => [
+                'title' => '2023 夏季货品零售汇总报表 表号:S014',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S014.jpg'
+            ],
+        ];
+        $res = [];
+
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+        }
+        return json($res);
+    }
+
     public function send_caigoudingtui()
     {
         
@@ -673,6 +718,14 @@ class SendReport extends BaseController
         $this->service->create_table_s015();
         // 发送数据报表
         $this->send5();
+    }
+
+    public function run6() {
+        $this->service->create_table_s007();
+        $this->service->create_table_s008();
+        $this->service->create_table_s013();
+        $this->service->create_table_s014();
+        $this->send6();
     }
 
     // 51 推送 11：46

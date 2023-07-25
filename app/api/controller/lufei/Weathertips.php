@@ -22,6 +22,7 @@ class Weathertips extends BaseController
     protected $db_easyA = '';
     protected $db_bi = '';
     protected $db_sqlsrv = '';
+    protected $db_tianqi = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -32,6 +33,7 @@ class Weathertips extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_tianqi = Db::connect('tianqi');
     }
 
     public function seasionHandle($seasion = "春季") {
@@ -61,7 +63,7 @@ class Weathertips extends BaseController
                 c.Region as 区域修订,
                 cf.RegionId,
                 c.Mathod as 经营属性,
-                c.CustomItem36 AS 温带,
+                c.CustomItem36 AS 温区,
                 cf.`首单日期`
             From customer as c
             LEFT JOIN customer_first as cf on c.CustomerName = cf.`店铺名称` and c.customerCode = cf.CustomerCode 
@@ -94,6 +96,65 @@ class Weathertips extends BaseController
         }
     }
 
+    
+    // 获取天气表 cid
+    public function customer_cid() {
+        $sql = "
+            SELECT
+                c.CustomerCode,
+                c.CustomerName,
+                c.RegionId,
+                c.cid,
+                u.city AS BdCity,
+                date_format(now(),'%Y-%m-%d') AS 更新日期 
+            FROM
+                customers as c 
+            LEFT JOIN city_url AS u ON c.cid = u.cid
+            WHERE
+                c.cid IS NOT NULL    
+        ";
+        $select = $this->db_tianqi->query($sql);
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE customer_cid;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('customer_cid')->strict(false)->insertAll($val);
+            }
+
+            // 更新cid和regionid
+            $sql2 = "
+                update cwl_weathertips_customer as c1
+                LEFT JOIN customer_cid as c2 ON c1.店铺编码 = c2.CustomerCode
+                set 
+                    c1.cid = c2.cid,
+                    c1.RegionId = c2.RegionId,
+                    c1.绑定城市 = c2.Bdcity
+            ";
+            $this->db_easyA->execute($sql2);
+
+            // 更新开业日期 
+            $sql3 = "
+                UPDATE cwl_weathertips_customer AS c1
+                LEFT JOIN ( SELECT 开业日期,店铺编码 FROM cwl_weathertips_stock GROUP BY 店铺编码 ) AS s ON c1.店铺编码 = s.`店铺编码` 
+                SET c1.`开业日期` = s.开业日期 
+                WHERE
+                    c1.`开业日期` IS NULL
+            ";
+            $this->db_easyA->execute($sql3);
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "customer_cid 更新成功！"
+            ]);
+
+        }
+    }
+    
     // 店铺库存
     public function customerStock_1() {
         $sql = "
@@ -680,4 +741,136 @@ class Weathertips extends BaseController
         //     ]);
         // }
     }
+
+    // 天气历史
+    public function getWeather() {
+        $dateList = getWeatherDateList(1);
+        // cid列表
+        $cidList = $this->db_easyA->query("
+            select cid from cwl_weathertips_customer where cid is not null group by cid
+        ");
+
+        $dateListStr = '';
+        $updateSql = '';
+        $cidListStr = '';
+        // 日期处理
+        foreach ($dateList as $key => $val) {
+            if ($key < count($dateList) - 1) {
+                $dateListStr .= $val . ',';
+            } else {
+                $dateListStr .= $val;
+            }
+            $updateSql .= " when weather_time = '{$val}' then '{$key}'";
+        }
+        
+        // $updateSql2 = "
+        //     day_index = case
+        //         {$updateSql}
+        //     end
+        // ";
+        // echo $updateSql2; 
+        // die;
+        // cid处理
+        foreach ($cidList as $key => $val) {
+            if ($key < count($cidList) - 1) {
+                $cidListStr .= $val['cid'] . ',';
+            } else {
+                $cidListStr .= $val['cid'];
+            }
+        }
+        // 天气日期列表
+        $dateList = xmSelectInput($dateListStr);
+        // cid列表
+        $cidList = xmSelectInput($cidListStr);
+
+        $sql = "
+            SELECT `cid`,`min_c`,`max_c`,ave_c,`weather_time`,`text_weather` FROM `weather` WHERE `cid` IN ($cidList) AND `weather_time` IN ($dateList)
+        ";
+        $select = $this->db_tianqi->query($sql);
+        $count = count($select);
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_weather;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_weathertips_weather')->strict(false)->insertAll($val);
+            }
+
+            // 更新 day_index
+            $sql2 = "
+                update cwl_weathertips_weather
+                    set 
+                        day_index = case
+                            {$updateSql}
+                        end
+                where 
+                day_index is null
+            ";
+            $this->db_easyA->execute($sql2);
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_weather 更新成功，数量：{$count}！"
+            ]);
+
+        }
+    }
+
+     // 天气历史
+     public function weather() {
+        $dateList = getWeatherDateList(1);
+
+        $dateListStr = '';
+        // 日期处理
+        foreach ($dateList as $key => $val) {
+            if ($key < count($dateList) - 1) {
+                $dateListStr .= $val . ',';
+            } else {
+                $dateListStr .= $val;
+            }
+        }
+
+        // 天气日期列表  24
+        $dateList = xmSelectInput($dateListStr); 
+        // die;
+
+        $sql = "
+            SELECT
+                m.省份,
+                m.温区,
+                m.店铺名称,
+                m.商品负责人,
+                m.绑定城市
+            FROM
+                cwl_weathertips_customer as m 
+            -- LEFT JOIN city_url AS u ON c.cid = u.cid
+            WHERE
+                m.cid IS NOT NULL   
+        ";
+        $select = $this->db_tianqi->query($sql);
+        $count = count($select);
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_weathertips_weather;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_weathertips_weather')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_weathertips_weather 更新成功，数量：{$count}！"
+            ]);
+
+        }
+    }   
+
 }
