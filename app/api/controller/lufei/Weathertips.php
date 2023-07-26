@@ -852,25 +852,25 @@ class Weathertips extends BaseController
                 m.cid IS NOT NULL   
         ";
         $select = $this->db_tianqi->query($sql);
-        $count = count($select);
-        if ($select) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_weathertips_weather;');
-            $chunk_list = array_chunk($select, 500);
-            // $this->db_easyA->startTrans();
+        // $count = count($select);
+        // if ($select) {
+        //     // 删除历史数据
+        //     // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+        //     $this->db_easyA->execute('TRUNCATE cwl_weathertips_weather;');
+        //     $chunk_list = array_chunk($select, 500);
+        //     // $this->db_easyA->startTrans();
 
-            foreach($chunk_list as $key => $val) {
-                $this->db_easyA->table('cwl_weathertips_weather')->strict(false)->insertAll($val);
-            }
+        //     foreach($chunk_list as $key => $val) {
+        //         $this->db_easyA->table('cwl_weathertips_weather')->strict(false)->insertAll($val);
+        //     }
 
-            return json([
-                'status' => 1,
-                'msg' => 'success',
-                'content' => "cwl_weathertips_weather 更新成功，数量：{$count}！"
-            ]);
+        //     return json([
+        //         'status' => 1,
+        //         'msg' => 'success',
+        //         'content' => "cwl_weathertips_weather 更新成功，数量：{$count}！"
+        //     ]);
 
-        }
+        // }
     }   
 
 }
