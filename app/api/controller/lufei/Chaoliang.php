@@ -171,7 +171,7 @@ class Chaoliang extends BaseController
                     sk.店铺名称,
                     sk.季节,
                     sk.货号 
-             	LIMIT 1000 
+             	-- LIMIT 1000 
                 ) AS t
         ";
 		
