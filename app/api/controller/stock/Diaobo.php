@@ -36,7 +36,7 @@ class Diaobo extends BaseController
         //     return json(['code'=>400, 'msg'=>'开始日期不能大于结束日期', 'data'=>[]]);
         // }
         // $data = Db::connect("sqlsrv")->Query($this->get_diaobo_sql($start_date, $end_date));
-        $data = LypWwDiaoboModel::where([])->select();
+        $data = LypWwDiaoboModel::where([])->withoutField(['id', 'create_time'], false)->select();
         $data = $data ? $data->toArray() : [];
         return json($data);
 
