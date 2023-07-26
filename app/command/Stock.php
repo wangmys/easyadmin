@@ -177,6 +177,7 @@ WHERE EC.MathodId IN (4,7)
 	AND EC.RegionId!=55
 	AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
 	AND CONVERT(VARCHAR(10),ECS.StockDate,23) <= '{$current_date}'
+	and EG.GoodsNo not in ('B12501021','B11501023','B11502006','B12502009','B12502008','B12502011','B12502013','B12502012','B12502010','B12612011','B22612003') 
 -- 	AND EG.TimeCategoryName1=2020
 -- 	AND EG.CategoryName='翻领羊毛衫'
 -- 	AND TimeCategoryName2='冬季'
