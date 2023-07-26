@@ -350,6 +350,35 @@ class ShopbuhuoB extends AdminController
         return $zaitu;
     }
 
+    // 分拣未完成  a(a存在给b分拣未完成记录)->b(当前操作店铺b给发调拨)->c
+    public function qudaodiaobo_fenjian_weiwancheng($CustomerCode = '', $GoodsNo = '') {
+        $sql = "
+            SELECT TOP 100
+                EIA.InstructionApplyId AS 指定单号,
+                EC_in.CustomerName AS 调入店名称,
+                EC_in.CustomerCode AS 调入店编号,
+                EC_out.CustomerName AS 调出店名称,
+                EC_out.CustomerCode AS 调出店编号,
+                EG.GoodsNo,
+                EIA.IsCompleted,
+                EIA.InstructionApplyDate
+            FROM
+                ErpInstructionApply AS EIA
+            LEFT JOIN ErpCustomer AS EC_in ON EIA.InItemId = EC_in.CustomerId
+            LEFT JOIN ErpCustomer AS EC_out ON EIA.OutItemId = EC_out.CustomerId
+            LEFT JOIN ErpInstructionApplyGoods AS EIAG ON EIA.InstructionApplyId = EIAG.InstructionApplyId
+            LEFT JOIN ErpGoods AS EG ON EIAG.GoodsId = EG.GoodsId
+            WHERE 
+            -- 	EIA.InItemId = 'C991000274'
+                EC_in.CustomerCode='{$CustomerCode}'
+                AND IsCompleted = 0
+            AND EG.GoodsNo = '{$GoodsNo}'
+        ";
+        // 分拣未完成
+        $fenjian_weiwancheng = $this->db_sqlsrv->query($sql);
+        return $fenjian_weiwancheng;
+    }
+
     // 康雷在途 调出店铺 调拨未完成计算 actual_quantity
     public function qudaodiaobo_weiwancheng($diaochufuzheren = "", $CustomerName = '', $GoodsNo = '') {
         // 调拨未完成数量
@@ -760,15 +789,29 @@ class ShopbuhuoB extends AdminController
                             $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有已配未发";
-                            $wrongData[] = $select_qudaodiaobo[$key];    
+                            $wrongData[] = $select_qudaodiaobo[$key];  
+                            continue;  
                         }
-                        // 3.上市天数不足8天
+                        // 3 分拣未完成
+                        $fenjian = $this->qudaodiaobo_fenjian_weiwancheng($val['调出店铺编号'], $val['货号']);
+                        if ($fenjian) {
+                            
+                            $select_qudaodiaobo[$key]['调出店在途量'] = 0; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在未完成调入指令单，指令单号：{$fenjian[0]['指定单号']}";
+                            $wrongData[] = $select_qudaodiaobo[$key];  
+                            continue;  
+                        }
+                        // 4.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
+                    } else {
+                        // 没调空
                     }
                 // 调出店没有调拨记录    
                 } else {
@@ -790,16 +833,30 @@ class ShopbuhuoB extends AdminController
                             $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在调空，有已配未发";
-                            $wrongData[] = $select_qudaodiaobo[$key];    
+                            $wrongData[] = $select_qudaodiaobo[$key];  
+                            continue;  
                         }
 
-                        // 3.上市天数不足8天
+                        // 3 分拣未完成
+                        $fenjian = $this->qudaodiaobo_fenjian_weiwancheng($val['调出店铺编号'], $val['货号']);
+                        if ($fenjian) {
+                            $select_qudaodiaobo[$key]['调出店在途量'] = 0; 
+                            $select_qudaodiaobo[$key]['未完成调拨量'] = 0;
+                            $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                            $select_qudaodiaobo[$key]['信息反馈'] = "调出店存在未完成调入指令单，指令单号：{$fenjian[0]['指定单号']}";
+                            $wrongData[] = $select_qudaodiaobo[$key];  
+                            continue;  
+                        }
+
+                        // 4.上市天数不足8天
                         if ($val['上市天数'] && $val['上市天数'] < 7) {
                             $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
                             $select_qudaodiaobo[$key]['信息反馈']  = "调出店存在调空，上市不足8天"; 
                             $wrongData[] = $select_qudaodiaobo[$key];
                             continue;
                         }
+                    } else {
+                        // 没调空
                     }
                 }
                 
