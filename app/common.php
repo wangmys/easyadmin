@@ -453,6 +453,17 @@ function generate_sql($arr, $table) {
 
 }
 
+function arr_add_member($arr,$add,$members){
+    foreach ($members as $k){
+        if(isset($arr[$k])){
+            $arr[$k] +=$add[$k];
+        }else{
+            $arr[$k]  =$add[$k];
+        }
+    }
+    return $arr;
+}
+
 // 多选提交参数处理
 function xmSelectInput($str = "") {
     // $str = "于燕华,周奇志,廖翠芳,张洋涛";
@@ -479,4 +490,24 @@ function rand_code($randLength=6,$chars="0123456789"){
     // tokenvalue=随机字符串+时间戳
     $tokenvalue = $randStr;
     return $tokenvalue;
+}
+
+/**
+ * @param int $type 返回格式 0 天数 1 Y-m-d
+ * @return array
+ */
+function getWeatherDateList($type = 0)
+{
+    $str = 'Y-m-d';
+    if($type == 0){
+        $str = 'm-d';
+    }
+    // 开始日期
+    $start_date = date('Y-m-d',strtotime(date('Y-m-d').'-3day'));
+    // 日期列表
+    $date_list = [];
+    for ($i = 0;$i <= 23;$i++){
+        $date_list[] = date($str,strtotime($start_date."+{$i}day"));
+    }
+    return $date_list;
 }
