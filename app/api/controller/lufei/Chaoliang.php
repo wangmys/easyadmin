@@ -171,7 +171,7 @@ class Chaoliang extends BaseController
                     sk.店铺名称,
                     sk.季节,
                     sk.货号 
-            -- 	LIMIT 100 
+             	LIMIT 1000 
                 ) AS t
         ";
 		
@@ -215,21 +215,31 @@ class Chaoliang extends BaseController
                 UPDATE 
                     cwl_chaoliang_sk
                 SET 
-                    周转合计 = 
-                        IFNULL(`周转00/28/37/44/100/160/S`, 0) + 
-                        IFNULL(`周转29/38/46/105/165/M`, 0) + 
-                        IFNULL(`周转30/39/48/110/170/L`, 0) + 
-                        IFNULL(`周转31/40/50/115/175/XL`, 0) + 
-                        IFNULL(`周转32/41/52/120/180/2XL`, 0) +
-                        IFNULL(`周转33/42/54/125/185/3XL`, 0) + 
-                        IFNULL(`周转34/43/56/190/4XL`, 0) + 
-                        IFNULL(`周转35/44/58/195/5XL`, 0) + 
-                        IFNULL(`周转36/6XL`, 0) + 
-                        IFNULL(`周转38/7XL`, 0) + 
-                        IFNULL(`周转_40`, 0)
+                    周转合计 = ROUND( 预计库存合计 / (两周销合计 / 2), 0)
                 WHERE
                     周转合计 IS NULL
             ";
+
+            // $sql0 = "
+            //     UPDATE 
+            //         cwl_chaoliang_sk
+            //     SET 
+            //         周转合计 = 
+            //             预计库存合计 / (两周销合计 / 2)
+            //             IFNULL(`周转00/28/37/44/100/160/S`, 0) + 
+            //             IFNULL(`周转29/38/46/105/165/M`, 0) + 
+            //             IFNULL(`周转30/39/48/110/170/L`, 0) + 
+            //             IFNULL(`周转31/40/50/115/175/XL`, 0) + 
+            //             IFNULL(`周转32/41/52/120/180/2XL`, 0) +
+            //             IFNULL(`周转33/42/54/125/185/3XL`, 0) + 
+            //             IFNULL(`周转34/43/56/190/4XL`, 0) + 
+            //             IFNULL(`周转35/44/58/195/5XL`, 0) + 
+            //             IFNULL(`周转36/6XL`, 0) + 
+            //             IFNULL(`周转38/7XL`, 0) + 
+            //             IFNULL(`周转_40`, 0)
+            //     WHERE
+            //         周转合计 IS NULL
+            // ";
 
             // 折率 当前零售 零售
             $status2 = $this->db_easyA->execute($sql);  
