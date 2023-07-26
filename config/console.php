@@ -20,6 +20,9 @@ return [
         'skc_kz_detail' => 'app\command\Skc_kz_detail',
         'cus_weather_output' => 'app\command\Cus_weather_output',
         'ww_data' => 'app\command\Ww_data',
-        'puhuo' => 'app\command\Puhuo',
+        'ww_data_diaobo' => 'app\command\Ww_data_diaobo',
+        'puhuo_yuncangkeyong' => 'app\command\Puhuo_yuncangkeyong',
+        'puhuo_liangzhou' => 'app\command\Puhuo_liangzhou',
+        'puhuo_start' => 'app\command\Puhuo_start',
     ],
 ];

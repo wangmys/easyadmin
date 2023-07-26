@@ -1,50 +1,56 @@
 <?php
 declare (strict_types = 1);
 
-namespace app\api\controller\stock;
-use app\api\constants\ApiConstant;
-use app\BaseController;
-use think\Request;
+namespace app\command;
+
+use think\console\Command;
+use think\console\Input;
+use think\console\input\Argument;
+use think\console\input\Option;
+use think\console\Output;
 use think\facade\Db;
-use app\admin\model\wwdata\LypWwDataModel;
 use app\admin\model\wwdata\LypWwDiaoboModel;
 
-class Diaobo extends BaseController
+class Ww_data_diaobo extends Command
 {
-
-    public function create_ww_json() {
-
-        ini_set('memory_limit','1024M');
-        $table = input('table');
-        $data = LypWwDataModel::table($table)->where([])->withoutField('id',false)->select();
-        $data = $data ? $data->toArray() : [];
-        return json($data);
-
+    protected function configure()
+    {
+        // 指令配置
+        $this->setName('Ww_data_diaobo')
+            ->setDescription('the Ww_data_diaobo command');
     }
 
-    //调拨前后json导出
-    public function create_diaobo_json() {
-        
-        ini_set('memory_limit','2048M');
-        
-        // $start_date = input('start_date');
-        // $end_date = input('end_date');
-        // if (!$start_date || !$end_date) {
-        //     return json(['code'=>400, 'msg'=>'开始日期或结束日期不能为空', 'data'=>[]]);
-        // }
-        // if ($start_date > $end_date) {
-        //     return json(['code'=>400, 'msg'=>'开始日期不能大于结束日期', 'data'=>[]]);
-        // }
-        // $data = Db::connect("sqlsrv")->Query($this->get_diaobo_sql($start_date, $end_date));
-        $data = LypWwDiaoboModel::where([])->select();
-        $data = $data ? $data->toArray() : [];
-        return json($data);
+    protected function execute(Input $input, Output $output)
+    {
+        ini_set('memory_limit','1024M');
+        $db = Db::connect("mysql");
 
+        $start_date = $end_date = '';
+        $w_day = date('w');
+        if ($w_day == 1) {//星期一，跑上周数据
+            $start_date = date('Y-m-d', strtotime('-7 days'));
+            $end_date = date('Y-m-d', strtotime('-1 days'));
+        } elseif ($w_day == 4) {//星期四，跑前3天数据
+            $start_date = date('Y-m-d', strtotime('-3 days'));
+            $end_date = date('Y-m-d', strtotime('-1 days'));
+        }
+        
+        $data = $this->get_diaobo_sql($start_date, $end_date);
+        if ($data) {
+            $chunk_list = array_chunk($data, 500);
+            $db->Query("truncate table ea_lyp_ww_diaobo;");
+            foreach($chunk_list as $key => $val) {
+                $insert = $db->table('ea_lyp_ww_diaobo')->strict(false)->insertAll($val);
+            }
+        }
+        echo 'okkk';
+        die;
     }
 
     protected function get_diaobo_sql($start_date, $end_date) {
+        if ($start_date=='' || $end_date=='') return [];
 
-        return "WITH T1 AS 
+        $sql= "WITH T1 AS 
         (
         SELECT 
             ECR.CustomerId,
@@ -343,42 +349,7 @@ class Diaobo extends BaseController
           AND EGPT.PriceId=1
         ;
         ";
-
-    }
-
-    protected function get_ww_sql() {
-
-        return "SELECT 
-        CONVERT(VARCHAR(10),ER.RetailDate,23) 日期,
-        EC.State 省份,
-        EC.CustomerName 店铺名称,
-        EM.Mathod 经营模式,
-        ERG.Status 销售方式,
-        EG.CategoryName1 一级分类,
-        SUM(ERG.Quantity) 数量,
-        SUM(ERG.Quantity * ERG.DiscountPrice) 金额
-    FROM ErpCustomer EC
-    LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
-    LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
-    LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
-    LEFT JOIN ErpBaseCustomerMathod EM ON EC.MathodId=EM.MathodId
-    WHERE ER.RetailDate>DATEADD(month, DATEDIFF(month, 0, GETDATE())-2, 0)
-        AND ERG.Status IN ('售','促')
-        AND ER.CodingCodeText='已审结'
-    GROUP BY 
-        CONVERT(VARCHAR(10),ER.RetailDate,23),
-        EC.State,
-        EC.CustomerName,
-        EM.Mathod,
-        ERG.Status,
-        EG.CategoryName1
-    ORDER BY 
-     CONVERT(VARCHAR(10),ER.RetailDate,23),
-     EC.State,
-     EM.Mathod,
-     ERG.Status,
-     EG.CategoryName1
-    ;";
+        return Db::connect("sqlsrv")->Query($sql);
 
     }
 
