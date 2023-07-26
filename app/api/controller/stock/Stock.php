@@ -36,7 +36,7 @@ class Stock extends BaseController
             return json(['仅限于查询两周数据'], 400);
         }
 
-        $data = Db::connect("mysql2")->Query($this->get_sql2($start_date, $end_date));
+        $data = Db::connect("mysql")->Query($this->get_sql2($start_date, $end_date));
         return json($data);
 
     }
@@ -58,7 +58,7 @@ class Stock extends BaseController
             return json(['仅限于查询一周数据'], 400);
         }
 
-        $data = Db::connect("mysql2")->Query($this->get_sql3($start_date, $end_date));
+        $data = Db::connect("mysql")->Query($this->get_sql3($start_date, $end_date));
         return json($data);
 
     }
