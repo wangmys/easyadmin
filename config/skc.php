@@ -13,5 +13,6 @@ return [
     'shoe_proportion' => 1,
     'customer_regionid' => "'91', '92', '93', '94', '95', '96', '98'",
     'customer_regionid_notin' => "'8', '40', '55', '84', '85'",
+    'customer_regionid_notin_text' => "'直营', '批发部', '闭店区', '内购区', '客订'",
 
 ];
