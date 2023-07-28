@@ -88,6 +88,21 @@ class Weathertips extends BaseController
                 $this->db_easyA->table('cwl_weathertips_customer')->strict(false)->insertAll($val);
             }
 
+            // 更新秋冬最早日期
+            $sql2 = "
+            UPDATE 	cwl_weathertips_customer AS c
+            LEFT JOIN cwl_weathertips_retail_customer_history AS ch_autumn ON c.店铺名称 = ch_autumn.店铺名称 AND ch_autumn.季节 = '秋季' AND ch_autumn.大类归集 = '内外'
+            LEFT JOIN cwl_weathertips_retail_customer_history AS ch_winter ON c.店铺名称 = ch_winter.店铺名称 AND ch_winter.季节 = '冬季' AND ch_winter.大类归集 = '内外'
+            LEFT JOIN cwl_weathertips_retail_province_history AS ph_autumn ON c.省份 = ph_autumn.省份 AND c.温区 = ph_autumn.温区 AND ph_autumn.季节 = '秋季' AND ph_autumn.大类归集 = '内外'
+            LEFT JOIN cwl_weathertips_retail_province_history AS ph_winter ON c.省份 = ph_winter.省份 AND c.温区 = ph_winter.温区 AND ph_winter.季节 = '冬季' AND ph_winter.大类归集 = '内外'
+            SET
+                c.`秋季历史最早` = ch_autumn.最早日期,
+                c.`冬季历史最早` = ch_winter.最早日期,
+                c.`秋季温区最早` = ph_autumn.最早日期,
+                c.`冬季温区最早` = ph_winter.最早日期	
+        ";
+        $this->db_easyA->execute($sql2);
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -169,6 +184,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1 AS 一级分类,
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
                 EG.GoodsName AS 货品名称,
                 EG.GoodsNo AS 货号,
             -- 	EG.GoodsId AS 货品ID,
@@ -229,6 +245,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1,
                 EG.CategoryName2,
                 EG.CategoryName,
+                EG.StyleCategoryName,
                 EC.CustomerCode,
                 EC.RegionId,
                 EC.CustomItem17,
@@ -538,6 +555,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1 AS 一级分类,
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
                 SUM(ERG.Quantity) AS 销售数量,
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期,   
@@ -578,6 +596,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1,
                 EG.CategoryName2,
                 EG.CategoryName,
+                EG.StyleCategoryName,
                 EG.TimeCategoryName2,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
             ORDER BY EC.State ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 
@@ -1575,7 +1594,7 @@ class Weathertips extends BaseController
 
     }
 
-    // 每天温度满足单独标记
+    // 每天温度满足单独标记  季节提醒识别
     public function weather_lianxu_handle_2() { 
         $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份,店铺名称,秋季连续天数A,秋季连续天数B,冬季连续天数A,冬季连续天数B')
         ->where(1)->select()->toArray();
@@ -1589,7 +1608,7 @@ class Weathertips extends BaseController
                 ['季节', '=', '冬季'],
             ])->find();
 
-            // 秋
+            // 秋 登记哪天
             if ($val['秋季连续天数A'] >= $biaozhun_秋['连续天数A']) {
                 // echo 111;
                 $sql_秋 = "
@@ -1616,26 +1635,47 @@ class Weathertips extends BaseController
                 $sql_秋 = "
                     update cwl_weathertips_customer 
                     set 
-                        day0_秋 =  case when day0_max <= {$biaozhun_秋['最高温B']} AND day0_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day1_秋 =  case when day1_max <= {$biaozhun_秋['最高温B']} AND day1_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day2_秋 =  case when day2_max <= {$biaozhun_秋['最高温B']} AND day2_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day3_秋 =  case when day3_max <= {$biaozhun_秋['最高温B']} AND day3_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day4_秋 =  case when day4_max <= {$biaozhun_秋['最高温B']} AND day4_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day5_秋 =  case when day5_max <= {$biaozhun_秋['最高温B']} AND day5_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day6_秋 =  case when day6_max <= {$biaozhun_秋['最高温B']} AND day6_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day7_秋 =  case when day7_max <= {$biaozhun_秋['最高温B']} AND day7_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day8_秋 =  case when day8_max <= {$biaozhun_秋['最高温B']} AND day8_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day9_秋 =  case when day9_max <= {$biaozhun_秋['最高温B']} AND day9_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
-                        day10_秋 =  case when day10_max <= {$biaozhun_秋['最高温B']} AND day10_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end
+                        day0_秋 = case when day0_max <= {$biaozhun_秋['最高温B']} AND day0_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day1_秋 = case when day1_max <= {$biaozhun_秋['最高温B']} AND day1_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day2_秋 = case when day2_max <= {$biaozhun_秋['最高温B']} AND day2_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day3_秋 = case when day3_max <= {$biaozhun_秋['最高温B']} AND day3_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day4_秋 = case when day4_max <= {$biaozhun_秋['最高温B']} AND day4_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day5_秋 = case when day5_max <= {$biaozhun_秋['最高温B']} AND day5_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day6_秋 = case when day6_max <= {$biaozhun_秋['最高温B']} AND day6_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day7_秋 = case when day7_max <= {$biaozhun_秋['最高温B']} AND day7_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day8_秋 = case when day8_max <= {$biaozhun_秋['最高温B']} AND day8_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day9_秋 = case when day9_max <= {$biaozhun_秋['最高温B']} AND day9_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day10_秋 = case when day10_max <= {$biaozhun_秋['最高温B']} AND day10_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
                 ";   
 
                 $this->db_easyA->execute($sql_秋);
+            } else { // 不满足A、B情况的时候执行C
+                $sql_秋_C = "
+                    update cwl_weathertips_customer 
+                    set 
+                        day0_秋 = case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day0_max <= {$biaozhun_秋['最高温B']} AND day0_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day1_秋 = case when day1_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day1_max <= {$biaozhun_秋['最高温B']} AND day1_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day2_秋 = case when day2_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day2_max <= {$biaozhun_秋['最高温B']} AND day2_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day3_秋 = case when day3_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day3_max <= {$biaozhun_秋['最高温B']} AND day3_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day4_秋 = case when day4_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day4_max <= {$biaozhun_秋['最高温B']} AND day4_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day5_秋 = case when day5_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day5_max <= {$biaozhun_秋['最高温B']} AND day5_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day6_秋 = case when day6_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day6_max <= {$biaozhun_秋['最高温B']} AND day6_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day7_秋 = case when day7_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day7_max <= {$biaozhun_秋['最高温B']} AND day7_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day8_秋 = case when day8_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day8_max <= {$biaozhun_秋['最高温B']} AND day8_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day9_秋 = case when day9_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} OR day9_max <= {$biaozhun_秋['最高温B']} AND day9_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end,
+                        day10_秋 = case when day10_max <= {$biaozhun_秋['最高温B']} AND day10_min <= {$biaozhun_秋['最低温B']} THEN 'Y' ELSE NULL end
+                    where    
+                        省份='{$val['省份']}'
+                        AND 店铺名称='{$val['店铺名称']}'
+                ";   
+
+                $this->db_easyA->execute($sql_秋_C); 
             }
 
-            // 冬
+            // 冬 登记哪天
             if ($val['冬季连续天数A'] >= $biaozhun_冬['连续天数A']) {
                 $sql_冬 = "
                     update cwl_weathertips_customer 
@@ -1676,8 +1716,89 @@ class Weathertips extends BaseController
                         AND 店铺名称='{$val['店铺名称']}'
                 ";   
                 $this->db_easyA->execute($sql_冬);
+            } else { // 不满足A、B情况的时候执行C
+                $sql_冬_C = "
+                    update cwl_weathertips_customer 
+                    set 
+                        day0_冬 = case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day0_max <= {$biaozhun_冬['最高温B']} AND day0_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day1_冬 = case when day1_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day1_max <= {$biaozhun_冬['最高温B']} AND day1_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day2_冬 = case when day2_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day2_max <= {$biaozhun_冬['最高温B']} AND day2_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day3_冬 = case when day3_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day3_max <= {$biaozhun_冬['最高温B']} AND day3_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day4_冬 = case when day4_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day4_max <= {$biaozhun_冬['最高温B']} AND day4_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day5_冬 = case when day5_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day5_max <= {$biaozhun_冬['最高温B']} AND day5_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day6_冬 = case when day6_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day6_max <= {$biaozhun_冬['最高温B']} AND day6_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day7_冬 = case when day7_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day7_max <= {$biaozhun_冬['最高温B']} AND day7_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day8_冬 = case when day8_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day8_max <= {$biaozhun_冬['最高温B']} AND day8_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day9_冬 = case when day9_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} OR day9_max <= {$biaozhun_冬['最高温B']} AND day9_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end,
+                        day10_冬 = case when day10_max <= {$biaozhun_冬['最高温B']} AND day10_min <= {$biaozhun_冬['最低温B']} THEN 'Y' ELSE NULL end
+                    where    
+                        省份='{$val['省份']}'
+                        AND 店铺名称='{$val['店铺名称']}'
+                ";   
+
+                $this->db_easyA->execute($sql_冬_C); 
             }
 
+        }
+    }
+
+    // 每天温度满足单独标记  季节提醒识别
+    public function weather_lianxu_handle_3() { 
+        $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份,店铺名称,day3_秋,day4_秋,day5_秋,day6_秋,day7_秋,day8_秋,day9_秋,day10_秋
+        ,day3_冬,day4_冬,day5_冬,day6_冬,day7_冬,day8_冬,day9_冬,day10_冬,秋季连续天数A,秋季连续天数B,冬季连续天数A,冬季连续天数B')
+        ->where(
+            1
+            // ['店铺名称' => '广安一店']
+        )->select()->toArray();
+        foreach ($select_customer as $key => $val) {
+            $biaozhun_秋 = $this->db_easyA->table('cwl_weathertips_biaozhun')->where([
+                ['省份', '=', $val['省份']],
+                ['季节', '=', '秋季'],
+            ])->find();
+            $biaozhun_冬 = $this->db_easyA->table('cwl_weathertips_biaozhun')->where([
+                ['省份', '=', $val['省份']],
+                ['季节', '=', '冬季'],
+            ])->find();
+
+            
+
+            // 今日起8天 , 满足6天
+            $秋季天数C = strlen($val['day3_秋'] . $val['day4_秋'] . $val['day5_秋'] . $val['day6_秋'] . $val['day7_秋'] . $val['day8_秋'] . $val['day9_秋'] . $val['day10_秋']) ;  
+            
+            $冬季天数C = strlen($val['day3_冬'] . $val['day4_冬'] . $val['day5_冬'] . $val['day6_冬'] . $val['day7_冬'] . $val['day8_冬'] . $val['day9_冬'] . $val['day10_冬']) ;  
+           
+            $tips1 = '';
+            $tips2 = '';
+            $tips3 = NULL;
+            if ($val['秋季连续天数A'] >= $biaozhun_秋['连续天数A'] || $val['秋季连续天数B'] >= $biaozhun_秋['连续天数B'] || $秋季天数C >= 6) {
+                $tips1 = '上秋';
+            }
+
+            if ($val['冬季连续天数A'] >= $biaozhun_冬['连续天数A'] || $val['冬季连续天数B'] >= $biaozhun_冬['连续天数B'] || $冬季天数C >= 6) {
+                $tips2 = '上冬';
+            }
+
+            if ($tips1 && $tips2) {
+                $tips3 = '秋冬可上'; 
+            } elseif ($tips1) {
+                $tips3 = $tips1; 
+            } elseif ($tips2) {
+                $tips3 = $tips2; 
+            }
+
+           
+            $sql = "
+                update cwl_weathertips_customer 
+                set 
+                    秋季天数C = {$秋季天数C},
+                    冬季天数C = {$冬季天数C},
+                    提醒 = '{$tips3}'
+                where    
+                    省份='{$val['省份']}'
+                    AND 店铺名称='{$val['店铺名称']}'
+            ";   
+
+            $this->db_easyA->execute($sql); 
         }
     }
 
