@@ -4,6 +4,7 @@
 namespace app\admin\controller\system;
 
 use app\admin\model\weather\Weather as WeatherM;
+use app\admin\model\weather\Weather2345Model;
 use app\admin\model\weather\Customers as CustomersM;
 use app\admin\model\weather\CityUrl;
 use app\admin\service\TriggerService;
@@ -34,7 +35,7 @@ class Weather extends AdminController
     public function __construct(App $app)
     {
         parent::__construct($app);
-        $this->model = new WeatherM;
+        $this->model = new Weather2345Model;
         $this->customers = new CustomersM;
     }
 
@@ -277,7 +278,7 @@ class Weather extends AdminController
                 'CustomerId' => $id
             ])->update(['cid' => $city_cid]);
             // 绑定城市后,更新该城市的天气数据
-            (new WeatherService)->updateCityWeather($city_id);
+            (new WeatherService)->updateCityWeather2345($city_id);
             if($res){
                 // 绑定城市
                 $this->success('绑定成功');
