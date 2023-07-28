@@ -891,7 +891,7 @@ class CodeService
         AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
         and ew.WarehouseCode IN ('CK002','CK003','CK004','CK005','CK006')
-        and ern.SupplyId != 'K191000638'
+        -- and ern.SupplyId != 'K191000638'
         GROUP BY
         ew.WarehouseName,
         eg.CategoryName1,
