@@ -35,15 +35,18 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 //绑定城市 字段权限
                 var if_can_see = res.if_can_see;
                 var mathod = res.mathod;
+                var CustomerGrade = res.CustomerGrade;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
+                    {hide:true, field: 'City', width: 50, title: '市',fixed:'left',search: 'xmSelect',selectList:city_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
                     {field: 'liable', width: 100, title: '商品负责人',fixed:'left',search: 'xmSelect',selectList:liable_list},
                     {hide:true, field: 'Mathod', width: 50, title: '经营模式',fixed:'left',search: 'xmSelect',selectList:mathod},
+                    {hide:true, field: 'CustomerGrade', width: 50, title: '店铺等级',fixed:'left',search: 'xmSelect',selectList:CustomerGrade,laySearch:true},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     // {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
@@ -56,6 +59,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
 
                 var data = res.data;
                 data.forEach(function (val,index){
+                    // console.log(val);
                     if(index == 0){
                         cols.push({
                             width: 60 , search:false , field: val, title: val, title: val
@@ -87,7 +91,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 ea.table.render({
                     url: init.list_index,
                     search:true,
-                    height: 1000,
+                    height: 855,
                     limit: 1000,
                     toolbar:[],
                     limits:[1000,2000,3000],
@@ -104,6 +108,12 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                         //             }
                         //         })
                         // })
+                        var today_date = res.today_date;
+
+                        $('th[data-field="'+today_date+'"]').css({
+                            'background-color': 'rgb(110, 170, 46)', 'color': '#000', 'font-weight':'bold'
+                        });
+
                     }
                 });
 
