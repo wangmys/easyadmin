@@ -62,6 +62,7 @@ class Weather extends AdminController
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
+                if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
@@ -79,9 +80,10 @@ class Weather extends AdminController
                 if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
                 if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
-                if (!empty($where['City'])) $query->where('c.City', $where['City']);
+                if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
+                if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
@@ -110,7 +112,18 @@ class Weather extends AdminController
                                 $value_c = $vv['max_c'];
                             }else{
                                 // 使用最低温
-                                $value_c = $vv['min_c'];
+                                // $value_c = $vv['min_c'];
+                                $diff = $vv['max_c']-$vv['min_c'];
+                                if ($vv['max_c'] > 30) {
+                                    $value_c = $vv['max_c'];
+                                } elseif ($diff <= 5) {
+                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 );
+                                } elseif ($diff > 5 && $diff <= 10) {
+                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 2;
+                                } elseif ($diff > 10) {
+                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
+                                }
+
                             }
                             if ($value_c < 10) {
                                 $bgCol = 'rgb(47,117,181)';
@@ -150,6 +163,7 @@ class Weather extends AdminController
             $data = [
                 'code'  => 0,
                 'msg'   => '',
+                'today_date'   => date('m-d'),
                 'count' => $count,
                 'data'  => $list
             ];
@@ -186,7 +200,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable,Mathod');
+        $info_list = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable,Mathod,CustomerGrade');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -217,8 +231,11 @@ class Weather extends AdminController
             $liable_list = array_combine($liable_list_temp,$liable_list_temp);
             $liable_list = array_filter($liable_list, function($value) {return !is_null($value) && !empty($value);});
             //经营模式
-            $mathod = array_unique(array_column($info_list,'Mathod'));
+            $mathod = array_filter(array_unique(array_column($info_list,'Mathod')));
             $mathod = array_combine($mathod, $mathod);
+            //店铺等级
+            $CustomerGrade = array_filter(array_unique(array_column($info_list,'CustomerGrade')));
+            $CustomerGrade = array_combine($CustomerGrade, $CustomerGrade);
         }
 
         //获取 绑定城市 字段权限
@@ -238,12 +255,13 @@ class Weather extends AdminController
                 'province_list'  => $province_list,
 //                'area_list'  => $area_list,
                 'store_list'  => $store_list,
-//                'city_list'  => $city_list,
+               'city_list'  => $city_list,
                 'wendai_list'  => $wendai_list,
                 'wenqu_list'  => $wenqu_list,
                 'liable_list'  => $liable_list,
                 'if_can_see'  => $if_can_see,
                 'mathod'  => $mathod,
+                'CustomerGrade'  => $CustomerGrade,
                 'data'  => $list
             ];
         return json($data);

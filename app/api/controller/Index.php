@@ -54,7 +54,7 @@ class Index
         $ids = "'".$ids."'";
         // 根据所有门店ID查询所属温带 + 气温区域
         // $data = Db::connect("sqlsrv")->table('ErpCustomer')->column('CustomItem30,CustomItem36,ShutOut','CustomerId');
-        $data = Db::connect("sqlsrv")->query("select ec.CustomerId,ec.CustomItem30,ec.CustomItem36,ec.ShutOut,ebcm.Mathod from 
+        $data = Db::connect("sqlsrv")->query("select ec.CustomerId,ec.CustomItem30,ec.CustomItem36,ec.ShutOut,ebcm.Mathod,ec.CustomerGrade from 
         ErpCustomer ec 
         left join ErpBaseCustomerMathod ebcm on ec.MathodId = ebcm.MathodId 
         where ec.CustomerId in ($ids);");
@@ -65,6 +65,7 @@ class Index
                 'CustomItem36' => $v['CustomItem36'],
                 'ShutOut' => $v['ShutOut'],
                 'Mathod' => $v['Mathod'],
+                'CustomerGrade' => $v['CustomerGrade'],
             ];
         }
         // print_r($update_data);die;
