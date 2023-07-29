@@ -231,7 +231,7 @@ class Weather extends AdminController
             $liable_list = array_combine($liable_list_temp,$liable_list_temp);
             $liable_list = array_filter($liable_list, function($value) {return !is_null($value) && !empty($value);});
             //经营模式
-            $mathod = array_unique(array_column($info_list,'Mathod'));
+            $mathod = array_filter(array_unique(array_column($info_list,'Mathod')));
             $mathod = array_combine($mathod, $mathod);
             //店铺等级
             $CustomerGrade = array_filter(array_unique(array_column($info_list,'CustomerGrade')));
