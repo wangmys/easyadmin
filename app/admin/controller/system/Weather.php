@@ -80,7 +80,7 @@ class Weather extends AdminController
                 if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
                 if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
-                if (!empty($where['City'])) $query->where('c.City', $where['City']);
+                if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
