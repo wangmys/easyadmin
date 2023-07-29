@@ -112,7 +112,7 @@ class Weather extends AdminController
                                 // 使用最低温
                                 // $value_c = $vv['min_c'];
                                 $diff = $vv['max_c']-$vv['min_c'];
-                                if ($vv['max_c'] >= 30) {
+                                if ($vv['max_c'] > 30) {
                                     $value_c = $vv['max_c'];
                                 } elseif ($diff <= 5) {
                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 );
