@@ -18,8 +18,10 @@ use think\facade\Db;
 use voku\helper\HtmlDomParser;
 use app\admin\model\weather\CityUrl;
 use app\admin\model\weather\Weather;
+use app\admin\model\weather\Weather2345Model;
 use app\admin\model\weather\Customers;
 use app\admin\model\weather\Capital;
+use think\facade\Log;
 
 /**
  * 天气信息服务
@@ -37,6 +39,8 @@ class WeatherService
 
     ];
 
+    protected $weather2345=null;
+
     /***
      * 构造方法
      * WeatherService constructor.
@@ -48,6 +52,7 @@ class WeatherService
     {
         // 实例化天气模型
         $this->weather = new Weather;
+        $this->weather2345 = new Weather2345Model();
         // 店铺模型
         $this->customers = new Customers;
         // 省会天气数据
@@ -97,6 +102,55 @@ class WeatherService
             }
             return $arr;
         }
+        return [];
+    }
+
+    /**
+     * 获取天气数据(2345天气)
+     * @param int $cid
+     * @return array
+     */
+    public function getWeather40_2345($cid = 0)
+    {
+        $url = CityUrl::where([
+            'cid' => $cid
+        ])->value('url_2345');
+        if(empty($url)) return [];
+
+        $res = [];
+
+        try {
+            $html = HtmlDomParser::file_get_html($url);
+
+            $res = $html->find('script', 28)->textContent;
+            $res = $res ? str_replace('window.statisticsReportModule.init();var fortyData=', '', $res) : '';
+            $res = $res ? json_decode($res, true) : [];
+            $res = $res ? $res['data'] : [];
+        } catch (\Exception $e) {
+            //记录失败日志：
+            Log::write(json_encode($e->getMessage()), 'crawl2345 error（绑定城市，保存后抓取不到数据）:cid='.$cid.',weather_url='.$url);
+        }
+
+        $add_data = [];
+        if ($res) {
+            foreach ($res as $v_res) {
+
+                $add_data[] = [
+                    'cid' => $cid,
+                    'weather_time' => date('Y-m-d', $v_res['time']),
+                    'text_weather' => $v_res['weather'],
+                    'temperature' => $v_res['weather'],
+                    'min_c' => $v_res['night_temp'],
+                    'max_c' => $v_res['day_temp'],
+                    'ave_c' => round( ( $v_res['night_temp'] + $v_res['day_temp'] ) / 2 , 1),
+                ];
+
+            }
+
+            return $add_data;
+
+        }
+
         return [];
     }
 
@@ -168,6 +222,49 @@ class WeatherService
             if(!empty($arr)){
                 return $this->weather->saveAll($arr);
             }
+        }
+        return false;
+    }
+
+    /**
+     * 更新城市天气（天气2345）
+     * @param int $cid
+     * @return false|\think\Collection
+     * @throws \Exception
+     */
+    public function updateCityWeather2345($cid = 0)
+    {
+        // 拉取近40天的天气
+        $arr = $this->getWeather40_2345($cid);
+        // 判断天气是否为空
+        if(!empty($arr)){
+
+            $if_exist_cid = $this->weather2345::where([['cid', '=', $cid]])->field('id')->find();
+            Db::startTrans();
+            try {
+
+                if (!$if_exist_cid) {
+                    $this->weather2345::insertAll($arr);
+                } else {
+                    foreach ($arr as $vv_data) {
+                        $if_exist_weather = $this->weather2345::where([['cid', '=', $cid], ['weather_time', '=', $vv_data['weather_time']]])->field('id')->find();
+                        if (!$if_exist_weather) {
+                            $this->weather2345::create($vv_data);
+                        } else {
+                            $this->weather2345::where([['id', '=', $if_exist_weather['id']]])->update($vv_data);
+                        }
+                    }
+                }
+
+                Db::commit();
+    
+            } catch (\Exception $e) {
+                //记录失败日志：
+                Log::write(json_encode($e->getMessage()), 'crawl2345 error(WeatherService-->updateCityWeather2345方法天气入库或更新失败):cid='.$cid);
+                Db::rollback();
+            }
+
+            return true;
         }
         return false;
     }
