@@ -65,6 +65,8 @@ class Shangguitips extends BaseController
                 '经营模式' => '加盟',
             ],
         ];
+
+        return json($data);
     }
 
     public function retail()
