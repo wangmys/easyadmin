@@ -921,7 +921,7 @@ class Weathertips extends BaseController
     }   
 
     // 春秋连续天数
-    public function weather_lianxu_handle_1() {
+    public function weather_handle_1() {
         $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份')->group('省份')->select()->toArray();
         foreach ($select_customer as $key => $val) {
             $biaozhun_秋 = $this->db_easyA->table('cwl_weathertips_biaozhun')->where([
@@ -1595,7 +1595,7 @@ class Weathertips extends BaseController
     }
 
     // 每天温度满足单独标记  季节提醒识别
-    public function weather_lianxu_handle_2() { 
+    public function weather_handle_2() { 
         $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份,店铺名称,秋季连续天数A,秋季连续天数B,冬季连续天数A,冬季连续天数B')
         ->where(1)->select()->toArray();
         foreach ($select_customer as $key => $val) {
@@ -1743,7 +1743,7 @@ class Weathertips extends BaseController
     }
 
     // 每天温度满足单独标记  季节提醒识别
-    public function weather_lianxu_handle_3() { 
+    public function weather_handle_3() { 
         $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份,店铺名称,day3_秋,day4_秋,day5_秋,day6_秋,day7_秋,day8_秋,day9_秋,day10_秋
         ,day3_冬,day4_冬,day5_冬,day6_冬,day7_冬,day8_冬,day9_冬,day10_冬,秋季连续天数A,秋季连续天数B,冬季连续天数A,冬季连续天数B')
         ->where(
@@ -1800,6 +1800,199 @@ class Weathertips extends BaseController
 
             $this->db_easyA->execute($sql); 
         }
+    }
+
+    // 各季节基本款skc数计算
+    public function weather_handle4() {
+        $sql1_春 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 春季SKC基本_内搭
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '春季'
+                AND 一级分类 = '内搭'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.春季SKC基本_内搭 = t.`春季SKC基本_内搭`
+        ";
+
+        $sql2_春 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 春季SKC基本_外套
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '春季'
+                AND 一级分类 = '外套'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.春季SKC基本_外套 = t.`春季SKC基本_外套`
+        ";
+
+        $sql3_春 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 春季SKC基本_下装
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '春季'
+                AND 一级分类 = '下装'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.春季SKC基本_下装 = t.`春季SKC基本_下装`
+        ";
+
+        $sql1_秋 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 秋季SKC基本_内搭
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '秋季'
+                AND 一级分类 = '内搭'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.秋季SKC基本_内搭 = t.`秋季SKC基本_内搭`
+        ";
+
+        $sql2_秋 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 秋季SKC基本_外套
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '秋季'
+                AND 一级分类 = '外套'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.秋季SKC基本_外套 = t.`秋季SKC基本_外套`
+        ";
+
+        $sql3_秋 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 秋季SKC基本_下装
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '秋季'
+                AND 一级分类 = '下装'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.秋季SKC基本_下装 = t.`秋季SKC基本_下装`
+        ";
+
+        $sql1_冬 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 冬季SKC基本_内搭
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '冬季'
+                AND 一级分类 = '内搭'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.冬季SKC基本_内搭 = t.`冬季SKC基本_内搭`
+        ";
+
+        $sql2_冬 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 冬季SKC基本_外套
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '冬季'
+                AND 一级分类 = '外套'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.冬季SKC基本_外套 = t.`冬季SKC基本_外套`
+        ";
+
+        $sql3_冬 = "
+            update cwl_weathertips_customer as c 
+            left join (
+            SELECT
+                店铺名称,
+                店铺编码,
+                sum(case when 是否调价款 = '否' then 1 else 0 end) as 冬季SKC基本_下装
+            FROM
+                `cwl_weathertips_stock` 
+            WHERE 1
+                AND 预计库存 > 0
+                AND 是否计算SKC = '是'
+                AND 季节归集 = '冬季'
+                AND 一级分类 = '下装'
+                AND 风格 in ('基本款')
+            GROUP BY 店铺名称
+            ) AS t ON c.`店铺编码` = t.`店铺编码`
+            set c.冬季SKC基本_下装 = t.`冬季SKC基本_下装`
+        ";
+
+        $this->db_easyA->execute($sql1_春);
+        $this->db_easyA->execute($sql2_春);
+        $this->db_easyA->execute($sql3_春);
+        $this->db_easyA->execute($sql1_秋);
+        $this->db_easyA->execute($sql2_秋);
+        $this->db_easyA->execute($sql3_秋);
+        $this->db_easyA->execute($sql1_冬);
+        $this->db_easyA->execute($sql2_冬);
+        $this->db_easyA->execute($sql3_冬);
     }
 
 }
