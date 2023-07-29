@@ -50,11 +50,22 @@ class Shangguitips extends BaseController
         return $seasionStr;
     }
 
-    // public function test() {
-    //     $sql = "select * from customer";
-    //     $slect = $this->db_bi->query($sql);
-    //     dump($slect);
-    // }
+    public function test() {
+        $data = [
+            [
+                '省份' => '广东省',
+                '经营模式' => '直营',
+            ],
+            [
+                '省份' => '湖南省',
+                '经营模式' => '加盟',
+            ],
+            [
+                '省份' => '四川省',
+                '经营模式' => '加盟',
+            ],
+        ];
+    }
 
     public function retail()
     {
