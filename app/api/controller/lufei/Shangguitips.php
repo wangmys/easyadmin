@@ -50,6 +50,12 @@ class Shangguitips extends BaseController
         return $seasionStr;
     }
 
+    // public function test() {
+    //     $sql = "select * from customer";
+    //     $slect = $this->db_bi->query($sql);
+    //     dump($slect);
+    // }
+
     public function retail()
     {
         $sql = "

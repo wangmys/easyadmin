@@ -845,8 +845,8 @@ class Weathertips extends BaseController
         }
     }
 
-     // 店铺天气
-     public function customer_weather() {
+    // 店铺天气
+    public function customer_weather() {
         // 每日天气日期，最高最低温度
         $sql = "
             UPDATE cwl_weathertips_customer as m 
