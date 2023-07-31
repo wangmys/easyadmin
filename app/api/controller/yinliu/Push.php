@@ -121,6 +121,11 @@ class Push extends BaseController
                 'userid' => '350364576037719254'
             ],
             [
+                'name' => '杨岳敏',
+                'tel' => '13362067222',
+                'userid' => '131255621326201188'
+            ],
+            [
                 'name' => '王威',
                 'tel' => '15880012590',
                 'userid' => '0812473564939990'
@@ -199,6 +204,11 @@ class Push extends BaseController
                 'userid' => '350364576037719254'
             ],
             [
+                'name' => '杨岳敏',
+                'tel' => '13362067222',
+                'userid' => '131255621326201188'
+            ],
+            [
                 'name' => '王威',
                 'tel' => '15880012590',
                 'userid' => '0812473564939990'
@@ -258,6 +268,43 @@ class Push extends BaseController
         foreach ($parms as $key => $val) {
             $res = $model->sendImageMsg($val['userid'], $media_id);
             // dump($res);
+        }  
+    }
+
+    /**
+     * 提送配饰
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function pushS012()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            [
+                'name' => '李逢生',
+                'tel' => '13927687768',
+                'userid' => '010946151826588427'
+            ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        // 创建图
+        $reportFormsService->create_table_s012();
+        $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S012.jpg';
+
+        // 上传图 
+        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_id);
         }  
     }
 

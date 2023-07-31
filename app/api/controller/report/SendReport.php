@@ -52,6 +52,8 @@ class SendReport extends BaseController
             $this->service->create_table_s009();
         } elseif ($name =='S010') {
             $this->service->create_table_s010();
+        } elseif ($name =='S012') {
+            $this->service->create_table_s012();
         } elseif ($name =='S013') {
             $this->service->create_table_s013();
         } elseif ($name =='S014') {
@@ -622,7 +624,7 @@ class SendReport extends BaseController
         // $this->service->create_table_s110A($date);
         // $this->service->create_table_s110B($date);
         // 发送数据报表
-        $this->send();
+        // $this->send();
     }
 
     // 报表主群
