@@ -40,7 +40,7 @@ class Ww_data_cusstock extends Command
 
     protected function get_sql() {
 
-        return "select T.店铺名称, T.季节, T.一级时间分类 as 年份, T.修改后风格, T.一级分类, T.二级分类, T.分类, sum(T.库存数量合计) as 库存数量合计, sum(T.SKC数) as SKC数  
+        return "select T.店铺名称, T.季节, T.一级时间分类 as 年份, T.修改后风格, T.一级分类, T.二级分类, T.分类, sum(T.库存数量合计) as 库存数量合计, sum(T.SKC数) as SKC数, sum(T.库存金额) as 库存金额  
         from 
         (
         select cs.店铺名称, cs.季节, g.一级时间分类, CASE 
@@ -49,7 +49,7 @@ class Ww_data_cusstock extends Command
                      WHEN cs.季节 like '%夏%' and right(g.二级分类, 2)='短裤' and (cs.当前零售价/cs.零售价)<1 and cs.当前零售价<=70 THEN '引流款' 
                      WHEN cs.季节 like '%夏%' and right(g.二级分类, 1)='衬' and (cs.当前零售价/cs.零售价)<1 and cs.当前零售价<=80 THEN '引流款' 
                      WHEN cs.季节 not like '%夏%' and (cs.当前零售价/cs.零售价)<=0.9 THEN '引流款' 
-                     ELSE g.风格 END AS 修改后风格, g.一级分类, g.二级分类, g.分类, sum(cs.合计) as 库存数量合计, 1 as SKC数, g.货号 from sjp_customer_stock cs 
+                     ELSE g.风格 END AS 修改后风格, g.一级分类, g.二级分类, g.分类, sum(cs.合计) as 库存数量合计, 1 as SKC数, cs.当前零售价*cs.合计 as 库存金额, g.货号 from sjp_customer_stock cs 
         left join sjp_goods g on cs.货号=g.货号 
         group by cs.店铺名称, g.货号
         ) as T 

@@ -23,7 +23,7 @@ class Wwdata extends BaseController
 
     public function ea_lyp_ww_cussale14day() {
 
-      ini_set('memory_limit','500M');
+      ini_set('memory_limit','1024M');
       $data = LypWwCussale14dayModel::where([])->withoutField(['id', 'create_time'], false)->select();
       $data = $data ? $data->toArray() : [];
       return json($data);
