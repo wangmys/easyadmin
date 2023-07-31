@@ -360,7 +360,9 @@ class Weather extends AdminController
         $province = input('province');
         $sql = "select distinct CustomItem30 from customers where State='{$province}' and CustomItem30!=''";
         $res = Db::connect('tianqi')->query($sql);
-        return json(["code" => "0", "msg" => "",  "data" => $res]);
+        $citys = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->where('State','=',$province)->distinct(true)->column('City');
+
+        return json(["code" => "0", "msg" => "",  "data" => $res, 'citys'=>$citys]);
 
     }
 
