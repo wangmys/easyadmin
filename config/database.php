@@ -102,7 +102,7 @@ return [
             'type'              => Env::get('database2.type', 'mysql'),
             // 服务器地址
             // 'hostname'          => Env::get('database2.hostname', '192.168.98.7'),
-            'hostname'          => Env::get('database2.hostname', '192.168.98.222'),
+            'hostname'          => Env::get('database2.hostname', '183.6.86.105'),
             // 数据库名
             'database'          => Env::get('database2.database', 'bi2023'),
             // 用户名
@@ -110,7 +110,7 @@ return [
             // 密码
             'password'          => Env::get('database2.password', 'sokobi2023'),
             // 端口
-            'hostport'          => Env::get('database2.hostport', '3306'),
+            'hostport'          => Env::get('database2.hostport', '33061'),
             // 数据库连接参数
             'params'            => [],
             // 数据库编码默认采用utf8
