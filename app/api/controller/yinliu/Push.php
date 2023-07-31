@@ -297,7 +297,7 @@ class Push extends BaseController
         
         // 创建图
         $reportFormsService->create_table_s012();
-        $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S012.jpg';
+        $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
 
         // 上传图 
         echo $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
