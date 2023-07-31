@@ -322,6 +322,11 @@ class Weather extends AdminController
                     break;
             }
         }
+        //cid对应的县/市名：
+        $cid_city_name = $city_model->where([['cid', '=', $customer['cid']]])->field('city')->find();
+        if ($cid_city_name) {
+            $keywords['cid_name'] = $cid_city_name['city'].'%';
+        }
         // 查询匹配店铺的城市列表
         $city_list = $city_model->where(function ($q)use($keywords){
             if(!empty($keywords)) $q->where('city', 'like',$keywords,'OR');
