@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>气温上新预警</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+
+        .cima {
+            height:18px; 
+            line-height:18px;
+        }
+        .cima_1 {
+            height:5px; 
+            width:10px;
+        }
+        .cima_2 {
+            line-height:5px;
+        }
+        .hot {
+            color: red;
+        }
+        .cool {
+            color:#0879bb;
+        }
+        .weather_div {
+            height:28px;
+        }
+
+        th[data-field="7"][data-key="1-0-7"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="预计库存合计"][data-key="1-1-11"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="8"][data-key="1-0-8"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="周转合计"][data-key="1-1-23"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="9"][data-key="1-0-9"] {
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+        th[data-field="提醒备注"][data-key="1-1-35"] {
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yc" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-customer" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-customer17" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-province" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营模式</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-jyms" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">大类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-dalei" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">中类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-zhonglei" class="xm-select-demo"></div>
+                            </div>
+                            <!-- <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">分类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fenlei" class="xm-select-demo"></div>
+                            </div> -->
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fengge" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-huohao" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">超量提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-tips" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">超量个数</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='超量个数' autocomplete="off" value="" maxlength="2" placeholder="0"
+                                    class="layui-input" lay-verify="">
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="flex col between" style="width:5%; height:70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">单店单款超量提醒 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单店品类断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Weathertips/Weathertips')}" 
+            , url_download_history_area = "{:url('admin/system.Weathertips/excel_weathertips')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Chaoliang/getXmMapSelect')}"
+
+        initFn();
+        startTable();
+
+        // 选择云仓
+        xmSelect.render({
+            el: '#xm-yc', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "南昌云仓", value: "南昌云仓", selected: ""},
+                {name: "广州云仓", value: "广州云仓", selected: ""},
+                {name: "武汉云仓", value: "武汉云仓", selected: ""},
+                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+                {name: "长沙云仓", value: "长沙云仓", selected: ""},
+            ]
+        })
+        // 
+        xmSelect.render({
+            el: '#xm-jyms', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '经营模式',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "直营", value: "直营", selected: ""},
+                {name: "加盟", value: "加盟", selected: ""},
+            ]
+        })
+        // 选择风格
+        xmSelect.render({
+            el: '#xm-fengge', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "基本款", value: "基本款", selected: ""},
+                {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+
+        // 选择省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            name: '省份',
+            // showCount: 1,
+            data: []
+        })
+
+        // 选择店铺
+        xmSelect.render({
+            el: '#xm-customer', 
+            filterable: true,
+            name: '店铺名称',
+            // showCount: 1,
+            data: []
+        })
+
+        xmSelect.render({
+            el: '#xm-dalei', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '大类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "外套", value: "外套", selected: ""},
+                {name: "内搭", value: "内搭", selected: ""},
+                {name: "下装", value: "下装", selected: ""},
+                {name: "鞋履", value: "鞋履", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-zhonglei', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '中类',
+            // showCount: 1,
+            data: [
+            ]
+        })
+
+        // xmSelect.render({
+        //     el: '#xm-fenlei', 
+        //     filterable: true,
+        //     toolbar: {show: true},
+        //     name: '分类',
+        //     // showCount: 1,
+        //     data: [
+        //     ]
+        // })
+
+        xmSelect.render({
+            el: '#xm-huohao', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '货号',
+            // showCount: 1,
+            data: [
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-customer17', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '商品专员',
+            // showCount: 1,
+            data: [
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-tips', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '提醒备注',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "超量", value: "请注意", selected: true},
+            ]
+        })
+
+        // xmSelect.render({
+        //     el: '#xm-lingxingqima', 
+        //     filterable: true,
+        //     toolbar: {show: true},
+        //     name: '领型齐码率',
+        //     // showCount: 1,
+        //     theme: {
+        //         color: '#1cbbb4',
+        //     },
+        //     data: [
+        //         {name: "小于100%", value: "0.9999", selected: true},
+        //         {name: "0-10%", value: "0.11", selected: true},
+        //         {name: "10%-20%", value: "0.21", selected: true},
+        //         {name: "20%-30%", value: "0.31", selected: true},
+        //         {name: "30%-40%", value: "0.41", selected: true},
+        //         {name: "40%-50%", value: "0.51", selected: true},
+        //         {name: "50%-60%", value: "0.61", selected: true},
+        //         {name: "60%-70%", value: "0.71", selected: true},
+        //         {name: "70%-80%", value: "0.81", selected: true},
+        //         {name: "80%-90%", value: "0.91", selected: true},
+        //     ]
+        // })
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                // storeData = res.data.storeAll
+                // provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer17', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'商品负责人',
+                    data: res.data.customer17
+                })
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: res.data.province
+                })
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
+                // 渲染所有中类
+                xmSelect.render({
+                    el: '#xm-zhonglei', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'中类',
+                    data: res.data.zhonglei
+                })
+
+                // 渲染所有中类
+                // xmSelect.render({
+                //     el: '#xm-fenlei', 
+                //     filterable: true,
+                //     toolbar: {show: true},
+                //     theme: {
+                //         color: '#1cbbb4',
+                //     },
+                //     // showCount: 1,
+                //     name:'分类',
+                //     data: res.data.fenlei
+                // })
+                xmSelect.render({
+                    el: '#xm-huohao', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.huohao
+                })
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+            return false; 
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                , toolbar: true
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 720
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , where: { "提醒备注" : '请注意'}
+                , cols: [[
+                    { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima">商品</div>
+                                 <div class="cima">专员</div>
+                                 <div class="cima"></div>
+                                </div>`, field: '商品专员', fixed: 'left', align: 'center' , width: 42, rowspan: 5}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center', width: 70, rowspan: 5}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima">店</div>
+                                 <div class="cima">铺</div>
+                                 <div class="cima">等</div>
+                                 <div class="cima">级</div>
+                                </div>`, field: '店铺等级', fixed: 'left', width: 22, align: 'center', rowspan: 5}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima">经营</div>
+                                 <div class="cima">模式</div>
+                                 <div class="cima"></div>
+                                </div>`,field: '经营属性', fixed: 'left', align: 'center', width: 32,rowspan: 5}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima">开业</div>
+                                 <div class="cima">日期</div>
+                                </div>`, field: '开业日期', fixed: 'left', width: 70, align: 'center' ,rowspan: 5, hide: false}
+                    , { title: '气温变化', align: 'center' ,colspan: 12}
+                    , { title: '满足条件情况', align: 'center' ,colspan: 12}
+                    , { title: '提醒', align: 'center' ,colspan: 12}
+                    ],
+                    [{ title:  `<div class="flex col around" style="color:#b2b2b2;">
+                                 <div class="cima">{$weather_date_month['day0']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day0']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, align: 'center', colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day0_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day0_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#969696;">
+                                 <div class="cima">{$weather_date_month['day1']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day1']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day1_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day1_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">{$weather_date_month['day2']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day2']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day2_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day2_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title:  `<div class="flex col around" style="color:red;">
+                                 <div class="cima">{$weather_date_month['day3']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day3']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day3_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day3_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0096ff;">
+                                 <div class="cima">{$weather_date_month['day4']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day4']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day4_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day4_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0191f6;">
+                                 <div class="cima">{$weather_date_month['day5']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day5']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day5_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day5_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#028ae9;">
+                                 <div class="cima">{$weather_date_month['day6']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day6']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day6_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day6_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0485df;">
+                                 <div class="cima">{$weather_date_month['day7']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day7']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day7_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day7_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0096ff;">
+                                 <div class="cima">{$weather_date_month['day8']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day8']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计36/6XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day8_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day8_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0582da;">
+                                 <div class="cima">{$weather_date_month['day9']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day9']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day9_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day9_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around" style="color:#0481d9;">
+                                 <div class="cima">{$weather_date_month['day10']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day10']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'预计_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day10_max']}</div>
+                                 <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day10_min']}</div>
+                               </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima"></div>
+                                <div class="cima">识</div>
+                                <div class="cima">别</div>
+                                <div class="cima"></div>
+                                </div>`, field:'预计库存合计', align: 'center',rowspan: 2, width: 35}
+
+
+                    ,{ title:  `<div class="flex col around" style="color:#b2b2b2;">
+                                 <div class="cima">{$weather_date_month['day0']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day0']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转00/28/37/44/100/160/S', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#969696;">
+                                 <div class="cima">{$weather_date_month['day1']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day1']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">{$weather_date_month['day2']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day2']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title:  `<div class="flex col around" style="color:red;">
+                                 <div class="cima">{$weather_date_month['day3']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day3']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0096ff;">
+                                 <div class="cima">{$weather_date_month['day4']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day4']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0191f6;">
+                                 <div class="cima">{$weather_date_month['day5']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day5']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#028ae9;">
+                                 <div class="cima">{$weather_date_month['day6']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day6']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0485df;">
+                                 <div class="cima">{$weather_date_month['day7']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day7']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0096ff;">
+                                 <div class="cima">{$weather_date_month['day8']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day8']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0582da;">
+                                 <div class="cima">{$weather_date_month['day9']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day9']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转_40', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around" style="color:#0481d9;">
+                                 <div class="cima">{$weather_date_month['day10']}</div>
+                                 <div class="cima">月</div>
+                                 <div class="cima">{$weather_date_day['day10']}</div>
+                                 <div class="cima">日</div>
+                               </div>`, field:'周转_40', align: 'center',colspan: 1, rowspan: 1, width: 30}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima"></div>
+                                <div class="cima">合</div>
+                                <div class="cima">计</div>
+                                <div class="cima"></div>
+                                </div>`, field:'周转合计', align: 'center',rowspan: 2, width: 35, templet: function (data) {
+                        if (data['周转合计']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return data['周转合计'];
+                        } else {
+                            return '';
+                        }
+                    }}
+
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">28</div>
+                                 <div class="cima">44</div>
+                                 <div class="cima">37</div>
+                                 <div class="cima">S</div>
+                               </div>`, field:'提醒00/28/37/44/100/160/S', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒00/28/37/44/100/160/S']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒00/28/37/44/100/160/S']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                 <div class="cima">29</div>
+                                 <div class="cima">46</div>
+                                 <div class="cima">38</div>
+                                 <div class="cima">S</div>
+                                </div>`, field:'提醒29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒29/38/46/105/165/M']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒29/38/46/105/165/M']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima">30</div>
+                                 <div class="cima">48</div>
+                                 <div class="cima">39</div>
+                                 <div class="cima">L</div>
+                                </div>`, field:'提醒30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒30/39/48/110/170/L']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒30/39/48/110/170/L']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title:  `<div class="flex col around">
+                                <div class="cima">31</div>
+                                <div class="cima">50</div>
+                                <div class="cima">40</div>
+                                <div class="cima">XL</div>    
+                                </div>`, field:'提醒31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒31/40/50/115/175/XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒31/40/50/115/175/XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">32</div>
+                                <div class="cima">52</div>
+                                <div class="cima">41</div>
+                                <div class="cima">2XL</div>    
+                                </div>`, field:'提醒32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒32/41/52/120/180/2XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒32/41/52/120/180/2XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">33</div>
+                                <div class="cima">54</div>
+                                <div class="cima">42</div>
+                                <div class="cima">3XL</div>  
+                                </div>`, field:'提醒33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒33/42/54/125/185/3XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒33/42/54/125/185/3XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">34</div>
+                                <div class="cima">56</div>
+                                <div class="cima">43</div>
+                                <div class="cima">4XL</div>  
+                                </div>`, field:'提醒34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒34/43/56/190/4XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒34/43/56/190/4XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">35</div>
+                                <div class="cima">58</div>
+                                <div class="cima">44</div>
+                                <div class="cima">5XL</div>  
+                                </div>`, field:'提醒35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒35/44/58/195/5XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒35/44/58/195/5XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">36</div>
+                                <div class="cima">60</div>
+                                <div class="cima">00</div>
+                                <div class="cima">6XL</div> 
+                                </div>`, field:'提醒36/6XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒36/6XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒36/6XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">38</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima">7XL</div>
+                                </div>`, field:'提醒38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒38/7XL']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒38/7XL']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">40</div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                <div class="cima"></div>
+                                </div>`, field:'提醒_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
+                        if (data['提醒_40']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒_40']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima"></div>
+                                <div class="cima">提醒</div>
+                                <div class="cima">备注</div>
+                                <div class="cima"></div>
+                                </div>`, field:'提醒备注', align: 'center',rowspan: 2, width: 50, templet: function (data) {
+                        if (data['提醒备注']) {
+                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
+                            return `<div style="color:red">${data['提醒备注']}</div>`;
+                        } else {
+                            return '';
+                        }
+                    }}
+                    ],
+                ]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
