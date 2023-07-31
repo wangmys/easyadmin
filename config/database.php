@@ -98,19 +98,39 @@ return [
             'schema_cache_path' => app()->getRuntimePath() . 'schema' . DIRECTORY_SEPARATOR,
         ],
         'mysql2' => [
+            // // 数据库类型
+            // 'type'              => Env::get('database2.type', 'mysql'),
+            // // 服务器地址
+            // // 'hostname'          => Env::get('database2.hostname', '192.168.98.7'),
+            // 'hostname'          => Env::get('database2.hostname', '183.6.86.105'),
+            // // 数据库名
+            // 'database'          => Env::get('database2.database', 'bi2023'),
+            // // 用户名
+            // 'username'          => Env::get('database2.username', 'bi2023'),
+            // // 密码
+            // 'password'          => Env::get('database2.password', 'sokobi2023'),
+            // // 端口
+            // 'hostport'          => Env::get('database2.hostport', '33061'),
+            // // 数据库连接参数
+            // 'params'            => [],
+            // // 数据库编码默认采用utf8
+            // 'charset'           => Env::get('database2.charset', 'utf8'),
+            // // 数据库表前缀
+            // 'prefix'            => Env::get('database2.prefix', 'sp_'),
+
             // 数据库类型
             'type'              => Env::get('database2.type', 'mysql'),
             // 服务器地址
             // 'hostname'          => Env::get('database2.hostname', '192.168.98.7'),
             'hostname'          => Env::get('database2.hostname', '183.6.86.105'),
             // 数据库名
-            'database'          => Env::get('database2.database', 'bi2023'),
+            'database'          => Env::get('database2.database', 'bi'),
             // 用户名
-            'username'          => Env::get('database2.username', 'bi2023'),
+            'username'          => Env::get('database2.username', 'bi'),
             // 密码
-            'password'          => Env::get('database2.password', 'sokobi2023'),
+            'password'          => Env::get('database2.password', 'WAwFEb772YXDYAza'),
             // 端口
-            'hostport'          => Env::get('database2.hostport', '33061'),
+            'hostport'          => Env::get('database2.hostport', '3306'),
             // 数据库连接参数
             'params'            => [],
             // 数据库编码默认采用utf8
