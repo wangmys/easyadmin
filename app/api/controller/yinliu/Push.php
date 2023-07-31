@@ -300,7 +300,7 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S012.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        echo $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
