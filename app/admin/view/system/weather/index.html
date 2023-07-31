@@ -92,6 +92,7 @@
                 data: {'province':province},
                 dataType: 'json',
                 success: function (res) {
+                    // console.log(res);
 
                     $('#c-CustomItem30').empty();
                     $('#c-CustomItem30').next().empty();
@@ -109,6 +110,26 @@
                     dd_append_str += '</dl></div>';
                     $('#c-CustomItem30').append(append_str);
                     $('#c-CustomItem30').next().append(dd_append_str);
+
+
+                    //市联动处理
+                    $('#c-City').empty();
+                    $('#c-City').next().empty();
+
+                    var append_str = '<option value="">- 全部 -</option>';
+                    var dd_append_str = '<div class="layui-unselect layui-form-select">';
+                    dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+                    dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+                    dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+                    $.each(res.citys, function(key, val){
+                        append_str += '<option value="'+val+'">'+val+'</option>';
+                        dd_append_str += '<dd lay-value="'+val+'" class="">'+val+'</dd>';
+                    });
+                    dd_append_str += '</dl></div>';
+                    $('#c-City').append(append_str);
+                    $('#c-City').next().append(dd_append_str);
+
                     form.render('select');
 
                 }

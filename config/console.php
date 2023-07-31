@@ -21,6 +21,8 @@ return [
         'cus_weather_output' => 'app\command\Cus_weather_output',
         'ww_data' => 'app\command\Ww_data',
         'ww_data_diaobo' => 'app\command\Ww_data_diaobo',
+        'ww_data_cusstock' => 'app\command\Ww_data_cusstock',
+        'ww_data_cussale14day' => 'app\command\Ww_data_cussale14day',
         'puhuo_yuncangkeyong' => 'app\command\Puhuo_yuncangkeyong',
         'puhuo_liangzhou' => 'app\command\Puhuo_liangzhou',
         'puhuo_start' => 'app\command\Puhuo_start',

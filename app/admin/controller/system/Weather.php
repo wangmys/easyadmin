@@ -88,7 +88,7 @@ class Weather extends AdminController
             })
             ->where(['c.ShutOut' => 0])
             ->where('c.RegionId','<>',55)
-            ->order('State asc,Region asc')
+            ->order('c.State asc,c.CustomItem30 asc,c.CustomItem36 asc,c.CustomerName asc,c.CustomerCode asc')
             ->page($page, $limit)
             ->select();
 
@@ -322,6 +322,11 @@ class Weather extends AdminController
                     break;
             }
         }
+        //cid对应的县/市名：
+        $cid_city_name = $city_model->where([['cid', '=', $customer['cid']]])->field('city')->find();
+        if ($cid_city_name) {
+            $keywords['cid_name'] = $cid_city_name['city'].'%';
+        }
         // 查询匹配店铺的城市列表
         $city_list = $city_model->where(function ($q)use($keywords){
             if(!empty($keywords)) $q->where('city', 'like',$keywords,'OR');
@@ -360,7 +365,9 @@ class Weather extends AdminController
         $province = input('province');
         $sql = "select distinct CustomItem30 from customers where State='{$province}' and CustomItem30!=''";
         $res = Db::connect('tianqi')->query($sql);
-        return json(["code" => "0", "msg" => "",  "data" => $res]);
+        $citys = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->where('State','=',$province)->distinct(true)->column('City');
+
+        return json(["code" => "0", "msg" => "",  "data" => $res, 'citys'=>$citys]);
 
     }
 

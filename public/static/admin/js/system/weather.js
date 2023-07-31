@@ -39,7 +39,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
-                    {hide:true, field: 'City', width: 50, title: '市',fixed:'left',search: 'xmSelect',selectList:city_list,laySearch:true},
+                    {hide:true, field: 'City', width: 50, title: '市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     // {field: 'Region', width: 100, title: '区域',fixed:'left',search: 'select',selectList:area_list,laySearch:true},
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
