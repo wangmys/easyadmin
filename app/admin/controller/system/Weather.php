@@ -88,7 +88,7 @@ class Weather extends AdminController
             })
             ->where(['c.ShutOut' => 0])
             ->where('c.RegionId','<>',55)
-            ->order('State asc,Region asc')
+            ->order('c.State asc,c.CustomItem30 asc,c.CustomItem36 asc,c.CustomerName asc,c.CustomerCode asc')
             ->page($page, $limit)
             ->select();
 

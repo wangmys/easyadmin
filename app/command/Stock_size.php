@@ -42,8 +42,8 @@ class Stock_size extends Command
         ini_set('memory_limit','1024M');
 		$db = Db::connect("mysql");
 
-        $start_date = '2023-07-23';//'2022-12-04';//date('Y-m-d', time()-24*60*60*2);//'2020-12-31';//填入 开始日期 的前一天
-        $end_date = '2023-07-30';//'2023-07-23';//date('Y-m-d', time()-24*60*60);//'2021-12-31';
+        $start_date = date('Y-m-d', time()-24*60*60*2);//'2020-12-31';//填入 开始日期 的前一天
+        $end_date = date('Y-m-d', time()-24*60*60);//'2021-12-31';
 
         $how_much_day = ( strtotime($end_date)-strtotime($start_date) )/(24*60*60);
         // echo $how_much_day;die;
