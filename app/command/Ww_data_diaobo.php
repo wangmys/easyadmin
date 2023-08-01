@@ -196,6 +196,36 @@ class Ww_data_diaobo extends Command
         GROUP BY
           ECR.CustomerId,
           ECRG.GoodsId
+        
+        UNION ALL 
+        
+        -- 店铺自己调拨
+        SELECT 
+          ECR.CustomerId,
+          ECRG.GoodsId,
+          SUM(CASE WHEN EBGS.ViewOrder=1  THEN ECRGD.Quantity END ) 	[调入数量_00/28/37/44/100/160/S],
+          SUM(CASE WHEN EBGS.ViewOrder=2  THEN ECRGD.Quantity END ) 	[调入数量_29/38/46/105/165/M],
+          SUM(CASE WHEN EBGS.ViewOrder=3  THEN ECRGD.Quantity END ) 	[调入数量_30/39/48/110/170/L],
+          SUM(CASE WHEN EBGS.ViewOrder=4  THEN ECRGD.Quantity END ) 	[调入数量_31/40/50/115/175/XL],
+          SUM(CASE WHEN EBGS.ViewOrder=5  THEN ECRGD.Quantity END ) 	[调入数量_32/41/52/120/180/2XL],
+          SUM(CASE WHEN EBGS.ViewOrder=6  THEN ECRGD.Quantity END ) 	[调入数量_33/42/54/125/185/3XL],
+          SUM(CASE WHEN EBGS.ViewOrder=7  THEN ECRGD.Quantity END ) 	[调入数量_34/43/56/190/4XL],
+          SUM(CASE WHEN EBGS.ViewOrder=8  THEN ECRGD.Quantity END ) 	[调入数量_35/44/58/195/5XL],
+          SUM(CASE WHEN EBGS.ViewOrder=9  THEN ECRGD.Quantity END ) 	[调入数量_36/6XL],
+          SUM(CASE WHEN EBGS.ViewOrder=10 THEN ECRGD.Quantity END ) 	[调入数量_38/7XL],
+          SUM(CASE WHEN EBGS.ViewOrder=11 THEN ECRGD.Quantity END ) 	[调入数量_40],
+          SUM(ECRGD.Quantity) AS 调入总数量
+        FROM ErpCustReceipt ECR
+        LEFT JOIN ErpCustReceiptGoods ECRG  ON ECR.ReceiptID=ECRG.ReceiptID
+        LEFT JOIN ErpCustReceiptGoodsDetail ECRGD ON ECRG.ReceiptGoodsID=ECRGD.ReceiptGoodsID
+        LEFT JOIN ErpBaseGoodsSize EBGS ON ECRGD.SizeId=EBGS.SizeId
+        LEFT JOIN ErpCustOutbound ECO ON ECRG.CustOutboundId=ECO.CustOutboundId
+        WHERE CONVERT(VARCHAR(10),ECR.ReceiptDate,23)  BETWEEN '{$start_date}' AND '{$end_date}'
+          AND ECR.Type=2
+          AND (ECO.ManualNo IS  NULL OR ECO.ManualNo='')	
+        GROUP BY
+          ECR.CustomerId,
+          ECRG.GoodsId
         ) A
         GROUP BY 
           A.CustomerId,
@@ -381,6 +411,8 @@ class Ww_data_diaobo extends Command
         WHERE EC.ShutOut=0
           AND EC.MathodId IN (4,7)
           AND EGPT.PriceId=1
+          -- AND EC.CustomerName='南昌一店'
+          -- AND EG.GoodsNo='B42101082'
         ;
         ";
         return Db::connect("sqlsrv")->Query($sql);
