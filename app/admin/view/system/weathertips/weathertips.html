@@ -1139,6 +1139,8 @@
                     , { title: `前天`, align: 'center' ,colspan: 3}
                     , { title: `昨天`, align: 'center' ,colspan: 3}
                     ],
+
+                    // 近三天销售占比
                     [
                     // 前三天 
                      { title: `内搭`, align: 'center', templet: 
@@ -1147,7 +1149,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_内搭']?'春秋:'+data['大前天_春秋_内搭']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['大前天_冬_内搭']?'冬季:'+data['大前天_冬_内搭']:''}</div>
                         </div>`; 
     
                     }}
@@ -1157,7 +1159,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_外套']?'春秋:'+data['大前天_春秋_外套']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['大前天_冬_外套']?'冬季:'+data['大前天_冬_外套']:''}</div>
                         </div>`; 
     
                     }}
@@ -1167,7 +1169,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_下装']?'春秋:'+data['大前天_春秋_下装']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['大前天_冬_下装']?'冬季:'+data['大前天_冬_下装']:''}</div>
                         </div>`; 
     
                     }}
@@ -1178,7 +1180,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_内搭']?'春秋:'+data['前天_春秋_内搭']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['前天_冬_内搭']?'冬季:'+data['前天_冬_内搭']:''}</div>
                         </div>`; 
     
                     }}
@@ -1188,7 +1190,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_外套']?'春秋:'+data['前天_春秋_外套']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['前天_冬_外套']?'冬季:'+data['前天_冬_外套']:''}</div>
                         </div>`; 
     
                     }}
@@ -1198,7 +1200,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_下装']?'春秋:'+data['前天_春秋_下装']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['前天_冬_下装']?'冬季:'+data['前天_冬_下装']:''}</div>
                         </div>`; 
     
                     }}
@@ -1209,7 +1211,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_内搭']?'春秋:'+data['昨天_春秋_内搭']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['昨天_冬_内搭']?'冬季:'+data['昨天_冬_内搭']:''}</div>
                         </div>`; 
     
                     }}
@@ -1219,7 +1221,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_外套']?'春秋:'+data['昨天_春秋_外套']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['昨天_冬_外套']?'冬季:'+data['昨天_冬_外套']:''}</div>
                         </div>`; 
     
                     }}
@@ -1229,7 +1231,7 @@
                             <div class="cima_1" style="height:5px; width:10px;"></div>   
                             <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_下装']?'春秋:'+data['昨天_春秋_下装']:''}</div>
                             <div class="cima_1" style="height:15px; width:10px;"></div> 
-                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                            <div class="cima_manzu" style="color:#0429c8;">${data['昨天_冬_下装']?'冬季:'+data['昨天_冬_下装']:''}</div>
                         </div>`; 
     
                     }}

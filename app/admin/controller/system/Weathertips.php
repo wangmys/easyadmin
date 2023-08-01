@@ -398,18 +398,37 @@ class Weathertips extends AdminController
                     r_2day_xz.销售占比 as 前天_春秋_下装,
                     r_1day_nd.销售占比 as 昨天_春秋_内搭,
                     r_1day_wt.销售占比 as 昨天_春秋_外套,
-                    r_1day_xz.销售占比 as 昨天_春秋_下装
+                    r_1day_xz.销售占比 as 昨天_春秋_下装,
+                    r_3day_nd_dj.销售占比 as 大前天_冬_内搭,
+                    r_3day_wt_dj.销售占比 as 大前天_冬_外套,
+                    r_3day_xz_dj.销售占比 as 大前天_冬_下装,
+                    r_2day_nd_dj.销售占比 as 前天_冬_内搭,
+                    r_2day_wt_dj.销售占比 as 前天_冬_外套,
+                    r_2day_xz_dj.销售占比 as 前天_冬_下装,
+                    r_1day_nd_dj.销售占比 as 昨天_冬_内搭,
+                    r_1day_wt_dj.销售占比 as 昨天_冬_外套,
+                    r_1day_xz_dj.销售占比 as 昨天_冬_下装
                 FROM
                     cwl_weathertips_customer AS c
-                left join cwl_weathertips_retail_2 as r_3day_nd ON c.省份 = r_3day_nd.省份 AND c.店铺名称 = r_3day_nd.店铺名称 AND r_3day_nd.季节修订 = '春秋季' AND r_3day_nd.日期识别='大前天' AND r_3day_nd.`一级分类`='内搭'
-                left join cwl_weathertips_retail_2 as r_3day_wt ON c.省份 = r_3day_wt.省份 AND c.店铺名称 = r_3day_wt.店铺名称 AND r_3day_wt.季节修订 = '春秋季' AND r_3day_wt.日期识别='大前天' AND r_3day_wt.`一级分类`='外套'
-                left join cwl_weathertips_retail_2 as r_3day_xz ON c.省份 = r_3day_xz.省份 AND c.店铺名称 = r_3day_xz.店铺名称 AND r_3day_xz.季节修订 = '春秋季' AND r_3day_xz.日期识别='大前天' AND r_3day_xz.`一级分类`='下装'
-                left join cwl_weathertips_retail_2 as r_2day_nd ON c.省份 = r_2day_nd.省份 AND c.店铺名称 = r_2day_nd.店铺名称 AND r_2day_nd.季节修订 = '春秋季' AND r_2day_nd.日期识别='前天' AND r_2day_nd.`一级分类`='内搭'
-                left join cwl_weathertips_retail_2 as r_2day_wt ON c.省份 = r_2day_wt.省份 AND c.店铺名称 = r_2day_wt.店铺名称 AND r_2day_wt.季节修订 = '春秋季' AND r_2day_wt.日期识别='前天' AND r_2day_wt.`一级分类`='外套'
-                left join cwl_weathertips_retail_2 as r_2day_xz ON c.省份 = r_2day_xz.省份 AND c.店铺名称 = r_2day_xz.店铺名称 AND r_2day_xz.季节修订 = '春秋季' AND r_2day_xz.日期识别='前天' AND r_2day_xz.`一级分类`='下装'
-                left join cwl_weathertips_retail_2 as r_1day_nd ON c.省份 = r_1day_nd.省份 AND c.店铺名称 = r_1day_nd.店铺名称 AND r_1day_nd.季节修订 = '春秋季' AND r_1day_nd.日期识别='前天' AND r_1day_nd.`一级分类`='内搭'
-                left join cwl_weathertips_retail_2 as r_1day_wt ON c.省份 = r_1day_wt.省份 AND c.店铺名称 = r_1day_wt.店铺名称 AND r_1day_wt.季节修订 = '春秋季' AND r_1day_wt.日期识别='前天' AND r_1day_wt.`一级分类`='外套'
-                left join cwl_weathertips_retail_2 as r_1day_xz ON c.省份 = r_1day_xz.省份 AND c.店铺名称 = r_1day_xz.店铺名称 AND r_1day_xz.季节修订 = '春秋季' AND r_1day_xz.日期识别='前天' AND r_1day_xz.`一级分类`='下装'
+                    left join cwl_weathertips_retail_2 as r_3day_nd ON c.省份 = r_3day_nd.省份 AND c.店铺名称 = r_3day_nd.店铺名称 AND r_3day_nd.季节修订 = '春秋季' AND r_3day_nd.日期识别='大前天' AND r_3day_nd.`一级分类`='内搭'
+                    left join cwl_weathertips_retail_2 as r_3day_wt ON c.省份 = r_3day_wt.省份 AND c.店铺名称 = r_3day_wt.店铺名称 AND r_3day_wt.季节修订 = '春秋季' AND r_3day_wt.日期识别='大前天' AND r_3day_wt.`一级分类`='外套'
+                    left join cwl_weathertips_retail_2 as r_3day_xz ON c.省份 = r_3day_xz.省份 AND c.店铺名称 = r_3day_xz.店铺名称 AND r_3day_xz.季节修订 = '春秋季' AND r_3day_xz.日期识别='大前天' AND r_3day_xz.`一级分类`='下装'
+                    left join cwl_weathertips_retail_2 as r_2day_nd ON c.省份 = r_2day_nd.省份 AND c.店铺名称 = r_2day_nd.店铺名称 AND r_2day_nd.季节修订 = '春秋季' AND r_2day_nd.日期识别='前天' AND r_2day_nd.`一级分类`='内搭'
+                    left join cwl_weathertips_retail_2 as r_2day_wt ON c.省份 = r_2day_wt.省份 AND c.店铺名称 = r_2day_wt.店铺名称 AND r_2day_wt.季节修订 = '春秋季' AND r_2day_wt.日期识别='前天' AND r_2day_wt.`一级分类`='外套'
+                    left join cwl_weathertips_retail_2 as r_2day_xz ON c.省份 = r_2day_xz.省份 AND c.店铺名称 = r_2day_xz.店铺名称 AND r_2day_xz.季节修订 = '春秋季' AND r_2day_xz.日期识别='前天' AND r_2day_xz.`一级分类`='下装'
+                    left join cwl_weathertips_retail_2 as r_1day_nd ON c.省份 = r_1day_nd.省份 AND c.店铺名称 = r_1day_nd.店铺名称 AND r_1day_nd.季节修订 = '春秋季' AND r_1day_nd.日期识别='昨天' AND r_1day_nd.`一级分类`='内搭'
+                    left join cwl_weathertips_retail_2 as r_1day_wt ON c.省份 = r_1day_wt.省份 AND c.店铺名称 = r_1day_wt.店铺名称 AND r_1day_wt.季节修订 = '春秋季' AND r_1day_wt.日期识别='昨天' AND r_1day_wt.`一级分类`='外套'
+                    left join cwl_weathertips_retail_2 as r_1day_xz ON c.省份 = r_1day_xz.省份 AND c.店铺名称 = r_1day_xz.店铺名称 AND r_1day_xz.季节修订 = '春秋季' AND r_1day_xz.日期识别='昨天' AND r_1day_xz.`一级分类`='下装'
+                    
+                    left join cwl_weathertips_retail_2 as r_3day_nd_dj ON c.省份 = r_3day_nd_dj.省份 AND c.店铺名称 = r_3day_nd_dj.店铺名称 AND r_3day_nd_dj.季节修订 = '冬季' AND r_3day_nd_dj.日期识别='大前天' AND r_3day_nd_dj.`一级分类`='内搭'
+                    left join cwl_weathertips_retail_2 as r_3day_wt_dj ON c.省份 = r_3day_wt_dj.省份 AND c.店铺名称 = r_3day_wt_dj.店铺名称 AND r_3day_wt_dj.季节修订 = '冬季' AND r_3day_wt_dj.日期识别='大前天' AND r_3day_wt_dj.`一级分类`='外套'
+                    left join cwl_weathertips_retail_2 as r_3day_xz_dj ON c.省份 = r_3day_xz_dj.省份 AND c.店铺名称 = r_3day_xz_dj.店铺名称 AND r_3day_xz_dj.季节修订 = '冬季' AND r_3day_xz_dj.日期识别='大前天' AND r_3day_xz_dj.`一级分类`='下装'
+                    left join cwl_weathertips_retail_2 as r_2day_nd_dj ON c.省份 = r_2day_nd_dj.省份 AND c.店铺名称 = r_2day_nd_dj.店铺名称 AND r_2day_nd_dj.季节修订 = '冬季' AND r_2day_nd_dj.日期识别='前天' AND r_2day_nd_dj.`一级分类`='内搭'
+                    left join cwl_weathertips_retail_2 as r_2day_wt_dj ON c.省份 = r_2day_wt_dj.省份 AND c.店铺名称 = r_2day_wt_dj.店铺名称 AND r_2day_wt_dj.季节修订 = '冬季' AND r_2day_wt_dj.日期识别='前天' AND r_2day_wt_dj.`一级分类`='外套'
+                    left join cwl_weathertips_retail_2 as r_2day_xz_dj ON c.省份 = r_2day_xz_dj.省份 AND c.店铺名称 = r_2day_xz_dj.店铺名称 AND r_2day_xz_dj.季节修订 = '冬季' AND r_2day_xz_dj.日期识别='前天' AND r_2day_xz_dj.`一级分类`='下装'			
+                    left join cwl_weathertips_retail_2 as r_1day_nd_dj ON c.省份 = r_1day_nd_dj.省份 AND c.店铺名称 = r_1day_nd_dj.店铺名称 AND r_1day_nd_dj.季节修订 = '冬季' AND r_1day_nd_dj.日期识别='昨天' AND r_1day_nd_dj.`一级分类`='内搭'
+                  left join cwl_weathertips_retail_2 as r_1day_wt_dj ON c.省份 = r_1day_wt_dj.省份 AND c.店铺名称 = r_1day_wt_dj.店铺名称 AND r_1day_wt_dj.季节修订 = '冬季' AND r_1day_wt_dj.日期识别='昨天' AND r_1day_wt_dj.`一级分类`='外套'
+                  left join cwl_weathertips_retail_2 as r_1day_xz_dj ON c.省份 = r_1day_xz_dj.省份 AND c.店铺名称 = r_1day_xz_dj.店铺名称 AND r_1day_xz_dj.季节修订 = '冬季' AND r_1day_xz_dj.日期识别='昨天' AND r_1day_xz_dj.`一级分类`='下装'		
                 WHERE 1	
 
                 LIMIT {$pageParams1}, {$pageParams2}  
