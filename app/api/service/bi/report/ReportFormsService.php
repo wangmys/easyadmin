@@ -403,6 +403,198 @@ class ReportFormsService
         return $arr;
     }
 
+    // 饰品
+    public function create_table_s012()
+    {
+        $code = 'S012';
+        $date = date('Y-m-d');
+        // $sql = "select 一级分类,二级分类,分类,总库存量,店库存数量,仓库库存,仓库可用库存,收仓在途,已配未发,昨天销,前四周销量,前三周销量,前两周销量,前一周销量,周转周 from accessories_report where 更新日期 = '$date'";
+        $sql = "select 一级分类,分类,总库存量,昨天销,前一周销量,前两周销量,前三周销量,前四周销量,周转周,店库存数量,仓库库存,仓库可用库存,收仓在途,已配未发,二级分类 from accessories_report
+         where 更新日期 = '$date' order by 一级分类 desc,二级分类 asc";
+        $data = $this->db_bi->Query($sql);
+        // echo "<pre>"; 
+        // print_r($data);
+        
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+
+        // 统计 
+        $last_wazi_key = 0;
+        $sum_wazi = [
+            '一级分类' => '袜子总计',
+            '分类' => '袜子合计',
+            '总库存量' => 0,
+            '昨天销' => 0,
+            '前一周销量' => 0,
+            '前两周销量' => 0,
+            '前三周销量' => 0,
+            '前四周销量' => 0,
+            '周转周' => 0,
+            '店库存数量' => 0,
+            '仓库库存' => 0,
+            '仓库可用库存' => 0,
+            '收仓在途' => 0,
+            '已配未发' => 0,
+            '二级分类' => '袜子合计',
+        ];
+        $sum_total = [
+            '一级分类' => '总计',
+            '分类' => '合计',
+            '总库存量' => 0,
+            '昨天销' => 0,
+            '前一周销量' => 0,
+            '前两周销量' => 0,
+            '前三周销量' => 0,
+            '前四周销量' => 0,
+            '周转周' => 0,
+            '店库存数量' => 0,
+            '仓库库存' => 0,
+            '仓库可用库存' => 0,
+            '收仓在途' => 0,
+            '已配未发' => 0,
+            '二级分类' => '合计',
+        ];
+        // 统计 
+        foreach($data as $key => $val) {
+            $sum_total['总库存量'] += $val['总库存量'];
+            $sum_total['昨天销'] += $val['昨天销'];
+            $sum_total['前一周销量'] += $val['前一周销量'];
+            $sum_total['前两周销量'] += $val['前两周销量'];
+            $sum_total['前三周销量'] += $val['前三周销量'];
+            $sum_total['前四周销量'] += $val['前四周销量'];
+            $sum_total['店库存数量'] += $val['店库存数量'];
+            $sum_total['仓库库存'] += $val['仓库库存'];
+            $sum_total['仓库可用库存'] += $val['仓库可用库存'];
+            $sum_total['收仓在途'] += $val['收仓在途'];
+            $sum_total['已配未发'] += $val['已配未发'];
+            if ($val['二级分类'] == '袜子' && $val['一级分类'] == '配饰') {
+                // 袜子最后一次出现位置
+                $last_wazi_key = $key;
+                $sum_wazi['总库存量'] += $val['总库存量'];
+                $sum_wazi['昨天销'] += $val['昨天销'];
+                $sum_wazi['前一周销量'] += $val['前一周销量'];
+                $sum_wazi['前两周销量'] += $val['前两周销量'];
+                $sum_wazi['前三周销量'] += $val['前三周销量'];
+                $sum_wazi['前四周销量'] += $val['前四周销量'];
+                $sum_wazi['店库存数量'] += $val['店库存数量'];
+                $sum_wazi['仓库库存'] += $val['仓库库存'];
+                $sum_wazi['仓库可用库存'] += $val['仓库可用库存'];
+                $sum_wazi['收仓在途'] += $val['收仓在途'];
+                $sum_wazi['已配未发'] += $val['已配未发'];
+            }
+        }
+        // 修改袜子统计位置
+        $new_data = [];
+        foreach ($data as $key => $val) {
+            if ($key > $last_wazi_key) {
+                if ($key == $last_wazi_key + 1) {
+                    $new_data[$key] = [
+                        '一级分类' => '袜子总计',
+                        '分类' => '袜子合计',
+                        '总库存量' => 0,
+                        '昨天销' => 0,
+                        '前一周销量' => 0,
+                        '前两周销量' => 0,
+                        '前三周销量' => 0,
+                        '前四周销量' => 0,
+                        '周转周' => 0,
+                        '店库存数量' => 0,
+                        '仓库库存' => 0,
+                        '仓库可用库存' => 0,
+                        '收仓在途' => 0,
+                        '已配未发' => 0,
+                        '二级分类' => '袜子合计',
+                    ];
+                } else {
+                    $new_data[$key + 1]  = $val;
+                }
+
+            } else {
+                $new_data[$key] = $val;
+            }
+            
+        }
+
+        $data = $new_data; 
+        $sum_wazi['周转周'] =  round(zeroHandle($sum_wazi['总库存量'], (($sum_wazi['前一周销量'] + $sum_wazi['前两周销量'] + $sum_wazi['前三周销量']) / 3)), 1);
+        $sum_total['周转周'] =  round(zeroHandle($sum_total['总库存量'], (($sum_total['前一周销量'] + $sum_total['前两周销量'] + $sum_total['前三周销量']) / 3)), 1);
+
+
+        $data[$last_wazi_key + 1] = $sum_wazi; // 插入袜子统计
+        $data[count($data) + 1] = $sum_total; // 插入总统计
+
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 80;
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 70;
+        $field_width[2] = 70;
+        $field_width[3] = 70;
+        $field_width[4] = 60;
+        $field_width[5] = 90;
+        $field_width[6] = 90;
+        $field_width[7] = 90;
+        $field_width[8] = 90;
+        $field_width[9] = 80;
+        $field_width[10] = 90;
+        $field_width[11] = 80;
+        $field_width[12] = 100;
+
+        // 计算占比用
+        $sql2 = "
+            select 
+                t.*, 
+                round(t.仓库可用库存 / t.`总库存量`, 2) as 占比
+            from 
+            (
+                SELECT
+                    一级分类,分类,sum(总库存量) as 总库存量,sum(仓库可用库存) as 仓库可用库存,二级分类 
+                FROM
+                    accessories_report 
+                WHERE
+                    更新日期 = '{$date}' 
+                GROUP BY 一级分类,二级分类
+                ORDER BY
+                    一级分类 DESC,二级分类 ASC
+            ) as t
+        ";
+        $data2 = $this->db_bi->Query($sql2);
+
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+//            1 => '[类型]：说明8 说明16 ',
+//            2 => '[类型]：说明8 说明16 ',
+        ];
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),
+            // 'file_name' =>$code.'.jpg',
+            'file_name' => $code.'.jpg',
+            'title' => "饰品销售情况表 [". date("Y-m-d", strtotime("-1 day")) ."]",//图片的表名字
+            'table_time' => date("Y-m-d H:i:s"),//表格时间
+            'data' => $data,
+            'data2' => $data2,
+            'table_explain' => $table_explain,//左上角title
+            'table_header' => $table_header,
+            'field_width' => $field_width,//表格每一列的宽度数组
+            'col' => '一级分类',//某一列用什么颜色
+            'field' => '一级分类',//某一列用什么颜色
+            'color'=> 16711877,//颜色值
+            'banben' => '   图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'
+        ];
+
+        // table_pic_new($params);
+        return $this->create_image_bgcolor($params, [
+            '分类' => 2,
+        ]);
+        
+    }
+
     //2022 春季货品销售报表
     public function create_table_s013()
     {
@@ -1517,6 +1709,8 @@ class ReportFormsService
             去年同月 AS 去年同月销额,
             本月业绩 as 本月销额
             from old_customer_state_2 where 更新时间 = '$date'";
+
+
         $list = Db::connect("mysql2")->query($sql);
         if ($list) {
             foreach ($list as $key => $val) {
@@ -2632,6 +2826,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . $dingName . '.jpg',   //保存的文件名
             'title' => "各省挑战目标完成情况-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
@@ -2648,6 +2843,7 @@ class ReportFormsService
         return $this->create_image_bgcolor($params, [
             '今日达成率' => 2,
             '本月达成率' => 3,
+            // '今日目标' => 5,
         ]);
     }
 
@@ -2717,6 +2913,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . $dingName . '.jpg',   //保存的文件名
             'title' => "直营单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
@@ -2827,7 +3024,7 @@ class ReportFormsService
         // 本月开始
         $current_month  = date("Y-m-01", time()); 
         $today  = date("Y-m-d", time()); 
-        $sql = "
+        $sql_bak = "
             SELECT 
             t1.销售日期 as 日期,
             '' as 星期,
@@ -2863,30 +3060,114 @@ class ReportFormsService
             order by t1.销售日期 asc
             ;
         ";
+        
+        $sql = "
+            SELECT 
+            t1.销售日期 as 日期,
+            '' as 星期,
+            concat(round(left_zy.毛利率 * 100, 1), '%') AS `[直营]毛率`,
+            left_zy.毛利 AS `毛利`,
+            concat(round(right_zy.毛利率 * 100, 1), '%') AS `月累毛率`,
+            right_zy.毛利 AS `月累毛利`,
+
+            concat(round(left_jm.毛利率 * 100, 1), '%') AS `[加盟]毛率 `,
+            left_jm.毛利 AS `毛利 `,
+            concat(round(right_jm.毛利率 * 100, 1), '%') AS `月累毛率 `,
+            right_jm.毛利 AS `月累毛利 `,
+
+            concat(round(left_hj.毛利率 * 100, 1), '%') AS `[总]毛率`,
+            left_hj.毛利 AS `.毛利  `,
+            concat(round(right_hj.毛利率 * 100, 1), '%') AS `.月累毛率`,
+            right_hj.毛利 AS `.月累毛利  `      
+        
+            FROM cwl_hexiao_res_day as t1
+            
+            LEFT JOIN `cwl_hexiao_res_day` AS left_zy ON left_zy.省份 = '单日总计' AND left_zy.经营属性 = '直营' AND left_zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS left_jm ON left_jm.省份 = '单日总计' AND left_jm.经营属性 = '加盟' AND left_jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS left_hj ON left_hj.省份 = '单日总计' AND left_hj.经营属性 = '合计' AND left_hj.销售日期 = t1.销售日期
+            
+            LEFT JOIN `cwl_hexiao_res_day` AS right_zy ON right_zy.省份 = '本月总计' AND right_zy.经营属性 = '直营' AND right_zy.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_jm ON right_jm.省份 = '本月总计' AND right_jm.经营属性 = '加盟' AND right_jm.销售日期 = t1.销售日期
+            LEFT JOIN `cwl_hexiao_res_day` AS right_hj ON right_hj.省份 = '本月总计' AND right_hj.经营属性 = '合计' AND right_hj.销售日期 = t1.销售日期
+            
+            where
+            t1.销售日期>= '{$current_month}'
+            AND t1.销售日期 <= '{$today}'
+
+            group by t1.销售日期
+            order by t1.销售日期 asc
+            ;
+        ";
         $list = $this->db_easyA->query($sql);
+
+        $sql2 = "
+            SELECT
+                t1.销售日期 AS 日期,
+                round( left_zy.毛利率 * 100, 1 ) AS 直营_毛利率,
+                round( right_zy.毛利率 * 100, 1 ) AS 直营累计_毛利率,
+                round( left_jm.毛利率 * 100, 1 ) AS 加盟_毛利率,
+                round( right_jm.毛利率 * 100, 1 ) AS 加盟累计_毛利率
+            
+            FROM
+                cwl_hexiao_res_day AS t1
+                LEFT JOIN `cwl_hexiao_res_day` AS left_zy ON left_zy.省份 = '单日总计' 
+                AND left_zy.经营属性 = '直营' 
+                AND left_zy.销售日期 = t1.销售日期
+                LEFT JOIN `cwl_hexiao_res_day` AS left_jm ON left_jm.省份 = '单日总计' 
+                AND left_jm.经营属性 = '加盟' 
+                AND left_jm.销售日期 = t1.销售日期
+                LEFT JOIN `cwl_hexiao_res_day` AS right_zy ON right_zy.省份 = '本月总计' 
+                AND right_zy.经营属性 = '直营' 
+                AND right_zy.销售日期 = t1.销售日期
+                LEFT JOIN `cwl_hexiao_res_day` AS right_jm ON right_jm.省份 = '本月总计' 
+                AND right_jm.经营属性 = '加盟' 
+                AND right_jm.销售日期 = t1.销售日期
+            WHERE
+                t1.销售日期 >= '2023-07-01' 
+                AND t1.销售日期 <= '2023-07-31' 
+            GROUP BY
+                t1.销售日期 
+            ORDER BY
+                t1.销售日期 ASC
+        ";
+        $list2 = $this->db_easyA->query($sql2);
         if ($list) {
             foreach ($list as $key => $val) {
                 $list[$key]['星期'] = date_to_week2($val['日期']);
-                // if ($val['省份'] != '单日总计' && $val['省份'] != '本月总计') {
-                //     $list[$key]['省份'] = province2zi($val['省份']);
-                // }
+                $list[$key]['日期'] = date('m/d', strtotime($val['日期']));
+            }
+            foreach ($list2 as $key2 => $val2) {
+                $list2[$key2]['日期'] = date('m/d', strtotime($val2['日期']));
             }
     
             $table_header = ['ID'];
             $field_width = [];
             $table_header = array_merge($table_header, array_keys($list[0]));
             foreach ($table_header as $v => $k) {
-                $field_width[] = 95;
+                $field_width[] = 130;
             }
             $field_width[0] = 30;
-            $field_width[2] = 70;
-            $field_width[8] = 85;
-            $field_width[9] = 130;
-            $field_width[10] = 130;
-            $field_width[11] = 130;
-            $field_width[12] = 130;
-            $field_width[13] = 130;
-            $field_width[14] = 130;
+            $field_width[1] = 50;
+            $field_width[2] = 60;
+
+            $field_width[3] = 80;
+            $field_width[4] = 55;
+            $field_width[5] = 70;
+            $field_width[6] = 70;
+
+            $field_width[7] = 85;
+            $field_width[8] = 55;
+            $field_width[9] = 75;
+            $field_width[10] = 75;
+
+            $field_width[11] = 65;
+            $field_width[12] = 55;
+            $field_width[13] = 75;
+            $field_width[14] = 75;
+
+            // $field_width[12] = 130;
+            // $field_width[13] = 130;
+            // $field_width[14] = 130;
             // $field_width[3] = 90;
     
     
@@ -2905,9 +3186,10 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "零售核销报表月统计 [" . $date . ']',
+                'title' => "月度毛利表 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
+                'data2' => $list2,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
@@ -2916,7 +3198,12 @@ class ReportFormsService
             ];
     
             // 生成图片
-            return $this->create_image($params);
+            // return $this->create_image($params);
+            return $this->create_image_bgcolor($params, [
+                '直营_毛利率' => 3,
+                '加盟_毛利率' => 7,
+                '合计_毛利率' => 11,
+            ]);
         } else {
             echo '没有数据,请稍后再试';
         }
@@ -2987,6 +3274,7 @@ class ReportFormsService
 
         //参数
         $params = [
+            'code' => $code,
             'row' => count($list),          //数据的行数
             'file_name' => $code . $dingName . '.jpg',   //保存的文件名
             'title' => "加盟单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
@@ -4384,7 +4672,41 @@ class ReportFormsService
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }   
             }
+
+            if (@$params['code'] == 'S012') {
+                if (isset($item['分类']) && $item['分类'] == '袜子合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+
+                if (count($params['data']) == $key + 1) {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+            }
+
+            
         }
+        
+        // 117标题颜色特殊处理
+        if (@$params['code'] == 'S117') { 
+            $s117_y1 = 38;
+            // 直营
+            $s117_x1 = $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2];
+            $s117_x2 = $s117_x1 + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5] + $params['field_width'][6];
+            // 加盟
+            $s117_x3 = $s117_x2 + $params['field_width'][7] + $params['field_width'][8] + $params['field_width'][9] + $params['field_width'][10];
+            // 合计
+            $s117_x4 = $s117_x3 + $params['field_width'][11] + $params['field_width'][12] + $params['field_width'][13] + $params['field_width'][14];
+
+            // 直营
+            imagefilledrectangle($img, $s117_x1, $s117_y1, $s117_x2, $y2, $yellow);
+            // 加盟
+            imagefilledrectangle($img, $s117_x2, $s117_y1, $s117_x3, $y2, $gray);
+            // 合计
+            imagefilledrectangle($img, $s117_x3, $s117_y1, $s117_x4, $y2, $orange);
+            // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
+            // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
+        }
+        
 
         // 2 单元格上色
         if (! empty($set_bgcolor)) {
@@ -4400,29 +4722,66 @@ class ReportFormsService
                     ]
                 ]
              */
-            foreach ($set_bgcolor as $key => $val) {
+            foreach ($set_bgcolor as $k => $v) {
                 $site_arr = [
                     'x0' => 0,
                     'x1' => 0
                 ];
-                for ($i = 0; $i <= $val; $i ++) {
-                    if ($i < $val) {
+                for ($i = 0; $i <= $v; $i ++) {
+                    if ($i < $v) {
                         $site_arr['x0'] += $params['field_width'][$i]; 
                     } else {
                         $site_arr['x1'] = $site_arr['x0'] + $params['field_width'][$i];
                     }
              
                 }
-                $set_bgcolor[$key] = $site_arr;
+                $set_bgcolor[$k] = $site_arr;
+                
             }
+            // dump($set_bgcolor[$key]);
+            
             foreach ($params['data'] as $key => $item) {
+                // echo '<pre>';
+                // print_r($set_bgcolor);
                 foreach ($set_bgcolor as $key2 => $val2) {
-                    if (!empty($item[$key2]) && $item[$key2] <= 60) {
-                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $gray);
-                    } elseif (!empty($item[$key2]) && ($item[$key2] > 60 && $item[$key2] <= 99)) {
-                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $green2);
-                    } elseif (!empty($item[$key2]) && $item[$key2] > 99) { 
-                        imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                    // echo $key2;
+                    if (@$params['code'] == 'S108A' || @$params['code'] =='S108B' || @$params['code'] == 'S109' || @$params['code'] == 'S109B' || @$params['code'] 
+                    == 'S110A'|| @$params['code'] == 'S110B') {
+                        // echo 1111111111;die;
+                        if (!empty($item[$key2]) && $item[$key2] <= 60) {
+                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $gray);
+                        } elseif (!empty($item[$key2]) && ($item[$key2] > 60 && $item[$key2] <= 99)) {
+                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $green2);
+                        } elseif (!empty($item[$key2]) && $item[$key2] > 99) { 
+                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);   
+                        }
+                    }
+
+                    // 配饰
+                    if (@$params['code'] == 'S012') {
+                        if ($item['周转周'] < 15 && !empty($item['周转周'])) {
+                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                        }
+                        // 或者以二级分类的仓库可用库存总量/二级分类总库存量的占比小于10%时候，在分类那边标红色
+                        foreach ($params['data2'] as $key3 => $item3) {
+                            if ($item3['二级分类'] == $item['二级分类'] && $item3['占比'] < 0.1) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                            }
+                        }
+                    }
+
+                    // 117
+                    if (@$params['code'] == 'S117') {
+                        foreach ($params['data2'] as $key3 => $item3) {
+                            if ($key2 == '直营_毛利率' && $item3['日期'] == $item['日期'] && $item3['直营_毛利率'] < $item3['直营累计_毛利率']) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                                break;
+                            }
+                            if ($key2 == '加盟_毛利率' && $item3['日期'] == $item['日期'] && $item3['加盟_毛利率'] < $item3['加盟累计_毛利率']) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                                break;
+                            }
+                        }
                     }
                 }
             }

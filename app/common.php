@@ -511,3 +511,16 @@ function getWeatherDateList($type = 0)
     }
     return $date_list;
 }
+
+// 0除以任何数都得0
+function zeroHandle($num1, $num2) {
+    if ($num1 == 0 || $num2 == 0) {
+        return 0;
+    } else {
+        $res = $num1 / $num2;
+        // $res = sprintf("%.3f", $res);
+        // $res = $this->precision_restore($num1, $num2, '除法');
+        return $res;
+    }
+}
+
