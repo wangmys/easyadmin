@@ -552,7 +552,7 @@ class ReportFormsService
                 FROM
                     accessories_report 
                 WHERE
-                    更新日期 = '2023-07-31' 
+                    更新日期 = '{$date}' 
                 GROUP BY 一级分类,二级分类
                 ORDER BY
                     一级分类 DESC,二级分类 ASC
