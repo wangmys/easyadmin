@@ -17,6 +17,8 @@ class Ww_data_diaobo extends Command
     {
         // 指令配置
         $this->setName('Ww_data_diaobo')
+            ->addArgument('start_date', Argument::OPTIONAL)
+            ->addArgument('end_date', Argument::OPTIONAL)
             ->setDescription('the Ww_data_diaobo command');
     }
 
@@ -25,15 +27,24 @@ class Ww_data_diaobo extends Command
         ini_set('memory_limit','1024M');
         $db = Db::connect("mysql");
 
+        $start_date_diy    = $input->getArgument('start_date') ?: '';
+        $end_date_diy    = $input->getArgument('end_date') ?: '';
+        
         $start_date = $end_date = '';
-        $w_day = date('w');
-        if ($w_day == 1) {//星期一，跑上周数据
-            $start_date = date('Y-m-d', strtotime('-7 days'));
-            $end_date = date('Y-m-d', strtotime('-1 days'));
-        } elseif ($w_day == 4) {//星期四，跑前3天数据
-            $start_date = date('Y-m-d', strtotime('-3 days'));
-            $end_date = date('Y-m-d', strtotime('-1 days'));
+        if ($start_date_diy && $end_date_diy) {
+            $start_date = $start_date_diy;
+            $end_date = $end_date_diy;
+        } else {
+            $w_day = date('w');
+            if ($w_day == 1) {//星期一，跑上周数据
+                $start_date = date('Y-m-d', strtotime('-7 days'));
+                $end_date = date('Y-m-d', strtotime('-1 days'));
+            } elseif ($w_day == 4) {//星期四，跑前3天数据
+                $start_date = date('Y-m-d', strtotime('-3 days'));
+                $end_date = date('Y-m-d', strtotime('-1 days'));
+            }
         }
+        if (!$start_date && !$end_date) die;
         
         $data = $this->get_diaobo_sql($start_date, $end_date);
         if ($data) {
