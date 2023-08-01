@@ -297,11 +297,11 @@ class Weather extends AdminController
             ])->update(['cid' => $city_cid]);
             // 绑定城市后,更新该城市的天气数据
             (new WeatherService)->updateCityWeather2345($city_id);
-            if($res){
+            // if($res){
                 // 绑定城市
                 $this->success('绑定成功');
-            }
-            $this->error('绑定失败');
+            // }
+            // $this->error('绑定失败');
         }
 
         // 查询店铺记录
