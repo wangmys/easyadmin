@@ -135,11 +135,15 @@
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-field="周转合计"][data-key="1-1-23"] {
+        th[data-field="季节"][data-key="1-1-23"] {
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-field="周转合计"][data-key="1-1-24"] {
+        th[data-field="识别规则"][data-key="1-1-24"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="识别天数"][data-key="1-1-25"] {
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
@@ -147,7 +151,7 @@
             background-color: #ff3c00 !important;
             color:#ffffff;
         }
-        th[data-field="提醒备注"][data-key="1-1-35"] {
+        th[data-field="提醒"][data-key="1-1-26"] {
             background-color: #ff3c00 !important;
             color:#ffffff;
         }
@@ -561,38 +565,51 @@
                 , page: true
                 , limit: 1000
                 , limits: [500, 1000, 5000, 10000, 20000]
-                , height: 720
+                , height: 820
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , where: { "提醒备注" : '请注意'}
                 , cols: [[
-                    { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
-                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 32, rowspan: 5}
+                    { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 32, rowspan: 3}
                     , { title: `<div class="flex col around">
                                  <div class="cima"></div>
                                  <div class="cima">商品</div>
                                  <div class="cima">专员</div>
                                  <div class="cima"></div>
-                                </div>`, field: '商品专员', fixed: 'left', align: 'center' , width: 42, rowspan: 5}
-                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center', width: 70, rowspan: 5}
+                                </div>`, field: '商品专员', fixed: 'left', align: 'center' , width: 42, rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center', width: 70, rowspan: 3}
                     , { title: `<div class="flex col around">
                                  <div class="cima">店</div>
                                  <div class="cima">铺</div>
                                  <div class="cima">等</div>
                                  <div class="cima">级</div>
-                                </div>`, field: '店铺等级', fixed: 'left', width: 22, align: 'center', rowspan: 5}
+                                </div>`, field: '店铺等级', fixed: 'left', width: 22, align: 'center', rowspan: 3}
                     , { title: `<div class="flex col around">
                                  <div class="cima"></div>
                                  <div class="cima">经营</div>
                                  <div class="cima">模式</div>
                                  <div class="cima"></div>
-                                </div>`,field: '经营属性', fixed: 'left', align: 'center', width: 32,rowspan: 5}
+                                </div>`,field: '经营属性', fixed: 'left', align: 'center', width: 32,rowspan: 3}
                     , { title: `<div class="flex col around">
                                  <div class="cima">开业</div>
                                  <div class="cima">日期</div>
-                                </div>`, field: '开业日期', fixed: 'left', width: 70, align: 'center' ,rowspan: 5, hide: false}
+                                </div>`, field: '开业日期', fixed: 'left', width: 70, align: 'center' ,rowspan: 3, hide: false}
                     , { title: '气温变化', align: 'center' ,colspan: 12}
-                    , { title: '满足条件情况', align: 'center' ,colspan: 13}
-                    , { title: '提醒', align: 'center' ,colspan: 12}
+                    , { title: '满足条件情况', align: 'center' ,colspan: 14}
+                    , { title: '上新提醒', align: 'center' ,colspan: 3}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima" style="">当年春季SKC数</div>
+                                 <div class="cima">基本</div>
+                                 <div class="cima"></div>
+                                </div>`, align: 'center', colspan: 2}
+                    , { title: `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima" style="">当前秋/冬季SKC数</div>
+                                 <div class="cima">基本</div>
+                                 <div class="cima"></div>
+                                </div>`, align: 'center' ,colspan: 3}
+                    , { title: `近三天销售占比`, align: 'center' ,colspan: 9}
                     ],
                     // 气温变化
                     [{ title:  `<div class="flex col around" style="color:#b2b2b2;">
@@ -600,7 +617,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day0']}</div>
                                  <div class="cima">日</div>
-                               </div>`, align: 'center', colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, align: 'center', colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -614,7 +631,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day1']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -628,7 +645,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day2']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -642,7 +659,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day3']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -656,7 +673,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day4']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -670,7 +687,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day5']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -684,7 +701,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day6']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -698,7 +715,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day7']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -712,7 +729,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day8']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计36/6XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计36/6XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -726,7 +743,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day9']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计38/7XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -740,7 +757,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day10']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'预计_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'预计_40', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -751,10 +768,18 @@
                     }}
                     ,{ title: `<div class="flex col around">
                                 <div class="cima"></div>
-                                <div class="cima">识</div>
-                                <div class="cima">别</div>
+                                <div class="cima">温</div>
+                                <div class="cima">度</div>
                                 <div class="cima"></div>
-                                </div>`, field:'预计库存合计', align: 'center',rowspan: 2, width: 35}
+                                </div>`, field:'温度', align: 'center',rowspan: 2, width: 35, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn hot" style="">最高</div>
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu winter cool" style="">最低</div>
+                            </div>`; 
+                    }}
 
                     // 满足条件情况
                     ,{ title:  `<div class="flex col around" style="color:#b2b2b2;">
@@ -762,7 +787,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day0']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转00/28/37/44/100/160/S', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转00/28/37/44/100/160/S', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -776,7 +801,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day1']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -790,7 +815,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day2']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -804,7 +829,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day3']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -818,7 +843,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day4']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -832,7 +857,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day5']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -846,7 +871,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day6']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -860,7 +885,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day7']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, field:'周转35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -874,7 +899,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day8']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -888,7 +913,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day9']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -902,7 +927,7 @@
                                  <div class="cima">月</div>
                                  <div class="cima">{$weather_date_day['day10']}</div>
                                  <div class="cima">日</div>
-                               </div>`, field:'周转_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: 
+                               </div>`, align: 'center',colspan: 1, rowspan: 2, width: 30, templet: 
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
@@ -912,187 +937,301 @@
                             </div>`; 
                     }}
                     ,{ title: `<div class="flex col around">
-                                <div class="cima">连</div>
-                                <div class="cima">续</div>
-                                <div class="cima">天</div>
-                                <div class="cima">数</div>
-                                </div>`, field:'周转合计', align: 'center',rowspan: 2, width: 35, templet: function (data) {
-                        if (data['周转合计']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return data['周转合计'];
-                        } else {
-                            return '';
-                        }
-                    }}
-                    ,{ title: `<div class="flex col around">
+                                <div class="cima"></div>
                                 <div class="cima">季</div>
                                 <div class="cima">节</div>
+                                <div class="cima"></div>
+                                </div>`, field:'季节', align: 'center',rowspan: 2, width: 35, templet:
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">秋季</div>
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu winter" style="color:#0429c8;">冬季</div>
+                            </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">识</div>
+                                <div class="cima">别</div>
+                                <div class="cima">规</div>
+                                <div class="cima">则</div>
+                                </div>`, field:'识别规则', align: 'center',rowspan: 2, width: 35, templet:
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">${data['识别规则_秋']?data['识别规则_秋']:''}</div>
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu winter" style="color:#0429c8;">${data['识别规则_冬']?data['识别规则_冬']:''}</div>
+                            </div>`; 
+                    }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">识</div>
+                                <div class="cima">别</div>
                                 <div class="cima">天</div>
                                 <div class="cima">数</div>
-                                </div>`, field:'周转合计', align: 'center',rowspan: 2, width: 35, templet: function (data) {
-                        if (data['周转合计']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return data['周转合计'];
+                                </div>`, field:'识别天数', align: 'center',rowspan: 2, width: 35, templet: 
+                    function (data) {
+                        if (data['识别规则_秋'] == 'A') {
+                            var html1 = `
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">${data['秋季连续天数A']}</div>
+                            `; 
+                        } else if (data['识别规则_秋'] == 'B') {
+                            var html1 = `
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">${data['秋季连续天数B']}</div>
+                            `; 
+                        } else if (data['识别规则_秋'] == 'C') {
+                            var html1 = `
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">${data['秋季天数C']}</div>
+                            `; 
                         } else {
-                            return '';
+                            var html1 = `
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style=""> </div>
+                            `;     
                         }
-                    }}
 
+                        if (data['识别规则_冬'] == 'A') {
+                            var html2 = `
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu winter" style="color:#0429c8;">${data['冬季连续天数A']}</div>
+                            `; 
+                        } else if (data['识别规则_冬'] == 'B') {
+                            var html2 = `
+                                <div class="cima_1" style="height:15px; width:10px;"></div>   
+                                <div class="cima_manzu winter" style="color:#0429c8;">${data['冬季连续天数B']}</div>
+                            `; 
+                        } else if (data['识别规则_冬'] == 'C') {
+                            var html2 = `
+                                <div class="cima_1" style="height:15px; width:10px;"></div>   
+                                <div class="cima_manzu winter" style="color:#0429c8;">${data['冬季天数C']}</div>
+                            `; 
+                        } else {
+                            var html2 = `
+                                <div class="cima_1" style="height:15px; width:10px;"></div>   
+                                <div class="cima_manzu winter" style="">&nbsp;</div>
+                            `;     
+                        }
+                        return `<div class="weather_div flex col around">
+                                ${html1}
+                                ${html2}
+                            </div>`; 
+                    }}
+                    // 上新提醒
                     ,{ title:  `<div class="flex col around">
-                                 <div class="cima">28</div>
-                                 <div class="cima">44</div>
-                                 <div class="cima">37</div>
-                                 <div class="cima">S</div>
-                               </div>`, field:'提醒00/28/37/44/100/160/S', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒00/28/37/44/100/160/S']) {
+                                 <div class="cima">提醒</div>
+                               </div>`, field:'提醒', align: 'center',colspan: 1, rowspan: 2, width: 60, templet: 
+                    function (data) {
+                        if (data['提醒']) {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒00/28/37/44/100/160/S']}</div>`;
+                            if (data['提醒'] == '上秋') {
+                                return `<div style="color:#c89804;background:#dedede;">${data['提醒']}</div>`;
+                            } else if (data['提醒'] == '上冬') {
+                                return `<div style="color:#0429c8;background:#dedede;">${data['提醒']}</div>`;
+                            } else if (data['提醒'] == '秋冬可上') {
+                                return `<div style="color:red;background:#dedede;">${data['提醒']}</div>`;
+                            }
                         } else {
                             return '';
                         }
                     }}
                     ,{ title: `<div class="flex col around">
-                                 <div class="cima">29</div>
-                                 <div class="cima">46</div>
-                                 <div class="cima">38</div>
-                                 <div class="cima">S</div>
-                                </div>`, field:'提醒29/38/46/105/165/M', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒29/38/46/105/165/M']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒29/38/46/105/165/M']}</div>`;
-                        } else {
-                            return '';
-                        }
+                                 <div class="cima"></div>
+                                 <div class="cima">历史最早</div>
+                                 <div class="cima">启动日起</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'历史最早动日起', align: 'center',colspan: 1, rowspan: 2, width: 80, templet:
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu" style="color:#c89804;">${data['秋季历史最早']?data['秋季历史最早']:''}</div>
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu" style="color:#0429c8;">${data['冬季历史最早']?data['冬季历史最早']:''}</div>
+                            </div>`; 
                     }}
                     ,{ title:  `<div class="flex col around">
-                                 <div class="cima">30</div>
-                                 <div class="cima">48</div>
-                                 <div class="cima">39</div>
-                                 <div class="cima">L</div>
-                                </div>`, field:'提醒30/39/48/110/170/L', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒30/39/48/110/170/L']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒30/39/48/110/170/L']}</div>`;
-                        } else {
-                            return '';
-                        }
+                                 <div class="cima"></div>
+                                 <div class="cima">温区最早</div>
+                                 <div class="cima">启动日起</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'温区最早启动日起', align: 'center',colspan: 1, rowspan: 2, width: 80, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['秋季温区最早']?data['秋季温区最早']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;">${data['冬季温区最早']?data['冬季温区最早']:''}</div>
+                        </div>`; 
+    
                     }}
                     ,{ title:  `<div class="flex col around">
-                                <div class="cima">31</div>
-                                <div class="cima">50</div>
-                                <div class="cima">40</div>
-                                <div class="cima">XL</div>    
-                                </div>`, field:'提醒31/40/50/115/175/XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒31/40/50/115/175/XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒31/40/50/115/175/XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                                 <div class="cima"></div>
+                                 <div class="cima" style="">内</div>
+                                 <div class="cima">搭</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'春季SKC基本_内搭', align: 'center',colspan: 1, rowspan: 2, width: 50, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_manzu" style="color:green;">${data['春季SKC基本_内搭']?data['春季SKC基本_内搭']:''}</div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">32</div>
-                                <div class="cima">52</div>
-                                <div class="cima">41</div>
-                                <div class="cima">2XL</div>    
-                                </div>`, field:'提醒32/41/52/120/180/2XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒32/41/52/120/180/2XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒32/41/52/120/180/2XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima">外</div>
+                                 <div class="cima">套</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'春季SKC基本_外套', align: 'center',colspan: 1, rowspan: 2, width: 50, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around"> 
+                            <div class="cima_manzu" style="color:green;">${data['春季SKC基本_外套']?data['春季SKC基本_外套']:''}</div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">33</div>
-                                <div class="cima">54</div>
-                                <div class="cima">42</div>
-                                <div class="cima">3XL</div>  
-                                </div>`, field:'提醒33/42/54/125/185/3XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒33/42/54/125/185/3XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒33/42/54/125/185/3XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima" style="">内</div>
+                                 <div class="cima">搭</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'秋冬季SKC基本_内搭', align: 'center',colspan: 1, rowspan: 2, width: 50, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['秋季SKC基本_内搭']?data['秋季SKC基本_内搭']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;">${data['冬季SKC基本_内搭']?data['冬季SKC基本_内搭']:''}</div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">34</div>
-                                <div class="cima">56</div>
-                                <div class="cima">43</div>
-                                <div class="cima">4XL</div>  
-                                </div>`, field:'提醒34/43/56/190/4XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒34/43/56/190/4XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒34/43/56/190/4XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima">外</div>
+                                 <div class="cima">套</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'秋冬季SKC基本_外套', align: 'center',colspan: 1, rowspan: 2, width: 50, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['秋季SKC基本_外套']?data['秋季SKC基本_外套']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;">${data['冬季SKC基本_外套']?data['冬季SKC基本_外套']:''}</div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">35</div>
-                                <div class="cima">58</div>
-                                <div class="cima">44</div>
-                                <div class="cima">5XL</div>  
-                                </div>`, field:'提醒35/44/58/195/5XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒35/44/58/195/5XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒35/44/58/195/5XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    ,{ title:  `<div class="flex col around">
+                                 <div class="cima"></div>
+                                 <div class="cima">下</div>
+                                 <div class="cima">装</div>
+                                 <div class="cima"></div>
+                                </div>`, field:'秋冬季SKC基本_下装', align: 'center',colspan: 1, rowspan: 2, width: 50, templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['秋季SKC基本_下装']?data['秋季SKC基本_下装']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;">${data['冬季SKC基本_下装']?data['冬季SKC基本_下装']:''}</div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">36</div>
-                                <div class="cima">60</div>
-                                <div class="cima">00</div>
-                                <div class="cima">6XL</div> 
-                                </div>`, field:'提醒36/6XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒36/6XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒36/6XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    , { title: `大前天`, align: 'center' ,colspan: 3}
+                    , { title: `前天`, align: 'center' ,colspan: 3}
+                    , { title: `昨天`, align: 'center' ,colspan: 3}
+                    ],
+                    [
+                    // 前三天 
+                     { title: `内搭`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_内搭']?'春秋:'+data['大前天_春秋_内搭']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">38</div>
-                                <div class="cima"></div>
-                                <div class="cima"></div>
-                                <div class="cima">7XL</div>
-                                </div>`, field:'提醒38/7XL', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒38/7XL']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒38/7XL']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    , { title: `外套`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_外套']?'春秋:'+data['大前天_春秋_外套']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima">40</div>
-                                <div class="cima"></div>
-                                <div class="cima"></div>
-                                <div class="cima"></div>
-                                </div>`, field:'提醒_40', align: 'center',colspan: 1, rowspan: 1, width: 30, templet: function (data) {
-                        if (data['提醒_40']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒_40']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    , { title: `下装`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['大前天_春秋_下装']?'春秋:'+data['大前天_春秋_下装']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
                     }}
-                    ,{ title: `<div class="flex col around">
-                                <div class="cima"></div>
-                                <div class="cima">提醒</div>
-                                <div class="cima">备注</div>
-                                <div class="cima"></div>
-                                </div>`, field:'提醒备注', align: 'center',rowspan: 2, width: 50, templet: function (data) {
-                        if (data['提醒备注']) {
-                            // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style="color:red">${data['提醒备注']}</div>`;
-                        } else {
-                            return '';
-                        }
+                    // 前两天
+                    , { title: `内搭`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_内搭']?'春秋:'+data['前天_春秋_内搭']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
+                    }}
+                    , { title: `外套`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_外套']?'春秋:'+data['前天_春秋_外套']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
+                    }}
+                    , { title: `下装`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['前天_春秋_下装']?'春秋:'+data['前天_春秋_下装']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
+                    }}
+                    // 昨天
+                    , { title: `内搭`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_内搭']?'春秋:'+data['昨天_春秋_内搭']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
+                    }}
+                    , { title: `外套`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_外套']?'春秋:'+data['昨天_春秋_外套']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
+                    }}
+                    , { title: `下装`, align: 'center', templet: 
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                            <div class="cima_1" style="height:5px; width:10px;"></div>   
+                            <div class="cima_manzu" style="color:#c89804;">${data['昨天_春秋_下装']?'春秋:'+data['昨天_春秋_下装']:''}</div>
+                            <div class="cima_1" style="height:15px; width:10px;"></div> 
+                            <div class="cima_manzu" style="color:#0429c8;"></div>
+                        </div>`; 
+    
                     }}
                     ],
                 ]

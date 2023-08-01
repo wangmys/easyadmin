@@ -557,7 +557,7 @@ class ShopbuhuoB extends AdminController
             WHERE  EC.ShutOut=0
                 AND EG.GoodsNo = '{$GoodsNo}'
                 AND EC.CustomerName = '{$CustomerName}'
-                AND EG.TimeCategoryName1 in (2021,2022,2023)
+                AND EG.TimeCategoryName1 in (2020,2021,2022,2023)
             GROUP BY 
                 EC.CustomItem17,
                 EC.CustomerName,
