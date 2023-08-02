@@ -284,90 +284,52 @@ class Weathertips extends AdminController
                 if (!empty($input['商品负责人'])) {
                     // echo $input['商品负责人'];
                     $map1Str = xmSelectInput($input['商品负责人']);
-                    $map1 = " AND 商品负责人 IN ({$map1Str})";
+                    $map1 = " AND c.商品负责人 IN ({$map1Str})";
                 } else {
                     $map1 = "";
                 }
             } else {
                 $admin = session('admin.name');
-                $map1 = " AND 商品负责人 IN ('{$admin}')";
+                $map1 = " AND c.商品负责人 IN ('{$admin}')";
             }
 
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $map2Str = xmSelectInput($input['云仓']);
-                $map2 = " AND 云仓 IN ({$map2Str})";
+                $map2 = " AND c.云仓 IN ({$map2Str})";
             } else {
                 $map2 = "";
             }
             if (!empty($input['省份'])) {
                 // echo $input['商品负责人'];
                 $map3Str = xmSelectInput($input['省份']);
-                $map3 = " AND 省份 IN ({$map3Str})";
+                $map3 = " AND c.省份 IN ({$map3Str})";
             } else {
                 $map3 = "";
             }   
             if (!empty($input['经营模式'])) {
                 // echo $input['商品负责人'];
                 $map4Str = xmSelectInput($input['经营模式']);
-                $map4 = " AND 经营模式 IN ({$map4Str})";
+                $map4 = " AND c.经营属性 IN ({$map4Str})";
             } else {
                 $map4 = "";
             }
             if (!empty($input['店铺名称'])) {
                 // echo $input['商品负责人'];
                 $map5Str = xmSelectInput($input['店铺名称']);
-                $map5 = " AND 店铺名称 IN ({$map5Str})";
+                $map5 = " AND c.店铺名称 IN ({$map5Str})";
             } else {
                 $map5 = "";
-            }
-            if (!empty($input['大类'])) {
+            }   
+            
+            if (!empty($input['提醒'])) {
                 // echo $input['商品负责人'];
-                $map6Str = xmSelectInput($input['大类']);
-                $map6 = " AND 一级分类 IN ({$map6Str})";
+                $map6Str = xmSelectInput($input['提醒']);
+                $map6 = " AND c.提醒 IN ({$map6Str})";
             } else {
                 $map6 = "";
             }
-            if (!empty($input['中类'])) {
-                // echo $input['商品负责人'];
-                $map7Str = xmSelectInput($input['中类']);
-                $map7 = " AND 二级分类 IN ({$map7Str})";
-            } else {
-                $map7 = "";
-            }
-            if (!empty($input['分类'])) {
-                // echo $input['商品负责人'];
-                $map8Str = xmSelectInput($input['分类']);
-                $map8 = " AND 分类 IN ({$map8Str})";
-            } else {
-                $map8 = "";
-            }
-            if (!empty($input['货号'])) {
-                // echo $input['商品负责人'];
-                $map9Str = xmSelectInput($input['货号']);
-                $map9 = " AND 货号 IN ({$map9Str})";
-            } else {
-                $map9 = "";
-            }
-            if (!empty($input['风格'])) {
-                // echo $input['商品负责人'];
-                $map10Str = xmSelectInput($input['风格']);
-                $map10 = " AND 风格 IN ({$map10Str})";
-            } else {
-                $map10 = "";
-            }
-            if (!empty($input['提醒备注'])) {
-                // echo $input['商品负责人'];
-                $map11Str = xmSelectInput($input['提醒备注']);
-                $map11 = " AND 提醒备注 IN ({$map11Str})";
-            } else {
-                $map11 = "";
-            }
-            if (!empty($input['超量个数'])) {
-                $map12 = " AND 超量个数 = {$input['超量个数']}";
-            } else {
-                $map12 = "";
-            }
+
 
             $sql = "
                 SELECT
@@ -390,24 +352,24 @@ class Weathertips extends AdminController
                     c.秋季历史最早,c.冬季历史最早,
                     c.秋季温区最早,c.冬季温区最早,
                     c.春季SKC基本_内搭,c.春季SKC基本_外套,c.秋季SKC基本_内搭,c.秋季SKC基本_外套,c.秋季SKC基本_下装,c.冬季SKC基本_内搭,c.冬季SKC基本_外套,c.冬季SKC基本_下装,
-                    concat(round(r_3day_nd.销售占比 * 100, 1), '%') as 大前天_春秋_内搭,
-                    concat(round(r_3day_wt.销售占比 * 100, 1), '%') as 大前天_春秋_外套,
-                    concat(round(r_3day_xz.销售占比 * 100, 1), '%') as 大前天_春秋_下装,
-                    concat(round(r_2day_nd.销售占比 * 100, 1), '%') as 前天_春秋_内搭,
-                    concat(round(r_2day_wt.销售占比 * 100, 1), '%') as 前天_春秋_外套,
-                    concat(round(r_2day_xz.销售占比 * 100, 1), '%') as 前天_春秋_下装,
-                    concat(round(r_1day_nd.销售占比 * 100, 1), '%') as 昨天_春秋_内搭,
-                    concat(round(r_1day_wt.销售占比 * 100, 1), '%') as 昨天_春秋_外套,
-                    concat(round(r_1day_xz.销售占比 * 100, 1), '%') as 昨天_春秋_下装,
-                    concat(round(r_3day_nd_dj.销售占比 * 100, 1), '%') as 大前天_冬_内搭,
-                    concat(round(r_3day_wt_dj.销售占比 * 100, 1), '%') as 大前天_冬_外套,
-                    concat(round(r_3day_xz_dj.销售占比 * 100, 1), '%') as 大前天_冬_下装,
-                    concat(round(r_2day_nd_dj.销售占比 * 100, 1), '%') as 前天_冬_内搭,
-                    concat(round(r_2day_wt_dj.销售占比 * 100, 1), '%') as 前天_冬_外套,
-                    concat(round(r_2day_xz_dj.销售占比 * 100, 1), '%') as 前天_冬_下装,
-                    concat(round(r_1day_nd_dj.销售占比 * 100, 1), '%') as 昨天_冬_内搭,
-                    concat(round(r_1day_wt_dj.销售占比 * 100, 1), '%') as 昨天_冬_外套,
-                    concat(round(r_1day_xz_dj.销售占比 * 100, 1), '%') as 昨天_冬_下装
+                    concat(round(r_3day_nd.销售占比 * 100, 1), '%') as `大前天_春秋_内搭`,
+                    concat(round(r_3day_wt.销售占比 * 100, 1), '%') as `大前天_春秋_外套`,
+                    concat(round(r_3day_xz.销售占比 * 100, 1), '%') as `大前天_春秋_下装`,
+                    concat(round(r_2day_nd.销售占比 * 100, 1), '%') as `前天_春秋_内搭`,
+                    concat(round(r_2day_wt.销售占比 * 100, 1), '%') as `前天_春秋_外套`,
+                    concat(round(r_2day_xz.销售占比 * 100, 1), '%') as `前天_春秋_下装`,
+                    concat(round(r_1day_nd.销售占比 * 100, 1), '%') as `昨天_春秋_内搭`,
+                    concat(round(r_1day_wt.销售占比 * 100, 1), '%') as `昨天_春秋_外套`,
+                    concat(round(r_1day_xz.销售占比 * 100, 1), '%') as `昨天_春秋_下装`,
+                    concat(round(r_3day_nd_dj.销售占比 * 100, 1), '%') as `大前天_冬_内搭`,
+                    concat(round(r_3day_wt_dj.销售占比 * 100, 1), '%') as `大前天_冬_外套`,
+                    concat(round(r_3day_xz_dj.销售占比 * 100, 1), '%') as `大前天_冬_下装`,
+                    concat(round(r_2day_nd_dj.销售占比 * 100, 1), '%') as `前天_冬_内搭`,
+                    concat(round(r_2day_wt_dj.销售占比 * 100, 1), '%') as `前天_冬_外套`,
+                    concat(round(r_2day_xz_dj.销售占比 * 100, 1), '%') as `前天_冬_下装`,
+                    concat(round(r_1day_nd_dj.销售占比 * 100, 1), '%') as `昨天_冬_内搭`,
+                    concat(round(r_1day_wt_dj.销售占比 * 100, 1), '%') as `昨天_冬_外套`,
+                    concat(round(r_1day_xz_dj.销售占比 * 100, 1), '%') as `昨天_冬_下装`
                 FROM
                     cwl_weathertips_customer AS c
                     left join cwl_weathertips_retail_2 as r_3day_nd ON c.省份 = r_3day_nd.省份 AND c.店铺名称 = r_3day_nd.店铺名称 AND r_3day_nd.季节修订 = '春秋季' AND r_3day_nd.日期识别='大前天' AND r_3day_nd.`一级分类`='内搭'
@@ -430,7 +392,12 @@ class Weathertips extends AdminController
                   left join cwl_weathertips_retail_2 as r_1day_wt_dj ON c.省份 = r_1day_wt_dj.省份 AND c.店铺名称 = r_1day_wt_dj.店铺名称 AND r_1day_wt_dj.季节修订 = '冬季' AND r_1day_wt_dj.日期识别='昨天' AND r_1day_wt_dj.`一级分类`='外套'
                   left join cwl_weathertips_retail_2 as r_1day_xz_dj ON c.省份 = r_1day_xz_dj.省份 AND c.店铺名称 = r_1day_xz_dj.店铺名称 AND r_1day_xz_dj.季节修订 = '冬季' AND r_1day_xz_dj.日期识别='昨天' AND r_1day_xz_dj.`一级分类`='下装'		
                 WHERE 1	
-
+                   {$map1} 
+                   {$map2} 
+                   {$map3} 
+                   {$map4} 
+                   {$map5} 
+                   {$map6} 
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
 
@@ -439,8 +406,14 @@ class Weathertips extends AdminController
             $sql2 = "
                 SELECT 
                     count(*) as total
-                FROM cwl_weathertips_customer
+                FROM cwl_weathertips_customer as c
                 WHERE 1
+                    {$map1} 
+                    {$map2} 
+                    {$map3} 
+                    {$map4} 
+                    {$map5} 
+                    {$map6} 
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
@@ -498,29 +471,19 @@ class Weathertips extends AdminController
     public function getXmMapSelect() {
         // 商品负责人
         $customer17 = $this->db_easyA->query("
-            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_chaoliang_sk WHERE 商品负责人 IS NOT NULL GROUP BY 商品负责人
+            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_weathertips_customer WHERE 商品负责人 IS NOT NULL AND 商品负责人 !='0' GROUP BY 商品负责人
         ");
         $province = $this->db_easyA->query("
-            SELECT 省份 as name, 省份 as value FROM cwl_chaoliang_sk WHERE 省份 IS NOT NULL GROUP BY 省份
+            SELECT 省份 as name, 省份 as value FROM cwl_weathertips_customer WHERE 省份 IS NOT NULL GROUP BY 省份
         ");
         $customer = $this->db_easyA->query("
-            SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_chaoliang_sk GROUP BY 店铺名称
-        ");
-        $zhonglei = $this->db_easyA->query("
-            SELECT 二级分类 as name, 二级分类 as value FROM cwl_chaoliang_sk WHERE  二级分类 IS NOT NULL GROUP BY 二级分类
-        ");
-        $fenlei = $this->db_easyA->query("
-            SELECT 分类 as name, 分类 as value FROM cwl_chaoliang_sk WHERE 分类 IS NOT NULL GROUP BY 分类
-        ");
-        $huohao = $this->db_easyA->query("
-            SELECT 货号 as name, 货号 as value FROM cwl_chaoliang_sk WHERE  货号 IS NOT NULL GROUP BY 货号
+            SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_weathertips_customer GROUP BY 店铺名称
         ");
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer, 'zhonglei' => $zhonglei, 
-        'fenlei' => $fenlei, 'huohao' => $huohao]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer]]);
     }
 
     // 下载超量明细  sk
