@@ -170,7 +170,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
+                                <!-- <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
                                 <div class="layui-input-inline" style="width: 100px !important;">
                                     <select id="season_id" name="季节归集" lay-verify="required">
                                         <option value="春季">春季</option>
@@ -178,6 +178,10 @@
                                         <option value="秋季">秋季</option>
                                         <option value="冬季">冬季</option>
                                     </select>
+                                </div> -->
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">季节归集</label>
+                                <div class="layui-input-inline" style="width: 250px !important;">
+                                    <div id="xm-season" class="xm-select-demo"></div>
                                 </div>
 
                                 <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">折率（计算排名用）>=</label>
@@ -236,6 +240,23 @@
             data: []
         })
 
+        xmSelect.render({
+            el: '#xm-season', 
+            filterable: true,
+            toolbar: {show: true},
+            theme: {
+                color: '#1cbbb4',
+            },
+            // showCount: 1,
+            name:'季节归集',
+            data: [
+                {name: "春季", value: "春季", selected: false},
+                {name: "夏季", value: "夏季", selected: false},
+                {name: "秋季", value: "秋季", selected: false},
+                {name: "冬季", value: "冬季", selected: false},
+            ]
+        })
+
 
         //监听保存
         form.on('submit(saveMap)', function (res) {
@@ -282,7 +303,17 @@
                     data: res.data.goodsNo
                 })
 
-                
+                xmSelect.render({
+                    el: '#xm-season', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'季节归集',
+                    data: res.data.season
+                })
             })
             $("#season_id").val("{$config['季节归集']}");
             form.render();

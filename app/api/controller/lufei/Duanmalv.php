@@ -34,17 +34,33 @@ class Duanmalv extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
-    public function seasionHandle($seasion = "春季") {
+    public function seasionHandle($seasion = "夏季,秋季") {
         $seasionStr = "";
-        if ($seasion == '春季') {
-            $seasionStr = "'初春','正春','春季'";
-        } elseif ($seasion == '夏季') {
-            $seasionStr = "'初夏','盛夏','夏季'";
-        } elseif ($seasion == '秋季') {
-            $seasionStr = "'初秋','深秋','秋季'";
-        } elseif ($seasion == '冬季') {
-            $seasionStr = "'初冬','深冬','冬季'";
+        $seasion = explode(',', $seasion);
+        foreach ($seasion as $key => $val) {
+            if ($key + 1 == count($seasion)) {
+                if ($val == '春季') {
+                    $seasionStr .= "'初春','正春','春季'";
+                } elseif ($val == '夏季') {
+                    $seasionStr .= "'初夏','盛夏','夏季'";
+                } elseif ($val == '秋季') {
+                    $seasionStr .= "'初秋','深秋','秋季'";
+                } elseif ($val == '冬季') {
+                    $seasionStr .= "'初冬','深冬','冬季'";
+                }
+            } else {
+                if ($val == '春季') {
+                    $seasionStr .= "'初春','正春','春季',";
+                } elseif ($val == '夏季') {
+                    $seasionStr .= "'初夏','盛夏','夏季',";
+                } elseif ($val == '秋季') {
+                    $seasionStr .= "'初秋','深秋','秋季',";
+                } elseif ($val == '冬季') {
+                    $seasionStr .= "'初冬','深冬','冬季',";
+                }
+            }
         }
+
         return $seasionStr;
     }
 
@@ -52,6 +68,8 @@ class Duanmalv extends BaseController
     public function retail_first() {
         $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
         $seasion = $this->seasionHandle($select_config['季节归集']); 
+        // $seasion = explode(',', $select_config['季节归集']);
+
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
         // 不考核货号
