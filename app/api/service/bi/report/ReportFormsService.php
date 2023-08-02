@@ -4762,9 +4762,9 @@ class ReportFormsService
                         if ($item['周转周'] < 15 && !empty($item['周转周'])) {
                             imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
                         }
-                        // 或者以二级分类的仓库可用库存总量/二级分类总库存量的占比小于10%时候，在分类那边标红色
+                        // 或者以二级分类的仓库可用库存总量/二级分类总库存量的占比小于5%时候，在分类那边标红色
                         foreach ($params['data2'] as $key3 => $item3) {
-                            if ($item3['二级分类'] == $item['二级分类'] && $item3['占比'] < 0.1) {
+                            if ($item3['二级分类'] == $item['二级分类'] && $item3['占比'] < 0.05) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
                             }
                         }

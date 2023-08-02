@@ -81,7 +81,7 @@ class SendReport extends BaseController
         } elseif ($name =='S108A') {
             $this->service->create_table_s108A();
         } elseif ($name =='S108B') {
-            $this->service->create_table_s108B('2023-05-12');
+            $this->service->create_table_s108B();
         } elseif ($name =='S109') {
             $this->service->create_table_s109();
         } elseif ($name =='S109B') {

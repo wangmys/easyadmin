@@ -398,7 +398,7 @@ class ShopbuhuoB extends AdminController
                 EC.ShutOut= 0 
                 AND EC.CustomerName = '{$CustomerName}' 
                 AND EG.GoodsNo = '{$GoodsNo}' 
-                AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
+                AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023) 
                 AND EIA.CodingCodeText='已审结'
                 AND EIA.IsCompleted=0
             GROUP BY
@@ -557,7 +557,7 @@ class ShopbuhuoB extends AdminController
             WHERE  EC.ShutOut=0
                 AND EG.GoodsNo = '{$GoodsNo}'
                 AND EC.CustomerName = '{$CustomerName}'
-                AND EG.TimeCategoryName1 in (2021,2022,2023)
+                AND EG.TimeCategoryName1 in (2020,2021,2022,2023)
             GROUP BY 
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -583,7 +583,7 @@ class ShopbuhuoB extends AdminController
             WHERE
                 EC.ShutOut= 0 
                 AND EC.CustomItem17 = '{$diaochufuzheren}' 
-                AND EG.TimeCategoryName1= in (2021,2022,2023)
+                AND EG.TimeCategoryName1= in (2020,2021,2022,2023)
             GROUP BY
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -735,7 +735,7 @@ class ShopbuhuoB extends AdminController
                     LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
                     LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
                 WHERE EC.CustomerName in ({$store_in_map})
-                    AND EG.TimeCategoryName1=2023
+                    AND EG.TimeCategoryName1 in (2023, 2022, 2021, 2020)
                     ) T
                     WHERE T.[清空时间] > GETDATE()-7
             ");
@@ -1069,7 +1069,7 @@ class ShopbuhuoB extends AdminController
                     LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
                     WHERE
                     EC.ShutOut= 0 
-                    AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
+                    AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023) 
                     AND EIA.CodingCodeText='已审结'
                     AND EIA.IsCompleted=0
                     GROUP BY
@@ -1377,7 +1377,7 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
                 WHERE
                 EC.ShutOut= 0 
-                AND EG.TimeCategoryName1 IN (2021, 2022, 2023) 
+                AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023) 
                 AND EIA.CodingCodeText='已审结'
                 AND EIA.IsCompleted=0
                 GROUP BY
