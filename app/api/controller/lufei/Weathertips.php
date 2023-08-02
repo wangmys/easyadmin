@@ -1795,7 +1795,7 @@ class Weathertips extends BaseController
             }
 
             if ($tips1 && $tips2) {
-                $tips3 = '秋冬可上'; 
+                $tips3 = '上秋冬'; 
             } elseif ($tips1) {
                 $tips3 = $tips1; 
             } elseif ($tips2) {
