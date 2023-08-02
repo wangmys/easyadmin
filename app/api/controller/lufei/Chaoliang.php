@@ -161,7 +161,7 @@ class Chaoliang extends BaseController
                     AND sk.店铺名称 = lz.店铺名称 
                     AND sk.货号 = lz.货号 
                 WHERE
-                    sk.季节 IN ( '初夏', '盛夏', '夏季' ) 
+                    sk.季节 IN ( '初秋', '深秋', '秋季' ) 
                     AND c.Region <> '闭店区' 
                     AND sk.店铺名称 NOT IN ( '' ) --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                     
