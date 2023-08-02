@@ -625,7 +625,7 @@ class Weathertips extends BaseController
         $sql = "
             SELECT 
                 t.*,
-                round(t.销售金额 / t.销售总金额, 2) AS 销售占比
+                round(t.销售金额 / t.销售总金额, 3) AS 销售占比
             FROM (
                 SELECT
                     省份,
