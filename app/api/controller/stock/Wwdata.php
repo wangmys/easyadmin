@@ -32,7 +32,7 @@ class Wwdata extends BaseController
 
     public function sjp_leixiao() {
 
-      ini_set('memory_limit','500M');
+      ini_set('memory_limit','1024M');
 
       $sql = "select lx.店铺名称,g.`二级时间分类` as 季节,g.`一级时间分类` as 年份, g.`风格`, g.`一级分类`, g.`二级分类`, g.`分类`, lx.合计, lx.金额, g.零售价 from sjp_leixiao lx 
       left join sjp_goods g on lx.货号=g.货号 
