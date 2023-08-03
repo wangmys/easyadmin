@@ -28,6 +28,19 @@ class Wwdata extends BaseController
       $data = $data ? $data->toArray() : [];
       return json($data);
 
-  }
+    }
+
+    public function sjp_leixiao() {
+
+      ini_set('memory_limit','500M');
+
+      $sql = "select lx.店铺名称,g.`二级时间分类` as 季节,g.`一级时间分类` as 年份, g.`风格`, g.`一级分类`, g.`二级分类`, g.`分类`, lx.合计, lx.金额, g.零售价 from sjp_leixiao lx 
+      left join sjp_goods g on lx.货号=g.货号 
+      where g.`一级时间分类`='2023' and (g.`二级时间分类` like '%秋%' or g.`二级时间分类` like '%冬%');";
+      $data = Db::connect("mysql2")->Query($sql);
+      return json($data);
+
+    }
+
 
 }

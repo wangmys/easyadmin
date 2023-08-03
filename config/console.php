@@ -26,5 +26,6 @@ return [
         'puhuo_yuncangkeyong' => 'app\command\Puhuo_yuncangkeyong',
         'puhuo_liangzhou' => 'app\command\Puhuo_liangzhou',
         'puhuo_start' => 'app\command\Puhuo_start',
+        'puhuo_spsk_stock' => 'app\command\Puhuo_spsk_stock',
     ],
 ];
