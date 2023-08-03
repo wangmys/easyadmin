@@ -57,7 +57,7 @@ class Duanmalv extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('id=1')->find();
         $select_noCustomer = explode(',', $select_config['不考核门店']);
 
         // 不考核门店选中
@@ -88,11 +88,28 @@ class Duanmalv extends AdminController
                 }
             } 
         }
+
+        // 季节
+        $season = [
+            ['name' => '春季', 'value' => '春季'],
+            ['name' => '夏季', 'value' => '夏季'],
+            ['name' => '秋季', 'value' => '秋季'],
+            ['name' => '冬季', 'value' => '冬季'],
+        ];
+
+        $select_season = explode(',', $select_config['季节归集']);
+        foreach ($select_season as $key => $val) {
+            foreach ($season as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $season[$key2]['selected'] = true;
+                }
+            } 
+        }
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 'season' => $season]]);
     }
 
     public function saveMap() {
@@ -101,6 +118,7 @@ class Duanmalv extends AdminController
             if ($params['折率'] > 1.5) return json(['status' => 0, 'msg' => '折率设置不能大于1.5']);
             if ($params['折率'] < 0.5) return json(['status' => 0, 'msg' => '折率设置不能小于0.5']);
 
+            // dump($params);die;
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update($params);     
             return json(['status' => 1, 'msg' => '操作成功']);
         } else {

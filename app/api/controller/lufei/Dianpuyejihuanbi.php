@@ -555,7 +555,9 @@ class Dianpuyejihuanbi extends BaseController
             }
 
             // 今日环比： (今天的店铺流水 / 上个月周N平均值) -1
-            if ($updateData['今日流水'] && $val[$today]) {
+            if ($updateData['今日流水'] && $val[$today]>0) {
+                // echo $val['店铺名称'] . '-' .$val[$today];
+                // echo '<br>';
                 $updateData['今日环比'] = ($updateData['今日流水'] / $val[$today]) - 1;
             } else {
                 $updateData['今日环比'] = '';
@@ -720,7 +722,7 @@ class Dianpuyejihuanbi extends BaseController
             }
 
             // 今日环比： (今天的店铺流水 / 上个月周N平均值) -1
-            if ($updateData['今日流水'] && $val[$today]) {
+            if ($updateData['今日流水'] && $val[$today] > 0) {
                 $updateData['今日环比'] = ($updateData['今日流水'] / $val[$today]) - 1;
             } else {
                 $updateData['今日环比'] = '';
