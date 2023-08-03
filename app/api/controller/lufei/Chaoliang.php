@@ -34,26 +34,41 @@ class Chaoliang extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
-    public function seasionHandle($seasion = "春季") {
+    public function seasionHandle($seasion = "夏季,秋季") {
         $seasionStr = "";
-        if ($seasion == '春季') {
-            $seasionStr = "'初春','正春','春季'";
-        } elseif ($seasion == '夏季') {
-            $seasionStr = "'初夏','盛夏','夏季'";
-        } elseif ($seasion == '秋季') {
-            $seasionStr = "'初秋','深秋','秋季'";
-        } elseif ($seasion == '冬季') {
-            $seasionStr = "'初冬','深冬','冬季'";
+        $seasion = explode(',', $seasion);
+        foreach ($seasion as $key => $val) {
+            if ($key + 1 == count($seasion)) {
+                if ($val == '春季') {
+                    $seasionStr .= "'初春','正春','春季'";
+                } elseif ($val == '夏季') {
+                    $seasionStr .= "'初夏','盛夏','夏季'";
+                } elseif ($val == '秋季') {
+                    $seasionStr .= "'初秋','深秋','秋季'";
+                } elseif ($val == '冬季') {
+                    $seasionStr .= "'初冬','深冬','冬季'";
+                }
+            } else {
+                if ($val == '春季') {
+                    $seasionStr .= "'初春','正春','春季',";
+                } elseif ($val == '夏季') {
+                    $seasionStr .= "'初夏','盛夏','夏季',";
+                } elseif ($val == '秋季') {
+                    $seasionStr .= "'初秋','深秋','秋季',";
+                } elseif ($val == '冬季') {
+                    $seasionStr .= "'初冬','深冬','冬季',";
+                }
+            }
         }
+
         return $seasionStr;
     }
 
     public function sk_first()
     {
-        // $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
-        // $seasion = $this->seasionHandle($select_config['季节归集']); 
-        // // 不考核门店
-        // $noCustomer = xmSelectInput($select_config['不考核门店']);
+        $select_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        $seasion = $this->seasionHandle($select_config['季节归集']); 
+
         $sql = "
             SELECT
                 t.*,
@@ -161,7 +176,7 @@ class Chaoliang extends BaseController
                     AND sk.店铺名称 = lz.店铺名称 
                     AND sk.货号 = lz.货号 
                 WHERE
-                    sk.季节 IN ( '初秋', '深秋', '秋季' ) 
+                    sk.季节 IN ( {$seasion} )
                     AND c.Region <> '闭店区' 
                     AND sk.店铺名称 NOT IN ( '' ) --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                     

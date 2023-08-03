@@ -183,6 +183,10 @@
                                 <input type="number" name='超量个数' autocomplete="off" value="" maxlength="2" placeholder="0"
                                     class="layui-input" lay-verify="">
                             </div> 
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-season" class="xm-select-demo"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="flex col between" style="width:5%; height:70px;">
@@ -278,6 +282,20 @@
             data: [
                 {name: "基本款", value: "基本款", selected: ""},
                 {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+        // 选择风格
+        xmSelect.render({
+            el: '#xm-season', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '季节',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
             ]
         })
 
@@ -470,6 +488,17 @@
                     name:'货号',
                     data: res.data.huohao
                 })
+                xmSelect.render({
+                    el: '#xm-season', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'季节',
+                    data: res.data.season
+                })
             }, 'json')
         }
 
@@ -558,6 +587,7 @@
                                  <div class="cima"></div>
                                 </div>`,field: '经营模式', fixed: 'left', align: 'center', width: 32,rowspan: 5}
                     , { field: '风格', title: '风格', fixed: 'left', align: 'center', width: 42, rowspan: 5}
+                    , { field: '季节', title: '季节', fixed: 'left', align: 'center', width: 42, rowspan: 5}
                     , { field: '大类', title: '大类', fixed: 'left', align: 'center', width: 35, rowspan: 5}
                     , { field: '中类', title: '中类', fixed: 'left', align: 'center', width: 55, rowspan: 5}
                     , { field: '分类', title: '分类', fixed: 'left', align: 'center', width: 90, rowspan: 5, hide: true}

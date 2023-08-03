@@ -3772,7 +3772,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . 'B' . '.jpg',   //保存的文件名
-                'title' => "门店业绩环比 [" . date("Y-m-d") . ']',
+                'title' => "门店业绩环比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,

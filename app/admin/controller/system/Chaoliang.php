@@ -368,6 +368,12 @@ class Chaoliang extends AdminController
             } else {
                 $map12 = "";
             }
+            if (!empty($input['季节'])) {
+                $map13Str = xmSelectInput($input['季节']);
+                $map13 = " AND 季节 IN ($map13Str)";
+            } else {
+                $map13 = "";
+            }
 
             $sql = "
                 SELECT
@@ -380,6 +386,7 @@ class Chaoliang extends AdminController
                     分类,
                     领型,
                     货号,
+                    季节,
                     上市天数, 
                     `预计00/28/37/44/100/160/S`,
                     `预计29/38/46/105/165/M`,
@@ -434,6 +441,7 @@ class Chaoliang extends AdminController
                     {$map10}
                     {$map11}
                     {$map12}
+                    {$map13}
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
 
@@ -456,6 +464,7 @@ class Chaoliang extends AdminController
                     {$map10}
                     {$map11}
                     {$map12}
+                    {$map13}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
@@ -488,12 +497,41 @@ class Chaoliang extends AdminController
         $huohao = $this->db_easyA->query("
             SELECT 货号 as name, 货号 as value FROM cwl_chaoliang_sk WHERE  货号 IS NOT NULL GROUP BY 货号
         ");
+        $season = $this->db_easyA->query("
+            SELECT 季节 as name, 季节 as value FROM cwl_chaoliang_sk WHERE  季节 IS NOT NULL GROUP BY 季节
+        ");
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
         return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer, 'zhonglei' => $zhonglei, 
-        'fenlei' => $fenlei, 'huohao' => $huohao]]);
+        'fenlei' => $fenlei, 'huohao' => $huohao, 'season' => $season]]);
+    }
+
+    public function getConfigMapData() {
+        $select_config = $this->db_easyA->table('cwl_chaoliang_config')->field('季节归集')->where('id=1')->find();
+
+        // 季节
+        $season = [
+            ['name' => '春季', 'value' => '春季'],
+            ['name' => '夏季', 'value' => '夏季'],
+            ['name' => '秋季', 'value' => '秋季'],
+            ['name' => '冬季', 'value' => '冬季'],
+        ];
+
+        $select_season = explode(',', $select_config['季节归集']);
+        foreach ($select_season as $key => $val) {
+            foreach ($season as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $season[$key2]['selected'] = true;
+                }
+            } 
+        }
+        
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['season' => $season]]);
     }
 
     // 下载超量明细  sk
