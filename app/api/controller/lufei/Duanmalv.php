@@ -1895,5 +1895,22 @@ class Duanmalv extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
             }
         }
+
+        $sql_del = "
+            DELETE 
+            FROM
+                cwl_duanmalv_table1_3 
+            WHERE
+                `直营-整体` IS NULL 
+                AND `加盟-整体` IS NULL 
+                AND `合计-整体` = 0.0000
+                AND `直营-TOP实际` IS NULL
+                AND `加盟-TOP实际` IS NULL
+                AND `合计-TOP实际` = 0.0000
+                AND `直营-TOP考核` IS NULL
+                AND `加盟-TOP考核` IS NULL
+                AND `合计-TOP考核` = 0.0000        
+        ";
+         $this->db_easyA->execute($sql_del);
     }
 }
