@@ -36,7 +36,7 @@ class Weathertips extends AdminController
      * 
      */
     public function config() {
-        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        $find_config = $this->db_easyA->table('cwl_weathertips_config')->where('id=1')->find();
         
         // dump($select_config );die;
 
@@ -330,6 +330,14 @@ class Weathertips extends AdminController
                 $map6 = "";
             }
 
+            if (!empty($input['秋季SKC'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['提醒']);
+                $map7 = " AND c.提醒 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+
 
             $sql = "
                 SELECT
@@ -465,8 +473,10 @@ class Weathertips extends AdminController
 
             $weather_date_month = $this->db_easyA->query($sql_month);
             $weather_date_day = $this->db_easyA->query($sql2_day);
+            $find_config = $this->db_easyA->table('cwl_weathertips_config')->where('id=1')->find();
 
             return View('weathertips', [
+                'config' => $find_config,
                 'weather_date_month' => $weather_date_month[0], 
                 'weather_date_day' => $weather_date_day[0] 
             ]);

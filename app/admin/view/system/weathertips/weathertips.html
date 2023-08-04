@@ -206,7 +206,7 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -228,13 +228,24 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-jyms" class="xm-select-demo"></div>
                             </div>
+
+                        </div>
+                        <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">提醒</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-tips" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">秋节SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-skc-autumn" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">冬节SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-skc-winter" class="xm-select-demo"></div>
+                            </div>
                         </div>
-
                     </div>
+
                     <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
@@ -357,6 +368,36 @@
                 {name: "上秋", value: "上秋", selected: false},
                 {name: "上冬", value: "上冬", selected: false},
                 {name: "上秋冬", value: "上秋冬", selected: false},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-skc-autumn', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '秋季SKC',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "大于等于{$config['秋季SKC']}", value: ">={$config['秋季SKC']}", selected: false},
+                {name: "小于{$config['秋季SKC']}", value: "<{$config['秋季SKC']}", selected: false},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-skc-winter', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '冬季SKC',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "大于等于{$config['冬季SKC']}", value: ">={$config['冬季SKC']}", selected: false},
+                {name: "小于{$config['冬季SKC']}", value: "<{$config['冬季SKC']}", selected: false},
             ]
         })
 
