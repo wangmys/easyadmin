@@ -147,11 +147,15 @@
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
+        th[data-field="季节SKC数"][data-key="1-1-26"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
         th[data-field="9"][data-key="1-0-9"] {
             background-color: #ff3c00 !important;
             color:#ffffff;
         }
-        th[data-field="提醒"][data-key="1-1-26"] {
+        th[data-field="提醒"][data-key="1-1-27"] {
             background-color: #ff3c00 !important;
             color:#ffffff;
         }
@@ -173,21 +177,21 @@
             background-color: #5a9afa !important;
             color:#ffffff;
         }
-        th[data-field="34"][data-key="1-1-34"],
+        th[data-field="35"][data-key="1-1-35"],
         th[data-field="0"][data-key="1-2-0"],
         th[data-field="1"][data-key="1-2-1"],
         th[data-field="2"][data-key="1-2-2"] {
             background-color: #90bcff !important;
             color:#ffffff;
         }
-        th[data-field="35"][data-key="1-1-35"],
+        th[data-field="36"][data-key="1-1-36"],
         th[data-field="3"][data-key="1-2-3"],
         th[data-field="4"][data-key="1-2-4"],
         th[data-field="5"][data-key="1-2-5"] {
             background-color: #7db0fc !important;
             color:#ffffff;
         }
-        th[data-field="36"][data-key="1-1-36"],
+        th[data-field="37"][data-key="1-1-37"],
         th[data-field="6"][data-key="1-2-6"],
         th[data-field="7"][data-key="1-2-7"],
         th[data-field="8"][data-key="1-2-8"] {
@@ -490,7 +494,7 @@
                                  <div class="cima">日期</div>
                                 </div>`, field: '开业日期', fixed: 'left', width: 70, align: 'center' ,rowspan: 3, hide: false}
                     , { title: '气温变化', align: 'center' ,colspan: 12}
-                    , { title: '满足条件情况', align: 'center' ,colspan: 14}
+                    , { title: '满足条件情况', align: 'center' ,colspan: 15}
                     , { title: '上新提醒', align: 'center' ,colspan: 3}
                     , { title: `<div class="flex col around">
                                  <div class="cima"></div>
@@ -914,6 +918,20 @@
                                 ${html2}
                             </div>`; 
                     }}
+                    ,{ title: `<div class="flex col around">
+                                <div class="cima">季</div>
+                                <div class="cima">节</div>
+                                <div class="cima">SKC</div>
+                                <div class="cima">数</div>
+                                </div>`, field:'季节SKC数', align: 'center',rowspan: 2, width: 35, templet:
+                    function (data) {
+                        return `<div class="weather_div flex col around">
+                                <div class="cima_1" style="height:5px; width:10px;"></div>   
+                                <div class="cima_manzu autumn" style="color:#c89804;">${data['秋季SKC']?data['秋季SKC']:''}</div>
+                                <div class="cima_1" style="height:15px; width:10px;"></div> 
+                                <div class="cima_manzu winter" style="color:#0429c8;">${data['冬季SKC']?data['冬季SKC']:''}</div>
+                            </div>`; 
+                    }}
                     // 上新提醒
                     ,{ title:  `<div class="flex col around">
                                  <div class="cima">提醒</div>
@@ -922,11 +940,23 @@
                         if (data['提醒']) {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
                             if (data['提醒'] == '上秋') {
-                                return `<div style="height:25px;line-height:25px;font-weight:bold;color:#c89804;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;
+                                if (data['秋季SKC'] < data['配置_秋季SKC']) {
+                                    return `<div style="height:25px;line-height:25px;font-weight:bold;color:#c89804;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;
+                                } else {
+                                    return '';
+                                }
                             } else if (data['提醒'] == '上冬') {
-                                return `<div style="height:25px;line-height:25px;font-weight:bold;color:#0429c8;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;
+                                if (data['冬季SKC'] < data['配置_冬季SKC']) {
+                                    return `<div style="height:25px;line-height:25px;font-weight:bold;color:#0429c8;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;     
+                                } else {
+                                    return '';
+                                }
                             } else if (data['提醒'] == '上秋冬') {
-                                return `<div style="height:25px;line-height:25px;font-weight:bold;color:red;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;
+                                if (data['秋季SKC'] < data['配置_秋季SKC'] && data['冬季SKC'] < data['配置_冬季SKC']) {
+                                    return `<div style="height:25px;line-height:25px;font-weight:bold;color:red;background:#eeeeee;border:1px solid red; border-radius: 5px;">${data['提醒']}</div>`;
+                                } else {
+                                    return '';
+                                }
                             }
                         } else {
                             return '';
