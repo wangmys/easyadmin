@@ -2002,6 +2002,42 @@ class Weathertips extends BaseController
             set c.冬季SKC基本_下装 = t.`冬季SKC基本_下装`
         ";
 
+        $sql_秋季SKC = "
+            UPDATE cwl_weathertips_customer AS c 
+            RIGHT JOIN (
+            SELECT
+                店铺名称,
+                count(*) AS 秋季SKC
+            FROM cwl_weathertips_stock 
+            WHERE 1
+                AND 预计库存 > 1
+                AND 是否计算SKC = '是'
+                AND 是否调价款 = '否'
+                AND 季节归集 = '秋季'
+            GROUP BY 店铺名称
+            ) AS b ON b.店铺名称 = c.店铺名称
+            SET
+                c.秋季SKC = b.秋季SKC
+        ";
+
+        $sql_冬季SKC = "
+            UPDATE cwl_weathertips_customer AS c 
+            RIGHT JOIN (
+            SELECT
+                店铺名称,
+                count(*) AS 冬季SKC
+            FROM cwl_weathertips_stock 
+            WHERE 1
+                AND 预计库存 > 1
+                AND 是否计算SKC = '是'
+                AND 是否调价款 = '否'
+                AND 季节归集 = '冬季'
+            GROUP BY 店铺名称
+            ) AS b ON b.店铺名称 = c.店铺名称
+            SET
+                c.冬季SKC = b.冬季SKC
+        ";
+
         $this->db_easyA->execute($sql1_春);
         $this->db_easyA->execute($sql2_春);
         $this->db_easyA->execute($sql3_春);
@@ -2011,6 +2047,8 @@ class Weathertips extends BaseController
         $this->db_easyA->execute($sql1_冬);
         $this->db_easyA->execute($sql2_冬);
         $this->db_easyA->execute($sql3_冬);
+        $this->db_easyA->execute($sql_秋季SKC);
+        $this->db_easyA->execute($sql_冬季SKC);
     }
 
     // 总表最终销售占比

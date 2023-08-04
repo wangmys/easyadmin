@@ -3100,6 +3100,8 @@ class ReportFormsService
         ";
         $list = $this->db_easyA->query($sql);
 
+        $sql2_date_start = date('Y-m-01');  
+        $sql2_date_end = date('Y-m-01', strtotime('+1 month', time()));  
         $sql2 = "
             SELECT
                 t1.销售日期 AS 日期,
@@ -3123,13 +3125,14 @@ class ReportFormsService
                 AND right_jm.经营属性 = '加盟' 
                 AND right_jm.销售日期 = t1.销售日期
             WHERE
-                t1.销售日期 >= '2023-07-01' 
-                AND t1.销售日期 <= '2023-07-31' 
+                t1.销售日期 >= '{$sql2_date_start}' 
+                AND t1.销售日期 < '{$sql2_date_end}' 
             GROUP BY
                 t1.销售日期 
             ORDER BY
                 t1.销售日期 ASC
         ";
+
         $list2 = $this->db_easyA->query($sql2);
         if ($list) {
             foreach ($list as $key => $val) {
