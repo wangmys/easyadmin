@@ -335,7 +335,7 @@ class Weathertips extends AdminController
                 if ($input['秋季SKC数'] == '大于等于') {
                     $map7 = " AND c.`秋季SKC` >= '{$find_config['秋季SKC']}'";
                 } else {
-                    $map7 = " AND c.`秋季SKC` < '{$find_config['秋季SKC']}' OR c.`秋季SKC` IS NULL";
+                    $map7 = " AND (c.`秋季SKC` < '{$find_config['秋季SKC']}' OR c.`秋季SKC` IS NULL)";
                 }
                 
             } else {
@@ -346,7 +346,7 @@ class Weathertips extends AdminController
                 if ($input['冬季SKC数'] == '大于等于') {
                     $map8 = " AND c.`冬季SKC` >= '{$find_config['冬季SKC']}'";
                 } else {
-                    $map8 = " AND c.`冬季SKC` < '{$find_config['冬季SKC']}' OR c.`冬季SKC` IS NULL";
+                    $map8 = " AND (c.`冬季SKC` < '{$find_config['冬季SKC']}' OR c.`冬季SKC` IS NULL)";
                 }
             } else {
                 $map8 = "";
@@ -543,6 +543,7 @@ class Weathertips extends AdminController
                 AND r_1day_xz_dj.`一级分类` = '下装'
                 RIGHT JOIN cwl_weathertips_config AS config ON config.id = 1 
                     WHERE 1	
+                    AND 首单日期 IS NOT NULL
                     {$map1} 
                     {$map2} 
                     {$map3} 
@@ -561,6 +562,7 @@ class Weathertips extends AdminController
                     count(*) as total
                 FROM cwl_weathertips_customer as c
                 WHERE 1
+                    AND 首单日期 IS NOT NULL
                     {$map1} 
                     {$map2} 
                     {$map3} 
