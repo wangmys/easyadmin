@@ -66,12 +66,15 @@ class hexiao extends BaseController
                 EG.GoodsNo AS 货号,
                 EG.GoodsId AS 货品编号,
                 EGPT_cbj.UnitPrice AS '成本价',
-                EGPT_dqjsj.UnitPrice AS '当前结算价',
+
+                EGPT_dqjsj.UnitPrice AS '当前结算单价',
+                SUM ( ERG.Quantity ) * EGPT_dqjsj.UnitPrice AS '当前结算价',
+
                 EGPT_lsfxj.UnitPrice AS '历史分销价',
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
                 SUM(ERG.Quantity) AS 销售数量,
                 CASE
-                    WHEN EG.TimeCategoryName1 = {$year} AND EBC.Mathod = '加盟' THEN EGPT_lsfxj.UnitPrice * SUM(ERG.Quantity) ELSE EGPT_cbj.UnitPrice * SUM(ERG.Quantity)
+                    WHEN EG.TimeCategoryName1 = 2023 AND EBC.Mathod = '加盟' THEN EGPT_lsfxj.UnitPrice * SUM ( ERG.Quantity ) ELSE EGPT_dqjsj.UnitPrice * SUM ( ERG.Quantity ) 
                 END AS 成本金额,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期
             FROM
@@ -152,15 +155,15 @@ class hexiao extends BaseController
         $sql = "
             SELECT 
                 t1.*,
-                ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
             FROM (
                 SELECT
                     省份, 
                     经营属性,
                     销售日期,
                     ROUND(SUM(销售金额), 2) AS 销售金额,
-                    SUM(当前结算价) AS 当前结算价
+                    SUM(成本金额) AS 成本金额
                 FROM
                     `cwl_hexiao_data`
                 WHERE 
@@ -175,15 +178,15 @@ class hexiao extends BaseController
         $sql2 = "
             SELECT 
                 t1.*,
-                ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
             FROM (
                 SELECT
                     省份, 
                     '合计' AS 经营属性,
                     销售日期,
                     ROUND(SUM(销售金额), 2) AS 销售金额,
-                    SUM(当前结算价) AS 当前结算价
+                    SUM(成本金额) AS 成本金额
                 FROM
                     `cwl_hexiao_res_day`
                 WHERE 
@@ -196,8 +199,8 @@ class hexiao extends BaseController
         $sql3 = "
             SELECT 
                 t1.*,
-                ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
             FROM (
                 SELECT
                     '1' AS `index`,
@@ -205,7 +208,7 @@ class hexiao extends BaseController
                     经营属性,
                     销售日期,
                     ROUND(SUM(销售金额), 2) AS 销售金额,
-                    SUM(当前结算价) AS 当前结算价
+                    SUM(成本金额) AS 成本金额
                 FROM
                     `cwl_hexiao_res_day`
                 WHERE 
@@ -220,8 +223,8 @@ class hexiao extends BaseController
         $sql4 = "
             SELECT 
                 t1.*,
-                ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
             FROM (
                 SELECT
                     '1' AS `index`,
@@ -229,7 +232,7 @@ class hexiao extends BaseController
                     经营属性,
                     销售日期,
                     ROUND(SUM(销售金额), 2) AS 销售金额,
-                    SUM(当前结算价) AS 当前结算价
+                    SUM(成本金额) AS 成本金额
                 FROM
                     `cwl_hexiao_res_day`
                 WHERE 
@@ -244,8 +247,8 @@ class hexiao extends BaseController
         $sql5 = "
             SELECT 
                 t1.*,
-                ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
             FROM (
                 SELECT
                     '1' AS `index`,
@@ -253,7 +256,7 @@ class hexiao extends BaseController
                     '合计' AS 经营属性,
                     销售日期,
                     ROUND(SUM(销售金额), 2) AS 销售金额,
-                    SUM(当前结算价) AS 当前结算价
+                    SUM(成本金额) AS 成本金额
                 FROM
                     `cwl_hexiao_res_day`
                 WHERE 
@@ -300,8 +303,8 @@ class hexiao extends BaseController
             $total_sql1 = "
                 SELECT 
                     t1.*,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                    ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                    ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
                 FROM (
                     SELECT
                         '2' AS `index`,
@@ -309,7 +312,7 @@ class hexiao extends BaseController
                         经营属性,
                         '{$today}' AS 销售日期,
                         ROUND(SUM(销售金额), 2) AS 销售金额,
-                        SUM(当前结算价) AS 当前结算价
+                        SUM(成本金额) AS 成本金额
                     FROM
                         `cwl_hexiao_res_day`
                     WHERE 
@@ -325,8 +328,8 @@ class hexiao extends BaseController
             $total_sql2 = "
                 SELECT 
                     t1.*,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                    ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                    ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
                 FROM (
                     SELECT
                         '2' AS `index`,
@@ -334,7 +337,7 @@ class hexiao extends BaseController
                         经营属性,
                         '{$today}' AS 销售日期,
                         ROUND(SUM(销售金额), 2) AS 销售金额,
-                        SUM(当前结算价) AS 当前结算价
+                        SUM(成本金额) AS 成本金额
                     FROM
                         `cwl_hexiao_res_day`
                     WHERE 
@@ -350,8 +353,8 @@ class hexiao extends BaseController
             $total_sql3 = "
                 SELECT 
                     t1.*,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / t1.销售金额, 3 ) AS 毛利率,
-                    ROUND( (t1.销售金额 - t1.当前结算价) / 10000, 2 )  AS 毛利
+                    ROUND( (t1.销售金额 - t1.成本金额) / t1.销售金额, 3 ) AS 毛利率,
+                    ROUND( (t1.销售金额 - t1.成本金额) / 10000, 2 )  AS 毛利
                 FROM (
                     SELECT
                         '2' AS `index`,
@@ -359,7 +362,7 @@ class hexiao extends BaseController
                         '合计' AS 经营属性,
                         '{$today}' AS 销售日期,
                         ROUND(SUM(销售金额), 2) AS 销售金额,
-                        SUM(当前结算价) AS 当前结算价
+                        SUM(成本金额) AS 成本金额
                     FROM
                         `cwl_hexiao_res_day`
                     WHERE 

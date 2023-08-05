@@ -235,13 +235,29 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-tips" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">秋节SKC数</label>
+                            <!-- <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">秋节SKC数</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-skc-autumn" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">冬节SKC数</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-skc-winter" class="xm-select-demo"></div>
+                            </div> -->
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center;">秋节SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <select id="xm-skc-autumn" name="秋季SKC数" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value=">={$config['秋季SKC']}">大于等于{$config['秋季SKC']}</option>
+                                    <option value="<{$config['秋季SKC']}">小于{$config['秋季SKC']}</option>
+                                </select>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center;">冬节SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <select id="xm-skc-winter" name="冬季SKC数" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value=">={$config['冬季SKC']}">大于等于{$config['冬季SKC']}</option>
+                                    <option value="<{$config['冬季SKC']}">小于{$config['冬季SKC']}</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -371,35 +387,35 @@
             ]
         })
 
-        xmSelect.render({
-            el: '#xm-skc-autumn', 
-            filterable: true,
-            toolbar: {show: true},
-            name: '秋季SKC',
-            // showCount: 1,
-            theme: {
-                color: '#e4362b',
-            },
-            data: [
-                {name: "大于等于{$config['秋季SKC']}", value: ">={$config['秋季SKC']}", selected: false},
-                {name: "小于{$config['秋季SKC']}", value: "<{$config['秋季SKC']}", selected: false},
-            ]
-        })
+        // xmSelect.render({
+        //     el: '#xm-skc-autumn', 
+        //     filterable: true,
+        //     toolbar: {show: true},
+        //     name: '秋季SKC',
+        //     // showCount: 1,
+        //     theme: {
+        //         color: '#e4362b',
+        //     },
+        //     data: [
+        //         {name: "大于等于{$config['秋季SKC']}", value: ">={$config['秋季SKC']}", selected: false},
+        //         {name: "小于{$config['秋季SKC']}", value: "<{$config['秋季SKC']}", selected: false},
+        //     ]
+        // })
 
-        xmSelect.render({
-            el: '#xm-skc-winter', 
-            filterable: true,
-            toolbar: {show: true},
-            name: '冬季SKC',
-            // showCount: 1,
-            theme: {
-                color: '#e4362b',
-            },
-            data: [
-                {name: "大于等于{$config['冬季SKC']}", value: ">={$config['冬季SKC']}", selected: false},
-                {name: "小于{$config['冬季SKC']}", value: "<{$config['冬季SKC']}", selected: false},
-            ]
-        })
+        // xmSelect.render({
+        //     el: '#xm-skc-winter', 
+        //     filterable: true,
+        //     toolbar: {show: true},
+        //     name: '冬季SKC',
+        //     // showCount: 1,
+        //     theme: {
+        //         color: '#e4362b',
+        //     },
+        //     data: [
+        //         {name: "大于等于{$config['冬季SKC']}", value: ">={$config['冬季SKC']}", selected: false},
+        //         {name: "小于{$config['冬季SKC']}", value: "<{$config['冬季SKC']}", selected: false},
+        //     ]
+        // })
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
