@@ -188,6 +188,7 @@ class Weathertips extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsName AS 货品名称,
                 EG.GoodsNo AS 货号,
+                EG.
             -- 	EG.GoodsId AS 货品ID,
                 EG.UnitPrice / 2 AS 零售价,
                 EC.CustomItem17 AS 商品负责人,
@@ -556,6 +557,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1 AS 一级分类,
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
+                EG.TimeCategoryName1 AS 年份,
                 EG.StyleCategoryName AS 风格,
                 SUM(ERG.Quantity) AS 销售数量,
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
@@ -599,6 +601,7 @@ class Weathertips extends BaseController
                 EG.CategoryName,
                 EG.StyleCategoryName,
                 EG.TimeCategoryName2,
+                EG.TimeCategoryName1,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
             ORDER BY EC.State ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 
         ";
