@@ -630,9 +630,15 @@ class Chaoliang extends AdminController
             } else {
                 $map12 = "";
             }
+            if (!empty($input['季节'])) {
+                $map13Str = xmSelectInput($input['季节']);
+                $map13 = " AND 季节 IN ($map13Str)";
+            } else {
+                $map13 = "";
+            }
 
 
-            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}{$map12}";
+            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}{$map12}{$map13}";
             $code = rand_code(6);
             cache($code, $map, 3600);
 
