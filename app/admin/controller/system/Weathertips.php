@@ -264,6 +264,7 @@ class Weathertips extends AdminController
      * 
      */
     public function weathertips() {
+        $find_config = $this->db_easyA->table('cwl_weathertips_config')->where('id=1')->find();
         if (request()->isAjax()) {
             // 筛选条件
             $input = input();
@@ -331,13 +332,22 @@ class Weathertips extends AdminController
             }
 
             if (!empty($input['秋季SKC数'])) {
-                $map7 = " AND c.`秋季SKC` {$input['秋季SKC数']}";
+                if ($input['秋季SKC数'] == '大于等于') {
+                    $map7 = " AND c.`秋季SKC` >= '{$find_config['秋季SKC']}'";
+                } else {
+                    $map7 = " AND c.`秋季SKC` < '{$find_config['秋季SKC']}' OR c.`秋季SKC` IS NULL";
+                }
+                
             } else {
                 $map7 = "";
             }
 
             if (!empty($input['冬季SKC数'])) {
-                $map8 = " AND c.`冬季SKC` {$input['冬季SKC数']}";
+                if ($input['冬季SKC数'] == '大于等于') {
+                    $map8 = " AND c.`冬季SKC` >= '{$find_config['冬季SKC']}'";
+                } else {
+                    $map8 = " AND c.`冬季SKC` < '{$find_config['冬季SKC']}' OR c.`冬季SKC` IS NULL";
+                }
             } else {
                 $map8 = "";
             }
@@ -533,16 +543,16 @@ class Weathertips extends AdminController
                 AND r_1day_xz_dj.`一级分类` = '下装'
                 RIGHT JOIN cwl_weathertips_config AS config ON config.id = 1 
                     WHERE 1	
-                   {$map1} 
-                   {$map2} 
-                   {$map3} 
-                   {$map4} 
-                   {$map5} 
-                   {$map6} 
-                   {$map7} 
-                   {$map8} 
+                    {$map1} 
+                    {$map2} 
+                    {$map3} 
+                    {$map4} 
+                    {$map5} 
+                    {$map6} 
+                    {$map7} 
+                    {$map8} 
                 LIMIT {$pageParams1}, {$pageParams2}  
-            "; 
+            ";  
 
             $select = $this->db_easyA->query($sql);
 
@@ -550,7 +560,6 @@ class Weathertips extends AdminController
                 SELECT 
                     count(*) as total
                 FROM cwl_weathertips_customer as c
-                RIGHT JOIN cwl_weathertips_config AS config ON config.id = 1 
                 WHERE 1
                     {$map1} 
                     {$map2} 
@@ -605,7 +614,6 @@ class Weathertips extends AdminController
 
             $weather_date_month = $this->db_easyA->query($sql_month);
             $weather_date_day = $this->db_easyA->query($sql2_day);
-            $find_config = $this->db_easyA->table('cwl_weathertips_config')->where('id=1')->find();
 
             return View('weathertips', [
                 'config' => $find_config,
