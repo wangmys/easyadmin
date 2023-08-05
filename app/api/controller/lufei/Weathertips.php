@@ -173,6 +173,7 @@ class Weathertips extends BaseController
     
     // 店铺库存
     public function customerStock_1() {
+        $year = date("Y", time());
         $sql = "
             SELECT 
             -- 	TOP 10000
@@ -232,8 +233,8 @@ class Weathertips extends BaseController
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EC.ShutOut = 0
                 -- AND EC.CustomerName = '亳州一店'
-                AND EG.TimeCategoryName1 IN ('2023')
-                AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季' )
+                AND EG.TimeCategoryName1 IN ('{$year}')
+                AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
                 AND EG.CategoryName1 IN ('内搭', '外套', '下装')
             GROUP BY 
                 EC.CustomerName,
