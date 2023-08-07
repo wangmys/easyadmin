@@ -176,7 +176,6 @@ class Weathertips extends BaseController
         $year = date("Y", time());
         $sql = "
             SELECT 
-            -- 	TOP 10000
                 EBR.Region AS 区域,
                 EC.RegionId,
                 EC.CustomerName AS 店铺名称,
@@ -188,8 +187,6 @@ class Weathertips extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsName AS 货品名称,
                 EG.GoodsNo AS 货号,
-                EG.
-            -- 	EG.GoodsId AS 货品ID,
                 EG.UnitPrice / 2 AS 零售价,
                 EC.CustomItem17 AS 商品负责人,
                 SUM(ECS.Quantity) AS 店铺库存,
@@ -233,14 +230,12 @@ class Weathertips extends BaseController
                 EC.RegionId NOT IN ('8','40', '55', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EC.ShutOut = 0
-                -- AND EC.CustomerName = '亳州一店'
                 AND EG.TimeCategoryName1 IN ('{$year}')
                 AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
                 AND EG.CategoryName1 IN ('内搭', '外套', '下装')
             GROUP BY 
                 EC.CustomerName,
                 EG.GoodsNo,
-            -- 	EG.GoodsId,
                 EG.UnitPrice,
                 EBR.Region,
                 EC.State,
@@ -253,8 +248,7 @@ class Weathertips extends BaseController
                 EC.CustomItem17,
                 EG.GoodsName,
                 FORMAT(EC.OpeningDate, 'yyyy-MM-dd'),
-                EG.TimeCategoryName2
-            -- HAVING  SUM ( ECS.Quantity ) > 0               
+                EG.TimeCategoryName2            
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
