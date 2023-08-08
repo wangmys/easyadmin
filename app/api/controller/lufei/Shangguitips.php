@@ -311,6 +311,7 @@ class Shangguitips extends BaseController
     }
 
     public function chagnku_2() {
+        $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where("id=1")->find();
         // 更新风格 一级风格 二级风格
         $sql1 = "
             UPDATE
@@ -345,5 +346,124 @@ class Shangguitips extends BaseController
             WHERE 
                 1
         ";
+
+        // 主码齐码情况
+        $sql_主码 = "
+             UPDATE `cwl_shangguitips_cangku` 
+                SET 
+                    主码齐码个数 = CASE 
+                        WHEN `一级分类` IN ('下装') THEN 
+                            CASE
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAAAAA%' THEN 6 
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAAAA%' THEN 5	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAAA%' THEN 4	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAA%' THEN 3	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AA%' THEN 2	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%A%' THEN 1		
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_29/38/46/105/165/M` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_34/43/56/190/4XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%BBBBBB%' THEN 0
+                        END
+                        WHEN `一级分类` IN ('内搭', '外套', '鞋履') OR `二级分类` IN ('松紧长裤', '松紧短裤') THEN 
+                            CASE
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAAA%' THEN 4 
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AAA%' THEN 3	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%AA%' THEN 2	
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%A%' THEN 1		
+                                WHEN CONCAT(
+                                                CASE WHEN `可用库存_30/39/48/110/170/L` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_31/40/50/115/175/XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_32/41/52/120/180/2XL` >0 THEN 'A' ELSE 'B' END,
+                                                CASE WHEN `可用库存_33/42/54/125/185/3XL` >0 THEN 'A' ELSE 'B' END
+                                        ) LIKE '%BBBB%' THEN 0
+                        END
+                    END
+                WHERE 1
+        ";
+
+        $sql_主码2 = "
+            UPDATE cwl_shangguitips_cangku
+            SET 
+                主码齐码情况 = case
+                    when 二级分类 = '松紧长裤' AND 主码齐码个数 >= {$find_config['松紧长裤']} THEN '可配'
+                    when 二级分类 = '松紧短裤' AND 主码齐码个数 >= {$find_config['松紧短裤']} THEN '可配'
+                    when 一级分类 = '内搭' AND 主码齐码个数 >= {$find_config['内搭']} THEN '可配'
+                    when 一级分类 = '外套' AND 主码齐码个数 >= {$find_config['外套']} THEN '可配'
+                    when 一级分类 = '鞋履' AND 主码齐码个数 >= {$find_config['鞋履']} THEN '可配'
+                    when 一级分类 = '下装' AND 主码齐码个数 >= {$find_config['下装']} THEN '可配'
+                    else NULL
+                end
+        ";
+        $this->db_easyA->execute($sql1);
+        $this->db_easyA->execute($sql2);
+        $this->db_easyA->execute($sql_主码);
+        $this->db_easyA->execute($sql_主码2);
     }
 }

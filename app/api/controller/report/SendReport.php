@@ -62,8 +62,12 @@ class SendReport extends BaseController
             $this->service->create_table_s015();
         } elseif ($name =='S016') {
             $this->service->create_table_s016();
+        } elseif ($name =='S017') {
+            $this->service->create_table_s017();
         } elseif ($name =='S018') {
             $this->service->create_table_s018();
+        } elseif ($name =='S019') {
+            $this->service->create_table_s019();
         } elseif ($name =='S101') {
             $this->service->create_table_s101('S101', $date);
         } elseif ($name =='S102') {
@@ -473,6 +477,35 @@ class SendReport extends BaseController
         return json($res);
     }
 
+    // 推送到打群 0：33
+    public function send7()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S017' => [
+                'title' => '商品部-直营秋冬老品库存结构报表 表号:S017',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S017.jpg'
+            ],
+            'S019' => [
+                'title' => '商品部-加盟秋冬老品库存结构报表 表号:S019',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S019.jpg'
+            ],
+        ];
+        $res = [];
+
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+        }
+        return json($res);
+    }
+
     public function send_caigoudingtui()
     {
         
@@ -758,6 +791,12 @@ class SendReport extends BaseController
         $this->service->create_table_s013();
         $this->service->create_table_s014();
         $this->send6();
+    }
+
+    public function run7() {
+        $this->service->create_table_s017();
+        $this->service->create_table_s019();
+        $this->send7();
     }
 
     // 51 推送 11：46

@@ -1253,6 +1253,88 @@ class ReportFormsService
         $this->create_image($params);
     }
 
+
+    public function create_table_s017()
+    {
+        $code = 'S017';
+        $date = date('Y-m-d');
+        $sql = "select * from sp_zy_autumn_and_winter_stock where 更新日期 = '$date'";
+        $data = $this->db_bi->Query($sql);
+
+        foreach ($data as $v=>$k){
+            unset($data[$v]['ID']);
+            unset($data[$v]['更新日期']);
+        }
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 130;
+        }
+
+        foreach ($data as $v=>$teams){
+            $fields = array_keys($teams);
+            foreach ($fields as $vv=> $team){
+                $leng = strlen($team);
+                $field_width[$vv] = $leng*10;
+                if($data[$v][$team] === '0'){
+                    $data[$v][$team] = '';
+                }
+            }
+        }
+        $field_width[0] = 30;
+        $field_width[1] = 50;
+        $field_width[2] = 75;
+        $field_width[3] = 75;
+        $field_width[4] = 65;
+        $field_width[5] = 65;
+        $field_width[6] = 75;
+        $field_width[7] = 65;
+        $field_width[8] = 65;
+        $field_width[9] = 75;
+        $field_width[10] = 65;
+        $field_width[11] = 65;
+        $field_width[12] = 75;
+        $field_width[13] = 75;
+        $field_width[14] = 65;
+        $field_width[15] = 75;
+        $field_width[16] = 65;
+        $field_width[17] = 65;
+        $field_width[18] = 75;
+        $field_width[19] = 65;
+        $field_width[20] = 65;
+        $field_width[21] = 75;
+        $field_width[22] = 65;
+        $field_width[23] = 65;
+        $field_width[24] = 75;
+        $field_width[25] = 90;
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+//            1 => '[类型]：说明8 说明16 ',
+//            2 => '[类型]：说明8 说明16 ',
+        ];
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "商品部-直营秋冬老品库存结构报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '一级分类',
+            'color'=>16711877,
+            'field' => '合计',
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $this->create_image($params);
+    }
+
     public function create_table_s018()
     {
         $code = 'S018';
@@ -1319,7 +1401,7 @@ class ReportFormsService
         //参数
         $params = [
             'code' => $code,
-            'row' => count($data),          //数据的行数
+            'row' => count($data),           //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
             'title' => "商品部-加盟春夏老品库存结构报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
@@ -1335,6 +1417,87 @@ class ReportFormsService
         ];
         $this->create_image($params);
     }   
+
+    public function create_table_s019()
+    {
+        $code = 'S019';
+        $date = date('Y-m-d');
+        $sql = "select * from sp_jm_autumn_and_winter_stock where 更新日期 = '$date'";
+        $data = $this->db_bi->Query($sql);
+        foreach ($data as $v=>$k){
+            unset($data[$v]['ID']);
+            unset($data[$v]['更新日期']);
+        }
+        $table_header = ['ID'];
+        $table_header = array_merge($table_header, array_keys($data[0]));
+        foreach ($table_header as $v => $k) {
+            $field_width[$v] = 130;
+        }
+        foreach ($data as $v=>$teams){
+            $fields = array_keys($teams);
+            foreach ($fields as $vv=> $team){
+                $leng = strlen($team);
+                $field_width[$vv] = $leng*10;
+                if($data[$v][$team] === '0'){
+                    $data[$v][$team] = '';
+                }
+            }
+        }
+
+        $field_width[0] = 30;
+        $field_width[1] = 50;
+        $field_width[2] = 75;
+        $field_width[3] = 75;
+        $field_width[4] = 65;
+        $field_width[5] = 65;
+        $field_width[6] = 75;
+        $field_width[7] = 65;
+        $field_width[8] = 65;
+        $field_width[9] = 75;
+        $field_width[10] = 65;
+        $field_width[11] = 65;
+        $field_width[12] = 75;
+        $field_width[13] = 75;
+        $field_width[14] = 65;
+        $field_width[15] = 75;
+        $field_width[16] = 65;
+        $field_width[17] = 65;
+        $field_width[18] = 75;
+        $field_width[19] = 65;
+        $field_width[20] = 65;
+        $field_width[21] = 75;
+        $field_width[22] = 65;
+        $field_width[23] = 65;
+        $field_width[24] = 75;
+        $field_width[25] = 90;
+
+        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+        //图片左上角汇总说明数据，可为空
+        $table_explain = [
+            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+//            1 => '[类型]：说明8 说明16 ',
+//            2 => '[类型]：说明8 说明16 ',
+        ];
+        //参数
+        $params = [
+            'code' => $code,
+            'row' => count($data),          //数据的行数
+            'file_name' =>$code.'.jpg',      //保存的文件名
+            'title' => "商品部-加盟秋冬老品库存结构报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'table_time' => date("Y-m-d H:i:s"),
+            'data' => $data,
+            'table_explain' => $table_explain,
+            'table_header' => $table_header,
+            'field_width' => $field_width,
+            'col' => '一级分类',
+            'color'=> 16711877,
+            'field' => '合计',
+            'banben' => '图片报表编号: '.$code,
+            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+        ];
+        $this->create_image($params);
+    }
 
     public function create_table_s023()
     {
@@ -4463,6 +4626,12 @@ class ReportFormsService
                 if (isset($item['大类']) && $item['大类'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
+                if (isset($item['性质']) && $item['性质'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
+            if (@$params['code'] == 'S017' || @$params['code'] == 'S019') {
                 if (isset($item['性质']) && $item['性质'] == '总计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
