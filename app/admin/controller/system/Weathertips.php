@@ -352,6 +352,9 @@ class Weathertips extends AdminController
                 $map8 = "";
             }
 
+            // 不考核门店
+            $noCustomer = xmSelectInput($find_config['不考核门店']);
+
             $sql = "
                 SELECT LEFT
                 ( c.云仓, 2 ) AS 云仓,
@@ -543,7 +546,8 @@ class Weathertips extends AdminController
                 AND r_1day_xz_dj.`一级分类` = '下装'
                 RIGHT JOIN cwl_weathertips_config AS config ON config.id = 1 
                     WHERE 1	
-                    AND 首单日期 IS NOT NULL
+                    AND c.首单日期 IS NOT NULL
+                    AND c.店铺名称 NOT IN ({$noCustomer})
                     {$map1} 
                     {$map2} 
                     {$map3} 
@@ -562,7 +566,8 @@ class Weathertips extends AdminController
                     count(*) as total
                 FROM cwl_weathertips_customer as c
                 WHERE 1
-                    AND 首单日期 IS NOT NULL
+                    AND c.首单日期 IS NOT NULL
+                    AND c.店铺名称 NOT IN ({$noCustomer})
                     {$map1} 
                     {$map2} 
                     {$map3} 
