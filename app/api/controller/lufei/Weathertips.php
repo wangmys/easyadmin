@@ -1765,8 +1765,8 @@ class Weathertips extends BaseController
             
             $冬季天数C = strlen($val['day3_冬'] . $val['day4_冬'] . $val['day5_冬'] . $val['day6_冬'] . $val['day7_冬'] . $val['day8_冬'] . $val['day9_冬'] . $val['day10_冬']) ;  
            
-            $tips1 = '';
-            $tips2 = '';
+            $tips1 = NULL;
+            $tips2 = NULL;
             $tips3 = NULL;
             $识别规则_秋 = NULL;
             $识别规则_冬 = NULL;
@@ -2075,6 +2075,11 @@ class Weathertips extends BaseController
             left join cwl_weathertips_retail_2 as r_1day_xz ON c.省份 = r_1day_xz.省份 AND c.店铺名称 = r_1day_xz.店铺名称 AND r_1day_xz.季节修订 = '春秋季' AND r_1day_xz.日期识别='前天' AND r_1day_xz.`一级分类`='下装'
         ";
         
-    }    
+    }   
+    
+    // 判断历史温度时间
+    public function weather_handle_5() {
+
+    }
 
 }
