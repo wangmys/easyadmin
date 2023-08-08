@@ -2036,6 +2036,24 @@ class Weathertips extends BaseController
                 c.冬季SKC = b.冬季SKC
         ";
 
+        $sql_历史天气更新提醒 = "
+            UPDATE
+                `cwl_weathertips_customer` 
+            SET 
+                提醒 =  CASE
+                            WHEN `冬季历史最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`冬季历史最早`, 6)) THEN '上冬'
+                            WHEN `冬季温区最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`冬季温区最早`, 6)) THEN '上冬'
+                            ELSE 
+                                CASE
+                                    WHEN `秋季历史最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`秋季历史最早`, 6)) THEN '上秋'
+                                    WHEN `秋季温区最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`秋季温区最早`, 6)) THEN '上秋'
+                                    ELSE ''
+                            END
+                        END
+            WHERE 1
+                AND (提醒 IS NULL OR 提醒 = '')
+        ";
+
         $this->db_easyA->execute($sql1_春);
         $this->db_easyA->execute($sql2_春);
         $this->db_easyA->execute($sql3_春);
@@ -2047,6 +2065,7 @@ class Weathertips extends BaseController
         $this->db_easyA->execute($sql3_冬);
         $this->db_easyA->execute($sql_秋季SKC);
         $this->db_easyA->execute($sql_冬季SKC);
+        $this->db_easyA->execute($sql_历史天气更新提醒);
     }
 
     // 总表最终销售占比
