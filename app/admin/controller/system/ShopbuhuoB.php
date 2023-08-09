@@ -645,8 +645,8 @@ class ShopbuhuoB extends AdminController
             FROM ErpCustomer EC
             LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
-            WHERE EC.CustomItem17='{$shangpingfuzheren}'-- EC.CustomerName='大石二店'
-            AND EG.TimeCategoryName1={$year}
+            WHERE EC.CustomItem17 IN ({$shangpingfuzheren})
+            -- AND EG.TimeCategoryName1={$year}
             ) T
             WHERE T.[清空时间] > GETDATE()-7
         ";
@@ -1095,11 +1095,19 @@ class ShopbuhuoB extends AdminController
             }
 
             // 7天清空库存数据 
-            $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
+            $select_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
                 ['aid', '=', $this->authInfo['id']]
-            ])->selet();
-            // echo $find_fuzheren['商品负责人']; die;
-            $day7 = $this->day7($find_fuzheren['商品负责人']);
+            ])->group('商品负责人')->select();
+            
+            
+            // $select_fuzheren = arrToStr($select_fuzheren);
+            $fuzheren_str = '';
+            foreach ($select_fuzheren as $key => $val) {
+                $fuzheren_str .= "'" . $val['商品负责人'] . "',";
+            }
+            // 删除最后的逗号 '余惠华','刘琳娜','周奇志','张洋涛','易丽平','曹太阳','林冠豪','许文贤','陈栋云','黎亿炎'
+            $fuzheren_str = mb_substr($fuzheren_str, 0, -1, "UTF-8");
+            $day7 = $this->day7($fuzheren_str);
 
             $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->insertAll($day7);
             $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
@@ -1408,11 +1416,14 @@ class ShopbuhuoB extends AdminController
         ])->group('商品负责人')->select();
         
         
-        $select_fuzheren = arrToStr($select_fuzheren);
-        dump($select_fuzheren);
-        die;
-        $day7 = $this->day7($find_fuzheren['商品负责人']);
-        dump($day7); die;
+        // $select_fuzheren = arrToStr($select_fuzheren);
+        $fuzheren_str = '';
+        foreach ($select_fuzheren as $key => $val) {
+            $fuzheren_str .= "'" . $val['商品负责人'] . "',";
+        }
+        // 删除最后的逗号 '余惠华','刘琳娜','周奇志','张洋涛','易丽平','曹太阳','林冠豪','许文贤','陈栋云','黎亿炎'
+        $fuzheren_str = mb_substr($fuzheren_str, 0, -1, "UTF-8");
+        $day7 = $this->day7($fuzheren_str);
 
         $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_test')->insertAll($day7);
         $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
