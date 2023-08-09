@@ -204,6 +204,7 @@ class Shangguitips extends BaseController
                     sk.云仓,sk.年份,sk.季节,sk.一级分类,sk.二级分类,sk.分类,
                     sk.货号,
                     count(sk.预计库存数量) as 上柜家数,
+                    sum(sk.预计库存数量) as 已铺件数,
                     zysgs.直营上柜数,
                     jmsgs.加盟上柜数,
                     dpgs.店铺个数
