@@ -1097,7 +1097,7 @@ class ShopbuhuoB extends AdminController
             // 7天清空库存数据 
             $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
                 ['aid', '=', $this->authInfo['id']]
-            ])->find();
+            ])->selet();
             // echo $find_fuzheren['商品负责人']; die;
             $day7 = $this->day7($find_fuzheren['商品负责人']);
 
@@ -1292,7 +1292,7 @@ class ShopbuhuoB extends AdminController
     // 补货测试
     public function redExcel_test_buhuo() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/test.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/6补货申请_林冠豪.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '手工单号',
@@ -1319,10 +1319,10 @@ class ShopbuhuoB extends AdminController
         //     $data = cache('test_date'); 
         // }
         $data = $this->readExcel1($save_path, $read_column);
-        echo '<pre>';
-        print_r($data);
+        // echo '<pre>';
+        // print_r($data);
 
-        die;
+        // die;
 
         // 店铺信息
         $select_customer = $this->db_easyA->table('customer')->field('CustomerName,CustomerCode,CustomItem17')->select()->toArray();
@@ -1352,10 +1352,10 @@ class ShopbuhuoB extends AdminController
         }
 
         // $this->db_easyA->startTrans();
-        $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
+        $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_test')->where([
             ['aid', '=', $this->authInfo['id']]
         ])->delete();
-        $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->where([
+        $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_test')->where([
             ['aid', '=', $this->authInfo['id']]
         ])->delete();  
 
@@ -1399,20 +1399,25 @@ class ShopbuhuoB extends AdminController
         // 批量切割插入
         $chunk_list = array_chunk($data, 1000);
         foreach($chunk_list as $key => $val) {
-            $this->db_easyA->table('cwl_chuhuozhilingdan_3')->insertAll($val);
+            $this->db_easyA->table('cwl_chuhuozhilingdan_test')->insertAll($val);
         }
 
         // 7天清空库存数据 
-        $find_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
+        $select_fuzheren = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->field('商品负责人')->where([
             ['aid', '=', $this->authInfo['id']]
-        ])->find();
-        // echo $find_fuzheren['商品负责人']; die;
+        ])->group('商品负责人')->select();
+        
+        
+        $select_fuzheren = arrToStr($select_fuzheren);
+        dump($select_fuzheren);
+        die;
         $day7 = $this->day7($find_fuzheren['商品负责人']);
+        dump($day7); die;
 
-        $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->insertAll($day7);
+        $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_test')->insertAll($day7);
         $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
-            UPDATE cwl_chuhuozhilingdan_7dayclean_3 AS a
-            LEFT JOIN cwl_chuhuozhilingdan_3 AS b ON a.店铺名称 = b.店铺名称 
+            UPDATE cwl_chuhuozhilingdan_7dayclean_test AS a
+            LEFT JOIN cwl_chuhuozhilingdan_test AS b ON a.店铺名称 = b.店铺名称 
             AND a.货号 = b.货号 
             AND b.aid = '{$this->authInfo["id"]}'
             SET b.清空时间 = a.清空时间,
@@ -1438,7 +1443,7 @@ class ShopbuhuoB extends AdminController
                 a.货号,
                 zt.*
             FROM
-                `cwl_chuhuozhilingdan_3` as a right join cwl_chuhuozhilingdan_zaitu as zt
+                `cwl_chuhuozhilingdan_test` as a right join cwl_chuhuozhilingdan_zaitu as zt
                 on a.店铺名称=zt.CustomerName and a.`商品负责人`= zt.CustomItem17 and a.货号=zt.GoodsNo and a.aid = zt.aid
             WHERE
                 a.`aid` = '{$this->authInfo['id']}' 
@@ -1472,7 +1477,7 @@ class ShopbuhuoB extends AdminController
                 if ($kucun[0]['actual_quantity'] - $val['调拨未完成数'] <= 0) {
                     $data['调拨未完成数'] = $val['调拨未完成数'];
                     $data['库存数量'] = $kucun[0]['actual_quantity']; 
-                    $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
+                    $this->db_easyA->table('cwl_chuhuozhilingdan_test')->where([
                         ['商品负责人', '=', $val['商品负责人']],
                         ['店铺名称', '=', $val['店铺名称']],
                         ['货号', '=', $val['货号']],
