@@ -311,7 +311,7 @@ class Shangguitips extends BaseController
         }
     }
 
-    public function chagnku_2() {
+    public function changku_2() {
         $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where("id=1")->find();
         // 更新风格 一级风格 二级风格
         $sql1 = "
