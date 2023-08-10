@@ -671,95 +671,6 @@ class Weathertips extends BaseController
         }
     }
 
-    // 历史销售启动数据
-    public function retail_customer_history() {
-        // $sql = "
-        //     select 
-        //         t.省份,
-        //         t.店铺名称,
-        //         t.季节归集,
-        //         t.一级分类,
-        //         sum(t.销售数量) AS 销售数量,
-        //         t.销售日期
-        //     from (
-        //         SELECT
-        //             EC.State AS 省份,
-        //             ER.CustomerName AS 店铺名称,
-        //             CASE
-        //                 EG.TimeCategoryName2
-        //                 WHEN '初春' THEN
-        //                 '春季'
-        //                 WHEN '正春' THEN
-        //                 '春季'
-        //                 WHEN '春季' THEN
-        //                 '春季'
-        //                 WHEN '初秋' THEN
-        //                 '秋季'
-        //                 WHEN '深秋' THEN
-        //                 '秋季'
-        //                 WHEN '秋季' THEN
-        //                 '秋季'
-        //                 WHEN '初夏' THEN
-        //                 '夏季'
-        //                 WHEN '盛夏' THEN
-        //                 '夏季'
-        //                 WHEN '夏季' THEN
-        //                 '夏季'
-        //                 WHEN '冬季' THEN
-        //                 '冬季'
-        //                 WHEN '初冬' THEN
-        //                 '冬季'
-        //                 WHEN '深冬' THEN
-        //                 '冬季'
-        //             END AS 季节归集,
-        //             EG.CategoryName1 AS 一级分类,
-        //             SUM(ERG.Quantity) AS 销售数量,
-        //             FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期
-        //         FROM
-        //                 ErpRetail AS ER 
-        //         LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-        //         LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-        //         LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-        //         LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-        //         WHERE
-        //             ER.RetailDate >= '2022-07-01'
-        //             AND ER.RetailDate < '2023-01-01' 
-        //             AND ER.CodingCodeText = '已审结'
-        //             AND EC.ShutOut = 0
-        //             AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
-        //             AND EG.CategoryName1 IN ('内搭', '外套','下装')
-        //             AND EG.TimeCategoryName2 IN ('初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
-        //             AND EBC.Mathod IN ('直营', '加盟')
-        //             AND EC.CustomerName = '亳州一店'
-        //         GROUP BY 
-        //             ER.CustomerName,
-        //             EC.State,
-        //             EG.TimeCategoryName2,
-        //             EG.CategoryName1,
-        //             FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
-        //     ) as t
-        //     GROUP BY t.省份, t.店铺名称, t.季节归集, t.一级分类, t.销售日期
-        //     ORDER BY t.省份 ASC, t.销售日期 ASC 
-        // ";
-        // $select = $this->db_sqlsrv->query($sql);
-        // if ($select) {
-        //     $this->db_easyA->execute('TRUNCATE cwl_weathertips_retail_customer_history;');
-
-        //     $chunk_list = array_chunk($select, 500);
-
-        //     foreach($chunk_list as $key => $val) {
-        //         // 基础结果 
-        //         $insert = $this->db_easyA->table('cwl_weathertips_retail_customer_history')->strict(false)->insertAll($val);
-        //     }
-
-        //     return json([
-        //         'status' => 1,
-        //         'msg' => 'success',
-        //         'content' => "cwl_weathertips_retail_customer_history 更新成功！"
-        //     ]);
-        // }
-    }
-
     // 天气历史
     public function getWeather() {
         $dateList = getWeatherDateList(1); 
@@ -871,7 +782,7 @@ class Weathertips extends BaseController
                 day8 = d8.weather_time,
                 day9 = d9.weather_time,
                 day10 = d10.weather_time,
-                day0_min = d0.min_c,
+                day0_min = d0.min_c + 2,
                 day0_max = d0.max_c + 2,
                 day1_min = d1.min_c + 2,
                 day1_max = d1.max_c + 2,
