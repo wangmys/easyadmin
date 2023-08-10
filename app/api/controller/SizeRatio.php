@@ -285,6 +285,20 @@ class SizeRatio
     public function flushall()
     {
         $this->redis = new Redis(['password' => 'sg2023-07']);
-        $this->redis->clear();
+        $res = $this->redis->clear();
+        echo '<pre>';
+        print_r($res);
+        die;
+    }
+
+    /**
+     * 
+     */
+    public function getKeys()
+    {
+        $this->redis = new Redis();
+        echo '<pre>';
+        print_r($this->redis->getMultiple());
+        die;
     }
 }
