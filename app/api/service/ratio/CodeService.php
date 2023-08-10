@@ -1085,37 +1085,48 @@ class CodeService
                     return ApiConstant::ERROR_CODE;
                 }
                 $model = null;
+                $tablename = '';
                 Db::startTrans();
                 try {
                     switch ($data_key){
                         // 同步周销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[0]:
                             $model = $this->size7DayModel;
+                            $tablename = 'ea_size_7day_sale';
                             break;
                         // 同步累销数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[1]:
                             $model = $this->sizeAccumulatedModel;
+                            $tablename = 'ea_size_accumulated_sale';
                             break;
                         // 同步店铺预计库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[2]:
                             $model = $this->sizeShopEstimatedModel;
+                            $tablename = 'ea_size_shop_estimated_stock';
                             break;
                         // 同步云仓可用库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
                             $model = $this->sizeWarehouseAvailableModel;
+                            $tablename = 'ea_size_warehouse_available_stock';
                             break;
-                        // 同步云仓可用库存数据
+                        // 同步云仓在途库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
                             $model = $this->sizeWarehouseTransitModel;
+                            $tablename = 'ea_size_warehouse_transit_stock';
                             break;
                         // 同步仓库采购库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
                             $model = $this->sizePurchaseStockModel;
+                            $tablename = 'ea_size_purchase_stock';
                             break;
                     }
                     if($model && $sale_data){
+                        // 清空历史数据
+                        if($tablename){
+                           Db::execute("truncate table $tablename");
+                        }
                         // 批量切割
-                        $data = array_chunk($sale_data,1000);
+                        $data = array_chunk($sale_data,1500);
                         foreach ($data as $key => $val){
                              // 执行插入操作
                             $model->insertAll($val);
