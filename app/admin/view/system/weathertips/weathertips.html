@@ -581,9 +581,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day0_max']?data['day0_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day0_max']?data['day0_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day0_min']?data['day0_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day0_min']?data['day0_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#969696;">
@@ -595,9 +595,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day1_max']?data['day1_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day1_max']?data['day1_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day1_min']?data['day1_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day1_min']?data['day1_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title:  `<div class="flex col around">
@@ -609,9 +609,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day2_max']?data['day2_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day2_max']?data['day2_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day2_min']?data['day2_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day2_min']?data['day2_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title:  `<div class="flex col around" style="color:red;">
@@ -623,9 +623,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day3_max']?data['day3_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day3_max']?data['day3_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day3_min']?data['day3_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day3_min']?data['day3_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0096ff;">
@@ -637,9 +637,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day4_max']?data['day4_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day4_max']?data['day4_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day4_min']?data['day4_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day4_min']?data['day4_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0191f6;">
@@ -651,9 +651,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day5_max']?data['day5_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day5_max']?data['day5_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day5_min']?data['day5_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day5_min']?data['day5_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#028ae9;">
@@ -665,9 +665,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day6_max']?data['day6_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day6_max']?data['day6_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day6_min']?data['day6_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day6_min']?data['day6_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0485df;">
@@ -679,9 +679,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day7_max']?data['day7_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day7_max']?data['day7_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day7_min']?data['day7_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day7_min']?data['day7_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0096ff;">
@@ -693,9 +693,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day8_max']?data['day8_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day8_max']?data['day8_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day8_min']?data['day8_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day8_min']?data['day8_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0582da;">
@@ -707,9 +707,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day9_max']?data['day9_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day9_max']?data['day9_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day9_min']?data['day9_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day9_min']?data['day9_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around" style="color:#0481d9;">
@@ -721,9 +721,9 @@
                     function (data) {
                         return `<div class="weather_div flex col around">
                                 <div class="cima_1" style="height:5px; width:10px;"></div>   
-                                 <div class="cima_2 hot" style="line-height:5px">${data['day10_max']?data['day10_max']:''}</div>
+                                 <div class="cima_2 hot" style="line-height:5px">${data['day10_max']?data['day10_max'] - 2:''}</div>
                                  <div class="cima_1" style="height:15px; width:10px;"></div> 
-                                 <div class="cima2_2 cool" style="line-height:5px">${data['day10_min']?data['day10_min']:''}</div>
+                                 <div class="cima2_2 cool" style="line-height:5px">${data['day10_min']?data['day10_min'] - 2:''}</div>
                                </div>`; 
                     }}
                     ,{ title: `<div class="flex col around">
