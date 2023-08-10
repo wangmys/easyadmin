@@ -284,6 +284,7 @@ class SizeRatio
      */
     public function getKeys()
     {
+        $this->redis = new Redis(['password' => 'sg2023-07']);
         echo '<pre>';
         print_r($this->redis->handler()->keys('*'));
         die;
