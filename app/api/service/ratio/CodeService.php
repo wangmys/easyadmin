@@ -42,7 +42,7 @@ class CodeService
     public function __construct()
     {
         // 设置内存
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '1024M');
         // 码比-排名表
         $this->sizeModel = new SizeRanking;
         // 码比-周销表
@@ -306,6 +306,8 @@ class CodeService
      */
     public function pullShopEstimatedStock()
     {
+        // 设置内存
+        ini_set('memory_limit', '1024M');
         // 查询累销数据
         $sql = "SELECT 
 	        CAST(GETDATE() AS DATE) as Date,
