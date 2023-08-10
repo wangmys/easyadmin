@@ -278,4 +278,13 @@ class SizeRatio
         }
         return 'success';
     }
+
+    /**
+     * 清空缓存
+     */
+    public function flushall()
+    {
+        $this->redis = new Redis(['password' => 'sg2023-07']);
+        $this->redis->clear();
+    }
 }
