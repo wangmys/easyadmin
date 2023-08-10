@@ -524,3 +524,44 @@ function zeroHandle($num1, $num2) {
     }
 }
 
+function get_goods_str($ti_goods=[]) {
+    $ti_goods_str = '';
+    if ($ti_goods) {
+        foreach ($ti_goods as $v_goods) {
+            $ti_goods_str .= "'".$v_goods."',";
+        }
+        $ti_goods_str = substr($ti_goods_str, 0, -1);
+    }
+    return $ti_goods_str;
+}
+
+function getSeriesNum($arr){
+    if (!$arr) return [];
+    $series=[];//存储连续数的数组
+    $seriesList=[];//存储连续数组成的数组
+    $i=0;//一共有多少连续数组成的数组个数
+    foreach ($arr as $k=> $v){
+        //计算下一个元素
+        $next=$v+1;
+        //如果有连续数且下一个数存在数组中
+        if(isset($arr[$k+1]) && $arr[$k+1]==$next){
+            //追加数组
+            array_push($series,$v,$next);
+        }else{
+            //如果不是连续数则清空数组重新存储连续数
+            $series=[];
+            $i++;
+            continue;
+        }
+        //追加到二维数组
+        $seriesList[$i]=array_unique($series);
+    }
+    //返回重新排列好的数组
+    return array_values($seriesList);
+}
+
+function uuid($str='')
+{
+    return $str.date('YmdHis').uniqid().rand(1000,9999);
+}
+

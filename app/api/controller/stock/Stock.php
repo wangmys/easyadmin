@@ -54,8 +54,8 @@ class Stock extends BaseController
         if ($start_date > $end_date) {
             return json(['开始日期不能大于结束日期'], 400);
         }
-        if ( (strtotime($end_date)-strtotime($start_date))/(24*60*60) > 6 ) {
-            return json(['仅限于查询一周数据'], 400);
+        if ( (strtotime($end_date)-strtotime($start_date))/(24*60*60) > 13 ) {
+            return json(['仅限于查询两周数据'], 400);
         }
 
         $data = Db::connect("mysql")->Query($this->get_sql3($start_date, $end_date));
@@ -102,7 +102,8 @@ group by start_date,YunCang, WenDai, WenQu, State, Mathod,TimeCategoryName1,Time
     protected function get_sql3($start_date, $end_date) {
 
         return "select 
-        Date as '日期', 
+        FROM_DAYS(TO_DAYS(DATE) - MOD(TO_DAYS(DATE) -2, 7)) as start_date, 
+        max(DATE) as '结束日期', 
         CONCAT(month(DATE), '月') as '月', 
         YunCang as '大区', 
         WenDai as '温带', 
@@ -156,9 +157,8 @@ group by start_date,YunCang, WenDai, WenQu, State, Mathod,TimeCategoryName1,Time
         sum(SalesVolume) as '销额', 
         sum(RetailAmount) as '零售金额' 
         from sp_customer_stock_sale_size 
-        where (DATE BETWEEN '{$start_date}' and '{$end_date}')  
-        and TimeCategoryName2 like '%夏%' 
-        group by Date,YunCang, WenDai, WenQu, State, CustomItem29, GoodsNo, GoodsName,  TimeCategoryName,TimeCategoryName2,  
+        where (DATE BETWEEN '{$start_date}' and '{$end_date}')   
+        group by start_date,YunCang, WenDai, WenQu, State, CustomItem29, GoodsNo, GoodsName,  TimeCategoryName,TimeCategoryName2,  
         CustomItem17, CategoryName1, CategoryName2, CategoryName, SupplyName, StyleCategoryName, StyleCategoryName1, ColorDesc, CustomItem46, 
         CustomItem47, CustomItem48, CustomItem11, CustomItem1, CustomItem45;";
 
