@@ -146,6 +146,7 @@ class SizeRatio
      */
     public function pullDataToSaveCache()
     {
+        ini_set("memory_limit", "512M");
         // 执行结果集
         $result = [];
         // 排名数据源
