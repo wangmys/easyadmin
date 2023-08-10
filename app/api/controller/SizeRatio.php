@@ -292,13 +292,21 @@ class SizeRatio
     }
 
     /**
-     * 
+     * 清除所有缓存数据
      */
-    public function getKeys()
+    public function clearAll()
     {
-        $this->redis = new Redis();
+        $this->redis = new Redis(['password' => 'sg2023-07']);
+        $all_keys = $this->redis->handler()->keys('*');
+        $this->redis->set('wx56a4463e942a299c_yuege_access_token',6666);
+        $not_list = ['wx56a4463e942a299c_yuege_access_token','wx56a4463e942a299c_yuege_expires_time','wx56a4463e942a299c_yuege_set_name'];
+        foreach ($all_keys as $k => $v){
+            if(!in_array($v,$not_list)){
+                $this->redis->delete($v);
+            }
+        }
         echo '<pre>';
-        print_r($this->redis->getMultiple());
+        print_r($this->redis->handler()->keys('*'));
         die;
     }
 }
