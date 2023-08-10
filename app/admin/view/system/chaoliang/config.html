@@ -173,6 +173,10 @@
                                 <input type="number" name='松紧长裤' autocomplete="off" value="{$config['松紧长裤']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <div id="xm-season" class="xm-select-demo"></div>
+                            </div>
                         </div>  
                     </div>
                 </div>
@@ -233,8 +237,11 @@
             , url_download_default = "{:url('admin/system.Chaoliang/downloadDefault')}" 
             , url_download_current = "{:url('admin/system.Chaoliang/downloadCurrent')}" 
             , url_getXmMapSelect = "{:url('admin/system.Chaoliang/getXmMapSelect')}"
+            , getConfigMapData = "{:url('admin/system.Chaoliang/getConfigMapData')}"
 
+        initFn(); 
         startTable();
+        
         //监听保存
         form.on('submit(saveMap)', function (res) {
             $.post(url_saveMap, res.field, function(res) {
@@ -251,6 +258,22 @@
             // console.log(111);
             return false;
         });
+        xmSelect.render({
+            el: '#xm-season', 
+            filterable: true,
+            toolbar: {show: true},
+            theme: {
+                color: '#1cbbb4',
+            },
+            // showCount: 1,
+            name:'季节归集',
+            data: [
+                {name: "春季", value: "春季", selected: false},
+                {name: "夏季", value: "夏季", selected: false},
+                {name: "秋季", value: "秋季", selected: false},
+                {name: "冬季", value: "冬季", selected: false},
+            ]
+        })
         //指定允许上传的文件类型
         upload.render({
             elem: '#importExcel'
@@ -307,6 +330,23 @@
             location.href = url_download_current;
             return false; 
         });
+        function initFn() {
+            $.get(getConfigMapData, {}, function(res) {
+                xmSelect.render({
+                    el: '#xm-season', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'季节归集',
+                    data: res.data.season
+                })
+            })
+            $("#season_id").val("{$config['季节归集']}");
+            form.render();
+        }
         function startTable() {
             table.render({
                 elem: '#table'

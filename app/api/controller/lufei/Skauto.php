@@ -82,8 +82,8 @@ class Skauto extends BaseController
             LEFT JOIN customer as c ON sk.店铺名称=c.CustomerName
             LEFT JOIN sp_ww_chunxia_stock as st ON sk.省份=st.省份 AND sk.店铺名称=st.店铺名称 AND sk.一级分类=st.一级分类 AND sk.二级分类=st.二级分类 AND sk.分类=st.分类 AND sk.货号 = st.货号
             LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.一级分类=bu.大类 AND sk.二级分类=bu.中类 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
-            WHERE
-                sk.季节 IN ({$this->seasionStr}) 
+            WHERE 1
+                -- sk.季节 IN ({$this->seasionStr}) 
                 AND c.Region <> '闭店区'
                 -- AND sk.商品负责人='曹太阳'
                 -- AND sk.店铺名称 IN ('东至一店')
@@ -140,7 +140,7 @@ class Skauto extends BaseController
                 AND EC.RegionId <> 55
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 = 2023
-                AND EG.TimeCategoryName2 in ( {$this->seasionStr} )
+        --        AND EG.TimeCategoryName2 in ( {$this->seasionStr} )
                 AND EG.CategoryName1 IN ('外套', '内搭','鞋履', '下装')
         -- 			AND EC.CustomerName in ('东至一店')
         -- 			AND EG.GoodsNo like 'B%'
@@ -317,7 +317,7 @@ class Skauto extends BaseController
             LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
             WHERE	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                 AND eg.TimeCategoryName1 = '2023'
-                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
+            --    AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
                 AND EC.ShutOut=0 
                 AND EC.MathodId IN (4,7)
                 AND ES.IsCompleted=0
@@ -383,7 +383,7 @@ class Skauto extends BaseController
                  AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
                 AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                 AND eg.TimeCategoryName1 = '2023'
-                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
+            --    AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
                 AND EC.ShutOut=0 
                 AND EC.MathodId IN (4,7)
             GROUP BY 
@@ -549,7 +549,7 @@ class Skauto extends BaseController
                 AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
+        --        AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
@@ -587,7 +587,7 @@ class Skauto extends BaseController
                 AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
+        --        AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')

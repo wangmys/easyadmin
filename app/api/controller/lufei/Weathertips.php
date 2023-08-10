@@ -173,9 +173,9 @@ class Weathertips extends BaseController
     
     // 店铺库存
     public function customerStock_1() {
+        $year = date("Y", time());
         $sql = "
             SELECT 
-            -- 	TOP 10000
                 EBR.Region AS 区域,
                 EC.RegionId,
                 EC.CustomerName AS 店铺名称,
@@ -187,7 +187,6 @@ class Weathertips extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsName AS 货品名称,
                 EG.GoodsNo AS 货号,
-            -- 	EG.GoodsId AS 货品ID,
                 EG.UnitPrice / 2 AS 零售价,
                 EC.CustomItem17 AS 商品负责人,
                 SUM(ECS.Quantity) AS 店铺库存,
@@ -231,14 +230,12 @@ class Weathertips extends BaseController
                 EC.RegionId NOT IN ('8','40', '55', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EC.ShutOut = 0
-                -- AND EC.CustomerName = '亳州一店'
-                AND EG.TimeCategoryName1 IN ('2023')
-                AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季' )
+                AND EG.TimeCategoryName1 IN ('{$year}')
+                AND EG.TimeCategoryName2 IN ( '初春', '正春', '春季', '初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
                 AND EG.CategoryName1 IN ('内搭', '外套', '下装')
             GROUP BY 
                 EC.CustomerName,
                 EG.GoodsNo,
-            -- 	EG.GoodsId,
                 EG.UnitPrice,
                 EBR.Region,
                 EC.State,
@@ -251,8 +248,7 @@ class Weathertips extends BaseController
                 EC.CustomItem17,
                 EG.GoodsName,
                 FORMAT(EC.OpeningDate, 'yyyy-MM-dd'),
-                EG.TimeCategoryName2
-            -- HAVING  SUM ( ECS.Quantity ) > 0               
+                EG.TimeCategoryName2            
         ";
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -555,6 +551,7 @@ class Weathertips extends BaseController
                 EG.CategoryName1 AS 一级分类,
                 EG.CategoryName2 AS 二级分类,
                 EG.CategoryName AS 分类,
+                EG.TimeCategoryName1 AS 年份,
                 EG.StyleCategoryName AS 风格,
                 SUM(ERG.Quantity) AS 销售数量,
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
@@ -598,6 +595,7 @@ class Weathertips extends BaseController
                 EG.CategoryName,
                 EG.StyleCategoryName,
                 EG.TimeCategoryName2,
+                EG.TimeCategoryName1,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
             ORDER BY EC.State ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 
         ";
@@ -1767,8 +1765,8 @@ class Weathertips extends BaseController
             
             $冬季天数C = strlen($val['day3_冬'] . $val['day4_冬'] . $val['day5_冬'] . $val['day6_冬'] . $val['day7_冬'] . $val['day8_冬'] . $val['day9_冬'] . $val['day10_冬']) ;  
            
-            $tips1 = '';
-            $tips2 = '';
+            $tips1 = NULL;
+            $tips2 = NULL;
             $tips3 = NULL;
             $识别规则_秋 = NULL;
             $识别规则_冬 = NULL;
@@ -2002,6 +2000,60 @@ class Weathertips extends BaseController
             set c.冬季SKC基本_下装 = t.`冬季SKC基本_下装`
         ";
 
+        $sql_秋季SKC = "
+            UPDATE cwl_weathertips_customer AS c 
+            RIGHT JOIN (
+            SELECT
+                店铺名称,
+                count(*) AS 秋季SKC
+            FROM cwl_weathertips_stock 
+            WHERE 1
+                AND 预计库存 > 1
+                AND 是否计算SKC = '是'
+                AND 是否调价款 = '否'
+                AND 季节归集 = '秋季'
+            GROUP BY 店铺名称
+            ) AS b ON b.店铺名称 = c.店铺名称
+            SET
+                c.秋季SKC = b.秋季SKC
+        ";
+
+        $sql_冬季SKC = "
+            UPDATE cwl_weathertips_customer AS c 
+            RIGHT JOIN (
+            SELECT
+                店铺名称,
+                count(*) AS 冬季SKC
+            FROM cwl_weathertips_stock 
+            WHERE 1
+                AND 预计库存 > 1
+                AND 是否计算SKC = '是'
+                AND 是否调价款 = '否'
+                AND 季节归集 = '冬季'
+            GROUP BY 店铺名称
+            ) AS b ON b.店铺名称 = c.店铺名称
+            SET
+                c.冬季SKC = b.冬季SKC
+        ";
+
+        $sql_历史天气更新提醒 = "
+            UPDATE
+                `cwl_weathertips_customer` 
+            SET 
+                提醒 =  CASE
+                            WHEN `冬季历史最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`冬季历史最早`, 6)) THEN '上冬'
+                            WHEN `冬季温区最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`冬季温区最早`, 6)) THEN '上冬'
+                            ELSE 
+                                CASE
+                                    WHEN `秋季历史最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`秋季历史最早`, 6)) THEN '上秋'
+                                    WHEN `秋季温区最早` IS NOT NULL && date_format(now(),'%Y-%m-%d') >= concat(date_format(now(),'%Y'), right(`秋季温区最早`, 6)) THEN '上秋'
+                                    ELSE ''
+                            END
+                        END
+            WHERE 1
+                AND (提醒 IS NULL OR 提醒 = '')
+        ";
+
         $this->db_easyA->execute($sql1_春);
         $this->db_easyA->execute($sql2_春);
         $this->db_easyA->execute($sql3_春);
@@ -2011,6 +2063,9 @@ class Weathertips extends BaseController
         $this->db_easyA->execute($sql1_冬);
         $this->db_easyA->execute($sql2_冬);
         $this->db_easyA->execute($sql3_冬);
+        $this->db_easyA->execute($sql_秋季SKC);
+        $this->db_easyA->execute($sql_冬季SKC);
+        $this->db_easyA->execute($sql_历史天气更新提醒);
     }
 
     // 总表最终销售占比
@@ -2039,6 +2094,11 @@ class Weathertips extends BaseController
             left join cwl_weathertips_retail_2 as r_1day_xz ON c.省份 = r_1day_xz.省份 AND c.店铺名称 = r_1day_xz.店铺名称 AND r_1day_xz.季节修订 = '春秋季' AND r_1day_xz.日期识别='前天' AND r_1day_xz.`一级分类`='下装'
         ";
         
-    }    
+    }   
+    
+    // 判断历史温度时间
+    public function weather_handle_5() {
+
+    }
 
 }

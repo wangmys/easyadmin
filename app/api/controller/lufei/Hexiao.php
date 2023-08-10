@@ -66,11 +66,15 @@ class hexiao extends BaseController
                 EG.GoodsNo AS 货号,
                 EG.GoodsId AS 货品编号,
                 EGPT_cbj.UnitPrice AS '成本价',
+
+                EGPT_dqjsj.UnitPrice AS '当前结算单价',
+                SUM ( ERG.Quantity ) * EGPT_dqjsj.UnitPrice AS '当前结算价',
+
                 EGPT_lsfxj.UnitPrice AS '历史分销价',
                 SUM ( ERG.Quantity* ERG.DiscountPrice ) AS 销售金额,
                 SUM(ERG.Quantity) AS 销售数量,
                 CASE
-                    WHEN EG.TimeCategoryName1 = {$year} AND EBC.Mathod = '加盟' THEN EGPT_lsfxj.UnitPrice * SUM(ERG.Quantity) ELSE EGPT_cbj.UnitPrice * SUM(ERG.Quantity)
+                    WHEN EG.TimeCategoryName1 = 2023 AND EBC.Mathod = '加盟' THEN EGPT_lsfxj.UnitPrice * SUM ( ERG.Quantity ) ELSE EGPT_dqjsj.UnitPrice * SUM ( ERG.Quantity ) 
                 END AS 成本金额,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd') AS 销售日期
             FROM
@@ -80,6 +84,7 @@ class hexiao extends BaseController
             LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
             LEFT JOIN ErpGoods AS EG ON ERG.GoodsId = EG.GoodsId
             LEFT JOIN ErpGoodsPriceType AS EGPT_cbj ON EGPT_cbj.GoodsId = EG.GoodsId AND EGPT_cbj.PriceName = '成本价'
+            LEFT JOIN ErpGoodsPriceType AS EGPT_dqjsj ON EGPT_dqjsj.GoodsId = EG.GoodsId AND EGPT_dqjsj.PriceName = '当前结算价'
             LEFT JOIN ErpGoodsPriceType AS EGPT_lsfxj ON EGPT_lsfxj.GoodsId = EG.GoodsId AND EGPT_lsfxj.PriceName = '历史分销价'
             WHERE
                 ER.RetailDate >= '{$today}'
@@ -99,10 +104,13 @@ class hexiao extends BaseController
                 EG.CategoryName2,
                 EG.CategoryName,
                 EGPT_cbj.UnitPrice,
+                EGPT_dqjsj.UnitPrice,
                 EGPT_lsfxj.UnitPrice,
                 FORMAT(ER.RetailDate, 'yyyy-MM-dd')	
             ORDER BY EC.State ASC, EBC.Mathod ASC, FORMAT(ER.RetailDate, 'yyyy-MM-dd') ASC 	
         ";
+
+        // die;
 		
         $select = $this->db_sqlsrv->query($sql);
         $count = count($select);
@@ -259,20 +267,8 @@ class hexiao extends BaseController
         ";
         
         $select = $this->db_easyA->query($sql);
-        
-        // dump($select2);
-
-        // $merge = array_merge($select, $select2);
-        // echo '<pre>';
-        // print_r($merge); die;
 
         if ($select) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            // $this->db_easyA->table('cwl_hexiao_res_day')->where([
-            //     ['销售日期', '=', $today]
-            // ])->delete();
-
             $chunk_list = array_chunk($select, 500);
             // $this->db_easyA->startTrans();
 
@@ -294,7 +290,7 @@ class hexiao extends BaseController
             $merge2 = array_merge($select3, $select4, $select5);
 
             $chunk_list2 = array_chunk($merge2, 500);
-            // $this->db_easyA->startTrans();
+
 
             foreach($chunk_list2 as $key => $val) {
                 $this->db_easyA->table('cwl_hexiao_res_day')->strict(false)->insertAll($val);
