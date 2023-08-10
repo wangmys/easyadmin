@@ -280,14 +280,12 @@ class SizeRatio
     }
 
     /**
-     * 清空缓存
+     * 获取所有key
      */
-    public function flushall()
+    public function getKeys()
     {
-        $this->redis = new Redis(['password' => 'sg2023-07']);
-        $res = $this->redis->clear();
         echo '<pre>';
-        print_r($res);
+        print_r($this->redis->handler()->keys('*'));
         die;
     }
 
