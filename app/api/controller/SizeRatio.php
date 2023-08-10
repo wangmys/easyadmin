@@ -180,6 +180,37 @@ class SizeRatio
         $server = new CodeService;
         $model = $server;
         foreach (ApiConstant::RATIO_PULL_REDIS_KEY as $k => $v){
+            $tablename = '';
+            switch ($v){
+                // 同步周销数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[0]:
+                    $tablename = 'ea_size_7day_sale';
+                    break;
+                // 同步累销数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[1]:
+                    $tablename = 'ea_size_accumulated_sale';
+                    break;
+                // 同步店铺预计库存数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[2]:
+                    $tablename = 'ea_size_shop_estimated_stock';
+                    break;
+                // 同步云仓可用库存数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
+                    $tablename = 'ea_size_warehouse_available_stock';
+                    break;
+                // 同步云仓在途库存数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
+                    $tablename = 'ea_size_warehouse_transit_stock';
+                    break;
+                // 同步仓库采购库存数据
+                case ApiConstant::RATIO_PULL_REDIS_KEY[5]:
+                    $tablename = 'ea_size_purchase_stock';
+                    break;
+            }
+            // 清空历史数据
+            if($tablename){
+               Db::execute("truncate table $tablename");
+            }
             // 从缓存同步到MYSQL数据库
             $code = $model->saveSaleData($v);
             // 记录执行
