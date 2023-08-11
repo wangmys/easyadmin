@@ -624,7 +624,7 @@
                     function (data) {
                         if (data['提醒00/28/37/44/100/160/S'] == '超' && data['预计00/28/37/44/100/160/S']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计00/28/37/44/100/160/S']}</div>`;
-                        } else if (data['预计00/28/37/44/100/160/S']) {
+                        } else if (data['预计00/28/37/44/100/160/S'] > 0) {
                             return data['预计00/28/37/44/100/160/S'];
                         } else {
                             return '';
@@ -639,7 +639,7 @@
                     function (data) {
                         if (data['提醒29/38/46/105/165/M'] == '超' && data['预计29/38/46/105/165/M']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计29/38/46/105/165/M']}</div>`;
-                        } else if (data['预计29/38/46/105/165/M']) {
+                        } else if (data['预计29/38/46/105/165/M'] > 0) {
                             return data['预计29/38/46/105/165/M'];
                         } else {
                             return '';
@@ -654,7 +654,7 @@
                     function (data) {
                         if (data['提醒30/39/48/110/170/L'] == '超' && data['预计30/39/48/110/170/L']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计30/39/48/110/170/L']}</div>`;
-                        } else if (data['预计30/39/48/110/170/L']) {
+                        } else if (data['预计30/39/48/110/170/L'] > 0) {
                             return data['预计30/39/48/110/170/L'];
                         } else {
                             return '';
@@ -669,7 +669,7 @@
                     function (data) {
                         if (data['提醒31/40/50/115/175/XL'] == '超' && data['预计31/40/50/115/175/XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计31/40/50/115/175/XL']}</div>`;
-                        } else if (data['预计31/40/50/115/175/XL']) {
+                        } else if (data['预计31/40/50/115/175/XL'] > 0) {
                             return data['预计31/40/50/115/175/XL'];
                         } else {
                             return '';
@@ -684,7 +684,7 @@
                     function (data) {
                         if (data['提醒32/41/52/120/180/2XL'] == '超' && data['预计32/41/52/120/180/2XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计32/41/52/120/180/2XL']}</div>`;
-                        } else if (data['预计32/41/52/120/180/2XL']) {
+                        } else if (data['预计32/41/52/120/180/2XL'] > 0) {
                             return data['预计32/41/52/120/180/2XL'];
                         } else {
                             return '';
@@ -699,7 +699,7 @@
                     function (data) {
                         if (data['提醒33/42/54/125/185/3XL'] == '超' && data['预计33/42/54/125/185/3XL']) {
                             return`<div style='color:red; font-weight:bold; background:yellow;'>${data['预计33/42/54/125/185/3XL']}</div>`;
-                        } else if (data['预计33/42/54/125/185/3XL']) {
+                        } else if (data['预计33/42/54/125/185/3XL'] > 0) {
                             return data['预计33/42/54/125/185/3XL'];
                         } else {
                             return '';
@@ -714,7 +714,7 @@
                     function (data) {
                         if (data['提醒34/43/56/190/4XL'] == '超' && data['预计34/43/56/190/4XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计34/43/56/190/4XL']}</div>`;
-                        } else if (data['预计34/43/56/190/4XL']) {
+                        } else if (data['预计34/43/56/190/4XL'] > 0) {
                             return data['预计34/43/56/190/4XL'];
                         } else {
                             return '';
@@ -729,7 +729,7 @@
                     function (data) {
                         if (data['提醒35/44/58/195/5XL'] == '超' && data['预计35/44/58/195/5XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计35/44/58/195/5XL']}</div>`;
-                        } else if (data['预计35/44/58/195/5XL']) {
+                        } else if (data['预计35/44/58/195/5XL'] > 0) {
                             return data['预计35/44/58/195/5XL'];
                         } else {
                             return '';
@@ -744,7 +744,7 @@
                     function (data) {
                         if (data['提醒36/6XL'] == '超' && data['预计36/6XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计36/6XL']}</div>`;
-                        } else if (data['预计36/6XL']) {
+                        } else if (data['预计36/6XL'] > 0) {
                             return data['预计36/6XL'];
                         } else {
                             return '';
@@ -759,7 +759,7 @@
                     function (data) {
                         if (data['提醒38/7XL'] == '超' && data['预计38/7XL']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计38/7XL']}</div>`;
-                        } else if (data['预计38/7XL']) {
+                        } else if (data['预计38/7XL'] > 0) {
                             return data['预计38/7XL'];
                         } else {
                             return '';
@@ -774,7 +774,7 @@
                     function (data) {
                         if (data['提醒_40'] == '超' && data['预计_40']) {
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['预计_40']}</div>`;
-                        } else if (data['预计_40']) {
+                        } else if (data['预计_40'] > 0) {
                             return data['预计_40'];
                         } else {
                             return '';
