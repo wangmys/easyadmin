@@ -300,7 +300,49 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
 
         // 上传图 
-        echo $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_id);
+        }  
+    }
+
+     /**
+     * 推送鞋履
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function pushS107()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            [
+                'name' => '王慧淼',
+                'tel' => '15868571991',
+                'userid' => '033834553729226560'
+            ],
+            [
+                'name' => '吴杭飞',
+                'tel' => '17307695571',
+                'userid' => '691524040721575237'
+            ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        // 创建图
+        $reportFormsService->create_table_s107();
+        $path = $this->request->domain() . "/img/" . date('Ymd').'/S107.jpg';
+
+        // 上传图 
+        $media_id = $model->uploadDingFile($path, "鞋履报表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
