@@ -207,7 +207,9 @@ class Shangguitips extends BaseController
                     sum(sk.预计库存数量) as 已铺件数,
                     zysgs.直营上柜数,
                     jmsgs.加盟上柜数,
-                    dpgs.店铺个数
+                    dpgs.店铺个数,
+                    dpgszy.`店铺个数_直营`,
+                    dpgsjm.`店铺个数_加盟`
                 FROM
                     sp_sk as sk
                 LEFT JOIN (
@@ -247,6 +249,34 @@ class Shangguitips extends BaseController
                     ) as t
                     GROUP BY t.云仓
                 ) AS dpgs ON sk.云仓 = dpgs.云仓
+                RIGHT JOIN (
+                    select t.云仓,count(*) AS `店铺个数_直营` from 
+                    (	
+                        SELECT
+                            云仓,店铺名称
+                        FROM
+                            sp_sk 
+                        WHERE 1
+                            AND 经营模式='直营'
+                        GROUP BY
+                            云仓,店铺名称
+                    ) as t
+                    GROUP BY t.云仓
+                ) AS dpgszy ON sk.云仓 = dpgszy.云仓
+                RIGHT JOIN (
+                    select t.云仓,count(*) AS `店铺个数_加盟` from 
+                    (	
+                        SELECT
+                            云仓,店铺名称
+                        FROM
+                            sp_sk 
+                        WHERE 1
+                            AND 经营模式='加盟'
+                        GROUP BY
+                            云仓,店铺名称
+                    ) as t
+                    GROUP BY t.云仓
+                ) AS dpgsjm ON sk.云仓 = dpgsjm.云仓
                 WHERE 1
                     AND sk.预计库存数量 > 0
                 GROUP BY
