@@ -687,7 +687,7 @@ class SendReport extends BaseController
         // $this->service->create_table_s110A($date);
         // $this->service->create_table_s110B($date);
         // 发送数据报表
-        $this->send();
+        // $this->send();
     }
 
     // 报表主群

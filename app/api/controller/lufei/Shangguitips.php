@@ -462,9 +462,77 @@ class Shangguitips extends BaseController
                     else NULL
                 end
         ";
+
+        $sql_主码最小值 = "
+            update cwl_shangguitips_cangku 
+            set 主码最小值 = 
+                            case 
+                                when
+                                    二级分类 IN ('松紧长裤', '松紧短裤')
+                                then	
+                                    least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                when
+                                    一级分类 in ('内搭', '外套', '鞋履')
+                                then	
+                                    case
+                                        when 
+                                            `可用库存_30/39/48/110/170/L` = 0 OR `可用库存_30/39/48/110/170/L` is null
+                                        then
+                                            least(`可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                        when 
+                                            `可用库存_33/42/54/125/185/3XL` = 0 OR `可用库存_33/42/54/125/185/3XL` is null
+                                        then
+                                            least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`)
+                                        else
+                                            least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                    end
+                                when
+                                    一级分类 in ('下装') AND 二级分类 NOT IN ('松紧长裤', '松紧短裤')
+                                then	
+                                    case
+                                        when 
+                                            `可用库存_29/38/46/105/165/M` = 0 OR `可用库存_29/38/46/105/165/M` is null
+                                        then
+                                                least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`, `可用库存_34/43/56/190/4XL`)
+                                        when 
+                                            `可用库存_34/43/56/190/4XL` = 0 OR `可用库存_34/43/56/190/4XL` is null
+                                        then
+                                                least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                        ELSE
+                                                least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`
+                                                , `可用库存_34/43/56/190/4XL`)
+                                    end
+                            end
+            where 1
+                and 主码齐码情况 = '可配' 
+        ";
+
+        $sql_预计最大可加店数 = "
+            update cwl_shangguitips_cangku as m1 
+            left join (select 
+                t.*,
+                case
+                    WHEN TRUNCATE(t.主码最小值 / 1.5, 0) > t.未上柜家数 THEN t.未上柜家数
+                    WHEN TRUNCATE(t.主码最小值 / 1.5, 0) <= t.未上柜家数 THEN TRUNCATE(t.主码最小值 / 1.5, 0)
+                end as 预计最大可加铺店数
+            from (
+                select 
+                    云仓,一级分类,二级分类,分类,货号,主码最小值,
+                    店铺个数 - 上柜家数 as 未上柜家数
+                    from cwl_shangguitips_cangku
+                    where 1
+                        and 主码齐码情况 = '可配'
+            ) AS t) m2 on m1.云仓 = m2.云仓 and m1.一级分类 = m2.一级分类 and m1.二级分类 = m2.二级分类 and m1.分类 = m2.分类 and m1.货号 = m2.货号
+            set 
+                m1.预计最大可加铺店数 = m2.预计最大可加铺店数 	
+            where 
+                m1.预计最大可加铺店数 is null        
+        ";
         $this->db_easyA->execute($sql1);
         $this->db_easyA->execute($sql2);
         $this->db_easyA->execute($sql_主码);
         $this->db_easyA->execute($sql_主码2);
+        $this->db_easyA->execute($sql_主码最小值);
+        $this->db_easyA->execute($sql_预计最大可加店数);
     }
 }
