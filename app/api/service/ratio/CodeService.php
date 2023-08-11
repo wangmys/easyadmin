@@ -42,7 +42,7 @@ class CodeService
     public function __construct()
     {
         // 设置内存
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '1024M');
         // 码比-排名表
         $this->sizeModel = new SizeRanking;
         // 码比-周销表
@@ -306,6 +306,8 @@ class CodeService
      */
     public function pullShopEstimatedStock()
     {
+        // 设置内存
+        ini_set('memory_limit', '1024M');
         // 查询累销数据
         $sql = "SELECT 
 	        CAST(GETDATE() AS DATE) as Date,
@@ -1102,7 +1104,7 @@ class CodeService
                         case ApiConstant::RATIO_PULL_REDIS_KEY[3]:
                             $model = $this->sizeWarehouseAvailableModel;
                             break;
-                        // 同步云仓可用库存数据
+                        // 同步云仓在途库存数据
                         case ApiConstant::RATIO_PULL_REDIS_KEY[4]:
                             $model = $this->sizeWarehouseTransitModel;
                             break;
@@ -1113,7 +1115,7 @@ class CodeService
                     }
                     if($model && $sale_data){
                         // 批量切割
-                        $data = array_chunk($sale_data,1000);
+                        $data = array_chunk($sale_data,1500);
                         foreach ($data as $key => $val){
                              // 执行插入操作
                             $model->insertAll($val);
