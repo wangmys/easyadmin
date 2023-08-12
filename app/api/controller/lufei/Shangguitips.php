@@ -297,41 +297,6 @@ class Shangguitips extends BaseController
                 $this->db_easyA->table('cwl_shangguitips_cangku')->strict(false)->insertAll($val);
             }
 
-            // 更新销售占比
-            // $sql2 = "
-            //     UPDATE cwl_shangguitips_retail AS r
-            //     RIGHT JOIN
-            //     (
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '春季' and 风格='基本款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '春季' and 风格='引流款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '夏季' and 风格='基本款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '夏季' and 风格='引流款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '秋季' and 风格='基本款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '秋季' and 风格='引流款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '冬季' and 风格='基本款'
-            //         UNION ALL
-            //         SELECT 
-            //             季节归集,风格, sum(销售金额) as 销售总金额 FROM `cwl_shangguitips_retail` where 季节归集 = '冬季' and 风格='引流款'
-            //     ) as t ON r.季节归集 = t.季节归集 AND r.风格 = t.风格
-            //     SET 
-            //         r.`销售总金额` = t.销售总金额,
-            //         r.`销售占比` = round(r.销售金额 / t.销售总金额, 3)
-            // ";
-            // $this->db_easyA->execute($sql2);
-
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -564,5 +529,128 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_主码2);
         $this->db_easyA->execute($sql_主码最小值);
         $this->db_easyA->execute($sql_预计最大可加店数);
+    }
+
+    // 更新标准 经营模式
+    public function biaozhun() {
+        $sql = "
+            UPDATE	cwl_shangguitips_biaozhun as b
+            LEFT JOIN customer as c ON c.CustomerName = b.`B级` AND c.Region <> '闭店区'
+            SET 经营模式 = c.Mathod
+            WHERE 1
+        ";
+    }
+
+    public function handle_1()
+    {
+        $sql = "
+            SELECT
+                云仓,年份,季节,
+                CASE
+                    季节
+                    WHEN '初春' THEN '春季'
+                    WHEN '正春' THEN '春季'
+                    WHEN '春季' THEN '春季'
+                    WHEN '初秋' THEN '秋季'
+                    WHEN '深秋' THEN '秋季'
+                    WHEN '秋季' THEN '秋季'
+                    WHEN '初夏' THEN '夏季'
+                    WHEN '盛夏' THEN '夏季'
+                    WHEN '夏季' THEN '夏季'
+                    WHEN '冬季' THEN '冬季'
+                    WHEN '初冬' THEN '冬季'
+                    WHEN '深冬' THEN '冬季'
+                END AS 季节归集,
+                一级分类,二级分类,分类,风格,一级风格,二级风格,货号,
+                可用数量 as 云仓_可用数量,
+                主码齐码情况 as `云仓_主码齐码情况`, 
+                店铺个数 as 店铺个数_合计,
+                `店铺个数_直营`,
+                `店铺个数_加盟`,
+                上柜家数 as 实际上柜_上柜家数,
+                直营上柜数 as 实际上柜_直营上柜数,
+                加盟上柜数 as 实际上柜_加盟上柜数,
+                date_format(now(),'%Y-%m-%d') AS 更新日期
+            FROM
+                cwl_shangguitips_cangku
+            WHERE 
+                二级风格 is NOT NULL
+        ";
+		
+        $select = $this->db_easyA->query($sql);
+        $count = count($select);
+
+        if ($select) {
+            // 删除历史数据
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle;');
+            $chunk_list = array_chunk($select, 500);
+
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_handle')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_shangguitips_cangku 更新成功，数量：{$count}！"
+            ]);
+
+        }
+    }
+
+    public function handle_2() {
+        $sql_货品等级_计划 = "
+                update cwl_shangguitips_handle as h
+                set 
+                货品等级_计划_直营 = 
+                    case
+                        h.二级风格
+                        when 'B级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营') 
+                        when 'A1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A1级` IS NOT NULL AND `A1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营') 
+                        when 'A2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A2级` IS NOT NULL AND `A2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'A3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A3级` IS NOT NULL AND `A3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'N级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `N级` IS NOT NULL AND `N级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'H3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H3级` IS NOT NULL AND `H3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'H6级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H6级` IS NOT NULL AND `H6级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'K1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K1级` IS NOT NULL AND `K1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        when 'K2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K2级` IS NOT NULL AND `K2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '直营')
+                        ELSE 店铺个数_直营
+                    end,
+                货品等级_计划_加盟 = 
+                    case
+                        h.二级风格
+                        when 'B级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟') 
+                        when 'A1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A1级` IS NOT NULL AND `A1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟') 
+                        when 'A2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A2级` IS NOT NULL AND `A2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'A3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A3级` IS NOT NULL AND `A3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'N级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `N级` IS NOT NULL AND `N级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'H3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H3级` IS NOT NULL AND `H3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'H6级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H6级` IS NOT NULL AND `H6级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'K1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K1级` IS NOT NULL AND `K1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        when 'K2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K2级` IS NOT NULL AND `K2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集 and 经营模式 = '加盟')
+                        ELSE 店铺个数_加盟
+                    end,
+                货品等级_计划_合计 = 
+                    case
+                        h.二级风格
+                        when 'B级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集) 
+                        when 'A1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A1级` IS NOT NULL AND `A1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集) 
+                        when 'A2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A2级` IS NOT NULL AND `A2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'A3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `A3级` IS NOT NULL AND `A3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'N级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `N级` IS NOT NULL AND `N级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'H3级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H3级` IS NOT NULL AND `H3级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'H6级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `H6级` IS NOT NULL AND `H6级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'K1级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K1级` IS NOT NULL AND `K1级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        when 'K2级' then (SELECT count(*) FROM cwl_shangguitips_biaozhun WHERE `K2级` IS NOT NULL AND `K2级` != '0' AND 云仓 = h.云仓 AND 季节 = h.季节归集)
+                        ELSE 店铺个数_合计
+                    end 
+            
+            WHERE 1
+            -- 	AND h.货号 = 'B52502002'
+            -- 	AND h.云仓 = '南昌云仓'
+                AND h.季节归集 in ('秋季')      
+        ";
+        $this->db_easyA->execute($sql_货品等级_计划);
     }
 }
