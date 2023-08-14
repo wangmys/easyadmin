@@ -202,7 +202,7 @@ class Shangguitips extends BaseController
             (
                 SELECT
                     sk.云仓,sk.年份,sk.季节,sk.一级分类,sk.二级分类,sk.分类,
-                    sk.货号,
+                    sk.货号,累销数量,
                     count(sk.预计库存数量) as 上柜家数,
                     sum(sk.预计库存数量) as 已铺件数,
                     zysgs.直营上柜数,
@@ -639,6 +639,7 @@ class Shangguitips extends BaseController
                 直营上柜数 as 实际上柜_直营上柜数,
                 加盟上柜数 as 实际上柜_加盟上柜数,
                 预计最大可加铺店数,
+                累销数量,
                 date_format(now(),'%Y-%m-%d') AS 更新日期
             FROM
                 cwl_shangguitips_cangku
@@ -819,23 +820,62 @@ class Shangguitips extends BaseController
                 AND h.`季节归集` IN ('秋季')	
         ";
 
+        $sql_近1周中类销售占比 = "
+            UPDATE cwl_shangguitips_handle AS h 
+            LEFT JOIN cwl_shangguitips_retail AS r ON h.季节归集 = r.季节归集 AND h.一级分类 = r.一级分类 AND h.二级分类 = r.二级分类 AND h.风格 = r.风格
+            SET h.`近1周中类销售占比` = r.销售占比
+            WHERE 1
+                AND h.季节归集 = r.季节归集
+        ";
+
         $this->db_easyA->execute($sql_货品等级_实际);
         $this->db_easyA->execute($sql_实际铺货);
         $this->db_easyA->execute($sql_铺货率);
         $this->db_easyA->execute($sql_上柜率);
         $this->db_easyA->execute($sql_货品等级上柜率);
+        $this->db_easyA->execute($sql_近1周中类销售占比);
     }
 
+    // 可上店铺
     public function handle_4() {
         $select = $this->db_easyA->table('cwl_shangguitips_handle')->where([
             ['季节归集', '=', '秋季'],
-            ['货号', '=', 'B52502002'],
+            // ['货号', '=', 'B52502002'],
         ])->select()->toArray();
 
-        dump($select);
+        $this->db_easyA->execute('TRUNCATE cwl_shangguitips_keshang_customer;');
         foreach ($select as $key => $val) {
-            
+            $sql_可上 = "
+                SELECT
+                    p.云仓,
+                    p.店铺名称,
+                    经营模式,
+                    '{$val['二级风格']}' AS 二级风格,
+                    '{$val['货号']}' AS 货号
+                FROM
+                    cwl_shangguitips_biaozhun_pro as p
+                WHERE
+                    p.云仓 = '{$val['云仓']}' 
+                    AND p.二级风格 = '{$val['二级风格']}'
+                    AND p.店铺名称 NOT IN (
+                        SELECT
+                            店铺名称 
+                        FROM
+                            cwl_shangguitips_biaozhun_customer 
+                        WHERE
+                            云仓 = p.云仓 
+                            AND 货号 = '{$val['货号']}'
+                  			AND 季节归集 = '{$val['季节归集']}'
+                    )            
+            ";  
+            $select_可上 = $this->db_easyA->query($sql_可上);
+            // dump($select_可上);
+            $this->db_easyA->table('cwl_shangguitips_keshang_customer')->strict(false)->insertAll($select_可上);            
         }
+
+
+
+
     }
 
 }
