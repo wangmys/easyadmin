@@ -69,6 +69,39 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
+    public function sk() {
+        $sql = "
+            SELECT
+                * 
+            FROM
+                sp_sk 
+            WHERE 1
+                AND 季节 IN ( '初秋', '深秋', '秋季')
+                AND 店铺名称 IN (
+                    SELECT CustomerName FROM customer_pro GROUP BY CustomerName
+                )
+        ";
+        $select = $this->db_easyA->query($sql);
+        $count = count($select);
+
+        if ($select) {
+            // 删除历史数据
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_sk;');
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_sk')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_shangguitips_sk 更新成功，数量：{$count}！"
+            ]);
+
+        }
+    }
+
     public function retail()
     {
         $sql = "
@@ -192,7 +225,7 @@ class Shangguitips extends BaseController
         }
     }
 
-    public function changku()
+    public function cangku()
     {
         $sql = "
             SELECT 
@@ -228,13 +261,13 @@ class Shangguitips extends BaseController
                     dpgszy.`店铺个数_直营`,
                     dpgsjm.`店铺个数_加盟`
                 FROM
-                    sp_sk as sk
+                    cwl_shangguitips_sk as sk
                 LEFT JOIN (
                     SELECT
                         云仓,一级分类,二级分类,分类,货号,
                         预计库存数量,count(预计库存数量) as 直营上柜数
                     FROM
-                        sp_sk 
+                        cwl_shangguitips_sk  
                     WHERE 1
                         AND 预计库存数量 > 0
                         AND 经营模式 = '直营'
@@ -246,7 +279,7 @@ class Shangguitips extends BaseController
                         云仓,一级分类,二级分类,分类,货号,
                         预计库存数量,count(预计库存数量) as 加盟上柜数
                     FROM
-                        sp_sk 
+                        cwl_shangguitips_sk 
                     WHERE 1
                         AND 预计库存数量 > 0
                         AND 经营模式 = '加盟'
@@ -257,12 +290,14 @@ class Shangguitips extends BaseController
                     select t.云仓,count(*) AS 店铺个数 from 
                     (	
                         SELECT
-                            云仓,店铺名称
+                            sk.云仓,sk.店铺名称,f.首单日期
                         FROM
-                            sp_sk 
+                            cwl_shangguitips_sk as sk 
+                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
                         WHERE 1
+                            AND f.首单日期 IS NOT NULL
                         GROUP BY
-                            云仓,店铺名称
+                            sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
                 ) AS dpgs ON sk.云仓 = dpgs.云仓
@@ -270,13 +305,15 @@ class Shangguitips extends BaseController
                     select t.云仓,count(*) AS `店铺个数_直营` from 
                     (	
                         SELECT
-                            云仓,店铺名称
+                            sk.云仓,sk.店铺名称,f.首单日期
                         FROM
-                            sp_sk 
+                            cwl_shangguitips_sk as sk
+                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
                         WHERE 1
-                            AND 经营模式='直营'
+                            AND f.首单日期 IS NOT NULL
+                            AND sk.经营模式='直营'
                         GROUP BY
-                            云仓,店铺名称
+                            sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
                 ) AS dpgszy ON sk.云仓 = dpgszy.云仓
@@ -284,13 +321,15 @@ class Shangguitips extends BaseController
                     select t.云仓,count(*) AS `店铺个数_加盟` from 
                     (	
                         SELECT
-                            云仓,店铺名称
+                        sk.云仓,sk.店铺名称,f.首单日期
                         FROM
-                            sp_sk 
+                            cwl_shangguitips_sk as sk
+                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
                         WHERE 1
-                            AND 经营模式='加盟'
+                            AND f.首单日期 IS NOT NULL
+                            AND sk.经营模式='加盟'
                         GROUP BY
-                            云仓,店铺名称
+                            sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
                 ) AS dpgsjm ON sk.云仓 = dpgsjm.云仓
@@ -758,7 +797,7 @@ class Shangguitips extends BaseController
                 sk.店铺名称,sk.经营模式,sk.预计库存数量
             FROM
                 `cwl_shangguitips_handle` as h 
-            LEFT JOIN sp_sk AS sk ON h.云仓 = sk.云仓 AND h.一级分类 = sk.一级分类 AND h.二级分类 = sk.二级分类 AND h.分类 = sk.分类 AND h.货号 = sk.货号 AND sk.`预计库存数量` > 0
+            LEFT JOIN cwl_shangguitips_sk AS sk ON h.云仓 = sk.云仓 AND h.一级分类 = sk.一级分类 AND h.二级分类 = sk.二级分类 AND h.分类 = sk.分类 AND h.货号 = sk.货号 AND sk.`预计库存数量` > 0
             WHERE 1
                 AND h.`季节归集` IN ('秋季')
         ";
@@ -843,7 +882,7 @@ class Shangguitips extends BaseController
                     货号, 
                     sum(累销数量) as 累销数量
                 FROM
-                    sp_sk 
+                    cwl_shangguitips_sk 
                 WHERE 1
                     AND 累销数量 is not null
                 GROUP BY 货号
@@ -952,6 +991,28 @@ class Shangguitips extends BaseController
             WHERE 1      
         ";
 
+        $sql_仓库可配中类SKC数 = "
+            UPDATE cwl_shangguitips_handle as h
+            LEFT JOIN (
+                SELECT
+                    云仓,季节归集,二级分类,风格,
+                    sum(
+                        case
+                            when `云仓_主码齐码情况`='可配' then 1 else 0
+                        end
+                    ) as 仓库可配中类SKC数
+                FROM
+                    `cwl_shangguitips_handle` 
+                WHERE 1
+                    AND 二级风格 is NOT NULL
+                GROUP BY
+                    云仓,季节归集,风格,二级分类
+            ) AS t ON h.云仓 = t.云仓 AND h.季节归集=t.季节归集 AND h.二级分类 = t.二级分类 AND h.风格 = t.风格 
+            set 
+                h.仓库可配中类SKC数 = t.仓库可配中类SKC数
+            where 1        
+        ";
+
         $this->db_easyA->execute($sql_货品等级_实际);
         $this->db_easyA->execute($sql_实际铺货);
         $this->db_easyA->execute($sql_铺货率);
@@ -963,6 +1024,7 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_最早上市天数);
         $this->db_easyA->execute($sql_单款全国日均销得分);
         $this->db_easyA->execute($sql_单款全国日均销排名_分组);
+        $this->db_easyA->execute($sql_仓库可配中类SKC数);
     }
 
     // 可上店铺
