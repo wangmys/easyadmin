@@ -202,7 +202,23 @@ class Shangguitips extends BaseController
             FROM
             (
                 SELECT
-                    sk.云仓,sk.年份,sk.季节,sk.一级分类,sk.二级分类,sk.分类,
+                    sk.云仓,sk.年份,sk.季节,
+                    CASE
+                        sk.季节
+                        WHEN '初春' THEN '春季'
+                        WHEN '正春' THEN '春季'
+                        WHEN '春季' THEN '春季'
+                        WHEN '初秋' THEN '秋季'
+                        WHEN '深秋' THEN '秋季'
+                        WHEN '秋季' THEN '秋季'
+                        WHEN '初夏' THEN '夏季'
+                        WHEN '盛夏' THEN '夏季'
+                        WHEN '夏季' THEN '夏季'
+                        WHEN '冬季' THEN '冬季'
+                        WHEN '初冬' THEN '冬季'
+                        WHEN '深冬' THEN '冬季'
+                    END AS 季节归集,
+                    sk.一级分类,sk.二级分类,sk.分类,
                     sk.货号,
                     count(sk.预计库存数量) as 上柜家数,
                     sum(sk.预计库存数量) as 已铺件数,
@@ -988,7 +1004,7 @@ class Shangguitips extends BaseController
     }
 
     // 请上柜
-    public function handle5() {
+    public function handle_5() {
         $sql_tips1 = "
             UPDATE cwl_shangguitips_handle as h
             RIGHT JOIN (
