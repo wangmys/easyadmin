@@ -1005,7 +1005,7 @@ class Shangguitips extends BaseController
 
     // 请上柜
     public function handle_5() {
-        $sql_tips1 = "
+        $sql_请上柜 = "
             UPDATE cwl_shangguitips_handle as h
             RIGHT JOIN (
                 SELECT
@@ -1022,6 +1022,24 @@ class Shangguitips extends BaseController
                 h.上柜提醒 = '请上柜'
             where 1
         ";
-        $this->db_easyA->query($sql_tips1);
+
+        $sql_重点上柜 = "
+            UPDATE cwl_shangguitips_handle as h
+            RIGHT JOIN
+            (SELECT
+                    云仓,季节归集,货号,单款全国日均销排名,仓库可配中类SKC数, `近1周中类销售占比`,
+                    仓库可配中类SKC数 * `近1周中类销售占比` as 计算条件
+            FROM
+                    cwl_shangguitips_handle 
+            WHERE 1
+                    AND 上柜提醒 = '请上柜'
+                    AND (单款全国日均销排名 > 0 AND 单款全国日均销排名 <= 仓库可配中类SKC数 * `近1周中类销售占比`)
+            ) AS t ON h.云仓 = t.云仓 AND h.季节归集=t.季节归集 AND h.货号 = t.货号
+            SET
+                h.上柜提醒 = '重点上柜'
+            
+        ";
+        $this->db_easyA->execute($sql_请上柜);
+        $this->db_easyA->execute($sql_重点上柜);
     }
 }
