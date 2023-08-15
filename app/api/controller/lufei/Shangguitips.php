@@ -115,6 +115,7 @@ class Shangguitips extends BaseController
                         AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                         AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
                         AND EG.TimeCategoryName2 NOT IN ('通季', '畅销季')
+                        AND EG.TimeCategoryName1 IN ('2023')
                         AND EG.CategoryName1 IN ('内搭', '外套','下装', '鞋履')
                         AND EBC.Mathod IN ('直营', '加盟')
                 GROUP BY 
@@ -202,7 +203,7 @@ class Shangguitips extends BaseController
             (
                 SELECT
                     sk.云仓,sk.年份,sk.季节,sk.一级分类,sk.二级分类,sk.分类,
-                    sk.货号,累销数量,
+                    sk.货号,
                     count(sk.预计库存数量) as 上柜家数,
                     sum(sk.预计库存数量) as 已铺件数,
                     zysgs.直营上柜数,
@@ -639,7 +640,6 @@ class Shangguitips extends BaseController
                 直营上柜数 as 实际上柜_直营上柜数,
                 加盟上柜数 as 实际上柜_加盟上柜数,
                 预计最大可加铺店数,
-                累销数量,
                 date_format(now(),'%Y-%m-%d') AS 更新日期
             FROM
                 cwl_shangguitips_cangku
@@ -820,6 +820,22 @@ class Shangguitips extends BaseController
                 AND h.`季节归集` IN ('秋季')	
         ";
 
+        $sql_全国累销数量 = "
+            update cwl_shangguitips_handle as h
+            right join (
+                    SELECT
+                    货号, 
+                    sum(累销数量) as 累销数量
+                FROM
+                    sp_sk 
+                WHERE 1
+                    AND 累销数量 is not null
+                GROUP BY 货号
+            ) as t on h.货号 = t.货号
+            set h.全国累销数量 = t.累销数量
+            WHERE 1
+        ";
+
         $sql_近1周中类销售占比 = "
             UPDATE cwl_shangguitips_handle AS h 
             LEFT JOIN cwl_shangguitips_retail AS r ON h.季节归集 = r.季节归集 AND h.一级分类 = r.一级分类 AND h.二级分类 = r.二级分类 AND h.风格 = r.风格
@@ -828,12 +844,109 @@ class Shangguitips extends BaseController
                 AND h.季节归集 = r.季节归集
         ";
 
+        $sql_全国上柜家数 = "
+            update cwl_shangguitips_handle as h
+            right join (
+                SELECT
+                    货号,
+                    sum(`实际上柜_上柜家数`) as `实际上柜_上柜家数`
+                FROM
+                    cwl_shangguitips_handle
+                WHERE 1
+                GROUP BY 货号
+            ) as t on h.货号 = t.货号
+            set 全国上柜家数 = t.实际上柜_上柜家数
+        ";
+
+        $sql_最早上市天数 = "
+            update cwl_shangguitips_handle as h
+            right join (
+                SELECT
+                    货号, 
+                    MAX(上市天数) AS 上市天数
+                FROM
+                    sp_ww_budongxiao_detail 
+                WHERE 1
+                GROUP BY 货号
+            ) as t on h.货号 = t.货号
+            set h.最早上市天数 = t.上市天数
+            WHERE 1
+        ";
+
+        $sql_单款全国日均销得分 = "
+            update cwl_shangguitips_handle as h
+            right join (
+                SELECT
+                    云仓,货号,
+                    (全国累销数量 / 全国上柜家数 / 最早上市天数) as 单款全国日均销得分
+                FROM
+                    cwl_shangguitips_handle AS h 
+                LEFT JOIN cwl_shangguitips_retail AS r ON h.季节归集 = r.季节归集 AND h.一级分类 = r.一级分类 AND h.二级分类 = r.二级分类 AND h.风格 = r.风格
+                WHERE 1
+                    AND h.季节归集 = '秋季'
+                ) as t on h.云仓 = t.云仓 AND h.货号 = t.货号
+            set h.单款全国日均销得分 = t.单款全国日均销得分
+            WHERE 1
+        ";
+
+        $sql_单款全国日均销排名_不分组 = "
+            UPDATE cwl_shangguitips_handle as h
+            LEFT JOIN (
+                SELECT t.*,
+                    @rank := @rank + 1 as 'rank' 
+                FROM (
+                SELECT
+                    货号,
+                    单款全国日均销得分
+                FROM
+                    cwl_shangguitips_handle
+                WHERE
+                    单款全国日均销得分 IS NOT NULL
+                group by 货号
+                ORDER BY 单款全国日均销得分 DESC 
+                ) as t, (SELECT @rank:=0) r 
+            ) AS m ON h.货号 = m.货号
+            SET h.单款全国日均销排名 = m.rank
+        ";
+
+        $sql_单款全国日均销排名_分组 = "
+            UPDATE cwl_shangguitips_handle as h
+            LEFT JOIN (
+                SELECT
+                a.货号,
+                CASE
+                    WHEN 
+                        a.二级分类 = @二级分类 and 
+                        a.风格 = @风格 
+                    THEN
+                        @rank := @rank + 1 ELSE @rank := 1
+                END AS 排名,
+                @二级分类 := a.二级分类 AS 二级分类,
+                @风格 := a.风格 AS 风格
+                FROM
+                    cwl_shangguitips_handle a,
+                    ( SELECT @二级分类 := null,  @风格 := null, @rank := 0 ) TT
+                WHERE
+                    季节归集 = '秋季'
+                ORDER BY
+                    a.风格 ASC,a.二级分类 ASC,a.单款全国日均销得分 DESC
+            ) AS m ON h.货号 = m.货号
+            SET 
+                h.单款全国日均销排名 = m.排名
+            WHERE 1      
+        ";
+
         $this->db_easyA->execute($sql_货品等级_实际);
         $this->db_easyA->execute($sql_实际铺货);
         $this->db_easyA->execute($sql_铺货率);
         $this->db_easyA->execute($sql_上柜率);
         $this->db_easyA->execute($sql_货品等级上柜率);
+        $this->db_easyA->execute($sql_全国累销数量);
         $this->db_easyA->execute($sql_近1周中类销售占比);
+        $this->db_easyA->execute($sql_全国上柜家数);
+        $this->db_easyA->execute($sql_最早上市天数);
+        $this->db_easyA->execute($sql_单款全国日均销得分);
+        $this->db_easyA->execute($sql_单款全国日均销排名_分组);
     }
 
     // 可上店铺
@@ -872,10 +985,27 @@ class Shangguitips extends BaseController
             // dump($select_可上);
             $this->db_easyA->table('cwl_shangguitips_keshang_customer')->strict(false)->insertAll($select_可上);            
         }
-
-
-
-
     }
 
+    // 请上柜
+    public function handle5() {
+        $sql_tips1 = "
+            UPDATE cwl_shangguitips_handle as h
+            RIGHT JOIN (
+                SELECT
+                    云仓,货号,季节归集
+                FROM
+                    cwl_shangguitips_handle 
+                WHERE 1
+                    AND 季节归集 = '秋季'
+                    AND `云仓_主码齐码情况` = '可配'
+                    AND `上柜率_合计` <= 0.95
+                    AND `铺货率_合计` <= 0.85
+            ) as t on h.云仓 = t.云仓 and h.货号 = t.货号 and h.季节归集 = t.季节归集 
+            set
+                h.上柜提醒 = '请上柜'
+            where 1
+        ";
+        $this->db_easyA->query($sql_tips1);
+    }
 }
