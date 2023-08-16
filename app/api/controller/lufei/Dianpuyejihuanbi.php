@@ -34,6 +34,12 @@ class Dianpuyejihuanbi extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // 修复昨天业绩数据
+    public function xiufu() {
+        $date = date("Y-m-d", strtotime('-1day'));
+        $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+    }
+
     public function dianpuyejihuanbi_date_handle() {
         $date = input('date');
 
@@ -87,7 +93,7 @@ class Dianpuyejihuanbi extends BaseController
                 AND ER.RetailDate < DATEADD( DAY, +1, @retail_date ) 
                 AND ER.CodingCodeText = '已审结'
                 AND EC.ShutOut = 0
-                AND EC.RegionId NOT IN ('8','40', '55', '84', '85',  '97')
+                AND EC.RegionId NOT IN ('8','40', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
             GROUP BY 
                 ER.CustomerName,
