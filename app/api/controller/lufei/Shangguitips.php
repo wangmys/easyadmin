@@ -587,8 +587,30 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_预计最大可加店数);
     }
 
+    // 标准1
+    public function biaozhun() {
+        // 去掉未开业，闭店
+        $sql = "
+            select * from cwl_shangguitips_biaozhun_no where B级 in (
+                select CustomerName from customer_pro where 1
+            )
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun;');
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_biaozhun')->strict(false)->insertAll($val);
+            }
+        }
+
+    }
+
     // 更新标准 经营模式
     public function biaozhun_pro() {
+        $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun_pro;'); 
         $sql_B级 = "
             SELECT 云仓,经营模式,B级 as 店铺名称,'B级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' 
             group by 云仓,经营模式,B级
@@ -663,6 +685,29 @@ class Shangguitips extends BaseController
         $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X1级);
         $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X2级);
         $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X3级);
+
+
+        $sql_店铺剔除 = "
+            (select 店铺名称 from cwl_shangguitips_biaozhun_pro where 店铺名称 not in (
+                select CustomerName from customer_pro where 1
+            )) 
+        ";
+        $店铺剔除 = $this->db_easyA->query($sql_店铺剔除);
+        // dump($店铺剔除);die;
+        if ($店铺剔除) {
+            $mapStr = '';
+            foreach ($店铺剔除 as $key => $val) {
+                if ($key < count($店铺剔除) -1 ) {
+                    $mapStr .= "'{$val["店铺名称"]}'" . ",";
+                } else {
+                    $mapStr .= "'{$val["店铺名称"]}'";
+                }
+            }
+                    // dump($mapStr);die;
+            $this->db_easyA->execute("
+                delete from cwl_shangguitips_biaozhun_pro where 店铺名称 in ($mapStr)
+            ");
+        }
     }
 
     public function handle_1()
@@ -819,12 +864,12 @@ class Shangguitips extends BaseController
             set 
                 货品等级_实际_直营 = 
                 (select count(*) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 
-                and 货号=h.货号 and 季节 = h.季节 and 经营模式='直营'),
+                and 货号=h.货号 and 季节归集 = h.季节归集 and 经营模式='直营'),
                 货品等级_实际_加盟 = 
                 (select count(*) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类
-                and 货号=h.货号 and 季节 = h.季节 and 经营模式='加盟'), 
+                and 货号=h.货号 and 季节归集 = h.季节归集 and 经营模式='加盟'), 
                 货品等级_实际_合计 = 	
-                (select count(*) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节) 
+                (select count(*) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节归集 = h.季节归集) 
             WHERE 1
                 AND h.`季节归集` IN ('秋季')	
         ";
@@ -1103,9 +1148,5 @@ class Shangguitips extends BaseController
         ";
         $this->db_easyA->execute($sql_请上柜);
         $this->db_easyA->execute($sql_重点上柜);
-    }
-
-    public function test2() {
-        echo 222;
     }
 }

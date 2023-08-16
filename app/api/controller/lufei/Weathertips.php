@@ -2024,10 +2024,5 @@ class Weathertips extends BaseController
         ";
         
     }   
-    
-    // 判断历史温度时间
-    public function weather_handle_5() {
-
-    }
 
 }
