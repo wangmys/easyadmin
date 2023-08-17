@@ -844,7 +844,6 @@ class Shangguitips extends BaseController
                 `cwl_shangguitips_handle` as h 
             LEFT JOIN cwl_shangguitips_sk AS sk ON h.云仓 = sk.云仓 AND h.一级分类 = sk.一级分类 AND h.二级分类 = sk.二级分类 AND h.分类 = sk.分类 AND h.货号 = sk.货号 AND sk.`预计库存数量` > 0
             WHERE 1
-                AND h.`季节归集` IN ('秋季')
         ";
         $select = $this->db_easyA->query($sql);
 

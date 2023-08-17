@@ -849,327 +849,328 @@ class Weathertips extends BaseController
             // 标准A
             $sqlA_lianxu = "
             update cwl_weathertips_customer
-                set 秋季连续天数A = 
+                set `秋季连续天数A` = 
                     CASE
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYYYY%' THEN 11
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYYY%' THEN 10
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYY%' THEN 9
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYY%' THEN 8
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYY%' THEN 7
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYY%' THEN 6
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYY%' THEN 5
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYY%' THEN 4
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYY%' THEN 3
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YY%' THEN 2
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%Y%' THEN 1
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_秋['最高温A']} AND day0_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_秋['最高温A']} AND day1_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_秋['最高温A']} AND day2_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_秋['最高温A']} AND day3_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_秋['最高温A']} AND day4_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_秋['最高温A']} AND day5_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_秋['最高温A']} AND day6_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_秋['最高温A']} AND day7_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_秋['最高温A']} AND day8_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_秋['最高温A']} AND day9_min <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_秋['最高温A']} AND day10_min <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_秋['最高温A']} AND `day0_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_秋['最高温A']} AND `day1_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_秋['最高温A']} AND `day2_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_秋['最高温A']} AND `day3_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_秋['最高温A']} AND `day4_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_秋['最高温A']} AND `day5_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_秋['最高温A']} AND `day6_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_秋['最高温A']} AND `day7_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_秋['最高温A']} AND `day8_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_秋['最高温A']} AND `day9_min` <= {$biaozhun_秋['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_秋['最高温A']} AND `day10_min` <= {$biaozhun_秋['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%NNNNNNNNNNN%' THEN 0
                 END,
-                冬季连续天数A = 
+                `冬季连续天数A` = 
                     CASE
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYYYY%' THEN 11
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYYY%' THEN 10
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYY%' THEN 9
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYYYY%' THEN 8
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYYY%' THEN 7
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYYY%' THEN 6
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYYY%' THEN 5
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYYY%' THEN 4
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YYY%' THEN 3
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%YY%' THEN 2
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%Y%' THEN 1
                         WHEN CONCAT(
-                            case when day0_max <= {$biaozhun_冬['最高温A']} AND day0_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day1_max <= {$biaozhun_冬['最高温A']} AND day1_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day2_max <= {$biaozhun_冬['最高温A']} AND day2_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day3_max <= {$biaozhun_冬['最高温A']} AND day3_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day4_max <= {$biaozhun_冬['最高温A']} AND day4_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day5_max <= {$biaozhun_冬['最高温A']} AND day5_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day6_max <= {$biaozhun_冬['最高温A']} AND day6_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day7_max <= {$biaozhun_冬['最高温A']} AND day7_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day8_max <= {$biaozhun_冬['最高温A']} AND day8_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day9_max <= {$biaozhun_冬['最高温A']} AND day9_min <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
-                            case when day10_max <= {$biaozhun_冬['最高温A']} AND day10_min <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
+                            case when `day0_max` <= {$biaozhun_冬['最高温A']} AND `day0_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day1_max` <= {$biaozhun_冬['最高温A']} AND `day1_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day2_max` <= {$biaozhun_冬['最高温A']} AND `day2_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day3_max` <= {$biaozhun_冬['最高温A']} AND `day3_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day4_max` <= {$biaozhun_冬['最高温A']} AND `day4_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day5_max` <= {$biaozhun_冬['最高温A']} AND `day5_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day6_max` <= {$biaozhun_冬['最高温A']} AND `day6_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day7_max` <= {$biaozhun_冬['最高温A']} AND `day7_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day8_max` <= {$biaozhun_冬['最高温A']} AND `day8_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day9_max` <= {$biaozhun_冬['最高温A']} AND `day9_min` <= {$biaozhun_冬['最低温A']} THEN 'Y' ELSE 'N' end,
+                            case when `day10_max` <= {$biaozhun_冬['最高温A']} AND `day10_min` <= {$biaozhun_冬['最低温A']} then 'Y' ELSE 'N' end
                         ) LIKE '%NNNNNNNNNNN%' THEN 0
                     END
                 WHERE 1
                     AND 省份 = '{$val['省份']}'  
-                    AND 冬季连续天数A IS NULL OR 秋季连续天数A IS NULL    
+                    AND `冬季连续天数A` IS NULL OR `秋季连续天数A` IS NULL 
+                    AND cid is not null   
             ";
             $this->db_easyA->execute($sqlA_lianxu);
 
@@ -1496,7 +1497,8 @@ class Weathertips extends BaseController
                     END
                 WHERE 1
                     AND 省份 = '{$val['省份']}'  
-                    AND 冬季连续天数B IS NULL OR 秋季连续天数B IS NULL    
+                    AND 冬季连续天数B IS NULL OR 秋季连续天数B IS NULL 
+                    AND cid is not null   
             ";
             $this->db_easyA->execute($sqlB_lianxu);
         }
@@ -1537,6 +1539,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";  
 
                 $this->db_easyA->execute($sql_秋);
@@ -1558,6 +1561,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";   
 
                 $this->db_easyA->execute($sql_秋);
@@ -1579,6 +1583,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";   
 
                 $this->db_easyA->execute($sql_秋_C); 
@@ -1603,6 +1608,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";   
                 $this->db_easyA->execute($sql_冬);
             } elseif ($val['冬季连续天数B'] >= $biaozhun_冬['连续天数B']) {
@@ -1623,6 +1629,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";   
                 $this->db_easyA->execute($sql_冬);
             } else { // 不满足A、B情况的时候执行C
@@ -1643,6 +1650,7 @@ class Weathertips extends BaseController
                     where    
                         省份='{$val['省份']}'
                         AND 店铺名称='{$val['店铺名称']}'
+                        AND cid is not null
                 ";   
 
                 $this->db_easyA->execute($sql_冬_C); 
@@ -1723,6 +1731,7 @@ class Weathertips extends BaseController
                 where    
                     省份='{$val['省份']}'
                     AND 店铺名称='{$val['店铺名称']}'
+                    AND cid is not null
             ";   
 
             $this->db_easyA->execute($sql); 
@@ -1746,6 +1755,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_内搭 = t.`春季SKC基本_内搭`
@@ -1766,6 +1776,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_外套 = t.`春季SKC基本_外套`
@@ -1786,6 +1797,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_下装 = t.`春季SKC基本_下装`
@@ -1806,6 +1818,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_内搭 = t.`秋季SKC基本_内搭`
@@ -1826,6 +1839,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_外套 = t.`秋季SKC基本_外套`
@@ -1846,6 +1860,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_下装 = t.`秋季SKC基本_下装`
@@ -1866,6 +1881,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_内搭 = t.`冬季SKC基本_内搭`
@@ -1886,6 +1902,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_外套 = t.`冬季SKC基本_外套`
@@ -1906,6 +1923,7 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_下装 = t.`冬季SKC基本_下装`
@@ -1923,6 +1941,7 @@ class Weathertips extends BaseController
                 AND 是否计算SKC = '是'
                 AND 是否调价款 = '否'
                 AND 季节归集 = '秋季'
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS b ON b.店铺名称 = c.店铺名称
             SET
@@ -1941,6 +1960,7 @@ class Weathertips extends BaseController
                 AND 是否计算SKC = '是'
                 AND 是否调价款 = '否'
                 AND 季节归集 = '冬季'
+                AND cid is not null
             GROUP BY 店铺名称
             ) AS b ON b.店铺名称 = c.店铺名称
             SET
@@ -1981,6 +2001,7 @@ class Weathertips extends BaseController
                     END
         WHERE 1
             AND (提醒 IS NULL OR 提醒 = '')
+            AND cid is not null
     ";
 
         $this->db_easyA->execute($sql1_春);
