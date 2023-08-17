@@ -67,11 +67,11 @@ class Uploadimg extends AdminController
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
             
-            $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
+            echo $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
 
-            
+            echo '<br>';
             // 上传图 
-            echo $media_id = $model->uploadDingFile($path, "测试");
+            echo $media_id = $model->uploadDingFile($path, "测试_". time());
 
             $res = $model->sendImageMsg('350364576037719254', $media_id );
             print_r($res);
