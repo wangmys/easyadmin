@@ -8,6 +8,7 @@ use app\common\controller\AdminController;
 use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\admin\controller\system\dingding\DingTalk;
+use app\api\service\dingding\Sample;
 
 /**
  * Class Uploadimg
@@ -64,7 +65,7 @@ class Uploadimg extends AdminController
     public function testSend() {
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         if (request()->isAjax()) {
-            $model = new DingTalk;
+            $model = new Sample;
             // echo $path = $this->request->domain() ;
             
             // echo $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
