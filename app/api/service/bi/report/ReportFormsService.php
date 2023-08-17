@@ -3333,7 +3333,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "零售核销报表单日统计-修正版 [" . $date . ']',
+                'title' => "省份单日毛利表 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -3526,7 +3526,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "月度毛利表-修正版 [" . $date . ']',
+                'title' => "月度毛利表 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'data2' => $list2,

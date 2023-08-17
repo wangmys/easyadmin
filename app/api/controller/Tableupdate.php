@@ -37,7 +37,7 @@ class Tableupdate extends BaseController
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_data()
     {
-        $date = date('Y-m-d', strtotime('-1 day'));
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('-1 day'));
 
         $sql = "
             declare @retail_date DATE
@@ -76,7 +76,7 @@ class Tableupdate extends BaseController
                 AND ER.RetailDate < DATEADD( DAY, +1, @retail_date ) 
                 AND ER.CodingCodeText = '已审结'
                 AND EC.ShutOut = 0
-                AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
+                AND EC.RegionId NOT IN ('40', '84', '85',  '97')
                 AND EBC.Mathod IN ('直营', '加盟')
             GROUP BY 
                 ER.CustomerName,
@@ -908,19 +908,40 @@ class Tableupdate extends BaseController
     // 更新 customer
     public function update_customer() {
         // 查询bi
-        $select_customer = $this->db_bi->table('customer')->where([
+        $select = $this->db_bi->table('customer')->where([
             ['Mathod', 'exp',  new Raw("IN ('直营', '加盟')")],
             ['Region', '<>', '闭店区']
         ])->select()->toArray();
-        if (!$select_customer) {
+        if (!$select) {
             echo '没有数据更新';
             die;
         } 
+
+        // $sql = "
+        //     SELECT
+        //         c.*,
+        //         f.首单日期 
+        //     FROM
+        //         customer as  c
+        //         LEFT JOIN customer_regionid AS f ON c.CustomerName = f.店铺名称 
+        //     WHERE 1
+        //         AND f.RegionId != 55
+        //         AND f.首单日期 IS NOT NULL
+        //         AND Region NOT IN (
+        //             '批发部',
+        //             '直营',
+        //             '闭店区',
+        //             '客订',
+        //         '内购区')
+        // ";
+        // $select = $this->db_bi->query($sql);
+
+        // dump($select_customer);die;
         // $this->db_bi->getLastSql();
-        if ($select_customer) {
+        if ($select) {
             $this->db_easyA->table('customer')->where(1)->delete();
 
-            $select_customer = array_chunk($select_customer, 500);
+            $select_customer = array_chunk($select, 500);
     
             foreach($select_customer as $key => $val) {
                 $insert = $this->db_easyA->table('customer')->strict(false)->insertAll($val);
@@ -939,6 +960,56 @@ class Tableupdate extends BaseController
                     'status' => 0,
                     'msg' => 'error',
                     'content' => 'easyadmin2 customer 更新失败！'
+                ]);
+            }   
+        }
+    }
+
+    // 更新 customer_pro
+    public function customer_pro() {
+        $sql = "
+            SELECT
+                c.*,
+                f.首单日期 
+            FROM
+                customer as  c
+                LEFT JOIN customer_regionid AS f ON c.CustomerName = f.店铺名称 
+            WHERE 1
+                AND f.RegionId != 55
+                AND f.首单日期 IS NOT NULL
+                AND Region NOT IN (
+                    '批发部',
+                    '直营',
+                    '闭店区',
+                    '客订',
+                '内购区')
+        ";
+        $select = $this->db_bi->query($sql);
+
+        // dump($select_customer);die;
+        // $this->db_bi->getLastSql();
+        if ($select) {
+            $this->db_easyA->table('customer_pro')->where(1)->delete();
+
+            $select_customer = array_chunk($select, 500);
+    
+            foreach($select_customer as $key => $val) {
+                $insert = $this->db_easyA->table('customer_pro')->strict(false)->insertAll($val);
+            }
+    
+            if ($select_customer) {
+                // $this->db_bi->commit();    
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'easyadmin2 customer_pro 更新成功！'
+                ]);
+            } else {
+                // $this->db_bi->rollback();   
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'easyadmin2 customer_pro 更新失败！'
                 ]);
             }   
         }

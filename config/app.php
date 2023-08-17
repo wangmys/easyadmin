@@ -43,4 +43,7 @@ return [
     'auto_multi_app' => true,
     // 静态资源上传到OSS前缀
     'oss_static_prefix'   => Env::get('easyadmin.oss_static_prefix', 'static_easyadmin'),
+    'providers' => [
+        thinkworkerProvider::class
+    ]
 ];
