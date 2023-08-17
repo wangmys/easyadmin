@@ -35,9 +35,14 @@ class Dingtalk extends BaseController
     protected $AppSecret;
 
 
-    public function test() {
-        echo 111;
+    public function clean() {
+        cache('dd_access_token', null);
     }
+
+    public function test() {
+        echo $this->getAccessToken();
+    }
+    
 
     /**
      * 构造函数
@@ -58,35 +63,37 @@ class Dingtalk extends BaseController
      * 获得query 参数access_token
      * @return bool|mixed|string
      */
-    public static function getAccessToken()
-    {
-        if (empty(cache('dd_access_token'))) {
-            $AppKey = 'dinga7devai5kbxij8zr';
-            $AppSecret = 'JnQ_2VRvr5BFKlBiTnGf3mnyiNCb3pafnkg5FmB_SkNzyNBPtXCE1vLdHjpNwc1A';
-            $url = "https://oapi.dingtalk.com/gettoken?appkey=" . $AppKey . "&appsecret=" . $AppSecret;
-            $re = file_get_contents($url);
-            $obj = json_decode($re);
-            $access_token = $obj->access_token;
-            cache('dd_access_token', $access_token, 7200);
-        } else {
-            $access_token = cache('dd_access_token');
-        }
-        return $access_token;
-    }
+    // public static function getAccessToken()
+    // {
+
+    //     if (empty(cache('dd_access_token'))) {
+    //         $AppKey = 'dingepkj0zauvbccggha';
+    //         $AppSecret = 'WDJFBx1neOcadWdg_uwjTIG2S2yw-aHtvhvVpGSjvpI9T2Etw9CiJMqNm5jFFWcD';
+    //         $url = "https://oapi.dingtalk.com/gettoken?appkey=" . $AppKey . "&appsecret=" . $AppSecret;
+    //         $re = file_get_contents($url);
+    //         $obj = json_decode($re);
+    //         $access_token = $obj->access_token;
+    //         cache('dd_access_token', $access_token, 7200);
+    //     } else {
+    //         $access_token = cache('dd_access_token');
+    //     }
+    //     return $access_token;
+    // }
 
 
     /**
      * 获得query 参数access_token
      * @return bool|mixed|string
      */
-    // protected function getAccessToken()
-    // {
-    //     $gettoken_config = 'https://oapi.dingtalk.com/gettoken' . '?corpid=' . $this->AppKey . '&corpsecret=' . $this->AppSecret;
-    //     $access_token = $this->GetCurlRequest($gettoken_config);
-    //     $access_token = json_decode($access_token, true);
-    //     $access_token = $access_token['access_token'];
-    //     return $access_token;
-    // }
+    protected function getAccessToken()
+    {
+        $gettoken_config = 'https://oapi.dingtalk.com/gettoken' . '?corpid=' . $this->AppKey . '&corpsecret=' . $this->AppSecret;
+        $access_token = $this->GetCurlRequest($gettoken_config);
+        $access_token = json_decode($access_token, true);
+        $access_token = $access_token['access_token'];
+        // dump($access_token);
+        return $access_token;
+    }
 
 
     public function testDep() {
