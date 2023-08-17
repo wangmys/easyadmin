@@ -308,6 +308,33 @@ class Push extends BaseController
         }  
     }
 
+    public function pushS012test()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        // 创建图
+        $reportFormsService->create_table_s012();
+        $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
+
+        // 上传图 
+        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_id);
+        }  
+    }
+
      /**
      * 推送鞋履
      * 131255621326201188
