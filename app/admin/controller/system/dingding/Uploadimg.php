@@ -75,7 +75,9 @@ class Uploadimg extends AdminController
             // 上传图 
             echo $media_id = $model->uploadDingFile($path, "测试_". time());
 
-            $res = $model->sendImageMsg('350364576037719254', $media_id );
+            // $res = $model->sendImageMsg('350364576037719254', $media_id );
+            // $res = $model->sendOaMsg('350364576037719254' );
+            $res = $model->sendActionCardMsg([]);
             print_r($res);
             
             // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);

@@ -433,8 +433,14 @@ class Dingtalk extends BaseController
             "msg" => [
                 "msgtype" => 'image',
                 'image' => [
-                    'media_id' => $media_id
-                ]
+                    'media_id' => $media_id,
+                    "content" => "你的订单112-1892467-4865808 的物流信息超过7天未更新，可能存在异常，单号：952677449652",
+                    "text" => [
+                        "content" => "123"
+                    ],
+                    'title' => '666'
+                ],
+
             ]
         ];
         $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
@@ -494,15 +500,15 @@ class Dingtalk extends BaseController
     {
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
         $SendToUser_data = [
-            'userid_list' => '191902624820360246',
+            'userid_list' => '350364576037719254',
             'agent_id' => $this->AgentId,
             "msg" => [
                 "msgtype" => 'action_card',
                 'action_card' => [
-                    'title' => '@SDFDFDSFDS',
-                    'markdown' => '@SDFDFDSFDS',
-                    'single_title' => '@查看详情',
-                    'single_url' => 'http://img.321.design/gallery/8ca942021031916374668180101.jpg',
+                    'title' => '月度毛利表',
+                    'markdown' => '月度毛利表',
+                    'single_title' => '查看详情',
+                    'single_url' => 'http://im.babiboy.com/img/20230817/S117.jpg',
 
 
                 ]
@@ -518,17 +524,18 @@ class Dingtalk extends BaseController
      * @param $SendToUser_data
      * @return bool|string
      */
-    public function sendOaMsg($SendToUser_data = [])
+    public function sendOaMsg($userid)
     {
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
-        if (!$SendToUser_data) {
+        // if (!$SendToUser_data) {
             $SendToUser_data = [
-                'userid_list' => '191902624820360246',
+                'userid_list' => $userid,
                 'agent_id' => $this->AgentId,
                 "msg" => [
                     "msgtype" => 'oa',
                     'oa' => [
-                        'message_url' => 'http://www.321.design/user/#/order-management',
+                        // 'message_url' => 'http://www.321.design/user/#/order-management',
+                        'message_url' => '',
                         'head' => [
                             'bgcolor' => 'FFBBBBBB',
                             'text' => '头部标题'
@@ -614,14 +621,14 @@ class Dingtalk extends BaseController
                                 "unit" => "元"
                             ],
                             "content" => "你的订单112-1892467-4865808 的物流信息超过7天未更新，可能存在异常，单号：952677449652",
-                            "image" => "@lAzPDgCwRdw4sJrOcZ2-dc5XVzvf",
+                            "image" => "@lAjPDgCwcHBV1z3OXFLSvs5Uauuv",
                             "file_count" => "0",
                             "author" => "321design系统消息"
                         ],
                     ]
                 ]
             ];
-        }
+        // }
 
         $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
         return $result;
