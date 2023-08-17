@@ -69,7 +69,7 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
-    public function sk() {
+    public function sk_1() {
         $sql = "
             SELECT
                 * 
@@ -100,6 +100,20 @@ class Shangguitips extends BaseController
             ]);
 
         }
+    }
+
+    public function sk_2() {
+        // 更新风格 一级风格 二级风格
+        $sql1 = "
+            UPDATE
+                cwl_shangguitips_sk AS sk 
+            LEFT JOIN sp_ww_hpzl AS hpzl ON  sk.一级分类 = hpzl.一级分类 AND sk.二级分类 = hpzl.二级分类 AND sk.分类 = hpzl.分类 AND sk.货号 = hpzl.货号
+            SET 
+                sk.二级风格 = hpzl.二级风格
+            WHERE 
+                1
+        ";
+        $this->db_easyA->execute($sql1);
     }
 
     public function retail()
@@ -364,15 +378,14 @@ class Shangguitips extends BaseController
 
     public function cangku_2() {
         $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where("id=1")->find();
-        // 更新风格 一级风格 二级风格
+        // 更新风格  二级风格
         $sql1 = "
             UPDATE
                 cwl_shangguitips_cangku AS ck 
-            LEFT JOIN sp_ww_budongxiao_yuncangkeyong AS ky ON  ck.一级分类 = ky.一级分类 AND ck.二级分类 = ky.二级分类 AND ck.分类 = ky.分类 AND ck.货号 = ky.货号
+            LEFT JOIN sp_ww_hpzl AS hpzl ON ck.一级分类 = hpzl.一级分类 AND ck.二级分类 = hpzl.二级分类 AND ck.分类 = hpzl.分类 AND ck.货号 = hpzl.货号
             SET 
-                ck.风格 = ky.风格,
-                ck.一级风格 = ky.一级风格,
-                ck.二级风格 = ky.二级风格
+                ck.风格 = hpzl.风格,
+                ck.二级风格 = hpzl.二级风格
             WHERE 
                 1
         ";
@@ -837,13 +850,19 @@ class Shangguitips extends BaseController
         // 货品等级实际 
         // 二级风格标准的店铺在sk表中出现了多少
         $sql = "
-            SELECT
-                h.云仓,h.二级分类,h.一级分类,h.分类,h.季节归集,h.货号,h.二级风格,
-                sk.店铺名称,sk.经营模式,sk.预计库存数量
-            FROM
-                `cwl_shangguitips_handle` as h 
-            LEFT JOIN cwl_shangguitips_sk AS sk ON h.云仓 = sk.云仓 AND h.一级分类 = sk.一级分类 AND h.二级分类 = sk.二级分类 AND h.分类 = sk.分类 AND h.货号 = sk.货号 AND sk.`预计库存数量` > 0
-            WHERE 1
+            select t.*, p.店铺名称 as pname, p.二级风格 as pstyle from 
+            (
+                SELECT
+                    h.云仓,h.二级分类,h.一级分类,h.分类,h.季节归集,h.货号,h.二级风格,
+                    sk.店铺名称,sk.经营模式,sk.预计库存数量
+                FROM
+                    `cwl_shangguitips_handle` as h 
+                LEFT JOIN cwl_shangguitips_sk AS sk ON h.云仓 = sk.云仓 AND h.一级分类 = sk.一级分类 AND h.二级分类 = sk.二级分类 AND h.分类 = sk.分类 AND h.货号 = sk.货号 AND sk.`预计库存数量` > 0
+                WHERE 1
+            ) as t
+            left join cwl_shangguitips_biaozhun_pro as p on p.店铺名称 = t.店铺名称 and p.二级风格=t.二级风格
+            where 
+                p.店铺名称 = t.店铺名称 and p.二级风格=t.二级风格
         ";
         $select = $this->db_easyA->query($sql);
 
@@ -856,6 +875,9 @@ class Shangguitips extends BaseController
                 $this->db_easyA->table('cwl_shangguitips_biaozhun_customer')->strict(false)->insertAll($val);
             }
         } 
+
+
+
 
         // 货品等级_实际_直营 货品等级_计划_加盟 货品等级_计划_合计
         $sql_货品等级_实际 = "

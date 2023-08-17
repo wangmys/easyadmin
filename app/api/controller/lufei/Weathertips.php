@@ -1762,7 +1762,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_内搭 = t.`春季SKC基本_内搭`
@@ -1783,7 +1782,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_外套 = t.`春季SKC基本_外套`
@@ -1804,7 +1802,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '春季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.春季SKC基本_下装 = t.`春季SKC基本_下装`
@@ -1825,7 +1822,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_内搭 = t.`秋季SKC基本_内搭`
@@ -1846,7 +1842,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_外套 = t.`秋季SKC基本_外套`
@@ -1867,7 +1862,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '秋季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.秋季SKC基本_下装 = t.`秋季SKC基本_下装`
@@ -1888,7 +1882,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '内搭'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_内搭 = t.`冬季SKC基本_内搭`
@@ -1909,7 +1902,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '外套'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_外套 = t.`冬季SKC基本_外套`
@@ -1930,7 +1922,6 @@ class Weathertips extends BaseController
                 AND 季节归集 = '冬季'
                 AND 一级分类 = '下装'
                 AND 风格 in ('基本款')
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS t ON c.`店铺编码` = t.`店铺编码`
             set c.冬季SKC基本_下装 = t.`冬季SKC基本_下装`
@@ -1948,7 +1939,6 @@ class Weathertips extends BaseController
                 AND 是否计算SKC = '是'
                 AND 是否调价款 = '否'
                 AND 季节归集 = '秋季'
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS b ON b.店铺名称 = c.店铺名称
             SET
@@ -1967,7 +1957,6 @@ class Weathertips extends BaseController
                 AND 是否计算SKC = '是'
                 AND 是否调价款 = '否'
                 AND 季节归集 = '冬季'
-                AND cid is not null
             GROUP BY 店铺名称
             ) AS b ON b.店铺名称 = c.店铺名称
             SET
@@ -2008,7 +1997,6 @@ class Weathertips extends BaseController
                     END
         WHERE 1
             AND (提醒 IS NULL OR 提醒 = '')
-            AND cid is not null
     ";
 
         $this->db_easyA->execute($sql1_春);
