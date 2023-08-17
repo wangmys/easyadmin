@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+</head>
+<body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend>拖拽上传</legend>
+    </fieldset> 
+    <form class="layui-form layui-form-pane ok-form layui-col-space8">
+        <div class="layui-upload-drag" id="test10">
+            <i class="layui-icon"></i>
+            <p>点击上传，或将文件拖拽到此处</p>
+            <div class="layui-hide" id="uploadDemoView">
+                <hr>
+                <img src="" alt="上传成功后渲染" style="max-width: 196px">
+            </div>
+        </div>
+        <div style="width: 95px;">
+            <div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="demo">
+            <div class="layui-progress-bar" lay-percent=""></div>
+            </div>
+        </div>
+        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="testSend"
+        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">发送
+        </button>
+    </form> 
+</body>
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script>
+layui.use(['form', 'upload', 'element', 'layer'], function(){
+    var $ = layui.jquery
+    ,upload = layui.upload
+    ,element = layui.element
+    ,layer = layui.layer
+    form = layui.form
+    ,url_upload = "{:url('admin/system.Dingding.Uploadimg/upload_img')}"
+    ,sendHandle = "{:url('admin/system.Dingding.Uploadimg/testSend')}";
+    
+    
+    //拖拽上传
+    upload.render({
+        elem: '#test10'
+        // ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        ,url: url_upload //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        // ,auto: false
+        
+        ,before: function(obj){
+            element.progress('demo', '0%'); //进度条复位
+            layer.msg('上传中', {icon: 16, time: 0});
+        }
+        ,done: function(res){
+            layer.msg('上传成功');
+            layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.path);
+            console.log(res)
+        }
+        //进度条
+        ,progress: function(n, elem, e){
+            element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
+            if(n == 100){
+            // layer.msg('上传完毕', {icon: 1});
+            }
+        }
+    });
+
+    form.on('submit(testSend)', function (data) {
+        $.post(sendHandle, data.field, function(res) {
+            // table.exportFile('#table', res, 'xls');
+            // console.log(223) 
+            
+
+        })
+        return false; 
+    });
+    
+
+    
+});
+</script>
