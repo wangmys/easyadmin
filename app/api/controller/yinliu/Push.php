@@ -330,9 +330,10 @@ class Push extends BaseController
         $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
-        foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-        }  
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_id);
+        // }  
+        $res = $model->sendImageMsg('350364576037719254', $media_id );
     }
 
      /**
