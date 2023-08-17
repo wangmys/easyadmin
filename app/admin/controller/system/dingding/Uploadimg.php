@@ -67,7 +67,8 @@ class Uploadimg extends AdminController
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
             
-            echo $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
+            // echo $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
+            $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
 
             echo '<br>';
             // 上传图 
