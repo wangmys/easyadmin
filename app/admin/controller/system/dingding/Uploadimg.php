@@ -50,7 +50,7 @@ class Uploadimg extends AdminController
             $file = request()->file('file');  //这里‘file’是你提交时的name
             $file->getOriginalName();
 
-            $new_name = $file->getOriginalName() . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
+            $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
             $save_path = app()->getRootPath() . 'public/upload/dd_img/' . date('Ymd',time()).'/';   //文件保存路径
             // print_r($_SERVER);
             $url = $_SERVER['HTTP_ORIGIN'] . '/upload/dd_img/' . date('Ymd',time()).'/' . $new_name;
@@ -65,10 +65,13 @@ class Uploadimg extends AdminController
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         if (request()->isAjax()) {
             $model = new DingTalk;
-            echo $path = $this->request->domain() . "/upload/dd_img/" . date('Ymd').'/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg';
+            // echo $path = $this->request->domain() ;
+            
+            $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
 
+            
             // 上传图 
-            $media_id = $model->uploadDingFile($path, "测试");
+            echo $media_id = $model->uploadDingFile($path, "测试");
             
             // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);
         }
