@@ -162,6 +162,12 @@ class Weathertips extends BaseController
             ";
             $this->db_easyA->execute($sql3);
 
+            // 删除没有绑定天气的记录
+            $sql4 = "
+                delete from cwl_weathertips_customer where cid is null
+            ";
+            $this->db_easyA->execute($sql4);
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -832,6 +838,7 @@ class Weathertips extends BaseController
     // 春秋连续天数
     public function weather_handle_1() {
         $select_customer = $this->db_easyA->table('cwl_weathertips_customer')->field('省份')->group('省份')->select()->toArray();
+        // dump($select_customer);die;
         foreach ($select_customer as $key => $val) {
             $biaozhun_秋 = $this->db_easyA->table('cwl_weathertips_biaozhun')->where([
                 ['省份', '=', $val['省份']],
