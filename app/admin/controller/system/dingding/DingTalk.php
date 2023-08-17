@@ -424,16 +424,16 @@ class Dingtalk extends BaseController
      * 发送图片消息
      * @return bool|string
      */
-    public function sendImageMsg()
+    public function sendImageMsg($userid, $media_id)
     {
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
         $SendToUser_data = [
-            'userid_list' => '191902624820360246',
+            'userid_list' => $userid,
             'agent_id' => $this->AgentId,
             "msg" => [
                 "msgtype" => 'image',
                 'image' => [
-                    'media_id' => '@lAjPDfYHyezlQyDOWmeJXM5HtYDJ'
+                    'media_id' => $media_id
                 ]
             ]
         ];
