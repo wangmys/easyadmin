@@ -672,7 +672,7 @@ class Dingtalk extends BaseController
     public function uploadDingFile($filePath, $fileName = '')
     {
         if (!$fileName) {
-            $fileName = str_shuffle(md5(getRandomStrStr())) . '.jpg';
+            $fileName = str_shuffle(md5(rand())) . '.jpg';
         }
 
         $url = "https://oapi.dingtalk.com/media/upload?access_token=" . $this->getAccessToken();

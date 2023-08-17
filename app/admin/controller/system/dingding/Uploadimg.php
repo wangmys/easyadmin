@@ -62,9 +62,10 @@ class Uploadimg extends AdminController
 
     // 发送测试
     public function testSend() {
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         if (request()->isAjax()) {
             $model = new DingTalk;
-            $path = $this->request->domain() . "/upload/dd_img/" . date('Ymd').'/S012.jpg';
+            echo $path = $this->request->domain() . "/upload/dd_img/" . date('Ymd').'/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg';
 
             // 上传图 
             $media_id = $model->uploadDingFile($path, "测试");
