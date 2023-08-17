@@ -46,8 +46,8 @@ class Dingtalk extends BaseController
     public function __construct()
     {
         $this->AgentId = '2476262581';
-        $this->AppKey = 'dinga7devai5kbxij8zr';
-        $this->AppSecret = 'JnQ_2VRvr5BFKlBiTnGf3mnyiNCb3pafnkg5FmB_SkNzyNBPtXCE1vLdHjpNwc1A';
+        $this->AppKey = 'dingepkj0zauvbccggha';
+        $this->AppSecret = 'WDJFBx1neOcadWdg_uwjTIG2S2yw-aHtvhvVpGSjvpI9T2Etw9CiJMqNm5jFFWcD';
 
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
