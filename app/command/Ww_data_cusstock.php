@@ -43,7 +43,13 @@ class Ww_data_cusstock extends Command
         return "select T.店铺名称, T.季节, T.一级时间分类 as 年份, T.修改后风格, T.一级分类, T.二级分类, T.分类, sum(T.库存数量合计) as 库存数量合计, sum(T.SKC数) as SKC数, sum(T.库存金额) as 库存金额  
         from 
         (
-        select cs.店铺名称, cs.季节, g.一级时间分类, CASE 
+        select cs.店铺名称
+				, case when cs.季节 like '%春%' then '春季' 
+				when cs.季节 like '%夏%' then '夏季' 
+				when cs.季节 like '%秋%' then '秋季' 
+				when cs.季节 like '%冬%' then '冬季' 
+				else  cs.季节 end as 季节 
+				, g.一级时间分类, CASE 
                      WHEN cs.季节 like '%夏%' and g.二级分类='短T' and (cs.当前零售价/cs.零售价)<1 and cs.当前零售价<=50 THEN '引流款' 
                      WHEN cs.季节 like '%夏%' and right(g.二级分类, 2)='长裤' and (cs.当前零售价/cs.零售价)<1 and cs.当前零售价<=100 THEN '引流款' 
                      WHEN cs.季节 like '%夏%' and right(g.二级分类, 2)='短裤' and (cs.当前零售价/cs.零售价)<1 and cs.当前零售价<=70 THEN '引流款' 
@@ -53,7 +59,7 @@ class Ww_data_cusstock extends Command
         left join sjp_goods g on cs.货号=g.货号 
         group by cs.店铺名称, g.货号
         ) as T 
-        group by T.分类,T.店铺名称,T.修改后风格;";
+				group by T.分类,T.店铺名称,T.修改后风格,T.季节,T.一级时间分类;";
 
     }
 

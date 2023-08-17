@@ -24,6 +24,7 @@ return [
         'ww_data_cusstock' => 'app\command\Ww_data_cusstock',
         'ww_data_cussale14day' => 'app\command\Ww_data_cussale14day',
         'puhuo_yuncangkeyong' => 'app\command\Puhuo_yuncangkeyong',
+        'puhuo_shangshiday' => 'app\command\Puhuo_shangshiday',
         'puhuo_liangzhou' => 'app\command\Puhuo_liangzhou',
         'puhuo_spsk_stock' => 'app\command\Puhuo_spsk_stock',
         'puhuo_start1' => 'app\command\Puhuo_start1',
@@ -33,5 +34,6 @@ return [
         'puhuo_start5' => 'app\command\Puhuo_start5',
         'puhuo_start6' => 'app\command\Puhuo_start6',
         'puhuo_end' => 'app\command\Puhuo_end',
+        'puhuo_end_data' => 'app\command\Puhuo_end_data',
     ],
 ];
