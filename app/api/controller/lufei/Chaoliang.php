@@ -563,7 +563,7 @@ class Chaoliang extends BaseController
             WHERE 1
                 AND 一级分类 IN ('内搭','外套','下装', '鞋履')
                 AND (`提醒00/28/37/44/100/160/S` = '超' OR `提醒29/38/46/105/165/M` = '超' OR `提醒30/39/48/110/170/L` = '超' OR `提醒31/40/50/115/175/XL` = '超' OR `提醒32/41/52/120/180/2XL` = '超'
-                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40`)         
+                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40` = '超')         
         ";
 
         // 超量个数
@@ -594,8 +594,9 @@ class Chaoliang extends BaseController
         $status3 = $this->db_easyA->execute($sql3);
         // 4 超量提醒
         $status4 = $this->db_easyA->execute($sql4);
-        // 5 超量提醒
+        // 5 超量个数
         $status5 = $this->db_easyA->execute($sql5);
+
         $total = $status1 + $status2 + $status3;
         if (($status1 || $status2 || $status3) && $status4 && $status5) {
             // $this->db_easyA->commit();
