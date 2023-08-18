@@ -312,6 +312,16 @@ function date_to_week2($time)
 }
 
 /**
+ * @param $time
+ * @return string
+ */
+function date_to_week3($time)
+{
+    $weekarray = array("日", "一", "二", "三", "四", "五", "六");
+    return $weekarray[date("w", strtotime($time))];
+}
+
+/**
  * 获取周一到今日的时间区间
  */
 function getThisDayToStartDate()
