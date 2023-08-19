@@ -43,6 +43,7 @@ class SendReport extends BaseController
     public function create_test() {
         $name = input('param.name') ? input('param.name') : 'S101'; 
         $date = input('param.date') ? input('param.date') : '';
+        $type = input('param.type') ? input('param.type') : '';
         cache('dingding_table_name', rand_code(5), 3600);
         if ($name =='S007') {
             $this->service->create_table_s007();
@@ -159,6 +160,8 @@ class SendReport extends BaseController
             $this->service->create_table_s116($date);
         } elseif ($name == 'S117') {
             $this->service->create_table_s117();
+        } elseif ($name == 'S118') {
+            $this->service->create_table_s118($date, $type);
         }
     }
 

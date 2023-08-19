@@ -271,6 +271,70 @@ class Push extends BaseController
         }  
     }
 
+
+    /**
+     * 连带客单件单
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function pushLiandai()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            // [
+            //     'name' => '杨岳敏',
+            //     'tel' => '13362067222',
+            //     'userid' => '131255621326201188'
+            // ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
+            // [
+            //     'name' => '杨剑',
+            //     'tel' => '15200838578',
+            //     'userid' => '1369166106841705'
+            // ],
+        ];
+
+        http_get("http://im.babiboy.com/api/lufei.Ldkdjd/dataHandle?date={$date}");
+        http_get("http://im.babiboy.com/api/lufei.Ldkdjd/handle?date={$date}");
+        http_get("http://im.babiboy.com/api/lufei.Ldkdjd/handle_jm?date={$date}");
+        http_get("http://im.babiboy.com/api/lufei.Ldkdjd/handle_zy?date={$date}");
+
+        $reportFormsService = new ReportFormsService();
+        
+        // 创建图
+        $reportFormsService->create_table_s118($date, 'A');
+        $reportFormsService->create_table_s118($date, 'B');
+        $reportFormsService->create_table_s118($date, 'C');
+
+        $pathA = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118A.jpg';
+        $pathB = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118B.jpg';
+        $pathC = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118C.jpg';
+        // 上传图 
+        $media_idA = $model->uploadDingFile($pathA, "连带客单件单_{$date}");
+        $media_idB = $model->uploadDingFile($pathB, "连带客单件单_{$date}");
+        $media_idC = $model->uploadDingFile($pathC, "连带客单件单_{$date}");
+        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
+        // 发送图
+        foreach ($parms as $key => $val) {
+            $res = $model->sendImageMsg($val['userid'], $media_idA);
+            $res = $model->sendImageMsg($val['userid'], $media_idB);
+            $res = $model->sendImageMsg($val['userid'], $media_idC);
+        }  
+
+
+
+    }
+
     /**
      * 提送配饰
      * 131255621326201188
