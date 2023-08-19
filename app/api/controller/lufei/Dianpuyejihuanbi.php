@@ -620,8 +620,11 @@ class Dianpuyejihuanbi extends BaseController
                 $huanbiliushui  = $this->db_easyA->table('cwl_dianpuyejihuanbi_data')->field("sum(销售金额) as 销售金额")->where([
                     ['日期', '>=', $val['首单日期']],
                     ['日期', '<=', $last_month_today],
-                    ['店铺名称', '=', $val['店铺名称']]
+                    ['店铺名称', '=', $val['店铺名称']],
+                    ['销售金额', '>', 0],
                 ])->group('店铺名称')->find();
+
+                // dump($huanbiliushui);
                 // $updateData['环比累计流水'] = $huanbiliushui['销售金额'];
                 // // 月度环比： (本月累计流水 /环比累计流水 )- 1
                 // $updateData['月度环比'] = round(($updateData['本月累计流水'] / $updateData['环比累计流水']) - 1, 2);
