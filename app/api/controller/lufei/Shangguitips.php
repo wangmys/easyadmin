@@ -732,11 +732,13 @@ class Shangguitips extends BaseController
                 二级风格 NOT IN ( SELECT 二级风格 FROM `cwl_shangguitips_biaozhun_pro` GROUP BY 二级风格 )
         ";
         $this->db_easyA->execute($sql1);
+        $this->db_easyA->execute($sql_二级风格修正);
         $this->db_easyA->execute($sql2);
         $this->db_easyA->execute($sql_主码);
         $this->db_easyA->execute($sql_主码2);
         $this->db_easyA->execute($sql_主码最小值);
         $this->db_easyA->execute($sql_预计最大可加店数);
+        
     }
 
     public function handle_1()
