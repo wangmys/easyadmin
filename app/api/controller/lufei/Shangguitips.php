@@ -69,6 +69,129 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
+    // 标准1
+    public function biaozhun() {
+        // 去掉未开业，闭店
+        $sql = "
+            select * from cwl_shangguitips_biaozhun_no where B级 in (
+                select CustomerName from customer_pro where 1
+            )
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun;');
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_biaozhun')->strict(false)->insertAll($val);
+            }
+        }
+
+    }
+
+    // 更新标准 经营模式
+    public function biaozhun_pro() {
+        $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun_pro;'); 
+        $sql_B级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'B级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_A1级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'A1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A1级` IS NOT NULL AND `A1级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_A2级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'A2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A2级` IS NOT NULL AND `A2级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_A3级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'A3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A3级` IS NOT NULL AND `A3级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_N级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'N级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `N级` IS NOT NULL AND `N级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_H3级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'H3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `H3级` IS NOT NULL AND `H3级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_H6级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'H6级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `H6级` IS NOT NULL AND `H6级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_K1级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'K1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `K1级` IS NOT NULL AND `K1级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_K2级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'K2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `K2级` IS NOT NULL AND `K2级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_X1级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'X1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X1级` IS NOT NULL AND `X1级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_X2级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'X2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X2级` IS NOT NULL AND `X2级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+        $sql_X3级 = "
+            SELECT 云仓,经营模式,B级 as 店铺名称,'X3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X3级` IS NOT NULL AND `X3级` != '0' 
+            group by 云仓,经营模式,B级
+        ";
+
+        $select_B级 = $this->db_easyA->query($sql_B级);
+        $select_A1级 = $this->db_easyA->query($sql_A1级);
+        $select_A2级 = $this->db_easyA->query($sql_A2级);
+        $select_A3级 = $this->db_easyA->query($sql_A3级);
+        $select_N级 = $this->db_easyA->query($sql_N级);
+        $select_H3级 = $this->db_easyA->query($sql_H3级);
+        $select_H6级 = $this->db_easyA->query($sql_H6级);
+        $select_K1级 = $this->db_easyA->query($sql_K1级);
+        $select_K2级 = $this->db_easyA->query($sql_K2级);
+        $select_X1级 = $this->db_easyA->query($sql_X1级);
+        $select_X2级 = $this->db_easyA->query($sql_X2级);
+        $select_X3级 = $this->db_easyA->query($sql_X3级);
+
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_B级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A1级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A2级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A3级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_N级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_H3级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_H6级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_K1级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_K2级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X1级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X2级);
+        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X3级);
+
+
+        $sql_店铺剔除 = "
+            (select 店铺名称 from cwl_shangguitips_biaozhun_pro where 店铺名称 not in (
+                select CustomerName from customer_pro where 1
+            )) 
+        ";
+        $店铺剔除 = $this->db_easyA->query($sql_店铺剔除);
+        // dump($店铺剔除);die;
+        if ($店铺剔除) {
+            $mapStr = '';
+            foreach ($店铺剔除 as $key => $val) {
+                if ($key < count($店铺剔除) -1 ) {
+                    $mapStr .= "'{$val["店铺名称"]}'" . ",";
+                } else {
+                    $mapStr .= "'{$val["店铺名称"]}'";
+                }
+            }
+                    // dump($mapStr);die;
+            $this->db_easyA->execute("
+                delete from cwl_shangguitips_biaozhun_pro where 店铺名称 in ($mapStr)
+            ");
+        }
+    }
+
     public function sk_1() {
         $sql = "
             SELECT
@@ -103,8 +226,8 @@ class Shangguitips extends BaseController
     }
 
     public function sk_2() {
-        // 更新风格 一级风格 二级风格
-        $sql1 = "
+        // 更新二级风格
+        $sql_二级风格 = "
             UPDATE
                 cwl_shangguitips_sk AS sk 
             LEFT JOIN sp_ww_hpzl AS hpzl ON  sk.一级分类 = hpzl.一级分类 AND sk.二级分类 = hpzl.二级分类 AND sk.分类 = hpzl.分类 AND sk.货号 = hpzl.货号
@@ -113,7 +236,16 @@ class Shangguitips extends BaseController
             WHERE 
                 1
         ";
-        $this->db_easyA->execute($sql1);
+        
+        $sql_二级风格修正 = "
+            UPDATE cwl_shangguitips_sk 
+                SET 二级风格 = 'B级' 
+            WHERE
+                二级风格 NOT IN ( SELECT 二级风格 FROM `cwl_shangguitips_biaozhun_pro` GROUP BY 二级风格 )
+        ";
+
+        $this->db_easyA->execute($sql_二级风格);
+        $this->db_easyA->execute($sql_二级风格修正);
     }
 
     public function retail()
@@ -598,129 +730,6 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_主码2);
         $this->db_easyA->execute($sql_主码最小值);
         $this->db_easyA->execute($sql_预计最大可加店数);
-    }
-
-    // 标准1
-    public function biaozhun() {
-        // 去掉未开业，闭店
-        $sql = "
-            select * from cwl_shangguitips_biaozhun_no where B级 in (
-                select CustomerName from customer_pro where 1
-            )
-        ";
-        $select = $this->db_easyA->query($sql);
-        
-        if ($select) {
-            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun;');
-            $chunk_list = array_chunk($select, 500);
-
-            foreach($chunk_list as $key => $val) {
-                $this->db_easyA->table('cwl_shangguitips_biaozhun')->strict(false)->insertAll($val);
-            }
-        }
-
-    }
-
-    // 更新标准 经营模式
-    public function biaozhun_pro() {
-        $this->db_easyA->execute('TRUNCATE cwl_shangguitips_biaozhun_pro;'); 
-        $sql_B级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'B级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `B级` IS NOT NULL AND `B级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_A1级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'A1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A1级` IS NOT NULL AND `A1级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_A2级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'A2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A2级` IS NOT NULL AND `A2级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_A3级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'A3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `A3级` IS NOT NULL AND `A3级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_N级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'N级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `N级` IS NOT NULL AND `N级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_H3级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'H3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `H3级` IS NOT NULL AND `H3级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_H6级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'H6级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `H6级` IS NOT NULL AND `H6级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_K1级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'K1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `K1级` IS NOT NULL AND `K1级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_K2级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'K2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `K2级` IS NOT NULL AND `K2级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_X1级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'X1级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X1级` IS NOT NULL AND `X1级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_X2级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'X2级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X2级` IS NOT NULL AND `X2级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-        $sql_X3级 = "
-            SELECT 云仓,经营模式,B级 as 店铺名称,'X3级' AS 二级风格 FROM cwl_shangguitips_biaozhun WHERE `X3级` IS NOT NULL AND `X3级` != '0' 
-            group by 云仓,经营模式,B级
-        ";
-
-        $select_B级 = $this->db_easyA->query($sql_B级);
-        $select_A1级 = $this->db_easyA->query($sql_A1级);
-        $select_A2级 = $this->db_easyA->query($sql_A2级);
-        $select_A3级 = $this->db_easyA->query($sql_A3级);
-        $select_N级 = $this->db_easyA->query($sql_N级);
-        $select_H3级 = $this->db_easyA->query($sql_H3级);
-        $select_H6级 = $this->db_easyA->query($sql_H6级);
-        $select_K1级 = $this->db_easyA->query($sql_K1级);
-        $select_K2级 = $this->db_easyA->query($sql_K2级);
-        $select_X1级 = $this->db_easyA->query($sql_X1级);
-        $select_X2级 = $this->db_easyA->query($sql_X2级);
-        $select_X3级 = $this->db_easyA->query($sql_X3级);
-
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_B级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A1级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A2级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_A3级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_N级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_H3级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_H6级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_K1级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_K2级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X1级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X2级);
-        $this->db_easyA->table('cwl_shangguitips_biaozhun_pro')->strict(false)->insertAll($select_X3级);
-
-
-        $sql_店铺剔除 = "
-            (select 店铺名称 from cwl_shangguitips_biaozhun_pro where 店铺名称 not in (
-                select CustomerName from customer_pro where 1
-            )) 
-        ";
-        $店铺剔除 = $this->db_easyA->query($sql_店铺剔除);
-        // dump($店铺剔除);die;
-        if ($店铺剔除) {
-            $mapStr = '';
-            foreach ($店铺剔除 as $key => $val) {
-                if ($key < count($店铺剔除) -1 ) {
-                    $mapStr .= "'{$val["店铺名称"]}'" . ",";
-                } else {
-                    $mapStr .= "'{$val["店铺名称"]}'";
-                }
-            }
-                    // dump($mapStr);die;
-            $this->db_easyA->execute("
-                delete from cwl_shangguitips_biaozhun_pro where 店铺名称 in ($mapStr)
-            ");
-        }
     }
 
     public function handle_1()
