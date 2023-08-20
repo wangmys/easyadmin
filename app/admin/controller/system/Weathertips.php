@@ -260,7 +260,7 @@ class Weathertips extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="单店单款超量") 
+     * @NodeAnotation(title="气温上新预警") 
      * 
      */
     public function weathertips() {

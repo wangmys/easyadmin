@@ -244,8 +244,17 @@ class Shangguitips extends BaseController
                 二级风格 NOT IN ( SELECT 二级风格 FROM `cwl_shangguitips_biaozhun_pro` GROUP BY 二级风格 )
         ";
 
+        $updateTime = date('Y-m-d H:i:s');
+        $sql_更新时间 = "
+        UPDATE cwl_shangguitips_config 
+            SET 更新日期 = {$updateTime} 
+        WHERE
+            id = 1
+    ";
+
         $this->db_easyA->execute($sql_二级风格);
         $this->db_easyA->execute($sql_二级风格修正);
+        $this->db_easyA->execute($sql_更新时间);
     }
 
     public function retail()
