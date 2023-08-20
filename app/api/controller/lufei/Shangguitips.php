@@ -724,6 +724,13 @@ class Shangguitips extends BaseController
             where 
                 m1.预计最大可加铺店数 is null        
         ";
+
+        $sql_二级风格修正 = "
+            UPDATE cwl_shangguitips_cangku 
+                SET 二级风格 = 'B级' 
+            WHERE
+                二级风格 NOT IN ( SELECT 二级风格 FROM `cwl_shangguitips_biaozhun_pro` GROUP BY 二级风格 )
+        ";
         $this->db_easyA->execute($sql1);
         $this->db_easyA->execute($sql2);
         $this->db_easyA->execute($sql_主码);
