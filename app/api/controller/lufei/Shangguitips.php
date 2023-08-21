@@ -193,6 +193,7 @@ class Shangguitips extends BaseController
     }
 
     public function sk_1() {
+        // customer_pro已开业 未闭店
         $sql = "
             SELECT
                 * 
@@ -247,10 +248,10 @@ class Shangguitips extends BaseController
         $updateTime = date('Y-m-d H:i:s');
         $sql_更新时间 = "
         UPDATE cwl_shangguitips_config 
-            SET 更新日期 = {$updateTime} 
-        WHERE
-            id = 1
-    ";
+                SET 更新日期 = '{$updateTime}' 
+            WHERE
+                id = 1
+        ";
 
         $this->db_easyA->execute($sql_二级风格);
         $this->db_easyA->execute($sql_二级风格修正);
@@ -926,13 +927,13 @@ class Shangguitips extends BaseController
             update `cwl_shangguitips_handle` as h 
             set 
                 实际铺货_直营 = 
-                (select sum(预计库存数量) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
+                (select sum(预计库存数量) from cwl_shangguitips_sk where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
                 and 经营模式='直营'),
                 实际铺货_加盟 = 
-                (select sum(预计库存数量) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
+                (select sum(预计库存数量) from cwl_shangguitips_sk where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
                 and 经营模式='加盟'), 
                 实际铺货_合计 = 	
-                (select sum(预计库存数量) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
+                (select sum(预计库存数量) from cwl_shangguitips_sk where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
                 ) 
             WHERE 1
                 AND h.`季节归集` IN ('秋季')	

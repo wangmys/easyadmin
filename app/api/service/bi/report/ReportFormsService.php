@@ -3565,22 +3565,22 @@ class ReportFormsService
                 SELECT
                     直营天.销售日期 AS 日期,
                     直营天.星期,
-                    直营天.单数 AS `直营天_单数`,
-                    直营天.连带 AS `直营天_连带`,
-                    直营天.客单 AS `直营天_客单`,
-                    直营天.件单 AS `直营天_件单`,
-                    同比天.单数 AS `同比天_单数`,
-                    同比天.连带 AS `同比天_连带`,
-                    同比天.客单 AS `同比天_客单`,
-                    同比天.件单 AS `同比天_件单`,
-                    直营累计.单数 AS `直营累计_单数`,
-                    直营累计.连带 AS `直营累计_连带`,
-                    直营累计.客单 AS `直营累计_客单`,
-                    直营累计.件单 AS `直营累计_件单`,
-                    同比累计.单数 AS `同比累计_单数`,
-                    同比累计.连带 AS `同比累计_连带`,
-                    同比累计.客单 AS `同比累计_客单`,
-                    同比累计.件单 AS `同比累计_件单`
+                    直营天.单数 AS `[日]单数`,
+                    直营天.连带 AS `连带`,
+                    直营天.客单 AS `客单`,
+                    直营天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    直营累计.单数 AS `[日累计]单数`,
+                    直营累计.连带 AS `.连带`,
+                    直营累计.客单 AS `.客单`,
+                    直营累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
                 FROM
                     `cwl_ldkdjd_handle_zy` as 直营天
                 LEFT JOIN cwl_ldkdjd_handle_zy as 同比天 ON 同比天.类型='同比天' AND  直营天.销售日期 = 同比天.销售日期
@@ -3596,22 +3596,22 @@ class ReportFormsService
                 SELECT
                     加盟天.销售日期 AS 日期,
                     加盟天.星期,
-                    加盟天.单数 AS `加盟天_单数`,
-                    加盟天.连带 AS `加盟天_连带`,
-                    加盟天.客单 AS `加盟天_客单`,
-                    加盟天.件单 AS `加盟天_件单`,
-                    同比天.单数 AS `同比天_单数`,
-                    同比天.连带 AS `同比天_连带`,
-                    同比天.客单 AS `同比天_客单`,
-                    同比天.件单 AS `同比天_件单`,
-                    加盟累计.单数 AS `加盟累计_单数`,
-                    加盟累计.连带 AS `加盟累计_连带`,
-                    加盟累计.客单 AS `加盟累计_客单`,
-                    加盟累计.件单 AS `加盟累计_件单`,
-                    同比累计.单数 AS `同比累计_单数`,
-                    同比累计.连带 AS `同比累计_连带`,
-                    同比累计.客单 AS `同比累计_客单`,
-                    同比累计.件单 AS `同比累计_件单`
+                    加盟天.单数 AS `[日]单数`,
+                    加盟天.连带 AS `连带`,
+                    加盟天.客单 AS `客单`,
+                    加盟天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    加盟累计.单数 AS `[日累计]单数`,
+                    加盟累计.连带 AS `.连带`,
+                    加盟累计.客单 AS `.客单`,
+                    加盟累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
                 FROM
                     `cwl_ldkdjd_handle_jm` as 加盟天
                 LEFT JOIN cwl_ldkdjd_handle_jm as 同比天 ON 同比天.类型='同比天' AND  加盟天.销售日期 = 同比天.销售日期
@@ -3627,22 +3627,22 @@ class ReportFormsService
                 SELECT
                     总计天.销售日期  AS 日期,
                     总计天.星期,
-                    总计天.单数 AS `总计天_单数`,
-                    总计天.连带 AS `总计天_连带`,
-                    总计天.客单 AS `总计天_客单`,
-                    总计天.件单 AS `总计天_件单`,
-                    同比天.单数 AS `同比天_单数`,
-                    同比天.连带 AS `同比天_连带`,
-                    同比天.客单 AS `同比天_客单`,
-                    同比天.件单 AS `同比天_件单`,
-                    总计累计.单数 AS `总计累计_单数`,
-                    总计累计.连带 AS `总计累计_连带`,
-                    总计累计.客单 AS `总计累计_客单`,
-                    总计累计.件单 AS `总计累计_件单`,
-                    同比累计.单数 AS `同比累计_单数`,
-                    同比累计.连带 AS `同比累计_连带`,
-                    同比累计.客单 AS `同比累计_客单`,
-                    同比累计.件单 AS `同比累计_件单`
+                    总计天.单数 AS `[日]单数`,
+                    总计天.连带 AS `连带`,
+                    总计天.客单 AS `客单`,
+                    总计天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    总计累计.单数 AS `[日累计]单数`,
+                    总计累计.连带 AS `.连带`,
+                    总计累计.客单 AS `.客单`,
+                    总计累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
                 FROM
                     `cwl_ldkdjd_handle` as 总计天
                 LEFT JOIN cwl_ldkdjd_handle as 同比天 ON 同比天.类型='同比天' AND  总计天.销售日期 = 同比天.销售日期
@@ -3663,38 +3663,45 @@ class ReportFormsService
                 $list[$key]['日期'] = date('m/d', strtotime($val['日期']));
             }
 
-    
+            // $table_header = ['ID'];
             $table_header = ['ID'];
             $field_width = [];
             $table_header = array_merge($table_header, array_keys($list[0]));
             foreach ($table_header as $v => $k) {
-                $field_width[] = 110;
+                $field_width[] = 50;
             }
             $field_width[0] = 30;
             $field_width[1] = 50;
             $field_width[2] = 40;
 
-            $field_width[3] = 95;
-            $field_width[4] = 95;
-            $field_width[5] = 95;
-            $field_width[6] = 95;
+            $field_width[3] = 70;
+            $field_width[4] = 50;
+            $field_width[5] = 50;
+            $field_width[6] = 50;
 
-            $field_width[7] = 95;
-            $field_width[8] = 95;
-            $field_width[9] = 95;
-            $field_width[10] = 95;
+            $field_width[7] = 100;
+            $field_width[8] = 50;
+            $field_width[9] = 50;
+            $field_width[10] = 50;
 
-            $field_width[11] = 110;
-            $field_width[12] = 110;
-            $field_width[13] = 110;
-            $field_width[14] = 110;
+            $field_width[11] = 100;
+            $field_width[12] = 50;
+            $field_width[13] = 50;
+            $field_width[14] = 50;
 
-            // $field_width[12] = 130;
-            // $field_width[13] = 130;
-            // $field_width[14] = 130;
-            // $field_width[3] = 90;
+            $field_width[15] = 110;
+            $field_width[16] = 60;
+            $field_width[17] = 60;
+            $field_width[18] = 60;
     
-    
+            // foreach ($table_header as $val) {
+            //     unset($val[0]);
+            //     // db('ding_department')->insertGetId($ent);
+            // }
+
+            // echo '<pre>';
+            // print_r($table_header);die;
+
     
             $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
             $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
@@ -3716,7 +3723,7 @@ class ReportFormsService
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '           编号: ' . $code,
+                'banben' => '          编号: ' . $code,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
@@ -4597,28 +4604,12 @@ class ReportFormsService
     public function create_table_s115D() {
         // 编号
         $code = 'S115D';
-        if (date('Y-m-d') == '2023-06-22') {
-            $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
-            $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
-            $fday = 3;
-        } else {
-            echo '活动已结束';
-            die;
-        }
-
         $sql = "
             select 
-                经营属性 as 性质,
-                23VS22,
-                23VS21,
-                今日流水,
-                22年同期,
-                21年同期
+                经营属性
             from cwl_festival_duanwu_table4 
             WHERE 
-                节日天数='{$fday}' 
+                1
         ";
         $list = $this->db_easyA->query($sql);
         // dump($list);die;
@@ -4645,18 +4636,18 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "【端午假期】平均单店流水对比-累计 [" . date("Y-m-d") . ']',
+                'title' => "test",
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '          编号: ' . $code ,
+                'banben' =>  $code ,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
             // 生成图片
-            return $this->create_image($params);
+            return $this->create_table($params);
         } else {
             return false;
         }
