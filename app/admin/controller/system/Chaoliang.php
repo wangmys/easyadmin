@@ -68,7 +68,7 @@ class Chaoliang extends AdminController
             $new_name = "超量标准修改_". session('admin.name')  . '.' . $file->getOriginalExtension();
             $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
             $info = $file->move($save_path, $new_name);
-
+            
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
@@ -115,8 +115,6 @@ class Chaoliang extends AdminController
                 //读取数据
                 $data = $this->readExcel($info, $read_column);
 
-                // echo '<pre>';
-                // print_r($data);
                 foreach ($data as $key => $val) {
                     $this->db_easyA->table('cwl_chaoliang_biaozhun')->where([
                         ['风格', '=', $val['风格']],
@@ -153,6 +151,84 @@ class Chaoliang extends AdminController
                 return json(['code' => 0, 'msg' => '上传成功']);
             } 
         }
+    }
+
+    // 测试上传excel
+    public function upload_local() {  
+        // $file = request()->file('file');  //这里‘file’是你提交时的name
+        // $new_name = "超量标准修改_". session('admin.name')  . '.' . $file->getOriginalExtension();
+        // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+        // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/超量标准修改_王梦园.xlsx';   //文件保存路径  
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/超量参数标准默认值33.xlsx';   //文件保存路径  
+
+    
+
+        //成功上传后 获取上传的数据
+        //要获取的数据字段
+        $read_column = [
+            'A' => '风格',
+            'B' => '店铺等级',
+            'C' => '一级分类',
+            'D' => '二级分类',
+            'E' => '单码量00/28/37/44/100/160/S',
+            'F' => '单码量29/38/46/105/165/M',
+            'G' => '单码量30/39/48/110/170/L',
+            'H' => '单码量31/40/50/115/175/XL',
+            'I' => '单码量32/41/52/120/180/2XL',
+            'J' => '单码量33/42/54/125/185/3XL',
+            'K' => '单码量34/43/56/190/4XL',
+            'L' => '单码量35/44/58/195/5XL',
+            'M' => '单码量36/6XL',
+            'N' => '单码量38/7XL',
+            'O' => '单码量_40',
+            'P' => '周转00/28/37/44/100/160/S',
+            'Q' => '周转29/38/46/105/165/M',
+            'R' => '周转30/39/48/110/170/L',
+            'S' => '周转31/40/50/115/175/XL',
+            'T' => '周转32/41/52/120/180/2XL',
+            'U' => '周转33/42/54/125/185/3XL',
+            'V' => '周转34/43/56/190/4XL',
+            'W' => '周转35/44/58/195/5XL',
+            'X' => '周转36/6XL',
+            'Y' => '周转38/7XL',
+            'Z' => '周转_40',
+        ];
+
+        //读取数据
+        $data = $this->readExcel($save_path, $read_column);
+
+        foreach ($data as $key => $val) {
+            $this->db_easyA->table('cwl_chaoliang_biaozhun')->where([
+                ['风格', '=', $val['风格']],
+                ['店铺等级', '=', $val['店铺等级']],
+                ['一级分类', '=', $val['一级分类']],
+                ['二级分类', '=', $val['二级分类']],
+            ])->save([
+                '单码量00/28/37/44/100/160/S' => $val['单码量00/28/37/44/100/160/S'],
+                '单码量29/38/46/105/165/M' => $val['单码量29/38/46/105/165/M'],
+                '单码量30/39/48/110/170/L' => $val['单码量30/39/48/110/170/L'],
+                '单码量31/40/50/115/175/XL' => $val['单码量31/40/50/115/175/XL'],
+                '单码量32/41/52/120/180/2XL' => $val['单码量32/41/52/120/180/2XL'],
+                '单码量33/42/54/125/185/3XL' => $val['单码量33/42/54/125/185/3XL'],
+                '单码量34/43/56/190/4XL' => $val['单码量34/43/56/190/4XL'],
+                '单码量35/44/58/195/5XL' => $val['单码量35/44/58/195/5XL'],
+                '单码量36/6XL' => $val['单码量36/6XL'],
+                '单码量38/7XL' => $val['单码量38/7XL'],
+                '单码量_40' => $val['单码量_40'],
+                '周转00/28/37/44/100/160/S' => $val['周转00/28/37/44/100/160/S'],
+                '周转29/38/46/105/165/M' => $val['周转29/38/46/105/165/M'],
+                '周转30/39/48/110/170/L' => $val['周转30/39/48/110/170/L'],
+                '周转31/40/50/115/175/XL' => $val['周转31/40/50/115/175/XL'],
+                '周转32/41/52/120/180/2XL' => $val['周转32/41/52/120/180/2XL'],
+                '周转33/42/54/125/185/3XL' => $val['周转33/42/54/125/185/3XL'],
+                '周转34/43/56/190/4XL' => $val['周转34/43/56/190/4XL'],
+                '周转35/44/58/195/5XL' => $val['周转35/44/58/195/5XL'],
+                '周转36/6XL' => $val['周转36/6XL'],
+                '周转38/7XL' => $val['周转38/7XL'],
+                '周转_40' => $val['周转_40'],
+            ]);
+        }
+
     }
 
     public function readExcel($file_path = '/', $read_column = array())
@@ -197,7 +273,7 @@ class Chaoliang extends AdminController
             }
             //取出指定的数据
             foreach ($read_column as $key => $val) {
-                $data[$row - 2][$val] = $data_origin[$key];
+                $data[$row - 2][$val] = @$data_origin[$key];
             }
         }
         return $data;
