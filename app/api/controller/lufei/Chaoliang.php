@@ -64,6 +64,28 @@ class Chaoliang extends BaseController
         return $seasionStr;
     }
 
+    // 更新单码量合计
+    public function biaozhun_total() {
+        $sql = "
+            UPDATE cwl_chaoliang_biaozhun
+                SET
+                    `单码量合计` = 
+                        IFNULL(`单码量00/28/37/44/100/160/S`, 0)
+                        + IFNULL(`单码量29/38/46/105/165/M`, 0) 
+                        + IFNULL(`单码量30/39/48/110/170/L`, 0) 
+                        + IFNULL(`单码量31/40/50/115/175/XL`, 0)
+                        + IFNULL(`单码量32/41/52/120/180/2XL`, 0)
+                        + IFNULL(`单码量33/42/54/125/185/3XL`, 0) 
+                        + IFNULL(`单码量34/43/56/190/4XL`, 0) 
+                        + IFNULL(`单码量35/44/58/195/5XL`, 0) 
+                        + IFNULL(`单码量36/6XL`, 0) 
+                        + IFNULL(`单码量38/7XL`, 0) 
+                        + IFNULL(`单码量_40`, 0)
+                WHERE 1
+        ";
+        $this->db_easyA->execute($sql);
+    }
+
     public function sk_first()
     {
         $select_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
@@ -394,7 +416,7 @@ class Chaoliang extends BaseController
                             (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
                             AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
                             AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -404,7 +426,7 @@ class Chaoliang extends BaseController
                             (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
                             AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
                             AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -414,7 +436,7 @@ class Chaoliang extends BaseController
                             (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
                             AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
                             AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -424,7 +446,7 @@ class Chaoliang extends BaseController
                             (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
                             AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
                             AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -434,7 +456,7 @@ class Chaoliang extends BaseController
                             (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
                             AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
                             AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -444,7 +466,7 @@ class Chaoliang extends BaseController
                             (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
                             AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
                             AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -454,7 +476,7 @@ class Chaoliang extends BaseController
                             (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
                             AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
                             AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -464,7 +486,7 @@ class Chaoliang extends BaseController
                             (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
                             AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
                             AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -474,7 +496,7 @@ class Chaoliang extends BaseController
                             (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
                             AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
                             AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_36/6XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -484,7 +506,7 @@ class Chaoliang extends BaseController
                             (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
                             AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
                             AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_38/7XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -494,7 +516,16 @@ class Chaoliang extends BaseController
                             (sk.`预计_40` > bz.`单码量_40`) 
                             AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
                             AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_40` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -513,7 +544,7 @@ class Chaoliang extends BaseController
                             (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
                             AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
                             AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -523,7 +554,7 @@ class Chaoliang extends BaseController
                             (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
                             AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
                             AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -533,7 +564,7 @@ class Chaoliang extends BaseController
                             (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
                             AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
                             AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -543,7 +574,7 @@ class Chaoliang extends BaseController
                             (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
                             AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
                             AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -553,7 +584,7 @@ class Chaoliang extends BaseController
                             (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
                             AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
                             AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -563,7 +594,7 @@ class Chaoliang extends BaseController
                             (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
                             AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
                             AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -573,7 +604,7 @@ class Chaoliang extends BaseController
                             (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
                             AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
                             AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -583,7 +614,7 @@ class Chaoliang extends BaseController
                             (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
                             AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
                             AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -593,7 +624,7 @@ class Chaoliang extends BaseController
                             (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
                             AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
                             AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_36/6XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -603,7 +634,7 @@ class Chaoliang extends BaseController
                             (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
                             AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
                             AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_38/7XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -613,7 +644,16 @@ class Chaoliang extends BaseController
                             (sk.`预计_40` > bz.`单码量_40`) 
                             AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
                             AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_40` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -633,7 +673,7 @@ class Chaoliang extends BaseController
                             (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
                             AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
                             AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -643,7 +683,7 @@ class Chaoliang extends BaseController
                             (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
                             AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
                             AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -653,7 +693,7 @@ class Chaoliang extends BaseController
                             (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
                             AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
                             AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -663,7 +703,7 @@ class Chaoliang extends BaseController
                             (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
                             AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
                             AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -673,7 +713,7 @@ class Chaoliang extends BaseController
                             (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
                             AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
                             AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -683,7 +723,7 @@ class Chaoliang extends BaseController
                             (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
                             AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
                             AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -693,7 +733,7 @@ class Chaoliang extends BaseController
                             (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
                             AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
                             AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -703,7 +743,7 @@ class Chaoliang extends BaseController
                             (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
                             AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
                             AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
-                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -713,7 +753,7 @@ class Chaoliang extends BaseController
                             (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
                             AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
                             AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}    
-                            AND sk.`可用库存_36/6XL` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
@@ -723,7 +763,7 @@ class Chaoliang extends BaseController
                             (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
                             AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
                             AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']} 
-                            AND sk.`可用库存_38/7XL` < {$find_config['云仓可用']}  
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}  
                         THEN '超'
                         ELSE NULL
                     END,
@@ -733,7 +773,16 @@ class Chaoliang extends BaseController
                             (sk.`预计_40` > bz.`单码量_40`) 
                             AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
                             AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']} 
-                            AND sk.`可用库存_40` < {$find_config['云仓可用']}
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -751,7 +800,7 @@ class Chaoliang extends BaseController
             WHERE 1
                 AND 一级分类 IN ('内搭','外套','下装', '鞋履')
                 AND (`提醒00/28/37/44/100/160/S` = '超' OR `提醒29/38/46/105/165/M` = '超' OR `提醒30/39/48/110/170/L` = '超' OR `提醒31/40/50/115/175/XL` = '超' OR `提醒32/41/52/120/180/2XL` = '超'
-                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40` = '超')         
+                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40` = '超' OR `提醒_合计` = '超')         
         ";
 
         // 超量个数
