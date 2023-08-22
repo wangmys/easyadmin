@@ -47,7 +47,7 @@ class Dress extends AdminController
         $head = $this->logic->dressHead->column('name,field,stock','id');
         $Date = date('Y-m-d');
         // 定义固定字段
-        $defaultFields  = ['省份','店铺名称','商品负责人'];
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
@@ -138,10 +138,11 @@ class Dress extends AdminController
                 $item['fixed'] = 'left';
                 if($v == '省份'){
                     $item['search'] = 'xmSelect';
+                    $item['width'] = 100;
                     $item['laySearch'] = true;
                 }
                 // 设置条件下拉列表数据(省份/店铺名称/商品负责人)
-                $item['selectList'] = $getSelectList[$v];
+                $item['selectList'] = $getSelectList[$v]??[];
             };
             $cols[] = $item;
         }
@@ -244,7 +245,7 @@ class Dress extends AdminController
         $head = $this->logic->dressHead->column('name,field,stock','id');
         $Date = date('Y-m-d');
         // 定义固定字段
-        $defaultFields  = ['省份','店铺名称','商品负责人'];
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
@@ -339,10 +340,11 @@ class Dress extends AdminController
                 $item['fixed'] = 'left';
                 if($v == '省份'){
                     $item['search'] = 'xmSelect';
+                    $item['width'] = 100;
                     $item['laySearch'] = true;
                 }
                 // 设置条件下拉列表数据(省份/店铺名称/商品负责人)
-                $item['selectList'] = $getSelectList[$v];
+                $item['selectList'] = $getSelectList[$v]??[];
             };
             $cols[] = $item;
         }
