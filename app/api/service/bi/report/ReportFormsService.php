@@ -3550,6 +3550,196 @@ class ReportFormsService
  
     }    
 
+    // s118 连带 客单 件单
+    public function create_table_s118($date, $type = 'A')
+    {
+        $date = $date ?: date('Y-m-d');
+        // $dingName = cache('dingding_table_name');
+        // 本月开始
+        $current_month  = date("Y-m-01", time()); 
+        $today  = date("Y-m-d", time()); 
+
+        if ($type == 'A') {
+            $code = 'S118A';
+            $sql = "
+                SELECT
+                    直营天.销售日期 AS 日期,
+                    直营天.星期,
+                    直营天.单数 AS `[日]单数`,
+                    直营天.连带 AS `连带`,
+                    直营天.客单 AS `客单`,
+                    直营天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    直营累计.单数 AS `[日累计]单数`,
+                    直营累计.连带 AS `.连带`,
+                    直营累计.客单 AS `.客单`,
+                    直营累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
+                FROM
+                    `cwl_ldkdjd_handle_zy` as 直营天
+                LEFT JOIN cwl_ldkdjd_handle_zy as 同比天 ON 同比天.类型='同比天' AND  直营天.销售日期 = 同比天.销售日期
+                LEFT JOIN cwl_ldkdjd_handle_zy as 直营累计 ON 直营累计.类型='直营累计' AND  直营天.销售日期 = 直营累计.销售日期
+                LEFT JOIN cwl_ldkdjd_handle_zy as 同比累计 ON 同比累计.类型='同比累计' AND  直营天.销售日期 = 同比累计.销售日期
+                WHERE 
+                    直营天.类型 = '直营天'
+            ";
+            $title = '直营连带、客单、件单及同比表';
+        } elseif ($type == 'B') {
+            $code = 'S118B';
+            $sql = "
+                SELECT
+                    加盟天.销售日期 AS 日期,
+                    加盟天.星期,
+                    加盟天.单数 AS `[日]单数`,
+                    加盟天.连带 AS `连带`,
+                    加盟天.客单 AS `客单`,
+                    加盟天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    加盟累计.单数 AS `[日累计]单数`,
+                    加盟累计.连带 AS `.连带`,
+                    加盟累计.客单 AS `.客单`,
+                    加盟累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
+                FROM
+                    `cwl_ldkdjd_handle_jm` as 加盟天
+                LEFT JOIN cwl_ldkdjd_handle_jm as 同比天 ON 同比天.类型='同比天' AND  加盟天.销售日期 = 同比天.销售日期
+                LEFT JOIN cwl_ldkdjd_handle_jm as 加盟累计 ON 加盟累计.类型='加盟累计' AND  加盟天.销售日期 = 加盟累计.销售日期
+                LEFT JOIN cwl_ldkdjd_handle_jm as 同比累计 ON 同比累计.类型='同比累计' AND  加盟天.销售日期 = 同比累计.销售日期
+                WHERE 
+                    加盟天.类型 = '加盟天'
+            ";
+            $title = '加盟连带、客单、件单及同比表';
+        } elseif ($type == 'C') {
+            $code = 'S118C';
+            $sql = "
+                SELECT
+                    总计天.销售日期  AS 日期,
+                    总计天.星期,
+                    总计天.单数 AS `[日]单数`,
+                    总计天.连带 AS `连带`,
+                    总计天.客单 AS `客单`,
+                    总计天.件单 AS `件单`,
+                    同比天.单数 AS `[同比天]单数`,
+                    同比天.连带 AS `连带.`,
+                    同比天.客单 AS `客单.`,
+                    同比天.件单 AS `件单.`,
+                    总计累计.单数 AS `[日累计]单数`,
+                    总计累计.连带 AS `.连带`,
+                    总计累计.客单 AS `.客单`,
+                    总计累计.件单 AS `.件单`,
+                    同比累计.单数 AS `[同比累计]单数`,
+                    同比累计.连带 AS `连带 `,
+                    同比累计.客单 AS `客单 `,
+                    同比累计.件单 AS `件单 `
+                FROM
+                    `cwl_ldkdjd_handle` as 总计天
+                LEFT JOIN cwl_ldkdjd_handle as 同比天 ON 同比天.类型='同比天' AND  总计天.销售日期 = 同比天.销售日期
+                LEFT JOIN cwl_ldkdjd_handle as 总计累计 ON 总计累计.类型='总计累计' AND  总计天.销售日期 = 总计累计.销售日期
+                LEFT JOIN cwl_ldkdjd_handle as 同比累计 ON 同比累计.类型='同比累计' AND  总计天.销售日期 = 同比累计.销售日期
+                WHERE 
+                    总计天.类型 = '总计天'
+            ";
+            $title = '总体连带、客单、件单及同比表';
+        } else {
+            die;
+        }
+
+
+        $list = $this->db_easyA->query($sql);
+        if ($list) {
+            foreach ($list as $key => $val) {
+                $list[$key]['日期'] = date('m/d', strtotime($val['日期']));
+            }
+
+            // $table_header = ['ID'];
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 50;
+            }
+            $field_width[0] = 30;
+            $field_width[1] = 50;
+            $field_width[2] = 40;
+
+            $field_width[3] = 70;
+            $field_width[4] = 50;
+            $field_width[5] = 50;
+            $field_width[6] = 50;
+
+            $field_width[7] = 100;
+            $field_width[8] = 50;
+            $field_width[9] = 50;
+            $field_width[10] = 50;
+
+            $field_width[11] = 100;
+            $field_width[12] = 50;
+            $field_width[13] = 50;
+            $field_width[14] = 50;
+
+            $field_width[15] = 110;
+            $field_width[16] = 60;
+            $field_width[17] = 60;
+            $field_width[18] = 60;
+    
+            // foreach ($table_header as $val) {
+            //     unset($val[0]);
+            //     // db('ding_department')->insertGetId($ent);
+            // }
+
+            // echo '<pre>';
+            // print_r($table_header);die;
+
+    
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -1 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => ' ',
+            ];
+    
+            //参数 
+            $params = [
+                'code' => $code,
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . '.jpg',   //保存的文件名
+                'title' => "{$title} [" . $date . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '          编号: ' . $code,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            // return $this->create_image($params);
+            return $this->create_image_bgcolor($params, [
+                // '直营_毛利率' => 3,
+                // '加盟_毛利率' => 7,
+                // '合计_毛利率' => 11,
+            ]);
+        } else {
+            echo '没有数据,请稍后再试';
+        }
+ 
+    } 
+
     // s110 单店目标达成情况
     public function create_table_s110B($date = '')
     {
@@ -4414,28 +4604,12 @@ class ReportFormsService
     public function create_table_s115D() {
         // 编号
         $code = 'S115D';
-        if (date('Y-m-d') == '2023-06-22') {
-            $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
-            $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
-            $fday = 3;
-        } else {
-            echo '活动已结束';
-            die;
-        }
-
         $sql = "
             select 
-                经营属性 as 性质,
-                23VS22,
-                23VS21,
-                今日流水,
-                22年同期,
-                21年同期
+                经营属性
             from cwl_festival_duanwu_table4 
             WHERE 
-                节日天数='{$fday}' 
+                1
         ";
         $list = $this->db_easyA->query($sql);
         // dump($list);die;
@@ -4462,18 +4636,18 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "【端午假期】平均单店流水对比-累计 [" . date("Y-m-d") . ']',
+                'title' => "test",
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '          编号: ' . $code ,
+                'banben' =>  $code ,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
             // 生成图片
-            return $this->create_image($params);
+            return $this->create_table($params);
         } else {
             return false;
         }
@@ -4951,6 +5125,8 @@ class ReportFormsService
 
         $red = imagecolorallocate($img, 255, 0, 0); //设定图片背景色
         $red2 = imagecolorallocate($img, 251, 89, 62); //设定图片背景色
+        $blue1 = imagecolorallocate($img, 168, 203, 255); //设定图片背景色
+        $blue2 = imagecolorallocate($img, 66, 182, 255); //设定图片背景色
         $yellow2 = imagecolorallocate($img, 250, 233, 84); //设定图片背景色
         $yellow3 = imagecolorallocate($img, 230, 244, 0); //设定图片背景色
         $green = imagecolorallocate($img, 24, 98, 0); //设定图片背景色
@@ -5049,6 +5225,31 @@ class ReportFormsService
             imagefilledrectangle($img, $s117_x2, $s117_y1, $s117_x3, $y2, $gray);
             // 合计
             imagefilledrectangle($img, $s117_x3, $s117_y1, $s117_x4, $y2, $orange);
+            // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
+            // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
+        }
+
+        // 117标题颜色特殊处理
+        if (@$params['code'] == 'S118A' || @$params['code'] == 'S118B' || @$params['code'] == 'S118C') { 
+            $s118_y1 = 38;
+            // 直营
+            $s118_x1 = $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2];
+            $s118_x2 = $s118_x1 + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5] + $params['field_width'][6];
+            // 加盟
+            $s118_x3 = $s118_x2 + $params['field_width'][7] + $params['field_width'][8] + $params['field_width'][9] + $params['field_width'][10];
+            // 累计
+            $s118_x4 = $s118_x3 + $params['field_width'][11] + $params['field_width'][12] + $params['field_width'][13] + $params['field_width'][14];
+            // 同比累计
+            $s118_x5 = $s118_x4 + $params['field_width'][15] + $params['field_width'][16] + $params['field_width'][17] + $params['field_width'][18];
+
+            // 直营
+            imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $blue1);
+            // 加盟
+            imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue2);
+            // 累计
+            imagefilledrectangle($img, $s118_x3, $s118_y1, $s118_x4, $y2, $yellow3);
+            // 同比累计
+            imagefilledrectangle($img, $s118_x4, $s118_y1, $s118_x5, $y2, $orange);
             // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
             // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
         }
