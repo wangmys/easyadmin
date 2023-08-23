@@ -57,7 +57,7 @@ class Skauto extends BaseController
     
     public function skauto() {
         $year = date('Y', time());
-        echo $sql = "
+        $sql = "
             SELECT 
                 sk.云仓,
                 sk.商品负责人,
@@ -103,8 +103,6 @@ class Skauto extends BaseController
             sk.店铺名称, 
             sk.货号
         ";
-
-        die;
 
         $select = $this->db_easyA->query($sql);
         $count = count($select);
