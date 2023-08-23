@@ -117,6 +117,30 @@ class Sample
     }
 
     /**
+     * 发送图片消息
+     * @return bool|string
+     */
+    public function sendMarkdownImg($userid, $title, $path)
+    {
+        $time = time();
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getToekn();
+        $SendToUser_data = [
+            'userid_list' => $userid,
+            'agent_id' => 2476262581,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => $title,
+                    "text" => "![screenshot]({$path}?t={$time})\n>"
+                ]
+
+            ]
+        ];
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    /**
      * 推送管理者
      * @param array $parms
      * @return mixed

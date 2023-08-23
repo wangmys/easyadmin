@@ -69,15 +69,18 @@ class Uploadimg extends AdminController
             // echo $path = $this->request->domain() ;
             
             // echo $path = $_SERVER['HTTP_ORIGIN']. "/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
-            $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
+            $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/62a21e4c7e989dce29832dd3ebb2e381_959.png';
 
             echo '<br>';
             // 上传图 
             echo $media_id = $model->uploadDingFile($path, "测试_". time());
 
             // $res = $model->sendImageMsg('350364576037719254', $media_id );
+            // $res = $model->sendImageMsg('350364576037719254', '@lAjPDgCwcKCcChTOPviv5c4jcn31' );
+            // $res = $model->sendFileMsg();
+            $res = $model->sendMarkdown('350364576037719254', '');
             // $res = $model->sendOaMsg('350364576037719254' );
-            $res = $model->sendActionCardMsg([]);
+            // $res = $model->sendActionCardMsg([]);
             print_r($res);
             
             // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);

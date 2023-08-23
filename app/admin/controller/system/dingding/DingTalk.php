@@ -434,12 +434,27 @@ class Dingtalk extends BaseController
                 "msgtype" => 'image',
                 'image' => [
                     'media_id' => $media_id,
-                    "content" => "你的订单112-1892467-4865808 的物流信息超过7天未更新，可能存在异常，单号：952677449652",
-                    "text" => [
-                        "content" => "123"
-                    ],
-                    'title' => '666'
                 ],
+
+            ]
+        ];
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    public function sendMarkdownImg($userid, $path)
+    {
+        $time = time();
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
+        $SendToUser_data = [
+            'userid_list' => $userid,
+            'agent_id' => $this->AgentId,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => "杭州天气1",
+                    "text" => "#### 杭州天气 @150XXXXXXXX \n> 9度，西北风1级，空气良89，相对温度73%\n> ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png?t={$time})\n>"
+                ]
 
             ]
         ];
@@ -478,12 +493,12 @@ class Dingtalk extends BaseController
     {
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
         $SendToUser_data = [
-            'userid_list' => '191902624820360246',
+            'userid_list' => '350364576037719254',
             'agent_id' => $this->AgentId,
             "msg" => [
                 "msgtype" => 'file',
                 'file' => [
-                    'media_id' => '@lAzPDe7szKOTxe3OQmI4mM5A_sZv',
+                    'media_id' => '@lAjPDgCwcKCcChTOPviv5c4jcn31',
 
                 ]
             ]
