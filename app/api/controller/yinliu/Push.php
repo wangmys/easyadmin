@@ -72,21 +72,21 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '杨岳敏',
-                'tel' => '13362067222',
-                'userid' => '131255621326201188'
-            ],
-            [
-                'name' => '王威',
-                'tel' => '15880012590',
-                'userid' => '0812473564939990'
-            ],
-            [
-                'name' => '杨剑',
-                'tel' => '15200838578',
-                'userid' => '1369166106841705'
-            ]
+            // [
+            //     'name' => '杨岳敏',
+            //     'tel' => '13362067222',
+            //     'userid' => '131255621326201188'
+            // ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
+            // [
+            //     'name' => '杨剑',
+            //     'tel' => '15200838578',
+            //     'userid' => '1369166106841705'
+            // ]
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -96,13 +96,16 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S106.jpg';
 
         // 上传图 
-        echo $media_id = $model->uploadDingFile($path, "每日业绩{$date}");
+        // echo $media_id = $model->uploadDingFile($path, "每日业绩{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_id);
+        //     dump($res);
+        // } 
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-            dump($res);
-        }  
+            $res = $model->sendMarkdownImg($val['userid'], '每日业绩', $path);
+        }   
     }
 
     /**
@@ -356,11 +359,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '李逢生',
-                'tel' => '13927687768',
-                'userid' => '010946151826588427'
-            ],
+            // [
+            //     'name' => '李逢生',
+            //     'tel' => '13927687768',
+            //     'userid' => '010946151826588427'
+            // ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -370,41 +373,15 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
-        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
-        // 发送图
-        foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-        }  
-    }
-
-    public function pushS012test()
-    {
-        $date = input('date') ? input('date') : date('Y-m-d');
-        $model = new Sample;
-        $parms = [
-            [
-                'name' => '陈威良',
-                'tel' => '13066166636',
-                'userid' => '350364576037719254'
-            ],
-        ];
-
-        $reportFormsService = new ReportFormsService();
-        
-        // 创建图
-        $reportFormsService->create_table_s012();
-        // $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
-        $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
-
-        // 上传图 
-        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        // $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         // foreach ($parms as $key => $val) {
         //     $res = $model->sendImageMsg($val['userid'], $media_id);
-        // }  
-        $res = $model->sendImageMsg('350364576037719254', $media_id );
+        // } 
+        foreach ($parms as $key => $val) {
+            $model->sendMarkdownImg($val['userid'], '饰品销售状况表', $path);
+        }  
     }
 
      /**
@@ -422,16 +399,16 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '王慧淼',
-                'tel' => '15868571991',
-                'userid' => '033834553729226560'
-            ],
-            [
-                'name' => '吴杭飞',
-                'tel' => '17307695571',
-                'userid' => '691524040721575237'
-            ],
+            // [
+            //     'name' => '王慧淼',
+            //     'tel' => '15868571991',
+            //     'userid' => '033834553729226560'
+            // ],
+            // [
+            //     'name' => '吴杭飞',
+            //     'tel' => '17307695571',
+            //     'userid' => '691524040721575237'
+            // ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -441,12 +418,15 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd').'/S107.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "鞋履报表{$date}");
+        // $media_id = $model->uploadDingFile($path, "鞋履报表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_id);
+        // }  
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-        }  
+            $model->sendMarkdownImg($val['userid'], '鞋履报表', $path);
+        } 
     }
 
     /**
