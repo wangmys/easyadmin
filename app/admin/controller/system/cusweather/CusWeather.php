@@ -109,7 +109,7 @@ class CusWeather extends AdminController
                 ['商品负责人', 'goods_manager'],
                 ['云仓', 'yuncang'],
                 ['店铺等级', 'store_level'],
-                ['南中北', 'nanzhongbei'],
+                // ['南中北', 'nanzhongbei'],
                 ['最低温', 'min_c'],
                 ['最高温', 'max_c'],
                 ['日期', 'weather_time'],

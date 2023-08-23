@@ -146,10 +146,10 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-store_level" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">南中北</label>
+                            <!-- <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">南中北</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-nanzhongbei" class="xm-select-demo"></div>
-                            </div>
+                            </div> -->
 
                             <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -303,13 +303,13 @@
             data: []
         })
         //南中北
-        xmSelect.render({
-            el: '#xm-nanzhongbei', 
-            filterable: true,
-            name: '南中北',
-            // showCount: 1,
-            data: []
-        })
+        // xmSelect.render({
+        //     el: '#xm-nanzhongbei', 
+        //     filterable: true,
+        //     name: '南中北',
+        //     // showCount: 1,
+        //     data: []
+        // })
 
         // 日期选择器
         laydate.render({
@@ -463,17 +463,17 @@
                     data: res.data.store_level
                 })
                 //南中北
-                xmSelect.render({
-                    el: '#xm-nanzhongbei', 
-                    filterable: true,
-                    toolbar: {show: true},
-                    theme: {
-                        color: '#1cbbb4',
-                    },
-                    // showCount: 1,
-                    name:'nanzhongbei',
-                    data: res.data.nanzhongbei
-                })
+                // xmSelect.render({
+                //     el: '#xm-nanzhongbei', 
+                //     filterable: true,
+                //     toolbar: {show: true},
+                //     theme: {
+                //         color: '#1cbbb4',
+                //     },
+                //     // showCount: 1,
+                //     name:'nanzhongbei',
+                //     data: res.data.nanzhongbei
+                // })
                 // 日期选择器
                 laydate.render({
                     name:'setTime1',
@@ -547,7 +547,7 @@
                     , { field: 'goods_manager', title: '商品负责人', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'yuncang', title: '云仓', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'store_level', title: '店铺等级', align: 'center', rowspan: 1, fixed:'left'}
-                    , { field: 'nanzhongbei', title: '南中北', align: 'center', rowspan: 1, fixed:'left'}
+                    // , { field: 'nanzhongbei', title: '南中北', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'min_c', title: '最低温', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'max_c', title: '最高温', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: 'weather_time', title: '日期', align: 'center', rowspan: 1, fixed:'left'}
