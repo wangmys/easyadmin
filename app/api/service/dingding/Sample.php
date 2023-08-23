@@ -130,12 +130,13 @@ class Sample
             "msg" => [
                 "msgtype" => 'markdown',
                 "markdown" => [
-                    "title" => $title,
-                    "text" => "![screenshot]({$path}?t={$time})\n>"
+                    "title" => "{$title}",
+                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n>"
                 ]
 
             ]
         ];
+        // dump($SendToUser_data);die;
         $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
         return $result;
     }
