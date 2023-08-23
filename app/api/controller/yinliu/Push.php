@@ -187,7 +187,12 @@ class Push extends BaseController
         }  
     }
 
-    public function pushHexiao_test()
+    /**
+     * 提送每日零售核销单
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function pushHexiao2()
     {
         $date = input('date') ? input('date') : date('Y-m-d');
         $model = new Sample;
@@ -202,11 +207,11 @@ class Push extends BaseController
             //     'tel' => '13362067222',
             //     'userid' => '131255621326201188'
             // ],
-            [
-                'name' => '王威',
-                'tel' => '15880012590',
-                'userid' => '0812473564939990'
-            ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
             // [
             //     'name' => '杨剑',
             //     'tel' => '15200838578',
@@ -252,98 +257,15 @@ class Push extends BaseController
         $reportFormsService = new ReportFormsService();
         
         // 创建图
-        $reportFormsService->create_table_s116($date);
-        $path = 'http://im.babiboy.com' . "/img/" . date('Ymd',strtotime('+1day')).'/S116.jpg';
-
-        // 上传图 
-        // $media_id = $model->uploadDingFile($path, "零售核销单报表日统计{$date}");
-        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
-        // 发送图
-        foreach ($parms as $key => $val) {
-            $res = $model->sendMarkdownImg($val['userid'], '省份单日毛利表', $path);
-        }  
-    }
-
-        /**
-     * 提送每日零售核销单
-     * 131255621326201188
-     * https://bx.babiboy.com/dingding/get?code=15880012590
-     */
-    public function pushHexiao2()
-    {
-        $date = input('date') ? input('date') : date('Y-m-d');
-        $model = new Sample;
-        $parms = [
-            [
-                'name' => '陈威良',
-                'tel' => '13066166636',
-                'userid' => '350364576037719254'
-            ],
-            [
-                'name' => '杨岳敏',
-                'tel' => '13362067222',
-                'userid' => '131255621326201188'
-            ],
-            [
-                'name' => '王威',
-                'tel' => '15880012590',
-                'userid' => '0812473564939990'
-            ],
-            [
-                'name' => '杨剑',
-                'tel' => '15200838578',
-                'userid' => '1369166106841705'
-            ],
-            [
-                'name' => '陈子文',
-                'tel' => '13925028633',
-                'userid' => '130821405237722239'
-            ],
-            [
-                'name' => '谷冬冬',
-                'tel' => '18557705286',
-                'userid' => '1302252256669056'
-            ],
-            [
-                'name' => '俞有岳',
-                'tel' => '13757775761',
-                'userid' => '051218272920490024'
-            ],
-            [
-                'name' => '周欢',
-                'tel' => '13576147826',
-                'userid' => '0427616739697274'
-            ],
-            [
-                'name' => '杨梦晓',
-                'tel' => '18858012505',
-                'userid' => '16205553134591457'
-            ],
-            [
-                'name' => '徐亮滨',
-                'tel' => '13799884322',
-                'userid' => '16085153953415770'
-            ],
-            [
-                'name' => '辛斌',
-                'tel' => '13387007546',
-                'userid' => '12525915671165649'
-            ],
-        ];
-
-        $reportFormsService = new ReportFormsService();
-        
-        // 创建图
         $reportFormsService->create_table_s117($date);
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S117.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "零售核销单报表月统计{$date}");
+        // $media_id = $model->uploadDingFile($path, "零售核销单报表月统计{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-            // dump($res);
+            $res = $model->sendMarkdownImg($val['userid'], '月度毛利表', $path);
         }  
     }
 
@@ -368,21 +290,21 @@ class Push extends BaseController
             //     'tel' => '17775611493',
             //     'userid' => '293746204229278162'
             // ],
-            [
-                'name' => '杨岳敏',
-                'tel' => '13362067222',
-                'userid' => '131255621326201188'
-            ],
-            [
-                'name' => '王威',
-                'tel' => '15880012590',
-                'userid' => '0812473564939990'
-            ],
-            [
-                'name' => '杨剑',
-                'tel' => '15200838578',
-                'userid' => '1369166106841705'
-            ],
+            // [
+            //     'name' => '杨岳敏',
+            //     'tel' => '13362067222',
+            //     'userid' => '131255621326201188'
+            // ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
+            // [
+            //     'name' => '杨剑',
+            //     'tel' => '15200838578',
+            //     'userid' => '1369166106841705'
+            // ],
         ];
 
         http_get("http://im.babiboy.com/api/lufei.Ldkdjd/dataHandle?date={$date}");
@@ -401,19 +323,22 @@ class Push extends BaseController
         $pathB = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118B.jpg';
         $pathC = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118C.jpg';
         // 上传图 
-        $media_idA = $model->uploadDingFile($pathA, "连带客单件单_{$date}");
-        $media_idB = $model->uploadDingFile($pathB, "连带客单件单_{$date}");
-        $media_idC = $model->uploadDingFile($pathC, "连带客单件单_{$date}");
+        // $media_idA = $model->uploadDingFile($pathA, "连带客单件单_{$date}");
+        // $media_idB = $model->uploadDingFile($pathB, "连带客单件单_{$date}");
+        // $media_idC = $model->uploadDingFile($pathC, "连带客单件单_{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_idA);
+        //     $res = $model->sendImageMsg($val['userid'], $media_idB);
+        //     $res = $model->sendImageMsg($val['userid'], $media_idC);
+        // }  
+
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_idA);
-            $res = $model->sendImageMsg($val['userid'], $media_idB);
-            $res = $model->sendImageMsg($val['userid'], $media_idC);
+            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathA);
+            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathB);
+            $model->sendMarkdownImg($val['userid'], '总体连带、客单、件单及同比表', $pathC);
         }  
-
-
-
     }
 
     /**
