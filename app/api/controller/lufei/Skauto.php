@@ -56,20 +56,34 @@ class Skauto extends BaseController
 
     
     public function skauto() {
-        $sql = "
+        $year = date('Y', time());
+        echo $sql = "
             SELECT 
                 sk.云仓,
                 sk.商品负责人,
                 sk.省份,
                 sk.经营模式,
                 sk.店铺名称,
-                --      sk.年份,
-                --      sk.季节, 
+                sk.季节, 
+                CASE
+                    sk.季节
+                    WHEN '初春' THEN '春季'
+                    WHEN '正春' THEN '春季'
+                    WHEN '春季' THEN '春季'
+                    WHEN '初秋' THEN '秋季'
+                    WHEN '深秋' THEN '秋季'
+                    WHEN '秋季' THEN '秋季'
+                    WHEN '初夏' THEN '夏季'
+                    WHEN '盛夏' THEN '夏季'
+                    WHEN '夏季' THEN '夏季'
+                    WHEN '冬季' THEN '冬季'
+                    WHEN '初冬' THEN '冬季'
+                    WHEN '深冬' THEN '冬季'
+                END AS 季节归集,
                 sk.一级分类,
                 sk.二级分类,
                 sk.分类,
                 sk.风格,
-                --      SUBSTRING(sk.分类, 1, 2) as 领型,
                 sk.货号,
                 st.零售价,
                 st.当前零售价,
@@ -83,18 +97,14 @@ class Skauto extends BaseController
             LEFT JOIN sp_ww_chunxia_stock as st ON sk.省份=st.省份 AND sk.店铺名称=st.店铺名称 AND sk.一级分类=st.一级分类 AND sk.二级分类=st.二级分类 AND sk.分类=st.分类 AND sk.货号 = st.货号
             LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.一级分类=bu.大类 AND sk.二级分类=bu.中类 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
             WHERE 1
-                -- sk.季节 IN ({$this->seasionStr}) 
                 AND c.Region <> '闭店区'
-                -- AND sk.商品负责人='曹太阳'
-                -- AND sk.店铺名称 IN ('东至一店')
-                AND sk.年份 = 2023
-                -- 	AND sk.省份='广东省'
-                -- 	AND sk.货号='B32101027'
+                AND sk.年份 = {$year}
             GROUP BY 
             sk.店铺名称, 
-            --          sk.季节, 
             sk.货号
         ";
+
+        die;
 
         $select = $this->db_easyA->query($sql);
         $count = count($select);
@@ -778,7 +788,8 @@ class Skauto extends BaseController
             (select 
                     云仓,商品负责人,省份,经营模式,店铺名称,一级分类,二级分类,分类,风格,货号,零售价,当前零售价,折率,上市天数,销售天数,总入量,累销数量,店铺库存,近一周销,近两周销,云仓可用,首单日期,更新日期,
                     IFNULL(在途库存, 0) as 在途库存,
-                    IFNULL(已配未发, 0) as 已配未发
+                    IFNULL(已配未发, 0) as 已配未发,
+                    季节,季节归集
                     from cwl_skauto 
             where 
             `销售天数`<= {$find_config['销售天数']} 
