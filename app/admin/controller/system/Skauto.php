@@ -171,12 +171,20 @@ class Skauto extends AdminController
             } else {
                 $map12 = "";
             }
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $map13Str = xmSelectInput($input['季节归集']);
+                $map13 = " AND 季节归集 IN ({$map13Str})";
+            } else {
+                $map13 = "";
+            }
 
             $sql = "
                 SELECT
                     云仓,
                     left(省份, 2) as 省份,
                     商品负责人,经营模式,店铺名称,
+                    季节归集,
                     一级分类,
                     二级分类,
                     分类,风格,货号,零售价,当前零售价,折率,上市天数,
@@ -195,6 +203,7 @@ class Skauto extends AdminController
                     {$map10}
                     {$map11}
                     {$map12}
+                    {$map13}
                 order by 
                     省份 asc
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -220,6 +229,7 @@ class Skauto extends AdminController
                     {$map10}
                     {$map11}
                     {$map12}
+                    {$map13}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();

@@ -140,6 +140,10 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-fengge" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-jjgj" class="xm-select-demo"></div>
+                            </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-huohao" class="xm-select-demo"></div>
@@ -354,6 +358,23 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-jjgj', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '季节归集',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "春季", value: "春季", selected: ""},
+                {name: "夏季", value: "夏季", selected: ""},
+                {name: "秋季", value: "秋季", selected: ""},
+                {name: "冬季", value: "冬季", selected: ""},
+            ]
+        })
+
         // xmSelect.render({
         //     el: '#xm-lingxingqima', 
         //     filterable: true,
@@ -525,6 +546,7 @@
                     , { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center'}
                     , { field: '经营模式', title: '性质', fixed: 'left', align: 'center', width: 40}
                     , { field: '店铺名称', title: '店铺名称', fixed: 'left' , align: 'center'}
+                    , { field: '季节归集', title: '季节归集', fixed: 'left' , align: 'center'}
                     , { field: '一级分类', title: '大类', fixed: 'left' , align: 'center', width: 40}
                     , { field: '二级分类', title: '中类', fixed: 'left' , align: 'center', width: 60}
                     , { field: '分类', title: '分类', fixed: 'left' , align: 'center', hide: true, width: 85}
