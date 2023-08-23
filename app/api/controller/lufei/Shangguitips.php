@@ -384,16 +384,10 @@ class Shangguitips extends BaseController
     public function cangku()
     {
         $sql = "
-            SELECT 
-                m.*, 
-                m.上柜家数 / m.店铺个数 AS 上柜率,
-                date_format(now(),'%Y-%m-%d') AS 更新日期
-            FROM
-            (
-                SELECT
-                    sk.云仓,sk.年份,sk.季节,
-                    CASE
-                        sk.季节
+            SELECT
+                yc.仓库名称 as 云仓,yc.一级时间分类 as 年份,yc.二级时间分类 as 季节,
+                CASE
+                        yc.二级时间分类
                         WHEN '初春' THEN '春季'
                         WHEN '正春' THEN '春季'
                         WHEN '春季' THEN '春季'
@@ -406,94 +400,101 @@ class Shangguitips extends BaseController
                         WHEN '冬季' THEN '冬季'
                         WHEN '初冬' THEN '冬季'
                         WHEN '深冬' THEN '冬季'
-                    END AS 季节归集,
-                    sk.一级分类,sk.二级分类,sk.分类,
-                    sk.货号,
-                    count(sk.预计库存数量) as 上柜家数,
-                    sum(sk.预计库存数量) as 已铺件数,
-                    zysgs.直营上柜数,
-                    jmsgs.加盟上柜数,
-                    dpgs.店铺个数,
-                    dpgszy.`店铺个数_直营`,
-                    dpgsjm.`店铺个数_加盟`
+                END AS 季节归集,
+                yc.一级分类,yc.二级分类,yc.分类,
+                yc.货号,
+                上柜和预计.上柜家数,
+                上柜和预计.已铺件数,
+                zysgs.直营上柜数,
+                jmsgs.加盟上柜数,
+                dpgs.店铺个数,
+                dpgszy.`店铺个数_直营`,
+                dpgsjm.`店铺个数_加盟`
+            FROM
+                sp_ww_budongxiao_yuncangkeyong as yc 
+            left join (
+                SELECT
+                    云仓, 货号, count(预计库存数量) as 上柜家数, sum(预计库存数量) as 已铺件数
                 FROM
-                    cwl_shangguitips_sk as sk
-                LEFT JOIN (
+                    cwl_shangguitips_sk 
+                WHERE
+                    预计库存数量 > 0 
+                GROUP BY
+                    云仓,季节,一级分类,二级分类,分类,货号
+            ) as 上柜和预计 ON 上柜和预计.云仓 = yc.仓库名称 AND 上柜和预计.货号 = yc.货号
+            LEFT JOIN (
                     SELECT
-                        云仓,一级分类,二级分类,分类,货号,
-                        预计库存数量,count(预计库存数量) as 直营上柜数
+                            云仓,一级分类,二级分类,分类,货号,
+                            预计库存数量,count(预计库存数量) as 直营上柜数
                     FROM
-                        cwl_shangguitips_sk  
+                            cwl_shangguitips_sk  
                     WHERE 1
-                        AND 预计库存数量 > 0
-                        AND 经营模式 = '直营'
+                            AND 预计库存数量 > 0
+                            AND 经营模式 = '直营'
                     GROUP BY
-                        云仓,季节,一级分类,二级分类,分类,货号
-                ) AS zysgs ON zysgs.云仓 = sk.云仓 AND zysgs.一级分类 = sk.一级分类 AND zysgs.二级分类 = sk.二级分类 AND zysgs.货号 = sk.货号
-                LEFT JOIN (
+                            云仓,季节,一级分类,二级分类,分类,货号
+            ) AS zysgs ON zysgs.云仓 = yc.仓库名称 AND zysgs.一级分类 = yc.一级分类 AND zysgs.二级分类 = yc.二级分类 AND zysgs.货号 = yc.货号
+            LEFT JOIN (
                     SELECT
-                        云仓,一级分类,二级分类,分类,货号,
-                        预计库存数量,count(预计库存数量) as 加盟上柜数
+                            云仓,一级分类,二级分类,分类,货号,
+                            预计库存数量,count(预计库存数量) as 加盟上柜数
                     FROM
-                        cwl_shangguitips_sk 
+                            cwl_shangguitips_sk 
                     WHERE 1
-                        AND 预计库存数量 > 0
-                        AND 经营模式 = '加盟'
+                            AND 预计库存数量 > 0
+                            AND 经营模式 = '加盟'
                     GROUP BY
-                        云仓,季节,一级分类,二级分类,分类,货号
-                ) AS jmsgs ON jmsgs.云仓 = sk.云仓 AND jmsgs.一级分类 = sk.一级分类 AND jmsgs.二级分类 = sk.二级分类 AND jmsgs.货号 = sk.货号
-                RIGHT JOIN (
+                            云仓,季节,一级分类,二级分类,分类,货号
+            ) AS jmsgs ON jmsgs.云仓 = yc.仓库名称 AND jmsgs.一级分类 = yc.一级分类 AND jmsgs.二级分类 = yc.二级分类 AND jmsgs.货号 = yc.货号
+            RIGHT JOIN (
                     select t.云仓,count(*) AS 店铺个数 from 
                     (	
-                        SELECT
-                            sk.云仓,sk.店铺名称,f.首单日期
-                        FROM
-                            cwl_shangguitips_sk as sk 
-                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
-                        WHERE 1
-                            AND f.首单日期 IS NOT NULL
-                        GROUP BY
-                            sk.云仓,sk.店铺名称
+                            SELECT
+                                    sk.云仓,sk.店铺名称,f.首单日期
+                            FROM
+                                    cwl_shangguitips_sk as sk 
+                            LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
+                            WHERE 1
+                                    AND f.首单日期 IS NOT NULL
+                            GROUP BY
+                                    sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
-                ) AS dpgs ON sk.云仓 = dpgs.云仓
-                RIGHT JOIN (
+            ) AS dpgs ON yc.仓库名称 = dpgs.云仓
+            RIGHT JOIN (
                     select t.云仓,count(*) AS `店铺个数_直营` from 
                     (	
-                        SELECT
-                            sk.云仓,sk.店铺名称,f.首单日期
-                        FROM
-                            cwl_shangguitips_sk as sk
-                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
-                        WHERE 1
-                            AND f.首单日期 IS NOT NULL
-                            AND sk.经营模式='直营'
-                        GROUP BY
-                            sk.云仓,sk.店铺名称
+                            SELECT
+                                    sk.云仓,sk.店铺名称,f.首单日期
+                            FROM
+                                    cwl_shangguitips_sk as sk
+                            LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
+                            WHERE 1
+                                    AND f.首单日期 IS NOT NULL
+                                    AND sk.经营模式='直营'
+                            GROUP BY
+                                    sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
-                ) AS dpgszy ON sk.云仓 = dpgszy.云仓
-                RIGHT JOIN (
+            ) AS dpgszy ON yc.仓库名称 = dpgszy.云仓
+            RIGHT JOIN (
                     select t.云仓,count(*) AS `店铺个数_加盟` from 
                     (	
-                        SELECT
-                        sk.云仓,sk.店铺名称,f.首单日期
-                        FROM
-                            cwl_shangguitips_sk as sk
-                        LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
-                        WHERE 1
-                            AND f.首单日期 IS NOT NULL
-                            AND sk.经营模式='加盟'
-                        GROUP BY
-                            sk.云仓,sk.店铺名称
+                            SELECT
+                            sk.云仓,sk.店铺名称,f.首单日期
+                            FROM
+                                    cwl_shangguitips_sk as sk
+                            LEFT JOIN customer_pro AS f ON sk.店铺名称 = f.CustomerName 
+                            WHERE 1
+                                    AND f.首单日期 IS NOT NULL
+                                    AND sk.经营模式='加盟'
+                            GROUP BY
+                                    sk.云仓,sk.店铺名称
                     ) as t
                     GROUP BY t.云仓
-                ) AS dpgsjm ON sk.云仓 = dpgsjm.云仓
-                WHERE 1
-                    AND sk.预计库存数量 > 0
-                GROUP BY
-                    sk.云仓,sk.季节,sk.一级分类,sk.二级分类,sk.分类,sk.货号
-            ) AS m		
+            ) AS dpgsjm ON yc.仓库名称 = dpgsjm.云仓
+            WHERE 1 
+                AND yc.二级时间分类 IN ('初秋', '深秋', '秋季')
         ";
 		
         $select = $this->db_easyA->query($sql);
@@ -676,17 +677,28 @@ class Shangguitips extends BaseController
                                 when
                                     二级分类 IN ('松紧长裤', '松紧短裤')
                                 then	
-                                    least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                    case
+                                         when 
+                                            `可用库存_30/39/48/110/170/L` <= 0 OR `可用库存_30/39/48/110/170/L` is null
+                                        then
+                                            least(`可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                        when 
+                                            `可用库存_33/42/54/125/185/3XL` <= 0 OR `可用库存_33/42/54/125/185/3XL` is null
+                                        then
+                                            least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`)
+                                        else
+                                            least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                    end
                                 when
                                     一级分类 in ('内搭', '外套', '鞋履')
                                 then	
                                     case
                                         when 
-                                            `可用库存_30/39/48/110/170/L` = 0 OR `可用库存_30/39/48/110/170/L` is null
+                                            `可用库存_30/39/48/110/170/L` <= 0 OR `可用库存_30/39/48/110/170/L` is null
                                         then
                                             least(`可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
                                         when 
-                                            `可用库存_33/42/54/125/185/3XL` = 0 OR `可用库存_33/42/54/125/185/3XL` is null
+                                            `可用库存_33/42/54/125/185/3XL` <= 0 OR `可用库存_33/42/54/125/185/3XL` is null
                                         then
                                             least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`)
                                         else
@@ -697,15 +709,15 @@ class Shangguitips extends BaseController
                                 then	
                                     case
                                         when 
-                                            `可用库存_29/38/46/105/165/M` = 0 OR `可用库存_29/38/46/105/165/M` is null
+                                            `可用库存_29/38/46/105/165/M` <= 0 OR `可用库存_29/38/46/105/165/M` is null
                                         then
-                                                least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`, `可用库存_34/43/56/190/4XL`)
+                                            least(`可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`, `可用库存_34/43/56/190/4XL`)
                                         when 
-                                            `可用库存_34/43/56/190/4XL` = 0 OR `可用库存_34/43/56/190/4XL` is null
+                                            `可用库存_34/43/56/190/4XL` <= 0 OR `可用库存_34/43/56/190/4XL` is null
                                         then
-                                                least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
+                                            least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`)
                                         ELSE
-                                                least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`
+                                            least(`可用库存_29/38/46/105/165/M`, `可用库存_30/39/48/110/170/L`, `可用库存_31/40/50/115/175/XL`, `可用库存_32/41/52/120/180/2XL`, `可用库存_33/42/54/125/185/3XL`
                                                 , `可用库存_34/43/56/190/4XL`)
                                     end
                             end
@@ -1171,8 +1183,8 @@ class Shangguitips extends BaseController
                 WHERE 1
                     AND 季节归集 = '秋季'
                     AND `云仓_主码齐码情况` = '可配'
-                    AND `上柜率_合计` <= 0.95
-                    AND `铺货率_合计` <= 0.85
+                    AND (`上柜率_合计` <= 0.95 OR 上柜率_合计 is null)
+                    AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
             ) as t on h.云仓 = t.云仓 and h.货号 = t.货号 and h.季节归集 = t.季节归集 
             set
                 h.上柜提醒 = '请上柜'

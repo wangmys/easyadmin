@@ -96,13 +96,16 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S106.jpg';
 
         // 上传图 
-        echo $media_id = $model->uploadDingFile($path, "每日业绩{$date}");
+        // echo $media_id = $model->uploadDingFile($path, "每日业绩{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_id);
+        //     dump($res);
+        // } 
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-            dump($res);
-        }  
+            $res = $model->sendMarkdownImg($val['userid'], '每日业绩', $path);
+        }   
     }
 
     /**
@@ -179,16 +182,15 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S116.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "零售核销单报表日统计{$date}");
+        // $media_id = $model->uploadDingFile($path, "零售核销单报表日统计{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-            
+            $res = $model->sendMarkdownImg($val['userid'], '省份单日毛利表', $path);
         }  
     }
 
-        /**
+    /**
      * 提送每日零售核销单
      * 131255621326201188
      * https://bx.babiboy.com/dingding/get?code=15880012590
@@ -262,12 +264,11 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S117.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "零售核销单报表月统计{$date}");
+        // $media_id = $model->uploadDingFile($path, "零售核销单报表月统计{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-            // dump($res);
+            $res = $model->sendMarkdownImg($val['userid'], '月度毛利表', $path);
         }  
     }
 
@@ -325,19 +326,22 @@ class Push extends BaseController
         $pathB = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118B.jpg';
         $pathC = $this->request->domain() . "/img/" . date('Ymd',strtotime('+1day')).'/S118C.jpg';
         // 上传图 
-        $media_idA = $model->uploadDingFile($pathA, "连带客单件单_{$date}");
-        $media_idB = $model->uploadDingFile($pathB, "连带客单件单_{$date}");
-        $media_idC = $model->uploadDingFile($pathC, "连带客单件单_{$date}");
+        // $media_idA = $model->uploadDingFile($pathA, "连带客单件单_{$date}");
+        // $media_idB = $model->uploadDingFile($pathB, "连带客单件单_{$date}");
+        // $media_idC = $model->uploadDingFile($pathC, "连带客单件单_{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_idA);
+        //     $res = $model->sendImageMsg($val['userid'], $media_idB);
+        //     $res = $model->sendImageMsg($val['userid'], $media_idC);
+        // }  
+
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_idA);
-            $res = $model->sendImageMsg($val['userid'], $media_idB);
-            $res = $model->sendImageMsg($val['userid'], $media_idC);
+            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathA);
+            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathB);
+            $model->sendMarkdownImg($val['userid'], '总体连带、客单、件单及同比表', $pathC);
         }  
-
-
-
     }
 
     /**
@@ -369,41 +373,15 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
-        // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
-        // 发送图
-        foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-        }  
-    }
-
-    public function pushS012test()
-    {
-        $date = input('date') ? input('date') : date('Y-m-d');
-        $model = new Sample;
-        $parms = [
-            [
-                'name' => '陈威良',
-                'tel' => '13066166636',
-                'userid' => '350364576037719254'
-            ],
-        ];
-
-        $reportFormsService = new ReportFormsService();
-        
-        // 创建图
-        $reportFormsService->create_table_s012();
-        // $path = $this->request->domain() . "/img/" . date('Ymd').'/S012.jpg';
-        $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/3ce3c522cbdcb4f9d4af5fecfc4ed532_337.jpg';
-
-        // 上传图 
-        $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
+        // $media_id = $model->uploadDingFile($path, "饰品销售状况表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
         // foreach ($parms as $key => $val) {
         //     $res = $model->sendImageMsg($val['userid'], $media_id);
-        // }  
-        $res = $model->sendImageMsg('350364576037719254', $media_id );
+        // } 
+        foreach ($parms as $key => $val) {
+            $model->sendMarkdownImg($val['userid'], '饰品销售状况表', $path);
+        }  
     }
 
      /**
@@ -440,12 +418,15 @@ class Push extends BaseController
         $path = $this->request->domain() . "/img/" . date('Ymd').'/S107.jpg';
 
         // 上传图 
-        $media_id = $model->uploadDingFile($path, "鞋履报表{$date}");
+        // $media_id = $model->uploadDingFile($path, "鞋履报表{$date}");
         // $media_id = '@lAjPDfmVbpW7TQjOOJWLGM5pLQAn';
         // 发送图
+        // foreach ($parms as $key => $val) {
+        //     $res = $model->sendImageMsg($val['userid'], $media_id);
+        // }  
         foreach ($parms as $key => $val) {
-            $res = $model->sendImageMsg($val['userid'], $media_id);
-        }  
+            $model->sendMarkdownImg($val['userid'], '鞋履报表', $path);
+        } 
     }
 
     /**

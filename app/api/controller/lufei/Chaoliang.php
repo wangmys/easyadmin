@@ -64,6 +64,29 @@ class Chaoliang extends BaseController
         return $seasionStr;
     }
 
+    // 更新单码量合计
+    public function biaozhun_total() {
+        $sql = "
+            UPDATE cwl_chaoliang_biaozhun
+                SET
+                    `单码量合计` = 
+                        IFNULL(`单码量00/28/37/44/100/160/S`, 0)
+                        + IFNULL(`单码量29/38/46/105/165/M`, 0) 
+                        + IFNULL(`单码量30/39/48/110/170/L`, 0) 
+                        + IFNULL(`单码量31/40/50/115/175/XL`, 0)
+                        + IFNULL(`单码量32/41/52/120/180/2XL`, 0)
+                        + IFNULL(`单码量33/42/54/125/185/3XL`, 0) 
+                        + IFNULL(`单码量34/43/56/190/4XL`, 0) 
+                        + IFNULL(`单码量35/44/58/195/5XL`, 0) 
+                        + IFNULL(`单码量36/6XL`, 0) 
+                        + IFNULL(`单码量38/7XL`, 0) 
+                        + IFNULL(`单码量_40`, 0),
+                    `周转合计` = 8    
+                WHERE 1
+        ";
+        $this->db_easyA->execute($sql);
+    }
+
     public function sk_first()
     {
         $select_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
@@ -279,6 +302,58 @@ class Chaoliang extends BaseController
         }
     }
 
+    // 大概10秒
+    public function sk_second() {
+        // 更新云仓可用
+        $sql_云仓可用 = "
+            UPDATE `cwl_chaoliang_sk` AS sk
+            LEFT JOIN sp_ww_budongxiao_yuncangkeyong as yc ON sk.云仓=yc.仓库名称 AND sk.一级分类 = yc.一级分类 AND sk.二级分类=yc.二级分类 AND sk.分类=yc.分类 AND sk.货号 = yc.货号
+            SET
+                sk.`可用库存_00/28/37/44/100/160/S` = yc.`可用库存_00/28/37/44/100/160/S`,
+                sk.`可用库存_29/38/46/105/165/M` = yc.`可用库存_29/38/46/105/165/M`,
+                sk.`可用库存_30/39/48/110/170/L` = yc.`可用库存_30/39/48/110/170/L`,
+                sk.`可用库存_31/40/50/115/175/XL` = yc.`可用库存_31/40/50/115/175/XL`,
+                sk.`可用库存_32/41/52/120/180/2XL` = yc.`可用库存_32/41/52/120/180/2XL`,
+                sk.`可用库存_33/42/54/125/185/3XL` = yc.`可用库存_33/42/54/125/185/3XL`,
+                sk.`可用库存_34/43/56/190/4XL` = yc.`可用库存_34/43/56/190/4XL`,
+                sk.`可用库存_35/44/58/195/5XL` = yc.`可用库存_35/44/58/195/5XL`,
+                sk.`可用库存_36/6XL` = yc.`可用库存_36/6XL`,
+                sk.`可用库存_38/7XL` = yc.`可用库存_38/7XL`,
+                sk.`可用库存_40` = yc.`可用库存_40`,
+                sk.`可用库存Quantity` = yc.`可用库存Quantity`
+        ";
+        $this->db_easyA->execute($sql_云仓可用);
+
+        $sql_全码个数 = "
+            UPDATE cwl_chaoliang_sk
+                SET 全码个数 = 
+                LENGTH(CONCAT(
+                    case when `预计00/28/37/44/100/160/S` > 0 then 'A' else '' end,
+                    case when `预计29/38/46/105/165/M` > 0 then 'A' else '' end,
+                    case when `预计30/39/48/110/170/L` > 0 then 'A' else '' end,
+                    case when `预计31/40/50/115/175/XL` > 0 then 'A' else '' end,
+                    case when `预计32/41/52/120/180/2XL` > 0 then 'A' else '' end,
+                    case when `预计33/42/54/125/185/3XL` > 0 then 'A' else '' end,
+                    case when `预计34/43/56/190/4XL` > 0 then 'A' else '' end,
+                    case when `预计35/44/58/195/5XL` > 0 then 'A' else '' end,
+                    case when `预计36/6XL` > 0 then 'A' else '' end,
+                    case when `预计38/7XL` > 0 then 'A' else '' end,
+                    case when `预计_40` > 0 then 'A' else '' end
+                    ))
+            WHERE 全码个数 is null	
+        ";
+        $this->db_easyA->execute($sql_全码个数);
+
+        $sql_全码平均值 = "
+            UPDATE cwl_chaoliang_sk
+                SET 
+                    全码平均值 =  预计库存合计 / 全码个数
+            WHERE 
+                全码平均值 is null	
+        ";
+        $this->db_easyA->execute($sql_全码平均值);
+    }
+    
     // 修正风格
     public function handle_1() {
         $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
@@ -327,6 +402,10 @@ class Chaoliang extends BaseController
 
     // 更新超量提醒1 
     public function handle_2() {
+        // 查询配置参数
+        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+        // dump($find_config);die;
+
         // 更新超量提醒1  内搭 外套 鞋履
         $sql1 = "
             UPDATE cwl_chaoliang_sk as sk 
@@ -334,67 +413,120 @@ class Chaoliang extends BaseController
                 SET
                     `提醒00/28/37/44/100/160/S` =  
                     CASE
-                        WHEN (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                        WHEN 
+                            (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
+                            AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                            AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒29/38/46/105/165/M` =  
                     CASE
-                        WHEN (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                        WHEN 
+                            (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
+                            AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                            AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒30/39/48/110/170/L` =  
                     CASE
-                        WHEN (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                        WHEN 
+                            (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
+                            AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                            AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒31/40/50/115/175/XL` =  
                     CASE
-                        WHEN (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                        WHEN 
+                            (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
+                            AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                            AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒32/41/52/120/180/2XL` =  
                     CASE
-                        WHEN (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                        WHEN 
+                            (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
+                            AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                            AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒33/42/54/125/185/3XL` =  
                     CASE
-                        WHEN (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                        WHEN 
+                            (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
+                            AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                            AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒34/43/56/190/4XL` =  
                     CASE
-                        WHEN (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                        WHEN 
+                            (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
+                            AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                            AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒35/44/58/195/5XL` =  
                     CASE
-                        WHEN (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                        WHEN 
+                            (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
+                            AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                            AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒36/6XL` =  
                     CASE
-                        WHEN (sk.`预计36/6XL` > bz.`单码量36/6XL`) AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                        WHEN 
+                            (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
+                            AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                            AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒38/7XL` =  
                     CASE
-                        WHEN (sk.`预计38/7XL` > bz.`单码量38/7XL`) AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                        WHEN 
+                            (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
+                            AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                            AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒_40` =  
                     CASE
-                        WHEN (sk.`预计_40` > bz.`单码量_40`) AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                        WHEN 
+                            (sk.`预计_40` > bz.`单码量_40`) 
+                            AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                            AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -409,67 +541,120 @@ class Chaoliang extends BaseController
                 SET
                     `提醒00/28/37/44/100/160/S` =  
                     CASE
-                        WHEN (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                        WHEN 
+                            (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
+                            AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                            AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒29/38/46/105/165/M` =  
                     CASE
-                        WHEN (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                        WHEN 
+                            (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
+                            AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                            AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒30/39/48/110/170/L` =  
                     CASE
-                        WHEN (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                        WHEN 
+                            (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
+                            AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                            AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒31/40/50/115/175/XL` =  
                     CASE
-                        WHEN (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                        WHEN 
+                            (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
+                            AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                            AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒32/41/52/120/180/2XL` =  
                     CASE
-                        WHEN (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                        WHEN 
+                            (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
+                            AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                            AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒33/42/54/125/185/3XL` =  
                     CASE
-                        WHEN (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                        WHEN 
+                            (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
+                            AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                            AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒34/43/56/190/4XL` =  
                     CASE
-                        WHEN (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                        WHEN 
+                            (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
+                            AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                            AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒35/44/58/195/5XL` =  
                     CASE
-                        WHEN (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                        WHEN 
+                            (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
+                            AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                            AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒36/6XL` =  
                     CASE
-                        WHEN (sk.`预计36/6XL` > bz.`单码量36/6XL`) AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                        WHEN 
+                            (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
+                            AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                            AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒38/7XL` =  
                     CASE
-                        WHEN (sk.`预计38/7XL` > bz.`单码量38/7XL`) AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                        WHEN 
+                            (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
+                            AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                            AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒_40` =  
                     CASE
-                        WHEN (sk.`预计_40` > bz.`单码量_40`) AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                        WHEN 
+                            (sk.`预计_40` > bz.`单码量_40`) 
+                            AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                            AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -485,67 +670,120 @@ class Chaoliang extends BaseController
                 SET
                     `提醒00/28/37/44/100/160/S` =  
                     CASE
-                        WHEN (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                        WHEN 
+                            (sk.`预计00/28/37/44/100/160/S` > bz.`单码量00/28/37/44/100/160/S`) 
+                            AND (sk.`周转00/28/37/44/100/160/S` > bz.`周转00/28/37/44/100/160/S` || sk.`周转00/28/37/44/100/160/S` IS NULL)
+                            AND sk.`预计00/28/37/44/100/160/S` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_00/28/37/44/100/160/S` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒29/38/46/105/165/M` =  
                     CASE
-                        WHEN (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                        WHEN 
+                            (sk.`预计29/38/46/105/165/M` > bz.`单码量29/38/46/105/165/M`) 
+                            AND (sk.`周转29/38/46/105/165/M` > bz.`周转29/38/46/105/165/M` || sk.`周转29/38/46/105/165/M` IS NULL)
+                            AND sk.`预计29/38/46/105/165/M` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_29/38/46/105/165/M` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒30/39/48/110/170/L` =  
                     CASE
-                        WHEN (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                        WHEN 
+                            (sk.`预计30/39/48/110/170/L` > bz.`单码量30/39/48/110/170/L`) 
+                            AND (sk.`周转30/39/48/110/170/L` > bz.`周转30/39/48/110/170/L` || sk.`周转30/39/48/110/170/L` IS NULL)
+                            AND sk.`预计30/39/48/110/170/L` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_30/39/48/110/170/L` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒31/40/50/115/175/XL` =  
                     CASE
-                        WHEN (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                        WHEN 
+                            (sk.`预计31/40/50/115/175/XL` > bz.`单码量31/40/50/115/175/XL`) 
+                            AND (sk.`周转31/40/50/115/175/XL` > bz.`周转31/40/50/115/175/XL` || sk.`周转31/40/50/115/175/XL` IS NULL)
+                            AND sk.`预计31/40/50/115/175/XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_31/40/50/115/175/XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒32/41/52/120/180/2XL` =  
                     CASE
-                        WHEN (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                        WHEN 
+                            (sk.`预计32/41/52/120/180/2XL` > bz.`单码量32/41/52/120/180/2XL`) 
+                            AND (sk.`周转32/41/52/120/180/2XL` > bz.`周转32/41/52/120/180/2XL` || sk.`周转32/41/52/120/180/2XL` IS NULL)
+                            AND sk.`预计32/41/52/120/180/2XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_32/41/52/120/180/2XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒33/42/54/125/185/3XL` =  
                     CASE
-                        WHEN (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                        WHEN 
+                            (sk.`预计33/42/54/125/185/3XL` > bz.`单码量33/42/54/125/185/3XL`) 
+                            AND (sk.`周转33/42/54/125/185/3XL` > bz.`周转33/42/54/125/185/3XL` || sk.`周转33/42/54/125/185/3XL` IS NULL)
+                            AND sk.`预计33/42/54/125/185/3XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_33/42/54/125/185/3XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒34/43/56/190/4XL` =  
                     CASE
-                        WHEN (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                        WHEN 
+                            (sk.`预计34/43/56/190/4XL` > bz.`单码量34/43/56/190/4XL`) 
+                            AND (sk.`周转34/43/56/190/4XL` > bz.`周转34/43/56/190/4XL` || sk.`周转34/43/56/190/4XL` IS NULL)
+                            AND sk.`预计34/43/56/190/4XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_34/43/56/190/4XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒35/44/58/195/5XL` =  
                     CASE
-                        WHEN (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                        WHEN 
+                            (sk.`预计35/44/58/195/5XL` > bz.`单码量35/44/58/195/5XL`) 
+                            AND (sk.`周转35/44/58/195/5XL` > bz.`周转35/44/58/195/5XL` || sk.`周转35/44/58/195/5XL` IS NULL)
+                            AND sk.`预计35/44/58/195/5XL` / sk.全码平均值 > {$find_config['倍率参数']}
+                            AND sk.`可用库存_35/44/58/195/5XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒36/6XL` =  
                     CASE
-                        WHEN (sk.`预计36/6XL` > bz.`单码量36/6XL`) AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                        WHEN 
+                            (sk.`预计36/6XL` > bz.`单码量36/6XL`) 
+                            AND (sk.`周转36/6XL` > bz.`周转36/6XL` || sk.`周转36/6XL` IS NULL)
+                            AND sk.`预计36/6XL` / sk.全码平均值 > {$find_config['倍率参数']}    
+                            AND sk.`可用库存_36/6XL` < {$find_config['单码可用']}
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒38/7XL` =  
                     CASE
-                        WHEN (sk.`预计38/7XL` > bz.`单码量38/7XL`) AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                        WHEN 
+                            (sk.`预计38/7XL` > bz.`单码量38/7XL`) 
+                            AND (sk.`周转38/7XL` > bz.`周转38/7XL` || sk.`周转38/7XL` IS NULL)
+                            AND sk.`预计38/7XL` / sk.全码平均值 > {$find_config['倍率参数']} 
+                            AND sk.`可用库存_38/7XL` < {$find_config['单码可用']}  
                         THEN '超'
                         ELSE NULL
                     END,
                     `提醒_40` =  
                     CASE
-                        WHEN (sk.`预计_40` > bz.`单码量_40`) AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                        WHEN 
+                            (sk.`预计_40` > bz.`单码量_40`) 
+                            AND (sk.`周转_40` > bz.`周转_40` || sk.`周转_40` IS NULL)
+                            AND sk.`预计_40` / sk.全码平均值 > {$find_config['倍率参数']} 
+                            AND sk.`可用库存_40` < {$find_config['单码可用']}
+                        THEN '超'
+                        ELSE NULL
+                    END,
+                    `提醒_合计` =  
+                    CASE
+                        WHEN 
+                            (sk.`预计库存合计` > bz.`单码量合计`) 
+                            AND (sk.`周转合计` > bz.`周转合计` || sk.`周转合计` IS NULL)
+                            AND sk.`可用库存Quantity` < {$find_config['总码可用']}
                         THEN '超'
                         ELSE NULL
                     END
@@ -563,7 +801,7 @@ class Chaoliang extends BaseController
             WHERE 1
                 AND 一级分类 IN ('内搭','外套','下装', '鞋履')
                 AND (`提醒00/28/37/44/100/160/S` = '超' OR `提醒29/38/46/105/165/M` = '超' OR `提醒30/39/48/110/170/L` = '超' OR `提醒31/40/50/115/175/XL` = '超' OR `提醒32/41/52/120/180/2XL` = '超'
-                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40` = '超')         
+                OR `提醒33/42/54/125/185/3XL` = '超' OR `提醒34/43/56/190/4XL` = '超' OR `提醒35/44/58/195/5XL` = '超' OR `提醒36/6XL` = '超' OR `提醒38/7XL` = '超' OR `提醒_40` = '超' OR `提醒_合计` = '超')         
         ";
 
         // 超量个数
@@ -598,21 +836,11 @@ class Chaoliang extends BaseController
         $status5 = $this->db_easyA->execute($sql5);
 
         $total = $status1 + $status2 + $status3;
-        if (($status1 || $status2 || $status3) && $status4 && $status5) {
-            // $this->db_easyA->commit();
-            return json([
-                'status' => 1,
-                'msg' => 'success',
-                'content' => "cwl_chaoliang_sk 超量更新1 更新成功，数量：{$status4}！"
-            ]);
-        } else {
-            // $this->db_easyA->rollback();
-            return json([
-                'status' => 0,
-                'msg' => 'error',
-                'content' => 'cwl_chaoliang_sk 超量更新1  更新失败！'
-            ]);
-        }
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_chaoliang_sk 超量更新1 更新成功，数量：{$status4}！"
+        ]);
     }
 
 }

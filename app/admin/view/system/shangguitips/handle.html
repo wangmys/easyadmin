@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>新品上柜提醒</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+        .cima {
+            height:18px; 
+            line-height:18px;
+        }
+        .weather_div {
+            height:28px;
+        }
+        .cima_1 {
+            height:5px; 
+            width:10px;
+        }
+        .cima_2 {
+            line-height:5px;
+        }
+        .cima_manzu {
+            /* height:5px; 
+            width:10px; */
+            line-height:5px
+        }
+        .autumn{
+            color: #afaf00;
+        }
+        .winter{
+            color: #24d3f2;
+        }
+        .hot {
+            color: red;
+        }
+        .cool {
+            color:#0879bb;
+        }
+        /* th[data-field="7"][data-key="1-0-7"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="温度"][data-key="1-1-11"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="8"][data-key="1-0-8"] {
+            background-color: #b9b9b9 !important;
+            color:#ffffff;
+        }
+        th[data-field="9"][data-key="1-0-9"] {
+            background-color: #dedede !important;
+        }
+        th[data-field="季节"][data-key="1-1-23"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="识别规则"][data-key="1-1-24"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="识别天数"][data-key="1-1-25"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="季节SKC数"][data-key="1-1-26"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+
+        th[data-field="提醒"][data-key="1-1-27"] {
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+        th[data-field="10"][data-key="1-0-10"],
+        th[data-field="春季SKC基本_内搭"][data-key="1-1-29"],
+        th[data-field="春季SKC基本_外套"][data-key="1-1-30"] {
+            background-color: #5a9afa !important;
+            color:#ffffff;
+        }
+        
+        th[data-field="11"][data-key="1-0-11"],
+        th[data-field="提醒"][data-key="1-1-20"]{
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+        th[data-field="12"][data-key="1-0-12"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="17"][data-key="1-1-17"],
+        th[data-field="0"][data-key="1-2-0"],
+        th[data-field="1"][data-key="1-2-1"],
+        th[data-field="2"][data-key="1-2-2"] {
+            background-color: #90bcff !important;
+            color:#ffffff;
+        }
+        th[data-field="18"][data-key="1-1-18"],
+        th[data-field="3"][data-key="1-2-3"],
+        th[data-field="4"][data-key="1-2-4"],
+        th[data-field="5"][data-key="1-2-5"] {
+            background-color: #7db0fc !important;
+            color:#ffffff;
+        }
+        th[data-field="19"][data-key="1-1-19"],
+        th[data-field="6"][data-key="1-2-6"],
+        th[data-field="7"][data-key="1-2-7"],
+        th[data-field="8"][data-key="1-2-8"] {
+            background-color: #599afb !important;
+            color:#ffffff;
+        } */
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yc" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fg" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-hh" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-tips" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height:70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 0px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">新品上柜提醒 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单店品类断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    var viewCustomers = function (yc, goodsno) {
+        window.localStorage.setItem('viewCustomer_yc', yc);
+        window.localStorage.setItem('viewCustomer_gdno', goodsno);
+    }
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Shangguitips/handle')}" 
+            , url_download_history_area = "{:url('admin/system.Weathertips/excel_weathertips')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Shangguitips/getXmMapSelect')}"
+            , keshang_url = "{$keshang_url}"
+
+        initFn();
+        startTable();
+
+        // 选择云仓
+        xmSelect.render({
+            el: '#xm-yc', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "南昌云仓", value: "南昌云仓", selected: ""},
+                {name: "广州云仓", value: "广州云仓", selected: ""},
+                {name: "武汉云仓", value: "武汉云仓", selected: ""},
+                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+                {name: "长沙云仓", value: "长沙云仓", selected: ""},
+            ]
+        })
+        // 
+        xmSelect.render({
+            el: '#xm-fg', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "基本款", value: "基本款", selected: ""},
+                {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-tips', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '上柜提醒',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "请上柜", value: "请上柜", selected: false},
+                {name: "重点上柜", value: "重点上柜", selected: false},
+            ]
+        })
+
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-hh', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.goodsno
+                })
+                // // // 渲染所有店铺
+                // xmSelect.render({
+                //     el: '#xm-customer', 
+                //     filterable: true,
+                //     toolbar: {show: true},
+                //     theme: {
+                //         color: '#1cbbb4',
+                //     },
+                //     // showCount: 1,
+                //     name:'店铺名称',
+                //     data: res.data.customer
+                // })
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+            return false; 
+        });
+
+        // 监听事件
+        $(document).on('click', '.viewBtn', function(data){
+            var yc = window.localStorage.getItem('viewCustomer_yc');
+            var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            layer.open({
+                title: '可上门店铺明细'
+                ,type: 2
+                ,area: ['100%', '100%'] // 100%全屏
+                ,content: keshang_url
+            });
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function startTable() {
+            var mapHeight = $('#map').height();
+            // console.log(111);
+            var height = document.documentElement.clientHeight - mapHeight - 10;
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                , toolbar: false
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: height
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , where: { "提醒备注" : '请注意'}
+                , cols: [
+                    [
+                        { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 3}
+                        ,{ field: '年份', title: '年份', fixed: 'left' ,align: 'center' , width: 40, rowspan: 3}
+                        ,{ field: '季节归集', title: '季节', fixed: 'left' ,align: 'center' , width: 35, rowspan: 3}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">一级</div>
+                                    <div class="cima">分类</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '一级分类', fixed: 'left', align: 'center' , width: 40, rowspan: 3}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">二级</div>
+                                    <div class="cima">分类</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '二级分类', fixed: 'left', width: 60, align: 'center', rowspan: 3}
+                        ,{ title: `分类`,field: '分类', fixed: 'left', align: 'center', width: 80,rowspan: 3}
+                        ,{ title: `风格`, field: '风格', fixed: 'left', width: 50, align: 'center' ,rowspan: 3, hide: false}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">二级</div>
+                                    <div class="cima">风格</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '二级风格', fixed: 'left', width: 40, align: 'center' ,rowspan: 3, hide: false}
+                        ,{ title: `货号`, field: '货号', fixed: 'left', width: 75, align: 'center' ,rowspan: 3}
+
+                        ,{ title: `店铺个数`, align: 'center', colspan: 3}
+                        ,{ title: `仓库情况`, align: 'center', colspan: 2}
+                        ,{ title: `实际上柜情况`, align: 'center', colspan: 3}
+                        ,{ title: `货品等级上柜计划`, align: 'center',  colspan: 6}
+                        ,{ title: `实际铺货件数`, align: 'center',  colspan: 3}
+                        ,{ title: `上柜测算`, align: 'center',  colspan: 13}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">上柜</div>
+                                    <div class="cima">提醒</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '上柜提醒', width: 60, align: 'center',  rowspan: 3}
+                    ],
+
+                    [
+                        // 店铺个数
+                        { field: '店铺个数_直营', title: '直营' ,align: 'center' , width: 32, rowspan: 2} 
+                        ,{ field: '店铺个数_加盟', title: '加盟' ,align: 'center' , width: 32, rowspan: 2} 
+                        ,{ field: '店铺个数_合计', title: '合计' ,align: 'center' , width: 32, rowspan: 2} 
+
+                        // 仓库情况
+                        ,{title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">可用</div>
+                                    <div class="cima">数量</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '云仓_可用数量', align: 'center' , width: 32, rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                    <div class="cima">主码</div>
+                                    <div class="cima">齐码</div>
+                                    <div class="cima">情况</div>
+                                    </div>`, field: '云仓_主码齐码情况', align: 'center' , width: 32, rowspan: 2} 
+
+                        // 实际上柜情况
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">直营</div>
+                                <div class="cima">上柜</div>
+                                <div class="cima">数</div>
+                                </div>`, field: '实际上柜_直营上柜数', align: 'center' , width: 32, rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">加盟</div>
+                                <div class="cima">上柜</div>
+                                <div class="cima">数</div>
+                                </div>`, field: '实际上柜_加盟上柜数', align: 'center' , width: 32, rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">上柜</div>
+                                <div class="cima">家数</div>
+                                </div>`, field: '实际上柜_上柜家数', align: 'center' , width: 32, rowspan: 2} 
+
+                        // 货品等级上柜计划
+                        ,{title: `计划`, align: 'center' , colspan: 3, rowspan: 1} 
+                        ,{title: `实际`,align: 'center' , colspan: 3, rowspan: 1} 
+
+                        // 实际铺货件数
+                        ,{title: `直营`, field: '实际铺货_直营', align: 'center' , width: 40, rowspan: 2}          
+                        ,{title: `加盟`, field: '实际铺货_加盟', align: 'center' , width: 40, rowspan: 2}           
+                        ,{title: `合计`, field: '实际铺货_合计', align: 'center' , width: 40, rowspan: 2}  
+
+                        // 上柜测算
+                        ,{title: `铺货率`, align: 'center' , colspan: 3, rowspan: 1} 
+                        ,{title: `上柜率`,align: 'center' , colspan: 3, rowspan: 1} 
+                        ,{title: `货品等级上柜率`,align: 'center' , colspan: 3, rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">预计最大</div>
+                                <div class="cima">可加铺店</div>
+                                <div class="cima">数</div>
+                                </div>`, field: '预计最大可加铺店数', width:50, align: 'center' , rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            // console.log(data)
+                            return `
+                                <button class="viewBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
+                                letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('${data['云仓']}', '${data['货号']}')">
+                                    查询
+                                </button>
+                            `; 
+                        }}
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">单款全国</div>
+                                <div class="cima">日均销</div>
+                                <div class="cima">排名</div>
+                                </div>`, field: '单款全国日均销排名', width:50, align: 'center' , rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">近1周</div>
+                                <div class="cima">中类销售</div>
+                                <div class="cima">占比</div>
+                                </div>`, field: '近1周中类销售占比', width:50, align: 'center' , rowspan: 2} 
+
+                    ],
+                    
+                    [
+                        // 货品等级上柜计划
+                        {title: `直营`, field: '货品等级_计划_直营', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `加盟`, field: '货品等级_计划_加盟', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `合计`, field: '货品等级_计划_合计', align: 'center' , width: 40, rowspan: 1},    
+                        
+                        {title: `直营`, field: '货品等级_实际_直营', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `加盟`, field: '货品等级_实际_加盟', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `合计`, field: '货品等级_实际_合计', align: 'center' , width: 40, rowspan: 1}, 
+
+                        // 上柜测算 铺货率
+                        {title: `直营`, field: '铺货率_直营', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `加盟`, field: '铺货率_加盟', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `合计`, field: '铺货率_合计', align: 'center' , width: 40, rowspan: 1},  
+
+                        // 上柜测算 上柜率
+                        {title: `直营`, field: '上柜率_直营', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `加盟`, field: '上柜率_加盟', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `合计`, field: '上柜率_合计', align: 'center' , width: 40, rowspan: 1},  
+
+                        // 上柜测算 货品等级上柜率
+                        {title: `直营`, field: '货品等级上柜率_直营', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `加盟`, field: '货品等级上柜率_加盟', align: 'center' , width: 40, rowspan: 1},           
+                        {title: `合计`, field: '货品等级上柜率_合计', align: 'center' , width: 40, rowspan: 1},  
+                    ]
+                    
+                ]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
