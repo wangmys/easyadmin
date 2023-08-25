@@ -165,7 +165,7 @@ class Dingtalk extends BaseController
             // $obj = json_decode($re);
             // // return halt($obj)['userid'];
             // return 11;
-                
+
     }
 
     /**
@@ -291,6 +291,52 @@ class Dingtalk extends BaseController
 //        }
 
         return $AllUserId;
+    }
+
+
+    public function updateUser() {
+        $select_deparent = $this->db_easyA->table('dd_department_info')->where([
+            ['use', '=', 1]
+        ])->limit(300)->select();
+
+        foreach($select_deparent as $key => $val) {
+            echo $val['depId'];
+            echo '<br>';
+            $this->ddUser($val['depId'], $val['name']);
+        }
+    }
+
+    public function ddUser($depId = '', $店铺名称 = '')
+    {
+        input('depId') ? $depId = input('depId') : '';
+
+        $find_deparent = $this->db_easyA->table('dd_department_info')->where([
+            ['depId', '=', $depId]
+        ])->find();
+        $getDepartment = 'https://oapi.dingtalk.com/topapi/v2/user/list?access_token=' . $this->getAccessToken();
+
+        $data = json_encode(['dept_id' => $depId, 'cursor' => 0, 'size' => 100]);
+        $AllUserId[] = json_decode($this->PostCurlRequest($getDepartment, $data), JSON_OBJECT_AS_ARRAY);
+
+        // dump($AllUserId[0]['result']['list']);die;
+
+        $new_data = [];
+        foreach ($AllUserId[0]['result']['list'] as $key => $val) {
+            $new_data[$key]['店铺名称'] = $店铺名称;
+            $new_data[$key]['depId'] = $depId;
+            $new_data[$key]['name'] = @$val['name'];
+            $new_data[$key]['title'] = @$val['title'];
+            $new_data[$key]['mobile'] = @$val['mobile'];
+            $new_data[$key]['userid'] = @$val['userid'];
+
+            
+        }
+        dump($new_data);
+        // $this->db_easyA->table('dd_user')->strict(false)->insertAll($new_data);
+
+
+
+        // return $AllUserId;
     }
 
 
