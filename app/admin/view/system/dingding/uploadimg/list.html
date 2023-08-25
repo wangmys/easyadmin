@@ -275,7 +275,8 @@
 
         //监听保存
         form.on('submit(addBtn)', function (data) {
-            layer.open({
+            
+            var testFram = layer.open({
                 title: '添加定推信息'
                 ,type: 2
                 ,area: ['40%', '70%'] // 100%全屏
@@ -285,20 +286,20 @@
             return false; 
         });
 
-        // 监听事件
+        // 监听事件 
         $(document).on('click', '.sendDingBtn', function(data){
             var id = window.localStorage.getItem('sendDingImg_id');
             $.post(sendDingImgHandle, {'id': id}, function(data) {
-            if (data.msg == '执行成功') {
-                alert(data.msg);
-                // layui.use('layer', function () {
-                //     setTimeout(function () {
-                //         layui.layer.closeAll();
-                //     }, 0);
-                // });
-            }
+                if (data.msg == '执行成功') {
+                    alert(data.msg);
+                    // layui.use('layer', function () {
+                    //     setTimeout(function () {
+                    //         layui.layer.closeAll();
+                    //     }, 0);
+                    // });
+                }
             
-        })
+            })
         });
 
         // 单店不动销数据统计 

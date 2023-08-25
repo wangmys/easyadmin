@@ -79,7 +79,7 @@ class Uploadimg extends AdminController
     public function download_excel_user_demo() {
         $sql = "
             SELECT
-                手机, 姓名
+                店铺名称, 姓名, 手机
             from dd_temp_excel_user_demo
             where 1
             limit 1
@@ -98,7 +98,7 @@ class Uploadimg extends AdminController
         if ($uid) {
             $sql = "
                 SELECT
-                    手机, 姓名
+                    店铺名称, 姓名, 手机
                 from dd_temp_excel_user_error
                 where 1
                     AND aid = '{$this->authInfo['id']}'
@@ -130,8 +130,9 @@ class Uploadimg extends AdminController
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
                 $read_column = [
-                    'A' => '手机',
+                    'A' => '店铺名称',
                     'B' => '姓名',
+                    'C' => '手机',
                 ];
                 
                 //读取数据
@@ -151,8 +152,9 @@ class Uploadimg extends AdminController
                             $sucess_data[$key]['uid'] = $uid;
                             $sucess_data[$key]['aid'] = $this->authInfo['id'];
                             $sucess_data[$key]['aname'] = $this->authInfo['name'];
-                            $sucess_data[$key]['手机'] = @$val['手机'];
+                            $sucess_data[$key]['店铺名称'] = @$val['店铺名称'];
                             $sucess_data[$key]['姓名'] = @$val['姓名'];
+                            $sucess_data[$key]['手机'] = @$val['手机'];
                             $sucess_data[$key]['userid'] = $info['userid'];
                             $sucess_data[$key]['errmsg'] = $info['errmsg'];
                             $sucess_data[$key]['time'] = $time;
@@ -160,8 +162,9 @@ class Uploadimg extends AdminController
                             $error_data[$key]['uid'] = $uid;
                             $error_data[$key]['aid'] = $this->authInfo['id'];
                             $error_data[$key]['aname'] = $this->authInfo['name'];
-                            $error_data[$key]['手机'] = @$val['手机'];
+                            $error_data[$key]['店铺名称'] = @$val['店铺名称'];
                             $error_data[$key]['姓名'] = @$val['姓名'];
+                            $error_data[$key]['手机'] = @$val['手机'];
                             $error_data[$key]['userid'] = '';
                             $error_data[$key]['errmsg'] = $info['errmsg'];
                             $error_data[$key]['time'] = $time;

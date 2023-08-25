@@ -283,6 +283,8 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
 
     // 提交
     form.on('submit(submitInfo)', function (data) {
+        var index = parent.layer.getFrameIndex(window.name); 
+        console.log(index);
         //开始加载效果
         layui.use('layer', function () {
             layui.layer.load();
@@ -295,21 +297,33 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
         })
         if (!pid) {
             alert('请上传图片');
+            layui.use('layer', function () {
+                setTimeout(function () {
+                    layui.layer.closeAll();
+                }, 0);
+            });
             return false;
         }
         if (!uid) {
             alert('请上传用户名单'); 
+            layui.use('layer', function () {
+                setTimeout(function () {
+                    layui.layer.closeAll();
+                }, 0);
+            });
             return false;
         }
+        // var _layer  = layer;
         $.post(submitHandle, {'title':data.field.title, 'pid':pid, 'uid':uid }, function(data) {
             if (data.msg == '提交成功') {
                 layui.use('layer', function () {
-                    alert('提交成功，请手动刷新页面-_-'); 
                     setTimeout(function () {
                         layui.layer.closeAll();
                     }, 0);
                 });
             }
+            // layui.layer.cloae(index);
+            alert('提交成功，请手动刷新页面-_-'); 
             
         })
         return false; 
