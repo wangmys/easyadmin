@@ -402,4 +402,47 @@ class Uploadimg extends AdminController
         }
     }
 
+    public function sendDingImgHandle() {
+        $input = input();
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+        if (request()->isAjax() && $input['id']) {
+            $model = new DingTalk;
+            // echo $path = $this->request->domain() ;
+            
+            $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                ['id', '=', $input['id']]
+            ])->find();
+
+            if ($find_list) {
+                $find_path = $this->db_easyA->table('dd_temp_img')->where([
+                    ['pid', '=', $find_list['pid']]
+                ])->find();
+                // echo $find_path['path'];
+
+                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+                    ['uid', '=', $find_list['uid']]
+                ])->select();
+
+                foreach ($select_user as $key => $val) {
+                    // echo $val['姓名'];
+                    $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
+                    // dump($res);
+                }
+                return json(['code' => 0, 'msg' => '执行成功']);
+            } else {
+                return json(['code' => 0, 'msg' => '执行失败']);
+            }
+            // $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/62a21e4c7e989dce29832dd3ebb2e381_959.png';
+
+
+
+            // $res = $model->sendMarkdownImg('350364576037719254', '');
+            // $res = $model->sendOaMsg('350364576037719254' );
+            // $res = $model->sendActionCardMsg([]);
+            // print_r($res);
+            
+            // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);
+        }        
+    }
+
 }

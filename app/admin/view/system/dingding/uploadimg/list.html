@@ -158,6 +158,9 @@
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
 <script>
+    var sendDingImg = function (id) {
+        window.localStorage.setItem('sendDingImg_id', id);
+    }
     watermark({ "watermark_txt": '南昌索歌服饰' });
     layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
         let form = layui.form
@@ -166,6 +169,7 @@
             , table = layui.table
             , laydate = layui.laydate
             , url_index = "{:url('admin/system.dingding.Uploadimg/index')}"
+            , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
             , url1 = "{:url('admin/system.dingding.Uploadimg/list')}"; 
 
 
@@ -281,6 +285,22 @@
             return false; 
         });
 
+        // 监听事件
+        $(document).on('click', '.sendDingBtn', function(data){
+            var id = window.localStorage.getItem('sendDingImg_id');
+            $.post(sendDingImgHandle, {'id': id}, function(data) {
+            if (data.msg == '执行成功') {
+                alert(data.msg);
+                // layui.use('layer', function () {
+                //     setTimeout(function () {
+                //         layui.layer.closeAll();
+                //     }, 0);
+                // });
+            }
+            
+        })
+        });
+
         // 单店不动销数据统计 
         function startTable() {
             var mapHeight = $('#map').height();
@@ -312,7 +332,17 @@
                     }}
                     , { field: '接收方', title: '接收方' }
                     , { field: 'sendtimes', title: '推送次数' }
-                    , { field: 'createtime', title: '创建时间' }
+                    , { field: 'createtime', title: '创建时间' } 
+                    , { title: '操作', templet:
+                        function (data) {
+                            // console.log(data)
+                            return `
+                                <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
+                                letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}')">
+                                    推送
+                                </button>
+                            `; 
+                        }}
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
