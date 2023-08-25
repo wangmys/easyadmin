@@ -104,9 +104,9 @@ class CusWeatherService
         if ($store_level) {
             $where[] = ['cwb.store_level', 'in', $store_level];
         }
-        if ($nanzhongbei) {
-            $where[] = ['cwb.nanzhongbei', 'in', $nanzhongbei];
-        }
+        // if ($nanzhongbei) {
+        //     $where[] = ['cwb.nanzhongbei', 'in', $nanzhongbei];
+        // }
         if ($setTime1 && $setTime2) {
             $where[] = ['cwd.weather_time', 'between', [$setTime1, $setTime2]];
         }
