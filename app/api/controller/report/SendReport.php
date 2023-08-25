@@ -818,9 +818,10 @@ class SendReport extends BaseController
     public function run_caigoudingtui()
     {
 
-        $res = http_get('http://im.babiboy.com//api/Tableupdate/receipt_receiptNotice');
+        $res = http_get('http://im.babiboy.com/api/Tableupdate/receipt_receiptNotice');
         // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
         $res =json_decode($res, true);
+     
         if ($res['status'] == 1) {
             $this->service->create_table_s111('春季');
             $this->service->create_table_s111('夏季');

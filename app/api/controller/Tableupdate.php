@@ -1853,7 +1853,7 @@ class Tableupdate extends BaseController
             WHERE
                 ERN.CodingCodeText = '已审结' 
                 AND ERN.ReceiptNoticeDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-                AND ERN.IsCompleted IS NULL
+                AND ERN.IsCompleted != 1
                 AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 

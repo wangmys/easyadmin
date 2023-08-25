@@ -4,31 +4,164 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>创建钉钉定推信息</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+        .upload_script {
+            width: 550px;
+        }
+    </style>
 </head>
 <body>
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+    <!-- <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
         <legend>拖拽上传</legend>
-    </fieldset> 
+    </fieldset>  -->
     <form class="layui-form layui-form-pane ok-form layui-col-space8">
-        <div class="layui-upload-drag" id="test10">
-            <i class="layui-icon"></i>
-            <p>点击上传，或将文件拖拽到此处</p>
-            <div class="layui-hide" id="uploadDemoView">
-                <hr>
-                <img src="" alt="上传成功后渲染" style="max-width: 196px">
-            </div>
-        </div>
-        <div style="width: 95px;">
-            <div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="demo">
-            <div class="layui-progress-bar" lay-percent=""></div>
+        <div class="flex col">
+            <div class="flex row between layui-form-item upload_script" style="margin:10px 0 50px 0;">
+                <div class="">
+                    <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">定推图标题</label>
+                    <div class="layui-input-inline" style="width: 350px !important;">
+                        <input type="text" name='title' autocomplete="off" value="" placeholder="推送图片的标题"
+                            class="layui-input" lay-verify="required">
+                    </div> 
+                </div>
+
+                <!-- 占位符 -->
+                <div></div>
+                <div></div>
+                <div></div>
+
+                <div class="">
+                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="submitInfo"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">提交
+                    </button>
+                </div>
+            </div>  
+
+            <div class="upload_script flex row between al-start">
+                <div class="flex col">
+                    <div>定推图</div>
+                    <div class="layui-upload-drag" id="test1">
+                        <i class="layui-icon"></i>
+                        <p>点击上传或拖拽<span style="color:brown; font-weight: bold;"> 图片 </span>到此处</p>
+                        <div class="layui-hide" id="uploadDemoView">
+                            <hr>
+                            <img src="" alt="上传成功后渲染" style="max-width: 196px">
+                        </div>
+                    </div>
+                    <div class="" style="width: 95px; margin: 5px;">
+                        <div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="demo1">
+                            <div class="layui-progress-bar" lay-percent=""></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex col">
+                    <div>定推名单<span id="down_excel_user" style="cursor:pointer; color:#0051ff">（下载模板）</span></div>
+                    <div class="layui-upload-drag" id="test2" >
+                        <i class="layui-icon"></i>
+                        <p>点击上传或拖拽<span style="color:rgb(240, 187, 16); font-weight: bold;"> Excel </span>到此处</p>
+                    </div>
+                    <div style="width: 95px; margin: 5px 0 5px 0;">
+                        <div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="demo2">
+                        <div class="layui-progress-bar" lay-percent=""></div>
+                        </div>
+                    </div>
+                    <div id="upload_excel_error_num" style="margin: 5px; color:red; cursor:pointer; display: none;">（下载识别失败名单）</div>
+                </div>
             </div>
         </div>
         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="testSend"
-        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">发送
+        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; display: none;">发送
         </button>
     </form> 
 </body>
@@ -41,34 +174,144 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
     ,upload = layui.upload
     ,element = layui.element
     ,layer = layui.layer
-    form = layui.form
-    ,url_upload = "{:url('admin/system.dingding.Uploadimg/upload_img')}"
-    ,sendHandle = "{:url('admin/system.dingding.Uploadimg/testSend')}";
+    ,form = layui.form
+    ,uid = ''
+    ,pid = ''
+    ,upload_upload_img = "{:url('admin/system.dingding.Uploadimg/upload_img')}"
+    ,download_excel_user_demo = "{:url('admin/system.dingding.Uploadimg/download_excel_user_demo')}" 
+    ,download_excel_user_error = "{:url('admin/system.dingding.Uploadimg/download_excel_user_error')}" // 失败用户名单
+    ,upload_excel_user = "{:url('admin/system.dingding.Uploadimg/upload_excel_user')}" 
+    ,sendHandle = "{:url('admin/system.dingding.Uploadimg/testSend')}"
+    ,submitHandle = "{:url('admin/system.dingding.Uploadimg/submitHandle')}";
     
-    
-    //拖拽上传
+    // 下载模板
+    $('#down_excel_user').click(function() {
+        location.href = download_excel_user_demo;
+    });
+
+    // 下载失败用户名单
+    $('#upload_excel_error_num').click(function() {
+        location.href = download_excel_user_error + '?uid=' + uid;
+    });
+
+    // img拖拽上传
     upload.render({
-        elem: '#test10'
+        elem: '#test1'
         // ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
-        ,url: url_upload //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        ,url: upload_upload_img //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
         // ,auto: false
         
         ,before: function(obj){
-            element.progress('demo', '0%'); //进度条复位
-            layer.msg('上传中', {icon: 16, time: 0});
+            pid = '';
+            element.progress('demo1', '0%'); //进度条复位
+            // layer.msg('上传中', {icon: 16, time: 0});
+            //开始加载效果
+            layui.use('layer', function () {
+                layui.layer.load();
+                //console.log(Lodingindex) opacity
+                $(".layui-layer-shade").css('background', '#000000')
+                $(".layui-layer-shade").css('opacity', '0.2')
+                $(".layui-layer-shade").click(function (event) {
+                    event.stopPropagation();
+                })
+            })
         }
         ,done: function(res){
-            layer.msg('上传成功');
-            layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.path);
-            console.log(res)
+            // layer.msg('上传成功');
+            pid = res.data.pid
+            layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.data.path);
+            layui.use('layer', function () {
+                setTimeout(function () {
+                    layui.layer.closeAll();
+                }, 0);
+            });
         }
         //进度条
         ,progress: function(n, elem, e){
-            element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
+            element.progress('demo1', n + '%'); //可配合 layui 进度条元素使用
             if(n == 100){
             // layer.msg('上传完毕', {icon: 1});
             }
         }
+    });
+
+    // excel拖拽上传
+    upload.render({
+        elem: '#test2'
+        // ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        ,url: upload_excel_user //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        ,accept: 'file'
+        ,exts: 'xlsx'
+        // ,auto: false
+        
+        ,before: function(obj){
+            uid = '';
+            $('#upload_excel_error_num').css({'display': 'none'})
+            element.progress('demo2', '0%'); //进度条复位
+            //开始加载效果
+            layui.use('layer', function () {
+                layui.layer.load();
+                //console.log(Lodingindex) opacity
+                $(".layui-layer-shade").css('background', '#000000')
+                $(".layui-layer-shade").css('opacity', '0.2')
+                $(".layui-layer-shade").click(function (event) {
+                    event.stopPropagation();
+                })
+            })
+        }
+        ,done: function(res){
+            uid = res.data.uid
+            if (res.data.error_data_num > 0) {
+                $('#upload_excel_error_num').css({'display': 'block'})
+            }
+            layui.use('layer', function () {
+                setTimeout(function () {
+                    layui.layer.closeAll();
+                }, 0);
+            });
+            alert(res.msg);
+            // alert(uid);
+        }
+        //进度条
+        ,progress: function(n, elem, e){
+            element.progress('demo2', n + '%'); //可配合 layui 进度条元素使用
+            if(n == 100){
+            // layer.msg('上传完毕', {icon: 1});
+            }
+        }
+    });
+
+    // 提交
+    form.on('submit(submitInfo)', function (data) {
+        //开始加载效果
+        layui.use('layer', function () {
+            layui.layer.load();
+            //console.log(Lodingindex) opacity
+            $(".layui-layer-shade").css('background', '#000000')
+            $(".layui-layer-shade").css('opacity', '0.2')
+            $(".layui-layer-shade").click(function (event) {
+                event.stopPropagation();
+            })
+        })
+        if (!pid) {
+            alert('请上传图片');
+            return false;
+        }
+        if (!uid) {
+            alert('请上传用户名单'); 
+            return false;
+        }
+        $.post(submitHandle, {'title':data.field.title, 'pid':pid, 'uid':uid }, function(data) {
+            if (data.msg == '提交成功') {
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 0);
+                });
+            }
+            
+        })
+        return false; 
     });
 
     form.on('submit(testSend)', function (data) {
@@ -76,12 +319,9 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
             // table.exportFile('#table', res, 'xls');
             // console.log(223) 
             
-
         })
         return false; 
     });
-    
-
     
 });
 </script>

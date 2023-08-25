@@ -359,11 +359,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '李逢生',
-                'tel' => '13927687768',
-                'userid' => '010946151826588427'
-            ],
+            // [
+            //     'name' => '李逢生',
+            //     'tel' => '13927687768',
+            //     'userid' => '010946151826588427'
+            // ],
         ];
 
         $reportFormsService = new ReportFormsService();
