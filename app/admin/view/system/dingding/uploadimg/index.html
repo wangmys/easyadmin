@@ -316,15 +316,13 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
         // var _layer  = layer;
         $.post(submitHandle, {'title':data.field.title, 'pid':pid, 'uid':uid }, function(data) {
             if (data.msg == '提交成功') {
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 0);
+
+                layer.msg('提交成功', {icon: 1, shade: [0.02, '#000'], scrollbar: false, time: 2000, shadeClose: true}, function () {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                    parent.layui.table.reload('table2');
                 });
             }
-            // layui.layer.cloae(index);
-            alert('提交成功，请手动刷新页面-_-'); 
-            
         })
         return false; 
     });
