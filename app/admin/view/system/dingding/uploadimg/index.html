@@ -304,6 +304,7 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
         $.post(submitHandle, {'title':data.field.title, 'pid':pid, 'uid':uid }, function(data) {
             if (data.msg == '提交成功') {
                 layui.use('layer', function () {
+                    alert('提交成功，请手动刷新页面-_-'); 
                     setTimeout(function () {
                         layui.layer.closeAll();
                     }, 0);
