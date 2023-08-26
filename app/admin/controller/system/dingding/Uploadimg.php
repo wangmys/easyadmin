@@ -392,17 +392,13 @@ class Uploadimg extends AdminController
                     dump($res);
                 }
             }
-            // $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/62a21e4c7e989dce29832dd3ebb2e381_959.png';
-
-
-
-            // $res = $model->sendMarkdownImg('350364576037719254', '');
-            // $res = $model->sendOaMsg('350364576037719254' );
-            // $res = $model->sendActionCardMsg([]);
-            // print_r($res);
-            
-            // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);
         }
+    }
+
+    public function test() {
+        $model = new DingTalk;
+        $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
+        dump($res);
     }
 
     public function sendDingImgHandle() {
@@ -429,7 +425,7 @@ class Uploadimg extends AdminController
                 foreach ($select_user as $key => $val) {
                     // echo $val['姓名'];
                     $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-                    // dump($res);
+                    print_r($res);
                 }
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {

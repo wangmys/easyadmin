@@ -175,6 +175,7 @@ class Dingtalk extends BaseController
     public function sendMarkdownImg($userid, $title, $path)
     {
         $time = time();
+        $timeStr = date('Y-m-y H:i:s', time());
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
         $SendToUser_data = [
             'userid_list' => $userid,
@@ -183,11 +184,48 @@ class Dingtalk extends BaseController
                 "msgtype" => 'markdown',
                 "markdown" => [
                     "title" => "{$title}",
-                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n>"
+                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
                 ]
 
             ]
         ];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    public function sendMarkdownImg_test($userid, $title, $path)
+    {
+        $time = time();
+        $timeStr = date('Y-m-y H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [
+            'userid_list' => '350364576037719254,284616312226634272,293746204229278162',
+            'agent_id' => 2476262581,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => "{$title}",
+                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
+                ]
+
+            ]
+        ];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    /**
+     * 获取 unionid
+     * @return bool|string
+     */
+    public function getUnionid()
+    {
+        // $time = time();
+        // $timeStr = date('Y-m-y H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/serviceaccount/get?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [];
         // dump($SendToUser_data);die;
         $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
         return $result;
