@@ -339,7 +339,7 @@ class Push extends BaseController
 
         foreach ($parms as $key => $val) {
             $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathA);
-            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathB);
+            $model->sendMarkdownImg($val['userid'], '加盟连带、客单、件单及同比表', $pathB);
             $model->sendMarkdownImg($val['userid'], '总体连带、客单、件单及同比表', $pathC);
         }  
     }
