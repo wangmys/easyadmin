@@ -34,6 +34,18 @@ class Tableupdate extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // sk新增领型字段
+    public function sk_lingxing() {
+        $sql  = "
+            update`sp_sk` 
+            set
+                领型 = left(分类, 2)
+            where
+                领型 is null
+        ";
+        $this->db_easyA->execute($sql);
+    }
+
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_data()
     {
