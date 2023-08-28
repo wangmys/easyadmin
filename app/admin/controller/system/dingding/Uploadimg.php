@@ -129,7 +129,7 @@ class Uploadimg extends AdminController
             $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/批量上传测试.xlsx';   //文件保存路径
+            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
@@ -160,30 +160,6 @@ class Uploadimg extends AdminController
                         $data[$key]['姓名'] = @$val['姓名'];
                         $data[$key]['手机'] = @$val['手机'];
                         $data[$key]['time'] = $time;
-
-                    //     // echo 11;
-                    //     $info =  $model->getDingId($val['手机']);
-                    //     if ($info['errcode'] == 0) {
-                    //         $sucess_data[$key]['uid'] = $uid;
-                    //         $sucess_data[$key]['aid'] = $this->authInfo['id'];
-                    //         $sucess_data[$key]['aname'] = $this->authInfo['name'];
-                    //         $sucess_data[$key]['店铺名称'] = @$val['店铺名称'];
-                    //         $sucess_data[$key]['姓名'] = @$val['姓名'];
-                    //         $sucess_data[$key]['手机'] = @$val['手机'];
-                    //         $sucess_data[$key]['userid'] = $info['userid'];
-                    //         $sucess_data[$key]['errmsg'] = $info['errmsg'];
-                    //         $sucess_data[$key]['time'] = $time;
-                    //     } else {
-                    //         $error_data[$key]['uid'] = $uid;
-                    //         $error_data[$key]['aid'] = $this->authInfo['id'];
-                    //         $error_data[$key]['aname'] = $this->authInfo['name'];
-                    //         $error_data[$key]['店铺名称'] = @$val['店铺名称'];
-                    //         $error_data[$key]['姓名'] = @$val['姓名'];
-                    //         $error_data[$key]['手机'] = @$val['手机'];
-                    //         $error_data[$key]['userid'] = '';
-                    //         $error_data[$key]['errmsg'] = $info['errmsg'];
-                    //         $error_data[$key]['time'] = $time;
-                    //     }
                     }
 
                     // 删除临时excel表该用户上传的记录
@@ -204,6 +180,8 @@ class Uploadimg extends AdminController
                         LEFT JOIN dd_user as u on 临时.手机 = u.mobile and mobile is not null
                         WHERE
                             临时.手机 = u.mobile
+                            AND 临时.aid = '{$this->authInfo['id']}'
+                            AND 临时.uid = '{$uid}'
                     ";
                     $select_成功名单 = $this->db_easyA->query($sql_成功名单);
 
@@ -225,7 +203,9 @@ class Uploadimg extends AdminController
                         FROM
                             `dd_temp_excel_user`
                         WHERE
-                            手机 not in (select mobile from dd_user where mobile is not null)
+                            aid = '{$this->authInfo['id']}'
+                            AND uid = '{$uid}'
+                            AND 手机 not in (select mobile from dd_user where mobile is not null)
                     ";
                     $select_失败名单 = $this->db_easyA->query($sql_失败名单);
 
@@ -347,6 +327,15 @@ class Uploadimg extends AdminController
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
+
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $aname = session('admin.name');       
+                $aid = session('admin.id');   
+                $mapSuper = " AND list.aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
             // $云仓 = $input['yc'];
             // $货号 = $input['gdno'];
             // if (!empty($input['yc'])) {
@@ -397,7 +386,7 @@ class Uploadimg extends AdminController
                     dd_userimg_list as list 
                 LEFT JOIN dd_temp_img as img ON list.pid = img.pid 
                 WHERE 1
-
+                    {$mapSuper}
                 ORDER BY
                     id DESC
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -407,8 +396,9 @@ class Uploadimg extends AdminController
             $sql2 = "
                 SELECT 
                     count(*) as total
-                    FROM dd_userimg_list
+                    FROM dd_userimg_list as list
                 WHERE 1
+                    {$mapSuper}
                 ORDER BY
                     id DESC
             ";
@@ -454,51 +444,25 @@ class Uploadimg extends AdminController
         }
     }
 
-    public function testDD() {
-        $input = input();
-        $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-            ['id', '=', $input['id']]
-        ])->find();
-
-        $find_path = $this->db_easyA->table('dd_temp_img')->where([
-            ['pid', '=', $find_list['pid']]
-        ])->find();
-
-        $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
-            ['uid', '=', $find_list['uid']]
-        ])->group('userid')->select()->toArray();
-
-        $chunk_list_success = array_chunk($select_user, 996);
-        $model = new DingTalk;
-        foreach($chunk_list_success as $key => $val) {
-            // $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
-            $str = '';
-            foreach ($val as $key2 => $val2) {
-                if ( ($key2 + 1) < count($val) ) {
-                    $str .= $val2['userid'] . ',';
-                } else {
-                    $str .= $val2['userid'];
-                    $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
-                }
-            }
-            
-        }
-        // dump($select_user);
-        // $model = new DingTalk;
-        // $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
-        // dump($res);
-    }
-
     public function sendDingImgHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
-        if (request()->isAjax() && $input['id']) {
+
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
             
-            $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-                ['id', '=', $input['id']]
-            ])->find();
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
+
 
             if ($find_list) {
                 $find_path = $this->db_easyA->table('dd_temp_img')->where([
@@ -527,16 +491,23 @@ class Uploadimg extends AdminController
                     
                 }
 
-                // foreach ($select_user as $key => $val) {
-                //     // echo $val['姓名'];
-                //     $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-                //     print_r($res);
-                // }
+                $updatetime = date('Y-m-d H:i:s');
+                $sql_更新 = "
+                    update dd_userimg_list
+                    set 
+                        sendtimes = sendtimes + 1,
+                        sendtime = '{$updatetime}'
+                    where id = '{$input['id']}'
+                ";
+                $this->db_easyA->execute($sql_更新);
+
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
-                return json(['code' => 0, 'msg' => '执行失败']);
+                return json(['code' => 0, 'msg' => '信息有误，执行失败']);
             }
-        }        
+        } else {
+            return json(['code' => 0, 'msg' => '请勿非法请求']);
+        }       
     }
 
 }

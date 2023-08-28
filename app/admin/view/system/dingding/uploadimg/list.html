@@ -289,16 +289,14 @@
         // 监听事件 
         $(document).on('click', '.sendDingBtn', function(data){
             var id = window.localStorage.getItem('sendDingImg_id');
-            $.post(sendDingImgHandle, {'id': id}, function(data) {
-                if (data.msg == '执行成功') {
-                    alert(data.msg);
-                    // layui.use('layer', function () {
-                    //     setTimeout(function () {
-                    //         layui.layer.closeAll();
-                    //     }, 0);
-                    // });
-                }
-            
+            $.post(sendDingImgHandle, {'id': id}, function(res) {
+                table.reload('table2', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                })
+                alert(res.msg);
             })
         });
 
