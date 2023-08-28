@@ -412,6 +412,57 @@ class Uploadimg extends AdminController
         }
     }
 
+    public function userList() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+            $uid = $input['uid'];
+            $aid = $this->authInfo['id'];
+
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $mapSuper = " AND aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
+ 
+            $sql = "
+                SELECT 
+                    *
+                FROM 
+                    dd_temp_excel_user_success   
+                WHERE 1
+                    AND uid = '{$uid}'
+                    {$mapSuper}
+                ORDER BY
+                    店铺名称 ASC
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    dd_temp_excel_user_success   
+                WHERE 1
+                    AND uid = '{$uid}'
+                    {$mapSuper}
+                ORDER BY
+                    店铺名称 ASC
+            ";
+            $count = $this->db_easyA->query($sql2);
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+        } else {
+            return View('userlist', [
+                // 'config' => ,
+            ]);
+        }        
+    }
+
     // 发送测试
     public function sendDingImg() {
         $input = input();

@@ -206,7 +206,7 @@ class Dingtalk extends BaseController
                 "msgtype" => 'markdown',
                 "markdown" => [
                     "title" => "{$title}",
-                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
+                    "text" => "#### {$title}\n ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
                 ]
 
             ]
