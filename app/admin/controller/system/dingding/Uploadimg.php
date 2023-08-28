@@ -125,7 +125,7 @@ class Uploadimg extends AdminController
             $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/钉钉定推用户名单模板_20230825_1692932146.xlsx';   //文件保存路径
+            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/批量上传测试.xlsx';   //文件保存路径
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
@@ -137,7 +137,8 @@ class Uploadimg extends AdminController
                 
                 //读取数据
                 $data = $this->readExcel_temp_excel_user($info, $read_column);
-                // print_r($data);
+                // echo '<pre>';
+                // print_r($data); die;
 
                 if ($data) {
                     $model = new DingTalk;
@@ -145,45 +146,96 @@ class Uploadimg extends AdminController
                     $error_data = [];
                     $uid = rand_code(8);
                     $time = date('Y-m-d H:i:s');
+
+
                     foreach ($data as $key => $val) {
-                        // echo 11;
-                        $info =  $model->getDingId($val['手机']);
-                        if ($info['errcode'] == 0) {
-                            $sucess_data[$key]['uid'] = $uid;
-                            $sucess_data[$key]['aid'] = $this->authInfo['id'];
-                            $sucess_data[$key]['aname'] = $this->authInfo['name'];
-                            $sucess_data[$key]['店铺名称'] = @$val['店铺名称'];
-                            $sucess_data[$key]['姓名'] = @$val['姓名'];
-                            $sucess_data[$key]['手机'] = @$val['手机'];
-                            $sucess_data[$key]['userid'] = $info['userid'];
-                            $sucess_data[$key]['errmsg'] = $info['errmsg'];
-                            $sucess_data[$key]['time'] = $time;
-                        } else {
-                            $error_data[$key]['uid'] = $uid;
-                            $error_data[$key]['aid'] = $this->authInfo['id'];
-                            $error_data[$key]['aname'] = $this->authInfo['name'];
-                            $error_data[$key]['店铺名称'] = @$val['店铺名称'];
-                            $error_data[$key]['姓名'] = @$val['姓名'];
-                            $error_data[$key]['手机'] = @$val['手机'];
-                            $error_data[$key]['userid'] = '';
-                            $error_data[$key]['errmsg'] = $info['errmsg'];
-                            $error_data[$key]['time'] = $time;
+                        $data[$key]['uid'] = $uid;
+                        $data[$key]['aid'] = $this->authInfo['id'];
+                        $data[$key]['aname'] = $this->authInfo['name'];
+                        $data[$key]['店铺名称'] = @$val['店铺名称'];
+                        $data[$key]['姓名'] = @$val['姓名'];
+                        $data[$key]['手机'] = @$val['手机'];
+                        $data[$key]['time'] = $time;
+
+                    //     // echo 11;
+                    //     $info =  $model->getDingId($val['手机']);
+                    //     if ($info['errcode'] == 0) {
+                    //         $sucess_data[$key]['uid'] = $uid;
+                    //         $sucess_data[$key]['aid'] = $this->authInfo['id'];
+                    //         $sucess_data[$key]['aname'] = $this->authInfo['name'];
+                    //         $sucess_data[$key]['店铺名称'] = @$val['店铺名称'];
+                    //         $sucess_data[$key]['姓名'] = @$val['姓名'];
+                    //         $sucess_data[$key]['手机'] = @$val['手机'];
+                    //         $sucess_data[$key]['userid'] = $info['userid'];
+                    //         $sucess_data[$key]['errmsg'] = $info['errmsg'];
+                    //         $sucess_data[$key]['time'] = $time;
+                    //     } else {
+                    //         $error_data[$key]['uid'] = $uid;
+                    //         $error_data[$key]['aid'] = $this->authInfo['id'];
+                    //         $error_data[$key]['aname'] = $this->authInfo['name'];
+                    //         $error_data[$key]['店铺名称'] = @$val['店铺名称'];
+                    //         $error_data[$key]['姓名'] = @$val['姓名'];
+                    //         $error_data[$key]['手机'] = @$val['手机'];
+                    //         $error_data[$key]['userid'] = '';
+                    //         $error_data[$key]['errmsg'] = $info['errmsg'];
+                    //         $error_data[$key]['time'] = $time;
+                    //     }
+                    }
+
+                    // 删除临时excel表该用户上传的记录
+                    $select_user_temp = $this->db_easyA->execute("delete from dd_temp_excel_user where aid = '{$this->authInfo['id']}'");
+
+                    $chunk_list = array_chunk($data, 500);
+                    foreach($chunk_list as $key => $val) {
+                        $this->db_easyA->table('dd_temp_excel_user')->strict(false)->insertAll($val);
+                    }
+
+                    $sql_成功名单 = "
+                        SELECT
+                            临时.*,
+                            u.title,
+                            u.userid 
+                        FROM
+                            `dd_temp_excel_user` as 临时
+                        LEFT JOIN dd_user as u on 临时.手机 = u.mobile and mobile is not null
+                        WHERE
+                            临时.手机 = u.mobile
+                    ";
+                    $select_成功名单 = $this->db_easyA->query($sql_成功名单);
+
+                    if ($select_成功名单) {
+                        // 成功
+                        $chunk_list_success = array_chunk($select_成功名单, 500);
+                        foreach($chunk_list_success as $key => $val) {
+                            $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
                         }
+
+                        $sucess_data_num = count($select_成功名单);
+                    } else {
+                        $sucess_data_num = 0;
                     }
 
-                    // 成功
-                    $chunk_list_success = array_chunk($sucess_data, 500);
-                    foreach($chunk_list_success as $key => $val) {
-                        $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
-                    }
-                    $sucess_data_num = count($sucess_data);
+                    $sql_失败名单 = "
+                        SELECT
+                            *
+                        FROM
+                            `dd_temp_excel_user`
+                        WHERE
+                            手机 not in (select mobile from dd_user where mobile is not null)
+                    ";
+                    $select_失败名单 = $this->db_easyA->query($sql_失败名单);
 
-                    // 失败
-                    $chunk_list_error = array_chunk($error_data, 500);
-                    foreach($chunk_list_error as $key => $val) {
-                        $this->db_easyA->table('dd_temp_excel_user_error')->strict(false)->insertAll($val);
+                    if ($select_失败名单) {
+                        // 失败
+                        $chunk_list_error = array_chunk($select_失败名单, 500);
+                        foreach($chunk_list_error as $key => $val) {
+                            $this->db_easyA->table('dd_temp_excel_user_error')->strict(false)->insertAll($val);
+                        }
+                        $error_data_num = count($select_失败名单);
+                    } else {
+                        $error_data_num = 0;
                     }
-                    $error_data_num = count($error_data);
+
                     return json(['code' => 0, 'msg' => "定推名单上传成功，识别成功：{$sucess_data_num}行，识别失败：{$error_data_num}行。", 'data' => [
                         'uid' => $uid,
                         'error_data_num' => $error_data_num,
@@ -395,10 +447,39 @@ class Uploadimg extends AdminController
         }
     }
 
-    public function test() {
+    public function testDD() {
+        $input = input();
+        $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+            ['id', '=', $input['id']]
+        ])->find();
+
+        $find_path = $this->db_easyA->table('dd_temp_img')->where([
+            ['pid', '=', $find_list['pid']]
+        ])->find();
+
+        $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
+            ['uid', '=', $find_list['uid']]
+        ])->group('userid')->select()->toArray();
+
+        $chunk_list_success = array_chunk($select_user, 996);
         $model = new DingTalk;
-        $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
-        dump($res);
+        foreach($chunk_list_success as $key => $val) {
+            // $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
+            $str = '';
+            foreach ($val as $key2 => $val2) {
+                if ( ($key2 + 1) < count($val) ) {
+                    $str .= $val2['userid'] . ',';
+                } else {
+                    $str .= $val2['userid'];
+                    $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
+                }
+            }
+            
+        }
+        // dump($select_user);
+        // $model = new DingTalk;
+        // $res = $model->sendMarkdownImg_test('', 'test', 'http://im.babiboy.com/upload/dd_img/20230825/c14298f31627a3ce3d2a7a5b08f86f98_945.jpg');
+        // dump($res);
     }
 
     public function sendDingImgHandle() {
@@ -418,29 +499,36 @@ class Uploadimg extends AdminController
                 ])->find();
                 // echo $find_path['path'];
 
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
                     ['uid', '=', $find_list['uid']]
-                ])->select();
+                ])->group('userid')->select()->toArray();
 
-                foreach ($select_user as $key => $val) {
-                    // echo $val['姓名'];
-                    $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-                    print_r($res);
+                
+                $chunk_list_success = array_chunk($select_user, 996);
+                $model = new DingTalk;
+                foreach($chunk_list_success as $key => $val) {
+                    // $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
+                    $userids = '';
+                    foreach ($val as $key2 => $val2) {
+                        if ( ($key2 + 1) < count($val) ) {
+                            $userids .= $val2['userid'] . ',';
+                        } else {
+                            $userids .= $val2['userid'];
+                            $res = $model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']);
+                        }
+                    }
+                    
                 }
+
+                // foreach ($select_user as $key => $val) {
+                //     // echo $val['姓名'];
+                //     $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
+                //     print_r($res);
+                // }
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
                 return json(['code' => 0, 'msg' => '执行失败']);
             }
-            // $path = "http://im.babiboy.com/upload/dd_img/" . date('Ymd').'/62a21e4c7e989dce29832dd3ebb2e381_959.png';
-
-
-
-            // $res = $model->sendMarkdownImg('350364576037719254', '');
-            // $res = $model->sendOaMsg('350364576037719254' );
-            // $res = $model->sendActionCardMsg([]);
-            // print_r($res);
-            
-            // return json(['code' => 0, 'msg' => '上传成功', 'path' => $url]);
         }        
     }
 

@@ -194,13 +194,13 @@ class Dingtalk extends BaseController
         return $result;
     }
 
-    public function sendMarkdownImg_test($userid, $title, $path)
+    public function sendMarkdownImg_pro($userids, $title, $path)
     {
         $time = time();
         $timeStr = date('Y-m-y H:i:s', time());
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
         $SendToUser_data = [
-            'userid_list' => '350364576037719254,284616312226634272,293746204229278162',
+            'userid_list' => $userids,
             'agent_id' => 2476262581,
             "msg" => [
                 "msgtype" => 'markdown',
@@ -331,12 +331,18 @@ class Dingtalk extends BaseController
         return $AllUserId;
     }
 
-
+    // 获取dd架构所有用户
     public function updateUser() {
-        $select_deparent = $this->db_easyA->table('dd_department_info')->where([
-            ['use', '=', 1]
-        ])->limit(300)->select();
+        $this->db_easyA->execute('TRUNCATE dd_user;');
+        $select_deparent = $this->db_easyA->table('dd_department_info')->where(
+            1
+            // [
+            // ['use', '=', 1],
+            // ['isCustomer', '=', 1],
+            // ]
+        )->select();
 
+        // dump($select_deparent); die;
         foreach($select_deparent as $key => $val) {
             echo $val['depId'];
             echo '<br>';
@@ -359,18 +365,24 @@ class Dingtalk extends BaseController
         // dump($AllUserId[0]['result']['list']);die;
 
         $new_data = [];
-        foreach ($AllUserId[0]['result']['list'] as $key => $val) {
-            $new_data[$key]['店铺名称'] = $店铺名称;
-            $new_data[$key]['depId'] = $depId;
-            $new_data[$key]['name'] = @$val['name'];
-            $new_data[$key]['title'] = @$val['title'];
-            $new_data[$key]['mobile'] = @$val['mobile'];
-            $new_data[$key]['userid'] = @$val['userid'];
 
-            
+        try {
+            foreach ($AllUserId[0]['result']['list'] as $key => $val) {
+                $new_data[$key]['店铺名称'] = $店铺名称;
+                $new_data[$key]['depId'] = $depId;
+                $new_data[$key]['name'] = @$val['name'];
+                $new_data[$key]['title'] = @$val['title'];
+                $new_data[$key]['mobile'] = @$val['mobile'];
+                $new_data[$key]['userid'] = @$val['userid'];
+    
+                
+            }
+            // dump($new_data);
+            $this->db_easyA->table('dd_user')->strict(false)->insertAll($new_data);
+        } catch (\Throwable $th) {
+            //throw $th;
         }
-        dump($new_data);
-        // $this->db_easyA->table('dd_user')->strict(false)->insertAll($new_data);
+
 
 
 
@@ -428,7 +440,8 @@ class Dingtalk extends BaseController
 
     }
 
-    // 获取部门信息
+    // 获取部门信息  有用
+    // https://www.easyadmin1.com/admin/system.Dingding.Dingtalk/getDepartmentInfo
     public function getDepartmentInfo()
     {
         $getDepartment_config = 'https://oapi.dingtalk.com/department/list?access_token=' . $this->getAccessToken() . '&id=1';
