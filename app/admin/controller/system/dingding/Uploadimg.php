@@ -13,7 +13,7 @@ use app\api\service\dingding\Sample;
 /**
  * Class Uploadimg
  * @package app\admin\controller\system\dingding
- * @ControllerAnnotation(title="钉钉上传图")
+ * @ControllerAnnotation(title="钉钉操作")
  */
 class Uploadimg extends AdminController
 {
@@ -39,6 +39,9 @@ class Uploadimg extends AdminController
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
+    /**
+     * @NodeAnotation(title="添加推送信息")
+     */
     public function index() {
         return View('index',[
             
@@ -334,6 +337,9 @@ class Uploadimg extends AdminController
         }
     }
 
+    /**
+     * @NodeAnotation(title="钉钉推送列表")
+     */
     public function list() {
         if (request()->isAjax()) {
             // 筛选条件
