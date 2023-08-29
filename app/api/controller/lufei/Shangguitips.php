@@ -1075,6 +1075,7 @@ class Shangguitips extends BaseController
             LEFT JOIN (
                 SELECT
                 a.货号,
+                a.单款全国日均销得分,
                 CASE
                     WHEN 
                         a.二级分类 = @二级分类 and 
@@ -1085,16 +1086,25 @@ class Shangguitips extends BaseController
                 @二级分类 := a.二级分类 AS 二级分类,
                 @风格 := a.风格 AS 风格
                 FROM
-                    cwl_shangguitips_handle a,
+                    (
+                        SELECT
+                            货号,
+                            二级分类,
+                            风格,
+                            单款全国日均销得分
+                            FROM
+                                cwl_shangguitips_handle
+                        GROUP BY 货号
+                    ) as a,
                     ( SELECT @二级分类 := null,  @风格 := null, @rank := 0 ) TT
                 WHERE
-                    季节归集 = '秋季'
+                    1
                 ORDER BY
                     a.风格 ASC,a.二级分类 ASC,a.单款全国日均销得分 DESC
             ) AS m ON h.货号 = m.货号
             SET 
                 h.单款全国日均销排名 = m.排名
-            WHERE 1      
+            WHERE 1       
         ";
 
         $sql_仓库可配中类SKC数 = "
