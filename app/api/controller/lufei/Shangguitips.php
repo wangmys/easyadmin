@@ -1094,6 +1094,7 @@ class Shangguitips extends BaseController
                             单款全国日均销得分
                             FROM
                                 cwl_shangguitips_handle
+                            where 最早上市天数 > 7
                         GROUP BY 货号
                     ) as a,
                     ( SELECT @二级分类 := null,  @风格 := null, @rank := 0 ) TT
@@ -1219,5 +1220,7 @@ class Shangguitips extends BaseController
         ";
         $this->db_easyA->execute($sql_请上柜);
         $this->db_easyA->execute($sql_重点上柜);
+
+
     }
 }
