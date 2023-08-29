@@ -457,7 +457,7 @@ class Uploadimg extends AdminController
             // print_r($count);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
-            return View('userlist', [
+            return View('userList', [
                 // 'config' => ,
             ]);
         }        
