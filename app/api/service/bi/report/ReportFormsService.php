@@ -2340,7 +2340,7 @@ class ReportFormsService
     // 直营
     public function create_table_s104C($date = '')
     {
-        $code = 'S104';
+        $code = 'S104C';
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
         $dingName = cache('dingding_table_name');
 
