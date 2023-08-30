@@ -1194,7 +1194,7 @@ class Shangguitips extends BaseController
                 WHERE 1
                     AND 季节归集 = '秋季'
                     AND `云仓_主码齐码情况` = '可配'
-                    AND (`上柜率_合计` <= 0.95 OR 上柜率_合计 is null)
+                    AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
                     AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
             ) as t on h.云仓 = t.云仓 and h.货号 = t.货号 and h.季节归集 = t.季节归集 
             set

@@ -51,6 +51,9 @@ class DingdingService
     protected $hook_test_url3 = 'https://oapi.dingtalk.com/robot/send?access_token=889f8683bd1947670a9d755f6398a49a15abda994c2a975216f3d6a1384ab79d';
     // 开黑群
     protected $hook_test_url4 = 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b';
+    // 王丽丽数据推送群 
+    protected $hook_test_url5 = 'https://oapi.dingtalk.com/robot/send?access_token=3e9461c0a1c013f084a1575ae487131a52717d4d259a3ec8ab65f75283d3430e';
+
     protected $token = '';
 
     public static function getAccessToken()

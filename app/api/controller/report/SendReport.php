@@ -79,6 +79,8 @@ class SendReport extends BaseController
             $this->service->create_table_s103B($date);
         } elseif ($name =='S104') {
             $this->service->create_table_s101('S104', $date);
+        } elseif ($name =='S104C') {
+            $this->service->create_table_s104C($date);
         } elseif ($name =='S106') {
             $this->service->create_table_s106();
         } elseif ($name =='S107') {
@@ -102,7 +104,7 @@ class SendReport extends BaseController
         } elseif ($name =='S102C') {
             $this->service->create_table_s102C();
         } elseif ($name =='S103C') {
-            $this->service->create_table_s103C();
+            $this->service->create_table_s103C($date);
         } elseif ($name =='S023') {
             $this->service->create_table_s023();
         } elseif ($name =='S025') {
@@ -320,6 +322,38 @@ class SendReport extends BaseController
 
                 // 推送 加盟
                 $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+            }
+        }
+        return json($res);
+    }
+
+    // 推送到丽丽群 23:48
+    public function send2_lili()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $dingName = cache('dingding_table_name');
+        $send_data = [
+            'S103C' => [
+                'title' => '省份老店业绩同比-加盟 表号:S103C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S103C{$dingName}.jpg"
+            ],
+            'S104C' => [
+                'title' => '省直营老店同比环比递增及完成率 表号:S104C',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S104C{$dingName}.jpg"
+            ],
+        ];
+        // dump($send_data);
+        // die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送 测试
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 丽丽群
+                $res[] = $model->send($v['title'],$v['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=3e9461c0a1c013f084a1575ae487131a52717d4d259a3ec8ab65f75283d3430e');
             }
         }
         return json($res);
@@ -710,7 +744,24 @@ class SendReport extends BaseController
         $this->send_1();
     }
 
+    // 王丽丽群 直营
+    public function run2_lili()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
 
+        cache('dingding_table_name', rand_code(5), 3600);
+        // 生成图片 s101
+        $this->service->create_table_s103C($date);
+        $this->service->create_table_s104C($date);
+        // $this->service->create_table_s108B($date);
+        // $this->service->create_table_s109B($date);
+        // $this->service->create_table_s110B($date);
+
+        // https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754
+
+        // 发送数据报表
+        $this->send2_lili();
+    }
 
     // 加盟群
     public function run2()

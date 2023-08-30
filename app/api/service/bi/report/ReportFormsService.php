@@ -2169,7 +2169,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
-                'title' => "省份老店业绩同比-分经营模式 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
+                'title' => "省份老店业绩同比-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -2270,6 +2270,150 @@ class ReportFormsService
     
             // 生成图片
             return $this->create_image($params);
+        }
+    }
+
+    // 加盟
+    public function create_table_s103C($date = '')
+    {
+        // 编号
+        $code = 'S103C';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = cache('dingding_table_name');
+        // $sql = "select 店铺数 as 22店数,两年以上老店数 as 21店数,经营模式,省份,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增率,前年累销递增金额差,累销递增金额差 from old_customer_state  where 更新时间 = '$date'";
+        $sql = "select
+            省份,
+            前年对比今年昨日递增率 AS 前年日增长,
+            昨日递增率 AS 去年日增长,
+            前年对比今年累销递增率 AS 前年月增长,
+            累销递增率 AS 去年月增长
+            from old_customer_state  where 更新时间 = '$date' and 经营模式='直营'";
+        $list = Db::connect("mysql2")->query($sql);
+        if ($list) {
+            foreach ($list as $key => $val) {
+                $list[$key]['省份'] = province2zi($val['省份']);
+            }
+            $table_header = ['ID'];
+            $field_width = [];
+            $table_header = array_merge($table_header, array_keys($list[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[] = 100;
+            }
+            $field_width[0] = 60;
+            // $field_width[1] = 75;
+            // $field_width[2] = 100;
+            // $field_width[3] = 100;
+    
+    
+    
+            // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => " "
+            ];
+    
+            //参数
+            $params = [
+                'row' => count($list),          //数据的行数
+                'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                'title' => "省份老店业绩同比-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $list,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '                 ' . $code,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+    
+            // 生成图片
+            return $this->create_image($params);
+        }
+    }
+
+    // 直营
+    public function create_table_s104C($date = '')
+    {
+        $code = 'S104';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = cache('dingding_table_name');
+
+        $title = "直营老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
+        $jingyingmoshi = '【直营】';
+        // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
+        // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
+        // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+        $sql = "select
+            省份,店铺名称,
+            前年对比今年昨日递增率 AS 前年日增长,
+            昨日递增率 AS 去年日增长,
+            前年对比今年累销递增率 AS 前年月增长,
+            累销递增率 AS 去年月增长
+            from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+
+        $data = Db::connect("mysql2")->query($sql);
+        if ($data) {
+            // echo '<pre>';
+            // print_r($data);
+            foreach ($data as $key => $val) {
+                $data[$key]['省份'] = province2zi($val['省份']);
+            }
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 90;
+            }
+
+            $field_width[0] = 35;
+            $field_width[1] = 45;
+            $field_width[2] = 90;
+            $field_width[3] = 90;
+
+            // $field_width[13] = 150;
+            // $field_width[14] = 120;
+            // $field_width[15] = 90;
+
+            // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
+
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => " ",
+            ];
+            //参数
+            $params = [
+                'row' => count($data),          //数据的行数
+                'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'title' => $title,
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '                 ' . $code,
+                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+
+            // 生成图片
+            return $this->create_image_bgcolor($params,
+                [
+                    // '前年日增长' => 3,
+                    // '去年日增长' => 4,
+                    // '前年月增长' => 5,
+                    // '去年月增长' => 6,
+                ]
+            );
         }
     }
 
@@ -3972,82 +4116,6 @@ class ReportFormsService
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "省份老店【五一假期】业绩同比 " . date("Y-m-d"),
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $list,
-            'table_explain' => $table_explain,
-            'table_header' => $table_header,
-            'field_width' => $field_width,
-            'banben' => '图片报表编号: ' . $code,
-            'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
-        ];
-
-        // 生成图片
-        return $this->create_image($params);
-    }
-
-    // 加盟
-    public function create_table_s103C($date = '')
-    {
-        // 编号
-        $code = 'S103C';
-        $date = $date ?: date('Y-m-d', strtotime('+1day'));
-        $list = Db::connect("mysql2")->table('old_customer_state_jiaqi')->field("
-            经营模式 as 经营,
-            省份,
-            同比前年假期同日递增率 AS 前年日增长,
-            同比去年假期同日递增率 AS 去年日增长,
-            同比前年假期累销递增率 AS 前年累计增长,
-            同比去年假期累销递增率 AS 去年累计增长,
-            前年假期同日 as 前年同日销额,
-            去年假期同日 as 去年同日销额,
-            今日假期销量 AS 今日销额,
-
-            前年假期累计 as 前年累计销额,
-            去年假期累计 AS 去年累计销额,
-            今年假期累计 as 今年累计销额
-        ")->where(['更新时间' => $date])->select()->toArray();
-        foreach ($list as $key => $val) {
-            $list[$key]['省份'] = province2zi($val['省份']);
-        }
-        // dump($list);die;
-        $table_header = ['ID'];
-        $field_width = [];
-        $table_header = array_merge($table_header, array_keys($list[0]));
-        foreach ($table_header as $v => $k) {
-            $field_width[] = 90;
-        }
-        $field_width[0] = 35;
-        $field_width[1] = 45;
-        $field_width[2] = 45;
-
-
-        $field_width[5] = 110;
-        $field_width[6] = 110;
-        $field_width[7] = 110;
-        $field_width[8] = 110;
-        $field_width[10] = 110;
-        $field_width[11] = 110;
-        $field_width[12] = 110;
-        // $field_width[15] = 150;
-        // $field_width[16] = 130;
-
-        // $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
-        // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
-        // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
-        $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
-        //图片左上角汇总说明数据，可为空
-        $table_explain = [
-            // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
-            0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
-        ];
-
-        //参数
-        $params = [
-            'row' => count($list),          //数据的行数
-            'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "省份老店【五一假期】业绩同比-分经营模式 " . date("Y-m-d"),
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
