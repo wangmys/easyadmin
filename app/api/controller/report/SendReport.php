@@ -335,7 +335,7 @@ class SendReport extends BaseController
         $dingName = cache('dingding_table_name');
         $send_data = [
             'S103C' => [
-                'title' => '省份老店业绩同比-加盟 表号:S103C',
+                'title' => '省份老店业绩同比-直营 表号:S103C',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S103C{$dingName}.jpg"
             ],
             'S104C' => [
