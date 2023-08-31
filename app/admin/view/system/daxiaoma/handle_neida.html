@@ -205,24 +205,32 @@
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
                     <div class="flex col between al-start" style="width:95%; height: 70px;">
-                        <!-- <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-yc" class="xm-select-demo"></div>
+                                <div id="xm-sf" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-dpmc" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-fg" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">一级风格</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-hh" class="xm-select-demo"></div>
+                                <div id="xm-yjfg" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">提醒</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">未上柜提醒</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-tips" class="xm-select-demo"></div>
+                                <div id="xm-wsgtx" class="xm-select-demo"></div>
                             </div>
-                        </div> -->
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">大小码提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-dxmtx" class="xm-select-demo"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex col between" style="width:5%; height:35px;">
@@ -273,7 +281,7 @@
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Daxiaoma/getXmMapSelect')}"
 
-        // initFn();
+        initFn();
         startTable();
 
         // 选择云仓
@@ -295,20 +303,65 @@
         //     ]
         // })
 
-        // xmSelect.render({
-        //     el: '#xm-fg', 
-        //     filterable: true,
-        //     toolbar: {show: true},
-        //     name: '风格',
-        //     // showCount: 1,
-        //     theme: {
-        //         color: '#1cbbb4',
-        //     },
-        //     data: [
-        //         {name: "基本款", value: "基本款", selected: ""},
-        //         {name: "引流款", value: "引流款", selected: ""},
-        //     ]
-        // })
+        xmSelect.render({
+            el: '#xm-fg', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "基本款", value: "基本款", selected: true},
+                {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-yjfg', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '一级风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "休闲系列", value: "休闲系列", selected: ""},
+                {name: "商务系列", value: "商务系列", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-wsgtx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '未上柜提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "小码-46", value: "未上柜提醒29/38/46/105/165/M", selected: ""},
+                {name: "大码-58", value: "未上柜提醒35/44/58/195/5XL", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-dxmtx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '大小码提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "建议偏大", value: "建议偏大", selected: ""},
+                {name: "建议偏小", value: "建议偏小", selected: ""},
+            ]
+        })
 
         // xmSelect.render({
         //     el: '#xm-tips', 
@@ -330,28 +383,28 @@
             $.get(url_getXmMapSelect, {}, function(res) {
                 // 渲染所有省份
                 xmSelect.render({
-                    el: '#xm-hh', 
+                    el: '#xm-sf', 
                     filterable: true,
                     toolbar: {show: true},
                     theme: {
                         color: '#1cbbb4',
                     },
                     // showCount: 1,
-                    name:'货号',
-                    data: res.data.goodsno
+                    name:'省份',
+                    data: res.data.province
                 })
-                // // // 渲染所有店铺
-                // xmSelect.render({
-                //     el: '#xm-customer', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'店铺名称',
-                //     data: res.data.customer
-                // })
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-dpmc', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
 
             }, 'json')
         }
@@ -432,7 +485,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: { "提醒备注" : '请注意'}
+                , where: { "风格" : '基本款'}
                 , cols: [
                     [
                         { title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
@@ -460,22 +513,37 @@
 
                         ,{ title: `预计库存SKC`, align: 'center', colspan: 3}
                         ,{ title: `预计库存件数`, align: 'center', colspan: 3}
-                        ,{ title: `店销尺码占比`, align: 'center', colspan: 7}
+                        ,{ title: `店铺累销尺码占比`, align: 'center', colspan: 7}
+                        ,{ title: `省份累销尺码占比`, align: 'center', colspan: 7}
+                        ,{ title: `大小码未上柜门店提醒`, align: 'center', colspan: 2}
+                        ,{ field: '大小码提醒', title: `大小码提醒`, align: 'center', width:80, rowspan: 2, templet:
+                        function (data) {
+                            if (data['大小码提醒'] == '建议偏大') {
+                                return `<div style="background:red;color:white;">${data['大小码提醒']}</div>`;
+                            } else if (data['大小码提醒'] == '建议偏小') {
+                                return `<div style="background:orange;color:white;">${data['大小码提醒']}</div>`;
+                            } else {
+                                return '';
+                            }  
+                        }}  
+                        ,{ title: `总入量`, align: 'center', colspan: 7}
+                        ,{ title: `累销量`, align: 'center', colspan: 7}
+                        ,{ title: `预计库存量`, align: 'center', colspan: 7}
                     ],
 
                     [
                         // 预计库存sck
-                        { field: '预计SKC_29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 2} 
-                        ,{ field: '预计SKC_34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 2} 
-                        ,{ field: '预计SKC_35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 2} 
+                        { field: '预计SKC_29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计SKC_34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计SKC_35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 1} 
 
                         // 预计库存件数
-                        ,{ field: '预计29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 2} 
-                        ,{ field: '预计34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 2} 
-                        ,{ field: '预计35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 2} 
+                        ,{ field: '预计29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 1} 
 
                         // 店销尺码占比
-                        ,{ field: '店销占比29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比29/38/46/105/165/M'] && (data['店销占比29/38/46/105/165/M'] == data['店销占比排名1'] || data['店销占比29/38/46/105/165/M'] == data['店销占比排名2']
                                 || data['店销占比29/38/46/105/165/M'] == data['店销占比排名3'])) {
@@ -488,7 +556,7 @@
                                 return '';
                             }  
                         }}
-                        ,{ field: '店销占比30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比30/39/48/110/170/L'] && (data['店销占比30/39/48/110/170/L'] == data['店销占比排名1'] || data['店销占比30/39/48/110/170/L'] == data['店销占比排名2']
                                 || data['店销占比30/39/48/110/170/L'] == data['店销占比排名3'])) {
@@ -501,7 +569,7 @@
                                 return '';
                             }  
                         }}
-                        ,{ field: '店销占比31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比31/40/50/115/175/XL'] && (data['店销占比31/40/50/115/175/XL'] == data['店销占比排名1'] || data['店销占比31/40/50/115/175/XL'] == data['店销占比排名2']
                                 || data['店销占比31/40/50/115/175/XL'] == data['店销占比排名3'])) {
@@ -514,7 +582,7 @@
                                 return '';
                             }  
                         }}
-                        ,{ field: '店销占比32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比32/41/52/120/180/2XL'] && (data['店销占比32/41/52/120/180/2XL'] == data['店销占比排名1'] || data['店销占比32/41/52/120/180/2XL'] == data['店销占比排名2']
                                 || data['店销占比32/41/52/120/180/2XL'] == data['店销占比排名3'])) {
@@ -527,7 +595,7 @@
                                 return '';
                             }  
                         }} 
-                        ,{ field: '店销占比33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比33/42/54/125/185/3XL'] && (data['店销占比33/42/54/125/185/3XL'] == data['店销占比排名1'] || data['店销占比33/42/54/125/185/3XL'] == data['店销占比排名2']
                                 || data['店销占比33/42/54/125/185/3XL'] == data['店销占比排名3'])) {
@@ -540,7 +608,7 @@
                                 return '';
                             }  
                         }} 
-                        ,{ field: '店销占比34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比34/43/56/190/4XL'] && (data['店销占比34/43/56/190/4XL'] == data['店销占比排名1'] || data['店销占比34/43/56/190/4XL'] == data['店销占比排名2']
                                 || data['店销占比34/43/56/190/4XL'] == data['店销占比排名3'])) {
@@ -553,7 +621,7 @@
                                 return '';
                             }  
                         }}  
-                        ,{ field: '店销占比35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 2, templet:
+                        ,{ field: '店销占比35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 1, templet:
                         function (data) {
                             if (data['店销占比35/44/58/195/5XL'] && (data['店销占比35/44/58/195/5XL'] == data['店销占比排名1'] || data['店销占比35/44/58/195/5XL'] == data['店销占比排名2']
                                 || data['店销占比35/44/58/195/5XL'] == data['店销占比排名3'])) {
@@ -566,6 +634,109 @@
                                 return '';
                             }  
                         }} 
+
+                        // 省份累销尺码占比
+                        ,{ field: '省销占比29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比29/38/46/105/165/M']) {
+                                return (data['省销占比29/38/46/105/165/M'] * 100).toFixed(1) + '%';  
+                            } else {
+                                return '';
+                            }  
+                        }}
+                        ,{ field: '省销占比30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比30/39/48/110/170/L']) {
+                                return (data['省销占比30/39/48/110/170/L'] * 100).toFixed(1) + '%';   
+                            } else {
+                                return '';
+                            }  
+                        }}
+                        ,{ field: '省销占比31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比31/40/50/115/175/XL']) {
+                                return (data['省销占比31/40/50/115/175/XL'] * 100).toFixed(1) + '%';
+                            } else {
+                                return '';
+                            }  
+                        }}
+                        ,{ field: '省销占比32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比32/41/52/120/180/2XL']) {
+                                return (data['省销占比32/41/52/120/180/2XL'] * 100).toFixed(1) + '%';  
+                            } else {
+                                return '';
+                            }  
+                        }} 
+                        ,{ field: '省销占比33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比33/42/54/125/185/3XL']) {
+                                return (data['省销占比33/42/54/125/185/3XL'] * 100).toFixed(1) + '%';  
+                            } else {
+                                return '';
+                            }  
+                        }} 
+                        ,{ field: '省销占比34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比34/43/56/190/4XL']) {
+                                return (data['省销占比34/43/56/190/4XL'] * 100).toFixed(1) + '%';   
+                            } else {
+                                return '';
+                            }  
+                        }}  
+                        ,{ field: '省销占比35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['省销占比35/44/58/195/5XL']) {
+                                return(data['省销占比35/44/58/195/5XL'] * 100).toFixed(1) + '%';
+                            } else {
+                                return '';
+                            }  
+                        }} 
+
+                        // 大小码未上柜门店提醒
+                        ,{ field: '未上柜提醒29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 70, rowspan: 1, templet:
+                        function (data) {
+                            if (data['未上柜提醒29/38/46/105/165/M']) {
+                                return `<span style="color:red;">${data['未上柜提醒29/38/46/105/165/M']}</span>`;
+                            } else {
+                                return '';
+                            }  
+                        }}  
+                        ,{ field: '未上柜提醒35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 70, rowspan: 1, templet:
+                        function (data) {
+                            if (data['未上柜提醒35/44/58/195/5XL']) {
+                                return `<span style="color:red;">${data['未上柜提醒35/44/58/195/5XL']}</span>`;
+                            } else {
+                                return '';
+                            }  
+                        }}   
+
+                        // 总入量
+                        ,{ field: '总入量29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '总入量35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 1} 
+
+                        // 累销量
+                        ,{ field: '累销29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '累销35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 1} 
+
+                        // 预计库存量
+                        ,{ field: '预计29/38/46/105/165/M', title: '46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计30/39/48/110/170/L', title: '48' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计31/40/50/115/175/XL', title: '50' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计32/41/52/120/180/2XL', title: '52' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计33/42/54/125/185/3XL', title: '54' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计34/43/56/190/4XL', title: '56' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计35/44/58/195/5XL', title: '58' ,align: 'center' , width: 50, rowspan: 1} 
                     ]
                             
                 ]
