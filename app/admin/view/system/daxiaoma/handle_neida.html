@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>大小码_鞋履</title>
+    <title>大小码提醒-内搭</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -204,7 +204,7 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                    <div class="flex col between al-start" style="width:95%; height: 35px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -245,9 +245,9 @@
             </form>
         </div>
     </div>
-    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 0px;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">大小码-内搭 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;">门店无大小码提醒-内搭 <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -277,7 +277,7 @@
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
-            , url1 = "{:url('admin/system.Daxiaoma/handle_neida')}" 
+            , url1 = "{:url('admin/system.Daxiaoma/handle')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Daxiaoma/getXmMapSelect')}"
 
@@ -485,7 +485,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: { "风格" : '基本款'}
+                , where: {"类型": "内搭" , "风格" : '基本款'}
                 , cols: [
                     [
                         { title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
