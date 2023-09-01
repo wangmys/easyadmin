@@ -463,6 +463,73 @@ class Uploadimg extends AdminController
         }        
     }
 
+    // 获取钉钉用户信息
+    public function getDingDingUserInfo() {
+        if (request()->isAjax()) {
+            $sql_康雷 = "
+                SELECT
+                    State AS 省份,
+                    CustomerName AS 店铺名称,
+                    EBC.Mathod AS 经营模式,
+                    CustomerId,
+                    CustomerCode,
+                    EC.RegionId,
+                    CustomItem17 AS 商品负责人,
+                    CustomItem18 AS 督导负责人,
+                    CustomItem19 AS 店铺负责人
+                FROM
+                    ErpCustomer AS EC 
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                WHERE 
+                EC.RegionId NOT IN ('8','40', '55' ,'84', '85',  '97')
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EC.CustomerCode IN (
+                                SELECT
+                                        EC.CustomerCode 
+                                FROM
+                                        ErpRetail AS ER
+                                        LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                                        LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                                        LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
+                                WHERE
+                                        ER.CodingCodeText = '已审结' 
+                                        AND EC.ShutOut = 0 
+                                        AND EC.RegionId <> 55 
+                                        AND EBC.Mathod IN ( '直营')    
+                                GROUP BY
+                                        ER.CustomerName,
+                                        EC.RegionId,
+                                        EC.CustomerCode
+                )
+                ORDER BY EBC.Mathod DESC
+            ";
+            $select_customer = $this->db_sqlsrv->query($sql_康雷);
+            $select_user = $this->db_easyA->table('dd_user')->select();
+            
+            foreach ($select_customer as $key => $val) {
+                foreach ($select_user as $key2 => $val2) {
+                    if ($val['店铺名称'] == $val2['店铺名称'] && $val['店铺负责人'] == $val2['name']) {
+                        $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+                    }
+                }
+                foreach ($select_user as $key2 => $val2) {
+                    if ($val['督导负责人'] == $val2['name'] || $val['督导负责人'] . '工作号' == $val2['name']) {
+                        $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
+                        break;
+                    }
+                }
+            }
+            return json(["code" => "0", "msg" => "", "count" => count($select_customer), "data" => $select_customer]);
+        } else {
+            return View('dduser', [
+                // 'config' => ,
+            ]);
+        }
+
+        // echo '<pre>';
+        // print_r($select_customer);
+    }
+
     // 发送测试
     public function sendDingImg() {
         $input = input();

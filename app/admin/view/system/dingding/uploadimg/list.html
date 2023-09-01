@@ -130,13 +130,14 @@
                     </div> -->
                     <div></div>
 
-                    <div class="flex col between" style="width:5%; height:35px;">
+                    <div class="flex row between" style="width:10%; height:35px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userBtn"
+                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">负责人名单
+                        </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="addBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">添加记录
                         </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
-                        </button>
+
                     </div>
                 </div>  
             </form>
@@ -175,6 +176,7 @@
             , laydate = layui.laydate
             , url_index = "{:url('admin/system.dingding.Uploadimg/index')}"
             , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}"
+            , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
             , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
             , url1 = "{:url('admin/system.dingding.Uploadimg/list')}"; 
 
@@ -216,6 +218,19 @@
                 
             }, 'json')
         }
+
+        //监听保存
+        form.on('submit(userBtn)', function (data) {
+            
+            var testFram = layer.open({
+                title: '店铺负责人钉钉信息'
+                ,type: 2
+                ,area: ['100%', '100%'] // 100%全屏
+                ,content: url_DingUsers
+            });
+            // layer.close(index)
+            return false; 
+        });
 
         //监听保存
         form.on('submit(addBtn)', function (data) {
