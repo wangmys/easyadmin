@@ -21,19 +21,26 @@ class Dingtalk extends BaseController
      * @var string
      */
     protected $AgentId;
+    protected $AgentId_cwl;
 
 
     /**
      * @var string
      */
     protected $AppKey;
+    protected $AppKey_cwl;
 
 
     /**
      * @var string
      */
     protected $AppSecret;
+    protected $AppSecret_cwl;
 
+    /**
+     * @var string
+     */
+    protected $CorpId;
 
     public function clean() {
         cache('dd_access_token', null);
@@ -50,9 +57,15 @@ class Dingtalk extends BaseController
      */
     public function __construct()
     {
+        $this->AgentId_cwl = '2476262581';
+        $this->AppKey_cwl = 'dingepkj0zauvbccggha';
+        $this->AppSecret_cwl = 'WDJFBx1neOcadWdg_uwjTIG2S2yw-aHtvhvVpGSjvpI9T2Etw9CiJMqNm5jFFWcD';
+
         $this->AgentId = '2476262581';
-        $this->AppKey = 'dingepkj0zauvbccggha';
-        $this->AppSecret = 'WDJFBx1neOcadWdg_uwjTIG2S2yw-aHtvhvVpGSjvpI9T2Etw9CiJMqNm5jFFWcD';
+        // cc
+        $this->AppKey = 'dinga7devai5kbxij8zr';
+        $this->AppSecret = 'JnQ_2VRvr5BFKlBiTnGf3mnyiNCb3pafnkg5FmB_SkNzyNBPtXCE1vLdHjpNwc1A';
+        $this->CorpId = 'ding113b83e00f1ca31435c2f4657eb6378f';
 
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
@@ -95,6 +108,148 @@ class Dingtalk extends BaseController
         return $access_token;
     }
 
+    protected function getAccessToken_cwl()
+    {
+        $gettoken_config = 'https://oapi.dingtalk.com/gettoken' . '?corpid=' . $this->AppKey_cwl . '&corpsecret=' . $this->AppSecret_cwl;
+        $access_token = $this->GetCurlRequest($gettoken_config);
+        $access_token = json_decode($access_token, true);
+        $access_token = $access_token['access_token'];
+        // dump($access_token);
+        return $access_token;
+    }
+
+    // 
+    public function getDingId($phone = '') {
+        $phone = $phone ? $phone : input('phone');
+        // if ($phone) {
+        //     $token = $this->getAccessToken();
+        //     $url = "https://oapi.dingtalk.com/user/get_by_mobile?access_token=" . $token . '&mobile=' . $phone;
+        //     $re = file_get_contents($url);
+        //     $obj = json_decode($re);
+        //     halt($obj);
+    
+        //     $data = [
+        //         'access_token' => $token,
+        //         'userid' => $obj->userid,
+        //     ];
+    
+        //     $query = http_build_query($data);
+        //     $url = "https://oapi.dingtalk.com/user/get?" . $query;
+    
+        //     $re = file_get_contents($url);
+        //     $obj = json_decode($re);
+        //     return $obj;
+        // } else {
+        //     return halt(false);
+        // }
+
+        $token = $this->getAccessToken();
+            $url = "https://oapi.dingtalk.com/user/get_by_mobile?access_token=" . $token . '&mobile=' . $phone;
+            $re = file_get_contents($url);
+            $obj = json_decode($re, true);
+            
+            return $obj;
+            // if($obj['errmsg'] == 'ok') {
+
+            // }
+    
+            // $data = [
+            //     'access_token' => $token,
+            //     'userid' => $obj->userid,
+            // ];
+    
+            // $query = http_build_query($data);
+            // $url = "https://oapi.dingtalk.com/user/get?" . $query;
+    
+            // $re = file_get_contents($url);
+            // $obj = json_decode($re);
+            // // return halt($obj)['userid'];
+            // return 11;
+
+    }
+
+    /**
+     * 发送图片消息
+     * @return bool|string
+     */
+    public function sendMarkdownImg($userid, $title, $path)
+    {
+        $time = time();
+        $timeStr = date('Y-m-y H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [
+            'userid_list' => $userid,
+            'agent_id' => 2476262581,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => "{$title}",
+                    "text" => "#### {$title} ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
+                ]
+
+            ]
+        ];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    public function sendMarkdownImg_pro($userids, $title, $path)
+    {
+        $time = time();
+        $timeStr = date('Y-m-y H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [
+            'userid_list' => $userids,
+            'agent_id' => 2476262581,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => "{$title}",
+                    "text" => "#### {$title}\n ![screenshot]({$path}?t={$time})\n ###### 发布时间： {$timeStr}"
+                ]
+
+            ]
+        ];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    /**
+     * 获取 unionid
+     * @return bool|string
+     */
+    public function getUnionid()
+    {
+        // $time = time();
+        // $timeStr = date('Y-m-y H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/serviceaccount/get?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
+    // public function sendMarkdownImg($userid, $path)
+    // {
+    //     $time = time();
+    //     $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
+    //     $SendToUser_data = [
+    //         'userid_list' => $userid,
+    //         'agent_id' => $this->AgentId,
+    //         "msg" => [
+    //             "msgtype" => 'markdown',
+    //             "markdown" => [
+    //                 "title" => "杭州天气1",
+    //                 "text" => "#### 杭州天气 @150XXXXXXXX \n> 9度，西北风1级，空气良89，相对温度73%\n> ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png?t={$time})\n>"
+    //             ]
+
+    //         ]
+    //     ];
+    //     $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+    //     return $result;
+    // }
 
     public function testDep() {
         $res = $this->getDepartmentListIds();
@@ -109,6 +264,7 @@ class Dingtalk extends BaseController
 
         $getDepartment_config = 'https://oapi.dingtalk.com/department/list_ids?access_token=' . $this->getAccessToken() . '&id=1';
         $getDepartment = json_decode($this->GetCurlRequest($getDepartment_config), true);
+        // dump($getDepartment);die;
         return $getDepartment;
 
     }
@@ -175,6 +331,64 @@ class Dingtalk extends BaseController
         return $AllUserId;
     }
 
+    // 获取dd架构所有用户
+    public function updateUser() {
+        $this->db_easyA->execute('TRUNCATE dd_user;');
+        $select_deparent = $this->db_easyA->table('dd_department_info')->where(
+            1
+            // [
+            // ['use', '=', 1],
+            // ['isCustomer', '=', 1],
+            // ]
+        )->select();
+
+        // dump($select_deparent); die;
+        foreach($select_deparent as $key => $val) {
+            echo $val['depId'];
+            echo '<br>';
+            $this->ddUser($val['depId'], $val['name']);
+        }
+    }
+
+    public function ddUser($depId = '', $店铺名称 = '')
+    {
+        input('depId') ? $depId = input('depId') : '';
+
+        $find_deparent = $this->db_easyA->table('dd_department_info')->where([
+            ['depId', '=', $depId]
+        ])->find();
+        $getDepartment = 'https://oapi.dingtalk.com/topapi/v2/user/list?access_token=' . $this->getAccessToken();
+
+        $data = json_encode(['dept_id' => $depId, 'cursor' => 0, 'size' => 100]);
+        $AllUserId[] = json_decode($this->PostCurlRequest($getDepartment, $data), JSON_OBJECT_AS_ARRAY);
+
+        // dump($AllUserId[0]['result']['list']);die;
+
+        $new_data = [];
+
+        try {
+            foreach ($AllUserId[0]['result']['list'] as $key => $val) {
+                $new_data[$key]['店铺名称'] = $店铺名称;
+                $new_data[$key]['depId'] = $depId;
+                $new_data[$key]['name'] = @$val['name'];
+                $new_data[$key]['title'] = @$val['title'];
+                $new_data[$key]['mobile'] = @$val['mobile'];
+                $new_data[$key]['userid'] = @$val['userid'];
+    
+                
+            }
+            // dump($new_data);
+            $this->db_easyA->table('dd_user')->strict(false)->insertAll($new_data);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+
+
+
+        // return $AllUserId;
+    }
+
 
     /**
      * 获取根部门的用户信息
@@ -226,7 +440,8 @@ class Dingtalk extends BaseController
 
     }
 
-    // 获取部门信息
+    // 获取部门信息  有用
+    // https://www.easyadmin1.com/admin/system.Dingding.Dingtalk/getDepartmentInfo
     public function getDepartmentInfo()
     {
         $getDepartment_config = 'https://oapi.dingtalk.com/department/list?access_token=' . $this->getAccessToken() . '&id=1';
@@ -286,15 +501,14 @@ class Dingtalk extends BaseController
      */
     public function getAllUserId()
     {
-
-        $data = $this->getDepartmentListIds()['sub_dept_id_list'];
+        // $data = $this->getDepartmentListIds()['sub_dept_id_list'];
+        $data = $this->getDepartmentListIds();
         $main_dep = ['dept_id' => 51388253]; #根部门
         $getDepartment = 'https://oapi.dingtalk.com/topapi/user/listid?access_token=' . $this->getAccessToken();
         $AllUserId = json_decode($this->PostCurlRequest($getDepartment, json_encode($main_dep)), JSON_OBJECT_AS_ARRAY);
 
         dump($AllUserId); die;
         return $AllUserId;
-
     }
 
 
@@ -441,27 +655,6 @@ class Dingtalk extends BaseController
         $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
         return $result;
     }
-
-    public function sendMarkdownImg($userid, $path)
-    {
-        $time = time();
-        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
-        $SendToUser_data = [
-            'userid_list' => $userid,
-            'agent_id' => $this->AgentId,
-            "msg" => [
-                "msgtype" => 'markdown',
-                "markdown" => [
-                    "title" => "杭州天气1",
-                    "text" => "#### 杭州天气 @150XXXXXXXX \n> 9度，西北风1级，空气良89，相对温度73%\n> ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png?t={$time})\n>"
-                ]
-
-            ]
-        ];
-        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
-        return $result;
-    }
-
 
     /**
      * 发送语音

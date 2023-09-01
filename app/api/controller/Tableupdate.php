@@ -34,6 +34,18 @@ class Tableupdate extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // sk新增领型字段
+    public function sk_lingxing() {
+        $sql  = "
+            update`sp_sk` 
+            set
+                领型 = left(分类, 2)
+            where
+                领型 is null
+        ";
+        $this->db_easyA->execute($sql);
+    }
+
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_data()
     {
@@ -1853,7 +1865,7 @@ class Tableupdate extends BaseController
             WHERE
                 ERN.CodingCodeText = '已审结' 
                 AND ERN.ReceiptNoticeDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-                AND ERN.IsCompleted IS NULL
+                AND ERN.IsCompleted != 1
                 AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 

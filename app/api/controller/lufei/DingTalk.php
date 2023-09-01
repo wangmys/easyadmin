@@ -230,6 +230,9 @@ class Dingtalk extends BaseController
             // db('ding_department')->insertGetId($ent);
         }
 
+        dump($dep_info);
+        die;
+
         $this->db_easyA->execute('TRUNCATE dd_department_info;');
         $chunk_list = array_chunk($dep_info, 500);
         // // $this->db_easyA->startTrans();
@@ -277,7 +280,7 @@ class Dingtalk extends BaseController
     {
 
         $data = $this->getDepartmentListIds()['sub_dept_id_list'];
-        $main_dep = ['dept_id' => 51388253]; #根部门
+        $main_dep = ['dept_id' => 62937933]; #根部门
         $getDepartment = 'https://oapi.dingtalk.com/topapi/user/listid?access_token=' . $this->getAccessToken();
         $AllUserId = json_decode($this->PostCurlRequest($getDepartment, json_encode($main_dep)), JSON_OBJECT_AS_ARRAY);
 

@@ -95,7 +95,7 @@ class CodeService
             EC.ShutOut=0 
             AND EC.MathodId IN (7,4)
             AND eg.TimeCategoryName1 = '2023'
-            AND eg.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+            AND eg.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
             and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
 -- 						and eg.GoodsNo = 'B42101021'
             GROUP BY 
@@ -176,7 +176,7 @@ class CodeService
         -- er.RetailDate >= '2023-05-02' AND er.RetailDate < '2023-05-10' and
         eg.TimeCategoryName1 = '2023'
         AND EBC.Mathod IN ('直营', '加盟')
-        AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+        AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
         GROUP BY
         CAST(er.RetailDate AS DATE),
@@ -265,7 +265,7 @@ class CodeService
             er.RetailDate >= '2022-10-01' AND er.RetailDate <= CAST(GETDATE() AS DATE) AND
             eg.TimeCategoryName1 = '2023'
             AND EBC.Mathod IN ('直营', '加盟')
-            AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+            AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
             and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
             GROUP BY
             ec.State,
@@ -364,7 +364,7 @@ class CodeService
         LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
         WHERE EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
         AND eg.TimeCategoryName1 = '2023'
-        AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+        AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
         AND EC.ShutOut=0 
         AND EC.MathodId IN (4,7) -- AND EG.GoodsNo = 'B32101321' AND EC.CustomerName = '阆中一店'
         GROUP BY
@@ -406,7 +406,7 @@ class CodeService
             AND ED.DeliveryID NOT IN (SELECT ERG.DeliveryId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.DeliveryId IS NOT NULL AND ERG.DeliveryId!='' GROUP BY ERG.DeliveryId)
         AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
         AND eg.TimeCategoryName1 = '2023'
-        AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+        AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
         AND EC.ShutOut=0 
         AND EC.MathodId IN (4,7)
         GROUP BY
@@ -447,7 +447,7 @@ class CodeService
             AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
             AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
             AND eg.TimeCategoryName1 = '2023'
-            AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+            AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
             AND EC.ShutOut=0 
             AND EC.MathodId IN (4,7)   -- AND EG.GoodsNo = 'B32503014' AND EC.CustomerName = '鹰潭一店'
         GROUP BY 
@@ -485,7 +485,7 @@ class CodeService
         LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
         WHERE	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
             AND eg.TimeCategoryName1 = '2023'
-            AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+            AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
             AND EC.ShutOut=0 
             AND EC.MathodId IN (4,7)
             AND ES.IsCompleted=0
@@ -890,7 +890,7 @@ class CodeService
         WHERE
         (ern.IsCompleted IS NULL OR ern.IsCompleted = 0) AND
         eg.TimeCategoryName1 = '2023'
-        AND EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) 
+        AND EG.TimeCategoryName2 IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
         and eg.CategoryName1 IN ('下装','外套','内搭','鞋履')
         and ew.WarehouseCode IN ('CK002','CK003','CK004','CK005','CK006')
         -- and ern.SupplyId != 'K191000638'
@@ -1025,7 +1025,7 @@ class CodeService
         ErpGoods sp on T.GoodsId=sp.GoodsId
         where 
         sp.CategoryName1 IN ('下装','外套','内搭','鞋履')
-        and sp.TimeCategoryName2  IN ( '初夏', '盛夏', '夏季' ) 
+        and sp.TimeCategoryName2  IN ( '秋季', '初秋', '深秋', '冬季', '初冬', '深冬' ) 
         and sp.TimeCategoryName1 = '2023'
         -- and sp.GoodsNo = 'B32305004'
         GROUP BY 

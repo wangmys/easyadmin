@@ -173,6 +173,11 @@ class Push extends BaseController
                 'tel' => '13387007546',
                 'userid' => '12525915671165649'
             ],
+            [
+                'name' => '李雅婷',
+                'tel' => '15298454189',
+                'userid' => '284616312226634272'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -255,6 +260,11 @@ class Push extends BaseController
                 'tel' => '13387007546',
                 'userid' => '12525915671165649'
             ],
+            [
+                'name' => '李雅婷',
+                'tel' => '15298454189',
+                'userid' => '284616312226634272'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -308,6 +318,11 @@ class Push extends BaseController
                 'tel' => '15200838578',
                 'userid' => '1369166106841705'
             ],
+            [
+                'name' => '李雅婷',
+                'tel' => '15298454189',
+                'userid' => '284616312226634272'
+            ],
         ];
 
         http_get("http://im.babiboy.com/api/lufei.Ldkdjd/dataHandle?date={$date}");
@@ -339,7 +354,7 @@ class Push extends BaseController
 
         foreach ($parms as $key => $val) {
             $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathA);
-            $model->sendMarkdownImg($val['userid'], '直营连带、客单、件单及同比表', $pathB);
+            $model->sendMarkdownImg($val['userid'], '加盟连带、客单、件单及同比表', $pathB);
             $model->sendMarkdownImg($val['userid'], '总体连带、客单、件单及同比表', $pathC);
         }  
     }
@@ -359,11 +374,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            [
-                'name' => '李逢生',
-                'tel' => '13927687768',
-                'userid' => '010946151826588427'
-            ],
+            // [
+            //     'name' => '李逢生',
+            //     'tel' => '13927687768',
+            //     'userid' => '010946151826588427'
+            // ],
         ];
 
         $reportFormsService = new ReportFormsService();
