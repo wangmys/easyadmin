@@ -466,6 +466,13 @@ class Uploadimg extends AdminController
     // 获取钉钉用户信息
     public function getDingDingUserInfo() {
         if (request()->isAjax()) {
+            if (!checkAdmin()) {
+                $CustomItem17 = $this->authInfo['name'];
+                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+            } else {
+                $map = "";
+            }
+        // if (1) {
             $sql_康雷 = "
                 SELECT
                     State AS 省份,
@@ -495,7 +502,8 @@ class Uploadimg extends AdminController
                                         ER.CodingCodeText = '已审结' 
                                         AND EC.ShutOut = 0 
                                         AND EC.RegionId <> 55 
-                                        AND EBC.Mathod IN ( '直营')    
+                                        AND EBC.Mathod IN ( '直营')
+                                        {$map}    
                                 GROUP BY
                                         ER.CustomerName,
                                         EC.RegionId,
@@ -506,19 +514,41 @@ class Uploadimg extends AdminController
             $select_customer = $this->db_sqlsrv->query($sql_康雷);
             $select_user = $this->db_easyA->table('dd_user')->select();
             
+            // echo '<pre>';
+            // print_r($select_customer);
+            // print_r($select_user);
+            // die;
             foreach ($select_customer as $key => $val) {
                 foreach ($select_user as $key2 => $val2) {
-                    if ($val['店铺名称'] == $val2['店铺名称'] && $val['店铺负责人'] == $val2['name']) {
-                        $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+
+                    if ($val['店铺名称'] == $val2['店铺名称']) {
+                        $店铺负责人 = trim($val['店铺负责人']);
+                        $pattern = "/{$店铺负责人}/i";
+                        $find_user = preg_match($pattern, $val2['name']);
+                        if ($find_user) {
+                            $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+                        }
                     }
                 }
                 foreach ($select_user as $key2 => $val2) {
-                    if ($val['督导负责人'] == $val2['name'] || $val['督导负责人'] . '工作号' == $val2['name']) {
-                        $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
-                        break;
+                    if ($val['督导负责人']) {
+                        $pattern_督导 = "/督导/i";
+                        $find_督导 = preg_match($pattern_督导, $val2['title']);
+
+                        $pattern_name = "/{$val['督导负责人']}/i";
+                        $find_name = preg_match($pattern_name, $val2['name']);
+
+                        if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
+                            $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
+                            break;
+                        }
                     }
                 }
             }
+            // echo '<pre>';
+            // print_r($select_customer);
+            // // print_r($select_user);
+            // die;
             return json(["code" => "0", "msg" => "", "count" => count($select_customer), "data" => $select_customer]);
         } else {
             return View('dduser', [
@@ -628,4 +658,10 @@ class Uploadimg extends AdminController
         }       
     }
 
+    public function test() {
+        $str = '田珊';
+        $str2 = ' 11田珊珊的工作号';
+        $pattern = "/{$str}/i";
+        echo preg_match($pattern, $str2);
+    }
 }
