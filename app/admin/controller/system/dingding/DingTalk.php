@@ -16,6 +16,7 @@ class Dingtalk extends BaseController
     protected $db_easyA = '';
     protected $db_bi = '';
     protected $db_sqlsrv = '';
+    protected $db_tianqi = '';
     
     /**
      * @var string
@@ -70,6 +71,7 @@ class Dingtalk extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_tianqi = Db::connect('tianqi');
     }
 
     /**
@@ -253,7 +255,6 @@ class Dingtalk extends BaseController
 
     public function testDep() {
         $res = $this->getDepartmentListIds();
-        dump($res);
     }
     /**
      * 获取部门useid
@@ -349,11 +350,24 @@ class Dingtalk extends BaseController
             $this->db_easyA->execute('TRUNCATE dd_user;');
             // dump($select_deparent); die;
             foreach($select_deparent as $key => $val) {
-                echo $val['depId'];
-                echo '<br>';
+                // echo $val['depId'];
+                // echo '<br>';
                 $this->ddUser($val['depId'], $val['name']);
             }
         }
+
+        $sql_更新user是否店铺 = "
+            update
+                dd_user AS u
+            LEFT JOIN 
+                `dd_department_info` AS d ON d.depId = u.depId
+            set 
+                u.isCustomer = '是'
+            WHERE 
+                d.isCustomer = '是'
+                AND u.店铺名称 != u.name
+        ";
+        $this->db_easyA->execute($sql_更新user是否店铺);
 
     }
 
@@ -446,6 +460,8 @@ class Dingtalk extends BaseController
     {
         $getDepartment_config = 'https://oapi.dingtalk.com/department/list?access_token=' . $this->getAccessToken() . '&id=1';
         $dep_info = json_decode($this->GetCurlRequest($getDepartment_config), true)['department'];
+
+
 
         foreach ($dep_info as &$val) {
             $val['depId'] = $val['id'];

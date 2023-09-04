@@ -560,6 +560,66 @@ class Uploadimg extends AdminController
         // print_r($select_customer);
     }
 
+    // 获取钉钉用户信息
+    public function getDingDingUserInfo2() {
+        // if (request()->isAjax()) {
+        if (1) {
+            if (!checkAdmin()) {
+                $CustomItem17 = $this->authInfo['name'];
+                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+            } else {
+                $map = "";
+            }
+
+            $select_user = $this->db_easyA->table('dd_user')->select();
+            
+            echo '<pre>';
+            // print_r($select_customer);
+            print_r($select_user);
+            die;
+            // foreach ($select_customer as $key => $val) {
+            //     foreach ($select_user as $key2 => $val2) {
+
+            //         if ($val['店铺名称'] == $val2['店铺名称']) {
+            //             $店铺负责人 = trim($val['店铺负责人']);
+            //             $pattern = "/{$店铺负责人}/i";
+            //             $find_user = preg_match($pattern, $val2['name']);
+            //             if ($find_user) {
+            //                 $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+            //             }
+            //         }
+            //     }
+            //     foreach ($select_user as $key2 => $val2) {
+            //         if ($val['督导负责人']) {
+            //             $pattern_督导 = "/督导/i";
+            //             $find_督导 = preg_match($pattern_督导, $val2['title']);
+
+            //             $pattern_name = "/{$val['督导负责人']}/i";
+            //             $find_name = preg_match($pattern_name, $val2['name']);
+
+            //             if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
+            //                 $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
+            //                 break;
+            //             }
+            //         }
+            //     }
+            // }
+            // echo '<pre>';
+            // print_r($select_customer);
+            // // print_r($select_user);
+            // die;
+            
+            return json(["code" => "0", "msg" => "", "count" => count($select_user), "data" => $select_user]);
+        } else {
+            return View('dduser', [
+                // 'config' => ,
+            ]);
+        }
+
+        // echo '<pre>';
+        // print_r($select_customer);
+    }
+
     // 发送测试
     public function sendDingImg() {
         $input = input();
