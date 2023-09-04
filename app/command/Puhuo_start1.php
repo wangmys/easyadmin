@@ -27,6 +27,7 @@ use app\admin\model\bi\SpLypPuhuoShangshidayModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaSkcnumModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
+use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 // use app\admin\model\CustomerModel;
 
@@ -48,6 +49,7 @@ class Puhuo_start1 extends Command
     protected $puhuo_daxiaoma_customer_model;
     protected $puhuo_daxiaoma_customer_sort_model;
     protected $puhuo_ti_goods_model;
+    protected $puhuo_zhiding_goods_model;
 
     protected function configure()
     {
@@ -69,11 +71,11 @@ class Puhuo_start1 extends Command
         $this->puhuo_daxiaoma_customer_model = new SpLypPuhuoDaxiaomaCustomerModel();
         $this->puhuo_daxiaoma_customer_sort_model = new SpLypPuhuoDaxiaomaCustomerSortModel();
         $this->puhuo_ti_goods_model = new SpLypPuhuoTiGoodsModel();
+        $this->puhuo_zhiding_goods_model = new SpLypPuhuoZhidingGoodsModel();
 
     }
 
     protected function execute(Input $input, Output $output) {
-
 
         ini_set('memory_limit','1024M');
         $db = Db::connect("mysql");
@@ -87,7 +89,7 @@ class Puhuo_start1 extends Command
             $this->puhuo_rule_model = new SpLypPuhuoRuleBModel();
         }
 
-        $list_rows    = $input->getArgument('list_rows') ?: 200;//每页条数
+        $list_rows    = $input->getArgument('list_rows') ?: 2000;//每页条数
         
         $data = $this->get_wait_goods_data($list_rows);
         // print_r($data);die;
@@ -159,7 +161,6 @@ class Puhuo_start1 extends Command
 
                 $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                 // print_r($all_customers);die;
-
 
                 //大小码-满足率-分母
                 $season = $this->get_season_str($TimeCategoryName2);
@@ -423,7 +424,6 @@ class Puhuo_start1 extends Command
                                 $add_puhuo_log[] = $puhuo_log;
                                 // print_r($add_puhuo_log);die;
                                 $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
-                                // print_r([$rule, $v_data]);die;
 
                             }
                             // print_r([$add_puhuo_log, $v_data]);die;
@@ -516,16 +516,39 @@ class Puhuo_start1 extends Command
             // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('GoodsNo', 'B82109001')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
             // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('GoodsNo', 'B62109212')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
             // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('GoodsNo', 'B52109237')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-            $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-            // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '休闲长衬')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-        // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '休闲长衬')->where('GoodsNo', 'B52106008')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-        // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('GoodsNo', 'B52109039')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-            'list_rows'=> $list_rows,//每页条数
-            'page' => $this->page,//当前页
-        ]);
-        $res = $res ? $res->toArray() : [];
-        $res = $res ? $res['data'] : [];
-        return $res;
+        //     $res = $this->puhuo_wait_goods_model::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+        //     // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '休闲长衬')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+        // // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '休闲长衬')->where('GoodsNo', 'B52106008')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+        // // $res = SpLypPuhuoWaitGoodsModel::where('WarehouseName', '贵阳云仓')->where('CategoryName1', '内搭')->where('CategoryName2', '针织衫')->where('GoodsNo', 'B52109039')->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+        //     'list_rows'=> $list_rows,//每页条数
+        //     'page' => $this->page,//当前页
+        // ]);
+        // $res = $res ? $res->toArray() : [];
+        // $res = $res ? $res['data'] : [];
+        // return $res;
+
+        //从指定铺货配置表里取数
+        $res_data = [];
+        $yuncangs = $this->puhuo_zhiding_goods_model::where([])->distinct(true)->column('Yuncang');
+        if ($yuncangs) {
+            foreach ($yuncangs as $v_yuncang) {
+                $yuncang_goods = $this->puhuo_zhiding_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
+                if ($yuncang_goods) {
+                    $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang)->where([['GoodsNo', 'in', $yuncang_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+                        'list_rows'=> $list_rows,//每页条数
+                        'page' => $this->page,//当前页
+                    ]);
+                    $res = $res ? $res->toArray() : [];
+                    $res = $res ? $res['data'] : [];
+                    if ($res) {
+                        foreach ($res as $v_res) {
+                            $res_data[] = $v_res;
+                        }
+                    }
+                }
+            }
+        }
+        return $res_data;
 
     }
 
