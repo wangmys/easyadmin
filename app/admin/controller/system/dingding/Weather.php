@@ -253,10 +253,12 @@ class Weather extends BaseController
             FROM
                 dd_weather_customer
             where 1
+            limit 1;
         ");
 
         foreach ($select as $key => $val) {
-            $path = "http://im.babiboy.com/upload/dd_weather/20230904/{$val['店铺名称']}.jpg?v=" . time();
+            echo $path = "http://im.babiboy.com/upload/dd_weather/20230904/{$val['店铺名称']}.jpg?v=" . time();
+            echo '<br>';
             $res = $model->sendMarkdownImg_pro('350364576037719254', "{$val['店铺名称']} 未来7天天气", $path);
             dump($res);
         }
@@ -272,6 +274,7 @@ class Weather extends BaseController
             FROM
                 dd_weather_customer
             where 1
+                AND 店铺名称 in ('仁寿一店')
         ");
 
         foreach ($select as $key => $val) {
@@ -320,44 +323,79 @@ class Weather extends BaseController
         $select = $this->db_easyA->query($sql);
 
         $data = $select[0];
-        
+
 
         // echo '<pre>';
         // print_r($data);
         
         $weather_data = [];
-
         $weather_data[0]['日期'] = $data['day4'];
+        $weather_data[0]['星期'] = date_to_week3($data['day4']);
         $weather_data[0]['最低温~最高温']= $data['day4_min'] . '~' . $data['day4_max']; 
-
         $weather_data[1]['日期'] = $data['day5'];
+        $weather_data[1]['星期'] = date_to_week3($data['day5']);
         $weather_data[1]['最低温~最高温']= $data['day5_min'] . '~' . $data['day5_max']; 
-
         $weather_data[2]['日期'] = $data['day6'];
+        $weather_data[2]['星期'] = date_to_week3($data['day6']);
         $weather_data[2]['最低温~最高温']= $data['day6_min'] . '~' . $data['day6_max']; 
-
         $weather_data[3]['日期'] = $data['day7'];
+        $weather_data[3]['星期'] = date_to_week3($data['day7']);
         $weather_data[3]['最低温~最高温']= $data['day7_min'] . '~' . $data['day7_max']; 
-
         $weather_data[4]['日期'] = $data['day8'];
+        $weather_data[4]['星期'] = date_to_week3($data['day8']);
         $weather_data[4]['最低温~最高温']= $data['day8_min'] . '~' . $data['day8_max']; 
-
         $weather_data[5]['日期'] = $data['day9'];
+        $weather_data[5]['星期'] = date_to_week3($data['day8']);
         $weather_data[5]['最低温~最高温']= $data['day9_min'] . '~' . $data['day9_max']; 
-
         $weather_data[6]['日期'] = $data['day10'];
+        $weather_data[6]['星期'] = date_to_week3($data['day10']);
         $weather_data[6]['最低温~最高温']= $data['day10_min'] . '~' . $data['day10_max']; 
 
+        $weather_data_对比 = [];
+        $weather_data_对比[0]['日期'] = $data['day4'];
+        $weather_data_对比[0]['最低温']= $data['day4_min']; 
+        $weather_data_对比[0]['最高温']= $data['day4_max']; 
+        $weather_data_对比[1]['日期'] = $data['day5'];
+        $weather_data_对比[1]['最低温']= $data['day5_min']; 
+        $weather_data_对比[1]['最高温']= $data['day5_max']; 
+
+        $weather_data_对比[2]['日期'] = $data['day6'];
+        $weather_data_对比[2]['最低温']= $data['day6_min']; 
+        $weather_data_对比[2]['最高温']= $data['day6_max']; 
+
+        $weather_data_对比[3]['日期'] = $data['day7'];
+        $weather_data_对比[3]['最低温']= $data['day7_min']; 
+        $weather_data_对比[3]['最高温']= $data['day7_max']; 
+        $weather_data_对比[4]['日期'] = $data['day8'];
+        $weather_data_对比[4]['最低温']= $data['day8_min']; 
+        $weather_data_对比[4]['最高温']= $data['day8_max']; 
+        $weather_data_对比[5]['日期'] = $data['day9'];
+        $weather_data_对比[5]['最低温']= $data['day9_min']; 
+        $weather_data_对比[5]['最高温']= $data['day9_max']; 
+        $weather_data_对比[6]['日期'] = $data['day10'];
+        $weather_data_对比[6]['最低温'] = $data['day10_min'];
+        $weather_data_对比[6]['最高温'] = $data['day10_max'];
+
+
+        foreach ($weather_data as $key => $val) {
+            $weather_data[$key]['日期'] = date('m-d', strtotime($val['日期']));
+        }
+
+        foreach ($weather_data_对比 as $key => $val) {
+            $weather_data_对比[$key]['日期'] = date('m-d', strtotime($val['日期']));
+        }
 
         if ($weather_data) {
 
             $table_header = ['ID'];
             $table_header = array_merge($table_header, array_keys($weather_data[0]));
             foreach ($table_header as $v => $k) {
-                $field_width[$v] = 120;
+                $field_width[$v] = 150;
             }
 
             $field_width[0] = 35;
+            $field_width[1] = 60;
+            $field_width[2] = 60;
  
             $table_explain = [
                 // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
@@ -370,22 +408,18 @@ class Weather extends BaseController
                 'title' => $data['店铺名称'] . ' 未来七天天气',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $weather_data,
+                'data_对比' => $weather_data_对比,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
                 'banben' => '',
                 'file_path' => app()->getRootPath() . 'public/upload/dd_weather/' . date('Ymd', time()) . '/'  //文件保存路径
             ];
-            // return $this->create_image_bgcolor($params, [
-            //     '前年日增长' => 3,
-            //     '去年日增长' => 4,
-            //     '前年月增长' => 5,
-            //     '去年月增长' => 6,
-            // ]);
-                // 生成图片
+
+            // 生成图片
             return $this->create_image_bgcolor($params,
                 [
-                    // '前年日增长' => 3,
+                    '最低温~最高温' => 3,
                     // '去年日增长' => 4,
                     // '前年月增长' => 5,
                     // '去年月增长' => 6,
@@ -459,6 +493,14 @@ class Weather extends BaseController
         $littleblue = imagecolorallocate($img, 22, 172, 176); //设定图片背景色
         $orange = imagecolorallocate($img, 255, 192, 0); //设定图片背景色
 
+        // 天气温度
+        $color1 = imagecolorallocate($img, 22, 108, 221); //设定图片背景色
+        $color2 = imagecolorallocate($img, 103, 184, 249); //设定图片背景色
+        $color3 = imagecolorallocate($img, 248, 243, 162); //设定图片背景色
+        $color4 = imagecolorallocate($img, 253, 206, 74); //设定图片背景色
+        $color5 = imagecolorallocate($img, 241, 124, 0); //设定图片背景色
+        $color6 = imagecolorallocate($img, 204, 41, 49); //设定图片背景色
+
         imagefill($img, 0, 0, $bg_color); //填充图片背景色
 
         // 表面颜色（浅灰）
@@ -474,107 +516,12 @@ class Weather extends BaseController
         $sum = $base['border'];
 
         // 1 统计上色
-        foreach ($params['data'] as $key => $item) {
-            if (isset($item['店铺名称']) && $item['店铺名称'] == '合计') {
-                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-            }
-            if (isset($item['省份']) && $item['省份'] == '合计') {
-                imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
-            }
-            if ($params['banben'] == '图片报表编号: S107') {
-                if (isset($item['二级分类']) && $item['二级分类'] == '合计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-                }
-                if (isset($item['新老品']) && $item['新老品'] == '总计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $littleblue);
-                }
-            }
-
-            if (@$params['code'] == 'S103') {
-                if (isset($item['省份']) && $item['省份'] == '合计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-                }
-                if (isset($item['经营']) && $item['经营'] == '总计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
-                }   
-            }
-
-            if (@$params['code'] == 'S108A') {
-                if (isset($item['省份']) && $item['省份'] == '合计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-                }
-                if (isset($item['督导']) && $item['督导'] == '总计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
-                }   
-            }
-
-            if (@$params['code'] == 'S109') {
-                if (isset($item['省份']) && $item['省份'] == '合计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-                }
-                if (isset($item['经营']) && $item['经营'] == '总计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
-                }   
-            }
-
-            if (@$params['code'] == 'S012') {
-                if (isset($item['分类']) && $item['分类'] == '袜子合计') {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
-                }
-
-                if (count($params['data']) == $key + 1) {
-                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
-                }
-            }
-
-            
-        }
-        
-        // 117标题颜色特殊处理
-        if (@$params['code'] == 'S117') { 
-            $s117_y1 = 38;
-            // 直营
-            $s117_x1 = $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2];
-            $s117_x2 = $s117_x1 + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5] + $params['field_width'][6];
-            // 加盟
-            $s117_x3 = $s117_x2 + $params['field_width'][7] + $params['field_width'][8] + $params['field_width'][9] + $params['field_width'][10];
-            // 合计
-            $s117_x4 = $s117_x3 + $params['field_width'][11] + $params['field_width'][12] + $params['field_width'][13] + $params['field_width'][14];
-
-            // 直营
-            imagefilledrectangle($img, $s117_x1, $s117_y1, $s117_x2, $y2, $yellow);
-            // 加盟
-            imagefilledrectangle($img, $s117_x2, $s117_y1, $s117_x3, $y2, $gray);
-            // 合计
-            imagefilledrectangle($img, $s117_x3, $s117_y1, $s117_x4, $y2, $orange);
-            // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
-            // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
-        }
-
-        // 117标题颜色特殊处理
-        if (@$params['code'] == 'S118A' || @$params['code'] == 'S118B' || @$params['code'] == 'S118C') { 
-            $s118_y1 = 38;
-            // 直营
-            $s118_x1 = $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2];
-            $s118_x2 = $s118_x1 + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5] + $params['field_width'][6];
-            // 加盟
-            $s118_x3 = $s118_x2 + $params['field_width'][7] + $params['field_width'][8] + $params['field_width'][9] + $params['field_width'][10];
-            // 累计
-            $s118_x4 = $s118_x3 + $params['field_width'][11] + $params['field_width'][12] + $params['field_width'][13] + $params['field_width'][14];
-            // 同比累计
-            $s118_x5 = $s118_x4 + $params['field_width'][15] + $params['field_width'][16] + $params['field_width'][17] + $params['field_width'][18];
-
-            // 直营
-            imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $blue1);
-            // 加盟
-            imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue2);
-            // 累计
-            imagefilledrectangle($img, $s118_x3, $s118_y1, $s118_x4, $y2, $yellow3);
-            // 同比累计
-            imagefilledrectangle($img, $s118_x4, $s118_y1, $s118_x5, $y2, $orange);
-            // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
-            // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
-        }
+        // foreach ($params['data'] as $key => $item) {
+        //     if (isset($item['督导']) && $item['督导'] == '总计') {
+        //         imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+        //     } 
+        //     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+        // }
         
 
         // 2 单元格上色
@@ -609,63 +556,55 @@ class Weather extends BaseController
             }
             // dump($set_bgcolor[$key]);
             
+
+
             foreach ($params['data'] as $key => $item) {
-                // echo '<pre>';
-                // print_r($set_bgcolor);
                 foreach ($set_bgcolor as $key2 => $val2) {
-                    // echo $key2;
-                    if (@$params['code'] == 'S108A' || @$params['code'] =='S108B' || @$params['code'] == 'S109' || @$params['code'] == 'S109B' || @$params['code'] 
-                    == 'S110A'|| @$params['code'] == 'S110B') {
-                        // echo 1111111111;die;
-                        if (!empty($item[$key2]) && $item[$key2] <= 60) {
-                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $gray);
-                        } elseif (!empty($item[$key2]) && ($item[$key2] > 60 && $item[$key2] <= 99)) {
-                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $green2);
-                        } elseif (!empty($item[$key2]) && $item[$key2] > 99) { 
-                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);   
-                        }
-                    }
+                    // dump($val2);
+                    // dump($item);
 
-                    // 配饰
-                    if (@$params['code'] == 'S012') {
-                        if ($item['周转周'] < 15 && !empty($item['周转周'])) {
-                            imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
-                        }
-                        // 或者以二级分类的仓库可用库存总量/二级分类总库存量的占比小于5%时候，在分类那边标红色
-                        foreach ($params['data2'] as $key3 => $item3) {
-                            if ($item3['二级分类'] == $item['二级分类'] && $item3['占比'] < 0.05) {
-                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
-                            }
-                        }
-                    }
+                    foreach ($params['data_对比'] as $key3 => $item3) {
+                        // dump($item3);
 
-                    // 117
-                    if (@$params['code'] == 'S117') {
-                        foreach ($params['data2'] as $key3 => $item3) {
-                            if ($key2 == '直营_毛利率' && $item3['日期'] == $item['日期'] && $item3['直营_毛利率'] < $item3['直营累计_毛利率']) {
-                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
-                                break;
+                        if ($item3['日期'] == $item['日期']) {
+                            $colorVal = '';
+                            if ($item3['最高温'] > 30 ) {
+                                // imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $orange);
+                                $colorVal = 38;
+                            } elseif ($item3['最高温'] - $item3['最低温'] <= 5) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2;
+                            } elseif ( ($item3['最高温'] - $item3['最低温']) > 5 && ($item3['最高温'] - $item3['最低温']) <= 10) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 2;
+                            } elseif ( ($item3['最高温'] - $item3['最低温']) > 10) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 4;
                             }
-                            if ($key2 == '加盟_毛利率' && $item3['日期'] == $item['日期'] && $item3['加盟_毛利率'] < $item3['加盟累计_毛利率']) {
-                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
-                                break;
+
+                            if ($colorVal < 10) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color1);
+                            } elseif ($colorVal < 18) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color2);
+                            } elseif ($colorVal < 22) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color3);
+                            } elseif ($colorVal < 26) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color4);
+                            } elseif ($colorVal <= 30) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color5);
+                            } elseif ($colorVal > 30) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color6);
                             }
                         }
+
+                        // elseif($item3['最高温'] > 30) {
+                        //     imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                        // }
                     }
                 }
             }
         }
 
-        // create_table_s105
-        if ($params['banben'] == '图片报表编号: S105') {
-            if (isset($item['一级分类']) && $item['一级分类'] == '总计') {
-                imagefilledrectangle($img, 0, $y1 + 30 * ($key + 1), $x2 + 3000 * ($key + 1), $y2 + 30 * ($key + 1), $yellow);
-            }
-        }
-        // s106
-        if ($params['banben'] == '图片报表编号: S106') {
-            imagefilledrectangle($img, 350, $y1, $x2 + 3000, $y2, $yellow);
-        }
+
+
+    
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
             $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
@@ -722,7 +661,7 @@ class Weather extends BaseController
 
         imagepng($img, $save_path); //输出图片，输出png使用imagepng方法，输出gif使用imagegif方法
 
-        echo '<img src="/' . $save_path . '"/>';
+        // echo '<img src="/' . $save_path . '"/>';
     }
     
 }
