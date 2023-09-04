@@ -8,10 +8,10 @@ use think\facade\Db;
 use app\admin\service\PuhuoService;
 
 /**
- * Class Zhidingconfig
+ * Class Zdconfig
  * 指定铺货货品配置
  */
-class Zhidingconfig extends AdminController
+class Zdconfig extends AdminController
 {
 
     protected $service;

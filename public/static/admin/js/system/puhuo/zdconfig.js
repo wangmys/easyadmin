@@ -3,7 +3,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
     var form = layui.form,
     table = layui.table,
     url = {
-        saveZhidingGoodsConfig_url:ea.url('system.puhuo.Zhidingconfig/saveZhidingGoodsConfig'),
+        saveZhidingGoodsConfig_url:ea.url('system.puhuo.Zdconfig/saveZhidingGoodsConfig'),
     }
 
     var Controller = {
