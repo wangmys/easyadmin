@@ -271,18 +271,28 @@ class Weather extends BaseController
         $model = new DingTalk;
         $select = $this->db_easyA->query("
             SELECT 
-                店铺名称
+                u.*
             FROM
-                dd_weather_customer
+                dd_weather_user_test as u
+            LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
             where 1
-            limit 1;
+                and u.店铺名称 = c.店铺名称
+                and u.isCustomer = '是'
+                and u.name in ('李雅婷', '王梦园')
         ");
 
+        // dump($select);die;
+
+        $datatime = date('Ymd');
         foreach ($select as $key => $val) {
-            echo $path = "http://im.babiboy.com/upload/dd_weather/20230904/{$val['店铺名称']}.jpg?v=" . time();
+            echo $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+            dump($val);
             echo '<br>';
-            $res = $model->sendMarkdownImg_pro('350364576037719254', "{$val['店铺名称']} 未来7天天气", $path);
-            dump($res);
+            // $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气a", $path);
+
+            // echo $val['userid'];
+            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
+            // print_r($res);
         }
         
 
