@@ -1,0 +1,47 @@
+<form id="app-form" class="layui-form layuimini-form">
+    <table class="layui-table">
+    
+        <table id="form-fill_rate-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">SKC满足率</th>
+                    <th style="width: 120px;">评分</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- <tr>
+                    <td colspan="2">
+                        <span>添加操作</span>
+                    </td>
+                    <td colspan="1">
+                        <div class="layui-btn-group">
+                            <button type="button" class="layui-btn add_fill_rate">增加</button>
+                        </div>
+                    </td>
+                </tr> -->
+            {foreach $fill_rate_list as $vo}
+            <tr class="puhuo_fill_rate-select" lay-data="{:htmlspecialchars(json_encode($vo['id']))}">
+                {foreach $vo as $key => $val}
+                {if ($key!='id' && $key!='config_str' && $key!='key_level')}
+                <td class="{$key}">
+                    <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入" value="{$val}" class="layui-input">
+                </td>
+                {/if}
+                {/foreach}
+                <td class="handler">
+                    <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                    <input type="text" name="config_str[]" class="layui-hide" value="{$vo.config_str}">
+                    <input type="text" name="key_level[]" class="layui-hide" value="{$vo.key_level}">
+                    <button type="button" class="layui-btn layui-btn-normal get_fill_rate">保存</button>
+                    <!-- <button type="button" class="layui-btn layui-btn-danger del_fill_rate">删除</button> -->
+                </td>
+            </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </table>
+    </form>
+    <input type="text" id="fill_rate_head" class="layui-hide" value="{:htmlspecialchars(json_encode($fill_rate_head))}">
+    <input type="text" id="fill_rate_list" class="layui-hide" value="{:htmlspecialchars(json_encode($fill_rate_list))}">
+    

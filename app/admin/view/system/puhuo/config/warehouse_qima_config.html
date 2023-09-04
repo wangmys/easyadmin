@@ -1,0 +1,33 @@
+<form id="app-form" class="layui-form layuimini-form">
+    <table class="layui-table">
+    
+        <table id="form-warehouse_qima-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">内/外/鞋/松紧</th>
+                    <th style="width: 120px;">下装</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="warehouse_qima_config-select" lay-data="{:htmlspecialchars(json_encode($puhuo_config))}">
+                    <td class="warehouse_qima_nd">
+                        <input type="text" name="warehouse_qima_nd" lay-verify="required" placeholder="请输入" value="{$puhuo_config['warehouse_qima_nd']}" class="layui-input">
+                    </td>
+                    <td class="warehouse_qima_xz">
+                        <input type="text" name="warehouse_qima_xz" lay-verify="required" placeholder="请输入" value="{$puhuo_config['warehouse_qima_xz']}" class="layui-input">
+                    </td>
+    
+                    <td class="handler">
+                        <input type="text" name="sign_id" class="layui-hide" value="{$puhuo_config['config_str']}">
+                        <button type="button" class="layui-btn layui-btn-normal get_warehouse_qima_config">保存</button>
+                        <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                    </td>
+                </tr>
+           
+            </tbody>
+        </table>
+    </table>
+    </form>
+    <input type="text" id="warehouse_qima_config" class="layui-hide" value="{:htmlspecialchars(json_encode($puhuo_config))}">
+    

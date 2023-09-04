@@ -1,0 +1,48 @@
+<form id="app-form" class="layui-form layuimini-form">
+<table class="layui-table">
+
+    <table id="form-coldtohot-config" class="layui-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">云仓</th>
+                <th style="width: 120px;">省份</th>
+                <th style="width: 120px;">温区</th>
+                <th style="width: 120px;">气温评分</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4">
+                    <span>添加操作</span>
+                </td>
+                <td colspan="1">
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn add_coldtohot">增加</button>
+                    </div>
+                </td>
+            </tr>
+        {foreach $coldtohot_list as $vo}
+        <tr class="puhuo_coldtohot-select" lay-data="{:htmlspecialchars(json_encode($vo['id']))}">
+            {foreach $vo as $key => $val}
+            {if ($key!='id' && $key!='qiwen_sort' && $key!='remark')}
+            <td class="{$key}">
+                <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入" value="{$val}" class="layui-input">
+            </td>
+            {/if}
+            {/foreach}
+            <td class="handler">
+                <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                <input type="text" name="qiwen_sort[]" class="layui-hide" value="{$vo.qiwen_sort}">
+                <input type="text" name="remark[]" class="layui-hide" value="{$vo.remark}">
+                <button type="button" class="layui-btn layui-btn-normal get_coldtohot">保存</button>
+                <button type="button" class="layui-btn layui-btn-danger del_coldtohot">删除</button>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</table>
+</form>
+<input type="text" id="qiwen_head" class="layui-hide" value="{:htmlspecialchars(json_encode($qiwen_head))}">
+<input type="text" id="coldtohot_list" class="layui-hide" value="{:htmlspecialchars(json_encode($coldtohot_list))}">

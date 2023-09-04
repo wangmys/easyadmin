@@ -1,0 +1,23 @@
+<div class="layuimini-container">
+    <div class="layuimini-main" id="app">
+
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                
+                <li class="layui-this">气温评分-冷到热</li>
+                <li>气温评分-热到冷</li>
+            </ul>
+            <div class="layui-tab-content">
+                
+                <div class="layui-tab-item layui-show">
+                    {include file="system/puhuo/qiwenconfig/coldtohot" /}
+                </div>
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/qiwenconfig/hottocold" /}
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</div>
