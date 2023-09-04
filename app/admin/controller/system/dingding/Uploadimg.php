@@ -625,31 +625,36 @@ class Uploadimg extends AdminController
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         // if (request()->isAjax() && $input['id']) {
-        if (1 && $input['id']) {
-            $model = new DingTalk;
-            // echo $path = $this->request->domain() ;
+        // if (1 && $input['id']) {
+        //     $model = new DingTalk;
+        //     // echo $path = $this->request->domain() ;
             
-            $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-                ['id', '=', $input['id']]
-            ])->find();
+        //     $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //         ['id', '=', $input['id']]
+        //     ])->find();
 
-            if ($find_list) {
-                $find_path = $this->db_easyA->table('dd_temp_img')->where([
-                    ['pid', '=', $find_list['pid']]
-                ])->find();
-                // echo $find_path['path'];
+        //     if ($find_list) {
+        //         $find_path = $this->db_easyA->table('dd_temp_img')->where([
+        //             ['pid', '=', $find_list['pid']]
+        //         ])->find();
+        //         // echo $find_path['path'];
 
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-                    ['uid', '=', $find_list['uid']]
-                ])->select();
+        //         $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+        //             ['uid', '=', $find_list['uid']]
+        //         ])->select();
 
-                foreach ($select_user as $key => $val) {
-                    // echo $val['姓名'];
-                    $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-                    dump($res);
-                }
-            }
-        }
+        //         foreach ($select_user as $key => $val) {
+        //             // echo $val['姓名'];
+        //             // $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
+        //             $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $find_path['path']);
+        //             dump($res);
+        //         }
+        //     }
+        // }
+        $model = new DingTalk;
+        $path = "http://im.babiboy.com/upload/dd_weather/20230904/万年一店.jpg";
+        $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $path);
+        dump($res);
     }
 
     public function sendDingImgHandle() {
