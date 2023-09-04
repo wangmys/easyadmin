@@ -1,0 +1,27 @@
+<div class="layuimini-container">
+    <div class="layuimini-main" id="app">
+
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                
+                <li class="layui-this">店铺等级评分</li>
+                <li>SKC满足率评分</li>
+                <li>动销率评分</li>
+            </ul>
+            <div class="layui-tab-content">
+                
+                <div class="layui-tab-item layui-show">
+                    {include file="system/puhuo/scconfig/customer_level" /}
+                </div>
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/scconfig/fill_rate" /}
+                </div>
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/scconfig/dongxiao_rate" /}
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</div>

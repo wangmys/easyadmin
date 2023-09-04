@@ -1,0 +1,39 @@
+<div class="layuimini-container">
+    <div class="layuimini-main" id="app">
+
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                
+                <li class="layui-this">仓库预留参数配置</li>
+                <li>门店上铺货连码标准配置(中间码)</li>
+                <li>仓库齐码参数设置</li>
+                <li>单店上市天数不再铺限制</li>
+                <li>最终铺货连码标准配置</li>
+            </ul>
+            <div class="layui-tab-content">
+                
+                <div class="layui-tab-item layui-show">
+                    {include file="system/puhuo/config/warehouse_config" /}
+                </div>
+
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/config/lianma_config" /}
+                </div>
+
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/config/warehouse_qima_config" /}
+                </div>
+                
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/config/listing_days_config" /}
+                </div>
+
+                <div class="layui-tab-item">
+                    {include file="system/puhuo/config/end_lianma_config" /}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

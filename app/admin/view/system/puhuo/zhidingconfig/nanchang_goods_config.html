@@ -1,0 +1,29 @@
+<form id="app-form" class="layui-form layuimini-form">
+    <table class="layui-table">
+    
+        <table id="form-nanchang_goods-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">货号</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="nanchang_goods_config-select" lay-data="{:htmlspecialchars(json_encode($nanchang_goods_config))}">
+                    <td class="nanchang_goods">
+                        <input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用#号隔开，如：B52109006#B52106011#B51501023" value="{$nanchang_goods_config}" class="layui-input">
+                    </td>
+    
+                    <td class="handler">
+                        <input type="text" name="sign_id" class="layui-hide" value="南昌云仓">
+                        <button type="button" class="layui-btn layui-btn-normal get_nanchang_goods_config">保存</button>
+                        <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                    </td>
+                </tr>
+           
+            </tbody>
+        </table>
+    </table>
+    </form>
+    <input type="text" id="nanchang_goods_config" class="layui-hide" value="{:htmlspecialchars(json_encode($nanchang_goods_config))}">
+    

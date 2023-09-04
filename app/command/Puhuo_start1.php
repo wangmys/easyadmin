@@ -30,7 +30,8 @@ use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
 use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 // use app\admin\model\CustomerModel;
-
+//每天凌晨04:00跑，预计10分钟跑完20个货号
+//1.sp_lyp_puhuo_customer_sort(主码排序)  2.sp_lyp_puhuo_cur_log/sp_lyp_puhuo_log   3.sp_lyp_puhuo_daxiaoma_customer_sort（大小码排序） 4.sp_lyp_puhuo_end_data（最终铺货结果）
 class Puhuo_start1 extends Command
 {
     protected $db_easy;
@@ -463,7 +464,7 @@ class Puhuo_start1 extends Command
 
 
 
-            //最终铺货数据清洗（暂时先屏蔽）
+            //最终铺货数据清洗
             $this->generate_end_data();
 
 

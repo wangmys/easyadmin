@@ -1,0 +1,29 @@
+<form id="app-form" class="layui-form layuimini-form">
+    <table class="layui-table">
+    
+        <table id="form-guiyang_goods-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">货号</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="guiyang_goods_config-select" lay-data="{:htmlspecialchars(json_encode($guiyang_goods_config))}">
+                    <td class="guiyang_goods">
+                        <input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用#号隔开，如：B72109013#B62109211#B62105155" value="{$guiyang_goods_config}" class="layui-input">
+                    </td>
+    
+                    <td class="handler">
+                        <input type="text" name="sign_id" class="layui-hide" value="贵阳云仓">
+                        <button type="button" class="layui-btn layui-btn-normal get_guiyang_goods_config">保存</button>
+                        <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
+                    </td>
+                </tr>
+           
+            </tbody>
+        </table>
+    </table>
+    </form>
+    <input type="text" id="guiyang_goods_config" class="layui-hide" value="{:htmlspecialchars(json_encode($guiyang_goods_config))}">
+    
