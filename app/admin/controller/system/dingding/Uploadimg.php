@@ -463,36 +463,198 @@ class Uploadimg extends AdminController
         }        
     }
 
+    // 获取钉钉用户信息
+    public function getDingDingUserInfo() {
+        if (request()->isAjax()) {
+            if (!checkAdmin()) {
+                $CustomItem17 = $this->authInfo['name'];
+                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+            } else {
+                $map = "";
+            }
+        // if (1) {
+            $sql_康雷 = "
+                SELECT
+                    State AS 省份,
+                    CustomerName AS 店铺名称,
+                    EBC.Mathod AS 经营模式,
+                    CustomerId,
+                    CustomerCode,
+                    EC.RegionId,
+                    CustomItem17 AS 商品负责人,
+                    CustomItem18 AS 督导负责人,
+                    CustomItem19 AS 店铺负责人
+                FROM
+                    ErpCustomer AS EC 
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                WHERE 
+                EC.RegionId NOT IN ('8','40', '55' ,'84', '85',  '97')
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EC.CustomerCode IN (
+                                SELECT
+                                        EC.CustomerCode 
+                                FROM
+                                        ErpRetail AS ER
+                                        LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                                        LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                                        LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
+                                WHERE
+                                        ER.CodingCodeText = '已审结' 
+                                        AND EC.ShutOut = 0 
+                                        AND EC.RegionId <> 55 
+                                        AND EBC.Mathod IN ( '直营')
+                                        {$map}    
+                                GROUP BY
+                                        ER.CustomerName,
+                                        EC.RegionId,
+                                        EC.CustomerCode
+                )
+                ORDER BY EBC.Mathod DESC
+            ";
+            $select_customer = $this->db_sqlsrv->query($sql_康雷);
+            $select_user = $this->db_easyA->table('dd_user')->select();
+            
+            // echo '<pre>';
+            // print_r($select_customer);
+            // print_r($select_user);
+            // die;
+            foreach ($select_customer as $key => $val) {
+                foreach ($select_user as $key2 => $val2) {
+
+                    if ($val['店铺名称'] == $val2['店铺名称']) {
+                        $店铺负责人 = trim($val['店铺负责人']);
+                        $pattern = "/{$店铺负责人}/i";
+                        $find_user = preg_match($pattern, $val2['name']);
+                        if ($find_user) {
+                            $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+                        }
+                    }
+                }
+                foreach ($select_user as $key2 => $val2) {
+                    if ($val['督导负责人']) {
+                        $pattern_督导 = "/督导/i";
+                        $find_督导 = preg_match($pattern_督导, $val2['title']);
+
+                        $pattern_name = "/{$val['督导负责人']}/i";
+                        $find_name = preg_match($pattern_name, $val2['name']);
+
+                        if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
+                            $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
+                            break;
+                        }
+                    }
+                }
+            }
+            // echo '<pre>';
+            // print_r($select_customer);
+            // // print_r($select_user);
+            // die;
+            return json(["code" => "0", "msg" => "", "count" => count($select_customer), "data" => $select_customer]);
+        } else {
+            return View('dduser', [
+                // 'config' => ,
+            ]);
+        }
+
+        // echo '<pre>';
+        // print_r($select_customer);
+    }
+
+    // 获取钉钉用户信息
+    public function getDingDingUserInfo2() {
+        // if (request()->isAjax()) {
+        if (1) {
+            if (!checkAdmin()) {
+                $CustomItem17 = $this->authInfo['name'];
+                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+            } else {
+                $map = "";
+            }
+
+            $select_user = $this->db_easyA->table('dd_user')->select();
+            
+            echo '<pre>';
+            // print_r($select_customer);
+            print_r($select_user);
+            die;
+            // foreach ($select_customer as $key => $val) {
+            //     foreach ($select_user as $key2 => $val2) {
+
+            //         if ($val['店铺名称'] == $val2['店铺名称']) {
+            //             $店铺负责人 = trim($val['店铺负责人']);
+            //             $pattern = "/{$店铺负责人}/i";
+            //             $find_user = preg_match($pattern, $val2['name']);
+            //             if ($find_user) {
+            //                 $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
+            //             }
+            //         }
+            //     }
+            //     foreach ($select_user as $key2 => $val2) {
+            //         if ($val['督导负责人']) {
+            //             $pattern_督导 = "/督导/i";
+            //             $find_督导 = preg_match($pattern_督导, $val2['title']);
+
+            //             $pattern_name = "/{$val['督导负责人']}/i";
+            //             $find_name = preg_match($pattern_name, $val2['name']);
+
+            //             if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
+            //                 $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
+            //                 break;
+            //             }
+            //         }
+            //     }
+            // }
+            // echo '<pre>';
+            // print_r($select_customer);
+            // // print_r($select_user);
+            // die;
+            
+            return json(["code" => "0", "msg" => "", "count" => count($select_user), "data" => $select_user]);
+        } else {
+            return View('dduser', [
+                // 'config' => ,
+            ]);
+        }
+
+        // echo '<pre>';
+        // print_r($select_customer);
+    }
+
     // 发送测试
     public function sendDingImg() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         // if (request()->isAjax() && $input['id']) {
-        if (1 && $input['id']) {
-            $model = new DingTalk;
-            // echo $path = $this->request->domain() ;
+        // if (1 && $input['id']) {
+        //     $model = new DingTalk;
+        //     // echo $path = $this->request->domain() ;
             
-            $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-                ['id', '=', $input['id']]
-            ])->find();
+        //     $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //         ['id', '=', $input['id']]
+        //     ])->find();
 
-            if ($find_list) {
-                $find_path = $this->db_easyA->table('dd_temp_img')->where([
-                    ['pid', '=', $find_list['pid']]
-                ])->find();
-                // echo $find_path['path'];
+        //     if ($find_list) {
+        //         $find_path = $this->db_easyA->table('dd_temp_img')->where([
+        //             ['pid', '=', $find_list['pid']]
+        //         ])->find();
+        //         // echo $find_path['path'];
 
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-                    ['uid', '=', $find_list['uid']]
-                ])->select();
+        //         $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+        //             ['uid', '=', $find_list['uid']]
+        //         ])->select();
 
-                foreach ($select_user as $key => $val) {
-                    // echo $val['姓名'];
-                    $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-                    dump($res);
-                }
-            }
-        }
+        //         foreach ($select_user as $key => $val) {
+        //             // echo $val['姓名'];
+        //             // $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
+        //             $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $find_path['path']);
+        //             dump($res);
+        //         }
+        //     }
+        // }
+        $model = new DingTalk;
+        $path = "http://im.babiboy.com/upload/dd_weather/20230904/万年一店.jpg";
+        $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $path);
+        dump($res);
     }
 
     public function sendDingImgHandle() {
@@ -561,4 +723,10 @@ class Uploadimg extends AdminController
         }       
     }
 
+    public function test() {
+        $str = '田珊';
+        $str2 = ' 11田珊珊的工作号';
+        $pattern = "/{$str}/i";
+        echo preg_match($pattern, $str2);
+    }
 }
