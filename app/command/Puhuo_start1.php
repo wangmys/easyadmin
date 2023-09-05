@@ -28,6 +28,7 @@ use app\admin\model\bi\SpLypPuhuoDaxiaomaSkcnumModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
 use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
+use app\admin\model\bi\CwlDaxiaoHandleModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 // use app\admin\model\CustomerModel;
 //每天凌晨04:00跑，预计10分钟跑完20个货号
@@ -51,6 +52,7 @@ class Puhuo_start1 extends Command
     protected $puhuo_daxiaoma_customer_sort_model;
     protected $puhuo_ti_goods_model;
     protected $puhuo_zhiding_goods_model;
+    protected $cwl_daxiao_handle_model;
 
     protected function configure()
     {
@@ -73,6 +75,7 @@ class Puhuo_start1 extends Command
         $this->puhuo_daxiaoma_customer_sort_model = new SpLypPuhuoDaxiaomaCustomerSortModel();
         $this->puhuo_ti_goods_model = new SpLypPuhuoTiGoodsModel();
         $this->puhuo_zhiding_goods_model = new SpLypPuhuoZhidingGoodsModel();
+        $this->cwl_daxiao_handle_model = new CwlDaxiaoHandleModel();
 
     }
 
@@ -264,9 +267,13 @@ class Puhuo_start1 extends Command
                         //大小码逻辑
 
                         //大小码店类型（大/正/小）
-                        $daxiaodian_info = $this->puhuo_daxiaoma_customer_model::where([['customer_name', '=', $v_customer['CustomerName']]])->field('big_small_store')->find();
+                        // $daxiaodian_info = $this->puhuo_daxiaoma_customer_model::where([['customer_name', '=', $v_customer['CustomerName']]])->field('big_small_store')->find();
+                        // $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
+                        // $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->puhuo_daxiaoma_customer_sort_model::store_type[$daxiaodian_info['big_small_store']] ?? 0) : 0;
+                        $daxiaodian_info = $this->cwl_daxiao_handle_model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $CategoryName1], ['二级分类', '=', $CategoryName2], 
+                        ['风格', '=', $StyleCategoryName], ['一级风格', '=', $StyleCategoryName1], ['季节归集', '=', $season]])->field('店铺名称,大小码提醒 as big_small_store')->find();
                         $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
-                        $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->puhuo_daxiaoma_customer_sort_model::store_type[$daxiaodian_info['big_small_store']] ?? 0) : 0;
+                        $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->cwl_daxiao_handle_model::store_type_text[$daxiaodian_info['big_small_store']] ?? 0) : 2;//1-大码店 2-正常店 3-小码店
                         
                         //大小码 满足率 分母
                         $daxiaoma_stock_skcnum = $this->return_daxiaoma_stock_skcnum($daxiaoma_skcnum_info, $daxiaodian_info);
@@ -838,7 +845,7 @@ class Puhuo_start1 extends Command
         if ($daxiaodian_info) {
 
             switch ($daxiaodian_info['big_small_store']) {
-                case '大码店': 
+                case $this->cwl_daxiao_handle_model::store_type['big']: //大码店
                     $Stock_00_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_00_skcnum_big'] : 0;
                     $Stock_29_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_29_skcnum_big'] : 0;
                     $Stock_34_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_34_skcnum_big'] : 0;
@@ -848,7 +855,17 @@ class Puhuo_start1 extends Command
                     $Stock_40_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_40_skcnum_big'] : 0;
                     $Stock_42_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_42_skcnum_big'] : 0;
                     break;
-                case '正常店': 
+                case $this->cwl_daxiao_handle_model::store_type['small']: //小码店
+                    $Stock_00_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_00_skcnum_small'] : 0;
+                    $Stock_29_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_29_skcnum_small'] : 0;
+                    $Stock_34_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_34_skcnum_small'] : 0;
+                    $Stock_35_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_35_skcnum_small'] : 0;
+                    $Stock_36_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_36_skcnum_small'] : 0;
+                    $Stock_38_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_38_skcnum_small'] : 0;
+                    $Stock_40_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_40_skcnum_small'] : 0;
+                    $Stock_42_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_42_skcnum_small'] : 0;
+                    break;      
+                default: //正常店
                     $Stock_00_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_00_skcnum_normal'] : 0;
                     $Stock_29_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_29_skcnum_normal'] : 0;
                     $Stock_34_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_34_skcnum_normal'] : 0;
@@ -858,16 +875,6 @@ class Puhuo_start1 extends Command
                     $Stock_40_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_40_skcnum_normal'] : 0;
                     $Stock_42_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_42_skcnum_normal'] : 0;
                     break;
-                case '小码店': 
-                    $Stock_00_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_00_skcnum_small'] : 0;
-                    $Stock_29_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_29_skcnum_small'] : 0;
-                    $Stock_34_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_34_skcnum_small'] : 0;
-                    $Stock_35_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_35_skcnum_small'] : 0;
-                    $Stock_36_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_36_skcnum_small'] : 0;
-                    $Stock_38_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_38_skcnum_small'] : 0;
-                    $Stock_40_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_40_skcnum_small'] : 0;
-                    $Stock_42_skcnum = $daxiaoma_skcnum_info ? $daxiaoma_skcnum_info['Stock_42_skcnum_small'] : 0;
-                    break;    
             }
 
         }
