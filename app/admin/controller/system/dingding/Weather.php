@@ -33,7 +33,7 @@ class Weather extends BaseController
     public function getCustomerCid() {
         $sql_1 = "
             SELECT cid,customerName AS 店铺名称,State AS 省份,date_format(now(),'%Y-%m-%d') AS 更新日期
-            FROM `customers` where cid is not null and RegionId <> 55
+            FROM `customers` where cid is not null and RegionId <> 55 AND Mathod = '直营'
         ";
         $selet_weather_customer = $this->db_tianqi->query($sql_1);
         // dump($selet_weather_customer);
@@ -207,7 +207,7 @@ class Weather extends BaseController
         // }
     }   
 
-    // 发送测试2
+    // 发送测试1
     public function sendDingImg() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
@@ -266,6 +266,38 @@ class Weather extends BaseController
 
     }
 
+    // 发送测试2
+    public function sendDingImg3() {
+        $model = new DingTalk;
+        $select = $this->db_easyA->query("
+            SELECT 
+                u.*
+            FROM
+                dd_weather_user_test as u
+            LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
+            where 1
+                and u.店铺名称 = c.店铺名称
+                and u.isCustomer = '是'
+                and u.name in ('李雅婷', '王梦园')
+        ");
+
+        // dump($select);die;
+
+        $datatime = date('Ymd');
+        foreach ($select as $key => $val) {
+            echo $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+            dump($val);
+            echo '<br>';
+            // $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气a", $path);
+
+            // echo $val['userid'];
+            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
+            // print_r($res);
+        }
+        
+
+    }
+
     // 图片生成1
     public function weather_pic() {
         $select = $this->db_easyA->query("
@@ -274,7 +306,7 @@ class Weather extends BaseController
             FROM
                 dd_weather_customer
             where 1
-                AND 店铺名称 in ('仁寿一店')
+                -- AND 店铺名称 in ('仁寿一店')
         ");
 
         foreach ($select as $key => $val) {

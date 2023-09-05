@@ -11,7 +11,7 @@ use app\BaseController;
  * Class Dingtalk
  * @package app\dingtalk
  */
-class Dingtalk extends BaseController
+class DingTalk extends BaseController
 {
     protected $db_easyA = '';
     protected $db_bi = '';
