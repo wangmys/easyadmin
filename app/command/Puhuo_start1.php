@@ -1077,11 +1077,14 @@ class Puhuo_start1 extends Command
                     foreach ($daxiaoma_puhuo_log as $v_daxiaoma_puhuo_log) {
                         if ($v_Stock_00_sort_arr['CustomerName'] == $v_daxiaoma_puhuo_log['CustomerName']) {
 
-                            if ($v_Stock_00_sort_arr['Stock_00_skcnum_cur'] >= $v_Stock_00_sort_arr['Stock_00_skcnum']) {//该店 当前尺码已满足无须再铺
-                                $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
-                            } else {
-                                $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
-                            }
+                            // if ($v_Stock_00_sort_arr['Stock_00_skcnum_cur'] >= $v_Stock_00_sort_arr['Stock_00_skcnum']) {//该店 当前尺码已满足无须再铺
+                            //     $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
+                            // } else {
+                            //     $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
+                            // }
+
+                            //去掉 当前尺码 大于 已有尺码库存逻辑 20230905
+                            $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
 
                         }
                     }
@@ -1392,11 +1395,14 @@ class Puhuo_start1 extends Command
                 if ($v_Stock_35_sort_arr['CustomerName'] == $v_daxiaoma_puhuo_log['CustomerName']) {
                     // $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
 
-                    if ($v_Stock_35_sort_arr['Stock_'.$each.'_skcnum_cur'] >= $v_Stock_35_sort_arr['Stock_'.$each.'_skcnum']) {//该店 当前尺码已满足无须再铺
-                        $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
-                    } else {
-                        $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
-                    }
+                    // if ($v_Stock_35_sort_arr['Stock_'.$each.'_skcnum_cur'] >= $v_Stock_35_sort_arr['Stock_'.$each.'_skcnum']) {//该店 当前尺码已满足无须再铺
+                    //     $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
+                    // } else {
+                    //     $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
+                    // }
+
+                    //去掉 当前尺码 大于 已有尺码库存逻辑 20230905
+                    $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
 
                 }
             }
@@ -1447,11 +1453,14 @@ class Puhuo_start1 extends Command
                 if ($v_Stock_35_sort_arr['CustomerName'] == $v_daxiaoma_puhuo_log['CustomerName']) {
                     // $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
 
-                    if ($v_Stock_35_sort_arr['Stock_'.$each.'_skcnum_cur'] >= $v_Stock_35_sort_arr['Stock_'.$each.'_skcnum']) {//该店 当前尺码已满足无须再铺
-                        $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
-                    } else {
-                        $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
-                    }
+                    // if ($v_Stock_35_sort_arr['Stock_'.$each.'_skcnum_cur'] >= $v_Stock_35_sort_arr['Stock_'.$each.'_skcnum']) {//该店 当前尺码已满足无须再铺
+                    //     $new_daxiaoma_puhuo_log_no[] = $v_daxiaoma_puhuo_log;
+                    // } else {
+                    //     $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
+                    // }
+
+                    //去掉 当前尺码 大于 已有尺码库存逻辑 20230905
+                    $new_daxiaoma_puhuo_log[] = $v_daxiaoma_puhuo_log;
 
                 }
             }
@@ -1538,49 +1547,49 @@ class Puhuo_start1 extends Command
         if ($v_last_daxiaoma_puhuo_log['Stock_00_puhuo'] > 0) {//28码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_00_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_00_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_29_puhuo'] > 0) {//29码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_29_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_29_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_29_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_34_puhuo'] > 0) {//34码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_34_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_34_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_34_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_35_puhuo'] > 0) {//35码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_35_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_35_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_36_puhuo'] > 0) {//36码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_36_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_36_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_38_puhuo'] > 0) {//38码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_38_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_38_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_40_puhuo'] > 0) {//40码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_40_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_40_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_42_puhuo'] > 0) {//42码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_42_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_42_goods_str_arr'] = $array_unique;
         }
 
@@ -1593,37 +1602,37 @@ class Puhuo_start1 extends Command
         if ($v_last_daxiaoma_puhuo_log['Stock_00_puhuo'] > 0) {//28码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_00_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_00_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_00_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_35_puhuo'] > 0) {//35码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_35_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_35_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_35_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_36_puhuo'] > 0) {//36码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_36_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_36_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_36_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_38_puhuo'] > 0) {//38码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_38_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_38_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_38_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_40_puhuo'] > 0) {//40码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_40_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_40_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_40_goods_str_arr'] = $array_unique;
         }
         if ($v_last_daxiaoma_puhuo_log['Stock_42_puhuo'] > 0) {//42码
             $array_unique = array_unique(array_merge($vv_daxiaoma_skcnum_score_sort['Stock_42_goods_str_arr'], $current_goods));
             $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur'] = count($array_unique);
-            $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_score'] = round($vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'], 2);
+            $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_score'] = $vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'] ? round($vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum_cur']/$vv_daxiaoma_skcnum_score_sort['Stock_42_skcnum'], 2) : 0;
             $vv_daxiaoma_skcnum_score_sort['Stock_42_goods_str_arr'] = $array_unique;
         }
 
