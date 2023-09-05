@@ -103,7 +103,13 @@ class Puhuo_start1 extends Command
             $this->db_easy->Query("truncate table sp_lyp_puhuo_log;");
 
             $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
-            $all_customers = $this->db_easy->Query("select * from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0;");
+            $new_customers = $this->db_easy->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
+            and CustomerName not in (select 店铺名称 from customer_first);");//剔除新店
+            $new_customers = $new_customers ? array_column($new_customers, 'CustomerName') : [];
+            $new_customers = get_goods_str($new_customers);
+            $new_customers_sql = $new_customers ? " and CustomerName not in ($new_customers) " : '';
+
+            $all_customers = $this->db_easy->Query("select * from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 $new_customers_sql;");
             //云仓归类
             $all_customer_arr = [];
             if ($all_customers) {
