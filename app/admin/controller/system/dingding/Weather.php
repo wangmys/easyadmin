@@ -377,7 +377,7 @@ class Weather extends BaseController
         $weather_data[4]['星期'] = date_to_week3($data['day8']);
         $weather_data[4]['最低温~最高温']= $data['day8_min'] . '~' . $data['day8_max']; 
         $weather_data[5]['日期'] = $data['day9'];
-        $weather_data[5]['星期'] = date_to_week3($data['day8']);
+        $weather_data[5]['星期'] = date_to_week3($data['day9']);
         $weather_data[5]['最低温~最高温']= $data['day9_min'] . '~' . $data['day9_max']; 
         $weather_data[6]['日期'] = $data['day10'];
         $weather_data[6]['星期'] = date_to_week3($data['day10']);
