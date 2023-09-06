@@ -273,15 +273,14 @@ class Weather extends BaseController
             SELECT 
                 u.*
             FROM
-                dd_weather_user_test as u
+                dd_weather_user as u
             LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
             where 1
                 and u.店铺名称 = c.店铺名称
                 and u.isCustomer = '是'
-                and u.name in ('李雅婷', '王梦园')
         ");
 
-        // dump($select);die;
+        // print_r($select);die;
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {

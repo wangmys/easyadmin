@@ -13,6 +13,7 @@ use app\BaseController;
 
 /**
  * @ControllerAnnotation(title="断码率")
+ * 改成 top50 了
  */
 class Duanmalv extends BaseController
 {
@@ -936,6 +937,7 @@ class Duanmalv extends BaseController
                     order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
         ";
 
+        // top60 top50 销售top分配 skctop分配
         $sql2 = "
         SELECT 
             m1.*,
@@ -951,18 +953,18 @@ class Duanmalv extends BaseController
             end as 销售占比,
             case
                 m1.风格
-                when '基本款' then round(m1.SKC数 / m1.店铺SKC数_基本款 * 60, 4)
-                when '引流款' then round(m1.SKC数 / m1.店铺SKC数_引流款 * 60, 4)
+                when '基本款' then round(m1.SKC数 / m1.店铺SKC数_基本款 * 50, 4)
+                when '引流款' then round(m1.SKC数 / m1.店铺SKC数_引流款 * 50, 4)
             end as SKC数TOP分配,
             case
                 m1.风格
-                when '基本款' then round(m1.销售金额 / m1.店铺总销售金额_基本款 * 60, 4)
-                when '引流款' then round(m1.销售金额 / m1.店铺总销售金额_引流款 * 60, 4)
+                when '基本款' then round(m1.销售金额 / m1.店铺总销售金额_基本款 * 50, 4)
+                when '引流款' then round(m1.销售金额 / m1.店铺总销售金额_引流款 * 50, 4)
             end as 销售TOP分配,
             case
                 m1.风格
-                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * 60 + m1.销售金额 / m1.店铺总销售金额_基本款 * 60) / 2, 0)
-                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * 60 + m1.销售金额 / m1.店铺总销售金额_引流款 * 60) / 2, 0)
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * 50 + m1.销售金额 / m1.店铺总销售金额_基本款 * 50) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * 50 + m1.销售金额 / m1.店铺总销售金额_引流款 * 50) / 2, 0)
             end as 实际分配TOP
         FROM
             (SELECT sk.经营模式,
