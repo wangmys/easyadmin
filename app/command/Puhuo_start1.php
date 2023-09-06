@@ -155,6 +155,9 @@ class Puhuo_start1 extends Command
             }
             // print_r($qiwen_config_arr);die;
 
+            //大小码店信息
+            $daxiao_res = $this->get_daxiao_handle();
+
             //开始尝试自动铺货模式
             foreach ($data as $v_data) {
                 // print_r($v_data);die;
@@ -270,11 +273,14 @@ class Puhuo_start1 extends Command
                         // $daxiaodian_info = $this->puhuo_daxiaoma_customer_model::where([['customer_name', '=', $v_customer['CustomerName']]])->field('big_small_store')->find();
                         // $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
                         // $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->puhuo_daxiaoma_customer_sort_model::store_type[$daxiaodian_info['big_small_store']] ?? 0) : 0;
-                        $daxiaodian_info = $this->cwl_daxiao_handle_model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $CategoryName1], ['二级分类', '=', $CategoryName2], 
-                        ['风格', '=', $StyleCategoryName], ['一级风格', '=', $StyleCategoryName1], ['季节归集', '=', $season]])->field('店铺名称,大小码提醒 as big_small_store')->find();
-                        $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
+
+                        // $daxiaodian_info = $this->cwl_daxiao_handle_model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $CategoryName1], ['二级分类', '=', $CategoryName2], 
+                        // ['风格', '=', $StyleCategoryName], ['一级风格', '=', $StyleCategoryName1], ['季节归集', '=', $season]])->field('店铺名称,大小码提醒 as big_small_store')->find();
+                        // $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
+                        // $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->cwl_daxiao_handle_model::store_type_text[$daxiaodian_info['big_small_store']] ?? 0) : 2;//1-大码店 2-正常店 3-小码店
+                        $daxiaodian_info = $daxiao_res[$v_customer['CustomerName'].$CategoryName1.$CategoryName2.$StyleCategoryName.$StyleCategoryName1.$season] ?? [];
                         $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->cwl_daxiao_handle_model::store_type_text[$daxiaodian_info['big_small_store']] ?? 0) : 2;//1-大码店 2-正常店 3-小码店
-                        
+
                         //大小码 满足率 分母
                         $daxiaoma_stock_skcnum = $this->return_daxiaoma_stock_skcnum($daxiaoma_skcnum_info, $daxiaodian_info);
                         // print_r($daxiaoma_stock_skcnum);die;
@@ -631,6 +637,17 @@ class Puhuo_start1 extends Command
         $sql = "select sum(skc_num) as store_yuji_skc_num from sp_lyp_puhuo_spsk_stock where store_name='{$data['店铺名称']}' and category1='{$data['一级分类']}' and category2='{$data['二级分类']}' and year='{$data['一级时间分类']}' and season='{$season}' and style='{$data['风格']}';";
         // echo $sql;die;
         return $sql;
+
+    }
+
+    //获取大小码店数据
+    protected function get_daxiao_handle() {
+
+        $sql = 'select CONCAT(店铺名称, "", 一级分类, "", 二级分类, "", 风格, "", 一级风格, "", 季节归集  ) as merge_str, 大小码提醒 as big_small_store from cwl_daxiao_handle group by merge_str;';
+        $res = $this->db_easy->Query($sql);
+        $merge_str_arr = $res ? array_column($res, 'merge_str') : [];
+        $res = array_combine($merge_str_arr, $res);
+        return $res;
 
     }
 
@@ -1093,7 +1110,7 @@ class Puhuo_start1 extends Command
                 if ($new_daxiaoma_puhuo_log) {
                     foreach ($new_daxiaoma_puhuo_log as &$v_new_daxiaoma_puhuo_log) {
     
-                        if ($each_sum >= $Stock_00 || $Stock_00==0) break;
+                        if ($Stock_00 <= 0) break;
                         if ($v_new_daxiaoma_puhuo_log['rule']['Stock_00'] > $Stock_00) {
     
                             $v_new_daxiaoma_puhuo_log['Stock_00_puhuo'] = $Stock_00;
@@ -1411,7 +1428,7 @@ class Puhuo_start1 extends Command
         if ($new_daxiaoma_puhuo_log) {
             foreach ($new_daxiaoma_puhuo_log as &$v_new_daxiaoma_puhuo_log) {
     
-                if ($each_sum >= $each_Stock || $each_Stock==0) break;
+                if ($each_Stock <= 0) break;
                 if ($v_new_daxiaoma_puhuo_log['rule']['Stock_'.$each] > $each_Stock) {
     
                     $v_new_daxiaoma_puhuo_log['Stock_'.$each.'_puhuo'] = $each_Stock;
@@ -1470,7 +1487,7 @@ class Puhuo_start1 extends Command
         if ($new_daxiaoma_puhuo_log) {
             foreach ($new_daxiaoma_puhuo_log as &$v_new_daxiaoma_puhuo_log) {
     
-                if ($each_sum >= $each_Stock || $each_Stock==0) break;
+                if ($each_Stock <= 0) break;//$each_sum >= $each_Stock || 
                 if ($v_new_daxiaoma_puhuo_log['rule']['Stock_'.$each] > $each_Stock) {
     
                     $v_new_daxiaoma_puhuo_log['Stock_'.$each.'_puhuo'] = $each_Stock;
