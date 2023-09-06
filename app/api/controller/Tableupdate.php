@@ -53,7 +53,7 @@ class Tableupdate extends BaseController
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_data()
     {
-        $date = input('date') ? input('date') : date('Y-m-d', strtotime('-1 day'));
+        $date = input('date') ? input('date') : date('Y-m-d', time());
 
         $sql = "
             declare @retail_date DATE
