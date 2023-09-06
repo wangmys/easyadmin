@@ -13,6 +13,10 @@ use app\BaseController;
 
 /**
  * @ControllerAnnotation(title="基础表更新")
+ * 
+ * 店铺每日业绩 bi ww_dianpuyejihuanbi_data
+ * 更新链接：
+ * 
  */
 class Tableupdate extends BaseController
 {
@@ -101,12 +105,12 @@ class Tableupdate extends BaseController
         if ($select_data) {
             // dump($select_data);
             // 删 easyadmin2
-            $this->db_bi->table('cwl_dianpuyejihuanbi_data')->where([
+            $this->db_bi->table('ww_dianpuyejihuanbi_data')->where([
                 ['日期', '=', $date]
             ])->delete();
 
             $this->db_bi->startTrans();
-            $insertAll = $this->db_bi->table('cwl_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
+            $insertAll = $this->db_bi->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
                 $this->db_bi->commit();
                 return json([
