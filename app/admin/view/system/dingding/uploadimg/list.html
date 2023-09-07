@@ -396,6 +396,24 @@
                     , { field: 'createtime', title: '创建时间', align:'center' } 
                     , { field: 'sendtime', title: '发送时间', align:'center' } 
                     , { field: '撤回时间', title: '撤回时间', align:'center' } 
+                    , { title: '状态', align:'center', templet:
+                        function (data) {
+                            var html = '';
+                            if (data.sendtime && !data['撤回时间']) {
+                                html = `
+                                    <span style="color:blue;">已发送</span>
+                                `;
+                            } else if (data['撤回时间'])  {
+                                html = `
+                                <span style="color:red;">已撤回</span>
+                                `;
+                            } else  {
+                                html = `
+                                    未发送
+                                `;
+                            }
+                            return html; 
+                        }}
                     , { title: '操作', align:'center', templet:
                         function (data) {
                             console.log(data.title)
@@ -418,8 +436,6 @@
                                     </button>
                                 `;
                             }
-
-    
                             return html; 
                         }}
                 ]]
