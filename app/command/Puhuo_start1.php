@@ -1181,18 +1181,16 @@ class Puhuo_start1 extends Command
                     'Stock_42_puhuo' => $v_data['Stock_42_puhuo'],
                     'Stock_Quantity_puhuo' => $v_data['Stock_Quantity_puhuo'],
                 ];
+                // print_r([$init_puhuo_stock, count($last_daxiaoma_puhuo_log), $last_daxiaoma_puhuo_log]);die;
 
-                //最终连码识别：
-                foreach ($last_daxiaoma_puhuo_log as $k_last_daxiaoma_puhuo_log=>&$v_last_daxiaoma_puhuo_log) {
-
-                    //test.....暂时测试测试
-                    // if ($v_last_daxiaoma_puhuo_log['CustomerName'] != '忠县一店') continue;
-
+                //先铺能满足连码的
+                $merge_lianma_arr = [];
+                $merge_not_lianma_arr = [];
+                foreach ($last_daxiaoma_puhuo_log as $k_last_daxiaoma_lianma=>$v_last_daxiaoma_lianma) {
                     $key_arr = [];    
-                    foreach ($v_last_daxiaoma_puhuo_log as $kk_daxiaoma_puhuo_log=>$vv_daxiaoma_puhuo_log) {
+                    foreach ($v_last_daxiaoma_lianma as $kk_daxiaoma_puhuo_log=>$vv_daxiaoma_puhuo_log) {
                         if (strstr($kk_daxiaoma_puhuo_log, 'Stock') && $vv_daxiaoma_puhuo_log > 0) $key_arr[] = $this->return_which_stock_num($kk_daxiaoma_puhuo_log);
                     }
-
 
                     $pu_arr_keys = getSeriesNum($key_arr);
                     if ($pu_arr_keys) {
@@ -1200,9 +1198,31 @@ class Puhuo_start1 extends Command
                             if (count($v_keys) < $lianma_num) unset($pu_arr_keys[$k_keys]);
                         }
                     }
-                    // print_r($pu_arr_keys);die;
-
                     if (!$pu_arr_keys) {//没有连码 ，不可铺
+                        $v_last_daxiaoma_lianma['is_lianma'] = 0;
+                        $merge_not_lianma_arr[] = $v_last_daxiaoma_lianma;
+                    } else {
+                        $v_last_daxiaoma_lianma['is_lianma'] = 1;
+                        $merge_lianma_arr[] = $v_last_daxiaoma_lianma;
+                    }
+                }
+                $merge_lianma_arr = array_merge($merge_lianma_arr, $merge_not_lianma_arr);
+
+                // //test...
+                // foreach ($last_daxiaoma_puhuo_log as $v_add_puhuo_log) {
+                //     if ($v_add_puhuo_log['Stock_38_puhuo'] > 0) $arr[] = $v_add_puhuo_log['Stock_38_puhuo'];
+                // }
+                // print_r([$arr, 7878]);die;
+
+                //最终连码识别：
+                foreach ($merge_lianma_arr as $k_last_daxiaoma_puhuo_log=>&$v_last_daxiaoma_puhuo_log) {
+
+                    //test.....暂时测试测试
+                    // if ($v_last_daxiaoma_puhuo_log['CustomerName'] != '忠县一店') continue;
+
+                    $is_lianma = $v_last_daxiaoma_puhuo_log['is_lianma'];
+
+                    if (!$is_lianma) {//没有连码 ，不可铺
 
                         //不可铺，wait_goods（主码）各个尺码库存恢复
                         if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
@@ -1325,15 +1345,14 @@ class Puhuo_start1 extends Command
 
                         }
 
-
                     }
 
                     unset($v_last_daxiaoma_puhuo_log['rule']);
+					unset($v_last_daxiaoma_puhuo_log['is_lianma']);
                     $v_last_daxiaoma_puhuo_log['total'] = ($v_last_daxiaoma_puhuo_log['Stock_00_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_29_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_30_puhuo'] + 
                     $v_last_daxiaoma_puhuo_log['Stock_31_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_32_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_33_puhuo'] + 
                     $v_last_daxiaoma_puhuo_log['Stock_34_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_35_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_36_puhuo'] + 
                     $v_last_daxiaoma_puhuo_log['Stock_38_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_40_puhuo'] + $v_last_daxiaoma_puhuo_log['Stock_42_puhuo']) ;
-
 
                 }
 
