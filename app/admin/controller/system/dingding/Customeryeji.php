@@ -222,7 +222,7 @@ class Customeryeji extends BaseController
         $date = input('date') ? input('date') : date('Y-m-d');
         $select_customer = $this->db_easyA->table('dd_customer_yeji')->field('店铺名称,温区')->where([
             ['销售日期', '=', $date],
-            // ['店铺名称', '=', '安化二店'],
+            ['店铺名称', '=', '南宁二店'],
         ])->group('店铺名称')->select()->toArray();
 
         // dump($select_customer);die;
@@ -411,6 +411,8 @@ class Customeryeji extends BaseController
                 }
             }
 
+            // echo '<pre>';
+            // print_r($data); die;
             // dump($data);
             // echo $v['店铺名称'];die;
 

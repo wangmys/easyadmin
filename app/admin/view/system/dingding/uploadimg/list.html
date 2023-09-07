@@ -178,6 +178,7 @@
             , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}"
             , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
             , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
+            , recallImgHandle = "{:url('admin/system.dingding.Uploadimg/recallImgHandle')}"
             , url1 = "{:url('admin/system.dingding.Uploadimg/list')}"; 
 
         // 表1初始化
@@ -253,7 +254,7 @@
 
             //询问框
             layer.confirm(`是否推送【${title}】`, {
-                btn: ['是的','再考'] //按钮
+                btn: ['是的','再想想'] //按钮
             }, function(data){
                 // layer.close();
                 if (!stop) {
@@ -268,6 +269,38 @@
                         layer.msg(res.msg, {icon: 1});
                         setTimeout(function() {
                             stop = false
+                        }, 500)
+                    })
+                }
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+        }); 
+
+        var stop2 = false;
+        // 监听事件 
+        $(document).on('click', '.recallBtn', function(data){
+            var id = window.localStorage.getItem('sendDingImg_id');
+            var title = window.localStorage.getItem('sendDingImg_title');
+
+            //询问框
+            layer.confirm(`是否撤回【${title}】`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                // layer.close();
+                if (!stop2) {
+                    stop2 = true
+                    $.post(recallImgHandle, {'id': id}, function(res) {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                        layer.msg(res.msg, {icon: 1});
+                        setTimeout(function() {
+                            stop2 = false
                         }, 500)
                     })
                 }
@@ -362,15 +395,32 @@
                         }}
                     , { field: 'createtime', title: '创建时间', align:'center' } 
                     , { field: 'sendtime', title: '发送时间', align:'center' } 
+                    , { field: '撤回时间', title: '撤回时间', align:'center' } 
                     , { title: '操作', align:'center', templet:
                         function (data) {
                             console.log(data.title)
-                            return `
+                            var html = `
                                 <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
                                 letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
                                     推送
                                 </button>
-                            `; 
+                            `;
+                            if (data.task_id) {
+                                var html = `
+                                    <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
+                                        推送
+                                    </button>
+
+                                    <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
+                                        撤回
+                                    </button>
+                                `;
+                            }
+
+    
+                            return html; 
                         }}
                 ]]
                 ,done: function (res, curr, count) {

@@ -381,14 +381,18 @@ class Uploadimg extends AdminController
             $sql = "
                 SELECT 
                     list.*,
-                    img.path
+                    img.path,
+                    task.task_id,
+                    list.撤回时间
                 FROM 
                     dd_userimg_list as list 
                 LEFT JOIN dd_temp_img as img ON list.pid = img.pid 
+                LEFT JOIN dd_task_id as task ON list.id = task.lid AND task.撤回时间 is null
                 WHERE 1
                     {$mapSuper}
+                group by id
                 ORDER BY
-                    id DESC
+                    id DESC     
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -676,7 +680,6 @@ class Uploadimg extends AdminController
                 ])->find();    
             }
 
-
             if ($find_list) {
                 $find_path = $this->db_easyA->table('dd_temp_img')->where([
                     ['pid', '=', $find_list['pid']]
@@ -697,8 +700,20 @@ class Uploadimg extends AdminController
                         if ( ($key2 + 1) < count($val) ) {
                             $userids .= $val2['userid'] . ',';
                         } else {
+                            // 最后一次发送
                             $userids .= $val2['userid'];
-                            $res = $model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']);
+                            $res = json_decode($model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']), true);
+
+                            $res2 = $this->db_easyA->table('dd_task_id')->insert([
+                                'lid' => $find_list['id'],
+                                'aid' => $find_list['aid'],
+                                'aname' => $find_list['aname'],
+                                'title' => $find_list['title'],
+                                'request_id' => $res['request_id'],
+                                'task_id' => $res['task_id'],
+                                'errmsg' => $res['errmsg'],
+                                'createtime' => date('Y-m-d H:i:s'),
+                            ]);
                         }
                     }
                     
@@ -717,6 +732,54 @@ class Uploadimg extends AdminController
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
                 return json(['code' => 0, 'msg' => '信息有误，执行失败']);
+            }
+        } else {
+            return json(['code' => 0, 'msg' => '请勿非法请求']);
+        }       
+    }
+
+    // 消息撤回
+    public function recallImgHandle() {
+        $input = input();
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
+            $model = new DingTalk;
+            // echo $path = $this->request->domain() ;
+            
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
+
+
+            if ($find_list) {
+                $select_task = $this->db_easyA->table('dd_task_id')->where([
+                    ['lid', '=', $find_list['id']]
+                ])->select()->toArray();
+
+                $model = new DingTalk;
+                foreach($select_task as $key => $val) {
+                    $res = json_decode($model->recallMessage($val['task_id']), true);
+                    
+                    $res2 = $this->db_easyA->table('dd_task_id')->where(['lid' => $input['id']])->update([
+                        '撤回时间' => date('Y-m-d H:i:s'),
+                    ]);
+                    $res2 = $this->db_easyA->table('dd_userimg_list')->where(['id' => $input['id']])->update([
+                        '撤回时间' => date('Y-m-d H:i:s'),
+                    ]);
+                    
+                }
+
+                return json(['code' => 0, 'msg' => '执行成功']);
+            } else {
+                return json(['code' => 0, 'msg' => '执行失败']);
             }
         } else {
             return json(['code' => 0, 'msg' => '请勿非法请求']);
