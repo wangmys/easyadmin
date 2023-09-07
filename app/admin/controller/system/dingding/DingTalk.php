@@ -177,7 +177,7 @@ class DingTalk extends BaseController
     public function sendMarkdownImg($userid, $title, $path)
     {
         $time = time();
-        $timeStr = date('Y-m-y H:i:s', time());
+        $timeStr = date('Y-m-d H:i:s', time());
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
         $SendToUser_data = [
             'userid_list' => $userid,
@@ -199,7 +199,7 @@ class DingTalk extends BaseController
     public function sendMarkdownImg_pro($userids, $title, $path)
     {
         $time = time();
-        $timeStr = date('Y-m-y H:i:s', time());
+        $timeStr = date('Y-m-d H:i:s', time());
         $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
         $SendToUser_data = [
             'userid_list' => $userids,
