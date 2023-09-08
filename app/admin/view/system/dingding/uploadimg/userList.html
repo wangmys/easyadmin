@@ -110,11 +110,8 @@
                 <div class="flex row end between">
                     <div></div>
                     <div class="flex col between" style="width:5%; height:35px; display: none;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="addBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">添加记录
-                        </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">导出未读
                         </button>
                     </div>
                 </div>  
@@ -136,6 +133,12 @@
 <script type="text/html" id="introduceHtml">
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
+<!-- tools -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="download">导出未读</button>
+    </div>
+</script>
 <script>
     // var sendDingImg = function (id, title) {
     //     window.localStorage.setItem('sendDingImg_id', id);
@@ -152,7 +155,8 @@
             , layer = layui.layer
             , table = layui.table
             , laydate = layui.laydate
-            , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}";
+            , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}"
+            , downloadUrl = "{:url('admin/system.dingding.Uploadimg/downloadUserList')}";
 
 
         // 表1初始化
@@ -221,7 +225,29 @@
         }
 
 
-        // 单店不动销数据统计 
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            uid = window.localStorage.getItem('sendDingImg_uid');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl + '?uid=' + uid;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
         function startTable() {
             var mapHeight = $('#map').height();
             // var yc = window.localStorage.getItem('viewCustomer_yc');
@@ -233,7 +259,7 @@
                 ,url: url_user
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: true
                 , limit: 2000
                 , limits: [2000, 500, 1000, 2000, 5000, 10000, 20000]

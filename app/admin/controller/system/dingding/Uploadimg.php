@@ -444,7 +444,7 @@ class Uploadimg extends AdminController
                     AND uid = '{$uid}'
                     {$mapSuper}
                 ORDER BY
-                    店铺名称 ASC
+                    已读 ASC,店铺名称
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -458,7 +458,7 @@ class Uploadimg extends AdminController
                     AND uid = '{$uid}'
                     {$mapSuper}
                 ORDER BY
-                    店铺名称 ASC
+                    已读 ASC,店铺名称
             ";
             $count = $this->db_easyA->query($sql2);
             // print_r($count);
@@ -468,6 +468,28 @@ class Uploadimg extends AdminController
                 // 'config' => ,
             ]);
         }        
+    }
+
+    public function downloadUserList() {
+        $uid = input('uid');
+        $sql = "
+            SELECT 
+                店铺名称,姓名,手机,title as 职位,
+                '否' as 已读
+            FROM 
+                dd_temp_excel_user_success   
+            WHERE 1
+                AND uid = '{$uid}'
+                AND 已读 = 'N'
+            ORDER BY
+                已读 ASC,店铺名称
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 获取钉钉用户信息
