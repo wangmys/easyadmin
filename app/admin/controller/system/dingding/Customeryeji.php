@@ -819,10 +819,8 @@ class Customeryeji extends BaseController
             FROM
                 dd_weather_user 
             where 1
-                AND name in ('陈威良', '王威')
+                -- AND name in ('陈威良', '王威')
         ");
-
-        // print_r($select);die;
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
