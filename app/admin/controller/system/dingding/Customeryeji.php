@@ -11,6 +11,7 @@ use app\BaseController;
  * @package app\dingtalk
  * 
  * 1.获取数据源 http://www.easyadmin1.com/admin/system.dingding.Customeryeji/getData?date=2023-09-05
+ * 2.生成店铺图 http://www.easyadmin1.com/admin/system.dingding.Customeryeji/getCustomer?date=2023-09-05
  */
 class Customeryeji extends BaseController
 {
@@ -222,7 +223,7 @@ class Customeryeji extends BaseController
         $date = input('date') ? input('date') : date('Y-m-d');
         $select_customer = $this->db_easyA->table('dd_customer_yeji')->field('店铺名称,温区')->where([
             ['销售日期', '=', $date],
-            ['店铺名称', '=', '南宁二店'],
+            // ['店铺名称', '=', '南宁二店'],
         ])->group('店铺名称')->select()->toArray();
 
         // dump($select_customer);die;
@@ -807,95 +808,36 @@ class Customeryeji extends BaseController
         // echo '<img src="/' . $save_path . '"/>';
     }
 
-    // 发送测试1
+
+    // 发送测试2
     public function sendDingImg() {
-        $input = input();
-        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
-        // if (request()->isAjax() && $input['id']) {
-        // if (1 && $input['id']) {
-        //     $model = new DingTalk;
-        //     // echo $path = $this->request->domain() ;
-            
-        //     $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-        //         ['id', '=', $input['id']]
-        //     ])->find();
-
-        //     if ($find_list) {
-        //         $find_path = $this->db_easyA->table('dd_temp_img')->where([
-        //             ['pid', '=', $find_list['pid']]
-        //         ])->find();
-        //         // echo $find_path['path'];
-
-        //         $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-        //             ['uid', '=', $find_list['uid']]
-        //         ])->select();
-
-        //         foreach ($select_user as $key => $val) {
-        //             // echo $val['姓名'];
-        //             // $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-        //             $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $find_path['path']);
-        //             dump($res);
-        //         }
-        //     }
-        // }
-        $model = new DingTalk;
-        $path = "http://im.babiboy.com/upload/dd_weather/20230904/万年一店.jpg";
-        $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $path);
-        dump($res);
-    }
-
-    // 发送测试2
-    public function sendDingImg2() {
+        $date = input('date') ? input('date') : date('Y-m-d');
         $model = new DingTalk;
         $select = $this->db_easyA->query("
             SELECT 
-                店铺名称
+                *
             FROM
-                dd_weather_customer
+                dd_weather_user 
             where 1
-            limit 1;
+                AND name in ('陈威良', '王威')
         ");
 
-        foreach ($select as $key => $val) {
-            echo $path = "http://im.babiboy.com/upload/dd_weather/20230904/{$val['店铺名称']}.jpg?v=" . time();
-            echo '<br>';
-            $res = $model->sendMarkdownImg_pro('350364576037719254', "{$val['店铺名称']} 未来7天天气", $path);
-            dump($res);
-        }
-        
-
-    }
-
-    // 发送测试2
-    public function sendDingImg3() {
-        $model = new DingTalk;
-        $select = $this->db_easyA->query("
-            SELECT 
-                u.*
-            FROM
-                dd_weather_user_test as u
-            LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
-            where 1
-                and u.店铺名称 = c.店铺名称
-                and u.isCustomer = '是'
-                and u.name in ('李雅婷', '王梦园')
-        ");
-
-        // dump($select);die;
+        // print_r($select);die;
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
-            echo $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
-            dump($val);
-            echo '<br>';
-            // $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气a", $path);
+            // 线上
+            $path = "http://im.babiboy.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
-            // echo $val['userid'];
-            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
-            // print_r($res);
+            // 本地
+            // $path = "http://www.easyadmin1.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+
+            $headers = get_headers($path);
+            if(substr($headers[0], 9, 3) == 200){
+                $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 今日销售情况", $path);    
+            } else {
+                echo '图片不存在';
+            }
         }
-        
-
     }
-    
 }

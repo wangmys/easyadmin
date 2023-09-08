@@ -207,63 +207,21 @@ class Weather extends BaseController
         // }
     }   
 
-    // 发送测试1
-    public function sendDingImg() {
-        $input = input();
-        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
-        // if (request()->isAjax() && $input['id']) {
-        // if (1 && $input['id']) {
-        //     $model = new DingTalk;
-        //     // echo $path = $this->request->domain() ;
-            
-        //     $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-        //         ['id', '=', $input['id']]
-        //     ])->find();
 
-        //     if ($find_list) {
-        //         $find_path = $this->db_easyA->table('dd_temp_img')->where([
-        //             ['pid', '=', $find_list['pid']]
-        //         ])->find();
-        //         // echo $find_path['path'];
-
-        //         $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-        //             ['uid', '=', $find_list['uid']]
-        //         ])->select();
-
-        //         foreach ($select_user as $key => $val) {
-        //             // echo $val['姓名'];
-        //             // $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-        //             $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $find_path['path']);
-        //             dump($res);
-        //         }
-        //     }
-        // }
-        $model = new DingTalk;
-        $path = "http://im.babiboy.com/upload/dd_weather/20230904/万年一店.jpg";
-        $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $path);
-        dump($res);
-    }
-
-    // 发送测试2
-    public function sendDingImg2() {
-        $model = new DingTalk;
+    // 图片生成1
+    public function weather_pic() {
         $select = $this->db_easyA->query("
             SELECT 
                 店铺名称
             FROM
                 dd_weather_customer
             where 1
-            limit 1;
+                -- AND 店铺名称 in ('仁寿一店')
         ");
 
         foreach ($select as $key => $val) {
-            echo $path = "http://im.babiboy.com/upload/dd_weather/20230904/{$val['店铺名称']}.jpg?v=" . time();
-            echo '<br>';
-            $res = $model->sendMarkdownImg_pro('350364576037719254', "{$val['店铺名称']} 未来7天天气", $path);
-            dump($res);
+            $this->create_table_weather($val['店铺名称']);
         }
-        
-
     }
 
     // 发送测试2
@@ -289,24 +247,6 @@ class Weather extends BaseController
             // echo $val['userid'];
             $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
             // print_r($res);
-        }
-        
-
-    }
-
-    // 图片生成1
-    public function weather_pic() {
-        $select = $this->db_easyA->query("
-            SELECT 
-                店铺名称
-            FROM
-                dd_weather_customer
-            where 1
-                -- AND 店铺名称 in ('仁寿一店')
-        ");
-
-        foreach ($select as $key => $val) {
-            $this->create_table_weather($val['店铺名称']);
         }
     }
 
