@@ -553,7 +553,43 @@ class DingTalk extends BaseController
         );
         $result = $this->PostCurlRequest($webhook, $SendToUser_data);
         return $result;
+    }
 
+
+    /**
+     * 工作通知进度
+     * @return bool|string
+     */    
+    public function getsendprogress($task_id = '')
+    {
+        $task_id ? $task_id : input('task_id');
+        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendprogress?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = json_encode(
+            [
+                'agent_id' => $this->AgentId_cwl,
+                'task_id' => $task_id
+            ]
+        );
+        $result = $this->PostCurlRequest($webhook, $SendToUser_data);
+        return $result;
+    }
+
+    /**
+     * 工作通知结果
+     * @return bool|string
+     */    
+    public function getsendresult($task_id = '')
+    {
+        $task_id ? $task_id : input('task_id');
+        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendresult?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = json_encode(
+            [
+                'agent_id' => $this->AgentId_cwl,
+                'task_id' => $task_id
+            ]
+        );
+        $result = $this->PostCurlRequest($webhook, $SendToUser_data);
+        return $result;
     }
 
 

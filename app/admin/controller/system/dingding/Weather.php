@@ -29,7 +29,7 @@ class Weather extends BaseController
         $this->db_tianqi = Db::connect('tianqi');
     }
 
-    // 更新店铺cid
+    // 更新店铺cid 几秒
     public function getCustomerCid() {
         $sql_1 = "
             SELECT cid,customerName AS 店铺名称,State AS 省份,date_format(now(),'%Y-%m-%d') AS 更新日期
@@ -46,7 +46,7 @@ class Weather extends BaseController
         }
     }
 
-    // 天气历史 10天
+    // 天气历史 10天 几秒
     public function getWeather() {
         $dateList = getWeatherDateList(1); 
         // dump($dateList ); die;
@@ -129,7 +129,7 @@ class Weather extends BaseController
         }
     }
 
-    // 店铺天气
+    // 店铺天气 几秒
     public function getCustomerWeather() {
         // 每日天气日期，最高最低温度
         $sql = "
@@ -284,10 +284,7 @@ class Weather extends BaseController
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
-            echo $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
-            dump($val);
-            echo '<br>';
-            // $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气a", $path);
+            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
             // echo $val['userid'];
             $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);

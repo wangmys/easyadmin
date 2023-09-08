@@ -233,7 +233,7 @@
                 ,url: url_user
                 , loading: true
                 , method: 'post'
-                , toolbar: false
+                , toolbar: true
                 , page: true
                 , limit: 2000
                 , limits: [2000, 500, 1000, 2000, 5000, 10000, 20000]
@@ -245,6 +245,16 @@
                     ,{ field: '姓名', title: '姓名', align:'center' }
                     ,{ field: 'title', title: '岗位' , align:'center' }
                     , { field: '手机', title: '手机'}
+                    , { title: '状态', templet:
+                    function (data) {
+                        var str = '';
+                        if (data['已读'] == 'Y') {
+                            str = '<span style="color:blue">已读</span>';
+                        } else {
+                            str = '<span style="color:red">未读</span>';
+                        }
+                        return str; 
+                    }}
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");

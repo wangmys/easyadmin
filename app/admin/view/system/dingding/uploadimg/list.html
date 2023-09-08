@@ -146,7 +146,7 @@
 
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
-            <div class="title_text2" style="text-align: center; color:#0051ff;">钉钉定推列表  <a class="dateStr"></a></div>
+            <div class="title_text2" style="text-align: center; color:#0051ff;">钉钉工作通知推列表  <a class="dateStr"></a></div>
         </table>
     </div>
 </body>
@@ -179,6 +179,7 @@
             , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
             , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
             , recallImgHandle = "{:url('admin/system.dingding.Uploadimg/recallImgHandle')}"
+            , getReadsHandle = "{:url('admin/system.dingding.Uploadimg/getReadsHandle')}"
             , url1 = "{:url('admin/system.dingding.Uploadimg/list')}"; 
 
         // 表1初始化
@@ -309,7 +310,39 @@
                 layer.close();
             });
         }); 
-    
+        
+
+        var stop3 = false;
+        // 监听事件 
+        $(document).on('click', '.getReadsBtn', function(data){
+            var id = window.localStorage.getItem('sendDingImg_id');
+            var title = window.localStorage.getItem('sendDingImg_title');
+
+            //询问框
+            layer.confirm(`是否拉取未/已读人数【${title}】`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                // layer.close();
+                if (!stop3) {
+                    stop3 = true
+                    $.post(getReadsHandle, {'id': id}, function(res) {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                        layer.msg(res.msg, {icon: 1});
+                        setTimeout(function() {
+                            stop3 = false
+                        }, 500)
+                    })
+                }
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+        }); 
         window.viewUsers = function(uid, title) {
             // console.log(uid);
             window.localStorage.setItem('sendDingImg_uid', uid);
@@ -380,14 +413,31 @@
                         `; 
                     }}
                     , { field: '接收方', title: '接收方', align:'center', templet:
-                        function (data) {
-                            console.log(data.title)
-                            return `
-                                <span style="cursor:pointer;" onClick="viewUsers('${data['uid']}', '${data['title']}')">
-                                    查看
-                                </span>
-                            `; 
-                        }}
+                    function (data) {
+                        console.log(data.title)
+                        return `
+                            <span style="cursor:pointer;" onClick="viewUsers('${data['uid']}', '${data['title']}')">
+                                查看
+                            </span>
+                        `; 
+                    }}
+                    , {title: `<span style="color:red;">未读</span> / <span style="color:blue;">已读</span> / <span style="color:green;">总数</span>`, align:'center', templet:
+                    function (data) {
+                        console.log(data.title)
+                        var readNums = 0;
+                        var unReadNums = 0;
+                        var totalReadNums = 0;
+                        if (data['已读'] && data['已读'] > 0) {
+                            readNums = data['已读'];
+                        }
+                        if (data['未读'] && data['未读'] > 0) {
+                            unReadNums = data['未读'];
+                        }
+                        totalReadNums = readNums + unReadNums;
+                        return `
+                            <span style="color:red;">${unReadNums}</span> / <span style="color:blue;">${readNums}</span> / <span style="color:green;">${totalReadNums}</span>  
+                        `; 
+                    }}
                     , { field: 'sendtimes', title: '推送次数', align:'center', templet:
                         function (data) {
                             var res = data.sendtimes > 0 ? `<span style="color:red; font-weight:bold;">${data.sendtimes}</span>` : data.sendtimes;
@@ -429,10 +479,13 @@
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
                                         推送
                                     </button>
-
                                     <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
                                         撤回
+                                    </button>
+                                    <button class="getReadsBtn layui-btn layui-btn-xs" style="background: blue;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
+                                        未/已读
                                     </button>
                                 `;
                             }
