@@ -25,6 +25,9 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var erjifenlei_list = res.data.erjifenlei;
                 var fenlei_list = res.data.fenlei;
                 var fengge_list = res.data.fengge;
+                var goods_manager_list = res.data.goods_manager;
+                var province_list = res.data.province;
+                var mathod_list = res.data.mathod;
 
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
@@ -43,22 +46,22 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     {field: '预计38/7XL', width: 40, title: '预计38/7XL',search: false},
                     {field: '预计_40', width: 40, title: '预计_40',search: false},
                     {field: '预计库存数量', width: 70, title: '预计库存数量',search: false},
-                    {field: '商品负责人', width: 70, title: '商品负责人',search: false},
-                    {field: '省份', width: 50, title: '省份',search: false},
-                    {field: '经营模式', width: 40, title: '经营模式',search: false},
+                    {field: '商品负责人', width: 70, title: '商品负责人',search: 'xmSelect',selectList:goods_manager_list,laySearch:true},
+                    {field: '省份', width: 50, title: '省份',search: 'xmSelect',selectList:province_list,laySearch:true},
+                    {field: '经营模式', width: 40, title: '经营模式',search: 'xmSelect',selectList:mathod_list,laySearch:true},
                     {field: '货品名称', width: 70, title: '货品名称',search: false},
                     {field: '年份', width: 50, title: '年份',search: false},
-                    {field: '季节', width: 40, title: '季节',search: 'select',selectList:jijie_list,laySearch:true},
+                    {field: '季节', width: 40, title: '季节',search: 'xmSelect',selectList:jijie_list,laySearch:true},
                     {field: '一级分类', width: 65, title: '一级分类',search: 'select',selectList:yijifenlei_list,laySearch:true},
-                    {field: '二级分类', width: 65, title: '二级分类',search: 'select',selectList:erjifenlei_list,laySearch:true},
-                    {field: '分类', width: 50, title: '分类',search: 'select',selectList:fenlei_list,laySearch:true},
+                    {field: '二级分类', width: 65, title: '二级分类',search: 'xmSelect',selectList:erjifenlei_list,laySearch:true},
+                    {field: '分类', width: 50, title: '分类',search: 'xmSelect',selectList:fenlei_list,laySearch:true},
                     {field: '风格', width: 50, title: '风格',search: 'select',selectList:fengge_list,laySearch:true},
                 ];
 
                 ea.table.render({
                     url: init.list_index,
                     search:true,
-                    height: 1000,
+                    height: 950,
                     limit: 1000,
                     toolbar:[],
                     limits:[1000,2000,3000],

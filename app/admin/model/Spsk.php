@@ -26,6 +26,7 @@ class Spsk extends TimeModel
      */
     public function get_spsk_select() {
 
+        $model = Db::connect('mysql2');
         $arr = [];
         $store_sql = "select distinct 店铺名称 from sp_sk;";
         $jijie_sql = "select distinct 季节 from sp_sk;";
@@ -33,12 +34,18 @@ class Spsk extends TimeModel
         $erjifenlei_sql = "select distinct 二级分类 from sp_sk;";
         $fenlei_sql = "select distinct 分类 from sp_sk;";
         $fengge_sql = "select distinct 风格 from sp_sk;";
-        $store = Db::connect('mysql2')->query($store_sql);
-        $jijie = Db::connect('mysql2')->query($jijie_sql);
-        $yijifenlei = Db::connect('mysql2')->query($yijifenlei_sql);
-        $erjifenlei = Db::connect('mysql2')->query($erjifenlei_sql);
-        $fenlei = Db::connect('mysql2')->query($fenlei_sql);
-        $fengge= Db::connect('mysql2')->query($fengge_sql);
+        $goods_manager_sql = "select distinct 商品负责人 from sp_sk where 商品负责人 <> '';";
+        $province_sql = "select distinct 省份 from sp_sk;";
+        $mathod_sql = "select distinct 经营模式 from sp_sk;";
+        $store = $model->query($store_sql);
+        $jijie = $model->query($jijie_sql);
+        $yijifenlei = $model->query($yijifenlei_sql);
+        $erjifenlei = $model->query($erjifenlei_sql);
+        $fenlei = $model->query($fenlei_sql);
+        $fengge= $model->query($fengge_sql);
+        $goods_manager= $model->query($goods_manager_sql);
+        $province= $model->query($province_sql);
+        $mathod= $model->query($mathod_sql);
 
         $store_temp = array_unique(array_column($store,'店铺名称'));
         $store = array_combine($store_temp,$store_temp);
@@ -58,12 +65,24 @@ class Spsk extends TimeModel
         $fengge_temp = array_unique(array_column($fengge,'风格'));
         $fengge = array_combine($fengge_temp,$fengge_temp);
 
+        $goods_manager_temp = array_unique(array_column($goods_manager,'商品负责人'));
+        $goods_manager = array_combine($goods_manager_temp,$goods_manager_temp);
+
+        $province_temp = array_unique(array_column($province,'省份'));
+        $province = array_combine($province_temp,$province_temp);
+
+        $mathod_temp = array_unique(array_column($mathod,'经营模式'));
+        $mathod = array_combine($mathod_temp,$mathod_temp);
+
         $arr['store'] = $store;
         $arr['jijie'] = $jijie;
         $arr['yijifenlei'] = $yijifenlei;
         $arr['erjifenlei'] = $erjifenlei;
         $arr['fenlei'] = $fenlei;
         $arr['fengge'] = $fengge;
+        $arr['goods_manager'] = $goods_manager;
+        $arr['province'] = $province;
+        $arr['mathod'] = $mathod;
         return $arr;
 
     }
