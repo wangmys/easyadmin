@@ -61,7 +61,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 ea.table.render({
                     url: init.list_index,
                     search:true,
-                    height: 950,
+                    height: 850,
                     limit: 1000,
                     toolbar:[],
                     limits:[1000,2000,3000],
