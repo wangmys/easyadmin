@@ -301,11 +301,23 @@ class Dress extends AdminController
                     if(!empty($filters['省份'])){
                        $q->whereIn('省份',$filters['省份']);
                     }
+                    if(!empty($filters['店铺名称'])){
+                        $q->whereIn('店铺名称',$filters['店铺名称']);
+                    }
+                    if(!empty($filters['经营模式'])){
+                        $q->whereIn('经营模式',$filters['经营模式']);
+                    }
                     if(!empty($where['商品负责人'])){
                        $q->whereIn('商品负责人',$where['商品负责人']);
                     }else{
                         $user = session('admin');
-                        if($user['id'] != AdminConstant::SUPER_ADMIN_ID) $q->whereIn('商品负责人',$user['name']);
+                        if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
+                            $q->whereIn('商品负责人',$user['name']);
+                        } else {
+                            if(!empty($filters['商品负责人'])){
+                                $q->whereIn('商品负责人',$filters['商品负责人']);
+                            }
+                        }
                     }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
                 // 根据筛选条件,设置颜色是否标红
@@ -338,7 +350,7 @@ class Dress extends AdminController
             // 固定字段可筛选
             if(in_array($v,$defaultFields)){
                 $item['fixed'] = 'left';
-                if($v == '省份'){
+                if(in_array($v,['省份', '店铺名称', '商品负责人', '经营模式'])){
                     $item['search'] = 'xmSelect';
                     $item['width'] = 100;
                     $item['laySearch'] = true;
@@ -474,7 +486,8 @@ class Dress extends AdminController
             // 设置省份列表
             'shop_list' => '店铺名称',
             // 设置省份列表
-            'charge_list' => '商品负责人'
+            'charge_list' => '商品负责人',
+            'mathod_list' => '经营模式',
         ];
         $model = (new \app\admin\model\dress\Accessories);
         foreach ($fields as $k => $v){
