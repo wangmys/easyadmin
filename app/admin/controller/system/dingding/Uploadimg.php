@@ -508,6 +508,7 @@ class Uploadimg extends AdminController
                 from dd_customer_push as p
                 left join customer_pro as c on p.店铺名称 = c.CustomerName
                 where 1 
+                    AND name not in ('陈威良', '王威')
                     {$map}
             ";
 
@@ -517,6 +518,7 @@ class Uploadimg extends AdminController
                 from dd_customer_push as p
                 left join customer_pro as c on p.店铺名称 = c.CustomerName
                 where 1 
+                    AND name not in ('陈威良', '王威')
                     {$map}
             ";
             $select = $this->db_easyA->query($sql_select);
@@ -621,7 +623,7 @@ class Uploadimg extends AdminController
                     ['uid', '=', $find_list['uid']]
                 ])->group('userid')->select()->toArray();
 
-                $chunk_list_success = array_chunk($select_user, 996);
+                $chunk_list_success = array_chunk($select_user, 150);
                 // $chunk_list_success = array_chunk($select_user, 2);
                 $model = new DingTalk;
                 foreach($chunk_list_success as $key => $val) {
@@ -763,7 +765,7 @@ class Uploadimg extends AdminController
                 foreach($select_user as $key => $val) {
                     $res = json_decode($model->getsendresult($val['task_id']), true);
                     
-                    if ($res['errmsg'] = 'ok') {  
+                    if ($res['errmsg'] = 'ok' && $res['send_result']) {  
                         if (count($res['send_result']['read_user_id_list']) > 0) {
                             // 已读
                             $reads = arrToStr($res['send_result']['read_user_id_list']);    
@@ -792,20 +794,20 @@ class Uploadimg extends AdminController
                             ");
                         }
 
-                        // 统计list展示的已读未读数
-                        $this->db_easyA->execute("
-                            UPDATE 
-                                dd_userimg_list as l
-                            SET 
-                                l.已读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='Y'),
-                                l.未读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='N')
-                            WHERE 1
-                                AND l.id = {$find_list['id']}
-                        ");
                     } else {
-                        echo '数据异常';
+                        return json(['code' => 0, 'msg' => '数据异常']);
                     }
                 }
+                // 统计list展示的已读未读数
+                $this->db_easyA->execute("
+                    UPDATE 
+                        dd_userimg_list as l
+                    SET 
+                        l.已读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='Y'),
+                        l.未读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='N')
+                    WHERE 1
+                        AND l.id = {$find_list['id']}
+                ");
 
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {

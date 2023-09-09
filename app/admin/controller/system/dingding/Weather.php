@@ -236,6 +236,7 @@ class Weather extends BaseController
             where 1
                 and u.店铺名称 = c.店铺名称
                 and u.isCustomer = '是'
+                
         ");
 
         // print_r($select);die;
