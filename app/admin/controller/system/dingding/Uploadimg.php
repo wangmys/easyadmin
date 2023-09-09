@@ -119,6 +119,7 @@ class Uploadimg extends AdminController
         }
     }
 
+    // 上次用户列表
     public function upload_excel_user() {
         if (request()->isAjax()) {
         // if (1) {
@@ -381,14 +382,19 @@ class Uploadimg extends AdminController
             $sql = "
                 SELECT 
                     list.*,
-                    img.path
+                    img.path,
+                    task.task_id,
+                    已读,未读,
+                    list.撤回时间
                 FROM 
                     dd_userimg_list as list 
                 LEFT JOIN dd_temp_img as img ON list.pid = img.pid 
+                LEFT JOIN dd_task_id as task ON list.id = task.lid AND task.撤回时间 is null
                 WHERE 1
                     {$mapSuper}
+                group by id
                 ORDER BY
-                    id DESC
+                    id DESC     
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -412,6 +418,7 @@ class Uploadimg extends AdminController
         }
     }
 
+    // 推送信息相关用户列表
     public function userList() {
         if (request()->isAjax()) {
             // 筛选条件
@@ -437,7 +444,7 @@ class Uploadimg extends AdminController
                     AND uid = '{$uid}'
                     {$mapSuper}
                 ORDER BY
-                    店铺名称 ASC
+                    已读 ASC,店铺名称
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -451,7 +458,7 @@ class Uploadimg extends AdminController
                     AND uid = '{$uid}'
                     {$mapSuper}
                 ORDER BY
-                    店铺名称 ASC
+                    已读 ASC,店铺名称
             ";
             $count = $this->db_easyA->query($sql2);
             // print_r($count);
@@ -461,6 +468,28 @@ class Uploadimg extends AdminController
                 // 'config' => ,
             ]);
         }        
+    }
+
+    public function downloadUserList() {
+        $uid = input('uid');
+        $sql = "
+            SELECT 
+                店铺名称,姓名,手机,title as 职位,
+                '否' as 已读
+            FROM 
+                dd_temp_excel_user_success   
+            WHERE 1
+                AND uid = '{$uid}'
+                AND 已读 = 'N'
+            ORDER BY
+                已读 ASC,店铺名称
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 获取钉钉用户信息
@@ -620,44 +649,102 @@ class Uploadimg extends AdminController
         // print_r($select_customer);
     }
 
-    // 发送测试
-    public function sendDingImg() {
+
+    // 发送 工作通知
+    public function sendDingImgHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
-        // if (request()->isAjax() && $input['id']) {
-        // if (1 && $input['id']) {
-        //     $model = new DingTalk;
-        //     // echo $path = $this->request->domain() ;
-            
-        //     $find_list = $this->db_easyA->table('dd_userimg_list')->where([
-        //         ['id', '=', $input['id']]
-        //     ])->find();
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
+            $model = new DingTalk;
+ 
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
 
-        //     if ($find_list) {
-        //         $find_path = $this->db_easyA->table('dd_temp_img')->where([
-        //             ['pid', '=', $find_list['pid']]
-        //         ])->find();
-        //         // echo $find_path['path'];
+            if ($find_list) {
+                $find_path = $this->db_easyA->table('dd_temp_img')->where([
+                    ['pid', '=', $find_list['pid']]
+                ])->find();
+                // echo $find_path['path'];
 
-        //         $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-        //             ['uid', '=', $find_list['uid']]
-        //         ])->select();
+                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
+                    ['uid', '=', $find_list['uid']]
+                ])->group('userid')->select()->toArray();
 
-        //         foreach ($select_user as $key => $val) {
-        //             // echo $val['姓名'];
-        //             // $res = $model->sendMarkdownImg($val['userid'], $find_list['title'], $find_path['path']);
-        //             $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $find_path['path']);
-        //             dump($res);
-        //         }
-        //     }
-        // }
-        $model = new DingTalk;
-        $path = "http://im.babiboy.com/upload/dd_weather/20230904/万年一店.jpg";
-        $res = $model->sendMarkdownImg_pro('350364576037719254', '7天天气', $path);
-        dump($res);
+                $chunk_list_success = array_chunk($select_user, 996);
+                // $chunk_list_success = array_chunk($select_user, 2);
+                $model = new DingTalk;
+                foreach($chunk_list_success as $key => $val) {
+
+                    $userids = '';
+                    foreach ($val as $key2 => $val2) {
+                        if ( ($key2 + 1) < count($val) ) {
+                            $userids .= $val2['userid'] . ',';
+                        } else {
+                            // 最后一次发送  发送id xxx,xxx,xxx
+                            $userids .= $val2['userid'];
+                            $update_uids = xmSelectInput($userids);
+
+                            // 发送
+                            $res = json_decode($model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']), true);
+
+                            // $res['request_id'] = rand_code();
+                            // $res['task_id'] = rand_code();
+                            // $res['errmsg'] = 'ok';
+                            $this->db_easyA->table('dd_task_id')->insert([
+                                'lid' => $find_list['id'],
+                                'aid' => $find_list['aid'],
+                                'aname' => $find_list['aname'],
+                                'title' => $find_list['title'],
+                                'request_id' => $res['request_id'],
+                                'task_id' => $res['task_id'],
+                                'errmsg' => $res['errmsg'],
+                                'createtime' => date('Y-m-d H:i:s'),
+                            ]);
+
+           
+                            // 更新用户列表 task_id
+                            $this->db_easyA->execute("
+                                update dd_temp_excel_user_success
+                                set 
+                                    task_id = '{$res['task_id']}'
+                                where 1
+                                    AND uid = '{$find_list['uid']}'
+                                    AND userid IN ({$update_uids})
+                            ");
+                        }
+                    }
+                }
+
+                $updatetime = date('Y-m-d H:i:s');
+                $sql_更新 = "
+                    update dd_userimg_list
+                    set 
+                        sendtimes = sendtimes + 1,
+                        sendtime = '{$updatetime}',
+                        撤回时间 = null
+                    where id = '{$input['id']}'
+                ";
+                $this->db_easyA->execute($sql_更新);
+
+                return json(['code' => 0, 'msg' => '执行成功']);
+            } else {
+                return json(['code' => 0, 'msg' => '信息有误，执行失败']);
+            }
+        } else {
+            return json(['code' => 0, 'msg' => '请勿非法请求']);
+        }       
     }
 
-    public function sendDingImgHandle() {
+    // 撤回 消息
+    public function recallImgHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
@@ -678,45 +765,108 @@ class Uploadimg extends AdminController
 
 
             if ($find_list) {
-                $find_path = $this->db_easyA->table('dd_temp_img')->where([
-                    ['pid', '=', $find_list['pid']]
-                ])->find();
-                // echo $find_path['path'];
+                $select_task = $this->db_easyA->table('dd_task_id')->where([
+                    ['lid', '=', $find_list['id']]
+                ])->select()->toArray();
 
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
-                    ['uid', '=', $find_list['uid']]
-                ])->group('userid')->select()->toArray();
-
-                
-                $chunk_list_success = array_chunk($select_user, 996);
                 $model = new DingTalk;
-                foreach($chunk_list_success as $key => $val) {
-                    // $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
-                    $userids = '';
-                    foreach ($val as $key2 => $val2) {
-                        if ( ($key2 + 1) < count($val) ) {
-                            $userids .= $val2['userid'] . ',';
-                        } else {
-                            $userids .= $val2['userid'];
-                            $res = $model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']);
-                        }
-                    }
+                foreach($select_task as $key => $val) {
+                    $res = json_decode($model->recallMessage($val['task_id']), true);
+                    
+                    $res2 = $this->db_easyA->table('dd_task_id')->where(['lid' => $input['id']])->update([
+                        '撤回时间' => date('Y-m-d H:i:s'),
+                    ]);
+                    $res2 = $this->db_easyA->table('dd_userimg_list')->where(['id' => $input['id']])->update([
+                        '撤回时间' => date('Y-m-d H:i:s'),
+                    ]);
                     
                 }
 
-                $updatetime = date('Y-m-d H:i:s');
-                $sql_更新 = "
-                    update dd_userimg_list
-                    set 
-                        sendtimes = sendtimes + 1,
-                        sendtime = '{$updatetime}'
-                    where id = '{$input['id']}'
-                ";
-                $this->db_easyA->execute($sql_更新);
+                return json(['code' => 0, 'msg' => '执行成功']);
+            } else {
+                return json(['code' => 0, 'msg' => '执行失败']);
+            }
+        } else {
+            return json(['code' => 0, 'msg' => '请勿非法请求']);
+        }       
+    }
+
+    // 拉取 已读 未读
+    public function getReadsHandle() {
+        $input = input();
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
+            $model = new DingTalk;
+            // echo $path = $this->request->domain() ;
+            
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
+
+            if ($find_list) {
+                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+                    ['uid', '=', $find_list['uid']]
+                ])->group('task_id')->select()->toArray();
+
+                $model = new DingTalk;
+                foreach($select_user as $key => $val) {
+                    $res = json_decode($model->getsendresult($val['task_id']), true);
+                    
+                    if ($res['errmsg'] = 'ok') {  
+                        if (count($res['send_result']['read_user_id_list']) > 0) {
+                            // 已读
+                            $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                            $this->db_easyA->execute("
+                                UPDATE 
+                                    dd_temp_excel_user_success 
+                                SET 
+                                    已读 = 'Y'
+                                WHERE 1
+                                    AND task_id = '{$val['task_id']}'
+                                    AND userid in ($reads)
+                            ");
+                        }
+
+                        if (count($res['send_result']['unread_user_id_list']) > 0) {
+                            // 未读
+                            $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
+                            $this->db_easyA->execute("
+                                UPDATE 
+                                    dd_temp_excel_user_success 
+                                SET 
+                                    已读 = 'N'
+                                WHERE 1
+                                    AND task_id = '{$val['task_id']}'
+                                    AND userid in ($unReads)
+                            ");
+                        }
+
+                        // 统计list展示的已读未读数
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_userimg_list as l
+                            SET 
+                                l.已读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='Y'),
+                                l.未读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='N')
+                            WHERE 1
+                                AND l.id = {$find_list['id']}
+                        ");
+                    } else {
+                        echo '数据异常';
+                    }
+                }
 
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
-                return json(['code' => 0, 'msg' => '信息有误，执行失败']);
+                return json(['code' => 0, 'msg' => '执行失败']);
             }
         } else {
             return json(['code' => 0, 'msg' => '请勿非法请求']);

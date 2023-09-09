@@ -233,29 +233,10 @@ class DingTalk extends BaseController
         return $result;
     }
 
-    // public function sendMarkdownImg($userid, $path)
-    // {
-    //     $time = time();
-    //     $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
-    //     $SendToUser_data = [
-    //         'userid_list' => $userid,
-    //         'agent_id' => $this->AgentId,
-    //         "msg" => [
-    //             "msgtype" => 'markdown',
-    //             "markdown" => [
-    //                 "title" => "杭州天气1",
-    //                 "text" => "#### 杭州天气 @150XXXXXXXX \n> 9度，西北风1级，空气良89，相对温度73%\n> ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png?t={$time})\n>"
-    //             ]
-
-    //         ]
-    //     ];
-    //     $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
-    //     return $result;
-    // }
-
     public function testDep() {
         $res = $this->getDepartmentListIds();
     }
+
     /**
      * 获取部门useid
      * @return mixed
@@ -269,8 +250,6 @@ class DingTalk extends BaseController
         return $getDepartment;
 
     }
-
-
 
 
     /**
@@ -562,18 +541,55 @@ class DingTalk extends BaseController
      * 撤回消息通知
      * @return bool|string
      */
-    public function recallMessage()
+    public function recallMessage($task_id = '')
     {
-        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/recall?access_token=' . $this->getAccessToken();
+        $task_id ? $task_id : input('task_id');
+        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/recall?access_token=' . $this->getAccessToken_cwl();
         $SendToUser_data = json_encode(
             [
-                'msg_task_id' => 351042088705,
-                'agent_id' => $this->AgentId
+                'msg_task_id' => $task_id,
+                'agent_id' => $this->AgentId_cwl
             ]
         );
         $result = $this->PostCurlRequest($webhook, $SendToUser_data);
         return $result;
+    }
 
+
+    /**
+     * 工作通知进度
+     * @return bool|string
+     */    
+    public function getsendprogress($task_id = '')
+    {
+        $task_id ? $task_id : input('task_id');
+        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendprogress?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = json_encode(
+            [
+                'agent_id' => $this->AgentId_cwl,
+                'task_id' => $task_id
+            ]
+        );
+        $result = $this->PostCurlRequest($webhook, $SendToUser_data);
+        return $result;
+    }
+
+    /**
+     * 工作通知结果
+     * @return bool|string
+     */    
+    public function getsendresult($task_id = '')
+    {
+        $task_id ? $task_id : input('task_id');
+        $webhook = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendresult?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = json_encode(
+            [
+                'agent_id' => $this->AgentId_cwl,
+                'task_id' => $task_id
+            ]
+        );
+        $result = $this->PostCurlRequest($webhook, $SendToUser_data);
+        return $result;
     }
 
 
