@@ -241,14 +241,12 @@
                 , where: {uid: uid}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '省份', title: '店铺名称', align:'center' }
+                    { field: 'State', title: '店铺名称', align:'center' }
                     ,{ field: '店铺名称', title: '店铺名称', align:'center' }
                     ,{ field: '经营模式', title: '经营模式', align:'center' }
-                    ,{ field: '商品负责人', title: '商品负责人', align:'center' }
-                    ,{ field: '店铺负责人', title: '店铺负责人', align:'center' }
-                    ,{ field: '店铺负责人手机', title: '店铺负责人手机', align:'center' }
-                    ,{ field: '督导负责人', title: '督导负责人', align:'center' }
-                    ,{ field: '督导负责人手机', title: '督导负责人手机', align:'center' }
+                    ,{ field: 'name', title: '商品负责人', align:'center' }
+                    ,{ field: 'CustomItem17', title: '店铺负责人', align:'center' }
+                    ,{ field: 'mobile', title: '店铺负责人手机', align:'center' }
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");

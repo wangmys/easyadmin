@@ -817,7 +817,7 @@ class Customeryeji extends BaseController
             SELECT 
                 *
             FROM
-                dd_weather_user 
+                dd_customer_push 
             where 1
                 -- AND name in ('陈威良', '王威')
         ");

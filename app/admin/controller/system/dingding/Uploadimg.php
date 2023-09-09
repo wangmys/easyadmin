@@ -497,88 +497,31 @@ class Uploadimg extends AdminController
         if (request()->isAjax()) {
             if (!checkAdmin()) {
                 $CustomItem17 = $this->authInfo['name'];
-                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+                $map = "AND c.CustomItem17 = '{$CustomItem17}'";
             } else {
                 $map = "";
             }
-        // if (1) {
-            $sql_康雷 = "
-                SELECT
-                    State AS 省份,
-                    CustomerName AS 店铺名称,
-                    EBC.Mathod AS 经营模式,
-                    CustomerId,
-                    CustomerCode,
-                    EC.RegionId,
-                    CustomItem17 AS 商品负责人,
-                    CustomItem18 AS 督导负责人,
-                    CustomItem19 AS 店铺负责人
-                FROM
-                    ErpCustomer AS EC 
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                WHERE 
-                EC.RegionId NOT IN ('8','40', '55' ,'84', '85',  '97')
-                AND EBC.Mathod IN ('直营', '加盟')
-                AND EC.CustomerCode IN (
-                                SELECT
-                                        EC.CustomerCode 
-                                FROM
-                                        ErpRetail AS ER
-                                        LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                                        LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                                        LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
-                                WHERE
-                                        ER.CodingCodeText = '已审结' 
-                                        AND EC.ShutOut = 0 
-                                        AND EC.RegionId <> 55 
-                                        AND EBC.Mathod IN ( '直营')
-                                        {$map}    
-                                GROUP BY
-                                        ER.CustomerName,
-                                        EC.RegionId,
-                                        EC.CustomerCode
-                )
-                ORDER BY EBC.Mathod DESC
+
+            $sql_select = "
+                select 
+                    p.店铺名称,p.name,p.title,p.mobile,c.State,c.CustomItem17,'直营' as 经营模式 
+                from dd_customer_push as p
+                left join customer_pro as c on p.店铺名称 = c.CustomerName
+                where 1 
+                    {$map}
             ";
-            $select_customer = $this->db_sqlsrv->query($sql_康雷);
-            $select_user = $this->db_easyA->table('dd_user')->select();
-            
-            // echo '<pre>';
-            // print_r($select_customer);
-            // print_r($select_user);
-            // die;
-            foreach ($select_customer as $key => $val) {
-                foreach ($select_user as $key2 => $val2) {
 
-                    if ($val['店铺名称'] == $val2['店铺名称']) {
-                        $店铺负责人 = trim($val['店铺负责人']);
-                        $pattern = "/{$店铺负责人}/i";
-                        $find_user = preg_match($pattern, $val2['name']);
-                        if ($find_user) {
-                            $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
-                        }
-                    }
-                }
-                foreach ($select_user as $key2 => $val2) {
-                    if ($val['督导负责人']) {
-                        $pattern_督导 = "/督导/i";
-                        $find_督导 = preg_match($pattern_督导, $val2['title']);
-
-                        $pattern_name = "/{$val['督导负责人']}/i";
-                        $find_name = preg_match($pattern_name, $val2['name']);
-
-                        if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
-                            $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
-                            break;
-                        }
-                    }
-                }
-            }
-            // echo '<pre>';
-            // print_r($select_customer);
-            // // print_r($select_user);
-            // die;
-            return json(["code" => "0", "msg" => "", "count" => count($select_customer), "data" => $select_customer]);
+            $sql_total = "
+                select 
+                    count(*) as total
+                from dd_customer_push as p
+                left join customer_pro as c on p.店铺名称 = c.CustomerName
+                where 1 
+                    {$map}
+            ";
+            $select = $this->db_easyA->query($sql_select);
+            $total = $this->db_easyA->query($sql_total);
+            return json(["code" => "0", "msg" => "", "count" => $total[0]['total'], "data" => $select]);
         } else {
             return View('dduser', [
                 // 'config' => ,

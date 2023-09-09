@@ -225,13 +225,13 @@ class Weather extends BaseController
     }
 
     // 发送测试2
-    public function sendDingImg3() {
+    public function sendDingImg() {
         $model = new DingTalk;
         $select = $this->db_easyA->query("
             SELECT 
                 u.*
             FROM
-                dd_weather_user as u
+                dd_customer_push as u
             LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
             where 1
                 and u.店铺名称 = c.店铺名称
