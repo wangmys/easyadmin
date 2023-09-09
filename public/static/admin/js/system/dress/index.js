@@ -48,7 +48,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             init.export_url = 'system.dress.index/list_export';
             ea.table.render({
                 init:init,
-                search:false,
+                search:true,
                 where:JSON.parse($get),
                 height: 760,
                 limit: 1000,

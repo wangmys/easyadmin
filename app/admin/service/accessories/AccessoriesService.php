@@ -98,7 +98,7 @@ class AccessoriesService
             '店铺名称' =>'CustomerName',
             '店铺等级' => 'CustomerGrade',
             '省份' =>'State',
-            '运营模式' =>'Mathod'
+            '经营模式' =>'Mathod'
         ];
         $fix_str = '';
         foreach ($fix_field as $k => &$v){
@@ -126,7 +126,7 @@ class AccessoriesService
      * @param int $is_result   是否展示结果
      * @return array
      */
-    public function getTableBody($Date = '',$is_result = 0)
+    public function getTableBody($Date = '',$is_result = 0,$filters = [])
     {
         $Date = $Date?$Date:date('Y-m-d');
         // 获取动态组合字段
@@ -140,7 +140,23 @@ class AccessoriesService
         $model = $this->stock->alias('s')->leftjoin(['customer'=>'c'],'s.CustomerId = c.CustomerId')->field($field)->where([
             'ShutOut' => 0,
             'Date' => $Date
-        ]);
+        ])->where(function ($q)use($filters){
+            if(!empty($filters['CustomItem17'])){
+               $q->whereIn('CustomItem17',$filters['CustomItem17']);
+            }
+            if(!empty($filters['CustomerName'])){
+                $q->whereIn('CustomerName',$filters['CustomerName']);
+            }
+            if(!empty($filters['CustomerGrade'])){
+                $q->whereIn('CustomerGrade',$filters['CustomerGrade']);
+            }
+            if(!empty($filters['State'])){
+                $q->whereIn('State',$filters['State']);
+            }
+            if(!empty($filters['Mathod'])){
+                $q->whereIn('Mathod',$filters['Mathod']);
+            }
+        });
 
         // 获取当前登录信息
         $user = session('admin');

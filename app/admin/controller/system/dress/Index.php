@@ -149,7 +149,7 @@ class Index extends AdminController
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
             // 查询数据
-            $table_data = $this->service->getTableBody('',1);
+            $table_data = $this->service->getTableBody('',1,$filters);
             // 返回数据
             $data = [
                 'code'  => 0,
@@ -167,6 +167,9 @@ class Index extends AdminController
         $head_field_1 = $this->service->getFixField('',1);
         $head_field_2 = $this->service->getTableField();
         $head_field = array_merge($head_field_1,$head_field_2);
+        // 获取搜索条件列表(店铺名称、商品负责人、店铺等级、省份、经营模式列表)
+        $getSelectList = $this->getSelectList();
+
         foreach ($head_field as $k => $v){
             if(is_array($v)){
                 $item = [
@@ -179,7 +182,7 @@ class Index extends AdminController
                     'field' => $v,
                     'title' => $k,
                     'rowspan' => 2,
-                    'fixed' => 'left',
+                    // 'fixed' => 'left',
                     'width' => 90,
                     'align' => 'center'
                 ];
@@ -187,6 +190,16 @@ class Index extends AdminController
                     $item['width'] = 115;
                     continue;
                 }
+
+                //添加筛选
+                if (in_array($k, ['店铺名称', '商品负责人', '店铺等级', '省份', '经营模式'])) {
+                    $item['fixed'] = 'left';
+                    $item['search'] = 'xmSelect';
+                    $item['width'] = 100;
+                    $item['laySearch'] = true;
+                    $item['selectList'] = $getSelectList[$v]??[];
+                }
+
             }
             $table_head_1[] = $item;
         }
@@ -216,6 +229,31 @@ class Index extends AdminController
             'head_field_2' => $head_field_2
         ]);
         return $this->fetch();
+    }
+
+    /**
+     * 获取条件列表
+     * @return array
+     */
+    public function getSelectList()
+    {
+        $default_select = [];
+        $fields = [
+             // 设置省份列表
+            'province_list' => 'State',
+            // 设置店铺名称列表
+            'shop_list' => 'CustomerName',
+            // 设置商品负责人列表
+            'charge_list' => 'CustomItem17',
+            'mathod_list' => 'Mathod',
+            'customer_grade_list' => 'CustomerGrade',
+        ];
+        $model = (new \app\admin\model\CustomerModel());
+        foreach ($fields as $k => $v){
+            $list = $model->group($v)->whereNotNull($v)->where($v, '<>', 0)->column($v);
+            $default_select[$v] =  array_combine($list,$list);
+        }
+        return $default_select;
     }
 
     /**
