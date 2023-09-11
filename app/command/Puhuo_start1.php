@@ -28,6 +28,7 @@ use app\admin\model\bi\SpLypPuhuoDaxiaomaSkcnumModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerModel;
 use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
 use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
+use app\admin\model\bi\SpLypPuhuoZdyAGoodsModel;
 use app\admin\model\bi\CwlDaxiaoHandleModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 // use app\admin\model\CustomerModel;
@@ -52,6 +53,7 @@ class Puhuo_start1 extends Command
     protected $puhuo_daxiaoma_customer_sort_model;
     protected $puhuo_ti_goods_model;
     protected $puhuo_zhiding_goods_model;
+    protected $puhuo_zdy_a_goods_model;
     protected $cwl_daxiao_handle_model;
 
     protected function configure()
@@ -75,6 +77,7 @@ class Puhuo_start1 extends Command
         $this->puhuo_daxiaoma_customer_sort_model = new SpLypPuhuoDaxiaomaCustomerSortModel();
         $this->puhuo_ti_goods_model = new SpLypPuhuoTiGoodsModel();
         $this->puhuo_zhiding_goods_model = new SpLypPuhuoZhidingGoodsModel();
+        $this->puhuo_zdy_a_goods_model = new SpLypPuhuoZdyAGoodsModel();
         $this->cwl_daxiao_handle_model = new CwlDaxiaoHandleModel();
 
     }
@@ -514,8 +517,8 @@ class Puhuo_start1 extends Command
 
         $list_rows    = 2000;//$input->getArgument('list_rows') ?: 2000;//每页条数
         
-        $data = $this->get_wait_goods_data($list_rows);
-        // print_r($data);die;
+        $data = $this->get_xuanhuoxuanliang_goods_data($list_rows);
+        print_r($data);die;
 
         //先清空旧数据再跑
         // $this->db_easy->Query("truncate table sp_lyp_puhuo_customer_sort;");
@@ -990,10 +993,10 @@ class Puhuo_start1 extends Command
 
         //从指定铺货配置表里取数
         $res_data = [];
-        $yuncangs = $this->puhuo_zhiding_goods_model::where([])->distinct(true)->column('Yuncang');
+        $yuncangs = $this->puhuo_zdy_a_goods_model::where([])->distinct(true)->column('Yuncang');
         if ($yuncangs) {
             foreach ($yuncangs as $v_yuncang) {
-                $yuncang_goods = $this->puhuo_zhiding_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
+                $yuncang_goods = $this->puhuo_zdy_a_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
                 if ($yuncang_goods) {
                     $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang)->where([['GoodsNo', 'in', $yuncang_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
                         'list_rows'=> $list_rows,//每页条数
