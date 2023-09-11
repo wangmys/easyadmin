@@ -470,28 +470,6 @@ class Uploadimg extends AdminController
         }        
     }
 
-    public function downloadUserList() {
-        $uid = input('uid');
-        $sql = "
-            SELECT 
-                店铺名称,姓名,手机,title as 职位,
-                '否' as 已读
-            FROM 
-                dd_temp_excel_user_success   
-            WHERE 1
-                AND uid = '{$uid}'
-                AND 已读 = 'N'
-            ORDER BY
-                已读 ASC,店铺名称
-        ";
-        $select = $this->db_easyA->query($sql);
-        $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
-        }
-        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
-    }
-
     // 获取钉钉用户信息
     public function getDingDingUserInfo() {
         if (request()->isAjax()) {
@@ -823,5 +801,58 @@ class Uploadimg extends AdminController
         $str2 = ' 11田珊珊的工作号';
         $pattern = "/{$str}/i";
         echo preg_match($pattern, $str2);
+    }
+
+    // 下载 钉钉 工作通知已读未读 
+    public function downloadUserList() {
+        $uid = input('uid');
+        $sql = "
+            SELECT 
+                店铺名称,姓名,手机,title as 职位,
+                '否' as 已读
+            FROM 
+                dd_temp_excel_user_success   
+            WHERE 1
+                AND uid = '{$uid}'
+                AND 已读 = 'N'
+            ORDER BY
+                已读 ASC,店铺名称
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+    }
+
+    // 下载 钉钉 工作通知已读未读 
+    public function downloadDduser() {
+        $uid = input('uid');
+
+        if (!checkAdmin()) {
+            $CustomItem17 = $this->authInfo['name'];
+            $map = "AND c.CustomItem17 = '{$CustomItem17}'";
+        } else {
+            $map = "";
+        }
+
+        $sql = "
+            select 
+                p.店铺名称,p.name as 姓名,p.mobile as 手机,p.title as 职位,c.State as 省份,'直营' as 性质, c.CustomItem17 as 专员 
+            from dd_customer_push as p
+            left join customer_pro as c on p.店铺名称 = c.CustomerName
+            where 1 
+                AND name not in ('陈威良', '王威')
+                {$map}
+            ORDER BY 省份
+        ";
+        
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉店铺负责人名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 }
