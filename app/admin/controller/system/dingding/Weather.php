@@ -1,5 +1,7 @@
 <?php
 namespace app\admin\controller\system\dingding;
+
+use AlibabaCloud\SDK\Dingtalk\Vworkflow_1_0\Models\QuerySchemaByProcessCodeResponseBody\result\schemaContent\items\props\push;
 use think\facade\Db;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
@@ -129,6 +131,38 @@ class Weather extends BaseController
         }
     }
 
+    // 更新天气值和颜色
+    public function getWeather2() {
+        $sql1 = "
+            update dd_weather 
+                set colorVal = 
+                    case 
+                        when `max_c` > 30 then `max_c`
+                        when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
+                        when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
+                        when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+                    end
+            where 
+                colorVal is null
+        ";
+
+        $sql2 = "
+            update dd_weather 
+                set colorVal = 
+                    case 
+                        when `max_c` > 30 then `max_c`
+                        when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
+                        when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
+                        when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+                    end
+            where 
+                colorVal is null
+        ";
+        $this->db_easyA->execute($sql1);
+        $this->db_easyA->execute($sql2);
+
+    }
+
     // 店铺天气 几秒
     public function getCustomerWeather() {
         // 每日天气日期，最高最低温度
@@ -179,33 +213,254 @@ class Weather extends BaseController
                 day9_max = d9.max_c,
                 day10_min = d10.min_c,
                 day10_max = d10.max_c,
+                day0_col = d0.colorNum,
+                day1_col = d1.colorNum,
+                day2_col = d2.colorNum,
+                day3_col = d3.colorNum,
+                day4_col = d4.colorNum,
+                day5_col = d5.colorNum,
+                day6_col = d6.colorNum,
+                day7_col = d7.colorNum,
+                day8_col = d8.colorNum,
+                day9_col = d9.colorNum,
+                day10_col = d10.colorNum,
                 更新日期 = date_format(now(),'%Y-%m-%d')
             WHERE
                 1
         ";
         // die;
         $update = $this->db_easyA->execute($sql);
-
-
-        // if ($update) {
-        //     // 删除历史数据
-        //     // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-        //     $this->db_easyA->execute('TRUNCATE cwl_weathertips_customer;');
-        //     $chunk_list = array_chunk($select, 500);
-        //     // $this->db_easyA->startTrans();
-
-        //     foreach($chunk_list as $key => $val) {
-        //         $this->db_easyA->table('cwl_weathertips_customer')->strict(false)->insertAll($val);
-        //     }
-
-        //     return json([
-        //         'status' => 1,
-        //         'msg' => 'success',
-        //         'content' => "cwl_weathertips_customer 更新成功，数量：{$count}！"
-        //     ]);
-
-        // }
     }   
+
+    // 天气颜色统计
+    public function getWeatherColor() {
+        $sql = "
+            SELECT
+                省份,
+                店铺名称,
+                `day0_col`,
+                `day1_col`,
+                `day2_col`,
+                `day3_col`,
+                `day4_col`,
+                `day5_col`,
+                `day6_col`,
+                `day7_col`,
+                `day8_col`,
+                `day9_col`
+            FROM
+                dd_weather_customer 
+            WHERE 1
+                -- and 省份 IN ('广东省')
+                -- and 店铺名称 in ('翁源一店')
+            ORDER BY 省份
+        ";
+        $select = $this->db_easyA->query($sql);
+
+        $this->db_easyA->execute('TRUNCATE dd_weather_color;');
+        $insertData = [];
+        foreach ($select as $key => $val) {
+            $前三天颜色1 = 0;
+            $前三天颜色2 = 0;
+            $前三天颜色3 = 0;
+            $前三天颜色4 = 0;
+            $前三天颜色5 = 0;
+            $前三天颜色6 = 0;
+            $七天颜色1 = 0;
+            $七天颜色2 = 0;
+            $七天颜色3 = 0;
+            $七天颜色4 = 0;
+            $七天颜色5 = 0;
+            $七天颜色6 = 0;
+            if ($val['day0_col']  == 1) {
+                $前三天颜色1 += 1;  
+            } elseif ($val['day0_col']  == 2) {
+                $前三天颜色2 += 1;
+            } elseif ($val['day0_col']  == 3) {
+                $前三天颜色3 += 1;
+            } elseif ($val['day0_col']  == 4 ) {
+                $前三天颜色4 += 1;
+            } elseif ($val['day0_col']  == 5) {
+                $前三天颜色5 += 1;
+            } elseif ($val['day0_col']  == 6) {
+                $前三天颜色6 += 1;
+            }
+
+            if ($val['day1_col']  == 1 ) {
+                $前三天颜色1 += 1;  
+            } elseif ($val['day1_col']  == 2 ) {
+                $前三天颜色2 += 1;
+            } elseif ( $val['day1_col']  == 3) {
+                $前三天颜色3 += 1;
+            } elseif ( $val['day1_col']  == 4 ) {
+                $前三天颜色4 += 1;
+            } elseif ( $val['day1_col']  == 5 ) {
+                $前三天颜色5 += 1;
+            } elseif ( $val['day1_col']  == 6 ) {
+                $前三天颜色6 += 1;
+            }
+
+            if ($val['day2_col']  == 1) {
+                $前三天颜色1 += 1;  
+            } elseif ($val['day2_col']  == 2) {
+                $前三天颜色2 += 1;
+            } elseif ($val['day2_col']  == 3) {
+                $前三天颜色3 += 1;
+            } elseif ($val['day2_col']  == 4) {
+                $前三天颜色4 += 1;
+            } elseif ($val['day2_col']  == 5) {
+                $前三天颜色5 += 1;
+            } elseif ( $val['day2_col']  == 6) {
+                $前三天颜色6 += 1;
+            }
+
+            // 今天
+            if ($val['day3_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day3_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day3_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day3_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day3_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day3_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day4_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day4_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day4_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day4_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day4_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day4_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day5_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day5_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day5_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day5_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day5_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day5_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day6_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day6_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day6_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day6_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day6_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day6_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day7_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day7_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day7_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day7_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day7_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day7_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day8_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day8_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day8_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day8_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day8_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day8_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+
+            if ($val['day9_col']  == 1) {
+                $七天颜色1 += 1;  
+            } elseif ($val['day9_col']  == 2) {
+                $七天颜色2 += 1;
+            } elseif ($val['day9_col']  == 3) {
+                $七天颜色3 += 1;
+            } elseif ($val['day9_col']  == 4) {
+                $七天颜色4 += 1;
+            } elseif ($val['day9_col']  == 5) {
+                $七天颜色5 += 1;
+            } elseif ( $val['day9_col']  == 6) {
+                $七天颜色6 += 1;
+            }
+            array_push($insertData, [
+                '省份' => $val['省份'],
+                '店铺名称' => $val['店铺名称'],
+                '前三天颜色1' => @$前三天颜色1,
+                '前三天颜色2' => @$前三天颜色2,
+                '前三天颜色3' => @$前三天颜色3,
+                '前三天颜色4' => @$前三天颜色4,
+                '前三天颜色5' => @$前三天颜色5,
+                '前三天颜色6' => @$前三天颜色6,
+                '七天颜色1' => @$七天颜色1,
+                '七天颜色2' => @$七天颜色2,
+                '七天颜色3' => @$七天颜色3,
+                '七天颜色4' => @$七天颜色4,
+                '七天颜色5' => @$七天颜色5,
+                '七天颜色6' => @$七天颜色6,
+                '更新日期' => date('Y-m-d'),
+            ]);
+        }
+
+        $this->db_easyA->table('dd_weather_color')->insertAll($insertData);
+
+        $sql_省份汇总 = "
+            SELECT
+                省份,
+                '汇总' as 店铺名称,
+                round(sum(`前三天颜色1`) / 3, 0) as `前三天颜色1`,
+                round(sum(`前三天颜色2`) / 3, 0) as `前三天颜色2`,
+                round(sum(`前三天颜色3`) / 3, 0) as `前三天颜色3`,
+                round(sum(`前三天颜色4`) / 3, 0) as `前三天颜色4`,
+                round(sum(`前三天颜色5`) / 3, 0) as `前三天颜色5`,
+                round(sum(`前三天颜色6`) / 3, 0) as `前三天颜色6`,
+                round(sum(`七天颜色1`) / 7, 0) as `七天颜色1`,
+                round(sum(`七天颜色2`) / 7, 0) as `七天颜色2`,
+                round(sum(`七天颜色3`) / 7, 0) as `七天颜色3`,
+                round(sum(`七天颜色4`) / 7, 0)as `七天颜色4`,
+                round(sum(`七天颜色5`) / 7, 0) as `七天颜色5`,
+                round(sum(`七天颜色6`) / 7, 0) as `七天颜色6`,
+                date_format(now(),'%Y-%m-%d') AS 更新日期
+            FROM
+                dd_weather_color 
+            WHERE
+                1
+            GROUP BY 省份
+        ";
+        $select_汇总 = $this->db_easyA->query($sql_省份汇总);
+        $this->db_easyA->table('dd_weather_color')->insertAll($select_汇总);
+    }
+
+
 
 
     // 图片生成1
@@ -570,8 +825,6 @@ class Weather extends BaseController
                 }
             }
         }
-
-
 
     
         foreach ($base['column_x_arr'] as $key => $x) {

@@ -508,68 +508,6 @@ class Uploadimg extends AdminController
             ]);
         }
 
-        // echo '<pre>';
-        // print_r($select_customer);
-    }
-
-    // 获取钉钉用户信息
-    public function getDingDingUserInfo2() {
-        // if (request()->isAjax()) {
-        if (1) {
-            if (!checkAdmin()) {
-                $CustomItem17 = $this->authInfo['name'];
-                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
-            } else {
-                $map = "";
-            }
-
-            $select_user = $this->db_easyA->table('dd_user')->select();
-            
-            echo '<pre>';
-            // print_r($select_customer);
-            print_r($select_user);
-            die;
-            // foreach ($select_customer as $key => $val) {
-            //     foreach ($select_user as $key2 => $val2) {
-
-            //         if ($val['店铺名称'] == $val2['店铺名称']) {
-            //             $店铺负责人 = trim($val['店铺负责人']);
-            //             $pattern = "/{$店铺负责人}/i";
-            //             $find_user = preg_match($pattern, $val2['name']);
-            //             if ($find_user) {
-            //                 $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
-            //             }
-            //         }
-            //     }
-            //     foreach ($select_user as $key2 => $val2) {
-            //         if ($val['督导负责人']) {
-            //             $pattern_督导 = "/督导/i";
-            //             $find_督导 = preg_match($pattern_督导, $val2['title']);
-
-            //             $pattern_name = "/{$val['督导负责人']}/i";
-            //             $find_name = preg_match($pattern_name, $val2['name']);
-
-            //             if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
-            //                 $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
-            // echo '<pre>';
-            // print_r($select_customer);
-            // // print_r($select_user);
-            // die;
-            
-            return json(["code" => "0", "msg" => "", "count" => count($select_user), "data" => $select_user]);
-        } else {
-            return View('dduser', [
-                // 'config' => ,
-            ]);
-        }
-
-        // echo '<pre>';
-        // print_r($select_customer);
     }
 
 
@@ -633,6 +571,100 @@ class Uploadimg extends AdminController
                             ]);
 
            
+                            // 更新用户列表 task_id
+                            $this->db_easyA->execute("
+                                update dd_temp_excel_user_success
+                                set 
+                                    task_id = '{$res['task_id']}'
+                                where 1
+                                    AND uid = '{$find_list['uid']}'
+                                    AND userid IN ({$update_uids})
+                            ");
+                        }
+                    }
+                }
+
+                $updatetime = date('Y-m-d H:i:s');
+                $sql_更新 = "
+                    update dd_userimg_list
+                    set 
+                        sendtimes = sendtimes + 1,
+                        sendtime = '{$updatetime}',
+                        撤回时间 = null
+                    where id = '{$input['id']}'
+                ";
+                $this->db_easyA->execute($sql_更新);
+
+                return json(['code' => 0, 'msg' => '执行成功']);
+            } else {
+                return json(['code' => 0, 'msg' => '信息有误，执行失败']);
+            }
+        } else {
+            return json(['code' => 0, 'msg' => '请勿非法请求']);
+        }       
+    }
+    
+
+    // 发送 工作通知
+    public function sendDingFileHandle() {
+        $input = input();
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
+            $model = new DingTalk;
+    
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
+
+            if ($find_list) {
+                $find_path = $this->db_easyA->table('dd_temp_img')->where([
+                    ['pid', '=', $find_list['pid']]
+                ])->find();
+                // echo $find_path['path'];
+
+                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
+                    ['uid', '=', $find_list['uid']]
+                ])->group('userid')->select()->toArray();
+
+                $chunk_list_success = array_chunk($select_user, 150);
+                // $chunk_list_success = array_chunk($select_user, 2);
+                $model = new DingTalk;
+                foreach($chunk_list_success as $key => $val) {
+
+                    $userids = '';
+                    foreach ($val as $key2 => $val2) {
+                        if ( ($key2 + 1) < count($val) ) {
+                            $userids .= $val2['userid'] . ',';
+                        } else {
+                            // 最后一次发送  发送id xxx,xxx,xxx
+                            $userids .= $val2['userid'];
+                            $update_uids = xmSelectInput($userids);
+
+                            // 发送
+                            $res = json_decode($model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']), true);
+
+                            // $res['request_id'] = rand_code();
+                            // $res['task_id'] = rand_code();
+                            // $res['errmsg'] = 'ok';
+                            $this->db_easyA->table('dd_task_id')->insert([
+                                'lid' => $find_list['id'],
+                                'aid' => $find_list['aid'],
+                                'aname' => $find_list['aname'],
+                                'title' => $find_list['title'],
+                                'request_id' => $res['request_id'],
+                                'task_id' => $res['task_id'],
+                                'errmsg' => $res['errmsg'],
+                                'createtime' => date('Y-m-d H:i:s'),
+                            ]);
+
+            
                             // 更新用户列表 task_id
                             $this->db_easyA->execute("
                                 update dd_temp_excel_user_success
@@ -797,10 +829,15 @@ class Uploadimg extends AdminController
     }
 
     public function test() {
-        $str = '田珊';
-        $str2 = ' 11田珊珊的工作号';
-        $pattern = "/{$str}/i";
-        echo preg_match($pattern, $str2);
+        // $str = '田珊';
+        // $str2 = ' 11田珊珊的工作号';
+        // $pattern = "/{$str}/i";
+        // echo preg_match($pattern, $str2);
+        $model = new DingTalk;
+        $path = 'http://im.babiboy.com/upload/dd_img/20230911/9b568b8758b29f6097327eb76ae51720_523.pdf';
+        // 上传图 
+        echo $media_id = $model->uploadDingFile($path, "test_" . time(). '.pdf');
+        $res = json_decode($model->sendFileMsg('350364576037719254', 'test', $media_id), true);
     }
 
     // 下载 钉钉 工作通知已读未读 

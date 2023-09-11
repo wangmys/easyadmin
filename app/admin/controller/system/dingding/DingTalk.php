@@ -586,16 +586,27 @@ class DingTalk extends BaseController
      * 发送文件
      * @return bool|string
      */
-    public function sendFileMsg()
+    public function sendFileMsg($userids, $title, $media_id)
     {
-        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken();
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
+        // $SendToUser_data = [
+        //     'userid_list' => '350364576037719254',
+        //     'agent_id' => $this->AgentId,
+        //     "msg" => [
+        //         "msgtype" => 'file',
+        //         'file' => [
+        //             'media_id' => '@lAjPDgCwcKCcChTOPviv5c4jcn31',
+
+        //         ]
+        //     ]
+        // ];
         $SendToUser_data = [
-            'userid_list' => '350364576037719254',
+            'userid_list' => $userids,
             'agent_id' => $this->AgentId,
             "msg" => [
                 "msgtype" => 'file',
                 'file' => [
-                    'media_id' => '@lAjPDgCwcKCcChTOPviv5c4jcn31',
+                    'media_id' => $media_id,
 
                 ]
             ]
