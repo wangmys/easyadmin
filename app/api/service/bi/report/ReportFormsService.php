@@ -4413,13 +4413,13 @@ class ReportFormsService
             $table_header = array_merge($table_header, array_keys($list[0]));
             
             foreach ($table_header as $v => $k) {
-                $field_width[] = 125;
+                $field_width[] = 90;
             }
             $field_width[0] = 30;
             $field_width[1] = 160;
-            // $field_width[2] = 80;
-            // $field_width[3] = 80;
-            // $field_width[4] = 80;
+            $field_width[2] = 90;
+            $field_width[3] = 90;
+            $field_width[4] = 160;
             // $field_width[7] = 110;
             // $field_width[8] = 110;
             // $field_width[4] = 90;

@@ -470,115 +470,38 @@ class Uploadimg extends AdminController
         }        
     }
 
-    public function downloadUserList() {
-        $uid = input('uid');
-        $sql = "
-            SELECT 
-                店铺名称,姓名,手机,title as 职位,
-                '否' as 已读
-            FROM 
-                dd_temp_excel_user_success   
-            WHERE 1
-                AND uid = '{$uid}'
-                AND 已读 = 'N'
-            ORDER BY
-                已读 ASC,店铺名称
-        ";
-        $select = $this->db_easyA->query($sql);
-        $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
-        }
-        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
-    }
-
     // 获取钉钉用户信息
     public function getDingDingUserInfo() {
         if (request()->isAjax()) {
             if (!checkAdmin()) {
                 $CustomItem17 = $this->authInfo['name'];
-                $map = "AND EC.CustomItem17 = '{$CustomItem17}'";
+                $map = "AND c.CustomItem17 = '{$CustomItem17}'";
             } else {
                 $map = "";
             }
-        // if (1) {
-            $sql_康雷 = "
-                SELECT
-                    State AS 省份,
-                    CustomerName AS 店铺名称,
-                    EBC.Mathod AS 经营模式,
-                    CustomerId,
-                    CustomerCode,
-                    EC.RegionId,
-                    CustomItem17 AS 商品负责人,
-                    CustomItem18 AS 督导负责人,
-                    CustomItem19 AS 店铺负责人
-                FROM
-                    ErpCustomer AS EC 
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                WHERE 
-                EC.RegionId NOT IN ('8','40', '55' ,'84', '85',  '97')
-                AND EBC.Mathod IN ('直营', '加盟')
-                AND EC.CustomerCode IN (
-                                SELECT
-                                        EC.CustomerCode 
-                                FROM
-                                        ErpRetail AS ER
-                                        LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                                        LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                                        LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
-                                WHERE
-                                        ER.CodingCodeText = '已审结' 
-                                        AND EC.ShutOut = 0 
-                                        AND EC.RegionId <> 55 
-                                        AND EBC.Mathod IN ( '直营')
-                                        {$map}    
-                                GROUP BY
-                                        ER.CustomerName,
-                                        EC.RegionId,
-                                        EC.CustomerCode
-                )
-                ORDER BY EBC.Mathod DESC
+
+            $sql_select = "
+                select 
+                    p.店铺名称,p.name,p.title,p.mobile,c.State,c.CustomItem17,'直营' as 经营模式 
+                from dd_customer_push as p
+                left join customer_pro as c on p.店铺名称 = c.CustomerName
+                where 1 
+                    AND name not in ('陈威良', '王威')
+                    {$map}
             ";
-            $select_customer = $this->db_sqlsrv->query($sql_康雷);
-            $select_user = $this->db_easyA->table('dd_user')->select();
-            
-            // echo '<pre>';
-            // print_r($select_customer);
-            // print_r($select_user);
-            // die;
-            foreach ($select_customer as $key => $val) {
-                foreach ($select_user as $key2 => $val2) {
 
-                    if ($val['店铺名称'] == $val2['店铺名称']) {
-                        $店铺负责人 = trim($val['店铺负责人']);
-                        $pattern = "/{$店铺负责人}/i";
-                        $find_user = preg_match($pattern, $val2['name']);
-                        if ($find_user) {
-                            $select_customer[$key]['店铺负责人手机'] = $val2['mobile'];
-                        }
-                    }
-                }
-                foreach ($select_user as $key2 => $val2) {
-                    if ($val['督导负责人']) {
-                        $pattern_督导 = "/督导/i";
-                        $find_督导 = preg_match($pattern_督导, $val2['title']);
-
-                        $pattern_name = "/{$val['督导负责人']}/i";
-                        $find_name = preg_match($pattern_name, $val2['name']);
-
-                        if (($find_督导 || $val2['title'] == '区域大店长') && $find_name) {
-                            $select_customer[$key]['督导负责人手机'] = $val2['mobile'];
-                            break;
-                        }
-                    }
-                }
-            }
-            // echo '<pre>';
-            // print_r($select_customer);
-            // // print_r($select_user);
-            // die;
-            return json(["code" => "0", "msg" => "", "count" => count($select_customer), "data" => $select_customer]);
+            $sql_total = "
+                select 
+                    count(*) as total
+                from dd_customer_push as p
+                left join customer_pro as c on p.店铺名称 = c.CustomerName
+                where 1 
+                    AND name not in ('陈威良', '王威')
+                    {$map}
+            ";
+            $select = $this->db_easyA->query($sql_select);
+            $total = $this->db_easyA->query($sql_total);
+            return json(["code" => "0", "msg" => "", "count" => $total[0]['total'], "data" => $select]);
         } else {
             return View('dduser', [
                 // 'config' => ,
@@ -678,7 +601,7 @@ class Uploadimg extends AdminController
                     ['uid', '=', $find_list['uid']]
                 ])->group('userid')->select()->toArray();
 
-                $chunk_list_success = array_chunk($select_user, 996);
+                $chunk_list_success = array_chunk($select_user, 150);
                 // $chunk_list_success = array_chunk($select_user, 2);
                 $model = new DingTalk;
                 foreach($chunk_list_success as $key => $val) {
@@ -820,7 +743,7 @@ class Uploadimg extends AdminController
                 foreach($select_user as $key => $val) {
                     $res = json_decode($model->getsendresult($val['task_id']), true);
                     
-                    if ($res['errmsg'] = 'ok') {  
+                    if ($res['errmsg'] = 'ok' && $res['send_result']) {  
                         if (count($res['send_result']['read_user_id_list']) > 0) {
                             // 已读
                             $reads = arrToStr($res['send_result']['read_user_id_list']);    
@@ -849,20 +772,20 @@ class Uploadimg extends AdminController
                             ");
                         }
 
-                        // 统计list展示的已读未读数
-                        $this->db_easyA->execute("
-                            UPDATE 
-                                dd_userimg_list as l
-                            SET 
-                                l.已读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='Y'),
-                                l.未读 = (select count(*) from dd_temp_excel_user_success where task_id = '{$val['task_id']}' and 已读='N')
-                            WHERE 1
-                                AND l.id = {$find_list['id']}
-                        ");
                     } else {
-                        echo '数据异常';
+                        return json(['code' => 0, 'msg' => '数据异常']);
                     }
                 }
+                // 统计list展示的已读未读数
+                $this->db_easyA->execute("
+                    UPDATE 
+                        dd_userimg_list as l
+                    SET 
+                        l.已读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='Y'),
+                        l.未读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='N')
+                    WHERE 1
+                        AND l.id = {$find_list['id']}
+                ");
 
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
@@ -878,5 +801,58 @@ class Uploadimg extends AdminController
         $str2 = ' 11田珊珊的工作号';
         $pattern = "/{$str}/i";
         echo preg_match($pattern, $str2);
+    }
+
+    // 下载 钉钉 工作通知已读未读 
+    public function downloadUserList() {
+        $uid = input('uid');
+        $sql = "
+            SELECT 
+                店铺名称,姓名,手机,title as 职位,
+                '否' as 已读
+            FROM 
+                dd_temp_excel_user_success   
+            WHERE 1
+                AND uid = '{$uid}'
+                AND 已读 = 'N'
+            ORDER BY
+                已读 ASC,店铺名称
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+    }
+
+    // 下载 钉钉 工作通知已读未读 
+    public function downloadDduser() {
+        $uid = input('uid');
+
+        if (!checkAdmin()) {
+            $CustomItem17 = $this->authInfo['name'];
+            $map = "AND c.CustomItem17 = '{$CustomItem17}'";
+        } else {
+            $map = "";
+        }
+
+        $sql = "
+            select 
+                p.店铺名称,p.name as 姓名,p.mobile as 手机,p.title as 职位,c.State as 省份,'直营' as 性质, c.CustomItem17 as 专员 
+            from dd_customer_push as p
+            left join customer_pro as c on p.店铺名称 = c.CustomerName
+            where 1 
+                AND name not in ('陈威良', '王威')
+                {$map}
+            ORDER BY 省份
+        ";
+        
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '钉钉店铺负责人名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 }

@@ -136,6 +136,12 @@
 <script type="text/html" id="introduceHtml">
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
+<!-- tools -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="download">导出名单</button>
+    </div>
+</script>
 <script>
     // var sendDingImg = function (id, title) {
     //     window.localStorage.setItem('sendDingImg_id', id);
@@ -152,7 +158,8 @@
             , layer = layui.layer
             , table = layui.table
             , laydate = layui.laydate
-            , url_user = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}";
+            , url_user = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
+            , downloadUrl = "{:url('admin/system.dingding.Uploadimg/downloadDduser')}";
 
 
         // 表1初始化
@@ -220,6 +227,51 @@
             });
         }
 
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            uid = window.localStorage.getItem('sendDingImg_uid');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl + '?uid=' + uid;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            uid = window.localStorage.getItem('sendDingImg_uid');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
 
         // 单店不动销数据统计 
         function startTable() {
@@ -233,7 +285,7 @@
                 ,url: url_user
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: true
                 , limit: 2000
                 , limits: [2000, 500, 1000, 2000, 5000, 10000, 20000]
@@ -241,14 +293,16 @@
                 , where: {uid: uid}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '省份', title: '店铺名称', align:'center' }
-                    ,{ field: '店铺名称', title: '店铺名称', align:'center' }
-                    ,{ field: '经营模式', title: '经营模式', align:'center' }
-                    ,{ field: '商品负责人', title: '商品负责人', align:'center' }
-                    ,{ field: '店铺负责人', title: '店铺负责人', align:'center' }
-                    ,{ field: '店铺负责人手机', title: '店铺负责人手机', align:'center' }
-                    ,{ field: '督导负责人', title: '督导负责人', align:'center' }
-                    ,{ field: '督导负责人手机', title: '督导负责人手机', align:'center' }
+                    
+                    { field: '店铺名称', title: '店铺名称', align:'center' }
+                    ,{ field: 'name', title: '姓名', align:'center' }
+                    ,{ field: 'mobile', title: '手机', align:'center' }
+                    ,{ field: 'title', title: '职位', align:'center' }
+                    ,{ field: 'State', title: '省份', align:'center' }
+                    ,{ field: '经营模式', title: '性质', align:'center' }
+                    
+                    ,{ field: 'CustomItem17', title: '专员', align:'center' }
+                    
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
