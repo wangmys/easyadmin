@@ -1157,20 +1157,20 @@ class Weather extends BaseController
                                 // imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $orange);
                                 $colorVal = 38;
                             } elseif ($item3['最高温'] - $item3['最低温'] <= 5) {
-                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2;
+                                $colorVal = round(($item3['最高温'] + $item3['最低温']) / 2, 0);
                             } elseif ( ($item3['最高温'] - $item3['最低温']) > 5 && ($item3['最高温'] - $item3['最低温']) <= 10) {
-                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 2;
+                                $colorVal = round(($item3['最高温'] + $item3['最低温']) / 2 + 2, 0);
                             } elseif ( ($item3['最高温'] - $item3['最低温']) > 10) {
-                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 4;
+                                $colorVal = round(($item3['最高温'] + $item3['最低温']) / 2 + 4, 0);
                             }
 
-                            if ($colorVal < 10) {
+                            if ($colorVal <= 10) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color1);
-                            } elseif ($colorVal < 18) {
+                            } elseif ($colorVal <= 18) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color2);
-                            } elseif ($colorVal < 22) {
+                            } elseif ($colorVal <= 22) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color3);
-                            } elseif ($colorVal < 26) {
+                            } elseif ($colorVal <= 26) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color4);
                             } elseif ($colorVal <= 30) {
                                 imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color5);
