@@ -199,6 +199,8 @@ layui.use(['form', 'upload', 'element', 'layer'], function(){
         elem: '#test1'
         // ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
         ,url: upload_upload_img //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+        ,accept: 'file'
+        ,exts: 'jpeg|jpg|gif|png|pdf'
         // ,auto: false
         
         ,before: function(obj){
