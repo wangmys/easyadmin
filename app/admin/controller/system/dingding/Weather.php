@@ -122,6 +122,36 @@ class Weather extends BaseController
             ";
             $this->db_easyA->execute($sql2);
 
+            $sql_天气值 = "
+                update dd_weather 
+                    set colorVal = 
+                        case 
+                            when `max_c` > 30 then `max_c`
+                            when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
+                            when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
+                            when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+                        end
+                where 
+                    colorVal is null
+            ";
+
+            $sql_颜色 = "
+                update dd_weather 
+                    set colorNum = 
+                        case 
+                            when `colorVal` < 10 then 1
+                            when `colorVal` < 18 then 2
+                            when `colorVal` < 22 then 3
+                            when `colorVal` < 26 then 4
+                            when `colorVal` <= 30 then 5
+                            when `colorVal` > 30 then 6
+                        end
+                where 
+                    colorNum is null
+            ";
+            $this->db_easyA->execute($sql_天气值);
+            $this->db_easyA->execute($sql_颜色);
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -133,7 +163,7 @@ class Weather extends BaseController
 
     // 更新天气值和颜色
     public function getWeather2() {
-        $sql1 = "
+        $sql_天气值 = "
             update dd_weather 
                 set colorVal = 
                     case 
@@ -146,20 +176,22 @@ class Weather extends BaseController
                 colorVal is null
         ";
 
-        $sql2 = "
+        $sql_颜色 = "
             update dd_weather 
-                set colorVal = 
+                set colorNum = 
                     case 
-                        when `max_c` > 30 then `max_c`
-                        when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
-                        when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
-                        when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+                        when `colorVal` < 10 then 1
+                        when `colorVal` < 18 then 2
+                        when `colorVal` < 22 then 3
+                        when `colorVal` < 26 then 4
+                        when `colorVal` <= 30 then 5
+                        when `colorVal` > 30 then 6
                     end
             where 
-                colorVal is null
+                colorNum is null
         ";
-        $this->db_easyA->execute($sql1);
-        $this->db_easyA->execute($sql2);
+        $this->db_easyA->execute($sql_天气值);
+        $this->db_easyA->execute($sql_颜色);
 
     }
 
