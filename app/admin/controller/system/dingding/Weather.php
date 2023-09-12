@@ -122,6 +122,7 @@ class Weather extends BaseController
             ";
             $this->db_easyA->execute($sql2);
 
+            // 更新天气值和颜色
             $sql_天气值 = "
                 update dd_weather 
                     set colorVal = 
@@ -162,38 +163,38 @@ class Weather extends BaseController
     }
 
     // 更新天气值和颜色
-    public function getWeather2() {
-        $sql_天气值 = "
-            update dd_weather 
-                set colorVal = 
-                    case 
-                        when `max_c` > 30 then `max_c`
-                        when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
-                        when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
-                        when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
-                    end
-            where 
-                colorVal is null
-        ";
+    // public function getWeather2() {
+    //     $sql_天气值 = "
+    //         update dd_weather 
+    //             set colorVal = 
+    //                 case 
+    //                     when `max_c` > 30 then `max_c`
+    //                     when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
+    //                     when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
+    //                     when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+    //                 end
+    //         where 
+    //             colorVal is null
+    //     ";
 
-        $sql_颜色 = "
-            update dd_weather 
-                set colorNum = 
-                    case 
-                        when `colorVal` < 10 then 1
-                        when `colorVal` < 18 then 2
-                        when `colorVal` < 22 then 3
-                        when `colorVal` < 26 then 4
-                        when `colorVal` <= 30 then 5
-                        when `colorVal` > 30 then 6
-                    end
-            where 
-                colorNum is null
-        ";
-        $this->db_easyA->execute($sql_天气值);
-        $this->db_easyA->execute($sql_颜色);
+    //     $sql_颜色 = "
+    //         update dd_weather 
+    //             set colorNum = 
+    //                 case 
+    //                     when `colorVal` < 10 then 1
+    //                     when `colorVal` < 18 then 2
+    //                     when `colorVal` < 22 then 3
+    //                     when `colorVal` < 26 then 4
+    //                     when `colorVal` <= 30 then 5
+    //                     when `colorVal` > 30 then 6
+    //                 end
+    //         where 
+    //             colorNum is null
+    //     ";
+    //     $this->db_easyA->execute($sql_天气值);
+    //     $this->db_easyA->execute($sql_颜色);
 
-    }
+    // }
 
     // 店铺天气 几秒
     public function getCustomerWeather() {
@@ -493,8 +494,6 @@ class Weather extends BaseController
     }
 
 
-
-
     // 图片生成1
     public function weather_pic() {
         $select = $this->db_easyA->query("
@@ -684,8 +683,338 @@ class Weather extends BaseController
         }
     }
 
+    // 气温颜色图
+    public function create_table_weather_color($date = '') {
+        $date = $date ?: date('Y-m-d', time());
+        $sql = "
+            SELECT
+                t.`省份`,
+                t.`七天颜色1`,
+                t.`七天颜色2`,
+                t.`七天颜色3`,
+                t.`七天颜色4`,
+                t.`七天颜色5`,
+                t.`七天颜色6`,
+                concat( ROUND(t.`七天颜色1` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色1占比`,
+                concat( ROUND(t.`七天颜色2` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色2占比`,
+                concat( ROUND(t.`七天颜色3` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色3占比`,
+                concat( ROUND(t.`七天颜色4` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色4占比`,
+                concat( ROUND(t.`七天颜色5` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色5占比`,
+                concat( ROUND(t.`七天颜色6` / 七天颜色总数 * 100, 1), '%' ) as `七天颜色6占比`,
+                t.`七天颜色1` - `前三天颜色1` AS `家数环比1`,
+                t.`七天颜色2` - `前三天颜色2` AS `家数环比2`,
+                t.`七天颜色3` - `前三天颜色3` AS `家数环比3`,
+                t.`七天颜色4` - `前三天颜色4` AS `家数环比4`,
+                t.`七天颜色5` - `前三天颜色5` AS `家数环比5`,
+                t.`七天颜色6` - `前三天颜色6` AS `家数环比6`
+            FROM (
+                SELECT
+                    `省份`,
+                    `前三天颜色1`,
+                    `前三天颜色2`,
+                    `前三天颜色3`,
+                    `前三天颜色4`,
+                    `前三天颜色5`,
+                    `前三天颜色6`,
+                    `七天颜色1`,
+                    `七天颜色2`,
+                    `七天颜色3`,
+                    `七天颜色4`,
+                    `七天颜色5`,
+                    `七天颜色6`,
+                    `七天颜色1` + `七天颜色2` + `七天颜色3` + `七天颜色4` + `七天颜色5` + `七天颜色6` as 七天颜色总数
+                FROM
+                    `dd_weather_color`
+                WHERE 1
+             		AND 省份 in ('重庆')
+                    AND 店铺名称 = '汇总'
+                    AND 更新日期 = '{$date}'
+                GROUP BY 省份
+            ) as t
+        ";
+        $select = $this->db_easyA->query($sql);
+        echo '<pre>';
+        print_r($select);
+
+
+        // dump($data);
+        foreach($select as $key => $val) {
+            $data = [
+                [
+                    '家数' => $val['七天颜色1'],
+                    '占比' => $val['七天颜色1占比'],
+                    '家数.' => $val['七天颜色4'],
+                    '占比.' => $val['七天颜色4占比'],
+                    '家数环比（三天）' => $val['家数环比1'],
+                    '家数环比（三天）.' => $val['家数环比4'],
+                ],
+                [
+                    '家数' => $val['七天颜色2'],
+                    '占比' => $val['七天颜色2占比'],
+                    '家数.' => $val['七天颜色5'],
+                    '占比.' => $val['七天颜色5占比'],
+                    '家数环比（三天）' => $val['家数环比2'],
+                    '家数环比（三天）.' => $val['家数环比5'],
+                ],
+                [
+                    '家数' => $val['七天颜色3'],
+                    '占比' => $val['七天颜色3占比'],
+                    '家数.' => $val['七天颜色4'],
+                    '占比.' => $val['七天颜色4占比'],
+                    '家数环比（三天）' => $val['家数环比3'],
+                    '家数环比（三天）.' => $val['家数环比6'],
+                ],
+                [
+                    '家数' => '秋天增加家数',
+                    '占比' => $val['家数环比3'],
+                    '家数.' => '',
+                    '占比.' => '',
+                    '家数环比（三天）' => '冬天新增家数',
+                    '家数环比（三天）.' => $val['家数环比6'],
+                ],
+            ];
+        }
+        echo '<pre>';
+        dump($data);
+
+    }
+
     // 格子带背景色
     public function create_image_bgcolor($params, $set_bgcolor = [])
+    {
+        // echo '<pre>';
+        // print_r($params);die;
+        $base = [
+            'border' => 1, //图片外边框
+            'file_path' => $params['file_path'], //图片保存路径
+            'title_height' => 35, //报表名称高度
+            'title_font_size' => 16, //报表名称字体大小
+            'font_ulr' => app()->getRootPath() . '/public/Medium.ttf', //字体文件路径
+            'text_size' => 12, //正文字体大小
+            'row_hight' => 30, //每行数据行高
+        ];
+
+        $y1 = 36;
+        $x2 = 1542;
+        $y2 = 65;
+        $font_west =  realpath('./static/plugs/font-awesome-4.7.0/fonts/SimHei.ttf'); //字体文件路径
+        $save_path = $base['file_path'] . $params['file_name'];
+
+        //如果表说明部分不为空，则增加表图片的高度
+        if (!empty($params['table_explain'])) {
+            $base['title_height'] =   $base['title_height'] * count($params['table_explain']);
+        }
+
+        //计算图片总宽
+        $w_sum = $base['border'];
+        foreach ($params['field_width'] as $key => $value) {
+            //图片总宽
+            $w_sum += $value;
+            //计算每一列的位置
+            $base['column_x_arr'][$key] = $w_sum;
+        }
+
+        $base['img_width'] = $w_sum + $base['border'] * 2 - $base['border']; //图片宽度
+        $base['img_height'] = ($params['row'] + 1) * $base['row_hight'] + $base['border'] * 2 + $base['title_height']; //图片高度
+        $border_top = $base['border'] + $base['title_height']; //表格顶部高度
+        $border_bottom = $base['img_height'] - $base['border']; //表格底部高度
+
+
+        $img = imagecreatetruecolor($base['img_width'], $base['img_height']); //创建指定尺寸图片
+        $bg_color = imagecolorallocate($img, 24, 98, 229); //设定图片背景色
+
+
+        $yellow = imagecolorallocate($img, 238, 228, 0); //设定图片背景色
+        $text_coler = imagecolorallocate($img, 0, 0, 0); //设定文字颜色
+        $text_coler2 = imagecolorallocate($img, 255, 255, 255); //设定文字颜色
+        $border_coler = imagecolorallocate($img, 150, 150, 150); //设定边框颜色
+        $xb  = imagecolorallocate($img, 255, 255, 255); //设定图片背景色
+
+        $red = imagecolorallocate($img, 255, 0, 0); //设定图片背景色
+        $red2 = imagecolorallocate($img, 251, 89, 62); //设定图片背景色
+        $blue1 = imagecolorallocate($img, 168, 203, 255); //设定图片背景色
+        $blue2 = imagecolorallocate($img, 66, 182, 255); //设定图片背景色
+        $yellow2 = imagecolorallocate($img, 250, 233, 84); //设定图片背景色
+        $yellow3 = imagecolorallocate($img, 230, 244, 0); //设定图片背景色
+        $green = imagecolorallocate($img, 24, 98, 0); //设定图片背景色
+        $green2 = imagecolorallocate($img, 75, 234, 32); //设定图片背景色
+        $chengse = imagecolorallocate($img, 255, 72, 22); //设定图片背景色
+        $blue = imagecolorallocate($img, 0, 42, 212); //设定图片背景色
+        $gray = imagecolorallocate($img, 37, 240, 240); //设定图片背景色
+        $littleblue = imagecolorallocate($img, 22, 172, 176); //设定图片背景色
+        $orange = imagecolorallocate($img, 255, 192, 0); //设定图片背景色
+
+        // 天气温度
+        $color1 = imagecolorallocate($img, 22, 108, 221); //设定图片背景色
+        $color2 = imagecolorallocate($img, 103, 184, 249); //设定图片背景色
+        $color3 = imagecolorallocate($img, 248, 243, 162); //设定图片背景色
+        $color4 = imagecolorallocate($img, 253, 206, 74); //设定图片背景色
+        $color5 = imagecolorallocate($img, 241, 124, 0); //设定图片背景色
+        $color6 = imagecolorallocate($img, 204, 41, 49); //设定图片背景色
+
+        imagefill($img, 0, 0, $bg_color); //填充图片背景色
+
+        // 表面颜色（浅灰）
+        $surface_color = imagecolorallocate($img, 235, 242, 255);
+        // 标题字体颜色（白色）
+        //先填充一个黑色的大块背景
+        imagefilledrectangle($img, $base['border'], $base['border'] + $base['title_height'], $base['img_width'] - $base['border'], $base['img_height'] - $base['border'], $bg_color); //画矩形
+
+        //再填充一个小两个像素的 背景色区域，形成一个两个像素的外边框
+        imagefilledrectangle($img, $base['border'] + 2, $base['border'] + $base['title_height'] + 2, $base['img_width'] - $base['border'] - 2, $base['img_height'] - $base['border'] - 2, $surface_color); //画矩形
+        //画表格纵线 及 写入表头文字
+
+        $sum = $base['border'];
+
+        // 1 统计上色
+        // foreach ($params['data'] as $key => $item) {
+        //     if (isset($item['督导']) && $item['督导'] == '总计') {
+        //         imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+        //     } 
+        //     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+        // }
+        
+
+        // 2 单元格上色
+        if (! empty($set_bgcolor)) {
+                /* 获取开始x1结束x2
+                ^ array:2 [▼
+                    "今日达成率" => array:2 [▼
+                        "start" => 120
+                        "end" => 210
+                    ]
+                    "本月达成率" => array:2 [▼
+                        "start" => 210
+                        "end" => 300
+                    ]
+                ]
+                */
+            foreach ($set_bgcolor as $k => $v) {
+                $site_arr = [
+                    'x0' => 0,
+                    'x1' => 0
+                ];
+                for ($i = 0; $i <= $v; $i ++) {
+                    if ($i < $v) {
+                        $site_arr['x0'] += $params['field_width'][$i]; 
+                    } else {
+                        $site_arr['x1'] = $site_arr['x0'] + $params['field_width'][$i];
+                    }
+                
+                }
+                $set_bgcolor[$k] = $site_arr;
+                
+            }
+            // dump($set_bgcolor[$key]);
+            
+
+
+            foreach ($params['data'] as $key => $item) {
+                foreach ($set_bgcolor as $key2 => $val2) {
+                    // dump($val2);
+                    // dump($item);
+
+                    foreach ($params['data_对比'] as $key3 => $item3) {
+                        // dump($item3);
+
+                        if ($item3['日期'] == $item['日期']) {
+                            $colorVal = '';
+                            if ($item3['最高温'] > 30 ) {
+                                // imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $orange);
+                                $colorVal = 38;
+                            } elseif ($item3['最高温'] - $item3['最低温'] <= 5) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2;
+                            } elseif ( ($item3['最高温'] - $item3['最低温']) > 5 && ($item3['最高温'] - $item3['最低温']) <= 10) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 2;
+                            } elseif ( ($item3['最高温'] - $item3['最低温']) > 10) {
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 4;
+                            }
+
+                            if ($colorVal < 10) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color1);
+                            } elseif ($colorVal < 18) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color2);
+                            } elseif ($colorVal < 22) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color3);
+                            } elseif ($colorVal < 26) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color4);
+                            } elseif ($colorVal <= 30) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color5);
+                            } elseif ($colorVal > 30) {
+                                imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $color6);
+                            }
+                        }
+
+                        // elseif($item3['最高温'] > 30) {
+                        //     imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $red2);
+                        // }
+                    }
+                }
+            }
+        }
+
+    
+        foreach ($base['column_x_arr'] as $key => $x) {
+            imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
+            $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
+            $title_x_len = $this_title_box[2] - $this_title_box[0];
+            imagettftext($img, $base['text_size'], 0, $sum + (($x - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $params['table_header'][$key]); //写入表头文字
+            $sum += $params['field_width'][$key];
+        }
+
+        //画表格横线
+        foreach ($params['data'] as $key => $item) {
+            $border_top += $base['row_hight'];
+            //画横线
+            imageline($img, $base['border'], $border_top, $base['img_width'] - $base['border'], $border_top, $border_coler);
+            $this_first = imagettfbbox($base['text_size'], 0, $font_west, $key);
+            $first_len = $this_first[2] - $this_first[0];
+            imagettftext($img, $base['text_size'], 0, $params['field_width'][0] / 2 - $first_len / 2 + $base['border'], $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $key + 1); //写入序号
+            $sub = 0;
+            $sum = $params['field_width'][0] + $base['border'];
+            foreach ($item as $k => $value) {
+                // dump($value);
+                if (empty($value)) {
+                    $value = '';
+                }
+                $sub++;
+                $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $value);
+                $title_x_len = $this_title_box[2] - $this_title_box[0];
+                imagettftext($img, $base['text_size'], 0, $sum + (($base['column_x_arr'][$sub] - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $value); //写入data数据
+                // imagettftext($img, $base['text_size'], 0, $sum + (($base['column_x_arr'][$sub] - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $value); //写入data数据
+                $sum += $params['field_width'][$sub];
+            }
+        }
+
+        //计算标题写入起始位置
+        $title_fout_box = imagettfbbox($base['title_font_size'], 0, $font_west, $params['title']); //imagettfbbox() 返回一个含有 8 个单元的数组表示了文本外框的四个角：
+        $title_fout_width = $title_fout_box[2] - $title_fout_box[0]; //右下角 X 位置 - 左下角 X 位置 为文字宽度
+        $title_fout_height = $title_fout_box[1] - $title_fout_box[7]; //左下角 Y 位置- 左上角 Y 位置 为文字高度
+        $save_path = $base['file_path'] . $params['file_name'];
+        if (!is_dir($base['file_path'])) //判断存储路径是否存在，不存在则创建
+        {
+            mkdir($base['file_path'], 0777, true);
+        }
+
+        //居中写入标题
+        imagettftext($img, $base['title_font_size'], 0, ($base['img_width'] - $title_fout_width) / 2, 30, $xb, $font_west, $params['title']);
+        //设置图片左上角信息
+        $a_hight = 10;
+        if (!empty($params['table_explain'])) {
+            foreach ($params['table_explain'] as $key => $value) {
+                imagettftext($img, $base['text_size'], 0, 10, 20 + $a_hight, $yellow, $font_west, $value);
+                imagettftext($img, $base['text_size'], 0, $base['img_width'] - 180, 20 + $a_hight, $xb, $font_west, $params['banben']);
+                $a_hight += 20;
+            }
+        }
+
+        imagepng($img, $save_path); //输出图片，输出png使用imagepng方法，输出gif使用imagegif方法
+
+        // echo '<img src="/' . $save_path . '"/>';
+    }
+
+    // 天气颜色 gd生产
+    public function create_image_bgcolor_pro($params, $set_bgcolor = [])
     {
         // echo '<pre>';
         // print_r($params);die;
