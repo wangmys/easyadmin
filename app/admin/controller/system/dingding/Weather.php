@@ -128,9 +128,9 @@ class Weather extends BaseController
                     set colorVal = 
                         case 
                             when `max_c` > 30 then `max_c`
-                            when (`max_c` - `min_c`) <= 5 then (`max_c` + `min_c`) / 2
-                            when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then (`max_c` + `min_c`) / 2 + 2 
-                            when (`max_c` - `min_c`) > 10 then (`max_c` + `min_c`) / 2 + 4
+                            when (`max_c` - `min_c`) <= 5 then round((`max_c` + `min_c`) / 2, 0)
+                            when (`max_c` - `min_c`) > 5 and (`max_c` - `min_c`) <= 10 then round((`max_c` + `min_c`) / 2 + 2, 0) 
+                            when (`max_c` - `min_c`) > 10 then round((`max_c` + `min_c`) / 2 + 4, 0)
                         end
                 where 
                     colorVal is null
@@ -140,10 +140,10 @@ class Weather extends BaseController
                 update dd_weather 
                     set colorNum = 
                         case 
-                            when `colorVal` < 10 then 1
-                            when `colorVal` < 18 then 2
-                            when `colorVal` < 22 then 3
-                            when `colorVal` < 26 then 4
+                            when `colorVal` <= 10 then 1
+                            when `colorVal` <= 18 then 2
+                            when `colorVal` <= 22 then 3
+                            when `colorVal` <= 26 then 4
                             when `colorVal` <= 30 then 5
                             when `colorVal` > 30 then 6
                         end
