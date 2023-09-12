@@ -35,7 +35,7 @@ class Weather extends BaseController
     public function getCustomerCid() {
         $sql_1 = "
             SELECT cid,customerName AS 店铺名称,State AS 省份,date_format(now(),'%Y-%m-%d') AS 更新日期
-            FROM `customers` where cid is not null and RegionId <> 55 AND Mathod = '直营'
+            FROM `customers` where cid is not null and RegionId <> 55 AND Mathod in ('直营', '加盟')
         ";
         $selet_weather_customer = $this->db_tianqi->query($sql_1);
         // dump($selet_weather_customer);
