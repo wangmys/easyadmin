@@ -2,6 +2,8 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
@@ -9,7 +11,8 @@ use app\admin\service\PuhuoService;
 
 /**
  * Class Qiwenconfig
- * 气温评分标准配置
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="气温评分")
  */
 class Qiwenconfig extends AdminController
 {
@@ -23,7 +26,7 @@ class Qiwenconfig extends AdminController
     }
 
     /**
-     * 气温评分标准配置
+     * @NodeAnotation(title="气温评分")
      */
     public function index() {
 
@@ -74,7 +77,7 @@ class Qiwenconfig extends AdminController
     }
 
     /**
-     * 保存气温评分标准配置(冷到热)
+     * @NodeAnotation(title="保存气温评分标准配置(冷到热)")
      */
     public function saveColdtohot() {
 
@@ -98,7 +101,7 @@ class Qiwenconfig extends AdminController
     }
 
     /**
-     * 保存气温评分标准配置（热到冷）
+     * @NodeAnotation(title="保存气温评分标准配置（热到冷）")
      */
     public function saveHottocold() {
 
@@ -122,7 +125,7 @@ class Qiwenconfig extends AdminController
     }
 
     /**
-     * 删除配置(冷到热)
+     * @NodeAnotation(title="删除配置(冷到热)")
      */
     public function delColdtohot() {
 
@@ -140,7 +143,7 @@ class Qiwenconfig extends AdminController
     }
 
     /**
-     * 删除配置(热到冷)
+     * @NodeAnotation(title="删除配置(热到冷)")
      */
     public function delHottocold() {
 

@@ -2,6 +2,8 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
@@ -9,7 +11,8 @@ use app\admin\service\PuhuoService;
 
 /**
  * Class Tigtconfig
- * 指定款货品等级配置
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="剔除指定货品等级管理")
  */
 class Tigtconfig extends AdminController
 {
@@ -23,7 +26,7 @@ class Tigtconfig extends AdminController
     }
 
     /**
-     * 指定款货品等级配置
+     * @NodeAnotation(title="剔除指定货品等级管理")
      */
     public function index() {
 
@@ -56,7 +59,7 @@ class Tigtconfig extends AdminController
     }
 
     /**
-     * 保存配置
+     * @NodeAnotation(title="保存配置")
      */
     public function saveConfig() {
 
@@ -79,7 +82,7 @@ class Tigtconfig extends AdminController
     }
 
     /**
-     * 删除配置
+     * @NodeAnotation(title="删除配置")
      */
     public function delConfig() {
 

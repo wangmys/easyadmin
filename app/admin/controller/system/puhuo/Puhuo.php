@@ -1,6 +1,8 @@
 <?php
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use app\admin\service\PuhuoService;
 use jianyan\excel\Excel;
@@ -8,7 +10,8 @@ use think\Request;
 
 /**
  * Class Puhuo
- * @package app\admin\controller\system
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="自动铺货")
  */
 class Puhuo extends AdminController
 {
@@ -22,7 +25,7 @@ class Puhuo extends AdminController
     }
 
     /**
-     * 单店上装明细
+     * @NodeAnotation(title="最终铺货结果")
      */
     public function puhuo_index() {
 

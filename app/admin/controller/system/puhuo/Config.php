@@ -2,6 +2,8 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
@@ -9,7 +11,8 @@ use app\admin\service\PuhuoService;
 
 /**
  * Class Config
- * 铺货配置
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="仓库&门店&最终铺货连码配置")
  */
 class Config extends AdminController
 {
@@ -23,7 +26,7 @@ class Config extends AdminController
     }
 
     /**
-     * 铺货配置
+     * @NodeAnotation(title="仓库&门店&最终铺货连码配置")
      */
     public function index() {
 
@@ -106,7 +109,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存仓库预留参数配置
+     * @NodeAnotation(title="保存仓库预留参数配置")
      */
     public function saveWarehouseConfig() {
 
@@ -121,7 +124,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存门店上铺货连码标准配置
+     * @NodeAnotation(title="保存门店上铺货连码标准配置")
      */
     public function saveLianmaConfig() {
 
@@ -139,7 +142,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存仓库齐码参数配置
+     * @NodeAnotation(title="保存仓库齐码参数配置")
      */
     public function saveWarehouseQimaConfig() {
 
@@ -157,7 +160,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存单店上市天数不再铺限制配置
+     * @NodeAnotation(title="保存单店上市天数不再铺限制配置")
      */
     public function saveListingDaysConfig() {
 
@@ -172,7 +175,7 @@ class Config extends AdminController
     }
 
     /**
-     * 保存最终连码标准配置
+     * @NodeAnotation(title="保存最终连码标准配置")
      */
     public function saveEndLianmaConfig() {
 

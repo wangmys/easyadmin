@@ -4,19 +4,19 @@
 namespace app\admin\controller\system;
 
 use app\admin\model\bi\SpLypPuhuoRuleAModel;
-use app\admin\service\TriggerService;
+// use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
 use think\facade\Db;
-use voku\helper\HtmlDomParser;
-use think\cache\driver\Redis;
-use app\admin\model\weather\Region;
+// use voku\helper\HtmlDomParser;
+// use think\cache\driver\Redis;
+// use app\admin\model\weather\Region;
 
 /**
- * Class Weather
+ * Class Puhuorulea
  * @package app\admin\controller\system
  * @ControllerAnnotation(title="铺货规则参数A")
  */
@@ -74,7 +74,7 @@ class Puhuorulea extends AdminController
     }
 
     /**
-     * 获取下拉字段列
+     * @NodeAnotation(title="获取下拉字段列")
      */
     public function getWeatherField() {
 
@@ -111,11 +111,7 @@ class Puhuorulea extends AdminController
 
 
     /**
-     * 编辑
-     * @return mixed
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @NodeAnotation(title="编辑")
      */
     public function update() {
         // 获取店铺ID

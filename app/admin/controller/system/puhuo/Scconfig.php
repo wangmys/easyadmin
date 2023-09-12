@@ -2,6 +2,8 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
@@ -9,7 +11,8 @@ use app\admin\service\PuhuoService;
 
 /**
  * Class Scconfig
- * 评分标准配置
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="店铺等级&&skc满足率&&动销率评分")
  */
 class Scconfig extends AdminController
 {
@@ -23,7 +26,7 @@ class Scconfig extends AdminController
     }
 
     /**
-     * 评分标准配置
+     * @NodeAnotation(title="店铺等级&&skc满足率&&动销率评分")
      */
     public function index() {
 
@@ -95,7 +98,7 @@ class Scconfig extends AdminController
     }
 
     /**
-     * 保存评分标准配置
+     * @NodeAnotation(title="保存评分标准配置")
      */
     public function saveConfig() {
 
@@ -116,7 +119,7 @@ class Scconfig extends AdminController
     }
 
     /**
-     * 删除配置
+     * @NodeAnotation(title="删除配置")
      */
     public function delConfig() {
 
