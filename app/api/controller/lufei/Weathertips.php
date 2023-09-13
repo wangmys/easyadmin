@@ -1981,7 +1981,7 @@ class Weathertips extends BaseController
                 AND (提醒 IS NULL OR 提醒 = '')
         ";
 
-        $sql_历史天气更新提醒 = "
+        $sql_历史天气更新提醒_bak2 = "
             UPDATE
                 `cwl_weathertips_customer` 
             SET 
@@ -2010,7 +2010,7 @@ class Weathertips extends BaseController
         $this->db_easyA->execute($sql3_冬);
         $this->db_easyA->execute($sql_秋季SKC);
         $this->db_easyA->execute($sql_冬季SKC);
-        $this->db_easyA->execute($sql_历史天气更新提醒);
+        // $this->db_easyA->execute($sql_历史天气更新提醒);
     }
 
     // 总表最终销售占比
