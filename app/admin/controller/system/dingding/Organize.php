@@ -232,6 +232,10 @@ class Organize extends BaseController
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($val);
             }
+
+            $补丁 = $this->db_easyA->table('dd_customer_push_buding')->select()->toArray();
+            // dump($补丁);die;
+            $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($补丁);
             return json([
                 'status' => 0,
                 'msg' => 'error',
@@ -241,28 +245,28 @@ class Organize extends BaseController
     }
 
     // 
-    public function addcwl() {
-        $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll([
-            [
-                '店铺名称' => '汉川一店',
-                'depId' => '380875357',
-                'name' => '陈威良',
-                'title' => '店长',
-                'mobile' => '13066166636',
-                'userid' => '350364576037719254',
-                'isCustomer' => '是',
-            ],
-            [
-                '店铺名称' => '宜春二店',
-                'depId' => '380875357',
-                'name' => '王威',
-                'title' => '店长',
-                'mobile' => '15880012590',
-                'userid' => '0812473564939990',
-                'isCustomer' => '是',
-            ],
-        ]);
-    }
+    // public function addcwl() {
+    //     $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll([
+    //         [
+    //             '店铺名称' => '汉川一店',
+    //             'depId' => '380875357',
+    //             'name' => '陈威良',
+    //             'title' => '店长',
+    //             'mobile' => '13066166636',
+    //             'userid' => '350364576037719254',
+    //             'isCustomer' => '是',
+    //         ],
+    //         [
+    //             '店铺名称' => '宜春二店',
+    //             'depId' => '380875357',
+    //             'name' => '王威',
+    //             'title' => '店长',
+    //             'mobile' => '15880012590',
+    //             'userid' => '0812473564939990',
+    //             'isCustomer' => '是',
+    //         ],
+    //     ]);
+    // }
 
     public function test() {
         $str = '田2珊';
