@@ -11,6 +11,7 @@ return [
         'worker' => 'think\Workerman\command\worker',
         'action'    => 'app\common\command\Action',
         'stock' => 'app\command\Stock',
+        'stock2' => 'app\command\Stock2',
         'duanma_sk' => 'app\command\Duanma_sk',
         'stock_size' => 'app\command\Stock_size',
         'sendpic' => 'app\command\Sendpic',

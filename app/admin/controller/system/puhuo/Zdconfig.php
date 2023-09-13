@@ -2,6 +2,8 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use EasyAdmin\annotation\ControllerAnnotation;
+use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use think\App;
 use think\facade\Db;
@@ -9,7 +11,8 @@ use app\admin\service\PuhuoService;
 
 /**
  * Class Zdconfig
- * 指定铺货货品配置
+ * @package app\admin\controller\system\puhuo
+ * @ControllerAnnotation(title="指定铺货货品配置")
  */
 class Zdconfig extends AdminController
 {
@@ -23,7 +26,7 @@ class Zdconfig extends AdminController
     }
 
     /**
-     * 指定铺货货品配置
+     * @NodeAnotation(title="指定铺货货品配置")
      */
     public function index() {
 
@@ -114,7 +117,7 @@ class Zdconfig extends AdminController
     }
 
     /**
-     * 保存仓库指定铺货货品配置
+     * @NodeAnotation(title="保存仓库指定铺货货品配置")
      */
     public function saveZhidingGoodsConfig() {
 
