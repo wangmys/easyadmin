@@ -933,27 +933,6 @@ class Tableupdate extends BaseController
             die;
         } 
 
-        // $sql = "
-        //     SELECT
-        //         c.*,
-        //         f.首单日期 
-        //     FROM
-        //         customer as  c
-        //         LEFT JOIN customer_regionid AS f ON c.CustomerName = f.店铺名称 
-        //     WHERE 1
-        //         AND f.RegionId != 55
-        //         AND f.首单日期 IS NOT NULL
-        //         AND Region NOT IN (
-        //             '批发部',
-        //             '直营',
-        //             '闭店区',
-        //             '客订',
-        //         '内购区')
-        // ";
-        // $select = $this->db_bi->query($sql);
-
-        // dump($select_customer);die;
-        // $this->db_bi->getLastSql();
         if ($select) {
             $this->db_easyA->table('customer')->where(1)->delete();
 
