@@ -1625,7 +1625,7 @@ class ReportFormsService
     public function create_table_s030()
     {
         $code = 'S030';
-        $sql = "
+        $sql_old = "
             SELECT
                 CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
                 ISNULL(EC.State,'合计') AS 省份,
@@ -1654,24 +1654,76 @@ class ReportFormsService
                 (EC.MathodId,
                 EC.State)
         ";
+        $sql = "
+            select 
+            t.*
+            from
+                (SELECT
+            CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
+            ISNULL(EC.State,'合计') AS 省份,
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年春],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年夏],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年秋],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年冬],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年春],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年夏],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年秋],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年冬],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品春],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品夏],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品秋],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品冬]
+            FROM ErpCustomer EC
+            LEFT JOIN ErpRetail ER ON ER.CustomerId=EC.CustomerId
+            LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+            LEFT JOIN ErpGoods EG ON EG.GoodsId=ERG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+            AND EG.CategoryName1 IN ('内搭','下装','外套','鞋履')
+            AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','秋季','初秋','深秋','冬季','初冬','深冬')
+            AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,GETDATE()-1,23)
+            AND ER.CodingCodeText='已审结'
+            GROUP BY ROLLUP
+            (EC.MathodId,
+            EC.State)
+                ) as t
+        ";
         $data = Db::connect("sqlsrv")->query($sql);
+        $new_data = [];
         foreach ($data as $key => $val) {
             $data[$key]['省份'] = province2zi($val['省份']);
+
+            $new_data[$key]['经营'] = $val['经营'];
+            $new_data[$key]['省份'] = province2zi($val['省份']);
+            
+            $new_data[$key]['2023年春'] = $val['2023年春'];
+            $new_data[$key]['2023年夏'] = $val['2023年夏'];
+            $new_data[$key]['2023年秋'] = $val['2023年秋'];
+            $new_data[$key]['2023年冬'] = $val['2023年冬'];
+
+            $new_data[$key]['旧品春'] = $val['2022年春'] + $val['旧品春'] . '%';
+            $new_data[$key]['旧品夏'] = $val['2022年夏'] + $val['旧品夏'] . '%';
+            $new_data[$key]['旧品秋'] = $val['2022年秋'] + $val['旧品秋'] . '%';
+            $new_data[$key]['旧品冬'] = $val['2022年冬'] + $val['旧品冬'] . '%';
         }
+
+        // echo '<pre>';
+        // print_r($new_data) ;
+        // die;
+
         $table_header = ['ID'];
-        $table_header = array_merge($table_header, array_keys($data[0]));
+        $table_header = array_merge($table_header, array_keys($new_data[0]));
         foreach ($table_header as $v => $k) {
-            $field_width[$v] = 75;
+            $field_width[$v] = 70;
         }
         $field_width[0] = 35;
         $field_width[1] = 45;
         $field_width[2] = 45;
         // $field_width[1] = 100;
         // $field_width[2] = 140;
-        $field_width[11] = 60;
-        $field_width[12] = 60;
-        $field_width[13] = 60;
-        $field_width[14] = 60;
+        // $field_width[11] = 60;
+        // $field_width[12] = 60;
+        // $field_width[13] = 60;
+        // $field_width[14] = 60;
         $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week(date("Y-m-d", strtotime("-1 day")));
         //图片左上角汇总说明数据，可为空
@@ -1684,18 +1736,18 @@ class ReportFormsService
         //参数
         $params = [
             'code' => $code,
-            'row' => count($data),          //数据的行数
+            'row' => count($new_data),          //数据的行数
             'file_name' => $code . '.jpg',      //保存的文件名
             'title' => "昨天各省各季节销售占比 [" . date("Y-m-d", strtotime("-1 day")) . "]",
             'table_time' => date("Y-m-d H:i:s"),
-            'data' => $data,
+            'data' => $new_data,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,
             'col' => '省份',
             'color' => 16711877,
             'field' => '合计',
-            'banben' => '  图片报表编号: ' . $code,
+            'banben' => '                 ' . $code,
             'file_path' => "./img/" . date('Ymd') . '/'  //文件保存路径
         ];
         $this->create_image($params);
