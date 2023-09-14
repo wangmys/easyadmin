@@ -746,12 +746,13 @@ class Uploadimg extends AdminController
         }       
     }
 
-    // 拉取 已读 未读
+    // 拉取 已读 未读 用户主动执行
     public function getReadsHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
         if (request()->isAjax() && $input['id'] && session('admin.name')) {
+        // if (request()->isAjax()) {
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
             
@@ -771,7 +772,6 @@ class Uploadimg extends AdminController
                     ['uid', '=', $find_list['uid']]
                 ])->group('task_id')->select()->toArray();
 
-                $model = new DingTalk;
                 foreach($select_user as $key => $val) {
                     $res = json_decode($model->getsendresult($val['task_id']), true);
                     
@@ -826,6 +826,93 @@ class Uploadimg extends AdminController
         } else {
             return json(['code' => 0, 'msg' => '请勿非法请求']);
         }       
+    }
+
+     // 拉取 已读 未读  自动更新24小时之内的记录
+    public function getReads_auto() {
+        // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //     ['id', '=', $input['id']],
+        // ])->find();
+        $hour24 = date('Y-m-d H:i:s', strtotime('-2day', time()));
+        $sql = "
+            SELECT id FROM dd_userimg_list
+            WHERE
+                sendtime >= '{$hour24}'
+                AND 撤回时间 is null
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        foreach ($select as $key => $val) {
+            $this->getReadsHandle_auto_handle($val['id']);
+        }
+    }
+
+    // 拉取 已读 未读  自动更新24小时之内的记录
+    private function getReadsHandle_auto_handle($id = '') {
+        $input = input();
+
+        $model = new DingTalk;
+        
+        $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+            ['id', '=', $id],
+        ])->find();
+
+        if ($find_list) {
+            $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+                ['uid', '=', $find_list['uid']]
+            ])->group('task_id')->select()->toArray();
+
+            foreach($select_user as $key => $val) {
+                $res = json_decode($model->getsendresult($val['task_id']), true);
+                
+                if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                    if (count($res['send_result']['read_user_id_list']) > 0) {
+                        // 已读
+                        $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_temp_excel_user_success 
+                            SET 
+                                已读 = 'Y'
+                            WHERE 1
+                                AND task_id = '{$val['task_id']}'
+                                AND userid in ($reads)
+                        ");
+                    }
+
+                    if (count($res['send_result']['unread_user_id_list']) > 0) {
+                        // 未读
+                        $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_temp_excel_user_success 
+                            SET 
+                                已读 = 'N'
+                            WHERE 1
+                                AND task_id = '{$val['task_id']}'
+                                AND userid in ($unReads)
+                        ");
+                    }
+
+                } else {
+                    return json(['code' => 0, 'msg' => '数据异常']);
+                }
+            }
+            // 统计list展示的已读未读数
+            $this->db_easyA->execute("
+                UPDATE 
+                    dd_userimg_list as l
+                SET 
+                    l.已读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='Y'),
+                    l.未读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='N')
+                WHERE 1
+                    AND l.id = {$find_list['id']}
+            ");
+
+            return json(['code' => 0, 'msg' => '执行成功']);
+        } else {
+            return json(['code' => 0, 'msg' => '执行失败']);
+        }  
     }
 
     public function test() {
