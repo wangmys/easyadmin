@@ -69,7 +69,7 @@ class Weather extends BaseController
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
             return View('list', [
-                // 'config' => ,
+                'today' => date('Y-m-d'),
             ]);
         }        
     }

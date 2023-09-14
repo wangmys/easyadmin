@@ -200,7 +200,7 @@ class Shangguitips extends BaseController
             FROM
                 sp_sk 
             WHERE 1
-                -- AND 季节 IN ( '初秋', '深秋', '秋季')
+                AND 季节 IN ( '初秋', '深秋', '秋季')
                 AND 店铺名称 IN (
                     SELECT CustomerName FROM customer_pro GROUP BY CustomerName
                 )
