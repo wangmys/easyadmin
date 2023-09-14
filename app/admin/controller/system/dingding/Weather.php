@@ -554,7 +554,7 @@ class Weather extends BaseController
     }
 
     // 推送天气图
-    public function sendDingImg() {
+    public function sendDingImg_old() {
         $model = new DingTalk;
         $select = $this->db_easyA->query("
             SELECT 
@@ -575,13 +575,13 @@ class Weather extends BaseController
             $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
             // echo $val['userid'];
-            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
+            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path);
             // print_r($res);
         }
     }
 
     // 发送测试
-    public function sendDingImg_cwl() {
+    public function sendDingImg() {
         $model = new DingTalk;
         $select = $this->db_easyA->query("
             SELECT 
@@ -603,7 +603,7 @@ class Weather extends BaseController
             $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
             // echo $val['userid'];
-            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path), true);
+            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path), true);
             // print_r($res);
             if ($res['errcode'] == 0) {
                 $this->db_easyA->table('dd_customer_push_weather')->where([
