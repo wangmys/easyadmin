@@ -233,7 +233,10 @@ class Organize extends BaseController
                 $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($val);
             }
 
-            $补丁 = $this->db_easyA->table('dd_customer_push_buding')->select()->toArray();
+            $date = date('Y-m-d');
+            $补丁 = $this->db_easyA->table('dd_customer_push_buding')->field(
+                "店铺名称,depId,name,title,mobile,userid,isCustomer, '{$date}' as 更新日期"
+            )->select()->toArray();
             // dump($补丁);die;
             $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($补丁);
             return json([
@@ -242,6 +245,14 @@ class Organize extends BaseController
                 'content' => "店铺推送表：dd_customer_push  更新成功！"
             ]);
         }
+    }
+
+    public function ddUser_weather() {
+        $select = $this->db_easyA->table('dd_customer_push')->select()->toArray();
+        $this->db_easyA->table('dd_customer_push_weather')->where([
+            ['更新日期', '=', date('Y-m-d')]
+        ])->delete();
+        $this->db_easyA->table('dd_customer_push_weather')->strict(false)->insertAll($select);
     }
 
     // 

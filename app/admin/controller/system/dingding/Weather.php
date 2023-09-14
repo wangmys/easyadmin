@@ -31,6 +31,49 @@ class Weather extends BaseController
         $this->db_tianqi = Db::connect('tianqi');
     }
 
+    public function list() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $aname = session('admin.name');       
+                $aid = session('admin.id');   
+                $mapSuper = " AND list.aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
+            $sql = "
+                SELECT 
+                   *
+                FROM 
+                    dd_customer_push_weather
+                WHERE 1
+                    order by sendtime desc
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    dd_customer_push_weather
+                WHERE 1
+            ";
+            $count = $this->db_easyA->query($sql2);
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+        } else {
+            return View('list', [
+                // 'config' => ,
+            ]);
+        }        
+    }
+
     // 更新店铺cid 几秒
     public function getCustomerCid() {
         $sql_1 = "
@@ -510,7 +553,7 @@ class Weather extends BaseController
         }
     }
 
-    // 发送测试2
+    // 推送天气图
     public function sendDingImg() {
         $model = new DingTalk;
         $select = $this->db_easyA->query("
@@ -536,6 +579,47 @@ class Weather extends BaseController
             // print_r($res);
         }
     }
+
+    // 发送测试
+    public function sendDingImg_cwl() {
+        $model = new DingTalk;
+        $select = $this->db_easyA->query("
+            SELECT 
+                u.*
+            FROM
+                dd_customer_push_weather as u
+            LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
+            where 1
+                and u.店铺名称 = c.店铺名称
+                -- AND name in ('陈威良','王梦园','李雅婷')
+                -- AND name in ('陈威良')
+                
+        ");
+
+        // dump($select);die;
+
+        $datatime = date('Ymd');
+        foreach ($select as $key => $val) {
+            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+
+            // echo $val['userid'];
+            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path), true);
+            // print_r($res);
+            if ($res['errcode'] == 0) {
+                $this->db_easyA->table('dd_customer_push_weather')->where([
+                    ['更新日期', '=', date('Y-m-d')],
+                    ['店铺名称', '=', $val['店铺名称']],
+                    ['name', '=', $val['name']]
+                ])->update([
+                    'path' => $path,
+                    'task_id' => $res['task_id'],
+                    'sendtime' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+    }
+
+
 
     // 图片生成2
     protected function create_table_weather($customer = '', $date = '')
@@ -1247,4 +1331,57 @@ class Weather extends BaseController
         // echo '<img src="/' . $save_path . '"/>';
     }
     
+
+     // 拉取 已读 未读  自动更新24小时之内的记录
+     public function getReads_auto() {
+        // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //     ['id', '=', $input['id']],
+        // ])->find();
+        $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
+        $sql = "
+            SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
+            WHERE
+                sendtime is not null
+                AND 撤回时间 is null
+                AND task_id is not null
+        ";
+        $select = $this->db_easyA->query($sql);
+        
+        $model = new DingTalk;
+        foreach ($select as $key => $val) {
+            // dump($val);
+            // $this->getReadsHandle_auto_handle($val['id']);
+            $res = json_decode($model->getsendresult($val['task_id']), true);
+            // dump($res);
+            if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                // 已读
+                if (count($res['send_result']['read_user_id_list']) > 0) {
+                    $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                    $this->db_easyA->execute("
+                        UPDATE 
+                            dd_temp_excel_user_success 
+                        SET 
+                            已读 = 'Y'
+                        WHERE 1
+                            AND task_id = '{$val['task_id']}'
+                            AND userid in ($reads)
+                    ");
+                    $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                        ['task_id', '=', $val['task_id']],
+                    ])->update([
+                        '已读' => 'Y',
+                    ]);
+                } else {
+                    $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                        ['task_id', '=', $val['task_id']],
+                    ])->update([
+                        '已读' => 'N',
+                    ]);
+                }
+
+            } else {
+                return json(['code' => 0, 'msg' => '数据异常']);
+            }
+        }
+    }
 }
