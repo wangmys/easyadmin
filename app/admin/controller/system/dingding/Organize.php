@@ -252,7 +252,11 @@ class Organize extends BaseController
         $this->db_easyA->table('dd_customer_push_weather')->where([
             ['更新日期', '=', date('Y-m-d')]
         ])->delete();
+        $this->db_easyA->table('dd_customer_push_yeji')->where([
+            ['更新日期', '=', date('Y-m-d')]
+        ])->delete();
         $this->db_easyA->table('dd_customer_push_weather')->strict(false)->insertAll($select);
+        $this->db_easyA->table('dd_customer_push_yeji')->strict(false)->insertAll($select);
     }
 
     // 

@@ -580,31 +580,31 @@ class Weather extends BaseController
     }
 
     // 推送天气图
-    public function sendDingImg_old() {
-        $model = new DingTalk;
-        $select = $this->db_easyA->query("
-            SELECT 
-                u.*
-            FROM
-                dd_customer_push as u
-            LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
-            where 1
-                and u.店铺名称 = c.店铺名称
-                and u.isCustomer = '是'
+    // public function sendDingImg_old() {
+    //     $model = new DingTalk;
+    //     $select = $this->db_easyA->query("
+    //         SELECT 
+    //             u.*
+    //         FROM
+    //             dd_customer_push as u
+    //         LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
+    //         where 1
+    //             and u.店铺名称 = c.店铺名称
+    //             and u.isCustomer = '是'
                 
-        ");
+    //     ");
 
-        // print_r($select);die;
+    //     // print_r($select);die;
 
-        $datatime = date('Ymd');
-        foreach ($select as $key => $val) {
-            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+    //     $datatime = date('Ymd');
+    //     foreach ($select as $key => $val) {
+    //         $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
-            // echo $val['userid'];
-            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path);
-            // print_r($res);
-        }
-    }
+    //         // echo $val['userid'];
+    //         $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path);
+    //         // print_r($res);
+    //     }
+    // }
 
     // 发送测试
     public function sendDingImg() {
@@ -626,10 +626,10 @@ class Weather extends BaseController
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
-            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg";
 
             // echo $val['userid'];
-            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path), true);
+            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path . '?v=' . time()), true);
             // print_r($res);
             if ($res['errcode'] == 0) {
                 $this->db_easyA->table('dd_customer_push_weather')->where([
@@ -1358,8 +1358,8 @@ class Weather extends BaseController
     }
     
 
-     // 拉取 已读 未读  自动更新24小时之内的记录
-     public function getReads_auto() {
+    // 拉取 已读 未读  自动更新24小时之内的记录
+    public function getReads_auto() {
         // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
         //     ['id', '=', $input['id']],
         // ])->find();
