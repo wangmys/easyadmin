@@ -1142,22 +1142,51 @@ class ReportFormsService
             ];
 
             $table_data[]=$new;
-
         }
 
         // echo '<pre>';
-        // print_r($table_data);die;
+        // print_r($table_data);
+        
+        // 数组错误排序修复 start
+        $基本款合计 = '';
+        foreach($table_data as $k => $v) {
+            if ($v['风格'] == '基本款' && $v['中类'] == '合计') {
+                $基本款合计 = $v;
+                unset($table_data[$k]);
+            }
+        }
+        // 重置下标
+        $table_data = array_merge($table_data);
+
+        $new_arr = [];
+        foreach($table_data as $k2 => $v2) {
+            if ($v2['风格'] == '基本款') {
+                // array_push($new_arr, $v2);
+                $new_arr[$k2] = $v2;
+            } elseif ($v2['风格'] != '基本款' && $table_data[$k2 -1]['风格'] == '基本款' ) {
+                $new_arr[$k2] = $基本款合计;
+            } 
+        }
+        foreach($table_data as $k3 => $v3) {
+            if ($v3['风格'] != '基本款') {
+                array_push($new_arr, $v3);
+                // $new_arr[$k2] = $v2;
+            } 
+        }
+        // 数组错误排序修复 end
 
         $table_explain = [
             0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
         ];
         $params = [
             'code' => $code,
-            'row' => count($table_data),          //数据的行数
+            // 'row' => count($table_data),          //数据的行数
+            'row' => count($new_arr),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
             'title' => "商品部-2023秋季货品零售汇总表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
-            'data' => $table_data,
+            // 'data' => $table_data,
+            'data' => $new_arr,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,

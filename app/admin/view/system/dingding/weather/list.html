@@ -112,18 +112,18 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">日期</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$today}" placeholder="yyyy-MM-dd" lay-verify="required">
+                                <input type="text" name="更新日期" class="layui-input" id="setTime1" value="{$today}" placeholder="yyyy-MM-dd" lay-verify="required">
                             </div>
                         </div>
                     </div>
                     <div></div>
 
-                    <div class="flex row between" style="width:10%; height:35px;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userBtn"
+                    <div class="flex row end" style="width:10%; height:35px;">
+                        <!-- <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userBtn"
                         style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">负责人名单
-                        </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="addBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">添加记录
+                        </button> -->
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="searchBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询记录
                         </button>
 
                     </div>
@@ -176,7 +176,7 @@
 
         // 日期选择器
         laydate.render({
-            elem: '#shangshiriqi'
+            elem: '#setTime1'
         });
 
         function initFn() {
@@ -210,28 +210,15 @@
         }
 
         //监听保存
-        form.on('submit(userBtn)', function (data) {
-            
-            var testFram = layer.open({
-                title: '店铺负责人钉钉信息'
-                ,type: 2
-                ,area: ['100%', '100%'] // 100%全屏
-                ,content: url_DingUsers
-            });
-            // layer.close(index)
-            return false; 
-        });
-
-        //监听保存
-        form.on('submit(addBtn)', function (data) {
-            
-            var testFram = layer.open({
-                title: '添加定推信息'
-                ,type: 2
-                ,area: ['40%', '70%'] // 100%全屏
-                ,content: url_index
-            });
-            // layer.close(index)
+        form.on('submit(searchBtn)', function (data) {
+            table.reload('table2', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                    , page: true
+                    , limit: data.field.limit
+                })
             return false; 
         });
 
@@ -450,10 +437,6 @@
                                     <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '【${data['店铺名称']}】${data['name']}')">
                                         撤回
-                                    </button>
-                                    <button class="getReadsBtn layui-btn layui-btn-xs" style="background: blue;
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
-                                        未/已读
                                     </button>
                                 `;
                             }

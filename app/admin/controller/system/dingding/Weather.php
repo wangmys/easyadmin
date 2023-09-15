@@ -52,7 +52,7 @@ class Weather extends BaseController
                 FROM 
                     dd_customer_push_weather
                 WHERE 1
-                    order by sendtime desc
+                    order by 已读 ASC
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -1337,6 +1337,14 @@ class Weather extends BaseController
         // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
         //     ['id', '=', $input['id']],
         // ])->find();
+
+        $time = time();
+        if ($time >= strtotime(date('Y-m-d 08:30:00')) && $time <= strtotime(date('Y-m-d 23:59:59'))) {
+            echo '时间范围内';
+        } else {
+            echo '时间范围外';
+        }
+        die;
         $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
         $sql = "
             SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
@@ -1344,6 +1352,9 @@ class Weather extends BaseController
                 sendtime is not null
                 AND 撤回时间 is null
                 AND task_id is not null
+                AND (已读 is null OR 已读 = 'N')
+                -- AND 已读 is null
+            LIMIT 2000
         ";
         $select = $this->db_easyA->query($sql);
         
@@ -1353,35 +1364,40 @@ class Weather extends BaseController
             // $this->getReadsHandle_auto_handle($val['id']);
             $res = json_decode($model->getsendresult($val['task_id']), true);
             // dump($res);
-            if ($res['errmsg'] = 'ok' && $res['send_result']) {  
-                // 已读
-                if (count($res['send_result']['read_user_id_list']) > 0) {
-                    $reads = arrToStr($res['send_result']['read_user_id_list']);    
-                    $this->db_easyA->execute("
-                        UPDATE 
-                            dd_temp_excel_user_success 
-                        SET 
-                            已读 = 'Y'
-                        WHERE 1
-                            AND task_id = '{$val['task_id']}'
-                            AND userid in ($reads)
-                    ");
-                    $update = $this->db_easyA->table('dd_customer_push_weather')->where([
-                        ['task_id', '=', $val['task_id']],
-                    ])->update([
-                        '已读' => 'Y',
-                    ]);
+            try {
+                if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                    // 已读
+                    if (count($res['send_result']['read_user_id_list']) > 0) {
+                        $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_temp_excel_user_success 
+                            SET 
+                                已读 = 'Y'
+                            WHERE 1
+                                AND task_id = '{$val['task_id']}'
+                                AND userid in ($reads)
+                        ");
+                        $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'Y',
+                        ]);
+                    } else {
+                        $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'N',
+                        ]);
+                    }
+    
                 } else {
-                    $update = $this->db_easyA->table('dd_customer_push_weather')->where([
-                        ['task_id', '=', $val['task_id']],
-                    ])->update([
-                        '已读' => 'N',
-                    ]);
+                    return json(['code' => 0, 'msg' => '数据异常']);
                 }
-
-            } else {
-                return json(['code' => 0, 'msg' => '数据异常']);
+            } catch (\Throwable $th) {
+                //throw $th;
             }
+
         }
     }
 }
