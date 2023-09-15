@@ -73,15 +73,25 @@ class Weather extends BaseController
                     {$map1}
             ";
             $count = $this->db_easyA->query($sql2);
+
+            $reads = $this->db_easyA->table('dd_customer_push_weather')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'Y'],
+            ])->count('*');
+
+            $noReads = $this->db_easyA->table('dd_customer_push_weather')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'N'],
+            ])->count('*');
             // print_r($count);
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'readsData' => ['reads' => $reads, 'noReads' => $noReads]]);
         } else {
             $time = time();
             if ($time < strtotime(date('Y-m-d 20:30:00'))) {
-                echo '显示昨天';
+                // echo '显示昨天';
                 $today = date('Y-m-d', strtotime('-1 day', $time));
             } else {
-                echo '显示今天';
+                // echo '显示今天';
                 $today = date('Y-m-d');
             }
             return View('list', [
@@ -1353,26 +1363,41 @@ class Weather extends BaseController
         // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
         //     ['id', '=', $input['id']],
         // ])->find();
-
-        $time = time();
-        if ($time >= strtotime(date('Y-m-d 08:30:00')) && $time <= strtotime(date('Y-m-d 23:59:59'))) {
-            echo '时间范围内';
+        if (request()->isAjax() && input('更新日期')) {
+            $更新日期 = input('更新日期');
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    AND sendtime is not null
+                    AND 更新日期 = '{$更新日期}';
+            ";
         } else {
-            echo '时间范围外';
-        }
-        // die;
-        $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
-        $sql = "
-            SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
-            WHERE
-                sendtime is not null
-                AND 撤回时间 is null
-                AND task_id is not null
-                AND (已读 is null OR 已读 = 'N')
-                -- AND 已读 is null
-                AND sendtime >= '{$hour24}'
-            LIMIT 2000
-        ";
+            // 非ajax请求
+            $time = time();
+            if ($time >= strtotime(date('Y-m-d 08:30:00')) && $time <= strtotime(date('Y-m-d 23:59:59'))) {
+                // echo '时间范围内';
+            } else {
+                // echo '时间范围外';
+                die;
+            }
+            // die;
+            $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    -- AND 已读 is null
+                    AND sendtime >= '{$hour24}'
+            ";
+        }   
+
         $select = $this->db_easyA->query($sql);
         
         $model = new DingTalk;
