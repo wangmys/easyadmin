@@ -375,7 +375,7 @@
                 , limit: 1000
                 , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
                 , height: height
-                , where: {}
+                , where: {'更新日期': '{$today}'}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
                     { field: '店铺名称', title: '店铺名称', align:'center' }

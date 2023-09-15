@@ -76,8 +76,16 @@ class Weather extends BaseController
             // print_r($count);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
+            $time = time();
+            if ($time < strtotime(date('Y-m-d 20:30:00'))) {
+                echo '显示昨天';
+                $today = date('Y-m-d', strtotime('-1 day', $time));
+            } else {
+                echo '显示今天';
+                $today = date('Y-m-d');
+            }
             return View('list', [
-                'today' => date('Y-m-d'),
+                'today' => $today,
             ]);
         }        
     }

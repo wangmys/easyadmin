@@ -595,7 +595,7 @@ class Skauto extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
-                AND ER.RetailDate < DATEADD(DAY, 7, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
         --        AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
