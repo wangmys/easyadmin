@@ -833,7 +833,7 @@ class Uploadimg extends AdminController
         // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
         //     ['id', '=', $input['id']],
         // ])->find();
-        $hour24 = date('Y-m-d H:i:s', strtotime('-2day', time()));
+        $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
         $sql = "
             SELECT id FROM dd_userimg_list
             WHERE
