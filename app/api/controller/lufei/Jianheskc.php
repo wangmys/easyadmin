@@ -104,4 +104,8 @@ class Jianheskc extends BaseController
         ]);
     }
 
+    public function test2() {
+        phpinfo();
+    }
+
 }
