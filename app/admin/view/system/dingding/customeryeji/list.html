@@ -148,6 +148,11 @@
 <script type="text/html" id="introduceHtml">
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="download">导出未读</button>
+    </div>
+</script>
 <script>
     var sendDingImg = function (id, title) {
         window.localStorage.setItem('sendDingImg_id', id);
@@ -168,8 +173,10 @@
             , url_user = ""
             , url_DingUsers = ""
             , sendDingImgHandle = ""
+            , today = '{$today}'
             , recallImgHandle = "{:url('admin/system.dingding.Customeryeji/recallImgHandle')}"
             , getReadsHandle = "{:url('admin/system.dingding.Customeryeji/getReads_auto')}"
+            , downloadUrl = "{:url('admin/system.dingding.Customeryeji/download_noreads')}"
             , url1 = "{:url('admin/system.dingding.Customeryeji/list')}"; 
 
         // 表1初始化
@@ -244,6 +251,9 @@
                                     layui.layer.closeAll();
                                 }, 0);
                             });
+                            today = datetime;
+                            $('.readsNum').text(res.readsData.reads);
+                            $('.noReadsNum').text(res.readsData.noReads);
                         }
                     })
                 })
@@ -256,14 +266,20 @@
 
         //监听保存
         form.on('submit(searchBtn)', function (data) {
+            var datetime = data.field['更新日期'];
             table.reload('table2', {
-                    where: data.field
-                    , method: 'post'
-                    , url: url1
-                    , loading: true
-                    , page: true
-                    , limit: data.field.limit
-                })
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+                ,done: function(res){
+                    today = datetime;
+                    $('.readsNum').text(res.readsData.reads);
+                    $('.noReadsNum').text(res.readsData.noReads);
+                }
+            })
             return false; 
         });
 
@@ -406,7 +422,29 @@
             });
         }
 
-
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            // uid = window.localStorage.getItem('sendDingImg_uid');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl + '?date=' + today;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+        
         // 单店不动销数据统计 
         function startTable() {
             var mapHeight = $('#map').height();
@@ -419,7 +457,7 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: true
                 , limit: 1000
                 , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
@@ -430,6 +468,7 @@
                     { field: '店铺名称', title: '店铺名称', align:'center' }
                     ,{ field: 'name', title: '接收方', align:'center' }
                     ,{ field: 'title', title: '职位' , align:'center'}
+                    ,{ field: 'mobile', title: '手机' , align:'center'}
                     // ,{ field: 'title', title: '职位' , align:'center' , templet:
                     // function (data) {
                     //     // console.log(data)

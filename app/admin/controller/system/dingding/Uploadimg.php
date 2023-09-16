@@ -944,9 +944,12 @@ class Uploadimg extends AdminController
         ";
         $select = $this->db_easyA->query($sql);
         $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
+        if ($select) {
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
         }
+
         return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 

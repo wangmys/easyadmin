@@ -4,6 +4,7 @@ use think\facade\Db;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
+use jianyan\excel\Excel;
 
 /**
  * 店铺业绩 直营
@@ -746,6 +747,40 @@ class Customeryeji extends BaseController
     //         }
     //     }
     // }
+
+    // 下载未读
+    public function download_noreads() {
+        $date = input('date');
+        $sql = "
+            SELECT 
+                店铺名称,name as 姓名,title as 职位,mobile as 手机,
+                case
+                    when sendtime is not null then '已发送' else '未发送'
+                end as 发送状态,
+                case
+                    when 已读 = 'Y' then '已读' else '未读'
+                end as 阅读状态,
+                更新日期 as 日期
+            FROM 
+                dd_customer_push_yeji   
+            WHERE 1
+                AND 更新日期 = '{$date}'
+                AND 已读 != 'Y'
+                AND sendtime is not null
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $header = [];
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+            
+        } else {
+            $header = []; 
+        }
+
+        return Excel::exportData($select, $header, '店铺业绩未读名单_'  . '_' . $date . '_' . time() , 'xlsx');
+    }
 
     // 发送
     public function sendDingImg() {
