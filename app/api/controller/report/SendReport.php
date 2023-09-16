@@ -7,6 +7,7 @@ use app\api\service\bi\report\ReportFormsService;
 use app\api\service\bi\report\ReportFormsServiceJiameng;
 use app\BaseController;
 use think\Request;
+use think\facade\Db;
 
 class SendReport extends BaseController
 {
@@ -19,6 +20,10 @@ class SendReport extends BaseController
     // 日期
     protected $Date = '';
 
+    protected $db_easyA = '';
+    protected $db_sqlsrv = '';
+    protected $db_bi = '';
+
 
     public function __construct(Request $request)
     {
@@ -26,6 +31,10 @@ class SendReport extends BaseController
         $this->Date = date('Y-m-d');
         $this->service = new ReportFormsService;
         $this->request = $request;
+
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_bi = Db::connect('mysql2');
     }
 
 //    /**
@@ -891,13 +900,17 @@ class SendReport extends BaseController
         }
     }
 
+    // 
     public function run_caigoudingtui_s114()
     {
-        $this->service->create_table_s114();
-
-        // 发送数据报表
-        $this->sendS114();
-
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态')->where(['编号' => 's114'])->find();
+        // dump($find);
+        // die;
+        if ($find && $find['状态'] == '开') {
+            $this->service->create_table_s114();
+            // 发送数据报表
+            $this->sendS114();
+        } 
     }
 
     public function run_s012()

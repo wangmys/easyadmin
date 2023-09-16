@@ -7,7 +7,7 @@ use app\BaseController;
 
 /**
  * 店铺业绩 直营
- * Class Weather
+ * Class Customeryeji
  * @package app\dingtalk
  * 
  * 1.获取数据源 http://www.easyadmin1.com/admin/system.dingding.Customeryeji/getData?date=2023-09-05
