@@ -99,6 +99,7 @@ class Jianheskc extends BaseController
     }
 
     public function test() {
+        sleep(10);
         $insert = $this->db_easyA->table('cwl_swoole_test')->where('id=1')->update([
             'num' => Db::raw('num+1'),
         ]);
