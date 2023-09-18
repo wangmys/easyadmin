@@ -219,7 +219,8 @@ class ReportFormsServicePro
             //参数
             $params = [
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $dingName  .'.jpg',   //保存的文件名
+                // 'file_name' => $code . $dingName  .'.jpg',   //保存的文件名
+                'file_name' => $code .'.jpg',   //保存的文件名
                 'title' =>  "省份老店业绩同比 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
@@ -304,7 +305,8 @@ class ReportFormsServicePro
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                'file_name' => $code . '.jpg',   //保存的文件名
                 'title' => "省份老店业绩同比-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
@@ -393,7 +395,8 @@ class ReportFormsServicePro
             //参数
             $params = [
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                'file_name' => $code . '.jpg',   //保存的文件名
                 'title' => "省份老店业绩同比-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
@@ -457,7 +460,8 @@ class ReportFormsServicePro
             //参数
             $params = [
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+                'file_name' => $code . '.jpg',   //保存的文件名
                 'title' => "省份老店业绩同比-直营 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
@@ -530,7 +534,8 @@ class ReportFormsServicePro
             //参数
             $params = [
                 'row' => count($data),          //数据的行数
-                'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'file_name' =>  $code . '.jpg',      //保存的文件名
                 'title' => $title,
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $data,
@@ -640,7 +645,8 @@ class ReportFormsServicePro
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code .$dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code .$dingName . '.jpg',   //保存的文件名
+            'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "督导挑战目标完成率 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
@@ -721,7 +727,8 @@ class ReportFormsServicePro
         //参数
         $params = [
             'row' => count($list),          //数据的行数
-            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "区域挑战目标完成率 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
@@ -813,7 +820,8 @@ class ReportFormsServicePro
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'file_name' => $code .'.jpg',   //保存的文件名
             'title' => "各省挑战目标完成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
@@ -903,7 +911,8 @@ class ReportFormsServicePro
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "各省挑战目标完成情况-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
@@ -990,7 +999,8 @@ class ReportFormsServicePro
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'file_name' => $code . '.jpg',   //保存的文件名
             'title' => "直营单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
@@ -1074,7 +1084,8 @@ class ReportFormsServicePro
         $params = [
             'code' => $code,
             'row' => count($list),          //数据的行数
-            'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
+            'file_name' => $code  . '.jpg',   //保存的文件名
             'title' => "加盟单店目标达成情况 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,

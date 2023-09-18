@@ -992,21 +992,24 @@ class SendReport extends BaseController
         $send_data = [
             'S101' => [
                 // 'title' => '加盟老店同比环比递增及完成率 表号:S101',
-                'title' => '测试测试',
+                'title' => '测试S101',
                 'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
             ],
-            // 'S104' => [
-            //     'title' => '直营老店同比环比递增及完成率 表号:S104',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S104{$dingName}.jpg"
-            // ],
-            // 'S102' => [
-            //     'title' => '省份老店业绩同比 表号:S102',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S102{$dingName}.jpg"
-            // ],
-            // 'S103' => [
-            //     'title' => '省份老店业绩同比-分经营模式 表号:S103',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S103{$dingName}.jpg"
-            // ],
+            'S104' => [
+                'title' => ' 测试S104',
+                // 'title' => '直营老店同比环比递增及完成率 表号:S104',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104.jpg?v=" . time()
+            ],
+            'S102' => [
+                // 'title' => '省份老店业绩同比 表号:S102',
+                'title' => '测试S102',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S102.jpg?v=" . time()
+            ],
+            'S103' => [
+                // 'title' => '省份老店业绩同比-分经营模式 表号:S103',
+                'title' => '测试S103',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S103.jpg?v=" . time()
+            ],
         ];
 
         // dump($send_data);
