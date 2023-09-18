@@ -970,9 +970,9 @@ class SendReport extends BaseController
         cache('dingding_table_name', rand_code(5), 3600);
         // 生成图片 s101
         $this->servicePro->create_table_s101('S101', $date);
-        // $this->service->create_table_s102($date);
-        // $this->service->create_table_s103($date);
-        // $this->service->create_table_s101('S104', $date);
+        $this->servicePro->create_table_s102($date);
+        $this->servicePro->create_table_s103($date);
+        $this->servicePro->create_table_s101('S104', $date);
 
         // 108-110
         // $this->service->create_table_s108A($date);
