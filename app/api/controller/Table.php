@@ -943,6 +943,221 @@ class Table extends BaseController
                 $this->db_bi->table('customer_day_qiannian_ww')->strict(false)->insertAll($val10);
             }
         }
+
+        // 视图层
+        // old_customer_state_detail_ww
+        $sql_old_customer_state_detail_ww = "
+            SELECT 
+                CASE WHEN A.`店铺名称`='合计'  AND A.`省份`='合计'  THEN CONCAT(A.`经营模式`,'合计') ELSE A.`经营模式` END AS 经营模式 ,
+            CASE WHEN A.`店铺名称`='合计'  AND A.`省份`!='合计'  THEN CONCAT(A.`省份`,'合计') 
+                        ELSE A.`省份` END  AS `省份`,
+                A.店铺名称 ,
+                CASE WHEN A.店铺名称 = '合计' THEN '合计' ELSE A.`首单日期` END AS 首单日期,
+                A.`前年同日`,
+                A.去年同日,
+                A. 昨天销量,
+                A.`前年同期今天`,
+                CONCAT(ROUND( ((A.`前年同期今天`/A.`前年同日` -1 )*100),2),'%') AS 前年对比今年昨日递增率 ,
+                CONCAT(ROUND( ((A.`昨天销量`/A.`去年同日` -1 )*100),2),'%') AS 昨日递增率 ,
+                A.`前年同月`,
+                A.去年同月,
+                A.本月业绩,
+                A.`前年同期本月业绩`,
+                CONCAT(ROUND( ((A.`前年同期本月业绩`/A.`前年同月` -1 )*100),2),'%') AS 前年对比今年累销递增率 ,
+                CONCAT(ROUND( ((A.`本月业绩`/A.`去年同月` -1 )*100),2),'%') AS 累销递增率 ,
+                A.`前年累销递增金额差`,
+                A.累销递增金额差,
+                DATE_SUB(curdate(),INTERVAL -1 DAY) AS 更新时间
+        FROM
+        (SELECT 
+                IFNULL(CFD.`性质`,'总计') AS 经营模式 ,
+                IFNULL(CFD.State,'合计') AS 省份,
+                IFNULL(CFD.CustomerName,'合计') AS 店铺名称 ,
+                CFD.first_date AS 首单日期,
+                SUM(QNBR.`前年同期今天`) AS 前年同期今天,
+                SUM(CYBLD.`前年同日`) AS 前年同日,
+                SUM(CLD.`去年同日`) AS 去年同日,
+                SUM(CY.`昨天销量`) AS 昨天销量,
+                SUM(CYBLM.`前年同月`) AS 前年同月,
+                SUM(CLM.`去年同月`) 去年同月,
+                SUM(CM.`本月业绩`) 本月业绩,
+                SUM(QNBY.`前年同期本月业绩`) AS 前年同期本月业绩,
+                SUM(QNBY.`前年同期本月业绩`) - SUM(CYBLM.`前年同月`) AS 前年累销递增金额差,
+                SUM(CM.`本月业绩`) - SUM(CLM.`去年同月`) AS 累销递增金额差
+        FROM customer_first_date_ww CFD
+        LEFT JOIN customer_region_b_ww CR ON CFD.CustomerName=CR.`店铺`
+        LEFT JOIN customer_lastyear_day_ww CLD ON CFD.CustomerName=CLD.`店铺名称`
+        LEFT JOIN customer_yesterday_ww CY ON CFD.CustomerName= CY.`店铺名称`
+        LEFT JOIN customer_lastyear_month_ww CLM ON CFD.CustomerName=CLM.`店铺名称`
+        LEFT JOIN customer_month_ww CM ON CFD.CustomerName=CM.`店铺名称`
+        LEFT JOIN customer_year_before_last_day_ww CYBLD ON CFD.CustomerName=CYBLD.`店铺名称`
+        LEFT JOIN customer_year_before_last_month_ww CYBLM ON CFD.CustomerName=CYBLM.`店铺名称`
+        LEFT JOIN customer_month_qiannian_ww QNBY ON CFD.CustomerName=QNBY.`店铺名称`
+        LEFT JOIN customer_day_qiannian_ww QNBR ON CFD.CustomerName=QNBR.`店铺名称`
+        WHERE CFD.CustomerName NOT LIKE '%停用%'
+        GROUP BY  CFD.`性质` ,CFD.State,CFD.CustomerName
+        WITH ROLLUP
+        ) AS A
+        ;
+        ";
+
+        $select_old_customer_state_detail_ww = $this->db_bi->query($sql_old_customer_state_detail_ww);
+        if ($select_old_customer_state_detail_ww) {
+            // dump($select_data); die;
+            // 保留历史
+            $this->db_bi->table('old_customer_state_detail_ww')->where([
+                ['更新时间', '=', date('Y-m-d', strtotime('+1 day', time()))]
+            ])->delete();
+
+            $select_chunk11 = array_chunk($select_old_customer_state_detail_ww, 500);
+    
+            foreach($select_chunk11 as $key11 => $val11) {
+                $this->db_bi->table('old_customer_state_detail_ww')->strict(false)->insertAll($val11);
+            }
+        }
+
+        // old_customer_state_ww
+        $sql_old_customer_state_ww = "
+            SELECT 
+                A.`店铺数`,
+                A.两年以上老店数,
+                A.`经营模式`,
+                A.`省份`,
+                A.`前年同日`,
+                A.`去年同日`,
+                A.`昨天销量`,
+                A.`前年同期今天`,
+                CONCAT(ROUND( ((A.`前年同期今天`/A.`前年同日` -1 )*100),2),'%') AS 前年对比今年昨日递增率 ,
+                CONCAT(ROUND( ((A.`昨天销量`/A.`去年同日` -1 )*100),2),'%') AS 昨日递增率 ,
+                A.`前年同月`,
+                A.`去年同月`,
+                A.`本月业绩`,
+                A.`前年同期本月业绩`,
+                CONCAT(ROUND( ((A.`前年同期本月业绩`/A.`前年同月` -1 )*100),2),'%') AS 前年对比今年累销递增率 ,
+                CONCAT(ROUND( ((A.`本月业绩`/A.`去年同月` -1 )*100),2),'%') AS 累销递增率 ,
+                A.`前年累销递增金额差`,
+                A.`累销递增金额差`,
+                DATE_SUB(curdate(),INTERVAL -1 DAY) AS 更新时间
+            FROM 
+            (SELECT 
+                    COUNT(DISTINCT CustomerName) AS 店铺数,
+                    COUNT(DISTINCT CASE WHEN CFD.first_date<= DATE_ADD(CURDATE(),INTERVAL -731 DAY) THEN CFD.CustomerName END) 两年以上老店数,
+                    IFNULL(CFD.`性质`,'总计') AS 经营模式 ,
+                    IFNULL(CFD.State,'合计') AS 省份,
+                    SUM(QNBR.`前年同期今天`) AS 前年同期今天,
+                    SUM(CYBLD.`前年同日`) AS 前年同日,
+                    SUM(CLD.`去年同日`) AS 去年同日,
+                    SUM(CY.`昨天销量`) AS 昨天销量,
+                    SUM(CYBLM.`前年同月`) AS 前年同月,
+                    SUM(CLM.`去年同月`) 去年同月,
+                    SUM(CM.`本月业绩`) 本月业绩,
+                    SUM(QNBY.`前年同期本月业绩`) AS 前年同期本月业绩,
+                    SUM(QNBY.`前年同期本月业绩`) - SUM(CYBLM.`前年同月`) AS 前年累销递增金额差,
+                    SUM(CM.`本月业绩`) - SUM(CLM.`去年同月`) AS 累销递增金额差
+            FROM customer_first_date_ww CFD
+            LEFT JOIN customer_region_b_ww CR ON CFD.CustomerName=CR.`店铺`
+            LEFT JOIN customer_lastyear_day_ww CLD ON CFD.CustomerName=CLD.`店铺名称`
+            LEFT JOIN customer_yesterday_ww CY ON CFD.CustomerName= CY.`店铺名称`
+            LEFT JOIN customer_lastyear_month_ww CLM ON CFD.CustomerName=CLM.`店铺名称`
+            LEFT JOIN customer_month_ww CM ON CFD.CustomerName=CM.`店铺名称`
+            LEFT JOIN customer_year_before_last_day_ww CYBLD ON CFD.CustomerName=CYBLD.`店铺名称`
+            LEFT JOIN customer_year_before_last_month_ww CYBLM ON CFD.CustomerName=CYBLM.`店铺名称`
+            LEFT JOIN customer_month_qiannian_ww QNBY ON CFD.CustomerName=QNBY.`店铺名称`
+            LEFT JOIN customer_day_qiannian_ww QNBR ON CFD.CustomerName=QNBR.`店铺名称`
+            WHERE CFD.CustomerName NOT LIKE '%停用%'
+            GROUP BY 
+                CFD.`性质`,
+                CFD.State
+            WITH ROLLUP	) AS A
+            ;
+        ";
+
+        $select_old_customer_state_ww = $this->db_bi->query($sql_old_customer_state_ww);
+        if ($select_old_customer_state_ww) {
+            // dump($select_data); die;
+            // 保留历史
+            $this->db_bi->table('old_customer_state_ww')->where([
+                ['更新时间', '=', date('Y-m-d', strtotime('+1 day', time()))]
+            ])->delete();
+
+            $select_chunk12 = array_chunk($select_old_customer_state_ww, 500);
+    
+            foreach($select_chunk12 as $key12 => $val12) {
+                $this->db_bi->table('old_customer_state_ww')->strict(false)->insertAll($val12);
+            }
+        }
+
+        // old_customer_state_2_ww
+        $sql_old_customer_state_2_ww = "
+            SELECT 
+                A.`店铺数`,
+                A.两年以上老店数,
+                A.`省份`,
+                A.`前年同日`,
+                A.`去年同日`,
+                A.`昨天销量`,
+                A.`前年同期今天`,
+                CONCAT(ROUND( ((A.`前年同期今天`/A.`前年同日` -1 )*100),2),'%') AS 前年对比今年昨日递增率 ,
+                CONCAT(ROUND( ((A.`昨天销量`/A.`去年同日` -1 )*100),2),'%') AS 昨日递增率 ,
+                A.`前年同月`,
+                A.`去年同月`,
+                A.`本月业绩`,
+                A.`前年同期本月业绩`,
+                CONCAT(ROUND( ((A.`前年同期本月业绩`/A.`前年同月` -1 )*100),2),'%') AS 前年对比今年累销递增率 ,
+                CONCAT(ROUND( ((A.`本月业绩`/A.`去年同月` -1 )*100),2),'%') AS 累销递增率 ,
+                A.`前年累销递增金额差`,
+                A.`累销递增金额差`,
+                DATE_SUB(curdate(),INTERVAL -1 DAY) AS 更新时间
+            FROM 
+            (SELECT 
+                    COUNT(DISTINCT CustomerName) AS 店铺数,
+                    COUNT(DISTINCT CASE WHEN CFD.first_date<= DATE_ADD(CURDATE(),INTERVAL -731 DAY) THEN CFD.CustomerName END) 两年以上老店数,
+                    IFNULL(CFD.State,'合计') AS 省份,
+                    SUM(QNBR.`前年同期今天`) AS 前年同期今天,
+                    SUM(CYBLD.`前年同日`) AS 前年同日,
+                    SUM(CLD.`去年同日`) AS 去年同日,
+                    SUM(CY.`昨天销量`) AS 昨天销量,
+                    SUM(CYBLM.`前年同月`) AS 前年同月,
+                    SUM(CLM.`去年同月`) 去年同月,
+                    SUM(CM.`本月业绩`) 本月业绩,
+                    SUM(QNBY.`前年同期本月业绩`) AS 前年同期本月业绩,
+                    SUM(QNBY.`前年同期本月业绩`) - SUM(CYBLM.`前年同月`) AS 前年累销递增金额差,
+                    SUM(CM.`本月业绩`) - SUM(CLM.`去年同月`) AS 累销递增金额差
+            FROM customer_first_date_ww CFD
+            LEFT JOIN customer_region_b_ww CR ON CFD.CustomerName=CR.`店铺`
+            LEFT JOIN customer_lastyear_day_ww CLD ON CFD.CustomerName=CLD.`店铺名称`
+            LEFT JOIN customer_yesterday_ww CY ON CFD.CustomerName= CY.`店铺名称`
+            LEFT JOIN customer_lastyear_month_ww CLM ON CFD.CustomerName=CLM.`店铺名称`
+            LEFT JOIN customer_month_ww CM ON CFD.CustomerName=CM.`店铺名称`
+            LEFT JOIN customer_year_before_last_day_ww CYBLD ON CFD.CustomerName=CYBLD.`店铺名称`
+            LEFT JOIN customer_year_before_last_month_ww CYBLM ON CFD.CustomerName=CYBLM.`店铺名称`
+            LEFT JOIN customer_month_qiannian_ww QNBY ON CFD.CustomerName=QNBY.`店铺名称`
+            LEFT JOIN customer_day_qiannian_ww QNBR ON CFD.CustomerName=QNBR.`店铺名称`
+            WHERE CFD.CustomerName NOT LIKE '%停用%'
+            GROUP BY 
+                CFD.State
+            WITH ROLLUP	) AS A
+            ;
+        ";
+
+        $select_old_customer_state_2_ww = $this->db_bi->query($sql_old_customer_state_2_ww);
+        if ($select_old_customer_state_2_ww) {
+            // dump($select_data); die;
+            // 保留历史
+            $this->db_bi->table('old_customer_state_2_ww')->where([
+                ['更新时间', '=', date('Y-m-d', strtotime('+1 day', time()))]
+            ])->delete();
+
+            $select_chunk13 = array_chunk($select_old_customer_state_2_ww, 500);
+    
+            foreach($select_chunk13 as $key13 => $val13) {
+                $this->db_bi->table('old_customer_state_2_ww')->strict(false)->insertAll($val13);
+            }
+        }
+    }
+
+    public function test2() {
+        echo date('Y-m-d', strtotime('+1 day', time()));
     }
 
 }
