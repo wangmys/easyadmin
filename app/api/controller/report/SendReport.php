@@ -1009,8 +1009,8 @@ class SendReport extends BaseController
             // ],
         ];
 
-        dump($send_data);
-        die;
+        // dump($send_data);
+        // die;
         $res = [];
         foreach ($send_data as $k=>$v){
             $headers = get_headers($v['jpg_url']);
