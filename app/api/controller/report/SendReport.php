@@ -984,6 +984,23 @@ class SendReport extends BaseController
         $this->send_pro_test();
     }
 
+    public function run_pro_test2()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+        // echo rand_code(5);die;
+        cache('dingding_table_name', rand_code(5), 3600);
+        // 生成图片 s101
+
+        // 108-110
+        $this->servicePro->create_table_s108A($date);
+        $this->servicePro->create_table_s108B($date);
+        $this->servicePro->create_table_s109($date);
+        $this->servicePro->create_table_s110A($date);
+        $this->servicePro->create_table_s110B($date);
+        // 发送数据报表
+        $this->send_pro_test2();
+    }
+
     public function send_pro_test()
     {
         $name = '\app\api\service\DingdingService';
@@ -1009,6 +1026,55 @@ class SendReport extends BaseController
                 // 'title' => '省份老店业绩同比-分经营模式 表号:S103',
                 'title' => '测试S103',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S103.jpg?v=" . time()
+            ],
+        ];
+
+        // dump($send_data);
+        // die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // echo $v['title'];
+                // echo '<br>';
+            }
+        }
+        return json($res);
+    }
+
+    public function send_pro_test2()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $dingName = cache('dingding_table_name');
+        $send_data = [
+            'S108A' => [
+                // 'title' => '督导挑战目标完成率 表号:S108A',
+                'title' => '测试S108A',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108A.jpg?v=" . time()
+            ],
+            'S108B' => [
+                // 'title' => '区域挑战目标完成率 表号:S108B',
+                'title' => '测试S108B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108B.jpg?v=" . time()
+            ],
+            'S109' => [
+                // 'title' => '各省挑战目标完成情况 表号:S109',
+                'title' => '测试S109',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S109.jpg?v=" . time()
+            ],
+            'S110A' => [
+                // 'title' => '直营单店目标达成情况 表号:S110A',
+                'title' => '测试S110A',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110A.jpg?v=" . time()
+            ],
+            'S110B' => [
+                // 'title' => '加盟单店目标达成情况 表号:S110B',
+                'title' => '测试S110B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110B.jpg?v=" . time()
             ],
         ];
 
