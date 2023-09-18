@@ -62,7 +62,7 @@ class ReportFormsServicePro
                     前年同月 as 前年同月销额,
                     去年同月 as 去年同月销额,
                     本月业绩 as 本月销额
-                    from old_customer_state_detail_ww where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计') limit 10";
+                    from old_customer_state_detail_ww where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
                 break;
             default:
                 $title = "直营老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
