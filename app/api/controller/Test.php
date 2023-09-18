@@ -86,9 +86,10 @@ class Test
      */
     public function testRedis()
     {
-        $redis = new Redis;
-        echo '<pre>';
-        print_r($redis);
-        die;
+        // $redis = new Redis;
+        // echo '<pre>';
+        // print_r($redis);
+        // die;
+        cache('test1', 666, 3600);
     }
 }

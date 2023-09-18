@@ -792,7 +792,8 @@ class Customeryeji extends BaseController
             FROM
                 dd_customer_push_yeji 
             where 1
-                -- AND name in ('陈威良', '王威')
+                AND 更新日期 = '{$date}'
+                -- AND name in ('陈威良')
         ");
 
         // dump($select);die;

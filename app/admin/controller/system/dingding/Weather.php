@@ -610,6 +610,7 @@ class Weather extends BaseController
     // 发送测试
     public function sendDingImg() {
         $model = new DingTalk;
+        $date = date('Y-m-d');
         $select = $this->db_easyA->query("
             SELECT 
                 u.*
@@ -618,6 +619,7 @@ class Weather extends BaseController
             LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
             where 1
                 and u.店铺名称 = c.店铺名称
+                AND u.更新日期 = '{$date}'
                 -- AND name in ('陈威良','王梦园','李雅婷')
                 -- AND name in ('陈威良')
                 
