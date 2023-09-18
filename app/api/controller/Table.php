@@ -100,7 +100,7 @@ class Table extends BaseController
             // $this->db_bi->table('sp_customer_mubiao_ww')->where([
             //     ['更新日期', '=', date('Y-m-d')]
             // ])->delete();
-            $this->db_easyA->execute('TRUNCATE sp_customer_mubiao_ww;');
+            $this->db_bi->execute('TRUNCATE sp_customer_mubiao_ww;');
 
             $select_chunk = array_chunk($select_data, 500);
     
