@@ -1008,23 +1008,23 @@ class SendReport extends BaseController
         $dingName = cache('dingding_table_name');
         $send_data = [
             'S101' => [
-                // 'title' => '加盟老店同比环比递增及完成率 表号:S101',
-                'title' => '测试S101',
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                // 'title' => '测试S101',
                 'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
             ],
             'S104' => [
-                'title' => ' 测试S104',
-                // 'title' => '直营老店同比环比递增及完成率 表号:S104',
+                // 'title' => ' 测试S104',
+                'title' => '直营老店同比环比递增及完成率 表号:S104',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104.jpg?v=" . time()
             ],
             'S102' => [
-                // 'title' => '省份老店业绩同比 表号:S102',
-                'title' => '测试S102',
+                'title' => '省份老店业绩同比 表号:S102',
+                // 'title' => '测试S102',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S102.jpg?v=" . time()
             ],
             'S103' => [
-                // 'title' => '省份老店业绩同比-分经营模式 表号:S103',
-                'title' => '测试S103',
+                'title' => '省份老店业绩同比-分经营模式 表号:S103',
+                // 'title' => '测试S103',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S103.jpg?v=" . time()
             ],
         ];
@@ -1052,28 +1052,28 @@ class SendReport extends BaseController
         $dingName = cache('dingding_table_name');
         $send_data = [
             'S108A' => [
-                // 'title' => '督导挑战目标完成率 表号:S108A',
-                'title' => '测试S108A',
+                'title' => '督导挑战目标完成率 表号:S108A',
+                // 'title' => '测试S108A',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108A.jpg?v=" . time()
             ],
             'S108B' => [
-                // 'title' => '区域挑战目标完成率 表号:S108B',
-                'title' => '测试S108B',
+                'title' => '区域挑战目标完成率 表号:S108B',
+                // 'title' => '测试S108B',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108B.jpg?v=" . time()
             ],
             'S109' => [
-                // 'title' => '各省挑战目标完成情况 表号:S109',
-                'title' => '测试S109',
+                'title' => '各省挑战目标完成情况 表号:S109',
+                // 'title' => '测试S109',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S109.jpg?v=" . time()
             ],
             'S110A' => [
-                // 'title' => '直营单店目标达成情况 表号:S110A',
-                'title' => '测试S110A',
+                'title' => '直营单店目标达成情况 表号:S110A',
+                // 'title' => '测试S110A',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110A.jpg?v=" . time()
             ],
             'S110B' => [
-                // 'title' => '加盟单店目标达成情况 表号:S110B',
-                'title' => '测试S110B',
+                'title' => '加盟单店目标达成情况 表号:S110B',
+                // 'title' => '测试S110B',
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110B.jpg?v=" . time()
             ],
         ];
