@@ -860,7 +860,7 @@ class Table extends BaseController
             $select_chunk5 = array_chunk($select_customer_yesterday_ww, 500);
     
             foreach($select_chunk5 as $key5 => $val5) {
-                $this->db_bi->table('customer_yesterday_ww')->strict(false)->insertAll($val4);
+                $this->db_bi->table('customer_yesterday_ww')->strict(false)->insertAll($val5);
             }
         }
 

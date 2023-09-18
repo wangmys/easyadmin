@@ -101,7 +101,7 @@ class Ldkdjd extends BaseController
                 EC.State,
                 mathod.Mathod,
                 ER.RetailID
-            HAVING (ERG.Quantity)<5000
+            HAVING SUM(ERG.Quantity)<5000
             ) T
             LEFT JOIN 
             (
@@ -187,7 +187,7 @@ class Ldkdjd extends BaseController
                 EC.State,
                 mathod.Mathod,
                 ER.RetailID
-            HAVING (ERG.Quantity)<5000
+            HAVING SUM(ERG.Quantity)<5000
             ) T
             LEFT JOIN 
             (
