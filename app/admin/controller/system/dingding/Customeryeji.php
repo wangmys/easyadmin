@@ -4,10 +4,11 @@ use think\facade\Db;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
+use jianyan\excel\Excel;
 
 /**
  * 店铺业绩 直营
- * Class Weather
+ * Class Customeryeji
  * @package app\dingtalk
  * 
  * 1.获取数据源 http://www.easyadmin1.com/admin/system.dingding.Customeryeji/getData?date=2023-09-05
@@ -30,6 +31,75 @@ class Customeryeji extends BaseController
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
         $this->db_tianqi = Db::connect('tianqi');
+    }
+
+    public function list() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $aname = session('admin.name');       
+                $aid = session('admin.id');   
+                $mapSuper = " AND list.aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
+            if (!empty($input['更新日期'])) {
+                $map1 = " AND `更新日期` = '{$input['更新日期']}'";                
+            } else {
+                $today = date('Y-m-d');
+                $map1 = " AND `更新日期` = '{$today}'";            
+            }
+            $sql = "
+                SELECT 
+                   *
+                FROM 
+                    dd_customer_push_yeji
+                WHERE 1
+                    {$map1}
+                order by 已读 ASC
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    dd_customer_push_yeji
+                WHERE 1
+                    {$map1}
+            ";
+            $count = $this->db_easyA->query($sql2);
+
+            $reads = $this->db_easyA->table('dd_customer_push_yeji')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'Y'],
+            ])->count('*');
+
+            $noReads = $this->db_easyA->table('dd_customer_push_yeji')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'N'],
+            ])->count('*');
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'readsData' => ['reads' => $reads, 'noReads' => $noReads]]);
+        } else {
+            $time = time();
+            if ($time < strtotime(date('Y-m-d 23:30:00'))) {
+                // echo '显示昨天';
+                $today = date('Y-m-d', strtotime('-1 day', $time));
+            } else {
+                // echo '显示今天';
+                $today = date('Y-m-d');
+            }
+            return View('list', [
+                'today' => $today,
+            ]);
+        }        
     }
 
     // 更新店铺cid
@@ -649,6 +719,70 @@ class Customeryeji extends BaseController
 
 
     // 发送测试2
+    // public function sendDingImg_old() {
+    //     $date = input('date') ? input('date') : date('Y-m-d');
+    //     $model = new DingTalk;
+    //     $select = $this->db_easyA->query("
+    //         SELECT 
+    //             *
+    //         FROM
+    //             dd_customer_push 
+    //         where 1
+    //             -- AND name in ('陈威良', '王威')
+    //     ");
+
+    //     $datatime = date('Ymd');
+    //     foreach ($select as $key => $val) {
+    //         // 线上
+    //         $path = "http://im.babiboy.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+
+    //         // 本地
+    //         // $path = "http://www.easyadmin1.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+
+    //         $headers = get_headers($path);
+    //         if(substr($headers[0], 9, 3) == 200){
+    //             $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 今日销售情况", $path);    
+    //         } else {
+    //             echo '图片不存在';
+    //         }
+    //     }
+    // }
+
+    // 下载未读
+    public function download_noreads() {
+        $date = input('date');
+        $sql = "
+            SELECT 
+                店铺名称,name as 姓名,title as 职位,mobile as 手机,
+                case
+                    when sendtime is not null then '已发送' else '未发送'
+                end as 发送状态,
+                case
+                    when 已读 = 'Y' then '已读' else '未读'
+                end as 阅读状态,
+                更新日期 as 日期
+            FROM 
+                dd_customer_push_yeji   
+            WHERE 1
+                AND 更新日期 = '{$date}'
+                AND 已读 != 'Y'
+                AND sendtime is not null
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $header = [];
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+            
+        } else {
+            $header = []; 
+        }
+
+        return Excel::exportData($select, $header, '店铺业绩未读名单_'  . '_' . $date . '_' . time() , 'xlsx');
+    }
+
+    // 发送
     public function sendDingImg() {
         $date = input('date') ? input('date') : date('Y-m-d');
         $model = new DingTalk;
@@ -656,25 +790,127 @@ class Customeryeji extends BaseController
             SELECT 
                 *
             FROM
-                dd_customer_push 
+                dd_customer_push_yeji 
             where 1
-                -- AND name in ('陈威良', '王威')
+                AND 更新日期 = '{$date}'
+                -- AND name in ('陈威良')
         ");
 
+        // dump($select);die;
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
             // 线上
-            $path = "http://im.babiboy.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+            $path = "http://im.babiboy.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg";
 
             // 本地
             // $path = "http://www.easyadmin1.com/upload/dd_customer_yeji/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
 
             $headers = get_headers($path);
             if(substr($headers[0], 9, 3) == 200){
-                $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 今日销售情况", $path);    
+                $res = json_decode($res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 今日销售情况", $path . '?v=' . time()), true); 
+                try {
+                    if ($res['errcode'] == 0) {
+                        $this->db_easyA->table('dd_customer_push_yeji')->where([
+                            ['更新日期', '=', date('Y-m-d')],
+                            ['店铺名称', '=', $val['店铺名称']],
+                            ['name', '=', $val['name']]
+                        ])->update([
+                            'path' => $path,
+                            'task_id' => $res['task_id'],
+                            'sendtime' => date('Y-m-d H:i:s')
+                        ]);
+                    }
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
             } else {
-                echo '图片不存在';
+                // echo '图片不存在';
             }
+        }
+    }
+
+    // 拉取 已读 未读  自动更新24小时之内的记录
+    public function getReads_auto() {
+        // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //     ['id', '=', $input['id']],
+        // ])->find();
+        if (request()->isAjax() && input('更新日期')) {
+            $更新日期 = input('更新日期');
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_yeji
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    AND sendtime is not null
+                    AND 更新日期 = '{$更新日期}';
+            ";
+        } else {
+            // 非ajax请求
+            $time = time();
+            if ($time >= strtotime(date('Y-m-d 08:30:00')) && $time <= strtotime(date('Y-m-d 23:59:59'))) {
+                // echo '时间范围内';
+            } else {
+                // echo '时间范围外';
+                die;
+            }
+            // die;
+            $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_yeji
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    -- AND 已读 is null
+                    AND sendtime >= '{$hour24}'
+            ";
+        }   
+
+        $select = $this->db_easyA->query($sql);
+        
+        $model = new DingTalk;
+        foreach ($select as $key => $val) {
+            // dump($val);
+            // $this->getReadsHandle_auto_handle($val['id']);
+            $res = json_decode($model->getsendresult($val['task_id']), true);
+            // dump($res);
+            try {
+                if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                    // 已读
+                    if (count($res['send_result']['read_user_id_list']) > 0) {
+                        $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_temp_excel_user_success 
+                            SET 
+                                已读 = 'Y'
+                            WHERE 1
+                                AND task_id = '{$val['task_id']}'
+                                AND userid in ($reads)
+                        ");
+                        $update = $this->db_easyA->table('dd_customer_push_yeji')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'Y',
+                        ]);
+                    } else {
+                        $update = $this->db_easyA->table('dd_customer_push_yeji')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'N',
+                        ]);
+                    }
+    
+                } else {
+                    return json(['code' => 0, 'msg' => '数据异常']);
+                }
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+
         }
     }
 }

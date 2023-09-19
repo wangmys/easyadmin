@@ -4,9 +4,11 @@ declare (strict_types = 1);
 namespace app\api\controller\report;
 use app\api\constants\ApiConstant;
 use app\api\service\bi\report\ReportFormsService;
+use app\api\service\bi\report\ReportFormsServicePro;
 use app\api\service\bi\report\ReportFormsServiceJiameng;
 use app\BaseController;
 use think\Request;
+use think\facade\Db;
 
 class SendReport extends BaseController
 {
@@ -15,9 +17,14 @@ class SendReport extends BaseController
      * @var ReportFormsService|null
      */
     protected $service = null;
+    protected $servicePro = null;
     protected $service_jiameng = null;
     // 日期
     protected $Date = '';
+
+    protected $db_easyA = '';
+    protected $db_sqlsrv = '';
+    protected $db_bi = '';
 
 
     public function __construct(Request $request)
@@ -25,7 +32,12 @@ class SendReport extends BaseController
         // 初始化日期
         $this->Date = date('Y-m-d');
         $this->service = new ReportFormsService;
+        $this->servicePro = new ReportFormsServicePro;
         $this->request = $request;
+
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_bi = Db::connect('mysql2');
     }
 
 //    /**
@@ -164,6 +176,43 @@ class SendReport extends BaseController
             $this->service->create_table_s117();
         } elseif ($name == 'S118') {
             $this->service->create_table_s118($date, $type);
+        }
+    }
+
+    // cwl
+    public function create_test_pro() {
+        $name = input('param.name') ? input('param.name') : 'S101'; 
+        $date = input('param.date') ? input('param.date') : '';
+        $type = input('param.type') ? input('param.type') : '';
+        cache('dingding_table_name', rand_code(5), 3600);
+        if ($name =='S101') {
+            $this->servicePro->create_table_s101('S101', $date);
+        } elseif ($name =='S102') {
+            $this->servicePro->create_table_s102($date);
+        } elseif ($name =='S103') {
+            $this->servicePro->create_table_s103($date);
+        } elseif ($name =='S103B') {
+            $this->servicePro->create_table_s103B($date);
+        } elseif ($name =='S103C') {
+            $this->servicePro->create_table_s103C($date);
+        } elseif ($name =='S104') {
+            $this->servicePro->create_table_s101('S104', $date);
+        } elseif ($name =='S104C') {
+            $this->servicePro->create_table_s104C($date);
+        }elseif ($name =='S108A') {
+            $this->servicePro->create_table_s108A($date);
+        } elseif ($name =='S108B') {
+            $this->servicePro->create_table_s108B($date);
+        } elseif ($name =='S109') {
+            $this->servicePro->create_table_s109($date);
+        } elseif ($name =='S109B') {
+            $this->servicePro->create_table_s109B($date);
+        } elseif ($name =='S110A') {
+            $this->servicePro->create_table_s110A($date);
+        } elseif ($name =='S110B') {
+            $this->servicePro->create_table_s110B($date);
+        }  else {
+            echo 'unknow';
         }
     }
 
@@ -891,13 +940,17 @@ class SendReport extends BaseController
         }
     }
 
+    // 
     public function run_caigoudingtui_s114()
     {
-        $this->service->create_table_s114();
-
-        // 发送数据报表
-        $this->sendS114();
-
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态')->where(['编号' => 's114'])->find();
+        // dump($find);
+        // die;
+        if ($find && $find['状态'] == '开') {
+            $this->service->create_table_s114();
+            // 发送数据报表
+            $this->sendS114();
+        } 
     }
 
     public function run_s012()
@@ -909,11 +962,136 @@ class SendReport extends BaseController
 
     }
 
-    public function testSend() {
-        // $name = '\app\api\service\DingdingService';
-        // $model = new $name;
-        // $res[] = $model->send('夏季新品发货及入库汇总 表号:S112', 'http://im.babiboy.com/img/20230520/S112%E5%A4%8F%E5%AD%A3.jpg', 'https://oapi.dingtalk.com/robot/send?access_token=b9c3d11ba661bf4d45f7bee40ed7d92e5f5b3cc92365c29492d129a6c105940b');
-        // return json($res);
+    //   cwl
+    public function run_pro_test()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+        // echo rand_code(5);die;
+        cache('dingding_table_name', rand_code(5), 3600);
+        // 生成图片 s101
+        $this->servicePro->create_table_s101('S101', $date);
+        $this->servicePro->create_table_s102($date);
+        $this->servicePro->create_table_s103($date);
+        $this->servicePro->create_table_s101('S104', $date);
+
+        // 108-110
+        // $this->service->create_table_s108A($date);
+        // $this->service->create_table_s108B($date);
+        // $this->service->create_table_s109($date);
+        // $this->service->create_table_s110A($date);
+        // $this->service->create_table_s110B($date);
+        // 发送数据报表
+        $this->send_pro_test();
+    }
+
+    public function run_pro_test2()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+        // echo rand_code(5);die;
+        cache('dingding_table_name', rand_code(5), 3600);
+        // 生成图片 s101
+
+        // 108-110
+        $this->servicePro->create_table_s108A($date);
+        $this->servicePro->create_table_s108B($date);
+        $this->servicePro->create_table_s109($date);
+        $this->servicePro->create_table_s110A($date);
+        $this->servicePro->create_table_s110B($date);
+        // 发送数据报表
+        $this->send_pro_test2();
+    }
+
+    public function send_pro_test()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $dingName = cache('dingding_table_name');
+        $send_data = [
+            'S101' => [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                // 'title' => '测试S101',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
+            ],
+            'S104' => [
+                // 'title' => ' 测试S104',
+                'title' => '直营老店同比环比递增及完成率 表号:S104',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104.jpg?v=" . time()
+            ],
+            'S102' => [
+                'title' => '省份老店业绩同比 表号:S102',
+                // 'title' => '测试S102',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S102.jpg?v=" . time()
+            ],
+            'S103' => [
+                'title' => '省份老店业绩同比-分经营模式 表号:S103',
+                // 'title' => '测试S103',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S103.jpg?v=" . time()
+            ],
+        ];
+
+        // dump($send_data);
+        // die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // echo $v['title'];
+                // echo '<br>';
+            }
+        }
+        return json($res);
+    }
+
+    public function send_pro_test2()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $dingName = cache('dingding_table_name');
+        $send_data = [
+            'S108A' => [
+                'title' => '督导挑战目标完成率 表号:S108A',
+                // 'title' => '测试S108A',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108A.jpg?v=" . time()
+            ],
+            'S108B' => [
+                'title' => '区域挑战目标完成率 表号:S108B',
+                // 'title' => '测试S108B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108B.jpg?v=" . time()
+            ],
+            'S109' => [
+                'title' => '各省挑战目标完成情况 表号:S109',
+                // 'title' => '测试S109',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S109.jpg?v=" . time()
+            ],
+            'S110A' => [
+                'title' => '直营单店目标达成情况 表号:S110A',
+                // 'title' => '测试S110A',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110A.jpg?v=" . time()
+            ],
+            'S110B' => [
+                'title' => '加盟单店目标达成情况 表号:S110B',
+                // 'title' => '测试S110B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110B.jpg?v=" . time()
+            ],
+        ];
+
+        // dump($send_data);
+        // die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // echo $v['title'];
+                // echo '<br>';
+            }
+        }
+        return json($res);
     }
 
 }

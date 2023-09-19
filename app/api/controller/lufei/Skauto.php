@@ -534,6 +534,7 @@ class Skauto extends BaseController
 
     // 7周销 14周销
     public function getRetail() {
+        // 近一周 1-7
         $sql = "
             SELECT TOP
                 1000000
@@ -561,7 +562,7 @@ class Skauto extends BaseController
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
             GROUP BY
                 ER.CustomerName
                 ,EG.GoodsNo
@@ -572,6 +573,7 @@ class Skauto extends BaseController
             HAVING  SUM ( ERG.Quantity ) <> 0
         ";
 
+        // 近两周 8-14
         $sql2 = "
             SELECT TOP
                 1000000
@@ -593,13 +595,13 @@ class Skauto extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
         -- 		AND ER.RetailDate < DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
         --        AND EG.TimeCategoryName2 IN ( {$this->seasionStr} )
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
             GROUP BY
                 ER.CustomerName
                 ,EG.GoodsNo

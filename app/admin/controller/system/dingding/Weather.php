@@ -6,6 +6,7 @@ use think\facade\Db;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
+use jianyan\excel\Excel;
 
 /**
  * 店铺天气
@@ -29,6 +30,75 @@ class Weather extends BaseController
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
         $this->db_tianqi = Db::connect('tianqi');
+    }
+
+    public function list() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $aname = session('admin.name');       
+                $aid = session('admin.id');   
+                $mapSuper = " AND list.aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
+            if (!empty($input['更新日期'])) {
+                $map1 = " AND `更新日期` = '{$input['更新日期']}'";                
+            } else {
+                $today = date('Y-m-d');
+                $map1 = " AND `更新日期` = '{$today}'";            
+            }
+            $sql = "
+                SELECT 
+                   *
+                FROM 
+                    dd_customer_push_weather
+                WHERE 1
+                    {$map1}
+                order by 已读 ASC
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    dd_customer_push_weather
+                WHERE 1
+                    {$map1}
+            ";
+            $count = $this->db_easyA->query($sql2);
+
+            $reads = $this->db_easyA->table('dd_customer_push_weather')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'Y'],
+            ])->count('*');
+
+            $noReads = $this->db_easyA->table('dd_customer_push_weather')->where([
+                ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
+                ['已读', '=', 'N'],
+            ])->count('*');
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'readsData' => ['reads' => $reads, 'noReads' => $noReads]]);
+        } else {
+            $time = time();
+            if ($time < strtotime(date('Y-m-d 20:30:00'))) {
+                // echo '显示昨天';
+                $today = date('Y-m-d', strtotime('-1 day', $time));
+            } else {
+                // echo '显示今天';
+                $today = date('Y-m-d');
+            }
+            return View('list', [
+                'today' => $today,
+            ]);
+        }        
     }
 
     // 更新店铺cid 几秒
@@ -510,32 +580,75 @@ class Weather extends BaseController
         }
     }
 
-    // 发送测试2
+    // 推送天气图
+    // public function sendDingImg_old() {
+    //     $model = new DingTalk;
+    //     $select = $this->db_easyA->query("
+    //         SELECT 
+    //             u.*
+    //         FROM
+    //             dd_customer_push as u
+    //         LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
+    //         where 1
+    //             and u.店铺名称 = c.店铺名称
+    //             and u.isCustomer = '是'
+                
+    //     ");
+
+    //     // print_r($select);die;
+
+    //     $datatime = date('Ymd');
+    //     foreach ($select as $key => $val) {
+    //         $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+
+    //         // echo $val['userid'];
+    //         $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path);
+    //         // print_r($res);
+    //     }
+    // }
+
+    // 发送测试
     public function sendDingImg() {
         $model = new DingTalk;
+        $date = date('Y-m-d');
         $select = $this->db_easyA->query("
             SELECT 
                 u.*
             FROM
-                dd_customer_push as u
+                dd_customer_push_weather as u
             LEFT JOIN dd_weather_customer as c on u.店铺名称 = c.店铺名称
             where 1
                 and u.店铺名称 = c.店铺名称
-                and u.isCustomer = '是'
+                AND u.更新日期 = '{$date}'
+                -- AND name in ('陈威良','王梦园','李雅婷')
+                -- AND name in ('陈威良')
                 
         ");
 
-        // print_r($select);die;
+        // dump($select);die;
 
         $datatime = date('Ymd');
         foreach ($select as $key => $val) {
-            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg?v=" . time();
+            $path = "http://im.babiboy.com/upload/dd_weather/{$datatime}/{$val['店铺名称']}.jpg";
 
             // echo $val['userid'];
-            $res = $model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来7天天气", $path);
+            $res = json_decode($model->sendMarkdownImg_pro($val['userid'], "{$val['店铺名称']} 未来一周天气", $path . '?v=' . time()), true);
             // print_r($res);
+            if ($res['errcode'] == 0) {
+                $this->db_easyA->table('dd_customer_push_weather')->where([
+                    ['更新日期', '=', date('Y-m-d')],
+                    ['店铺名称', '=', $val['店铺名称']],
+                    ['name', '=', $val['name']]
+                ])->update([
+                    'path' => $path,
+                    'task_id' => $res['task_id'],
+                    'sendtime' => date('Y-m-d H:i:s')
+                ]);
+            }
         }
     }
+
+
 
     // 图片生成2
     protected function create_table_weather($customer = '', $date = '')
@@ -1246,5 +1359,123 @@ class Weather extends BaseController
 
         // echo '<img src="/' . $save_path . '"/>';
     }
+
+    // 下载未读
+    public function download_noreads() {
+        $date = input('date');
+        $sql = "
+            SELECT 
+                店铺名称,name as 姓名,title as 职位,mobile as 手机,
+                case
+                    when sendtime is not null then '已发送' else '未发送'
+                end as 发送状态,
+                case
+                    when 已读 = 'Y' then '已读' else '未读'
+                end as 阅读状态,
+                更新日期 as 日期
+            FROM 
+                dd_customer_push_weather   
+            WHERE 1
+                AND 更新日期 = '{$date}'
+                AND 已读 != 'Y'
+                AND sendtime is not null
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $header = [];
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+            
+        } else {
+            $header = []; 
+        }
+
+        return Excel::exportData($select, $header, '未来天气未读名单_'  . '_' . $date . '_' . time() , 'xlsx');
+    }
+
+    // 拉取 已读 未读  自动更新24小时之内的记录
+    public function getReads_auto() {
+        // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+        //     ['id', '=', $input['id']],
+        // ])->find();
+        if (request()->isAjax() && input('更新日期')) {
+            $更新日期 = input('更新日期');
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    AND sendtime is not null
+                    AND 更新日期 = '{$更新日期}';
+            ";
+        } else {
+            // 非ajax请求
+            $time = time();
+            if ($time >= strtotime(date('Y-m-d 08:30:00')) && $time <= strtotime(date('Y-m-d 23:59:59'))) {
+                // echo '时间范围内';
+            } else {
+                // echo '时间范围外';
+                die;
+            }
+            // die;
+            $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
+            $sql = "
+                SELECT 店铺名称,name,userid,task_id,更新日期 FROM dd_customer_push_weather
+                WHERE
+                    sendtime is not null
+                    AND 撤回时间 is null
+                    AND task_id is not null
+                    AND (已读 is null OR 已读 = 'N')
+                    -- AND 已读 is null
+                    AND sendtime >= '{$hour24}'
+            ";
+        }   
+
+        $select = $this->db_easyA->query($sql);
+        
+        $model = new DingTalk;
+        foreach ($select as $key => $val) {
+            // dump($val);
+            // $this->getReadsHandle_auto_handle($val['id']);
+            $res = json_decode($model->getsendresult($val['task_id']), true);
+            // dump($res);
+            try {
+                if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                    // 已读
+                    if (count($res['send_result']['read_user_id_list']) > 0) {
+                        $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                        $this->db_easyA->execute("
+                            UPDATE 
+                                dd_temp_excel_user_success 
+                            SET 
+                                已读 = 'Y'
+                            WHERE 1
+                                AND task_id = '{$val['task_id']}'
+                                AND userid in ($reads)
+                        ");
+                        $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'Y',
+                        ]);
+                    } else {
+                        $update = $this->db_easyA->table('dd_customer_push_weather')->where([
+                            ['task_id', '=', $val['task_id']],
+                        ])->update([
+                            '已读' => 'N',
+                        ]);
+                    }
     
+                } else {
+                    return json(['code' => 0, 'msg' => '数据异常']);
+                }
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+
+        }
+    }
 }

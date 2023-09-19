@@ -69,7 +69,7 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
-    // 标准1
+    // 标准1  标准文件上传到 cwl_shangguitips_biaozhun_no 通过该方法更新到 cwl_shangguitips_biaozhun
     public function biaozhun() {
         // 去掉未开业，闭店
         $sql = "

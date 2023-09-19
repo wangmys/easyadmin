@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>工作通知列表</title>
+    <title>店铺未来天气推送列表</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -108,34 +108,22 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <!-- <div class="flex col between al-start" style="width:95%; height: 70px;">
+                    <div class="flex col between al-start" style="width:95%; height: 35px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">日期</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-yc" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-hh" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-customer" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营模式</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-jyms" class="xm-select-demo"></div>
+                                <input type="text" name="更新日期" class="layui-input" id="setTime1" value="{$today}" placeholder="yyyy-MM-dd" lay-verify="required">
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                     <div></div>
 
-                    <div class="flex row between" style="width:10%; height:35px;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userBtn"
-                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">负责人名单
+                    <div class="flex row between" style="width:160px; height:35px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="getReadsBtn"
+                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">阅读状态
                         </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="addBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">添加记录
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="searchBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询记录
                         </button>
 
                     </div>
@@ -146,7 +134,9 @@
 
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
-            <div class="title_text2" style="text-align: center; color:#0051ff;">钉钉工作通知推列表  <a class="dateStr"></a></div>
+            <div class="title_text2" style="text-align: center; color:#0051ff;">
+            店铺未来天气推送列表（<span style="color:red;">未读：<a class="noReadsNum" style="color:red;"></a></span>&nbsp;&nbsp;<span style="color:rgb(10, 112, 32);">已读：<a class="readsNum" style="color:rgb(10, 112, 32);"></a></span>）
+             </div>
         </table>
     </div>
 </body>
@@ -157,6 +147,11 @@
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/html" id="introduceHtml">
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
+</script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="download">导出未读</button>
+    </div>
 </script>
 <script>
     var sendDingImg = function (id, title) {
@@ -174,13 +169,15 @@
             , layer = layui.layer
             , table = layui.table
             , laydate = layui.laydate
-            , url_index = "{:url('admin/system.dingding.Uploadimg/index')}"
-            , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}"
-            , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
-            , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
-            , recallImgHandle = "{:url('admin/system.dingding.Uploadimg/recallImgHandle')}"
-            , getReadsHandle = "{:url('admin/system.dingding.Uploadimg/getReadsHandle')}"
-            , url1 = "{:url('admin/system.dingding.Uploadimg/list')}"; 
+            , url_index = ""
+            , url_user = ""
+            , url_DingUsers = ""
+            , sendDingImgHandle = ""
+            , today = '{$today}'
+            , downloadUrl = "{:url('admin/system.dingding.Weather/download_noreads')}"
+            , recallImgHandle = "{:url('admin/system.dingding.Weather/recallImgHandle')}"
+            , getReadsHandle = "{:url('admin/system.dingding.Weather/getReads_auto')}"
+            , url1 = "{:url('admin/system.dingding.Weather/list')}"; 
 
         // 表1初始化
         startTable();
@@ -188,7 +185,7 @@
 
         // 日期选择器
         laydate.render({
-            elem: '#shangshiriqi'
+            elem: '#setTime1'
         });
 
         function initFn() {
@@ -222,28 +219,67 @@
         }
 
         //监听保存
-        form.on('submit(userBtn)', function (data) {
-            
-            var testFram = layer.open({
-                title: '店铺负责人钉钉信息'
-                ,type: 2
-                ,area: ['100%', '100%'] // 100%全屏
-                ,content: url_DingUsers
+        form.on('submit(getReadsBtn)', function (data) {
+            var datetime = data.field['更新日期'];
+            var limit = data.field.limit;
+            //询问框
+            layer.confirm(`是否更新【${datetime}】的阅读状态？1-3分钟，请耐心等待`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                // layer.close();
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+                $.post(getReadsHandle, {'更新日期': datetime}, function(res) {  
+                    table.reload('table2', {
+                        where: {'更新日期': datetime, 'limit': limit}
+                        , method: 'post'
+                        , url: url1
+                        , loading: true
+                        , page: true
+                        , limit: limit
+                        ,done: function(res){
+                            layui.use('layer', function () {
+                                setTimeout(function () {
+                                    layui.layer.closeAll();
+                                }, 0);
+                            });
+                            today = datetime;
+                            $('.readsNum').text(res.readsData.reads);
+                            $('.noReadsNum').text(res.readsData.noReads);
+                        }
+                    })
+                })
+            }, function(){
+                console.log('关闭');
+                layer.close();
             });
-            // layer.close(index)
             return false; 
         });
 
         //监听保存
-        form.on('submit(addBtn)', function (data) {
-            
-            var testFram = layer.open({
-                title: '添加定推信息'
-                ,type: 2
-                ,area: ['40%', '70%'] // 100%全屏
-                ,content: url_index
-            });
-            // layer.close(index)
+        form.on('submit(searchBtn)', function (data) {
+            var datetime = data.field['更新日期'];
+            table.reload('table2', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                    , page: true
+                    , limit: data.field.limit
+                    ,done: function(res){
+                        today = datetime;
+                        $('.readsNum').text(res.readsData.reads);
+                        $('.noReadsNum').text(res.readsData.noReads);
+                    }
+                })
             return false; 
         });
 
@@ -286,7 +322,7 @@
             var title = window.localStorage.getItem('sendDingImg_title');
 
             //询问框
-            layer.confirm(`是否撤回【${title}】`, {
+            layer.confirm(`是否撤回${title}的消息推送`, {
                 btn: ['是的','再想想'] //按钮
             }, function(data){
                 // layer.close();
@@ -357,16 +393,20 @@
             return false; 
         }
 
-        window.previewImg = function(obj) {
+        window.previewImg = function(path) {
             var img = new Image();
-            img.src = obj.src;
-            var height=img.height,width=img.width;
-            if(img.height > 600) {
-                height = '600px';
-                width=(600/(img.height))*(img.width);
-            }
+            img.src = path;
+            // var height=img.height,width=img.width;
+            var height = 277;
+            var width = 307;
+
+            // if(img.height > 600) {
+            //     height = '600px';
+            //     width=(600/(img.height))*(img.width);
+            // }
         
-            var imgHtml = "<img src='" + obj.src + "' height='"+height+"' width='"+width+"' />";
+            var imgHtml = "<img src='" + path + "' height='"+height+"' width='"+width+"' />";
+            console.log(imgHtml);
             //弹出层
             layer.open({
                 type: 1,
@@ -382,6 +422,28 @@
             });
         }
 
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            // uid = window.localStorage.getItem('sendDingImg_uid');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl + '?date=' + today;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
 
         // 单店不动销数据统计 
         function startTable() {
@@ -395,58 +457,39 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                , toolbar: '#toolbar1'
                 , page: true
-                , limit: 100
+                , limit: 1000
                 , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
                 , height: height
-                , where: {}
+                , where: {'更新日期': '{$today}'}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: 'aname', title: '创建人', align:'center' }
-                    ,{ field: 'title', title: '标题', align:'center' }
-                    ,{ field: 'path', title: '图片' , align:'center' , templet:
+                    { field: '店铺名称', title: '店铺名称', align:'center' }
+                    ,{ field: 'name', title: '接收方', align:'center' }
+                    ,{ field: 'title', title: '职位' , align:'center'}
+                    ,{ field: 'mobile', title: '手机' , align:'center'}
+                    // ,{ field: 'title', title: '职位' , align:'center' , templet:
+                    // function (data) {
+                    //     // console.log(data)
+                    //     return `
+                    //         <img src="${data.path}" style="height:50px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
+                    //     `; 
+                    // }}
+                    , { title: '图片', align:'center', templet:
                     function (data) {
-                        // console.log(data)
+                        // console.log(data.title)
                         return `
-                            <img src="${data.path}" style="height:50px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
-                        `; 
-                    }}
-                    , { field: '接收方', title: '接收方', align:'center', templet:
-                    function (data) {
-                        console.log(data.title)
-                        return `
-                            <span style="cursor:pointer;" onClick="viewUsers('${data['uid']}', '${data['title']}')">
+                            <span style="cursor:pointer;" onClick="previewImg('${data['path']}')">
                                 查看
                             </span>
+                            
                         `; 
                     }}
-                    , {title: `<span style="color:red;">未读</span> / <span style="color:blue;">已读</span> / <span style="color:green;">总数</span>`, align:'center', templet:
-                    function (data) {
-                        console.log(data.title)
-                        var readNums = 0;
-                        var unReadNums = 0;
-                        var totalReadNums = 0;
-                        if (data['已读'] && data['已读'] > 0) {
-                            readNums = data['已读'];
-                        }
-                        if (data['未读'] && data['未读'] > 0) {
-                            unReadNums = data['未读'];
-                        }
-                        totalReadNums = readNums + unReadNums;
-                        return `
-                            <span style="color:red;">${unReadNums}</span> / <span style="color:blue;">${readNums}</span> / <span style="color:green;">${totalReadNums}</span>  
-                        `; 
-                    }}
-                    , { field: 'sendtimes', title: '推送次数', align:'center', templet:
-                        function (data) {
-                            var res = data.sendtimes > 0 ? `<span style="color:red; font-weight:bold;">${data.sendtimes}</span>` : data.sendtimes;
-                            return res; 
-                        }}
-                    , { field: 'createtime', title: '创建时间', align:'center' } 
+                    , { field: '更新日期', title: '日期', align:'center' } 
                     , { field: 'sendtime', title: '发送时间', align:'center' } 
-                    , { field: '撤回时间', title: '撤回时间', align:'center' } 
-                    , { title: '状态', align:'center', templet:
+                    // , { field: '撤回时间', title: '撤回时间', align:'center' } 
+                    , { title: '发送状态', align:'center', templet:
                         function (data) {
                             var html = '';
                             if (data.sendtime && !data['撤回时间']) {
@@ -455,46 +498,45 @@
                                 `;
                             } else if (data['撤回时间'])  {
                                 html = `
-                                <span style="color:red;">已撤回</span>
+                                <span style="color:orange;">已撤回</span>
                                 `;
                             } else  {
                                 html = `
-                                    未发送
+                                <span style="color:red;">未发送</span>
                                 `;
                             }
                             return html; 
                         }}
-                    , { title: '操作', align:'center', templet:
-                        function (data) {
-                            console.log(data.title)
-                            var html = `
-                                <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
-                                letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
-                                    推送
-                                </button>
-                            `;
-                            if (data.task_id) {
-                                var html = `
-                                    <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
-                                        推送
-                                    </button>
-                                    <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
-                                        撤回
-                                    </button>
-                                    <button class="getReadsBtn layui-btn layui-btn-xs" style="background: blue;
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '${data['title']}')">
-                                        未/已读
-                                    </button>
-                                `;
-                            }
-                            return html; 
-                        }}
+                    , { title: '阅读状态', align:'center', templet:
+                    function (data) {
+                        var str = '';
+                        if (data['已读'] == 'Y') {
+                            str = '<span style="color:blue">已读</span>';
+                        } else if (data['已读'] != 'Y' && data.sendtime) {
+                            str = '<span style="color:red">未读</span>';
+                        }
+                        return str; 
+                    }}
+                    // , { title: '操作', align:'center', templet:
+                    //     function (data) {
+                    //         var html = `
+                    //         `;
+                    //         if (data.task_id) {
+                    //             var html = `
+                    //                 <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
+                    //                 letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendDingImg('${data['id']}', '【${data['店铺名称']}】${data['name']}')">
+                    //                     撤回
+                    //                 </button>
+                    //             `;
+                    //         }
+                    //         return html; 
+                    //     }}
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
-                    console.log(res);
+                    // console.log(res);
+                    $('.readsNum').text(res.readsData.reads);
+                    $('.noReadsNum').text(res.readsData.noReads);
                 }
             });
         }

@@ -198,6 +198,26 @@ return [
             // 数据库表前缀
             'prefix'            => Env::get('database5.prefix', ''),
         ],
+        'wechat' => [
+            // 数据库类型
+            'type'              => 'mysql',
+            // 服务器地址
+            'hostname'          => 'bx.babiboy.com',
+            // 数据库名
+            'database'          => 'wechat',
+            // 用户名
+            'username'          => 'wechat',
+            // 密码
+            'password'          => 'sokodidi',
+            // 端口
+            'hostport'          => '3306',
+            // 数据库连接参数
+            'params'            => [],
+            // 数据库编码默认采用utf8
+            'charset'           => 'utf8',
+            // 数据库表前缀
+            'prefix'            => '',
+        ],
         // 更多的数据库配置信息
     ],
 ];

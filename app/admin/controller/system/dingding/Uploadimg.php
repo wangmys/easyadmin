@@ -833,7 +833,7 @@ class Uploadimg extends AdminController
         // $find_list = $this->db_easyA->table('dd_userimg_list')->where([
         //     ['id', '=', $input['id']],
         // ])->find();
-        $hour24 = date('Y-m-d H:i:s', strtotime('-2day', time()));
+        $hour24 = date('Y-m-d H:i:s', strtotime('-1day', time()));
         $sql = "
             SELECT id FROM dd_userimg_list
             WHERE
@@ -944,9 +944,12 @@ class Uploadimg extends AdminController
         ";
         $select = $this->db_easyA->query($sql);
         $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
+        if ($select) {
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
         }
+
         return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
