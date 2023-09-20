@@ -96,7 +96,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     toolbar:[
                         [
                             {
-                                text: '<b style="color:black;font-size:25px;">店铺温度是定时获取,会存在与天气网的实时温度存在偏差,请各位知悉</b>',
+                                text: '<b style="color:black;font-size:25px;">店铺温度是定时获取,会与天气网的实时温度存在偏差,请各位知悉</b>',
                                 method: 'none',
                                 auth: '',
                                 class: 'layui-badge layui-bg-red',
