@@ -90,6 +90,30 @@ class Jianheskc extends BaseController
                 $insert = $this->db_easyA->table('cwl_jianhe_stock_skc')->strict(false)->insertAll($val);
             }
 
+            $sql_update1 = "
+                update cwl_jianhe_stock_skc
+                    set 
+                        修订季节 = right(二级时间分类, 1),
+                        修订风格 = left(调整风格, 2),
+                        合并 = concat(二级时间分类,调整风格,一级分类,二级分类,分类)
+                    where 1
+            ";
+            $this->db_easyA->execute($sql_update1);
+
+            $sql_update2 = "
+                update cwl_jianhe_stock_skc as sk
+                LEFT JOIN (
+                    SELECT
+                        分类,修订分类
+                    FROM	cwl_jianhe_skc_biaozhun_1 where 分类 is not null group by 分类
+                ) as b ON sk.分类 = b.分类
+                set 
+                    sk.修订分类 = b.修订分类
+                where 
+                    sk.修订分类 is null
+            ";
+            $this->db_easyA->execute($sql_update2);
+
             return json([
                 'status' => 1,
                 'msg' => 'success',

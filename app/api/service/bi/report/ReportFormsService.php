@@ -4534,14 +4534,15 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD
-    public function create_table_s115A($type = "加盟") {
+    public function create_table_s115A($type = "加盟", $date) {
+        $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115A';
-        if (date('Y-m-d') == '2023-06-22') {
+        if ($date == '2023-09-17') {
             $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
+        } elseif ($date == '2023-09-18') {
             $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
+        } elseif ($date == '2023-09-19') {
             $fday = 3;
         } else {
             echo '活动已结束';
@@ -4588,7 +4589,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "{$type}老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'title' => "{$type}老店【国庆假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4606,14 +4607,16 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD
-    public function create_table_s115B() {
+    public function create_table_s115B($date) {
+        $date = $date ?: date('Y-m-d');
+
         // 编号
         $code = 'S115B';
-        if (date('Y-m-d') == '2023-06-22') {
+        if ($date == '2023-09-17') {
             $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
+        } elseif ($date == '2023-09-18') {
             $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
+        } elseif ($date == '2023-09-19') {
             $fday = 3;
         } else {
             echo '活动已结束';
@@ -4663,7 +4666,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "省份老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'title' => "省份老店【国庆假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4681,14 +4684,15 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD 端午节平均单店流水对比-单日
-    public function create_table_s115C() {
+    public function create_table_s115C($date) {
+        $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115C';
-        if (date('Y-m-d') == '2023-06-22') {
+        if ($date == '2023-09-17') {
             $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
+        } elseif ($date == '2023-09-18') {
             $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
+        } elseif ($date == '2023-09-19') {
             $fday = 3;
         } else {
             echo '活动已结束';
@@ -4732,7 +4736,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "【端午假期】平均单店流水对比-单日 [" . date("Y-m-d") . ']',
+                'title' => "【国庆假期】平均单店流水对比-单日 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4750,15 +4754,32 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD 端午节平均单店流水对比-累计
-    public function create_table_s115D() {
+    public function create_table_s115D( $date) {
         // 编号
         $code = 'S115D';
+        $date = $date ?: date('Y-m-d');
+
+        if ($date == '2023-09-17') {
+            $fday = 1;
+        } elseif ($date == '2023-09-18') {
+            $fday = 2;
+        } elseif ($date == '2023-09-19') {
+            $fday = 3;
+        } else {
+            echo '活动已结束';
+            die;
+        }
         $sql = "
             select 
-                经营属性
+                经营属性 as 性质,
+                23VS22,
+                23VS21,
+                今日流水,
+                22年同期,
+                21年同期
             from cwl_festival_duanwu_table4 
-            WHERE 
-                1
+            WHERE 1
+                
         ";
         $list = $this->db_easyA->query($sql);
         // dump($list);die;
@@ -4773,30 +4794,31 @@ class ReportFormsService
             }
             $field_width[0] = 30;
             $field_width[1] = 80;
+
     
             //图片左上角汇总说明数据，可为空
             $table_explain = [
                 // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
                 0 => "  "
             ];
-    
+
             //参数
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "test",
+                'title' => "【国庆假期】平均单店流水对比-累计 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' =>  $code ,
+                'banben' => '          编号: ' . $code ,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
             // 生成图片
-            return $this->create_table($params);
+            return $this->create_image($params);
         } else {
             return false;
         }

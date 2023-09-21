@@ -147,7 +147,6 @@ class SendReport extends BaseController
                 return $res;
             }
         } elseif ($name =='S113') {
-
             $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             
@@ -163,13 +162,13 @@ class SendReport extends BaseController
             $this->service->create_table_s114();
         } elseif ($name == 'S115A') {
             $type = input('type');
-            $this->service->create_table_s115A($type);
+            $this->service->create_table_s115A($type, $date);
         } elseif ($name == 'S115B') {
-            $this->service->create_table_s115B();
+            $this->service->create_table_s115B($date);
         } elseif ($name == 'S115C') {
-            $this->service->create_table_s115C();
+            $this->service->create_table_s115C($date);
         } elseif ($name == 'S115D') {
-            $this->service->create_table_s115D();
+            $this->service->create_table_s115D($date);
         } elseif ($name == 'S116') {
             $this->service->create_table_s116($date);
         } elseif ($name == 'S117') {
