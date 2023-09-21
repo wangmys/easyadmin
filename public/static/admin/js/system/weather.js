@@ -93,7 +93,18 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     search:true,
                     height: 855,
                     limit: 1000,
-                    toolbar:[],
+                    toolbar:[
+                        [
+                            {
+                                text: '<b style="color:black;font-size:25px;">店铺温度是定时获取,会与天气网的实时温度存在偏差,请各位知悉</b>',
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-badge layui-bg-red',
+                                event:'guangzhou'
+                            }
+                        ]
+
+                    ],
                     limits:[1000,2000,3000],
                     cols: [cols],
                     done:function (res, curr, count) {

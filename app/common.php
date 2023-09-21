@@ -575,3 +575,22 @@ function uuid($str='')
     return $str.date('YmdHis').uniqid().rand(1000,9999);
 }
 
+//根据第几周获取当周的开始日期与最后日期
+function getWeekDate($year, $weeknum)
+{
+        $firstdayofyear = mktime(0, 0, 0, 1, 1, $year);
+        $firstweekday = date('N', $firstdayofyear);
+        $firstweenum = date('W', $firstdayofyear);
+        if ($firstweenum == 1) {
+            $day = (1 - ($firstweekday - 1)) + 7 * ($weeknum - 1);
+            $startdate = date('Y-m-d', mktime(0, 0, 0, 1, $day, $year));
+            $enddate = date('Y-m-d', mktime(0, 0, 0, 1, $day + 6, $year));
+        } else {
+            $day = (9 - $firstweekday) + 7 * ($weeknum - 1);
+            $startdate = date('Y-m-d', mktime(0, 0, 0, 1, $day, $year));
+            $enddate = date('Y-m-d', mktime(0, 0, 0, 1, $day + 6, $year));
+        }
+ 
+        return array($startdate, $enddate);
+}
+

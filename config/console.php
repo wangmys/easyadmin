@@ -12,6 +12,8 @@ return [
         'action'    => 'app\common\command\Action',
         'stock' => 'app\command\Stock',
         'stock2' => 'app\command\Stock2',
+        'stock_week_date' => 'app\command\Stock_week_date',
+        'stock_week' => 'app\command\Stock_week',
         'duanma_sk' => 'app\command\Duanma_sk',
         'stock_size' => 'app\command\Stock_size',
         'sendpic' => 'app\command\Sendpic',
