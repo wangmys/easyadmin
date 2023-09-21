@@ -524,16 +524,34 @@ class Festival extends BaseController
                 t.省份,t.经营属性,t.节日日期,节日天数,
                 t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
                 t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
-                t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
                 t.前年同日销额,
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比去年,
                 t.今日销额同比前年,
-                t.前年累销额,
-                t.去年累销额,
-                t.今年累销额
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
+
+
+                -- t.前年累销额,
+                -- t.去年累销额,
+                -- t.今年累销额,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长
             from(
                 SELECT
                     省份,经营属性,节日日期,节日天数,
@@ -559,10 +577,11 @@ class Festival extends BaseController
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
                             AND `销售金额2021` is not null
-                    ) as 今日销额同比前年,
-                    sum(前年累销额) as 前年累销额,	
-                    sum(去年累销额) as 去年累销额,
-                    sum(今年累销额) as 今年累销额
+                    ) as 今日销额同比前年
+                    -- ,
+                    -- sum(前年累销额) as 前年累销额,	
+                    -- sum(去年累销额) as 去年累销额,
+                    -- sum(今年累销额) as 今年累销额
                 FROM
                     cwl_festival_statistics as m
                 WHERE
@@ -578,6 +597,9 @@ class Festival extends BaseController
         // 插        
         $insert_jiameng = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng);
     
+
+        // die;
+
         // 加盟合计 
         $sql_jiameng_total = "
             select 
@@ -586,27 +608,37 @@ class Festival extends BaseController
                 t.节日日期,t.节日天数,
                 t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
                 t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
-                t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
                 t.前年同日销额,
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比前年,
                 t.今日销额同比去年,
-                t.前年累销额,
-                t.去年累销额,
-                t.今年累销额
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
             from
             (select 
-                经营属性,节日日期,节日天数,
+                省份,经营属性,节日日期,节日天数,
                 sum(前年同日销额) AS 前年同日销额,
                 sum(去年同日销额) AS 去年同日销额,
                 sum(今日销额) AS 今日销额,
                 sum(今日销额同比去年) AS 今日销额同比去年,
-                sum(今日销额同比前年) as 今日销额同比前年,
-                sum(前年累销额) AS 前年累销额,
-                sum(去年累销额) AS 去年累销额,
-                sum(今年累销额) AS 今年累销额
+                sum(今日销额同比前年) as 今日销额同比前年
             from cwl_festival_statistics_province where 节日天数= {$this->节日天数} and 经营属性 in ('加盟')) as t       
         ";
 
@@ -615,23 +647,36 @@ class Festival extends BaseController
         // 加盟合计 删
         $insert_jiameng_total = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng_total);
         
-        
+        // die;
         // 直营总省
         $sql_zhiying = "
             select t.
                 t.省份,t.经营属性,t.节日日期,节日天数,
                 t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
                 t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
-                t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
                 t.前年同日销额,
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比去年,
                 t.今日销额同比前年,
-                t.前年累销额,
-                t.去年累销额,
-                t.今年累销额
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
             from(
                 SELECT
                     省份,经营属性,节日日期,节日天数,
@@ -657,10 +702,7 @@ class Festival extends BaseController
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
                             AND `销售金额2022` is not null
-                    ) as 今日销额同比去年,
-                    sum(前年累销额) as 前年累销额,	
-                    sum(去年累销额) as 去年累销额,
-                    sum(今年累销额) as 今年累销额
+                    ) as 今日销额同比去年
                 FROM
                     cwl_festival_statistics as m 
                 WHERE
@@ -684,27 +726,37 @@ class Festival extends BaseController
                 t.节日日期,t.节日天数,
                 t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
                 t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
-                t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
                 t.前年同日销额,
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比前年,
                 t.今日销额同比去年,
-                t.前年累销额,
-                t.去年累销额,
-                t.今年累销额
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
             from
             (select 
-                经营属性,节日日期,节日天数,
+                省份,经营属性,节日日期,节日天数,
                 sum(前年同日销额) AS 前年同日销额,
                 sum(去年同日销额) AS 去年同日销额,
                 sum(今日销额) AS 今日销额,
                 sum(今日销额同比前年) as 今日销额同比前年,
-                sum(今日销额同比去年) as 今日销额同比去年,
-                sum(前年累销额) AS 前年累销额,
-                sum(去年累销额) AS 去年累销额,
-                sum(今年累销额) AS 今年累销额
+                sum(今日销额同比去年) as 今日销额同比去年
             from cwl_festival_statistics_province where 节日天数= {$this->节日天数} and 经营属性 in ('直营')) as t       
         ";
 
@@ -722,27 +774,37 @@ class Festival extends BaseController
                 t.节日日期,t.节日天数,
                 t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
                 t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
-                t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
                 t.前年同日销额,
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比前年,
                 t.今日销额同比去年,
-                t.前年累销额,
-                t.去年累销额,
-                t.今年累销额
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
             from
             (select 
-                经营属性,节日日期,节日天数,
+                省份,经营属性,节日日期,节日天数,
                 sum(前年同日销额) AS 前年同日销额,
                 sum(去年同日销额) AS 去年同日销额,
                 sum(今日销额) AS 今日销额,
                 sum(今日销额同比前年) as 今日销额同比前年,
-                sum(今日销额同比去年) as 今日销额同比去年,
-                sum(前年累销额) AS 前年累销额,
-                sum(去年累销额) AS 去年累销额,
-                sum(今年累销额) AS 今年累销额
+                sum(今日销额同比去年) as 今日销额同比去年
             from cwl_festival_statistics_province 
                 where 节日天数= {$this->节日天数} 
                 and 经营属性 in ('直营', '加盟')
@@ -754,6 +816,16 @@ class Festival extends BaseController
         $select_zongji = $this->db_easyA->query($sql_zongji);
         // 直营合计 插
         $insert_zongji  = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zongji);
+
+        $sql_更新 = "
+            update `cwl_festival_statistics_province`
+            set
+                前年累计增长 = 今年累销额同比前年 / 前年累销额 - 1,
+                去年累计增长 = 今年累销额同比去年 / 去年累销额 - 1
+            where
+                1
+        ";
+        $this->db_easyA->execute($sql_更新);
 
         return json([
             'status' => 1,
