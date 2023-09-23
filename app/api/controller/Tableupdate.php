@@ -1010,6 +1010,46 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 更新 窗数
+    public function getChuangshu() {
+        $sql = "
+            SELECT
+                *
+            FROM
+                sp_skc_sz_detail
+            WHERE 1
+        ";
+        $select = $this->db_bi->query($sql);
+
+        // dump($select_customer);die;
+        // $this->db_bi->getLastSql();
+        if ($select) {
+            $this->db_easyA->table('sp_skc_sz_detail')->where(1)->delete();
+
+            $select_customer = array_chunk($select, 500);
+    
+            foreach($select_customer as $key => $val) {
+                $insert = $this->db_easyA->table('sp_skc_sz_detail')->strict(false)->insertAll($val);
+            }
+    
+            if ($select_customer) {
+                // $this->db_bi->commit();    
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'easyadmin2 sp_skc_sz_detail 更新成功！'
+                ]);
+            } else {
+                // $this->db_bi->rollback();   
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'easyadmin2 sp_skc_sz_detail 更新失败！'
+                ]);
+            }   
+        }
+    }
+
     // 拉取 sjp_goods
     public function sjp_goods() {
         // 查询bi
