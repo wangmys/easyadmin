@@ -1511,12 +1511,17 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_table1_1')->where([
                 '更新日期' => $date
             ])->delete();
+
+            $this->db_bi->table('cwl_duanmalv_table1_1')->where([
+                '更新日期' => $date
+            ])->delete();
             // die;
             $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+                $insert = $this->db_bi->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
             }
             $this->table1_1_sort();   
 
