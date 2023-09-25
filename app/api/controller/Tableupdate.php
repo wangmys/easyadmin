@@ -144,6 +144,37 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 更新货品资料
+    public function getHpzl($date = '')
+    {
+        // $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
+        $sql = "
+            SELECT
+                *
+            FROM
+                sp_ww_hpzl 
+            WHERE
+                1
+        ";
+        $list = $this->db_bi->query($sql);
+
+        if ($list) {
+            // $this->db_easyA->table('sp_ww_hpzl')->where([
+            //     ['更新日期', '=', $date]
+            // ])->delete();
+            $this->db_easyA->execute('TRUNCATE sp_ww_hpzl;');
+
+            // 入库
+            $this->db_easyA->table('sp_ww_hpzl')->strict(false)->insertAll($list);
+
+            $select_chunk = array_chunk($list, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $this->db_easyA->table('sp_ww_hpzl')->strict(false)->insertAll($val);
+            }
+        }
+    }
+
     // 门店业绩环比报表  http://www.easyadmin1.com/api/tableupdate/s113?date=2023-07-14
     public function s113($date = '')
     {
