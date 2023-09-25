@@ -4538,7 +4538,7 @@ class ReportFormsService
     // 端午节统计 ABCD
     // api/report.sendreport/create_test?name=S115A&type=加盟
 
-    public function create_table_s115A($date, $type = "加盟") {
+    public function create_table_s115A($type = "加盟", $date) {
         $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115A';
@@ -4596,11 +4596,17 @@ class ReportFormsService
                 0 => "【{$type}】"
             ];
     
+
+            if ($type == '加盟') {
+                $filename = $code . 'jm.jpg';
+            } else {
+                $filename = $code . 'zy.jpg';
+            }
             //参数
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . '.jpg',   //保存的文件名
+                'file_name' => $filename,   //保存的文件名
                 'title' => "{$type}老店【国庆假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,

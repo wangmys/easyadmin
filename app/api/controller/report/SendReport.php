@@ -162,7 +162,7 @@ class SendReport extends BaseController
             $this->service->create_table_s114();
         } elseif ($name == 'S115A') {
             $type = input('type');
-            $this->service->create_table_s115A($date, $type);
+            $this->service->create_table_s115A($type, $date);
         } elseif ($name == 'S115B') {
             $this->service->create_table_s115B($date);
         } elseif ($name == 'S115C') {
@@ -1091,6 +1091,59 @@ class SendReport extends BaseController
             }
         }
         return json($res);
+    }
+
+
+    public function send_festival()
+    {
+        $name = '\app\api\service\DingdingService';
+        $model = new $name;
+        $send_data = [
+            'S115Ajm' => [
+                'title' => '加盟老店【国庆假期】业绩同比 表号:S115A',
+                // 'title' => '测试S108A',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Ajm.jpg?v=" . time()
+            ],
+            'S115Azy' => [
+                'title' => '直营老店【国庆假期】业绩同比 表号:S115A',
+                // 'title' => '测试S108B',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Azy.jpg?v=" . time()
+            ],
+            'S115B' => [
+                'title' => '省份老店【国庆假期】业绩同比 表号:S115B',
+                // 'title' => '测试S109',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115B.jpg?v=" . time()
+            ],
+        ];
+
+        // dump($send_data);
+        // die;
+        $res = [];
+        foreach ($send_data as $k=>$v){
+            $headers = get_headers($v['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // echo $v['title'];
+                // echo '<br>';
+            }
+        }
+        return json($res);
+    }
+
+    public function run_festival()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', time());
+        $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1";
+        http_get($url);
+
+        $this->service->create_table_s115A('直营', $date);
+        $this->service->create_table_s115A('加盟', $date);
+        $this->service->create_table_s115B($date);
+
+        // 发送数据报表
+        $this->send_festival();
     }
 
 }
