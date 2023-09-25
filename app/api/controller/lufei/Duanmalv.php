@@ -543,6 +543,8 @@ class Duanmalv extends BaseController
                     sk.货号
                 -- limit 100    
         ";
+
+        // die;
 		
         $select_sk = $this->db_bi->query($sql);
         $count = count($select_sk);

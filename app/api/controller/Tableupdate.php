@@ -109,17 +109,17 @@ class Tableupdate extends BaseController
                 ['日期', '=', $date]
             ])->delete();
 
-            $this->db_bi->startTrans();
+            // $this->db_bi->startTrans();
             $insertAll = $this->db_bi->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
-                $this->db_bi->commit();
+                // $this->db_bi->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "店铺业绩环比数据源 更新成功，{$date}！"
                 ]);
             } else {
-                $this->db_bi->rollback();
+                // $this->db_bi->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -129,12 +129,27 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
+    public function bi_dianpuyejihuanbi_everyday() {
+        $date = date('Y-m-01');
+        $select = $this->db_bi->query("
+            select 日期 from ww_dianpuyejihuanbi_data where 日期>= '{$date}' group by 日期
+        ");
+
+        foreach ($select as $key => $val) {
+            // http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+            $url = "http://im.babiboy.com/api/Tableupdate/bi_dianpuyejihuanbi_data?date=" . $val['日期'];
+            
+            http_get($url);
+        }
+    }
+
     // 门店业绩环比报表  http://www.easyadmin1.com/api/tableupdate/s113?date=2023-07-14
     public function s113($date = '')
     {
         // 编号
         $code = 'S113';
-        echo $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
+        $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
         $sql = "
             SELECT
                 IFNULL(经营属性, '总计') AS 性质,
