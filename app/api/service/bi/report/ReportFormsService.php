@@ -4480,7 +4480,8 @@ class ReportFormsService
                 供应商名称,
                 单号 as 采购入库指令单,
                 发出天数,
-                数量 as 发货数量
+                数量 as 发货数量,
+                备注
             FROM `sp_warehouse_ws_cangjiafahuo` where 
                         YEAR(审批时间) = 2023
                         AND (仓库名称 IN ('广州云仓', '南昌云仓', '武汉云仓', '长沙云仓') OR 仓库名称='贵阳云仓' AND `发出天数`>= 8)
@@ -4499,8 +4500,9 @@ class ReportFormsService
             $field_width[0] = 30;
             $field_width[1] = 160;
             $field_width[2] = 90;
-            $field_width[3] = 90;
+            $field_width[3] = 160;
             $field_width[4] = 160;
+            $field_width[7] = 160;
             // $field_width[7] = 110;
             // $field_width[8] = 110;
             // $field_width[4] = 90;
@@ -4534,16 +4536,17 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD
-    public function create_table_s115A($type = "加盟", $date) {
+    // api/report.sendreport/create_test?name=S115A&type=加盟
+
+    public function create_table_s115A($date, $type = "加盟") {
         $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115A';
-        if ($date == '2023-09-17') {
-            $fday = 1;
-        } elseif ($date == '2023-09-18') {
-            $fday = 2;
-        } elseif ($date == '2023-09-19') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4556,9 +4559,18 @@ class ReportFormsService
             concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
             concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
             concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
-            round(销售金额2021, 1) as 前年同日销额,
-            round(销售金额2022, 1) as 去年同日销额,
-            round(销售金额2023, 1) as 今日销额,
+            case
+                when 销售金额2021 !=0 then round(销售金额2021, 1) else ''
+            end as 前年同日销额,
+            case
+                when 销售金额2022 !=0 then round(销售金额2022, 1) else ''
+            end as 去年同日销额,
+            case
+                when 销售金额2023 !=0 then round(销售金额2023, 1) else ''
+            end as 今日销额,
+            -- round(销售金额2021, 1) as 前年同日销额,
+            -- round(销售金额2022, 1) as 去年同日销额,
+            -- round(销售金额2023, 1) as 今日销额,
             round(前年累销额, 1) as 前年累销额,
             round(去年累销额, 1) as 去年累销额,
             round(今年累销额, 1) as 今年累销额
@@ -4612,12 +4624,11 @@ class ReportFormsService
 
         // 编号
         $code = 'S115B';
-        if ($date == '2023-09-17') {
-            $fday = 1;
-        } elseif ($date == '2023-09-18') {
-            $fday = 2;
-        } elseif ($date == '2023-09-19') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4635,7 +4646,8 @@ class ReportFormsService
                 round(今日销额, 1) as 今日销额,
                 round(前年累销额, 1) as 前年累销额,
                 round(去年累销额, 1) as 去年累销额,
-                round(今年累销额, 1) as 今年累销额
+                round(今年累销额同比前年, 1) as 今年累销额同比前年,
+                round(今年累销额同比去年, 1) as 今年累销额同比去年
             from cwl_festival_statistics_province 
             WHERE 
                 节日天数='{$fday}' 
@@ -4654,6 +4666,8 @@ class ReportFormsService
             $field_width[0] = 30;
             $field_width[1] = 50;
             $field_width[2] = 50;
+            $field_width[12] = 150;
+            $field_width[13] = 150;
     
             //图片左上角汇总说明数据，可为空
             $table_explain = [
@@ -4688,12 +4702,11 @@ class ReportFormsService
         $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115C';
-        if ($date == '2023-09-17') {
-            $fday = 1;
-        } elseif ($date == '2023-09-18') {
-            $fday = 2;
-        } elseif ($date == '2023-09-19') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4759,12 +4772,11 @@ class ReportFormsService
         $code = 'S115D';
         $date = $date ?: date('Y-m-d');
 
-        if ($date == '2023-09-17') {
-            $fday = 1;
-        } elseif ($date == '2023-09-18') {
-            $fday = 2;
-        } elseif ($date == '2023-09-19') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;

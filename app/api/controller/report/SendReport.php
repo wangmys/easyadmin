@@ -162,7 +162,7 @@ class SendReport extends BaseController
             $this->service->create_table_s114();
         } elseif ($name == 'S115A') {
             $type = input('type');
-            $this->service->create_table_s115A($type, $date);
+            $this->service->create_table_s115A($date, $type);
         } elseif ($name == 'S115B') {
             $this->service->create_table_s115B($date);
         } elseif ($name == 'S115C') {
@@ -706,7 +706,7 @@ class SendReport extends BaseController
         $send_data = [
             'S107' => [
                 'title' => '工厂直发仓库超五天未验收单据 表号:S114',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S114.jpg'
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day')).'/S114.jpg?v=' . time()
             ]
         ];
         // dump($send_data);die;
