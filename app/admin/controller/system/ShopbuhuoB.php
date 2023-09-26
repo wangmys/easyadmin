@@ -1310,7 +1310,7 @@ class ShopbuhuoB extends AdminController
 
     // 调拨测试
     public function redExcel_test_diaobo() {
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/222.xls';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/222.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '调出店铺编号',

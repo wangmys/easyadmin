@@ -109,17 +109,17 @@ class Tableupdate extends BaseController
                 ['日期', '=', $date]
             ])->delete();
 
-            $this->db_bi->startTrans();
+            // $this->db_bi->startTrans();
             $insertAll = $this->db_bi->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
-                $this->db_bi->commit();
+                // $this->db_bi->commit();
                 return json([
                     'status' => 1,
                     'msg' => 'success',
                     'content' => "店铺业绩环比数据源 更新成功，{$date}！"
                 ]);
             } else {
-                $this->db_bi->rollback();
+                // $this->db_bi->rollback();
                 return json([
                     'status' => 0,
                     'msg' => 'error',
@@ -129,12 +129,58 @@ class Tableupdate extends BaseController
         }
     }
 
+    // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
+    public function bi_dianpuyejihuanbi_everyday() {
+        $date = date('Y-m-01');
+        $select = $this->db_bi->query("
+            select 日期 from ww_dianpuyejihuanbi_data where 日期>= '{$date}' group by 日期
+        ");
+
+        foreach ($select as $key => $val) {
+            // http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
+            $url = "http://im.babiboy.com/api/Tableupdate/bi_dianpuyejihuanbi_data?date=" . $val['日期'];
+            
+            http_get($url);
+        }
+    }
+
+    // 更新货品资料
+    public function getHpzl($date = '')
+    {
+        // $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
+        $sql = "
+            SELECT
+                *
+            FROM
+                sp_ww_hpzl 
+            WHERE
+                1
+        ";
+        $list = $this->db_bi->query($sql);
+
+        if ($list) {
+            // $this->db_easyA->table('sp_ww_hpzl')->where([
+            //     ['更新日期', '=', $date]
+            // ])->delete();
+            $this->db_easyA->execute('TRUNCATE sp_ww_hpzl;');
+
+            // 入库
+            $this->db_easyA->table('sp_ww_hpzl')->strict(false)->insertAll($list);
+
+            $select_chunk = array_chunk($list, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $this->db_easyA->table('sp_ww_hpzl')->strict(false)->insertAll($val);
+            }
+        }
+    }
+
     // 门店业绩环比报表  http://www.easyadmin1.com/api/tableupdate/s113?date=2023-07-14
     public function s113($date = '')
     {
         // 编号
         $code = 'S113';
-        echo $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
+        $date = $date ? $date : date("Y-m-d", strtotime("-1 day")); 
         $sql = "
             SELECT
                 IFNULL(经营属性, '总计') AS 性质,
@@ -1005,6 +1051,46 @@ class Tableupdate extends BaseController
                     'status' => 0,
                     'msg' => 'error',
                     'content' => 'easyadmin2 customer_pro 更新失败！'
+                ]);
+            }   
+        }
+    }
+
+    // 更新 窗数
+    public function getChuangshu() {
+        $sql = "
+            SELECT
+                *
+            FROM
+                sp_skc_sz_detail
+            WHERE 1
+        ";
+        $select = $this->db_bi->query($sql);
+
+        // dump($select_customer);die;
+        // $this->db_bi->getLastSql();
+        if ($select) {
+            $this->db_easyA->table('sp_skc_sz_detail')->where(1)->delete();
+
+            $select_customer = array_chunk($select, 500);
+    
+            foreach($select_customer as $key => $val) {
+                $insert = $this->db_easyA->table('sp_skc_sz_detail')->strict(false)->insertAll($val);
+            }
+    
+            if ($select_customer) {
+                // $this->db_bi->commit();    
+                return json([
+                    'status' => 1,
+                    'msg' => 'success',
+                    'content' => 'easyadmin2 sp_skc_sz_detail 更新成功！'
+                ]);
+            } else {
+                // $this->db_bi->rollback();   
+                return json([
+                    'status' => 0,
+                    'msg' => 'error',
+                    'content' => 'easyadmin2 sp_skc_sz_detail 更新失败！'
                 ]);
             }   
         }

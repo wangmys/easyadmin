@@ -543,6 +543,8 @@ class Duanmalv extends BaseController
                     sk.货号
                 -- limit 100    
         ";
+
+        // die;
 		
         $select_sk = $this->db_bi->query($sql);
         $count = count($select_sk);
@@ -1509,12 +1511,17 @@ class Duanmalv extends BaseController
             $this->db_easyA->table('cwl_duanmalv_table1_1')->where([
                 '更新日期' => $date
             ])->delete();
+
+            $this->db_bi->table('cwl_duanmalv_table1_1')->where([
+                '更新日期' => $date
+            ])->delete();
             // die;
             $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+                $insert = $this->db_bi->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
             }
             $this->table1_1_sort();   
 

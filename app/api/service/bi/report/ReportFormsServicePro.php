@@ -1109,6 +1109,8 @@ class ReportFormsServicePro
         ]);
     }
 
+    
+
     public function create_image($params)
     {
         $base = [

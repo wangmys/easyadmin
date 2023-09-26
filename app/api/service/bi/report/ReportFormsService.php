@@ -4480,7 +4480,8 @@ class ReportFormsService
                 供应商名称,
                 单号 as 采购入库指令单,
                 发出天数,
-                数量 as 发货数量
+                数量 as 发货数量,
+                备注
             FROM `sp_warehouse_ws_cangjiafahuo` where 
                         YEAR(审批时间) = 2023
                         AND (仓库名称 IN ('广州云仓', '南昌云仓', '武汉云仓', '长沙云仓') OR 仓库名称='贵阳云仓' AND `发出天数`>= 8)
@@ -4499,8 +4500,9 @@ class ReportFormsService
             $field_width[0] = 30;
             $field_width[1] = 160;
             $field_width[2] = 90;
-            $field_width[3] = 90;
+            $field_width[3] = 160;
             $field_width[4] = 160;
+            $field_width[7] = 160;
             // $field_width[7] = 110;
             // $field_width[8] = 110;
             // $field_width[4] = 90;
@@ -4534,15 +4536,17 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD
-    public function create_table_s115A($type = "加盟") {
+    // api/report.sendreport/create_test?name=S115A&type=加盟
+
+    public function create_table_s115A($type = "加盟", $date) {
+        $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115A';
-        if (date('Y-m-d') == '2023-06-22') {
-            $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
-            $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4555,9 +4559,18 @@ class ReportFormsService
             concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
             concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
             concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
-            round(销售金额2021, 1) as 前年同日销额,
-            round(销售金额2022, 1) as 去年同日销额,
-            round(销售金额2023, 1) as 今日销额,
+            case
+                when 销售金额2021 !=0 then round(销售金额2021, 1) else ''
+            end as 前年同日销额,
+            case
+                when 销售金额2022 !=0 then round(销售金额2022, 1) else ''
+            end as 去年同日销额,
+            case
+                when 销售金额2023 !=0 then round(销售金额2023, 1) else ''
+            end as 今日销额,
+            -- round(销售金额2021, 1) as 前年同日销额,
+            -- round(销售金额2022, 1) as 去年同日销额,
+            -- round(销售金额2023, 1) as 今日销额,
             round(前年累销额, 1) as 前年累销额,
             round(去年累销额, 1) as 去年累销额,
             round(今年累销额, 1) as 今年累销额
@@ -4583,12 +4596,18 @@ class ReportFormsService
                 0 => "【{$type}】"
             ];
     
+
+            if ($type == '加盟') {
+                $filename = $code . 'jm.jpg';
+            } else {
+                $filename = $code . 'zy.jpg';
+            }
             //参数
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
-                'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "{$type}老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'file_name' => $filename,   //保存的文件名
+                'title' => "{$type}老店【国庆假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4606,15 +4625,16 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD
-    public function create_table_s115B() {
+    public function create_table_s115B($date) {
+        $date = $date ?: date('Y-m-d');
+
         // 编号
         $code = 'S115B';
-        if (date('Y-m-d') == '2023-06-22') {
-            $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
-            $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4632,7 +4652,8 @@ class ReportFormsService
                 round(今日销额, 1) as 今日销额,
                 round(前年累销额, 1) as 前年累销额,
                 round(去年累销额, 1) as 去年累销额,
-                round(今年累销额, 1) as 今年累销额
+                round(今年累销额同比前年, 1) as 今年累销额同比前年,
+                round(今年累销额同比去年, 1) as 今年累销额同比去年
             from cwl_festival_statistics_province 
             WHERE 
                 节日天数='{$fday}' 
@@ -4651,6 +4672,8 @@ class ReportFormsService
             $field_width[0] = 30;
             $field_width[1] = 50;
             $field_width[2] = 50;
+            $field_width[12] = 150;
+            $field_width[13] = 150;
     
             //图片左上角汇总说明数据，可为空
             $table_explain = [
@@ -4663,7 +4686,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "省份老店【端午假期】业绩同比 [" . date("Y-m-d") . ']',
+                'title' => "省份老店【国庆假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4681,15 +4704,15 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD 端午节平均单店流水对比-单日
-    public function create_table_s115C() {
+    public function create_table_s115C($date) {
+        $date = $date ?: date('Y-m-d');
         // 编号
         $code = 'S115C';
-        if (date('Y-m-d') == '2023-06-22') {
-            $fday = 1;
-        } elseif (date('Y-m-d') == '2023-06-23') {
-            $fday = 2;
-        } elseif (date('Y-m-d') == '2023-06-24') {
-            $fday = 3;
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
         } else {
             echo '活动已结束';
             die;
@@ -4732,7 +4755,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "【端午假期】平均单店流水对比-单日 [" . date("Y-m-d") . ']',
+                'title' => "【国庆假期】平均单店流水对比-单日 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4750,15 +4773,31 @@ class ReportFormsService
     }
 
     // 端午节统计 ABCD 端午节平均单店流水对比-累计
-    public function create_table_s115D() {
+    public function create_table_s115D( $date) {
         // 编号
         $code = 'S115D';
+        $date = $date ?: date('Y-m-d');
+
+        $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
+            ['节日日期', '=', $date]
+        ])->find();
+        if ($find_festival) {
+            $fday = $find_festival['节日天数'];
+        } else {
+            echo '活动已结束';
+            die;
+        }
         $sql = "
             select 
-                经营属性
+                经营属性 as 性质,
+                23VS22,
+                23VS21,
+                今日流水,
+                22年同期,
+                21年同期
             from cwl_festival_duanwu_table4 
-            WHERE 
-                1
+            WHERE 1
+                
         ";
         $list = $this->db_easyA->query($sql);
         // dump($list);die;
@@ -4773,30 +4812,31 @@ class ReportFormsService
             }
             $field_width[0] = 30;
             $field_width[1] = 80;
+
     
             //图片左上角汇总说明数据，可为空
             $table_explain = [
                 // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
                 0 => "  "
             ];
-    
+
             //参数
             $params = [
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "test",
+                'title' => "【国庆假期】平均单店流水对比-累计 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' =>  $code ,
+                'banben' => '          编号: ' . $code ,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
             // 生成图片
-            return $this->create_table($params);
+            return $this->create_image($params);
         } else {
             return false;
         }
