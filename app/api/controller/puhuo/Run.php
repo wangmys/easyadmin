@@ -12,7 +12,7 @@ use app\admin\model\wwdata\LypWwCussale14dayModel;
 class Run extends BaseController
 {
 
-  public function exec() {
+  public function puhuo() {
 
     $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_yuncangkeyong");
     sleep(10);
