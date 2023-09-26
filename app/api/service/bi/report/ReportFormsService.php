@@ -4540,6 +4540,8 @@ class ReportFormsService
 
     public function create_table_s115A($type = "加盟", $date) {
         $date = $date ?: date('Y-m-d');
+        
+
         // 编号
         $code = 'S115A';
         $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
@@ -4547,6 +4549,11 @@ class ReportFormsService
         ])->find();
         if ($find_festival) {
             $fday = $find_festival['节日天数'];
+            $find_lastyear = $this->db_easyA->table('cwl_festival_config')->where([
+                ['节日天数', '=', $fday],
+                ['年份', '=', 2022]
+            ])->find();
+            $year2022 = $find_lastyear['节日日期'];
         } else {
             echo '活动已结束';
             die;
@@ -4554,30 +4561,31 @@ class ReportFormsService
 
         $sql = "
             select 
-            省份,店铺名称,
-            concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
-            concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
-            concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
-            concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
-            case
-                when 销售金额2021 !=0 then round(销售金额2021, 1) else ''
-            end as 前年同日销额,
-            case
-                when 销售金额2022 !=0 then round(销售金额2022, 1) else ''
-            end as 去年同日销额,
-            case
-                when 销售金额2023 !=0 then round(销售金额2023, 1) else ''
-            end as 今日销额,
-            -- round(销售金额2021, 1) as 前年同日销额,
-            -- round(销售金额2022, 1) as 去年同日销额,
-            -- round(销售金额2023, 1) as 今日销额,
-            round(前年累销额, 1) as 前年累销额,
-            round(去年累销额, 1) as 去年累销额,
-            round(今年累销额, 1) as 今年累销额
-            from cwl_festival_statistics WHERE 节日天数='{$fday}' AND 经营属性='{$type}' order by 省份 DESC
+                省份,店铺名称,
+                concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
+                concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
+                concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
+                concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
+                case
+                    when 销售金额2021 !=0 then round(销售金额2021, 1) else ''
+                end as 前年同日销额,
+                case
+                    when 销售金额2022 !=0 then round(销售金额2022, 1) else ''
+                end as 去年同日销额,
+                case
+                    when 销售金额2023 !=0 then round(销售金额2023, 1) else ''
+                end as 今日销额,
+                round(前年累销额, 1) as 前年累销额,
+                round(去年累销额, 1) as 去年累销额,
+                round(今年累销额, 1) as 今年累销额
+            from cwl_festival_statistics 
+            WHERE 
+                节日天数='{$fday}' 
+                AND 经营属性='{$type}' 
+                AND (`销售金额2022` > 0 OR `首单日期` <= '{$year2022}')
+            order by 省份 DESC
         ";
         $list = $this->db_easyA->query($sql);
-        // dump($list);die;
 
         if ($list) {
             $table_header = ['ID'];

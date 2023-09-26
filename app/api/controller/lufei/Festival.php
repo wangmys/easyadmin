@@ -54,7 +54,7 @@ class Festival extends BaseController
         $date = date('Y-m-d');
 
         // 测试
-        // $date = '2023-09-22';
+        // $date = '2023-09-25';
 
         $date_res = $this->isFestavalDate($date);
         if ($date_res) {
@@ -117,22 +117,22 @@ class Festival extends BaseController
         // $this->duanwu_data(true);
 
         // echo $this->节日日期_2021;die;
-        if ($this->festival_date == '2023-09-17') {
-            $this->duanwu_handle_1day();
-            $this->createTable2(1);
-            $this->createTable3(1);
-            $this->createTable4(1);
-        } elseif ($this->festival_date == '2023-09-18') {
-            $this->duanwu_handle_2day();
-            $this->createTable2(2);
-            $this->createTable3(2);
-            $this->createTable4(2);
-        } elseif ($this->festival_date == '2023-09-19') {
-            $this->duanwu_handle_3day();
-            $this->createTable2(3);
-            $this->createTable3(3);
-            $this->createTable4(3);
-        }
+        // if ($this->festival_date == '2023-09-17') {
+        //     $this->duanwu_handle_1day();
+        //     $this->createTable2(1);
+        //     $this->createTable3(1);
+        //     $this->createTable4(1);
+        // } elseif ($this->festival_date == '2023-09-18') {
+        //     $this->duanwu_handle_2day();
+        //     $this->createTable2(2);
+        //     $this->createTable3(2);
+        //     $this->createTable4(2);
+        // } elseif ($this->festival_date == '2023-09-19') {
+        //     $this->duanwu_handle_3day();
+        //     $this->createTable2(3);
+        //     $this->createTable3(3);
+        //     $this->createTable4(3);
+        // }
     }
 
     // 节日3年数据源
@@ -161,12 +161,16 @@ class Festival extends BaseController
                         SUBSTRING(EC.State, 1, 2)  AS 省份,
                         ER.CustomerName AS 店铺名称,
                         (
-                            SELECT TOP 
-                                1 
-                                FORMAT(RetailDate, 'yyyy-MM-dd') AS FormattedDate
+                            SELECT TOP
+                                1 t1.RetailDate 
                             FROM
-                                ErpRetail  
-                            WHERE CustomerName = ER.CustomerName
+                                ErpRetail t1
+                                LEFT JOIN ErpCustomer AS t2 ON t1.CustomerId = t2.CustomerId 
+                            WHERE
+                                t1.CustomerName = ER.CustomerName 
+                                AND t2.CustomerCode = EC.CustomerCode 
+                            ORDER BY
+                                t1.RetailDate ASC 
                         ) AS 首单日期,
                         EBC.Mathod AS 经营属性,
                         '{$v['节日']}' as 节日,
@@ -190,6 +194,7 @@ class Festival extends BaseController
                     GROUP BY 
                         ER.CustomerName,
                         EC.State,
+                        EC.CustomerCode,
                         EBC.Mathod	
                     ORDER BY EC.State ASC
                 ";
@@ -292,6 +297,26 @@ class Festival extends BaseController
                                     and 店铺名称 in ('湘潭二店', '樵岭一店')
                         ";
                         $this->db_easyA->execute($sql_特殊店铺改名);
+
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '德庆一店'])->update(['首单日期' => '2021-04-10']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '丰顺一店'])->update(['首单日期' => '2020-12-30']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '河源二店'])->update(['首单日期' => '2021-07-09']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '河源一店'])->update(['首单日期' => '2021-03-18']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '厚街一店'])->update(['首单日期' => '2020-12-01']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '惠东一店'])->update(['首单日期' => '2020-12-16']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '开平一店'])->update(['首单日期' => '2021-05-01']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '龙川一店'])->update(['首单日期' => '2021-06-30']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '龙岗一店'])->update(['首单日期' => '2021-03-20']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '水口一店'])->update(['首单日期' => '2020-12-22']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '顺德一店'])->update(['首单日期' => '2020-12-19']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '太和一店'])->update(['首单日期' => '2021-07-30']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '塘厦一店'])->update(['首单日期' => '2021-04-15']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '西樵一店'])->update(['首单日期' => '2020-12-23']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '西乡一店'])->update(['首单日期' => '2021-06-18']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '兴宁一店'])->update(['首单日期' => '2021-06-26']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '阳春一店'])->update(['首单日期' => '2020-12-11']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '英德一店'])->update(['首单日期' => '2021-09-15']);
+                        $this->db_easyA->table('cwl_festival_retail_data')->where(['店铺名称' => '十堰二店'])->update(['首单日期' => '2021-11-07']);
             
                     }   
                 }
@@ -551,6 +576,8 @@ class Festival extends BaseController
                     WHERE
                         t0.节日日期 = '{$this->节日日期_2023}' 
                         AND t0.节日天数 = '{$this->节日天数}' 
+
+                        -- AND t0.省份 in ('江西')
                     GROUP BY
                         `店铺名称` 
                     ORDER BY
@@ -608,30 +635,25 @@ class Festival extends BaseController
                 t.去年同日销额,
                 t.今日销额,
                 t.今日销额同比去年,
-                t.今日销额同比前年,
+                t.今日销额同比前年
+                 ,
                 case
-                    when t.节日天数 > 1 then t.前年同日销额 + ifnull( (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
-                    else t.前年同日销额
+                     when t.节日天数 > 1 then t.前年同日销额 + ifnull( (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
+                     else t.前年同日销额
                 end as 前年累销额,
                 case
-                    when t.节日天数 > 1 then t.去年同日销额 + ifnull( (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
-                    else t.去年同日销额
+                     when t.节日天数 > 1 then t.去年同日销额 + ifnull( (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
+                     else t.去年同日销额
                 end as 去年累销额,
                 case
-                    when t.节日天数 > 1 then t.今日销额同比前年 + ifnull( (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
-                    else t.今日销额同比前年
+                     when t.节日天数 > 1 then t.今日销额同比前年 + ifnull( (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
+                     else t.今日销额同比前年
                 end as 今年累销额同比前年,
                 case
                     when t.节日天数 > 1 then t.今日销额同比去年 + ifnull( (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) ,0) 
-                    else t.今日销额同比去年
+                     else t.今日销额同比去年
                 end as 今年累销额同比去年
 
-
-                -- t.前年累销额,
-                -- t.去年累销额,
-                -- t.今年累销额,
-                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长
             from(
                 SELECT
                     省份,经营属性,节日日期,节日天数,
@@ -646,7 +668,7 @@ class Festival extends BaseController
                             节日天数 = m.节日天数
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
-                            AND `销售金额2022` is not null
+                            AND ( `销售金额2022` > 0 OR `首单日期` <= '{$this->节日日期_2022}')
                     ) as 今日销额同比去年,
                     (SELECT
                         sum(`销售金额2023`) 
@@ -656,7 +678,7 @@ class Festival extends BaseController
                             节日天数 = m.节日天数
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
-                            AND `销售金额2021` is not null
+                            AND ( `销售金额2021` > 0 OR `首单日期` <= '{$this->节日日期_2021}')
                     ) as 今日销额同比前年
                     -- ,
                     -- sum(前年累销额) as 前年累销额,	
@@ -678,7 +700,6 @@ class Festival extends BaseController
         $insert_jiameng = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng);
     
 
-        // die;
 
         // 加盟合计 
         $sql_jiameng_total = "
@@ -773,7 +794,7 @@ class Festival extends BaseController
                             节日天数 = m.节日天数
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
-                            AND `销售金额2021` is not null
+                            AND  ( `销售金额2021` > 0 OR `首单日期` <= '{$this->节日日期_2021}')
                     ) as 今日销额同比前年,
                     (SELECT
                         sum(`销售金额2023`) 
@@ -783,7 +804,7 @@ class Festival extends BaseController
                             节日天数 = m.节日天数
                             AND 经营属性 = m.经营属性 
                             AND 省份 = m.省份
-                            AND `销售金额2022` is not null
+                            AND  ( `销售金额2022` > 0 OR `首单日期` <= '{$this->节日日期_2022}')
                     ) as 今日销额同比去年
                 FROM
                     cwl_festival_statistics as m 
@@ -920,475 +941,326 @@ class Festival extends BaseController
         ]);
     }
 
-    // 端午同比 第一天
-    // public function duanwu_handle_1day($fday = '') {
-    //     $date = '2023-09-17';
-    //     $fday = 1; // 活动第几天
-    //     if (! empty($fday)) {
-    //         $sql = "   
-    //             SELECT
-    //                 m.*,
-    //                 m.销售金额2023 / m.销售金额2021 -1 AS `前年日增长`, 
-    //                 m.销售金额2023 / m.销售金额2022 -1 AS `去年日增长`,
-    //                 m.销售金额2023 / m.销售金额2021 -1 AS `前年累计增长`, 
-    //                 m.销售金额2023 / m.销售金额2022 -1 AS `去年累计增长`,
-    //                 m.销售金额2021 as 前年累销额,
-    //                 m.销售金额2022 as 去年累销额,
-    //                 m.销售金额2023 as 今年累销额
-    //             FROM
-    //                 (
-    //                 SELECT
-    //                     t0.省份,
-    //                     t0.店铺名称,
-    //                     t0.首单日期,
-    //                     t0.经营属性,
-    //                     '国庆' AS 节日,
-    //                     t0.节日日期,
-    //                     t0.节日天数,
-    //                     t0.销售金额 AS `销售金额2023`,
-    //                     t1.销售金额 AS `销售金额2022`,
-    //                     t2.销售金额 AS `销售金额2021` 
-    //                 FROM
-    //                     `cwl_festival_retail_data` AS t0
-    //                     LEFT JOIN cwl_festival_retail_data AS t1 ON t0.店铺名称 = t1.店铺名称 
-    //                     AND t1.节日日期 = '2022-09-17' 
-    //                     AND t1.节日天数 = t0.节日天数
-    //                     LEFT JOIN cwl_festival_retail_data AS t2 ON t0.店铺名称 = t2.店铺名称 
-    //                     AND t2.节日日期 = '2021-09-17' 
-    //                     AND t2.节日天数 = t0.节日天数 
-    //                 WHERE
-    //                     t0.节日日期 = '{$date}' 
-    //                     AND t0.节日天数 = '{$fday}' 
-    //                 GROUP BY
-    //                     `店铺名称` 
-    //                 ORDER BY
-    //                     t0.省份 ASC 
-    //                 ) AS m 
-    //             WHERE
-    //                 m.`销售金额2022` IS NOT NULL || m.`销售金额2021` IS NOT NULL
-    //         ";
+    public function createTable2_old() {
+        $this->db_easyA->table('cwl_festival_statistics_province')->where([
+            ['节日天数', '=', $this->节日天数]
+        ])->delete();
 
-    //         $select = $this->db_easyA->query($sql);
-    //         $count = count($select);
-    
-    //         if ($select) {
-    //             // 删除
-    //             $this->db_easyA->table('cwl_festival_statistics')->where([
-    //                 ['节日日期', '=', $date]
-    //             ])->delete();
-    //             // $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
-    
-    //             $chunk_list = array_chunk($select, 500);
-    
-    //             foreach($chunk_list as $key => $val) {
-    //                 // 基础结果 
-    //                 $insert = $this->db_easyA->table('cwl_festival_statistics')->strict(false)->insertAll($val);
-    //             }
-    
-    //             return json([
-    //                 'status' => 1,
-    //                 'msg' => 'success',
-    //                 'content' => "cwl_festival_statistics 更新成功，数量：{$count}！"
-    //             ]);
-    //         }
-    //     } else {
-    //         return json([
-    //             'status' => 0,
-    //             'msg' => 'error',
-    //             'content' => "cwl_festival_statistics 更新失败，活动第几天不能为空！"
-    //         ]);  
-    //     }
-
-    // }
-
-    // // 端午同比 第二天
-    // public function duanwu_handle_2day($fday = '') {
-    //     $date = '2023-09-18';
-    //     $fday = 2; // 活动第几天
-    //     if (! empty($fday)) {
-    //         $sql = "   
-    //             select 
-    //                 m0.*, 
-    //                 m0.今年累销额 / m0.前年累销额 - 1 AS `前年累计增长`,
-    //                 m0.今年累销额 / m0.去年累销额 - 1 AS `去年累计增长`
-    //             from (
-    //             SELECT
-    //                     m1.*,
-    //                     m1.销售金额2023 / m1.销售金额2021 -1 AS `前年日增长`, 
-    //                     m1.销售金额2023 / m1.销售金额2022 -1 AS `去年日增长`,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2021-09-17', '2021-09-18')) as 前年累销额,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2022-09-17', '2022-09-18')) as 去年累销额,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2023-09-17', '2023-06-18')) as 今年累销额
-    //             FROM
-    //                     (
-    //                     SELECT
-    //                             t0.省份,
-    //                             t0.店铺名称,
-    //                             t0.首单日期,
-    //                             t0.经营属性,
-    //                             '端午' AS 节日,
-    //                             t0.节日日期,
-    //                             t0.节日天数,
-    //                             t0.销售金额 AS `销售金额2023`,
-    //                             t1.销售金额 AS `销售金额2022`,
-    //                             t2.销售金额 AS `销售金额2021` 
-    //                     FROM
-    //                             `cwl_festival_retail_data` AS t0
-    //                             LEFT JOIN cwl_festival_retail_data AS t1 ON t0.店铺名称 = t1.店铺名称 
-    //                             AND t1.节日日期 = '2022-09-18' 
-    //                             AND t1.节日天数 = t0.节日天数
-    //                             LEFT JOIN cwl_festival_retail_data AS t2 ON t0.店铺名称 = t2.店铺名称 
-    //                             AND t2.节日日期 = '2021-09-18' 
-    //                             AND t2.节日天数 = t0.节日天数 
-    //                     WHERE
-    //                             t0.节日日期 = '{$date}' 
-    //                             AND t0.节日天数 = 2 
-    //                     GROUP BY
-    //                             `店铺名称` 
-    //                     ORDER BY
-    //                             t0.省份 ASC 
-    //                     ) AS m1 
-    //             WHERE
-    //                     m1.`销售金额2022` IS NOT NULL || m1.`销售金额2021` IS NOT NULL
-    //             ) as m0
-    //         ";
-
-    //         $select = $this->db_easyA->query($sql);
-    //         $count = count($select);
-    
-    //         if ($select) {
-    //             // 删除
-    //             $this->db_easyA->table('cwl_festival_statistics')->where([
-    //                 ['节日日期', '=', $date]
-    //             ])->delete();
-    //             // $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
-    
-    //             $chunk_list = array_chunk($select, 500);
-    
-    //             foreach($chunk_list as $key => $val) {
-    //                 // 基础结果 
-    //                 $insert = $this->db_easyA->table('cwl_festival_statistics')->strict(false)->insertAll($val);
-    //             }
-    
-    //             return json([
-    //                 'status' => 1,
-    //                 'msg' => 'success',
-    //                 'content' => "cwl_festival_statistics 更新成功，数量：{$count}！"
-    //             ]);
-    //         } else {
-    //             echo $sql;
-    //         }
-    //     } else {
-    //         return json([
-    //             'status' => 0,
-    //             'msg' => 'error',
-    //             'content' => "cwl_festival_statistics 更新失败，活动第几天不能为空！"
-    //         ]);  
-    //     }
-
-    // }
+        // 加盟总省
+        $sql_jiameng = "
+            select t.
+                t.省份,t.经营属性,t.节日日期,节日天数,
+                t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
+                t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
+                t.前年同日销额,
+                t.去年同日销额,
+                t.今日销额,
+                t.今日销额同比去年,
+                t.今日销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
 
 
-    // // 端午同比 第3天
-    // public function duanwu_handle_3day($fday = '') {
-    //     $date = '2023-09-19';
-    //     $fday = 3; // 活动第几天
-    //     if (! empty($fday)) {
-    //         $sql = "   
-    //             select 
-    //                 m0.*, 
-    //                 m0.今年累销额 / m0.前年累销额 - 1 AS `前年累计增长`,
-    //                 m0.今年累销额 / m0.去年累销额 - 1 AS `去年累计增长`
-    //             from (
-    //             SELECT
-    //                     m1.*,
-    //                     m1.销售金额2023 / m1.销售金额2021 -1 AS `前年日增长`, 
-    //                     m1.销售金额2023 / m1.销售金额2022 -1 AS `去年日增长`,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2021-09-17', '2021-09-18', '2021-09-19')) as 前年累销额,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2022-09-17', '2022-09-18', '2022-09-19')) as 去年累销额,
-    //                     (select sum(销售金额) from cwl_festival_retail_data where 店铺名称=m1.店铺名称 and 节日日期 in ('2023-09-17', '2023-09-18', '2023-09-19')) as 今年累销额
-    //             FROM
-    //                     (
-    //                     SELECT
-    //                             t0.省份,
-    //                             t0.店铺名称,
-    //                             t0.首单日期,
-    //                             t0.经营属性,
-    //                             '国庆' AS 节日,
-    //                             t0.节日日期,
-    //                             t0.节日天数,
-    //                             t0.销售金额 AS `销售金额2023`,
-    //                             t1.销售金额 AS `销售金额2022`,
-    //                             t2.销售金额 AS `销售金额2021` 
-    //                     FROM
-    //                             `cwl_festival_retail_data` AS t0
-    //                             LEFT JOIN cwl_festival_retail_data AS t1 ON t0.店铺名称 = t1.店铺名称 
-    //                             AND t1.节日日期 = '2022-09-19' 
-    //                             AND t1.节日天数 = t0.节日天数
-    //                             LEFT JOIN cwl_festival_retail_data AS t2 ON t0.店铺名称 = t2.店铺名称 
-    //                             AND t2.节日日期 = '2021-09-19' 
-    //                             AND t2.节日天数 = t0.节日天数 
-    //                     WHERE
-    //                             t0.节日日期 = '{$date}' 
-    //                             AND t0.节日天数 = 3 
-    //                     GROUP BY
-    //                             `店铺名称` 
-    //                     ORDER BY
-    //                             t0.省份 ASC 
-    //                     ) AS m1 
-    //             WHERE
-    //                     m1.`销售金额2022` IS NOT NULL || m1.`销售金额2021` IS NOT NULL
-    //             ) as m0
-    //         ";
+                -- t.前年累销额,
+                -- t.去年累销额,
+                -- t.今年累销额,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长
+            from(
+                SELECT
+                    省份,经营属性,节日日期,节日天数,
+                    sum(销售金额2021) as 前年同日销额,
+                    sum(销售金额2022) as 去年同日销额,
+                    sum(销售金额2023) as 今日销额,
+                    (SELECT
+                        sum(`销售金额2023`) 
+                        FROM
+                            cwl_festival_statistics 
+                        WHERE
+                            节日天数 = m.节日天数
+                            AND 经营属性 = m.经营属性 
+                            AND 省份 = m.省份
+                            AND `销售金额2022` is not null
+                    ) as 今日销额同比去年,
+                    (SELECT
+                        sum(`销售金额2023`) 
+                        FROM
+                            cwl_festival_statistics 
+                        WHERE
+                            节日天数 = m.节日天数
+                            AND 经营属性 = m.经营属性 
+                            AND 省份 = m.省份
+                            AND `销售金额2021` is not null
+                    ) as 今日销额同比前年
+                    -- ,
+                    -- sum(前年累销额) as 前年累销额,	
+                    -- sum(去年累销额) as 去年累销额,
+                    -- sum(今年累销额) as 今年累销额
+                FROM
+                    cwl_festival_statistics as m
+                WHERE
+                    节日天数 = '{$this->节日天数}' 
+                    AND 经营属性 in ('加盟')
+                group BY
+                    省份, 经营属性
+                order by 经营属性
+            ) as t
+        ";
+        // 查    
+        $select_jiameng = $this->db_easyA->query($sql_jiameng);
+        // 插        
+        $insert_jiameng = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng);
+    
 
-    //         $select = $this->db_easyA->query($sql);
-    //         $count = count($select);
-    
-    //         if ($select) {
-    //             // 删除
-    //             $this->db_easyA->table('cwl_festival_statistics')->where([
-    //                 ['节日日期', '=', $date]
-    //             ])->delete();
-    //             // $this->db_easyA->execute('TRUNCATE cwl_duanmalv_retail;');
-    
-    //             $chunk_list = array_chunk($select, 500);
-    
-    //             foreach($chunk_list as $key => $val) {
-    //                 // 基础结果 
-    //                 $insert = $this->db_easyA->table('cwl_festival_statistics')->strict(false)->insertAll($val);
-    //             }
-    
-    //             return json([
-    //                 'status' => 1,
-    //                 'msg' => 'success',
-    //                 'content' => "cwl_festival_statistics 更新成功，数量：{$count}！"
-    //             ]);
-    //         } else {
-    //             echo $sql;
-    //         }
-    //     } else {
-    //         return json([
-    //             'status' => 0,
-    //             'msg' => 'error',
-    //             'content' => "cwl_festival_statistics 更新失败，活动第几天不能为空！"
-    //         ]);  
-    //     }
+        // die;
 
-    // }
+        // 加盟合计 
+        $sql_jiameng_total = "
+            select 
+                '合计' AS 省份,
+                '加盟' AS 经营属性,
+                t.节日日期,t.节日天数,
+                t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
+                t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                t.前年同日销额,
+                t.去年同日销额,
+                t.今日销额,
+                t.今日销额同比前年,
+                t.今日销额同比去年,
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
+            from
+            (select 
+                省份,经营属性,节日日期,节日天数,
+                sum(前年同日销额) AS 前年同日销额,
+                sum(去年同日销额) AS 去年同日销额,
+                sum(今日销额) AS 今日销额,
+                sum(今日销额同比去年) AS 今日销额同比去年,
+                sum(今日销额同比前年) as 今日销额同比前年
+            from cwl_festival_statistics_province where 节日天数= {$this->节日天数} and 经营属性 in ('加盟')) as t       
+        ";
 
-    // public function createTable2($fday) {
-    //     if (! $fday) {
-    //         $fday = input('fday');
-    //     }
+        // 加盟合计 查
+        $select_jiameng_total = $this->db_easyA->query($sql_jiameng_total);
+        // 加盟合计 删
+        $insert_jiameng_total = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng_total);
         
-    //     if ($fday == 1 || $fday == 2 || $fday == 3 ) {
-    //         $this->db_easyA->table('cwl_festival_statistics_province')->where([
-    //             ['节日天数', '=', $fday]
-    //         ])->delete();
-    
-    //         // 加盟总省
-    //         $sql_jiameng = "
-    //             select t.
-    //                 t.省份,t.经营属性,t.节日日期,节日天数,
-    //                 t.今日销额 / t.前年同日销额 - 1 AS 前年日增长,
-    //                 t.今日销额 / t.去年同日销额 - 1 AS 去年日增长,
-    //                 t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-    //                 t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
-    //                 t.前年同日销额,
-    //                 t.去年同日销额,
-    //                 t.今日销额,
-    //                 t.前年累销额,
-    //                 t.去年累销额,
-    //                 t.今年累销额
-    //             from(
-    //                 SELECT
-    //                     省份,经营属性,节日日期,节日天数,
-    //                     sum(销售金额2021) as 前年同日销额,
-    //                     sum(销售金额2022) as 去年同日销额,
-    //                     sum(销售金额2023) as 今日销额,
-    //                     sum(前年累销额) as 前年累销额,	
-    //                     sum(去年累销额) as 去年累销额,
-    //                     sum(今年累销额) as 今年累销额
-    //                 FROM
-    //                     cwl_festival_statistics 
-    //                 WHERE
-    //                     节日天数 = '{$fday}' 
-    //                     AND 经营属性 in ('加盟')
-    //                 group BY
-    //                     省份, 经营属性
-    //                 order by 经营属性
-    //             ) as t
-    //         ";
-    //         // 查    
-    //         $select_jiameng = $this->db_easyA->query($sql_jiameng);
-    //         // 插        
-    //         $insert_jiameng = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng);
-      
-    //         // 加盟合计 
-    //         $sql_jiameng_total = "
-    //             select 
-    //                 '合计' AS 省份,
-    //                 '' AS 经营属性,
-    //                 t.节日日期,t.节日天数,
-    //                 t.今日销额 / t.前年同日销额 - 1 AS 前年日增长,
-    //                 t.今日销额 / t.去年同日销额 - 1 AS 去年日增长,
-    //                 t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-    //                 t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
-    //                     t.前年同日销额,
-    //                 t.去年同日销额,
-    //                 t.今日销额,
-    //                 t.前年累销额,
-    //                 t.去年累销额,
-    //                 t.今年累销额
-    //             from
-    //             (select 
-    //                 经营属性,节日日期,节日天数,
-    //                 sum(前年同日销额) AS 前年同日销额,
-    //                 sum(去年同日销额) AS 去年同日销额,
-    //                 sum(今日销额) AS 今日销额,
-    //                 sum(前年累销额) AS 前年累销额,
-    //                 sum(去年累销额) AS 去年累销额,
-    //                 sum(今年累销额) AS 今年累销额
-    //             from cwl_festival_statistics_province where 节日天数= {$fday} and 经营属性 in ('加盟')) as t       
-    //         ";
-    
-    //         // 加盟合计 查
-    //         $select_jiameng_total = $this->db_easyA->query($sql_jiameng_total);
-    //         // 加盟合计 删
-    //         $insert_jiameng_total = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_jiameng_total);
-            
-            
-    //         // 直营总省
-    //         $sql_zhiying = "
-    //             select t.
-    //                 t.省份,t.经营属性,t.节日日期,节日天数,
-    //                 t.今日销额 / t.前年同日销额 - 1 AS 前年日增长,
-    //                 t.今日销额 / t.去年同日销额 - 1 AS 去年日增长,
-    //                 t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-    //                 t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
-    //                 t.前年同日销额,
-    //                 t.去年同日销额,
-    //                 t.今日销额,
-    //                 t.前年累销额,
-    //                 t.去年累销额,
-    //                 t.今年累销额
-    //             from(
-    //                 SELECT
-    //                     省份,经营属性,节日日期,节日天数,
-    //                     sum(销售金额2021) as 前年同日销额,
-    //                     sum(销售金额2022) as 去年同日销额,
-    //                     sum(销售金额2023) as 今日销额,
-    //                     sum(前年累销额) as 前年累销额,	
-    //                     sum(去年累销额) as 去年累销额,
-    //                     sum(今年累销额) as 今年累销额
-    //                 FROM
-    //                     cwl_festival_statistics 
-    //                 WHERE
-    //                     节日天数 = '{$fday}' 
-    //                     AND 经营属性 in ('直营')
-    //                 group BY
-    //                     省份, 经营属性
-    //                 order by 经营属性
-    //             ) as t
-    //         ";
-    //         // 查    
-    //         $select_zhiying = $this->db_easyA->query($sql_zhiying);
-    //         // 插        
-    //         $insert_zhiying = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zhiying);
-            
-    //         // 直营合计 
-    //         $sql_zhiying_total = "
-    //             select 
-    //                 '合计' AS 省份,
-    //                 '' AS 经营属性,
-    //                 t.节日日期,t.节日天数,
-    //                 t.今日销额 / t.前年同日销额 - 1 AS 前年日增长,
-    //                 t.今日销额 / t.去年同日销额 - 1 AS 去年日增长,
-    //                 t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-    //                 t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
-    //                 t.前年同日销额,
-    //                 t.去年同日销额,
-    //                 t.今日销额,
-    //                 t.前年累销额,
-    //                 t.去年累销额,
-    //                 t.今年累销额
-    //             from
-    //             (select 
-    //                 经营属性,节日日期,节日天数,
-    //                 sum(前年同日销额) AS 前年同日销额,
-    //                 sum(去年同日销额) AS 去年同日销额,
-    //                 sum(今日销额) AS 今日销额,
-    //                 sum(前年累销额) AS 前年累销额,
-    //                 sum(去年累销额) AS 去年累销额,
-    //                 sum(今年累销额) AS 今年累销额
-    //             from cwl_festival_statistics_province where 节日天数= {$fday} and 经营属性 in ('直营')) as t       
-    //         ";
-    
-    //         // 直营合计 查
-    //         $select_zhiying_total = $this->db_easyA->query($sql_zhiying_total);
-    //         // 直营合计 插
-    //         $insert_jiameng_total = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zhiying_total);
-            
-            
-    //         // 直营加盟总计
-    //         $sql_zongji = "
-    //             select 
-    //                 '总计' AS 省份,
-    //                 '' AS 经营属性,
-    //                 t.节日日期,t.节日天数,
-    //                 t.今日销额 / t.前年同日销额 - 1 AS 前年日增长,
-    //                 t.今日销额 / t.去年同日销额 - 1 AS 去年日增长,
-    //                 t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
-    //                 t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
-    //                 t.前年同日销额,
-    //                 t.去年同日销额,
-    //                 t.今日销额,
-    //                 t.前年累销额,
-    //                 t.去年累销额,
-    //                 t.今年累销额
-    //             from
-    //             (select 
-    //                 经营属性,节日日期,节日天数,
-    //                 sum(前年同日销额) AS 前年同日销额,
-    //                 sum(去年同日销额) AS 去年同日销额,
-    //                 sum(今日销额) AS 今日销额,
-    //                 sum(前年累销额) AS 前年累销额,
-    //                 sum(去年累销额) AS 去年累销额,
-    //                 sum(今年累销额) AS 今年累销额
-    //             from cwl_festival_statistics_province 
-    //                 where 节日天数= {$fday} 
-    //                 and 经营属性 in ('直营', '加盟')
-    //                 and 省份 not in ('合计')
-    //             ) as t       
-    //         ";
-    
-    //         // 直营合计 查
-    //         $select_zongji = $this->db_easyA->query($sql_zongji);
-    //         // 直营合计 插
-    //         $insert_zongji  = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zongji);
-    
-    //         return json([
-    //             'status' => 1,
-    //             'msg' => 'success',
-    //             'content' => "cwl_festival_statistics_province 更新成功！"
-    //         ]);
-    //     } else {
-    //         return json([
-    //             'status' => 0,
-    //             'msg' => 'error',
-    //             'content' => "cwl_festival_statistics_province 更新失败，活动天数必须是1,2,3！"
-    //         ]);
-    //     }
-    // }
+        // die;
+        // 直营总省
+        $sql_zhiying = "
+            select t.
+                t.省份,t.经营属性,t.节日日期,节日天数,
+                t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
+                t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                t.前年同日销额,
+                t.去年同日销额,
+                t.今日销额,
+                t.今日销额同比去年,
+                t.今日销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
+            from(
+                SELECT
+                    省份,经营属性,节日日期,节日天数,
+                    sum(销售金额2021) as 前年同日销额,
+                    sum(销售金额2022) as 去年同日销额,
+                    sum(销售金额2023) as 今日销额,
+                    (SELECT
+                        sum(`销售金额2023`) 
+                        FROM
+                            cwl_festival_statistics 
+                        WHERE
+                            节日天数 = m.节日天数
+                            AND 经营属性 = m.经营属性 
+                            AND 省份 = m.省份
+                            AND `销售金额2021` is not null
+                    ) as 今日销额同比前年,
+                    (SELECT
+                        sum(`销售金额2023`) 
+                        FROM
+                            cwl_festival_statistics 
+                        WHERE
+                            节日天数 = m.节日天数
+                            AND 经营属性 = m.经营属性 
+                            AND 省份 = m.省份
+                            AND `销售金额2022` is not null
+                    ) as 今日销额同比去年
+                FROM
+                    cwl_festival_statistics as m 
+                WHERE
+                    节日天数 = '{$this->节日天数}' 
+                    AND 经营属性 in ('直营')
+                group BY
+                    省份, 经营属性
+                order by 经营属性
+            ) as t
+        ";
+        // 查    
+        $select_zhiying = $this->db_easyA->query($sql_zhiying);
+        // 插        
+        $insert_zhiying = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zhiying);
+        
+        // 直营合计 
+        $sql_zhiying_total = "
+            select 
+                '合计' AS 省份,
+                '直营' AS 经营属性,
+                t.节日日期,t.节日天数,
+                t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
+                t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                t.前年同日销额,
+                t.去年同日销额,
+                t.今日销额,
+                t.今日销额同比前年,
+                t.今日销额同比去年,
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
+            from
+            (select 
+                省份,经营属性,节日日期,节日天数,
+                sum(前年同日销额) AS 前年同日销额,
+                sum(去年同日销额) AS 去年同日销额,
+                sum(今日销额) AS 今日销额,
+                sum(今日销额同比前年) as 今日销额同比前年,
+                sum(今日销额同比去年) as 今日销额同比去年
+            from cwl_festival_statistics_province where 节日天数= {$this->节日天数} and 经营属性 in ('直营')) as t       
+        ";
 
-    // public function showTable1($fday) {
-    //     if (! $fday) {
-    //         $fday = input('fday');
-    //     }
-    //     $sql1 = "
-    //         select * from cwl_festival_statistics WHERE 节日天数='{$fday}' order by 经营属性 DESC
-    //     ";
-    // }
+        // 直营合计 查
+        $select_zhiying_total = $this->db_easyA->query($sql_zhiying_total);
+        // 直营合计 插
+        $insert_jiameng_total = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zhiying_total);
+        
+        
+        // 直营加盟总计
+        $sql_zongji = "
+            select 
+                '总计' AS 省份,
+                '' AS 经营属性,
+                t.节日日期,t.节日天数,
+                t.今日销额同比前年 / t.前年同日销额 - 1 AS 前年日增长,
+                t.今日销额同比去年 / t.去年同日销额 - 1 AS 去年日增长,
+                -- t.今年累销额 / t.前年累销额 - 1 AS 前年累计增长,
+                -- t.今年累销额 / t.去年累销额 - 1 AS 去年累计增长,
+                t.前年同日销额,
+                t.去年同日销额,
+                t.今日销额,
+                t.今日销额同比前年,
+                t.今日销额同比去年,
+                case
+                    when t.节日天数 > 1 then t.前年同日销额 + (select 前年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.前年同日销额
+                end as 前年累销额,
+                case
+                    when t.节日天数 > 1 then t.去年同日销额 + (select 去年累销额 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.去年同日销额
+                end as 去年累销额,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比前年 + (select 今年累销额同比前年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比前年
+                end as 今年累销额同比前年,
+                case
+                    when t.节日天数 > 1 then t.今日销额同比去年 + (select 今年累销额同比去年 from cwl_festival_statistics_province where 省份=t.省份 and 节日天数 = t.节日天数 - 1 and 经营属性=t.经营属性 ) 
+                    else t.今日销额同比去年
+                end as 今年累销额同比去年
+            from
+            (select 
+                省份,经营属性,节日日期,节日天数,
+                sum(前年同日销额) AS 前年同日销额,
+                sum(去年同日销额) AS 去年同日销额,
+                sum(今日销额) AS 今日销额,
+                sum(今日销额同比前年) as 今日销额同比前年,
+                sum(今日销额同比去年) as 今日销额同比去年
+            from cwl_festival_statistics_province 
+                where 节日天数= {$this->节日天数} 
+                and 经营属性 in ('直营', '加盟')
+                and 省份 not in ('合计')
+            ) as t       
+        ";
+
+        // 直营合计 查
+        $select_zongji = $this->db_easyA->query($sql_zongji);
+        // 直营合计 插
+        $insert_zongji  = $this->db_easyA->table('cwl_festival_statistics_province')->strict(false)->insertAll($select_zongji);
+
+        $sql_更新 = "
+            update `cwl_festival_statistics_province`
+            set
+                前年累计增长 = 今年累销额同比前年 / 前年累销额 - 1,
+                去年累计增长 = 今年累销额同比去年 / 去年累销额 - 1
+            where
+                1
+        ";
+        $this->db_easyA->execute($sql_更新);
+
+        return json([
+            'status' => 1,
+            'msg' => 'success',
+            'content' => "cwl_festival_statistics_province 更新成功！"
+        ]);
+    }
 
     // 端午节平均单店流水对比-单日
     public function createTable3($fday) {
