@@ -47,7 +47,7 @@ class Puhuorulea extends AdminController
             $where = $this->getParms();
             $list = $this->model->where(function ($query) use ($where) {
                                 if (!empty($where['Yuncang'])) $query->where('Yuncang', $where['Yuncang']);
-                                if (!empty($where['State'])) $query->where('c.State', $where['State']);
+                                if (!empty($where['State'])) $query->where('State', $where['State']);
                                 if (!empty($where['StyleCategoryName'])) $query->where('StyleCategoryName', $where['StyleCategoryName']);
                                 if (!empty($where['CategoryName1'])) $query->where('CategoryName1', 'in', $where['CategoryName1']);
                                 if (!empty($where['CategoryName2'])) $query->where('CategoryName2', 'in', $where['CategoryName2']);
