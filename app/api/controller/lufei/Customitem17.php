@@ -206,6 +206,14 @@ class Customitem17 extends BaseController
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('cwl_customitem17_retail')->strict(false)->insertAll($val);
             }
+
+            $sql_商品专员 = "
+            update cwl_customitem17_retail as r
+                left join customer_pro as c on r.店铺名称 = c.CustomerName
+                set
+                    r.商品专员 = c.CustomItem17
+            ";
+            $this->db_easyA->execute($sql_商品专员);
         }
 
         $sql_实际累计流水 = "
@@ -378,7 +386,6 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('直营') 
-                AND 本月目标 IS NOT NULL 
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -399,7 +406,6 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('加盟') 
-                AND 本月目标 IS NOT NULL 
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -418,7 +424,6 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('加盟', '直营') 
-                AND 本月目标 IS NOT NULL 
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -455,27 +460,39 @@ class Customitem17 extends BaseController
         $sql_85日均需销额 = "
             update cwl_customitem17_zhuanyuan
             set 
-                `85%日均需销额_直营` = (`目标_直营` - `累计流水_直营`) * 0.85 / {$到结束剩余天数},
-                `85%日均需销额_加盟` = (`目标_加盟` - `累计流水_加盟`) * 0.85 / {$到结束剩余天数} ,
-                `85%日均需销额_合计` = (`目标_合计` - `累计流水_合计`) * 0.85 / {$到结束剩余天数}
+                `85%日均需销额_直营` = (`目标_直营` * 0.85  - `累计流水_直营`) / {$到结束剩余天数},
+                `85%日均需销额_加盟` = (`目标_加盟` * 0.85 - `累计流水_加盟`)  / {$到结束剩余天数} ,
+                `85%日均需销额_合计` = (`目标_合计` * 0.85 - `累计流水_合计`)  / {$到结束剩余天数}
             where
                 目标月份 = '{$目标月份}'
         ";
         $this->db_easyA->execute($sql_85日均需销额);
 
+        $str_近七天日期 = '';
+        $getBefore7 = $this->getBefore7();
+        if($getBefore7) {
+            $str_近七天日期 = arrToStr($getBefore7);
+        }
         $sql_近七天日均销_直营 = "
             update cwl_customitem17_zhuanyuan as z 
             left join ( 
-            SELECT
-                商品专员,
-                sum(近七天日均销) AS 近七天日均销 
-            FROM
-                cwl_customitem17_yeji 
-            WHERE 1
-                AND 经营模式 in ('直营') 
-                AND 本月目标 IS NOT NULL 
-            GROUP BY
-                商品专员
+           
+                select 
+                    m.商品专员, 
+                    m.销售金额 / 7 as 近七天日均销
+                from (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail
+                    WHERE
+                        日期 IN ( {$str_近七天日期} ) 
+                        AND 经营属性 = '直营'
+                    GROUP BY
+                        商品专员
+                ) as m
+
             ) as t on z.商品专员=t.商品专员
             set 
                 z.`近七天日均销额_直营` = t.近七天日均销
@@ -486,16 +503,23 @@ class Customitem17 extends BaseController
         $sql_近七天日均销_加盟 = "
             update cwl_customitem17_zhuanyuan as z 
             left join ( 
-            SELECT
-                商品专员,
-                sum(近七天日均销) AS 近七天日均销 
-            FROM
-                cwl_customitem17_yeji 
-            WHERE 1
-                AND 经营模式 in ('加盟') 
-                AND 本月目标 IS NOT NULL 
-            GROUP BY
-                商品专员
+
+                select 
+                    m.商品专员, 
+                    m.销售金额 / 7 as 近七天日均销
+                from (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail
+                    WHERE
+                        日期 IN ( {$str_近七天日期} ) 
+                        AND 经营属性 = '加盟'
+                    GROUP BY
+                        商品专员
+                ) as m
+
             ) as t on z.商品专员=t.商品专员
             set 
                 z.`近七天日均销额_加盟` = t.近七天日均销
@@ -506,16 +530,22 @@ class Customitem17 extends BaseController
         $sql_近七天日均销_合计 = "
             update cwl_customitem17_zhuanyuan as z 
             left join ( 
-            SELECT
-                商品专员,
-                sum(近七天日均销) AS 近七天日均销 
-            FROM
-                cwl_customitem17_yeji 
-            WHERE 1
-                AND 经营模式 in ('直营', '加盟') 
-                AND 本月目标 IS NOT NULL 
-            GROUP BY
-                商品专员
+
+                select 
+                    m.商品专员, 
+                    m.销售金额 / 7 as 近七天日均销
+                from (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail
+                    WHERE
+                        日期 IN ( {$str_近七天日期} ) 
+                    GROUP BY
+                        商品专员
+                ) as m
+
             ) as t on z.商品专员=t.商品专员
             set 
                 z.`近七天日均销额_合计` = t.近七天日均销
@@ -534,5 +564,26 @@ class Customitem17 extends BaseController
         echo $本月最后一天 = date('Y-m-t'); 
         echo '<br>';
         echo $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+
+
+        $str_近七天日期 = '';
+        $getBefore7 = $this->getBefore7();
+        if($getBefore7) {
+            $str_近七天日期 = arrToStr($getBefore7);
+        }
+        echo '<br>';
+        $str_近七天日期 = "'2023-09-26','2023-09-25','2023-09-24','2023-09-23','2023-09-22','2023-09-21','2023-09-20'";
+
+        echo $sql_近七天日均销 = " 
+            SELECT
+                店铺名称,
+                销售金额
+            FROM
+                cwl_customitem17_retail
+            WHERE 
+                日期 in ({$str_近七天日期})
+                AND 商品专员 = '刘琳娜'
+            GROUP BY 店铺名称
+        ";
     }
 }

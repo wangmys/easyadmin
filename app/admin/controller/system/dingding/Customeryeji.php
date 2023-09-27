@@ -660,9 +660,9 @@ class Customeryeji extends BaseController
     
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
-            $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
+            $this_title_box = @imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
             $title_x_len = $this_title_box[2] - $this_title_box[0];
-            imagettftext($img, $base['text_size'], 0, $sum + (($x - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $params['table_header'][$key]); //写入表头文字
+            @imagettftext($img, $base['text_size'], 0, $sum + (($x - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $params['table_header'][$key]); //写入表头文字
             $sum += $params['field_width'][$key];
         }
 
