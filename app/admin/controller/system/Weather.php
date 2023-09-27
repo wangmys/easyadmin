@@ -121,7 +121,8 @@ class Weather extends AdminController
                                 } elseif ($diff > 5 && $diff <= 10) {
                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 2;
                                 } elseif ($diff > 10) {
-                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
+                                    // $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
+                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 3;
                                 }
 
                             }

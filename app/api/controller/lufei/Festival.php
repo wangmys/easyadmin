@@ -54,7 +54,7 @@ class Festival extends BaseController
         $date = date('Y-m-d');
 
         // 测试
-        // $date = '2023-09-25';
+        // $date = '2023-09-26';
 
         $date_res = $this->isFestavalDate($date);
         if ($date_res) {

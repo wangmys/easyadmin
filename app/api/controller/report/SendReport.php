@@ -961,7 +961,7 @@ class SendReport extends BaseController
 
     }
 
-    //   cwl
+    //   cwl 101 104 102 103
     public function run_pro_test()
     {
         $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
@@ -973,16 +973,11 @@ class SendReport extends BaseController
         $this->servicePro->create_table_s103($date);
         $this->servicePro->create_table_s101('S104', $date);
 
-        // 108-110
-        // $this->service->create_table_s108A($date);
-        // $this->service->create_table_s108B($date);
-        // $this->service->create_table_s109($date);
-        // $this->service->create_table_s110A($date);
-        // $this->service->create_table_s110B($date);
         // 发送数据报表
         $this->send_pro_test();
     }
 
+    // cwl 108 109 110 
     public function run_pro_test2()
     {
         $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
@@ -1035,8 +1030,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -1084,8 +1079,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($v['title'],$v['jpg_url']);
+                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }

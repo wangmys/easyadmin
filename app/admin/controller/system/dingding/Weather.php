@@ -1040,7 +1040,7 @@ class Weather extends BaseController
                             } elseif ( ($item3['最高温'] - $item3['最低温']) > 5 && ($item3['最高温'] - $item3['最低温']) <= 10) {
                                 $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 2;
                             } elseif ( ($item3['最高温'] - $item3['最低温']) > 10) {
-                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 4;
+                                $colorVal = ($item3['最高温'] + $item3['最低温']) / 2 + 3;
                             }
 
                             if ($colorVal < 10) {

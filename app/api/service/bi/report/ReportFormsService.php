@@ -4585,6 +4585,8 @@ class ReportFormsService
                 AND (`销售金额2022` > 0 OR `首单日期` <= '{$year2022}')
             order by 省份 DESC
         ";
+
+        // die;
         $list = $this->db_easyA->query($sql);
 
         if ($list) {
