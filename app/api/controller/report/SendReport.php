@@ -125,6 +125,8 @@ class SendReport extends BaseController
             $this->service->create_table_s030();
         } elseif ($name =='S031') {
             $this->service->create_table_s031();
+        } elseif ($name =='S032') {
+            $this->service->create_table_s032();
         } elseif ($name =='S043') {
             $this->service->create_table_s043();
         } elseif ($name =='S045') {
