@@ -602,7 +602,7 @@ class ReportFormsServicePro
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
             SUM(SCL.`近七天日均`) AS 近七天日均,
-            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) + 1), 2)  AS 剩余目标日均
+            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) ), 2)  AS 剩余目标日均
             FROM sp_customer_liushui_ww SCL
             LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             where SCL.`经营模式`='直营'
@@ -684,12 +684,11 @@ class ReportFormsServicePro
                 SUM(SCM.`本月目标`) 本月目标,
                 SUM(SCL.`本月流水`) 本月流水,
                 SUM(SCL.`近七天日均`) AS 近七天日均,
-                ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) + 1),2) AS 剩余目标日均
+                ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) ),2) AS 剩余目标日均
                 FROM sp_customer_liushui_ww SCL
                 LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
                 where SCL.`经营模式`='加盟'
                 GROUP BY
-                SCL.`督导`,
                 SCL.`省份`
                 WITH ROLLUP
         ";
@@ -769,7 +768,7 @@ class ReportFormsServicePro
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
             SUM(SCL.`近七天日均`) AS 近七天日均,
-            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE())+1),2) AS 剩余目标日均
+            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE())),2) AS 剩余目标日均
             FROM sp_customer_liushui_ww SCL
             LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             GROUP BY
@@ -863,7 +862,7 @@ class ReportFormsServicePro
             SUM(SCM.`本月目标`) 本月目标,
             SUM(SCL.`本月流水`) 本月流水,
             SUM(SCL.`近七天日均`) AS 近七天日均,
-            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) + 1), 2) AS 剩余目标日均
+            ROUND((SUM(SCM.`本月目标`) - SUM(SCL.`本月流水`)) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) ), 2) AS 剩余目标日均
             FROM sp_customer_liushui_ww SCL
             LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             where 经营模式='加盟'
@@ -956,7 +955,7 @@ class ReportFormsServicePro
             SCM.`本月目标`,
             SCL.`本月流水`,
             SCL.`近七天日均`,
-            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) + 1), 2) AS 剩余目标日均
+            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) ), 2) AS 剩余目标日均
             FROM sp_customer_liushui_ww SCL
             LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             WHERE SCL.`经营模式`='直营'
@@ -1043,7 +1042,7 @@ class ReportFormsServicePro
             SCM.`本月目标`,
             SCL.`本月流水`,
             SCL.`近七天日均`,
-            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) + 1), 2) AS 剩余目标日均
+            ROUND((SCM.`本月目标` - SCL.`本月流水`) /  (DATEDIFF(LAST_DAY(CURDATE()),CURDATE()) ), 2) AS 剩余目标日均
             FROM sp_customer_liushui_ww SCL
             LEFT JOIN sp_customer_mubiao_ww SCM ON SCL.`店铺名称`=SCM.`店铺名称`
             WHERE SCL.`经营模式`='加盟'

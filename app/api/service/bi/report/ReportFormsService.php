@@ -3286,7 +3286,6 @@ class ReportFormsService
                 LEFT JOIN sp_customer_mubiao SCM ON SCL.`店铺名称`=SCM.`店铺名称`
                 where SCL.`经营模式`='加盟'
                 GROUP BY
-                SCL.`督导`,
                 SCL.`省份`
                 WITH ROLLUP
         ";
