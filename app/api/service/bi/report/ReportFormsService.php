@@ -4658,7 +4658,6 @@ class ReportFormsService
     public function create_table_s115A($type = "加盟", $date) {
         $date = $date ?: date('Y-m-d');
         
-
         // 编号
         $code = 'S115A';
         $find_festival = $this->db_easyA->table('cwl_festival_config')->where([
@@ -4823,7 +4822,7 @@ class ReportFormsService
             $table_header = array_merge($table_header, array_keys($list[0]));
             
             foreach ($table_header as $v => $k) {
-                $field_width[] = 100;
+                $field_width[] = 97;
             }
             $field_width[0] = 30;
             $field_width[1] = 60;
@@ -4858,7 +4857,12 @@ class ReportFormsService
     
             // 生成图片
             // return $this->create_image($params);
-            return $this->create_image_festival($params);
+            return $this->create_image_festival($params, [
+                '23(22老店)'.PHP_EOL.'日增长' => 3,
+                '23(21老店)'.PHP_EOL.'日增长' => 4,
+                '23(22老店)'.PHP_EOL.'累计增长' => 5,
+                '23(21老店)'.PHP_EOL.'累计增长' => 6,
+            ]);
         } else {
             return false;
         }
@@ -5984,18 +5988,6 @@ class ReportFormsService
 
         $sum = $base['border'];
 
-        // $y1 = 51;
-        // $y2 = 110;
-        // 1 统计上色
-        // foreach ($params['data'] as $key => $item) {
-        //     if (isset($item['品类']) && $item['品类'] == '店铺业绩') {
-        //         imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $orange);
-        //     } 
-        //     if (isset($item['品类']) && $item['品类'] == '季节流水占比') {
-        //         imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $yellow);
-        //     } 
-        // }
-
         foreach ($params['data'] as $key => $item) {
             if (@$params['code'] == 'S115B') {
                 // die;
@@ -6014,16 +6006,67 @@ class ReportFormsService
 
 
         // 标题颜色特殊处理
-        // $s118_y1 = 52;
+        $s118_y1 = 52;
         // // 直营
-        // $s118_x1 = $params['field_width'][0] + $params['field_width'][1];
-        // $s118_x2 = $s118_x1 +  $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4];
+        $s118_x1 = $params['field_width'][0] + $params['field_width'][1] +  $params['field_width'][2];
+        $s118_x2 = $s118_x1  + $params['field_width'][3] + $params['field_width'][4];
         // // 加盟
-        // $s118_x3 = $s118_x2 + $params['field_width'][5] + $params['field_width'][6] + $params['field_width'][7];
+        $s118_x3 = $s118_x2 + $params['field_width'][5] + $params['field_width'][6];
         // // 直营
-        // imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $blue2);
+        imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $blue2);
         // // 加盟
-        // imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue1);
+        imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue1);
+
+        // 2 单元格上色
+        if (! empty($set_bgcolor)) {
+            /* 获取开始x1结束x2
+            ^ array:2 [▼
+                    "今日达成率" => array:2 [▼
+                        "start" => 120
+                        "end" => 210
+                    ]
+                    "本月达成率" => array:2 [▼
+                        "start" => 210
+                        "end" => 300
+                    ]
+                ]
+            */
+            foreach ($set_bgcolor as $k => $v) {
+                $site_arr = [
+                    'x0' => 0,
+                    'x1' => 0
+                ];
+                for ($i = 0; $i <= $v; $i ++) {
+                    if ($i < $v) {
+                        $site_arr['x0'] += $params['field_width'][$i]; 
+                    } else {
+                        $site_arr['x1'] = $site_arr['x0'] + $params['field_width'][$i];
+                    }
+            
+                }
+                $set_bgcolor[$k] = $site_arr;
+                
+            }
+            // dump($set_bgcolor[$key]);
+            
+            foreach ($params['data'] as $key => $item) {
+                // echo '<pre>';
+                // print_r($set_bgcolor);
+                foreach ($set_bgcolor as $key2 => $val2) {
+                    // echo $key2;
+                    if (@$params['code'] == 'S115B') {
+                        $y1 = 51;
+                        $y2 = 95; 
+                        
+                        if (!empty($item[$key2]) && substr($item[$key2], 0, 1) == '-') {
+                            imagefilledrectangle($img, $val2['x0'], $y1 + $base['row_hight'] * ($key + 1), $val2['x1'], $y2 + $base['row_hight'] * ($key + 1), $red2);
+                        }
+                        
+                    }
+
+                }
+            }
+        }
 
     
         foreach ($base['column_x_arr'] as $key => $x) {
