@@ -4768,23 +4768,52 @@ class ReportFormsService
             die;
         }
 
+        // $sql = "
+        //     select 
+        //         省份,经营属性 as 性质,
+        //         concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
+        //         concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
+        //         concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
+        //         concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
+        //         round(前年同日销额, 1) as 前年同日销额,
+        //         round(去年同日销额, 1) as 去年同日销额,
+        //         round(今日销额, 1) as 今日销额,
+        //         round(前年累销额, 1) as 前年累销额,
+        //         round(去年累销额, 1) as 去年累销额,
+        //         round(今年累销额同比前年, 1) as 今年累销额同比前年,
+        //         round(今年累销额同比去年, 1) as 今年累销额同比去年
+        //     from cwl_festival_statistics_province 
+        //     WHERE 
+        //         节日天数='{$fday}' 
+        // ";
+
         $sql = "
             select 
                 省份,经营属性 as 性质,
-                concat(round(前年日增长 * 100, 1), '%') AS 前年日增长,
-                concat(round(去年日增长 * 100, 1), '%') AS 去年日增长,
-                concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
-                concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
-                round(前年同日销额, 1) as 前年同日销额,
-                round(去年同日销额, 1) as 去年同日销额,
-                round(今日销额, 1) as 今日销额,
-                round(前年累销额, 1) as 前年累销额,
-                round(去年累销额, 1) as 去年累销额,
-                round(今年累销额同比前年, 1) as 今年累销额同比前年,
-                round(今年累销额同比去年, 1) as 今年累销额同比去年
+                concat(round(去年日增长 * 100, 1), '%') AS `23(22老店)".PHP_EOL."日增长`,
+                concat(round(前年日增长 * 100, 1), '%') AS `23(21老店)".PHP_EOL."日增长`,
+                concat(round(去年累计增长 * 100, 1), '%') AS `23(22老店)".PHP_EOL."累计增长`,
+                concat(round(前年累计增长 * 100, 1), '%') AS `23(21老店)".PHP_EOL."累计增长`,
+
+                round(今日销额同比去年, 1) as `23(22老店)".PHP_EOL."同日销额`,
+                round(去年同日销额, 1) as `22老店".PHP_EOL."同日销额`,
+
+                round(今日销额同比前年, 1) as `23(21老店)".PHP_EOL."同日销额`,
+                round(前年同日销额, 1) as `21老店".PHP_EOL."同日销额`,
+
+
+                round(今年累销额同比去年, 1) as `23(22老店)".PHP_EOL."假期累销额`,
+                round(去年累销额, 1) as `22老店".PHP_EOL."假期累销额`,
+
+                round(今年累销额同比前年, 1) as `23(21老店)".PHP_EOL."假期累销额`,
+                round(前年累销额, 1) as `21老店".PHP_EOL."假期累销额`
+
+
+                  
             from cwl_festival_statistics_province 
             WHERE 
                 节日天数='{$fday}' 
+                AND (去年同日销额 > 0 || 前年同日销额 > 0)
         ";
         $list = $this->db_easyA->query($sql);
         // dump($list);die;
@@ -4798,10 +4827,14 @@ class ReportFormsService
                 $field_width[] = 100;
             }
             $field_width[0] = 30;
-            $field_width[1] = 50;
-            $field_width[2] = 50;
-            $field_width[12] = 150;
-            $field_width[13] = 150;
+            $field_width[1] = 60;
+            $field_width[2] = 60;
+            // $field_width[5] = 120;
+            // $field_width[6] = 120;
+            // $field_width[10] = 140;
+            // $field_width[11] = 140;
+            // $field_width[12] = 140;
+            // $field_width[13] = 140;
     
             //图片左上角汇总说明数据，可为空
             $table_explain = [
@@ -4820,12 +4853,13 @@ class ReportFormsService
                 'table_explain' => $table_explain,
                 'table_header' => $table_header,
                 'field_width' => $field_width,
-                'banben' => '          编号: ' . $code ,
+                'banben' => '        编号: ' . $code ,
                 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
             ];
     
             // 生成图片
-            return $this->create_image($params);
+            // return $this->create_image($params);
+            return $this->create_image_festival($params);
         } else {
             return false;
         }
@@ -5862,5 +5896,194 @@ class ReportFormsService
 
     }
 
+    // 格子带背景色
+    public function create_image_festival($params, $set_bgcolor = [])
+    {
+        // echo '<pre>';
+        // print_r($params);die;
+        $base = [
+            'border' => 1, //图片外边框
+            'file_path' => $params['file_path'], //图片保存路径
+            // 'title_height' => 35, //报表名称高度
+            'title_height' => 50, //报表名称高度
+            'title_font_size' => 18, //报表名称字体大小
+            'font_ulr' => app()->getRootPath() . '/public/Medium.ttf', //字体文件路径
+            'text_size' => 13, //正文字体大小
+            'row_hight' => 45, //每行数据行高
+            // 'row_hight' => 60, //每行数据行高
+        ];
+
+        $y1 = 36;
+        $x2 = 1542;
+        $y2 = 65;
+        $font_west =  realpath('./static/plugs/font-awesome-4.7.0/fonts/SimHei.ttf'); //字体文件路径
+        $save_path = $base['file_path'] . $params['file_name'];
+
+        //如果表说明部分不为空，则增加表图片的高度
+        if (!empty($params['table_explain'])) {
+            $base['title_height'] =   $base['title_height'] * count($params['table_explain']);
+        }
+
+        //计算图片总宽
+        $w_sum = $base['border'];
+        foreach ($params['field_width'] as $key => $value) {
+            //图片总宽
+            $w_sum += $value;
+            //计算每一列的位置
+            $base['column_x_arr'][$key] = $w_sum;
+        }
+
+        $base['img_width'] = $w_sum + $base['border'] * 2 - $base['border']; //图片宽度
+        $base['img_height'] = ($params['row'] + 1) * $base['row_hight'] + $base['border'] * 2 + $base['title_height']; //图片高度
+        $border_top = $base['border'] + $base['title_height']; //表格顶部高度
+        $border_bottom = $base['img_height'] - $base['border']; //表格底部高度
+
+
+        $img = imagecreatetruecolor($base['img_width'], $base['img_height']); //创建指定尺寸图片
+        $bg_color = imagecolorallocate($img, 24, 98, 229); //设定图片背景色
+
+
+        $yellow = imagecolorallocate($img, 238, 228, 0); //设定图片背景色
+        $text_coler = imagecolorallocate($img, 0, 0, 0); //设定文字颜色
+        $text_coler2 = imagecolorallocate($img, 255, 255, 255); //设定文字颜色
+        $border_coler = imagecolorallocate($img, 150, 150, 150); //设定边框颜色
+        $xb  = imagecolorallocate($img, 255, 255, 255); //设定图片背景色
+
+        $red = imagecolorallocate($img, 255, 0, 0); //设定图片背景色
+        $red2 = imagecolorallocate($img, 251, 89, 62); //设定图片背景色
+        $blue1 = imagecolorallocate($img, 168, 203, 255); //设定图片背景色
+        $blue2 = imagecolorallocate($img, 66, 182, 255); //设定图片背景色
+        $yellow2 = imagecolorallocate($img, 250, 233, 84); //设定图片背景色
+        $yellow3 = imagecolorallocate($img, 230, 244, 0); //设定图片背景色
+        $green = imagecolorallocate($img, 24, 98, 0); //设定图片背景色
+        $green2 = imagecolorallocate($img, 75, 234, 32); //设定图片背景色
+        $chengse = imagecolorallocate($img, 255, 72, 22); //设定图片背景色
+        $blue = imagecolorallocate($img, 0, 42, 212); //设定图片背景色
+        $gray = imagecolorallocate($img, 37, 240, 240); //设定图片背景色
+        $littleblue = imagecolorallocate($img, 22, 172, 176); //设定图片背景色
+        $orange = imagecolorallocate($img, 255, 192, 0); //设定图片背景色
+
+        // 天气温度
+        $color1 = imagecolorallocate($img, 22, 108, 221); //设定图片背景色
+        $color2 = imagecolorallocate($img, 103, 184, 249); //设定图片背景色
+        $color3 = imagecolorallocate($img, 248, 243, 162); //设定图片背景色
+        $color4 = imagecolorallocate($img, 253, 206, 74); //设定图片背景色
+        $color5 = imagecolorallocate($img, 241, 124, 0); //设定图片背景色
+        $color6 = imagecolorallocate($img, 204, 41, 49); //设定图片背景色
+
+        imagefill($img, 0, 0, $bg_color); //填充图片背景色
+
+        // 表面颜色（浅灰）
+        $surface_color = imagecolorallocate($img, 235, 242, 255);
+        // 标题字体颜色（白色）
+        //先填充一个黑色的大块背景
+        imagefilledrectangle($img, $base['border'], $base['border'] + $base['title_height'], $base['img_width'] - $base['border'], $base['img_height'] - $base['border'], $bg_color); //画矩形
+
+        //再填充一个小两个像素的 背景色区域，形成一个两个像素的外边框
+        imagefilledrectangle($img, $base['border'] + 2, $base['border'] + $base['title_height'] + 2, $base['img_width'] - $base['border'] - 2, $base['img_height'] - $base['border'] - 2, $surface_color); //画矩形
+        //画表格纵线 及 写入表头文字
+
+        $sum = $base['border'];
+
+        // $y1 = 51;
+        // $y2 = 110;
+        // 1 统计上色
+        // foreach ($params['data'] as $key => $item) {
+        //     if (isset($item['品类']) && $item['品类'] == '店铺业绩') {
+        //         imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $orange);
+        //     } 
+        //     if (isset($item['品类']) && $item['品类'] == '季节流水占比') {
+        //         imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $yellow);
+        //     } 
+        // }
+
+        foreach ($params['data'] as $key => $item) {
+            if (@$params['code'] == 'S115B') {
+                // die;
+                $y1 = 51;
+                $y2 = 95;
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    // imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                    imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $yellow2);
+                }
+                if (isset($item['省份']) && $item['省份'] == '总计') {
+                    // imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                    imagefilledrectangle($img, 3, $y1 + $base['row_hight'] * ($key + 1), $base['img_width'] - 3, $y2 + $base['row_hight'] * ($key + 1), $orange);
+                }
+            }
+        }
+
+
+        // 标题颜色特殊处理
+        // $s118_y1 = 52;
+        // // 直营
+        // $s118_x1 = $params['field_width'][0] + $params['field_width'][1];
+        // $s118_x2 = $s118_x1 +  $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4];
+        // // 加盟
+        // $s118_x3 = $s118_x2 + $params['field_width'][5] + $params['field_width'][6] + $params['field_width'][7];
+        // // 直营
+        // imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $blue2);
+        // // 加盟
+        // imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue1);
+
+    
+        foreach ($base['column_x_arr'] as $key => $x) {
+            imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
+            $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
+            $title_x_len = $this_title_box[2] - $this_title_box[0];
+            imagettftext($img, $base['text_size'], 0, $sum + (($x - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] -20 + $base['text_size']) / 2, $text_coler, $font_west, $params['table_header'][$key]); //写入表头文字
+            $sum += $params['field_width'][$key];
+        }
+
+        //画表格横线
+        foreach ($params['data'] as $key => $item) {
+            $border_top += $base['row_hight'];
+            //画横线
+            imageline($img, $base['border'], $border_top, $base['img_width'] - $base['border'], $border_top, $border_coler);
+            $this_first = imagettfbbox($base['text_size'], 0, $font_west, $key);
+            $first_len = $this_first[2] - $this_first[0];
+            imagettftext($img, $base['text_size'], 0, $params['field_width'][0] / 2 - $first_len / 2 + $base['border'], $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $key + 1); //写入序号
+            $sub = 0;
+            $sum = $params['field_width'][0] + $base['border'];
+            foreach ($item as $k => $value) {
+                // dump($value);
+                if (empty($value)) {
+                    $value = '';
+                }
+                $sub++;
+                $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $value);
+                $title_x_len = $this_title_box[2] - $this_title_box[0];
+                imagettftext($img, $base['text_size'], 0, $sum + (($base['column_x_arr'][$sub] - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $value); //写入data数据
+                // imagettftext($img, $base['text_size'], 0, $sum + (($base['column_x_arr'][$sub] - $sum) / 2 - $title_x_len / 2), $border_top + ($base['row_hight'] + $base['text_size']) / 2, $text_coler, $font_west, $value); //写入data数据
+                $sum += $params['field_width'][$sub];
+            }
+        }
+
+        //计算标题写入起始位置
+        $title_fout_box = imagettfbbox($base['title_font_size'], 0, $font_west, $params['title']); //imagettfbbox() 返回一个含有 8 个单元的数组表示了文本外框的四个角：
+        $title_fout_width = $title_fout_box[2] - $title_fout_box[0]; //右下角 X 位置 - 左下角 X 位置 为文字宽度
+        $title_fout_height = $title_fout_box[1] - $title_fout_box[7]; //左下角 Y 位置- 左上角 Y 位置 为文字高度
+        $save_path = $base['file_path'] . $params['file_name'];
+        if (!is_dir($base['file_path'])) //判断存储路径是否存在，不存在则创建
+        {
+            mkdir($base['file_path'], 0777, true);
+        }
+
+        //居中写入标题
+        imagettftext($img, $base['title_font_size'], 0, ($base['img_width'] - $title_fout_width) / 2, 30, $xb, $font_west, $params['title']);
+        //设置图片左上角信息
+        $a_hight = 10;
+        if (!empty($params['table_explain'])) {
+            foreach ($params['table_explain'] as $key => $value) {
+                imagettftext($img, $base['text_size'], 0, 10, 20 + $a_hight, $yellow, $font_west, $value);
+                imagettftext($img, $base['text_size'], 0, $base['img_width'] - 180, 20 + $a_hight, $xb, $font_west, $params['banben']);
+                $a_hight += 20;
+            }
+        }
+
+        imagepng($img, $save_path); //输出图片，输出png使用imagepng方法，输出gif使用imagegif方法
+
+        echo '<img src="/' . $save_path . '"/>';
+    }
 
 }
