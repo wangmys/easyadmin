@@ -4797,7 +4797,10 @@ class ReportFormsService
                 round(去年同日销额, 1) as `22老店".PHP_EOL."同日销额`,
 
                 round(今日销额同比前年, 1) as `23(21老店)".PHP_EOL."同日销额`,
-                round(前年同日销额, 1) as `21老店".PHP_EOL."同日销额`,
+                case
+                    when 前年同日销额 > 0 then round(前年同日销额, 1) else ''
+                end as `21老店".PHP_EOL."同日销额`,
+               
 
 
                 round(今年累销额同比去年, 1) as `23(22老店)".PHP_EOL."假期累销额`,
