@@ -1168,7 +1168,7 @@ class SendReport extends BaseController
     }
 
     // 国庆报表
-    public function run_festival()
+    public function run_festival10()
     {
         $date = input('date') ? input('date') : date('Y-m-d', time());
         $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1";
