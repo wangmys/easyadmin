@@ -67,6 +67,10 @@ class Customitem17 extends BaseController
     public function getCustomer1()
     {
         $目标月份 = date('Y-m');
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
+
         $sql = "
             select 
                 CustomerName as 店铺名称,
@@ -100,6 +104,9 @@ class Customitem17 extends BaseController
     {
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
         $目标月份 = date('Y-m');
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
         $sql = "
             select 
                 店铺名称,
@@ -149,6 +156,27 @@ class Customitem17 extends BaseController
         // echo '<br>';
         $day7 = date('Y-m-d', strtotime('-7 day', strtotime($今天)));
 
+        // 每月1号
+        if ($今天 == date('Y-m-01')) {
+            // $今天 = date('Y-m-d');
+            $本月 = strtotime(date('Y-m-01', strtotime('-1 month')));
+            $day1 = date('Y-m-d', strtotime('-1 day', strtotime($今天)));
+            // echo '<br>';
+            $day2 = date('Y-m-d', strtotime('-2 day', strtotime($今天)));
+            // echo '<br>';
+            $day3 = date('Y-m-d', strtotime('-3 day', strtotime($今天)));
+            // echo '<br>';
+            $day4 = date('Y-m-d', strtotime('-4 day', strtotime($今天)));
+            // echo '<br>';
+            $day5 = date('Y-m-d', strtotime('-5 day', strtotime($今天)));
+            // echo '<br>';
+            $day6 = date('Y-m-d', strtotime('-6 day', strtotime($今天)));
+            // echo '<br>';
+            $day7 = date('Y-m-d', strtotime('-7 day', strtotime($今天)));
+        }
+
+        // die;
+
         $res_data = [];
         if (strtotime($day1) >= $本月) {
             array_push($res_data, $day1);
@@ -172,7 +200,7 @@ class Customitem17 extends BaseController
             array_push($res_data, $day7);
         }
 
-        // dump($res_data);
+        // dump($res_data);die;
         // echo arrToStr($res_data);
         return $res_data;
     }
@@ -185,8 +213,26 @@ class Customitem17 extends BaseController
         $本月最后一天 = date('Y-m-t'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
 
-        $落后分母 = date('d', strtotime('-1 day')) / date('t'); 
+        $目标月份 = date('Y-m');
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
 
+        // 每月1号
+        if ($开始 == date('Y-m-01')) {
+            $开始= date("Y-m-01", strtotime('-1month')); 
+            // $date_str = date("Y-m-01", strtotime('-1month')); 
+            // $结束= date('Y-m-d');
+            // $截止日期 = date('Y-m-d', strtotime('-1 day'));
+            $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
+            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        }
+
+
+        // die;
+
+        $落后分母 = date('d', strtotime('-1 day')) / date('t'); 
+        // die;
         $sql = "
             select 
                 *
@@ -224,9 +270,12 @@ class Customitem17 extends BaseController
             set
                 y.实际累计流水 = r.销售金额,
                 y.累计流水截止日期 = '{$截止日期}'
+            where  
+                y.目标月份 = '{$目标月份}'
         ";
+     
         $this->db_easyA->execute($sql_实际累计流水);
-
+                
         $sql_目标达成率 = "
             update cwl_customitem17_yeji
                 set
@@ -237,9 +286,12 @@ class Customitem17 extends BaseController
                     `85%缺口额` = case
                                     when (本月目标 * 0.85) - 实际累计流水 > 0 then (本月目标 * 0.85) - 实际累计流水 else NULL
                                   end
+                where  
+                    目标月份 = '{$目标月份}'
         ";
         $this->db_easyA->execute($sql_目标达成率);
 
+        
         $sql_缺口日均 = "
             update cwl_customitem17_yeji
                 set
@@ -249,9 +301,11 @@ class Customitem17 extends BaseController
                     `85%缺口_日均额` = case
                                           when `85%缺口额` > 0 then  `85%缺口额` / $到结束剩余天数 else null 
                                        end
+                where  
+                    目标月份 = '{$目标月份}'
         ";
         $this->db_easyA->execute($sql_缺口日均);
-
+        
         // 近七天日均销
         $str_近七天日期 = '';
         $getBefore7 = $this->getBefore7();
@@ -272,9 +326,12 @@ class Customitem17 extends BaseController
             ) as r on y.店铺名称 = r.店铺名称
             set
                 y.近七天日均销 = r.近七天日均销
+            where  
+                目标月份 = '{$目标月份}'
         ";
+        
         $this->db_easyA->execute($sql_近七天日均销);
-
+        
         $sql_落后 = "
             update cwl_customitem17_yeji
             set
@@ -286,16 +343,28 @@ class Customitem17 extends BaseController
                     case
                         when 本月目标 is not null > 0 then 实际累计流水 / (本月目标*0.85) - {$落后分母} else NULL
                     end
+            where  
+                目标月份 = '{$目标月份}'
         ";  
         $this->db_easyA->execute($sql_落后);      
     }
 
     // 专员表
-    public function updateZhuanyuan1() {
+    public function updateZhuanyuan() {
         $目标月份 = date('Y-m');
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
         $本月最后一天 = date('Y-m-t'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
+
+        // 每月1号
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
+            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        }
 
         $sql = "
             select 商品专员,目标月份 from cwl_customitem17_yeji where 目标月份 = '{$目标月份}' group by 商品专员
@@ -450,7 +519,7 @@ class Customitem17 extends BaseController
             update cwl_customitem17_zhuanyuan
             set 
                 `100%日均需销额_直营` = (`目标_直营` - `累计流水_直营`) / {$到结束剩余天数},
-                `100%日均需销额_加盟` = (`目标_加盟` - `累计流水_加盟`) / {$到结束剩余天数} ,
+                `100%日均需销额_加盟` = (`目标_加盟` - `累计流水_加盟`) / {$到结束剩余天数},
                 `100%日均需销额_合计` = (`目标_合计` - `累计流水_合计`) / {$到结束剩余天数}
             where
                 目标月份 = '{$目标月份}'
@@ -461,7 +530,7 @@ class Customitem17 extends BaseController
             update cwl_customitem17_zhuanyuan
             set 
                 `85%日均需销额_直营` = (`目标_直营` * 0.85  - `累计流水_直营`) / {$到结束剩余天数},
-                `85%日均需销额_加盟` = (`目标_加盟` * 0.85 - `累计流水_加盟`)  / {$到结束剩余天数} ,
+                `85%日均需销额_加盟` = (`目标_加盟` * 0.85 - `累计流水_加盟`)  / {$到结束剩余天数},
                 `85%日均需销额_合计` = (`目标_合计` * 0.85 - `累计流水_合计`)  / {$到结束剩余天数}
             where
                 目标月份 = '{$目标月份}'

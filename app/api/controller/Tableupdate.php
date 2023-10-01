@@ -1037,6 +1037,27 @@ class Tableupdate extends BaseController
             foreach($select_customer as $key => $val) {
                 $insert = $this->db_easyA->table('customer_pro')->strict(false)->insertAll($val);
             }
+
+            // 补丁修复首单日期
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '德庆一店'])->update(['首单日期' => '2021-04-10']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '丰顺一店'])->update(['首单日期' => '2020-12-30']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '河源二店'])->update(['首单日期' => '2021-07-09']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '河源一店'])->update(['首单日期' => '2021-03-18']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '厚街一店'])->update(['首单日期' => '2020-12-01']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '惠东一店'])->update(['首单日期' => '2020-12-16']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '开平一店'])->update(['首单日期' => '2021-05-01']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '龙川一店'])->update(['首单日期' => '2021-06-30']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '龙岗一店'])->update(['首单日期' => '2021-03-20']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '水口一店'])->update(['首单日期' => '2020-12-22']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '顺德一店'])->update(['首单日期' => '2020-12-19']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '太和一店'])->update(['首单日期' => '2021-07-30']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '塘厦一店'])->update(['首单日期' => '2021-04-15']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '西樵一店'])->update(['首单日期' => '2020-12-23']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '西乡一店'])->update(['首单日期' => '2021-06-18']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '兴宁一店'])->update(['首单日期' => '2021-06-26']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '阳春一店'])->update(['首单日期' => '2020-12-11']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '英德一店'])->update(['首单日期' => '2021-09-15']);
+            $this->db_easyA->table('customer_pro')->where(['CustomerName' => '十堰二店'])->update(['首单日期' => '2021-11-07']);
     
             if ($select_customer) {
                 // $this->db_bi->commit();    

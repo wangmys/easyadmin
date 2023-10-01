@@ -112,6 +112,7 @@ class Push extends BaseController
      * 提送每日零售核销单
      * 131255621326201188
      * https://bx.babiboy.com/dingding/get?code=15880012590
+     * 数据源执行 http://im.babiboy.com/api/lufei.Hexiao/dataHandle
      */
     public function pushHexiao()
     {

@@ -42,7 +42,10 @@ class Dianpuyejihuanbi extends BaseController
 
     public function dianpuyejihuanbi_date_handle() {
         $date = input('date');
-
+        if ($date = date('Y-m-01')) {
+            // echo '每月1号';
+            $this->dianpuyejihuanbi_lastmonth();
+        }
         // die;
         $res = $this->dianpuyejihuanbi_date($date);
         // dump(json_decode($res->toArray(), true));

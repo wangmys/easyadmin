@@ -28,6 +28,9 @@ class Duanmalv extends BaseController
     // 创建时间
     protected $create_time = '';
 
+    // top50
+    private $top = 50;
+
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
@@ -909,9 +912,9 @@ class Duanmalv extends BaseController
                 m1.*,
                 m1.SKC数 / m1.店铺总SKC数 AS SKC占比,
                 round(m1.销售金额 / m1.店铺总销售金额, 4) AS 销售占比,
-                round(m1.SKC数 / m1.店铺总SKC数 * 60, 4) AS SKC数TOP分配,
-                round(m1.销售金额 / m1.店铺总销售金额 * 60, 4) AS 销售TOP分配,
-                round((m1.SKC数 / m1.店铺总SKC数 * 60 + m1.销售金额 / m1.店铺总销售金额 * 60) / 4, 0) AS 实际分配TOP
+                round(m1.SKC数 / m1.店铺总SKC数 * {$this->top}, 4) AS SKC数TOP分配,
+                round(m1.销售金额 / m1.店铺总销售金额 * {$this->top}, 4) AS 销售TOP分配,
+                round((m1.SKC数 / m1.店铺总SKC数 * {$this->top} + m1.销售金额 / m1.店铺总销售金额 * {$this->top}) / 4, 0) AS 实际分配TOP
             FROM
                 (SELECT sk.经营模式,
                     sk.商品负责人,
@@ -955,18 +958,18 @@ class Duanmalv extends BaseController
             end as 销售占比,
             case
                 m1.风格
-                when '基本款' then round(m1.SKC数 / m1.店铺SKC数_基本款 * 50, 4)
-                when '引流款' then round(m1.SKC数 / m1.店铺SKC数_引流款 * 50, 4)
+                when '基本款' then round(m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top}, 4)
+                when '引流款' then round(m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top}, 4)
             end as SKC数TOP分配,
             case
                 m1.风格
-                when '基本款' then round(m1.销售金额 / m1.店铺总销售金额_基本款 * 50, 4)
-                when '引流款' then round(m1.销售金额 / m1.店铺总销售金额_引流款 * 50, 4)
+                when '基本款' then round(m1.销售金额 / m1.店铺总销售金额_基本款 * {$this->top}, 4)
+                when '引流款' then round(m1.销售金额 / m1.店铺总销售金额_引流款 * {$this->top}, 4)
             end as 销售TOP分配,
             case
                 m1.风格
-                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * 50 + m1.销售金额 / m1.店铺总销售金额_基本款 * 50) / 2, 0)
-                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * 50 + m1.销售金额 / m1.店铺总销售金额_引流款 * 50) / 2, 0)
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
             end as 实际分配TOP
         FROM
             (SELECT sk.经营模式,
@@ -1475,33 +1478,33 @@ class Duanmalv extends BaseController
                 h1.*,
                 -- (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码') AS '断码数-整体',
                 1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
-                1 - ROUND(`SKC数-TOP实际` / 60, 4)AS '齐码率-TOP实际',
-                1 - ROUND(`SKC数-TOP考核` / 60, 4)AS '齐码率-TOP考核',
+                1 - ROUND(`SKC数-TOP实际` / {$this->top}, 4)AS '齐码率-TOP实际',
+                1 - ROUND(`SKC数-TOP考核` / {$this->top}, 4)AS '齐码率-TOP考核',
                 date_format(now(),'%Y-%m-%d') AS 更新日期
                 FROM 
-                        (SELECT
-                                f.首单日期,
-                                h0.商品负责人,
-                                h0.云仓,
-                                h0.省份,
-                                h0.店铺名称,
-                                h0.经营模式,
-                                h0.店铺总SKC数 AS 'SKC数-整体',
-                                SUM(h0.`全部断码SKC数`) AS 'SKC数-TOP实际',
-                                SUM(h0.`TOP断码SKC数`) AS 'SKC数-TOP考核'
-                        FROM cwl_duanmalv_handle_1 h0 
-                        LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
-                        WHERE 
-                                h0.风格 in ('基本款')
-                                AND h0.店铺总SKC数 > 0
-                                AND f.首单日期 IS NOT NULL
-                -- 	店铺名称='大石二店'
-                        GROUP BY
-                                h0.商品负责人,
-                                h0.店铺名称,
-                                h0.经营模式
-                        ORDER BY
-                                h0.商品负责人,h0.店铺名称,h0.省份,h0.经营模式) AS h1 
+                    (SELECT
+                            f.首单日期,
+                            h0.商品负责人,
+                            h0.云仓,
+                            h0.省份,
+                            h0.店铺名称,
+                            h0.经营模式,
+                            h0.店铺总SKC数 AS 'SKC数-整体',
+                            SUM(h0.`全部断码SKC数`) AS 'SKC数-TOP实际',
+                            SUM(h0.`TOP断码SKC数`) AS 'SKC数-TOP考核'
+                    FROM cwl_duanmalv_handle_1 h0 
+                    LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
+                    WHERE 
+                            h0.风格 in ('基本款')
+                            AND h0.店铺总SKC数 > 0
+                            AND f.首单日期 IS NOT NULL
+            -- 	店铺名称='大石二店'
+                    GROUP BY
+                            h0.商品负责人,
+                            h0.店铺名称,
+                            h0.经营模式
+                    ORDER BY
+                            h0.商品负责人,h0.店铺名称,h0.省份,h0.经营模式) AS h1 
                 ORDER BY `齐码率-TOP实际` DESC                                             
         ";
         $select = $this->db_easyA->query($sql);
