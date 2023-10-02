@@ -149,9 +149,9 @@ class SendReport extends BaseController
                 return $res;
             }
         } elseif ($name =='S113') {
-            echo "http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}";
+            // echo "http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}";
 
-            die;
+            // die;
             $res = http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             // $res = http_get("http://www.easyadmin1.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
             

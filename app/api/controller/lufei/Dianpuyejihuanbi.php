@@ -42,7 +42,7 @@ class Dianpuyejihuanbi extends BaseController
 
     public function dianpuyejihuanbi_date_handle() {
         $date = input('date');
-        if ($date = date('Y-m-01')) {
+        if ($date == date('Y-m-01')) {
             // echo '每月1号';
             $this->dianpuyejihuanbi_lastmonth();
         }
@@ -104,6 +104,7 @@ class Dianpuyejihuanbi extends BaseController
                 EBC.Mathod	
             ORDER BY EC.State ASC
         ";
+        die;
         // 查康雷
         $select_data = $this->db_sqlsrv->query($sql);
         if ($select_data) {
