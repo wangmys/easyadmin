@@ -101,11 +101,14 @@ class Table extends BaseController
             //     ['更新日期', '=', date('Y-m-d')]
             // ])->delete();
             $this->db_bi->execute('TRUNCATE sp_customer_mubiao_ww;');
+            $this->db_easyA->execute('TRUNCATE sp_customer_mubiao_ww;');
 
             $select_chunk = array_chunk($select_data, 500);
     
             foreach($select_chunk as $key => $val) {
                 $insertAll = $this->db_bi->table('sp_customer_mubiao_ww')->strict(false)->insertAll($val);
+                $insertAll2 = $this->db_easyA->table('sp_customer_mubiao_ww')->strict(false)->insertAll($val);
+                
             }
             
             return json([

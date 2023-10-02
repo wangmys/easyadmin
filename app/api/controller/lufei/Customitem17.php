@@ -70,6 +70,9 @@ class Customitem17 extends BaseController
         if (date('Y-m-d') == date('Y-m-01')) {
             $目标月份 = date('Y-m', strtotime('-1 month'));
         }
+        // 待会删除
+        // $目标月份 = date('Y-m', strtotime('-1 month'));
+        // 待会删除 END
 
         $sql = "
             select 
@@ -89,8 +92,8 @@ class Customitem17 extends BaseController
 
         if ($select) {
             // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_customitem17_yeji;');
+            $this->db_easyA->table('cwl_customitem17_yeji')->where(['目标月份' => $目标月份])->delete();
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_yeji;');
             $chunk_list = array_chunk($select, 500);
             // $this->db_easyA->startTrans();
 
@@ -100,6 +103,7 @@ class Customitem17 extends BaseController
         }
     }
 
+    // 老店业绩同比
     public function getCustomer2()
     {
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
@@ -107,6 +111,13 @@ class Customitem17 extends BaseController
         if (date('Y-m-d') == date('Y-m-01')) {
             $目标月份 = date('Y-m', strtotime('-1 month'));
         }
+
+        // 待会删除
+        // $目标月份 = date('Y-m', strtotime('-1 month'));
+        // $截止日期 = date('Y-m-d', strtotime('-2 day'));
+        // 待会删除 END
+
+
         $sql = "
             select 
                 店铺名称,
@@ -175,6 +186,16 @@ class Customitem17 extends BaseController
             $day7 = date('Y-m-d', strtotime('-7 day', strtotime($今天)));
         }
 
+        // 待会删除
+        // $本月 = strtotime(date('Y-m-01', strtotime('-1 month')));
+        // $day1 = date('Y-m-d', strtotime('-2 day', strtotime($今天)));
+        // $day2 = date('Y-m-d', strtotime('-3 day', strtotime($今天)));
+        // $day3 = date('Y-m-d', strtotime('-4 day', strtotime($今天)));
+        // $day4 = date('Y-m-d', strtotime('-5 day', strtotime($今天)));
+        // $day5 = date('Y-m-d', strtotime('-6 day', strtotime($今天)));
+        // $day6 = date('Y-m-d', strtotime('-7 day', strtotime($今天)));
+        // $day7 = date('Y-m-d', strtotime('-8 day', strtotime($今天)));
+        // 待会删除 END
         // die;
 
         $res_data = [];
@@ -214,19 +235,38 @@ class Customitem17 extends BaseController
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
 
         $目标月份 = date('Y-m');
-        if (date('Y-m-d') == date('Y-m-01')) {
-            $目标月份 = date('Y-m', strtotime('-1 month'));
-        }
+
 
         // 每月1号
-        if ($开始 == date('Y-m-01')) {
+        if (date('Y-m-d') == date('Y-m-01')) {
             $开始= date("Y-m-01", strtotime('-1month')); 
-            // $date_str = date("Y-m-01", strtotime('-1month')); 
-            // $结束= date('Y-m-d');
-            // $截止日期 = date('Y-m-d', strtotime('-1 day'));
+            $目标月份 = date('Y-m', strtotime('-1 month'));
             $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
             $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
         }
+
+        // 待会删除 数据调整用
+        // $目标月份 = date('Y-m', strtotime('-1 month'));
+        // $开始= date("Y-m-01", strtotime('-1month')); 
+        // $结束= date('Y-m-d', strtotime('-1 day'));
+        // $截止日期 = date('Y-m-d', strtotime('-2 day'));
+        // $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
+        // $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+
+        // 待会删除 数据调整用 END
+
+
+        // echo $开始;
+        // echo '<br>';
+        // echo $结束;
+        // echo '<br>';
+        // echo $截止日期;
+        // echo '<br>';
+        // echo $本月最后一天;
+        // echo '<br>';
+        // echo $到结束剩余天数;
+        // echo '<br>';
+        // echo $目标月份;
 
 
         // die;
@@ -241,11 +281,13 @@ class Customitem17 extends BaseController
         ";
 		
         $select = $this->db_bi->query($sql);
-        // dump($select);die;
+        // echo '<pre>';
+        // print_r($select);die;
         if ($select) {
             // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_customitem17_retail;');
+            // $this->db_easyA->table('cwl_customitem17_retail')->where(1)->delete();
+            $this->db_easyA->execute("delete from cwl_customitem17_retail where 日期>='{$开始}' and 日期<'{$结束}'");
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_retail;');
             $chunk_list = array_chunk($select, 500);
             // $this->db_easyA->startTrans();
 
@@ -265,7 +307,7 @@ class Customitem17 extends BaseController
         $sql_实际累计流水 = "
             update cwl_customitem17_yeji as y 
             left join (
-                select 店铺名称,sum(销售金额) as 销售金额 from cwl_customitem17_retail GROUP BY 店铺名称
+                select 店铺名称,sum(销售金额) as 销售金额 from cwl_customitem17_retail where 日期>='{$开始}' AND 日期<'{$结束}' GROUP BY 店铺名称
             ) as r on y.店铺名称 = r.店铺名称
             set
                 y.实际累计流水 = r.销售金额,
@@ -275,6 +317,7 @@ class Customitem17 extends BaseController
         ";
      
         $this->db_easyA->execute($sql_实际累计流水);
+        
                 
         $sql_目标达成率 = "
             update cwl_customitem17_yeji
@@ -291,7 +334,7 @@ class Customitem17 extends BaseController
         ";
         $this->db_easyA->execute($sql_目标达成率);
 
-        
+        // die;
         $sql_缺口日均 = "
             update cwl_customitem17_yeji
                 set
@@ -309,6 +352,8 @@ class Customitem17 extends BaseController
         // 近七天日均销
         $str_近七天日期 = '';
         $getBefore7 = $this->getBefore7();
+        // dump($getBefore7);        
+        // die;
         if($getBefore7) {
             $str_近七天日期 = arrToStr($getBefore7);
         }
@@ -395,6 +440,7 @@ class Customitem17 extends BaseController
             WHERE 1
                 AND 经营模式 in ('直营') 
                 AND 本月目标 IS NOT NULL 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -414,6 +460,7 @@ class Customitem17 extends BaseController
             WHERE 1
                 AND 经营模式 in ('加盟') 
                 AND 本月目标 IS NOT NULL 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -433,6 +480,7 @@ class Customitem17 extends BaseController
             WHERE 1
                 AND 经营模式 in ('直营','加盟') 
                 AND 本月目标 IS NOT NULL 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -455,6 +503,7 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('直营') 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -475,6 +524,7 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('加盟') 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
@@ -493,6 +543,7 @@ class Customitem17 extends BaseController
                 cwl_customitem17_yeji 
             WHERE 1
                 AND 经营模式 in ('加盟', '直营') 
+                AND 目标月份 = '{$目标月份}'
             GROUP BY
                 商品专员
             ) as t on z.商品专员=t.商品专员
