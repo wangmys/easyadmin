@@ -2010,7 +2010,24 @@ class Duanmalv extends BaseController
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
             }
-            $this->table1_3_sort();   
+
+            $sql_del = "
+                DELETE 
+                FROM
+                    cwl_duanmalv_table1_3 
+                WHERE
+                    `直营-整体` IS NULL 
+                    AND `加盟-整体` IS NULL 
+                    AND `合计-整体` IS NULL 
+                    AND `直营-TOP实际` IS NULL
+                    AND `加盟-TOP实际` IS NULL
+                    AND `合计-TOP实际` IS NULL 
+                    AND `直营-TOP考核` IS NULL
+                    AND `加盟-TOP考核` IS NULL
+                    AND `合计-TOP考核` IS NULL        
+            ";
+            $this->db_easyA->execute($sql_del);
+            // $this->table1_3_sort();   
 
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
                 'table1_3_updatetime' => date('Y-m-d H:i:s')
@@ -2057,22 +2074,5 @@ class Duanmalv extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
             }
         }
-
-        $sql_del = "
-            DELETE 
-            FROM
-                cwl_duanmalv_table1_3 
-            WHERE
-                `直营-整体` IS NULL 
-                AND `加盟-整体` IS NULL 
-                AND `合计-整体` = 0.0000
-                AND `直营-TOP实际` IS NULL
-                AND `加盟-TOP实际` IS NULL
-                AND `合计-TOP实际` = 0.0000
-                AND `直营-TOP考核` IS NULL
-                AND `加盟-TOP考核` IS NULL
-                AND `合计-TOP考核` = 0.0000        
-        ";
-         $this->db_easyA->execute($sql_del);
     }
 }

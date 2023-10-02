@@ -64,6 +64,30 @@ class Summary extends BaseController
         return $seasionStr;
     }
 
+    public function getDate0() {
+        $目标月份 = date('Y-m');
+
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
+        $sql = "
+            select 商品专员,省份,经营模式,店铺名称,目标月份 from cwl_customitem17_yeji where 目标月份='{$目标月份}'
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            $this->db_easyA->table('cwl_summary')->where([
+                ['目标月份' , '=', $目标月份]
+            ])->delete();
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_yeji;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_summary')->strict(false)->insertAll($val);
+            }
+        }
+    }
+
     public function getDate()
     {
          // 每月1号
@@ -90,7 +114,7 @@ class Summary extends BaseController
     
         $sql_更新若干 = "
             update cwl_summary as s
-            left join cwl_customitem17_yeji as y on s.店铺名称=y.店铺名称
+            left join cwl_customitem17_yeji as y on s.店铺名称=y.店铺名称 and y.目标月份='{$目标月份}'
             set
                 s.本月目标=y.本月目标,
                 s.当前流水=y.实际累计流水,
