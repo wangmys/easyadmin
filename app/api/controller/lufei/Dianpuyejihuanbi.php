@@ -104,7 +104,7 @@ class Dianpuyejihuanbi extends BaseController
                 EBC.Mathod	
             ORDER BY EC.State ASC
         ";
-        die;
+        // die;
         // 查康雷
         $select_data = $this->db_sqlsrv->query($sql);
         if ($select_data) {
