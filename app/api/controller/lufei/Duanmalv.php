@@ -1602,7 +1602,8 @@ class Duanmalv extends BaseController
                     zy.`直营-TOP实际`,
                     AVG( hj.`齐码率-TOP考核` ) AS `合计-TOP考核`,
                     jm.`加盟-TOP考核`,
-                    zy.`直营-TOP考核` 
+                    zy.`直营-TOP考核`,
+                    date_format(now(),'%Y-%m-%d') as 更新日期 
             FROM
                     cwl_duanmalv_table1_1 AS hj
                     LEFT JOIN (
@@ -1768,7 +1769,8 @@ class Duanmalv extends BaseController
                     zy.`直营-TOP实际`,
                     AVG( hj.`齐码率-TOP考核` ) AS `合计-TOP考核`,
                     jm.`加盟-TOP考核`,
-                    zy.`直营-TOP考核`
+                    zy.`直营-TOP考核`,
+                    date_format(now(),'%Y-%m-%d') as 更新日期
             FROM
                     cwl_duanmalv_table1_1 AS hj
                     LEFT JOIN (
