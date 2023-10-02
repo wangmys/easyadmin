@@ -1872,29 +1872,71 @@ class Duanmalv extends BaseController
     // 首页表1_3
     public function table1_3() {
         $date = date('Y-m-d');
-            $sql = "
-                SELECT 
-                    t2.*,
-                case
-                    when t2.`直营-整体` > 0 AND t2.`加盟-整体` > 0 then (t2.`直营-整体` + t2.`加盟-整体`) / 2
-                    when t2.`直营-整体` > 0 AND (t2.`加盟-整体` <= 0 || t2.`加盟-整体` is null) then (t2.`直营-整体`)
-                    when (t2.`直营-整体` >= 0 || t2.`直营-整体` is null) AND t2.`加盟-整体` > 0 then (t2.`加盟-整体`)
-                    else 0
-                end as 	`合计-整体`,
-                case
-                    when t2.`直营-TOP实际` > 0 AND t2.`加盟-TOP实际` > 0 then (t2.`直营-TOP实际` + t2.`加盟-TOP实际`) / 2
-                    when t2.`直营-TOP实际` > 0 AND (t2.`加盟-TOP实际` <= 0 || t2.`加盟-TOP实际` is null) then (t2.`直营-TOP实际`)
-                    when (t2.`直营-TOP实际` >= 0 || t2.`直营-TOP实际` is null) AND t2.`加盟-TOP实际` > 0 then (t2.`加盟-TOP实际`)
-                    else 0
-                end as 	`合计-TOP实际`,
-                case
-                    when t2.`直营-TOP考核` > 0 AND t2.`加盟-TOP考核` > 0 then (t2.`直营-TOP考核` + t2.`加盟-TOP考核`) / 2
-                    when t2.`直营-TOP考核` > 0 AND (t2.`加盟-TOP考核` <= 0 || t2.`加盟-TOP考核` is null) then (t2.`直营-TOP考核`)
-                    when (t2.`直营-TOP考核` >= 0 || t2.`直营-TOP考核` is null) AND t2.`加盟-TOP考核` > 0 then (t2.`加盟-TOP考核`)
-                    else 0
-                end as 	`合计-TOP考核`,
-                date_format(now(),'%Y-%m-%d') as 更新日期
-                FROM (
+        $sql_old = "
+            SELECT 
+                t2.*,
+            case
+                when t2.`直营-整体` > 0 AND t2.`加盟-整体` > 0 then (t2.`直营-整体` + t2.`加盟-整体`) / 2
+                when t2.`直营-整体` > 0 AND (t2.`加盟-整体` <= 0 || t2.`加盟-整体` is null) then (t2.`直营-整体`)
+                when (t2.`直营-整体` >= 0 || t2.`直营-整体` is null) AND t2.`加盟-整体` > 0 then (t2.`加盟-整体`)
+                else 0
+            end as 	`合计-整体`,
+            case
+                when t2.`直营-TOP实际` > 0 AND t2.`加盟-TOP实际` > 0 then (t2.`直营-TOP实际` + t2.`加盟-TOP实际`) / 2
+                when t2.`直营-TOP实际` > 0 AND (t2.`加盟-TOP实际` <= 0 || t2.`加盟-TOP实际` is null) then (t2.`直营-TOP实际`)
+                when (t2.`直营-TOP实际` >= 0 || t2.`直营-TOP实际` is null) AND t2.`加盟-TOP实际` > 0 then (t2.`加盟-TOP实际`)
+                else 0
+            end as 	`合计-TOP实际`,
+            case
+                when t2.`直营-TOP考核` > 0 AND t2.`加盟-TOP考核` > 0 then (t2.`直营-TOP考核` + t2.`加盟-TOP考核`) / 2
+                when t2.`直营-TOP考核` > 0 AND (t2.`加盟-TOP考核` <= 0 || t2.`加盟-TOP考核` is null) then (t2.`直营-TOP考核`)
+                when (t2.`直营-TOP考核` >= 0 || t2.`直营-TOP考核` is null) AND t2.`加盟-TOP考核` > 0 then (t2.`加盟-TOP考核`)
+                else 0
+            end as 	`合计-TOP考核`,
+            date_format(now(),'%Y-%m-%d') as 更新日期
+            FROM (
+            SELECT
+                t1.省份,
+                t1.商品负责人,
+                zy.`直营-整体`,
+                zy.`直营-TOP实际`,
+                zy.`直营-TOP考核`,
+                jm.`加盟-整体`,
+                jm.`加盟-TOP实际`,
+                jm.`加盟-TOP考核`
+            FROM
+                cwl_duanmalv_table1_1 t1
+            LEFT JOIN (
+            SELECT
+                省份,
+                商品负责人,
+                AVG( `齐码率-整体` ) AS `直营-整体`,
+                AVG( `齐码率-TOP实际` ) AS `直营-TOP实际`,
+                AVG( `齐码率-TOP考核` ) AS `直营-TOP考核`
+            FROM
+                cwl_duanmalv_table1_1 
+            where 
+                经营模式 = '直营' 
+                AND 更新日期 = date_format(now(),'%Y-%m-%d')
+            GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
+            LEFT JOIN (
+                SELECT
+                    省份,
+                    商品负责人,
+                        AVG( `齐码率-整体` ) AS `加盟-整体`,
+                        AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
+                        AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核`
+                FROM
+                    cwl_duanmalv_table1_1 
+                where 
+                    经营模式 = '加盟' 
+                    AND 更新日期 = date_format(now(),'%Y-%m-%d')
+                GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
+            GROUP BY
+                    t1.省份, t1.商品负责人 
+            ) AS t2                                          
+        ";
+        $sql = "
                 SELECT
                     t1.省份,
                     t1.商品负责人,
@@ -1903,40 +1945,56 @@ class Duanmalv extends BaseController
                     zy.`直营-TOP考核`,
                     jm.`加盟-整体`,
                     jm.`加盟-TOP实际`,
-                    jm.`加盟-TOP考核`
-                FROM
+                    jm.`加盟-TOP考核`,
+                    hj.`合计-整体`,
+                    hj.`合计-TOP实际`,
+                    hj.`合计-TOP考核`,
+                    date_format(now(),'%Y-%m-%d') as 更新日期
+            FROM
                     cwl_duanmalv_table1_1 t1
-                LEFT JOIN (
+            LEFT JOIN (
                 SELECT
-                    省份,
-                    商品负责人,
-                    AVG( `齐码率-整体` ) AS `直营-整体`,
-                    AVG( `齐码率-TOP实际` ) AS `直营-TOP实际`,
-                    AVG( `齐码率-TOP考核` ) AS `直营-TOP考核`
-                FROM
-                    cwl_duanmalv_table1_1 
-                where 
-                    经营模式 = '直营' 
-                    AND 更新日期 = date_format(now(),'%Y-%m-%d')
-                GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
-                LEFT JOIN (
-                    SELECT
                         省份,
                         商品负责人,
-                         AVG( `齐码率-整体` ) AS `加盟-整体`,
-                         AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
-                         AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核`
-                    FROM
+                        AVG( `齐码率-整体` ) AS `直营-整体`,
+                        AVG( `齐码率-TOP实际` ) AS `直营-TOP实际`,
+                        AVG( `齐码率-TOP考核` ) AS `直营-TOP考核`
+                FROM
                         cwl_duanmalv_table1_1 
-                    where 
-                        经营模式 = '加盟' 
+                where 
+                        经营模式 = '直营' 
                         AND 更新日期 = date_format(now(),'%Y-%m-%d')
+                GROUP BY 省份, 商品负责人 )  AS zy  ON zy.商品负责人 = t1.`商品负责人` and zy.省份 = t1.`省份`
+            LEFT JOIN (
+                    SELECT
+                            省份,
+                            商品负责人,
+                            AVG( `齐码率-整体` ) AS `加盟-整体`,
+                            AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
+                            AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核`
+                    FROM
+                            cwl_duanmalv_table1_1 
+                    where 
+                            经营模式 = '加盟' 
+                            AND 更新日期 = date_format(now(),'%Y-%m-%d')
                     GROUP BY 省份, 商品负责人 )  AS jm  ON jm.商品负责人 = t1.`商品负责人` and jm.省份 = t1.`省份`	
-                GROUP BY
-                        t1.省份, t1.商品负责人 
-            ) AS t2                                          
-        ";
+            LEFT JOIN (
+                    SELECT
+                            省份,
+                            商品负责人,
+                            AVG( `齐码率-整体` ) AS `合计-整体`,
+                            AVG( `齐码率-TOP实际` ) AS `合计-TOP实际`,
+                            AVG( `齐码率-TOP考核` ) AS `合计-TOP考核`
+                    FROM
+                            cwl_duanmalv_table1_1 
+                    where 
+                            经营模式 in ( '加盟', '加盟' )
+                            AND 更新日期 = date_format(now(),'%Y-%m-%d')
+                    GROUP BY 省份, 商品负责人 )  AS hj  ON hj.商品负责人 = t1.`商品负责人` and hj.省份 = t1.`省份`	
+            GROUP BY
+                    t1.省份, t1.商品负责人 
 
+        ";
         
         $select = $this->db_easyA->query($sql);
         // dump($select); die;
