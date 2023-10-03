@@ -42,6 +42,7 @@ class ThreeyearService
         // $weather_2021 = $weather_2021 ? $weather_2021->toArray() : [];
         // print_r($weather_2021);die;
 
+        $from_cache = $params['from_cache'] ?? '';//是否来自缓存
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
         $Year = $params['Year'] ?? '';
@@ -73,13 +74,15 @@ class ThreeyearService
 
         if (!$Year) {//没有选择年份，要看三年的数据
 
-            if (!$Year && !$Month && !$YunCang && !$WenDai && !$WenQu && !$State && !$Mathod && !$NewOld && !$Season && !$StyleCategoryName && !$CategoryName1 && !$CategoryName2 && !$CategoryName && !$CustomItem46) {
-                //先查缓存数据是否存在
-                $cache = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_index']])->field('cache_data')->find();
-                if ($cache && $cache['cache_data']) {
-                    $cache = json_decode($cache['cache_data'], true);
-                    if ($cache) {
-                        return $cache;
+            if (!$from_cache) {
+                if (!$Year && !$Month && !$YunCang && !$WenDai && !$WenQu && !$State && !$Mathod && !$NewOld && !$Season && !$StyleCategoryName && !$CategoryName1 && !$CategoryName2 && !$CategoryName && !$CustomItem46) {
+                    //先查缓存数据是否存在
+                    $cache = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_index']])->field('cache_data')->find();
+                    if ($cache && $cache['cache_data']) {
+                        $cache = json_decode($cache['cache_data'], true);
+                        if ($cache) {
+                            return $cache;
+                        }
                     }
                 }
             }
