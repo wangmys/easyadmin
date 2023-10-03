@@ -101,6 +101,7 @@ class AccessoriesLogic
                 ['CategoryName' => '挎包'],
                 ['CategoryName' => '领带'],
                 ['CategoryName' => '领结'],
+                ['CategoryName' => '拉链领带'],
                 ['CategoryName' => '户外帽'],
                 ['CategoryName' => '鸭舌帽'],
                 ['CategoryName' => '渔夫帽'],
@@ -125,7 +126,7 @@ class AccessoriesLogic
                 ['CategoryName' => '乳胶枕'],
                 ['CategoryName' => '船袜'],
                 ['CategoryName' => '袜子'],
-                ['CategoryName' => '中长袜']
+                ['CategoryName' => '中长袜'],
             ];
 //            $sql = "";
 //            $levelName = "selet * from sp_customer_yinliu_sale limit 1";
