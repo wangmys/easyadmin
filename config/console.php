@@ -14,6 +14,7 @@ return [
         'stock2' => 'app\command\Stock2',
         'stock_week_date' => 'app\command\Stock_week_date',
         'stock_week' => 'app\command\Stock_week',
+        'stock_week_select' => 'app\command\Stock_week_select',
         'duanma_sk' => 'app\command\Duanma_sk',
         'stock_size' => 'app\command\Stock_size',
         'sendpic' => 'app\command\Sendpic',

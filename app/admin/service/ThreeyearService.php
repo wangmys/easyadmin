@@ -6,6 +6,7 @@ use app\admin\model\bi\SpCustomerStockSaleWeekDateModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2Model;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekCacheModel;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekSelectModel;
 use app\admin\model\weather\CusWeatherBase;
 use app\admin\model\weather\CusWeatherData;
 use app\common\traits\Singleton;
@@ -59,6 +60,14 @@ class ThreeyearService
         $CategoryName2 = $params['CategoryName2'] ?? '';
         $CategoryName = $params['CategoryName'] ?? '';
         $CustomItem46 = $params['CustomItem46'] ?? '';//深浅色
+
+        $TimeCategoryName2 = $params['TimeCategoryName2'] ?? '';//二级时间分类
+        $TimeCategoryName = $params['TimeCategoryName'] ?? '';//时间分类
+        $CustomItem17 = $params['CustomItem17'] ?? '';
+        $CustomItem1 = $params['CustomItem1'] ?? '';
+        $CustomItem45 = $params['CustomItem45'] ?? '';
+        $CustomItem47 = $params['CustomItem47'] ?? '';
+        $CustomItem48 = $params['CustomItem48'] ?? '';
 
         $week_dates = $this->week_date_model::where([['year', '=', '2023']])->field("year, week, start_time, end_time, CONCAT(SUBSTRING(start_time, 6, 5), ' 到 ', SUBSTRING(end_time, 6, 5)) as '周期'")->select();
         $week_dates = $week_dates ? $week_dates->toArray() : [];
@@ -312,16 +321,18 @@ class ThreeyearService
             if ($NewOld) {
 
                 $cur_year = date('Y');
+                $cur_year_last = date('Y')-1;
+                $cur_year_last_last = date('Y')-2;
                 if ($NewOld == '新品') {
 
-                    $where_yeji_2021[] = ['TimeCategoryName1', '=', $cur_year];
-                    $where_yeji_2022[] = ['TimeCategoryName1', '=', $cur_year];
+                    $where_yeji_2021[] = ['TimeCategoryName1', '=', $cur_year_last_last];
+                    $where_yeji_2022[] = ['TimeCategoryName1', '=', $cur_year_last];
                     $where_yeji_2023[] = ['TimeCategoryName1', '=', $cur_year];
 
                 } else {
 
-                    $where_yeji_2021[] = ['TimeCategoryName1', '<', $cur_year];
-                    $where_yeji_2022[] = ['TimeCategoryName1', '<', $cur_year];
+                    $where_yeji_2021[] = ['TimeCategoryName1', '<', $cur_year_last_last];
+                    $where_yeji_2022[] = ['TimeCategoryName1', '<', $cur_year_last];
                     $where_yeji_2023[] = ['TimeCategoryName1', '<', $cur_year];
 
                 }
@@ -382,11 +393,61 @@ class ThreeyearService
 
             }
 
+            //二级时间分类
+            if ($TimeCategoryName2) {
+                $where_yeji_2021[] = ['TimeCategoryName2', 'in', $TimeCategoryName2];
+                $where_yeji_2022[] = ['TimeCategoryName2', 'in', $TimeCategoryName2];
+                $where_yeji_2023[] = ['TimeCategoryName2', 'in', $TimeCategoryName2];
+            }
+
+            //时间分类
+            if ($TimeCategoryName) {
+                $where_yeji_2021[] = ['TimeCategoryName', 'in', $TimeCategoryName];
+                $where_yeji_2022[] = ['TimeCategoryName', 'in', $TimeCategoryName];
+                $where_yeji_2023[] = ['TimeCategoryName', 'in', $TimeCategoryName];
+            }
+
+            //厚度
+            if ($CustomItem17) {
+                $where_yeji_2021[] = ['CustomItem17', 'in', $CustomItem17];
+                $where_yeji_2022[] = ['CustomItem17', 'in', $CustomItem17];
+                $where_yeji_2023[] = ['CustomItem17', 'in', $CustomItem17];
+            }
+
+            //适龄段
+            if ($CustomItem1) {
+                $where_yeji_2021[] = ['CustomItem1', 'in', $CustomItem1];
+                $where_yeji_2022[] = ['CustomItem1', 'in', $CustomItem1];
+                $where_yeji_2023[] = ['CustomItem1', 'in', $CustomItem1];
+            }
+
+            //时尚度
+            if ($CustomItem45) {
+                $where_yeji_2021[] = ['CustomItem45', 'in', $CustomItem45];
+                $where_yeji_2022[] = ['CustomItem45', 'in', $CustomItem45];
+                $where_yeji_2023[] = ['CustomItem45', 'in', $CustomItem45];
+            }
+
+            //色感
+            if ($CustomItem47) {
+                $where_yeji_2021[] = ['CustomItem47', 'in', $CustomItem47];
+                $where_yeji_2022[] = ['CustomItem47', 'in', $CustomItem47];
+                $where_yeji_2023[] = ['CustomItem47', 'in', $CustomItem47];
+            }
+
+            //色系
+            if ($CustomItem48) {
+                $where_yeji_2021[] = ['CustomItem48', 'in', $CustomItem48];
+                $where_yeji_2022[] = ['CustomItem48', 'in', $CustomItem48];
+                $where_yeji_2023[] = ['CustomItem48', 'in', $CustomItem48];
+            }
+
             
             //业绩占比/库存占比/效率 计算(当有选择货品属性的情况)
             $customer_threeyear_2021 = $customer_threeyear_2022 = $customer_threeyear_2023 = [];
             $if_select_goods = 0;
-            if ($NewOld || $Season || $StyleCategoryName || $CategoryName1 || $CategoryName2 || $CategoryName || $CustomItem46) {
+            if ($NewOld || $Season || $StyleCategoryName || $CategoryName1 || $CategoryName2 || $CategoryName || $CustomItem46
+            || $TimeCategoryName2 || $TimeCategoryName || $CustomItem17 || $CustomItem1 || $CustomItem45 || $CustomItem47 || $CustomItem48) {
                 $if_select_goods = 1;
 
                 $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -710,7 +771,14 @@ class ThreeyearService
         $CategoryName2 = $params['CategoryName2'] ?? '';
         $CategoryName = $params['CategoryName'] ?? '';
         $CustomItem46 = $params['CustomItem46'] ?? '';//深浅色
-
+        
+        $TimeCategoryName2 = $params['TimeCategoryName2'] ?? '';//二级时间分类
+        $TimeCategoryName = $params['TimeCategoryName'] ?? '';//时间分类
+        $CustomItem17 = $params['CustomItem17'] ?? '';
+        $CustomItem1 = $params['CustomItem1'] ?? '';
+        $CustomItem45 = $params['CustomItem45'] ?? '';
+        $CustomItem47 = $params['CustomItem47'] ?? '';
+        $CustomItem48 = $params['CustomItem48'] ?? '';
 
         //where条件组装
         $where_yeji_new = [['Year', '=', $Year]];
@@ -871,11 +939,47 @@ class ThreeyearService
         if ($CustomItem46) {
             $where_yeji_new[] = ['CustomItem46', '=', $CustomItem46];
         }
+
+        //二级时间分类
+        if ($TimeCategoryName2) {
+            $where_yeji_new[] = ['TimeCategoryName2', 'in', $TimeCategoryName2];
+        }
+
+        //时间分类
+        if ($TimeCategoryName) {
+            $where_yeji_new[] = ['TimeCategoryName', 'in', $TimeCategoryName];
+        }
+
+        //厚度
+        if ($CustomItem17) {
+            $where_yeji_new[] = ['CustomItem17', 'in', $CustomItem17];
+        }
+
+        //适龄段
+        if ($CustomItem1) {
+            $where_yeji_new[] = ['CustomItem1', 'in', $CustomItem1];
+        }
+
+        //时尚度
+        if ($CustomItem45) {
+            $where_yeji_new[] = ['CustomItem45', 'in', $CustomItem45];
+        }
+
+        //色感
+        if ($CustomItem47) {
+            $where_yeji_new[] = ['CustomItem47', 'in', $CustomItem47];
+        }
+
+        //色系
+        if ($CustomItem48) {
+            $where_yeji_new[] = ['CustomItem48', 'in', $CustomItem48];
+        }
         
         //业绩占比/库存占比/效率 计算(当有选择货品属性的情况)
         $customer_threeyear_new = [];
         $if_select_goods = 0;
-        if ($NewOld || $Season || $StyleCategoryName || $CategoryName1 || $CategoryName2 || $CategoryName || $CustomItem46) {
+        if ($NewOld || $Season || $StyleCategoryName || $CategoryName1 || $CategoryName2 || $CategoryName || $CustomItem46 
+        || $TimeCategoryName2 || $TimeCategoryName || $CustomItem17 || $CustomItem1 || $CustomItem45 || $CustomItem47 || $CustomItem48) {
             $if_select_goods = 1;
 
             $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -1081,9 +1185,20 @@ class ThreeyearService
         $CategoryName = $this->easy_db->query("select 分类 as name, 分类 as value from sjp_goods group by 分类;");
         $CustomItem46 = [['name'=>'深色系', 'value'=>'深色系'], ['name'=>'浅色系', 'value'=>'浅色系']];
 
+        $selects = SpCustomerStockSaleThreeyear2WeekSelectModel::where([])->field('param_name,name,value')->select();
+        $selects = $selects ? $selects->toArray() : [];
+        $selects_arr = [];
+        if ($selects) {
+            foreach ($selects as $v_sel) {
+                $selects_arr[$v_sel['param_name']][] = ['name' => $v_sel['name'], 'value' => $v_sel['value']];
+            }
+        }
+        // print_r($selects_arr);die;
+
         return ['Year' => $Year, 'Month' => $Month, 'YunCang'=>$YunCang, 'WenDai'=>$WenDai, 'WenQu' => $WenQu, 
         'State' => $State, 'Mathod' => $Mathod, 'NewOld'=>$NewOld, 'Season'=>$Season, 'StyleCategoryName' => $StyleCategoryName, 
         'CategoryName1' => $CategoryName1, 'CategoryName2' => $CategoryName2, 'CategoryName'=>$CategoryName, 'CustomItem46'=>$CustomItem46,
+        'TimeCategoryName2' => $selects_arr['TimeCategoryName2'] ?? [], 'TimeCategoryName' => $selects_arr['TimeCategoryName'] ?? [], 'CustomItem17'=>$selects_arr['CustomItem17'] ?? [], 'CustomItem1'=>$selects_arr['CustomItem1'] ?? [], 'CustomItem45'=>$selects_arr['CustomItem45'] ?? [], 'CustomItem47'=>$selects_arr['CustomItem47'] ?? [], 'CustomItem48'=>$selects_arr['CustomItem48'] ?? [],
         ];
 
     }
