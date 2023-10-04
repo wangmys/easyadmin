@@ -36,6 +36,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var if_can_see = res.if_can_see;
                 var mathod = res.mathod;
                 var CustomerGrade = res.CustomerGrade;
+                var last_update_time = res.last_update_time;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
@@ -100,6 +101,16 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                                 method: 'none',
                                 auth: '',
                                 class: 'layui-badge layui-bg-red',
+                                event:'guangzhou'
+                            }
+                        ],
+
+                        [
+                            {
+                                text: "<b style='color:black;font-size:25px;'>&nbsp; &nbsp; &nbsp; &nbsp; 最后更新时间为："+last_update_time+"&nbsp; &nbsp; &nbsp; &nbsp; </b>",
+                                method: 'none',
+                                auth: '',
+                                class: 'layui-badge layui-bg-blue',
                                 event:'guangzhou'
                             }
                         ]
