@@ -351,6 +351,63 @@ class Summary extends BaseController
                 s.大小码缺少提醒 = case when m.缺码>0 then '缺' end
         ";
         $this->db_easyA->execute($sql_大小码缺码提醒);
+
+        $slq_售空SKC数 = "
+            SELECT
+                店铺名称,
+                sum(1) as 数量
+            from cwl_skauto_res 
+            where 1
+                AND 在途库存 + 已配未发 <= 0
+                AND 售空提醒 = '售空'
+            group by 店铺名称
+        ";
+        $select_售空SKC数 = $this->db_easyA->query($slq_售空SKC数);
+        if ($select_售空SKC数) {
+            foreach($select_售空SKC数 as $key3 => $val3) {
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val3['店铺名称']])->update(['售空SKC数' => $val3['数量']]); 
+            }
+        }
+
+        $slq_即将售空SKC数 = "
+            SELECT
+                店铺名称,
+                sum(1) as 数量
+            from cwl_skauto_res 
+            where 1
+                AND 在途库存 + 已配未发 <= 0
+                AND 售空提醒 = '即将售空'
+            group by 店铺名称
+        ";
+        $select_即将售空SKC数 = $this->db_easyA->query($slq_即将售空SKC数);
+        if ($select_即将售空SKC数) {
+            foreach($select_即将售空SKC数 as $key4 => $val4) {
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val4['店铺名称']])->update(['即将售空SKC数' => $val4['数量']]); 
+            }
+        }
+
+        $sql_不动销 = "
+            SELECT
+                店铺简称 as 店铺名称,
+                `5-10天`,
+                `10-15天`,
+                `20-30天`,
+                `30天以上`,
+                `考核标准`,
+                `考核标准占比`,
+                需要调整SKC数 
+            FROM
+                cwl_budongxiao_result_sys 
+            WHERE
+                考核结果 = '不合格'
+        ";
+        $select_不动销 = $this->db_easyA->query($sql_不动销);
+        if ($select_不动销) {
+            foreach ($select_不动销 as $key5 => $val5) {
+                // $val5[$val5['考核标准']]
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val5['店铺名称']])->update(['不动销占比' => $val5['考核标准占比'], '不动销SKC数' => $val5['需要调整SKC数']]); 
+            }
+        }
     }
 
     // 传入开始结束时间戳
@@ -359,20 +416,6 @@ class Summary extends BaseController
         return $days;
     }
 
-     /**
-     * 引流
-     */
-    public function yinliu()
-    {
-        // $Dress = new Dress(App);
-        // dump(Dress->index_api());
 
-        // die;
-        $url = 'http://www.easyadmin1.com/admin/system.dress.dress/index_api';
-        $res = http_get($url);
-        // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
-        $res =json_decode($res, true);
-        
-    }
 
 }

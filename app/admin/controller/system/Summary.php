@@ -106,7 +106,7 @@ class Summary extends AdminController
                     concat(round(上装冬占比 * 100, 1), '%') as 上装冬占比,
                     concat(round(下装占比 * 100, 1), '%') as 下装占比,
                     concat(round(鞋履占比 * 100, 1), '%') as 鞋履占比,
-                    上新提醒,引流是否提醒,配饰是否提醒,大小码缺少提醒
+                    上新提醒,引流是否提醒,配饰是否提醒,大小码缺少提醒,售空SKC数,即将售空SKC数
                     
                 FROM
                     cwl_summary 
