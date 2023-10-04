@@ -23,7 +23,8 @@ use app\common\logic\execl\PHPExecl;
  */
 class Index extends AdminController
 {
-
+    protected $db_easyA = '';
+    protected $db_bi = '';
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
@@ -34,6 +35,8 @@ class Index extends AdminController
         parent::__construct($app);
         $this->service = AccessoriesService::instance();
         $this->logic = new AccessoriesLogic;
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
     }
 
     /**
@@ -136,6 +139,24 @@ class Index extends AdminController
         // 导出
         $exec->export($header,$list);
         exit();
+    }
+
+    // 汇总表用 list copy
+    public function list_api() {
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
+        // 查询数据
+        $table_data = $this->service->getTableBody('',1,$filters);
+        // 返回数据
+        $data = [
+            'code'  => 0,
+            'msg'   => '',
+            'count' => count($table_data),
+            'data'  => $table_data
+        ];
+        // dump($table_data);
+        foreach ($table_data as $key => $val) {
+            $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val['CustomerName']])->update(['配饰是否提醒' => '是']);
+        }
     }
 
     /**

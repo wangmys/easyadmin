@@ -22,7 +22,8 @@ use jianyan\excel\Excel;
  */
 class Dress extends AdminController
 {
-
+    protected $db_easyA = '';
+    protected $db_bi = '';
     protected $sort = [
         'sort' => 'desc',
         'id'   => 'desc',
@@ -34,6 +35,8 @@ class Dress extends AdminController
         $this->model = new Accessories;
         // 实例化逻辑类
         $this->logic = new DressLogic;
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
     }
 
      /**
@@ -384,6 +387,7 @@ class Dress extends AdminController
         return $this->fetch('',['cols' => $cols,'_field' => $standard,'where' => $where]);
     }
 
+    // 汇总表用 index的copy
     public function index_api()
     {
         // 动态表头字段
@@ -479,8 +483,11 @@ class Dress extends AdminController
                 'count' => count($list_all),
                 'data'  => $list_all
             ];
-        echo '<pre>';
-        print_r($list_all);
+        // echo '<pre>';
+        // dump($list_all);
+        foreach ($list_all as $key => $val) {
+            $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val['店铺名称']])->update(['引流是否提醒' => '是']);
+        }
 
     }
 

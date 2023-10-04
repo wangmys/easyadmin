@@ -319,6 +319,13 @@ class Summary extends BaseController
                 $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val2['店铺名称']])->update(['上新提醒' => $val2['提醒']]);
             } 
         }
+
+        // 引流
+        $res = http_get('http://www.easyadmin1.com/admin/system.dress.dress/index_api');
+        $res = http_get('http://im.babiboy.com/admin/system.dress.dress/index_api');
+        // 配饰
+        $res = http_get('http://www.easyadmin1.com/admin/system.dress.index/list_api.html');
+        $res = http_get('http://im.babiboy.com/admin/system.dress.index/list_api.html');
     }
 
     // 传入开始结束时间戳
@@ -332,11 +339,14 @@ class Summary extends BaseController
      */
     public function yinliu()
     {
-        $Dress = new Dress(App);
+        // $Dress = new Dress(App);
         // dump(Dress->index_api());
 
-        die;
-
+        // die;
+        $url = 'http://www.easyadmin1.com/admin/system.dress.dress/index_api';
+        $res = http_get($url);
+        // $res = http_get('http://www.easyadmin1.com/api/Tableupdate/receipt_receiptNotice');
+        $res =json_decode($res, true);
         
     }
 
