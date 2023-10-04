@@ -244,7 +244,7 @@ class Stock_week extends Command
 	protected function generate_index_data() {
 
 		$service = (new ThreeyearService())::getInstance();
-		$res = $service->index([]);
+		$res = $service->index(['from_cache'=>1]);
 		if ($res) {
 			SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_index']])->update(['cache_data' => json_encode($res)]);
 		} else {
