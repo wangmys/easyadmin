@@ -479,7 +479,8 @@ class Dress extends AdminController
                 'count' => count($list_all),
                 'data'  => $list_all
             ];
-        return json($data);
+        echo '<pre>';
+        print_r($list_all);
 
     }
 
