@@ -233,6 +233,10 @@ class Dress extends AdminController
         return Excel::exportData($list_all, $header, $fileName, 'xlsx','',[],'dress');
     }
 
+    public static function test() {
+        echo 'test';
+    }
+
 
     /**
      * @NodeAnotation(title="店铺引流结果")
@@ -291,6 +295,7 @@ class Dress extends AdminController
 
                 // 筛选门店
                 $list = $this->logic->setStoreFilter($this->model);
+                // print_r($list);
                 // 查询数据
                 $list = $list->field($field)->where([
                     'Date' => $Date
@@ -320,6 +325,8 @@ class Dress extends AdminController
                         }
                     }
                 })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+
+                // echo $this->model->getLastSql();
                 // 根据筛选条件,设置颜色是否标红
                 $this->setStyle($list,$vv['_data']);
                 $list_all = array_merge($list_all,$list);
@@ -377,6 +384,104 @@ class Dress extends AdminController
         return $this->fetch('',['cols' => $cols,'_field' => $standard,'where' => $where]);
     }
 
+    public function index_api()
+    {
+        // 动态表头字段
+        $head = $this->logic->dressHead->column('name,field,stock','id');
+        $Date = date('Y-m-d');
+        // 定义固定字段
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
+        $dynamic_head = array_column($head,'name');
+        // 合并字段成完整表头
+        $_field = array_merge($defaultFields,$dynamic_head);
+         // 获取预警库存查询条件
+        $warStockItem = $this->logic->warStockItem();
+        // 获取参数
+        $where = $this->request->get();
+
+        // 筛选
+        $filters = json_decode($this->request->get('filter', '{}',null), true);
+        // 固定字段
+        $field = implode(',',$defaultFields);
+        foreach ($head as $k=>$v){
+            // 计算字段合并,多字段相加
+//                $field_str = str_replace(',',' + ',$v['field']);
+            // 计算字段合并,多字段相加
+            $field_arr = explode(',',$v['field']);
+            $field_str = '';
+            foreach ($field_arr as $fk =>$fv){
+                $field_str .= " IFNULL($fv,0) +";
+            }
+            // 清空多余字符串
+            $field_str = trim($field_str,'+');
+            // 拼接查询字段
+            $field .= ",( $field_str ) as {$v['name']}";
+        }
+        // 清空多余字符串
+        $field = trim($field,',');
+        // 数据集
+        $list_all = [];
+        // 根据每个省份设置的筛选查询
+        foreach($warStockItem as $kk => $vv){
+            // 查询条件
+            $having = '';
+            foreach ($vv['_data'] as $k=>$v){
+                // 表头有的字段才能筛选
+                if(in_array($k,$dynamic_head)){
+                    // 拼接过滤条件
+                    $having .= " ({$k} < {$v} or $k is null) or ";
+                }
+            }
+            $having = "(".trim($having,'or ').")";
+
+            // 筛选门店
+            $list = $this->logic->setStoreFilter($this->model);
+            // print_r($list);
+            // 查询数据
+            $list = $list->field($field)->where([
+                'Date' => $Date
+            ])->where(function ($q)use($vv,$filters,$where){
+                if(!empty($vv['省份'])){
+                    $q->whereIn('省份',$vv['省份']);
+                }
+                if(!empty($filters['省份'])){
+                    $q->whereIn('省份',$filters['省份']);
+                }
+                if(!empty($filters['店铺名称'])){
+                    $q->whereIn('店铺名称',$filters['店铺名称']);
+                }
+                if(!empty($filters['经营模式'])){
+                    $q->whereIn('经营模式',$filters['经营模式']);
+                }
+                if(!empty($where['商品负责人'])){
+                    $q->whereIn('商品负责人',$where['商品负责人']);
+                }else{
+                    $user = session('admin');
+                    if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
+                        $q->whereIn('商品负责人',$user['name']);
+                    } else {
+                        if(!empty($filters['商品负责人'])){
+                            $q->whereIn('商品负责人',$filters['商品负责人']);
+                        }
+                    }
+                }
+            })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+
+            // echo $this->model->getLastSql();
+            // 根据筛选条件,设置颜色是否标红
+            $this->setStyle($list,$vv['_data']);
+            $list_all = array_merge($list_all,$list);
+        }
+        // 返回数据
+        $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($list_all),
+                'data'  => $list_all
+            ];
+        return json($data);
+
+    }
 
     /**
      * 引流服饰的可用库存与在途库存

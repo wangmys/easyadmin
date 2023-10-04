@@ -97,7 +97,16 @@ class Summary extends AdminController
 
             $sql = "
                 SELECT
-                    *
+                    商品专员,省份,经营模式,店铺名称,首单日期,本月目标,当前流水,目标达成率,
+                    round(日均流水, 2) as 日均流水,
+                    剩余日均流水,环比,同比,
+                    concat(round(上装春占比 * 100, 1), '%') as 上装春占比,
+                    concat(round(上装夏占比 * 100, 1), '%') as 上装夏占比,
+                    concat(round(上装秋占比 * 100, 1), '%') as 上装秋占比,
+                    concat(round(上装冬占比 * 100, 1), '%') as 上装冬占比,
+                    concat(round(下装占比 * 100, 1), '%') as 下装占比,
+                    concat(round(鞋履占比 * 100, 1), '%') as 鞋履占比,
+                    上新提醒
                 FROM
                     cwl_summary 
                 WHERE 1	
