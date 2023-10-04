@@ -326,6 +326,31 @@ class Summary extends BaseController
         // 配饰
         $res = http_get('http://www.easyadmin1.com/admin/system.dress.index/list_api.html');
         $res = http_get('http://im.babiboy.com/admin/system.dress.index/list_api.html');
+
+        $sql_大小码缺码提醒 = "
+            update cwl_summary as s left join
+            (
+                select
+                    t.店铺名称,
+                    t.`未上柜提醒00/28/37/44/100/160/S` + `未上柜提醒29/38/46/105/165/M` + `未上柜提醒34/43/56/190/4XL` + `未上柜提醒35/44/58/195/5XL` + `未上柜提醒36/6XL` + `未上柜提醒38/7XL` + `未上柜提醒_40` AS 缺码
+                from
+                (
+                    SELECT 
+                        店铺名称,
+                        sum(case when `未上柜提醒00/28/37/44/100/160/S` is not null then 1 else 0  end) as `未上柜提醒00/28/37/44/100/160/S`,
+                        sum(case when `未上柜提醒29/38/46/105/165/M` is not null then 1  else 0 end) as `未上柜提醒29/38/46/105/165/M`,
+                        sum(case when `未上柜提醒34/43/56/190/4XL` is not null then 1  else 0 end) as `未上柜提醒34/43/56/190/4XL`,
+                        sum(case when `未上柜提醒35/44/58/195/5XL` is not null then 1  else 0 end) as `未上柜提醒35/44/58/195/5XL`,
+                        sum(case when `未上柜提醒36/6XL` is not null then 1 else 0 end) as `未上柜提醒36/6XL`,
+                        sum(case when `未上柜提醒38/7XL` is not null then 1 else 0 end) as `未上柜提醒38/7XL`,
+                        sum(case when `未上柜提醒_40` is not null then 1 else 0 end) as `未上柜提醒_40`
+                    FROM `cwl_daxiao_handle` group by 店铺名称
+                ) as t
+            ) as m on s.店铺名称 = m.店铺名称
+            set
+                s.大小码缺少提醒 = case when m.缺码>0 then '缺' end
+        ";
+        $this->db_easyA->execute($sql_大小码缺码提醒);
     }
 
     // 传入开始结束时间戳
