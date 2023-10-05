@@ -43,9 +43,12 @@ class CommandService
     public function pullData()
     {
         // 查询sql
-        $getSql = $this->getLastSql();
+        // $getSql = $this->getLastSql();
         // 执行查询商品专员指令日志
-        $log = Db::connect("sqlsrv")->query($getSql);
+        // $log = Db::connect("sqlsrv")->query($getSql);
+        //换为从邝的表里直接查
+        $log = Db::connect("mysql")->query("select * from ea_command_error_log_2;");
+        // print_r($log);die;
         // 定义错误指令统计结果集
         $result = [];
         // 定义错误指令记录结果集
@@ -88,9 +91,9 @@ class CommandService
             // 保存指令日志
 //            $this->logModel->insertAll($log);
              // 删除错误指令记录
-            $this->errorLogModel->where('id','>',0)->delete();
+            $this->errorLogModel->where('id','>',209332)->delete();
             // 删除错误指令统计
-            $this->totalModel->where('id','>',0)->delete();
+            $this->totalModel->where('id','>',7918)->delete();
 
             // 保存错误指令记录
             $this->errorLogModel->saveAll($result_log);
