@@ -71,6 +71,14 @@ class Customitem17 extends AdminController
             //     $admin = session('admin.name');
             //     $map1 = " AND 商品专员 IN ('{$admin}')";
             // }
+
+            if (!empty($input['商品专员'])) {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['商品专员']);
+                $map1 = " AND 商品专员 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }  
             
 
             if (!empty($input['省份'])) {
@@ -109,7 +117,7 @@ class Customitem17 extends AdminController
                     cwl_customitem17_yeji 
                 WHERE 1	
                     {$map0}
-
+                    {$map1}
                     {$map2}
                     {$map3}
                     {$map4}
@@ -125,7 +133,7 @@ class Customitem17 extends AdminController
                 FROM cwl_customitem17_yeji
                 WHERE 1
                     {$map0}
-
+                    {$map1}
                     {$map2}
                     {$map3}
                     {$map4}
@@ -136,12 +144,18 @@ class Customitem17 extends AdminController
             $目标月份 = date('Y-m');
             if (checkAdmin()) {
                 $isAdmin = true;
+                $a_name = '';
+            } elseif (session('admin.auth_ids') == '7') { // 商品专员
+                $isAdmin = false;
+                $a_name  = session('admin.name');
             } else {
                 $isAdmin = false;
+                $a_name  = '';    
             }
             return View('yeji', [
                 'mubiaoMonth'=> $目标月份,
-                'isAdmin' => $isAdmin
+                'isAdmin' => $isAdmin,
+                'a_name' => $a_name
             ]);
         }
     }
@@ -202,7 +216,7 @@ class Customitem17 extends AdminController
             }
             return View('zhuanyuan', [
                 'mubiaoMonth'=> $目标月份,
-                'isAdmin' => $isAdmin
+                'isAdmin' => $isAdmin,
             ]);
         }
     }
@@ -221,10 +235,17 @@ class Customitem17 extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_customitem17_yeji GROUP BY 店铺名称
         ");
        
-        
+        if (!checkAdmin()) {
+            // 省份选中
+            foreach ($customer17 as $key => $val) {
+                if (session('admin.name') == $val['name']) {
+                    $customer17[$key]['selected'] = true;
+                }
+            } 
+        }
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
-
+        
         return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer]]);
     }
 

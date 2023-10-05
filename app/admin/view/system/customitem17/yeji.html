@@ -213,12 +213,12 @@
                                     <option value="2023-10">2023-10</option>
                                 </select>
                             </div>
-                            {php} if ($isAdmin) { {/php}
+                            
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-spzy" class="xm-select-demo"></div>
                             </div>
-                            {php} } {/php}
+            
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-sf" class="xm-select-demo"></div>
@@ -279,6 +279,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , mubiaoMonth = "{$mubiaoMonth}"
+            , spzy = "{$mubiaoMonth}"
             , url1 = "{:url('admin/system.Customitem17/yeji')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Customitem17/getXmMapSelect')}"
@@ -309,20 +310,20 @@
         //     ]
         // })
 
-        {php} if ($isAdmin) { {/php}
-            xmSelect.render({
-                el: '#xm-spzy', 
-                filterable: true,
-                toolbar: {show: true},
-                name: '商品专员',
-                // showCount: 1,
-                theme: {
-                    color: '#1cbbb4',
-                },
-                data: [
-                ]
-            })
-        {php} } {/php}
+
+        xmSelect.render({
+            el: '#xm-spzy', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '商品专员',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+            ]
+        })
+
 
         xmSelect.render({
             el: '#xm-sf', 
@@ -370,7 +371,7 @@
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
-                {php} if ($isAdmin) { {/php}
+
                 xmSelect.render({
                     el: '#xm-spzy', 
                     filterable: true,
@@ -382,7 +383,7 @@
                     name:'商品专员',
                     data: res.data.customer17
                 })
-                {php} } {/php}
+
                 // 渲染所有省份
                 xmSelect.render({
                     el: '#xm-sf', 
@@ -487,7 +488,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: {"目标月份": mubiaoMonth}
+                , where: {"目标月份": mubiaoMonth, '商品专员': "{$a_name}"}
                 , cols: [
                     [
                         {title: `<div class="flex col around">
