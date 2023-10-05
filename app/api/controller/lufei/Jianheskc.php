@@ -70,7 +70,7 @@ class Jianheskc extends BaseController
         $year = date('Y', time());
 
         $sql = "
-            select * from sp_customer_stock_skc_2
+            select * from sp_customer_stock_skc_2 where 一级时间分类 in('2023')
         ";
 		
         $select = $this->db_bi->query($sql);
