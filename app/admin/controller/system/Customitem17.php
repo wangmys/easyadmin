@@ -59,18 +59,18 @@ class Customitem17 extends AdminController
                 $map0 = " AND 目标月份 = '{$目标月份}'";;
             }
 
-            if (checkAdmin()) {
-                if (!empty($input['商品专员'])) {
-                    // echo $input['商品负责人'];
-                    $map1Str = xmSelectInput($input['商品专员']);
-                    $map1 = " AND 商品专员 IN ({$map1Str})";
-                } else {
-                    $map1 = "";
-                }
-            } else {
-                $admin = session('admin.name');
-                $map1 = " AND 商品专员 IN ('{$admin}')";
-            }
+            // if (checkAdmin()) {
+            //     if (!empty($input['商品专员'])) {
+            //         // echo $input['商品负责人'];
+            //         $map1Str = xmSelectInput($input['商品专员']);
+            //         $map1 = " AND 商品专员 IN ({$map1Str})";
+            //     } else {
+            //         $map1 = "";
+            //     }
+            // } else {
+            //     $admin = session('admin.name');
+            //     $map1 = " AND 商品专员 IN ('{$admin}')";
+            // }
             
 
             if (!empty($input['省份'])) {
@@ -109,7 +109,7 @@ class Customitem17 extends AdminController
                     cwl_customitem17_yeji 
                 WHERE 1	
                     {$map0}
-                    {$map1}
+
                     {$map2}
                     {$map3}
                     {$map4}
@@ -125,7 +125,7 @@ class Customitem17 extends AdminController
                 FROM cwl_customitem17_yeji
                 WHERE 1
                     {$map0}
-                    {$map1}
+
                     {$map2}
                     {$map3}
                     {$map4}
@@ -146,7 +146,7 @@ class Customitem17 extends AdminController
         }
     }
 
-        /**
+    /**
      * @NodeAnotation(title="商品负责人业绩目标达成情况") 
      * 
      */
@@ -165,20 +165,6 @@ class Customitem17 extends AdminController
                 $map0 = " AND 目标月份 = '{$目标月份}'";;
             }
 
-            if (checkAdmin()) {
-                if (!empty($input['商品专员'])) {
-                    // echo $input['商品负责人'];
-                    $map1Str = xmSelectInput($input['商品专员']);
-                    $map1 = " AND 商品专员 IN ({$map1Str})";
-                } else {
-                    $map1 = "";
-                }
-            } else {
-                $admin = session('admin.name');
-                $map1 = " AND 商品专员 IN ('{$admin}')";
-            }
-            
-
 
             $sql = "
                 SELECT
@@ -194,7 +180,6 @@ class Customitem17 extends AdminController
                 cwl_customitem17_zhuanyuan 
                 WHERE 1	
                     {$map0}
-                    {$map1}
             ";
 
             $select = $this->db_easyA->query($sql);
@@ -205,7 +190,6 @@ class Customitem17 extends AdminController
                 FROM cwl_customitem17_zhuanyuan
                 WHERE 1
                     {$map0}
-                    {$map1}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => date('Y-m-d')]);
