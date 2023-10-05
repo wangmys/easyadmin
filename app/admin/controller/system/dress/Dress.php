@@ -15,6 +15,12 @@ use app\common\logic\inventory\DressLogic;
 use jianyan\excel\Excel;
 
 
+
+// use EasyAdmin\annotation\ControllerAnnotation;
+// use EasyAdmin\annotation\NodeAnotation;
+// use app\common\controller\AdminController;
+
+
 /**
  * Class Dress
  * @package app\admin\controller\system\dress
@@ -30,6 +36,7 @@ class Dress extends AdminController
     ];
 
     public function __construct(App $app)
+    // public function __construct()
     {
         parent::__construct($app);
         $this->model = new Accessories;
@@ -402,6 +409,7 @@ class Dress extends AdminController
         $warStockItem = $this->logic->warStockItem();
         // 获取参数
         $where = $this->request->get();
+        // $where = input();
 
         // 筛选
         $filters = json_decode($this->request->get('filter', '{}',null), true);

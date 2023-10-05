@@ -901,9 +901,9 @@ class SendReport extends BaseController
     }
 
     public function run7() {
-        $this->service->create_table_s017();
-        $this->service->create_table_s019();
-        $this->send7();
+        // $this->service->create_table_s017();
+        // $this->service->create_table_s019();
+        // $this->send7();
     }
 
     // 51 推送 11：46

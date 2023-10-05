@@ -204,36 +204,76 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center;">月份</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">月份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <select id="mubiaoMonth" name="目标月份" lay-verify="required">
                                     <option value="2023-09">2023-09</option>
                                     <option value="2023-10">2023-10</option>
                                 </select>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">商品专员</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-spzy" class="xm-select-demo"></div>
                             </div>
        
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-sf" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营模式</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">经营模式</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-jyms" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">店铺名称</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-dpmc" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">上新提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-sxtx" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">引流是否提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-ylsftx" class="xm-select-demo"></div>
+                            </div>
                         </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">配饰是否提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-pssftx" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">大小码缺少提醒</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-dxmqstx" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">售空SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-skskcs" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">即将售空SKC数</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-jjskskcs" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">不动销情况</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-bbxqk" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+
+
                     </div>
 
-                    <div class="flex col between" style="width:5%; height:35px;">
+                    
+
+
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
@@ -277,6 +317,7 @@
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
+            , mubiaoMonth = '{$mubiaoMonth}'
             , url1 = "{:url('admin/system.Summary/index')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Summary/getXmMapSelect')}"
@@ -347,6 +388,106 @@
             data: [
                 {name: "加盟", value: "加盟", selected: ""},
                 {name: "直营", value: "直营", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-sxtx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '上新提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "上秋", value: "上秋", selected: ""},
+                {name: "上冬", value: "上冬", selected: ""},
+                {name: "上秋冬", value: "上秋冬", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-ylsftx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '引流是否提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "是", value: "是", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-pssftx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '配饰是否提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "是", value: "是", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-dxmqstx', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '大小码缺少提醒',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "缺", value: "缺", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-skskcs', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '售空SKC数',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "大于0", value: "is not null", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-jjskskcs', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '即将售空SKC数',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "大于0", value: "is not null", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-bbxqk', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '不动销情况',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "有情况", value: "is not null", selected: ""},
             ]
         })
 
@@ -512,7 +653,7 @@
                                     <div class="cima">提</div>
                                     <div class="cima">醒</div>
                                     </div>`, field:'上新提醒', align: 'center', colspan: 1,rowspan: 3}
-                        ,{ title: `整体监控提醒`, align: 'center', colspan: 11,rowspan: 1}
+                        ,{ title: `整体监控提醒`, align: 'center', colspan: 10,rowspan: 1}
                     ],
 
                     [
@@ -546,11 +687,11 @@
                                     <div class="cima">缺少</div>
                                     <div class="cima">提醒</div>
                                     </div>`,field:'大小码缺少提醒' ,align: 'center' , rowspan: 2} 
-                        ,{ title: `<div class="flex col around">
-                                    <div class="cima">云仓</div>
-                                    <div class="cima">TOP</div>
-                                    <div class="cima">SKC数</div>
-                                    </div>` ,align: 'center' , rowspan: 2} 
+                        // ,{ title: `<div class="flex col around">
+                        //             <div class="cima">云仓</div>
+                        //             <div class="cima">TOP</div>
+                        //             <div class="cima">SKC数</div>
+                        //             </div>` ,align: 'center' , rowspan: 2} 
                         ,{title: '售空情况' ,align: 'center' , rowspan: 1, colspan: 2} 
                         ,{title: '不动销情况' ,align: 'center' , rowspan: 1, colspan: 2} 
                         ,{title: '断码率' ,align: 'center' , rowspan: 1, colspan: 2} 
@@ -558,7 +699,7 @@
                                     <div class="cima">单款</div>
                                     <div class="cima">超量</div>
                                     <div class="cima">SKC数</div>
-                                    </div>` ,align: 'center' , rowspan: 2} 
+                                    </div>`,field:'单款超量SKC数' ,align: 'center' , rowspan: 2} 
                     ],
 
                     [
@@ -579,14 +720,14 @@
                         ,{  title: `<div class="flex col around">
                                     <div class="cima">不动销</div>
                                     <div class="cima">SKC数</div>
-                                    </div>` ,align: 'center' ,  rowspan: 1} 
+                                    </div>`,field:'不动销SKC数', align: 'center' ,  rowspan: 1} 
                         ,{  title: `<div class="flex col around">
                                     <div class="cima">不动销</div>
                                     <div class="cima">占比</div>
-                                    </div>` ,align: 'center' ,  rowspan: 1} 
+                                    </div>`, field:'不动销占比', align: 'center' ,  rowspan: 1} 
 
-                        ,{  title: '整体' ,align: 'center' ,  rowspan: 1} 
-                        ,{  title: 'TOP' ,align: 'center' ,  rowspan: 1}
+                        ,{  title: '整体',field:'断码率整体齐码率', align: 'center' ,  rowspan: 1} 
+                        ,{  title: 'TOP',field:'断码率TOP考核齐码率', align: 'center' ,  rowspan: 1}
                     ]
                             
                 ]

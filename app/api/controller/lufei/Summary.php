@@ -324,8 +324,8 @@ class Summary extends BaseController
         $res = http_get('http://www.easyadmin1.com/admin/system.dress.dress/index_api');
         $res = http_get('http://im.babiboy.com/admin/system.dress.dress/index_api');
         // 配饰
-        $res = http_get('http://www.easyadmin1.com/admin/system.dress.index/list_api.html');
-        $res = http_get('http://im.babiboy.com/admin/system.dress.index/list_api.html');
+        $res = http_get('http://www.easyadmin1.com/admin/system.dress.index/list_api');
+        $res = http_get('http://im.babiboy.com/admin/system.dress.index/list_api');
 
         $sql_大小码缺码提醒 = "
             update cwl_summary as s left join
@@ -408,6 +408,33 @@ class Summary extends BaseController
                 $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val5['店铺名称']])->update(['不动销占比' => $val5['考核标准占比'], '不动销SKC数' => $val5['需要调整SKC数']]); 
             }
         }
+
+        $date = date('Y-m-d');
+        $sql_断码率 = "
+            UPDATE cwl_summary AS s
+            LEFT JOIN cwl_duanmalv_table1_1 as t on s.店铺名称=t.店铺名称 and t.更新日期='{$date}'
+            SET
+                s.`断码率整体齐码率`=t.`齐码率-整体`,
+                s.`断码率TOP考核齐码率`=t.`齐码率-TOP考核`
+        ";
+        $this->db_easyA->execute($sql_断码率);
+
+        $sql_单款超量SKC数 = "
+            UPDATE cwl_summary AS s
+            LEFT JOIN (
+                SELECT
+                    店铺名称,
+                    count(*) as 数量 
+                FROM
+                    `cwl_chaoliang_sk` 
+                WHERE 
+                    `提醒备注`='请注意'
+                GROUP BY 店铺名称
+            ) as t on s.店铺名称=t.店铺名称
+            SET
+                s.`单款超量SKC数`=t.数量
+        ";
+        $this->db_easyA->execute($sql_单款超量SKC数);
     }
 
     // 传入开始结束时间戳
