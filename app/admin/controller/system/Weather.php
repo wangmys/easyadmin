@@ -7,6 +7,7 @@ use app\admin\model\weather\Weather as WeatherM;
 use app\admin\model\weather\Weather2345Model;
 use app\admin\model\weather\Customers as CustomersM;
 use app\admin\model\weather\CityUrl;
+use app\admin\model\weather\WeatherUpdateStatus2345Model;
 use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
@@ -271,6 +272,8 @@ class Weather extends AdminController
             $if_can_see = 0;
         }
 
+        $last_update_time = WeatherUpdateStatus2345Model::where([])->field('update_time')->order('update_time desc')->find();
+
         // 省列表
         // 区域列表
         $data = [
@@ -286,6 +289,7 @@ class Weather extends AdminController
                 'if_can_see'  => $if_can_see,
                 'mathod'  => $mathod,
                 'CustomerGrade'  => $CustomerGrade,
+                'last_update_time'  => $last_update_time ? $last_update_time['update_time'] : '',
                 'data'  => $list
             ];
         return json($data);
