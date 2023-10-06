@@ -289,8 +289,22 @@ class Push extends BaseController
      * 131255621326201188
      * https://bx.babiboy.com/dingding/get?code=15880012590
      */
-    public function pushLiandai222()
+    public function pushLiandai()
     {
+        $time = time();
+        if ($time >= strtotime(date('Y-m-d 23:30:00')) && $time <= strtotime(date('Y-m-d 23:40:00'))) {
+        } else {
+            // echo '时间范围外';
+            die;
+        }
+
+        // if ($time >= strtotime(date('Y-m-d 14:50:00')) && $time <= strtotime(date('Y-m-d 15:00:00'))) {
+        // } else {
+        //     // echo '时间范围外';
+        //     die;
+        // }
+        // echo '时间范围内';
+        // die;
         $date = input('date') ? input('date') : date('Y-m-d');
         $model = new Sample;
         $parms = [
