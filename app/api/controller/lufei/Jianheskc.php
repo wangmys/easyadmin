@@ -148,4 +148,24 @@ class Jianheskc extends BaseController
         dump($select);
     }
 
+    public function test3() {
+        $host     = '192.168.9.230:9030';
+        $username = 'root';
+        $password = 'doris@2023';
+        $dbname   = 'sg_dw';
+        $mysql    = new Mysqli($host, $username, $password, $dbname);
+        if($mysql -> connect_errno){
+            die('connection fail'.$mysql->connect_errno);
+        }else{
+            echo 'successs';
+            // $mysql -> set_charset('UTF-8');            
+            // $sql = 'select * from test limit 1;';     
+            // $result = $mysql -> query($sql);     
+            // $data = $result -> fetch_all();
+            // $mysql -> close();
+        }
+        // echo '<pre>';
+        // print_r($data);
+    }
+
 }
