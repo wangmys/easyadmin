@@ -22,6 +22,7 @@ class Jianheskc extends BaseController
     protected $db_easyA = '';
     protected $db_bi = '';
     protected $db_sqlsrv = '';
+    protected $db_doris = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -32,6 +33,7 @@ class Jianheskc extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_doris = Db::connect('doris');
     }
 
     public function seasionHandle($seasion = "夏季,秋季") {
@@ -138,10 +140,12 @@ class Jianheskc extends BaseController
         $insert = $this->db_easyA->table('cwl_swoole_test')->where('id=1')->update([
             'num' => Db::raw('num+1'),
         ]);
+        
     }
 
     public function test2() {
-        phpinfo();
+        $select = $this->db_doris->table('market_history_stock_week')->limit(10)->select();
+        dump($select);
     }
 
 }
