@@ -158,14 +158,36 @@ class Jianheskc extends BaseController
             die('connection fail'.$mysql->connect_errno);
         }else{
             echo 'successs';
-            // $mysql -> set_charset('UTF-8');            
-            // $sql = 'select * from test limit 1;';     
-            // $result = $mysql -> query($sql);     
-            // $data = $result -> fetch_all();
-            // $mysql -> close();
+            $mysql -> set_charset('UTF-8');            
+            $sql = 'select * from test limit 1;';     
+            $result = $mysql -> query($sql);     
+            $data = $result -> fetch_all();
+            $mysql -> close();
         }
-        // echo '<pre>';
+        // echo '<pre>';    
         // print_r($data);
+    }
+
+    function doris(){
+        $host     = '192.168.9.230:9030';
+        $username = 'root';
+        $password = 'doris@2023';
+        $dbname   = 'sg_dw';
+        $mysql    =  mysqli_connect($host, $username, $password, $dbname);
+        if($mysql -> connect_errno){
+            die('connection fail'.$mysql->connect_errno);
+        }else{
+            echo 'successs';
+            $mysql -> set_charset('UTF-8');
+            $sql = 'select * from market_history_stock_week limit 1;';
+            $result = $mysql -> query($sql);
+            $data = $result -> fetch_all();
+            $mysql -> close();
+        }
+
+        echo '<pre>';
+        print_r($data);
+//        Db::connect('doris')->table('aa')->select();
     }
 
 }
