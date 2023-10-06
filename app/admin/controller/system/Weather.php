@@ -70,7 +70,7 @@ class Weather extends AdminController
             ->where('c.RegionId','<>',55)->count();
 
             $list = $this->customers
-            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid,c.liable,c.Mathod')
+            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid,c.liable,c.Mathod,c.url_2345_cid')
             ->field(['cu.City'=>'BdCity'])
             ->alias('c')
             ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
@@ -98,8 +98,10 @@ class Weather extends AdminController
             $dateList = $this->getDateList(1);
             $list = $list->toArray();
             if(!empty($list)){
-                foreach ($list as &$v_list) $v_list['State'] = mb_substr($v_list['State'], 0, 2);
-
+                foreach ($list as &$v_list) {
+                    $v_list['State'] = mb_substr($v_list['State'], 0, 2);
+                    $v_list['cid'] = $v_list['url_2345_cid'] ?: $v_list['cid']; 
+                }
                 $cid_list = array_column($list,'cid');
                 // 查询天气
                 $weather_list = $this->model->field('cid,id,min_c,max_c,weather_time,temperature')->whereIn('cid',$cid_list)->where('weather_time','in',array_values($dateList))->select();
@@ -367,6 +369,60 @@ class Weather extends AdminController
         $this->assign([
             'city_list' => $city_list,
             'cid' => $customer['cid'] ?? 0
+        ]);
+        return $this->fetch();
+    }
+
+    /**
+     * 店铺绑定天气网址链接
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function tianqi_url()
+    {
+        // 获取店铺ID
+        $id = $this->request->get('CustomerId');
+        $city_model = new CityUrl;
+        if ($this->request->isAjax()) {
+
+            $post = $this->request->post();
+            $url_2345 = $post['url_2345'] ? trim($post['url_2345']) : '';
+            $url_2345 = $url_2345 ? str_replace(['https'], ['http'], $url_2345) : '';
+
+            if ($url_2345) {
+                //抓取该链接天气数据得到 所在城市名称
+                $res = (new WeatherService)->getWeather15_2345_byurl($url_2345);
+                // print_r($res);die;
+                if ($res['add_data']) {
+
+                    $res = $this->customers->where([
+                        'CustomerId' => $id
+                    ])->update(['url_2345' => $url_2345, 'url_2345_cid'=>$res['cid']]);
+
+                } else {
+
+                    $this->error('绑定失败，请检查天气链接网址,必须使用2345天气网15天天气页面url');
+
+                }   
+                
+            } else {
+
+                $res = $this->customers->where([
+                    'CustomerId' => $id
+                ])->update(['url_2345' => '', 'url_2345_cid'=>0]);
+
+            }
+
+            $this->success('绑定成功');
+        }
+
+        //查询店铺记录
+        $customer = $this->customers->field('url_2345')->where(['CustomerId' => $id])->find();
+
+        $this->assign([
+            'url_2345' => $customer ? $customer['url_2345'] : ''
         ]);
         return $this->fetch();
     }

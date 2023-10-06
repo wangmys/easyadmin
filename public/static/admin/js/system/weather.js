@@ -4,6 +4,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
         table_render_id: 'currentTableRenderId',
         index_url: 'system.weather/index',
         city_url: 'system.weather/city',
+        tianqi_url: 'system.weather/tianqi_url',
         list_index: '/admin/system.weather/index'
     };
 
@@ -78,8 +79,16 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     templet: ea.table.tool,
                     operat: [
                         [{
-                            text: '绑定城市',
+                            text: '绑城市',
                             url: init.city_url,
+                            method: 'open',
+                            auth: '',
+                            class: 'layui-btn layui-btn-normal layui-btn-xs',
+                            field:'CustomerId'
+                        }],
+                        [{
+                            text: '绑网址',
+                            url: init.tianqi_url,
                             method: 'open',
                             auth: '',
                             class: 'layui-btn layui-btn-normal layui-btn-xs',
@@ -165,6 +174,9 @@ define(["jquery", "easy-admin2"], function ($, ea) {
             })
         },
         city: function () {
+            ea.listen();
+        },
+        tianqi_url: function () {
             ea.listen();
         }
     };
