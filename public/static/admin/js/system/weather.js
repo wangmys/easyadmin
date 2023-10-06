@@ -145,6 +145,14 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                             'background-color': 'rgb(110, 170, 46)', 'color': '#000', 'font-weight':'bold'
                         });
 
+
+                        res.data.forEach(function (item,index) {
+                            if (item['url_2345_cid']) {
+                                $('tr[data-index="'+index+'"] td[data-field="33"] a[data-title="绑网址"]').addClass('layui-bg-red');
+                            }
+                        })
+                        
+
                     }
                 });
 
