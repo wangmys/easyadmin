@@ -289,7 +289,7 @@ class Push extends BaseController
      * 131255621326201188
      * https://bx.babiboy.com/dingding/get?code=15880012590
      */
-    public function pushLiandai()
+    public function pushLiandai222()
     {
         $date = input('date') ? input('date') : date('Y-m-d');
         $model = new Sample;
