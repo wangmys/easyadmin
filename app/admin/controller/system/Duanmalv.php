@@ -24,11 +24,16 @@ class Duanmalv extends AdminController
     // 创建时间
     protected $create_time = '';
 
+    // 配置信息
+    protected $config = '';
+
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->create_time = date('Y-m-d H:i:s', time());
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        $this->config = $select_config;
     }
 
     /**
@@ -43,7 +48,9 @@ class Duanmalv extends AdminController
         // ]);
 
         // // 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        // $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        // $this->top = $config['top'];
         
         // dump($select_config );die;
 
@@ -57,7 +64,7 @@ class Duanmalv extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('status=1')->find();
         $select_noCustomer = explode(',', $select_config['不考核门店']);
 
         // 不考核门店选中
@@ -236,7 +243,8 @@ class Duanmalv extends AdminController
      */
     public function sk() {
         if (request()->isAjax()) {
-            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+            // $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+            $find_config = $this->config;
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -963,7 +971,7 @@ class Duanmalv extends AdminController
      */
     public function table1() {
         if (request()->isAjax()) {
-            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+            $find_config = $this->config;
             // 目前时间该展示的两个时间 
             $limitDate = $this->duanmalvDateHandle(true);  
             // 筛选条件
@@ -1069,6 +1077,7 @@ class Duanmalv extends AdminController
             }
             return View('table1', [
                 'limitDate' => $limitDate,
+                'config' => $this->config,
                 'admin' => $admin
             ]);
         }  
@@ -1207,7 +1216,7 @@ class Duanmalv extends AdminController
      */
     public function table1_2() {
         if (request()->isAjax()) {
-            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+            $find_config = $this->config;
         // if (1) {
             // 筛选条件
             $input = input();
@@ -1676,6 +1685,7 @@ class Duanmalv extends AdminController
             }
             return View('table1_2', [
                 'limitDate' => $limitDate,
+                'config' => $this->config,
                 'admin' => $admin
             ]);
         }  
@@ -1711,7 +1721,7 @@ class Duanmalv extends AdminController
      */
      public function table1_3() {
         if (request()->isAjax()) {
-            $find_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+            $find_config = $this->config;
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
@@ -2261,6 +2271,7 @@ class Duanmalv extends AdminController
             }
             return View('table1_3', [
                 'limitDate' => $limitDate,
+                'config' => $this->config,
                 'admin' => $admin
             ]);
         }  

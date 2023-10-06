@@ -36,6 +36,9 @@ class Duanmalv extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+
+        $config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        $this->top = $config['top'];
     }
 
     public function seasionHandle($seasion = "夏季,秋季") {

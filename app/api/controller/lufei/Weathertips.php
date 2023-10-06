@@ -472,7 +472,7 @@ class Weathertips extends BaseController
             SET 
                 是否计算SKC = 
                 CASE
-                    WHEN 二级分类 NOT IN ('正统长衬', '套西', '套西裤') THEN '是' ELSE '否'
+                    WHEN 二级分类 NOT IN ('正统长衬', '套西', '套西裤', '正统短衬') THEN '是' ELSE '否'
                 END 
             WHERE 
                 是否计算SKC IS NULL
@@ -573,7 +573,7 @@ class Weathertips extends BaseController
                     WHEN DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) = FORMAT(ER.RetailDate, 'yyyy-MM-dd') THEN 1
                 END 日期识别B,
                 CASE
-                    WHEN EG.CategoryName2 NOT IN ('正统长衬', '套西', '套西裤') THEN '是' ELSE '否'
+                    WHEN EG.CategoryName2 NOT IN ('正统长衬', '套西', '套西裤', '正统短衬') THEN '是' ELSE '否'
                 END AS 是否计算SKC, 
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM

@@ -307,7 +307,7 @@ class ReportFormsServicePro
                 'row' => count($list),          //数据的行数
                 // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "省份老店业绩同比-加盟 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
+                'title' => "省份老店业绩同比 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,

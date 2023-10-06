@@ -22,6 +22,7 @@ class Jianheskc extends BaseController
     protected $db_easyA = '';
     protected $db_bi = '';
     protected $db_sqlsrv = '';
+    protected $db_doris = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -32,6 +33,7 @@ class Jianheskc extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_doris = Db::connect('doris');
     }
 
     public function seasionHandle($seasion = "夏季,秋季") {
@@ -138,10 +140,54 @@ class Jianheskc extends BaseController
         $insert = $this->db_easyA->table('cwl_swoole_test')->where('id=1')->update([
             'num' => Db::raw('num+1'),
         ]);
+        
     }
 
     public function test2() {
-        phpinfo();
+        $select = $this->db_doris->table('market_history_stock_week')->limit(10)->select();
+        dump($select);
+    }
+
+    public function test3() {
+        $host     = '192.168.9.230:9030';
+        $username = 'root';
+        $password = 'doris@2023';
+        $dbname   = 'sg_dw';
+        $mysql    = new Mysqli($host, $username, $password, $dbname);
+        if($mysql -> connect_errno){
+            die('connection fail'.$mysql->connect_errno);
+        }else{
+            echo 'successs';
+            $mysql -> set_charset('UTF-8');            
+            $sql = 'select * from test limit 1;';     
+            $result = $mysql -> query($sql);     
+            $data = $result -> fetch_all();
+            $mysql -> close();
+        }
+        // echo '<pre>';    
+        // print_r($data);
+    }
+
+    function doris(){
+        $host     = '192.168.9.230:9030';
+        $username = 'root';
+        $password = 'doris@2023';
+        $dbname   = 'sg_dw';
+        $mysql    =  mysqli_connect($host, $username, $password, $dbname);
+        if($mysql -> connect_errno){
+            die('connection fail'.$mysql->connect_errno);
+        }else{
+            echo 'successs';
+            $mysql -> set_charset('UTF-8');
+            $sql = 'select * from market_history_stock_week limit 1;';
+            $result = $mysql -> query($sql);
+            $data = $result -> fetch_all();
+            $mysql -> close();
+        }
+
+        echo '<pre>';
+        print_r($data);
+//        Db::connect('doris')->table('aa')->select();
     }
 
 }
