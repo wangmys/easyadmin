@@ -155,6 +155,159 @@ class WeatherService
     }
 
     /**
+     * 获取天气数据(2345天气)(15天)
+     * @param int $cid
+     * @return array
+     */
+    public function getWeather15_2345($cid = 0)
+    {
+        $url = CityUrl::where([
+            'cid' => $cid
+        ])->value('url_2345_15day');
+        if(empty($url)) return [];
+
+        $res = [];
+
+        try {
+            $html = HtmlDomParser::file_get_html($url);
+
+            $res = $html->find('script', 32)->textContent;
+            $res = $res ? str_replace(' var fortyData=', '', $res) : '';
+            $res = $res ? json_decode($res, true) : [];
+            $res = $res ? $res['data'] : [];
+        } catch (\Exception $e) {
+            //记录失败日志：
+            Log::write(json_encode($e->getMessage()), 'crawl2345 error（绑定城市，保存后抓取不到数据）:cid='.$cid.',weather_url='.$url);
+        }
+
+        $add_data = [];
+        if ($res) {
+            foreach ($res as $v_res) {
+
+                $add_data[] = [
+                    'cid' => $cid,
+                    'weather_time' => date('Y-m-d', $v_res['time']),
+                    'text_weather' => $v_res['weather'],
+                    'temperature' => $v_res['weather'],
+                    'min_c' => $v_res['night_temp'],
+                    'max_c' => $v_res['day_temp'],
+                    'ave_c' => round( ( $v_res['night_temp'] + $v_res['day_temp'] ) / 2 , 1),
+                ];
+
+            }
+
+            return $add_data;
+
+        }
+
+        return [];
+    }
+
+    /**
+     * 通过链接获取(2345天气)(15天)天气数据
+     * @param int $url
+     * @return array
+     */
+    public function getWeather15_2345_byurl($url = '')
+    {
+
+        if(empty($url)) return [];
+
+        $res = [];
+        $province = $city = '';
+
+        try {
+            $html = HtmlDomParser::file_get_html($url);
+
+            //获取链接里的省份、城市信息
+            $province_city_info = $html->find('meta', 4)->content;
+            if ($province_city_info) {
+                $ex_res = explode('，', $province_city_info);
+                $ex_res = $ex_res ? $ex_res[0] : '';
+                $aim_str = $ex_res ? str_replace(['2345天气预报提供', '天气预报'], ['', ''], $ex_res) : '';
+                $aim_str = $aim_str ? trim($aim_str) : '';
+                $province = $aim_str ? mb_substr($aim_str, 0, 2) : '';
+                $city = $aim_str ? str_replace([$province], [''], $aim_str) : '';
+            }
+
+            $res = $html->find('script', 32)->textContent;
+            $res = $res ? str_replace(' var fortyData=', '', $res) : '';
+            $res = $res ? json_decode($res, true) : [];
+            $res = $res ? $res['data'] : [];
+
+        } catch (\Exception $e) {
+            //记录失败日志：
+            Log::write(json_encode($e->getMessage()), 'crawl2345 error（绑定链接，保存后抓取不到数据）:weather_url='.$url);
+        }
+
+        $cid = 0;
+        if ($province && $city) {
+
+            $if_exist = CityUrl::where([['province', '=', $province.'天气预报40天'], ['city', '=', $city]])->find();
+            if ($if_exist) {
+                $cid = $if_exist['cid'];
+            } else {
+                //入库city_url表
+                $add_city_url = [
+                    'province' => $province.'天气预报40天',
+                    'city' => $city,
+                    'url_2345' => $url,
+                    'url_2345_15day' => $url,
+                ];
+                $city_url_res = CityUrl::create($add_city_url);
+                $cid = $city_url_res->id;
+            }
+            
+        }
+        // print_r([$cid, $res]);die;
+
+        $add_data = [];
+        if ($res && $cid) {
+            foreach ($res as $v_res) {
+
+                $add_data[] = [
+                    'cid' => $cid,
+                    'weather_time' => date('Y-m-d', $v_res['time']),
+                    'text_weather' => $v_res['weather'],
+                    'temperature' => $v_res['weather'],
+                    'min_c' => $v_res['night_temp'],
+                    'max_c' => $v_res['day_temp'],
+                    'ave_c' => round( ( $v_res['night_temp'] + $v_res['day_temp'] ) / 2 , 1),
+                ];
+
+            }
+
+            $if_exist_cid = $this->weather2345::where([['cid', '=', $cid]])->field('id')->find();
+            Db::startTrans();
+            try {
+
+                if (!$if_exist_cid) {
+                    $this->weather2345::insertAll($add_data);
+                } else {
+                    foreach ($add_data as $vv_data) {
+                        $if_exist_weather = $this->weather2345::where([['cid', '=', $cid], ['weather_time', '=', $vv_data['weather_time']]])->field('id')->find();
+                        if (!$if_exist_weather) {
+                            $this->weather2345::create($vv_data);
+                        } else {
+                            $this->weather2345::where([['id', '=', $if_exist_weather['id']]])->update($vv_data);
+                        }
+                    }
+                }
+
+                Db::commit();
+    
+            } catch (\Exception $e) {
+                //记录失败日志：
+                Log::write(json_encode($e->getMessage()), 'crawl2345 error(WeatherService-->getWeather15_2345_byurl方法天气入库或更新失败):cid='.$cid);
+                Db::rollback();
+            }
+
+        }
+
+        return ['add_data' => $add_data, 'province' => $province, 'city' => $city, 'cid' => $cid, 'url' => $url];
+    }
+
+    /**
      * 获取城市,天气地址列表
      * @return array|false
      */
@@ -234,8 +387,8 @@ class WeatherService
      */
     public function updateCityWeather2345($cid = 0)
     {
-        // 拉取近40天的天气
-        $arr = $this->getWeather40_2345($cid);
+        // 拉取近40天的天气(取15天那个页面的数据)
+        $arr = $this->getWeather15_2345($cid);
         // 判断天气是否为空
         if(!empty($arr)){
 
