@@ -204,7 +204,7 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center;">检核类型</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -242,9 +242,12 @@
                         </div>
                     </div>
 
-                    <div class="flex col between" style="width:5%; height:35px;">
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="updateBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">实时更新
                         </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
@@ -290,6 +293,7 @@
             , url1 = "{:url('admin/system.Jianheskc/handle')}" 
             , url_download_history_area = "{:url('admin/system.Jianheskc/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Jianheskc/getXmMapSelect')}"
+            , url_updateDdata = "{:url('admin/system.Jianheskc/updateDdata')}"
 
 
         $("#checkType").val("店铺库存");
@@ -411,6 +415,42 @@
                 , page: true
                 , limit: data.field.limit
             })
+
+            return false; 
+        });
+
+        //监听保存
+        form.on('submit(updateBtn)', function (data) {
+            layui.use('layer', function () {
+                layui.layer.load();
+                //console.log(Lodingindex) opacity
+                $(".layui-layer-shade").css('background', '#000000')
+                $(".layui-layer-shade").css('opacity', '0.2')
+                $(".layui-layer-shade").click(function (event) {
+                    event.stopPropagation();
+                })
+            })
+            $.post(url_updateDdata, {}, function(res) {
+                if (res.status == 1) {
+                    table.reload('table', {
+                        where: data.field
+                        , method: 'post'
+                        , url: url1
+                        , loading: true
+                        , page: true
+                        , limit: data.field.limit
+                    })
+                } else {
+                    alert(res.msg);
+                }
+
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 0);
+                });
+            })
+
 
             return false; 
         });

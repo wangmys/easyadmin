@@ -200,7 +200,7 @@ class Shangguitips extends BaseController
             FROM
                 sp_sk 
             WHERE 1
-                AND 季节 IN ( '初秋', '深秋', '秋季')
+                AND 季节 IN ( '初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
                 AND 店铺名称 IN (
                     SELECT CustomerName FROM customer_pro GROUP BY CustomerName
                 )
@@ -494,7 +494,7 @@ class Shangguitips extends BaseController
                     GROUP BY t.云仓
             ) AS dpgsjm ON yc.仓库名称 = dpgsjm.云仓
             WHERE 1 
-                AND yc.二级时间分类 IN ('初秋', '深秋', '秋季')
+                AND yc.二级时间分类 IN ('初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
         ";
 		
         $select = $this->db_easyA->query($sql);
@@ -881,7 +881,7 @@ class Shangguitips extends BaseController
             WHERE 1
             -- 	AND h.货号 = 'B52502002'
             -- 	AND h.云仓 = '南昌云仓'
-                AND h.季节归集 in ('秋季')      
+                AND h.季节归集 in ('秋季', '冬季')      
         ";
         $this->db_easyA->execute($sql_货品等级_计划);
     }
@@ -932,7 +932,7 @@ class Shangguitips extends BaseController
                 货品等级_实际_合计 = 	
                 (select count(*) from cwl_shangguitips_biaozhun_customer where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节归集 = h.季节归集) 
             WHERE 1
-                AND h.`季节归集` IN ('秋季')	
+                AND h.`季节归集` IN ('秋季', '冬季')	
         ";
 
         $sql_实际铺货 = "
@@ -948,7 +948,7 @@ class Shangguitips extends BaseController
                 (select sum(预计库存数量) from cwl_shangguitips_sk where 云仓=h.云仓 and 二级分类=h.二级分类 and 一级分类=h.一级分类 and 分类=h.分类 and 货号=h.货号 and 季节 = h.季节
                 ) 
             WHERE 1
-                AND h.`季节归集` IN ('秋季')	
+                AND h.`季节归集` IN ('秋季', '冬季')	
         ";
 
         $sql_铺货率 = "
@@ -958,7 +958,7 @@ class Shangguitips extends BaseController
                 铺货率_加盟 = round(h.实际铺货_加盟 / (h.实际铺货_合计 + `云仓_可用数量`), 3) , 
                 铺货率_合计 = round(h.实际铺货_合计 / (h.实际铺货_合计 + `云仓_可用数量`), 3)
             WHERE 1
-                AND h.`季节归集` IN ('秋季')	
+                AND h.`季节归集` IN ('秋季', '冬季')	
         ";
 
         $sql_上柜率 = "
@@ -968,7 +968,7 @@ class Shangguitips extends BaseController
                 上柜率_加盟 = round(h.`实际上柜_加盟上柜数` / h.`店铺个数_加盟`, 3), 
                 上柜率_合计 = round(h.`实际上柜_上柜家数` / h.`店铺个数_合计`, 3)
             WHERE 1
-                AND h.`季节归集` IN ('秋季')
+                AND h.`季节归集` IN ('秋季', '冬季')
         ";
 
         $sql_货品等级上柜率 = "
@@ -978,7 +978,7 @@ class Shangguitips extends BaseController
                 货品等级上柜率_加盟 = round(h.`货品等级_实际_加盟` / h.`货品等级_计划_加盟`, 3), 
                 货品等级上柜率_合计 = round(h.`货品等级_实际_合计` / h.`货品等级_计划_合计`, 3)
             WHERE 1
-                AND h.`季节归集` IN ('秋季')	
+                AND h.`季节归集` IN ('秋季', '冬季')	
         ";
 
         $sql_全国累销数量 = "
@@ -1044,7 +1044,7 @@ class Shangguitips extends BaseController
                     cwl_shangguitips_handle AS h 
                 LEFT JOIN cwl_shangguitips_retail AS r ON h.季节归集 = r.季节归集 AND h.一级分类 = r.一级分类 AND h.二级分类 = r.二级分类 AND h.风格 = r.风格
                 WHERE 1
-                    AND h.季节归集 = '秋季'
+                    AND h.季节归集 in ('秋季', '冬季')
                 ) as t on h.云仓 = t.云仓 AND h.货号 = t.货号
             set h.单款全国日均销得分 = t.单款全国日均销得分
             WHERE 1
@@ -1146,10 +1146,13 @@ class Shangguitips extends BaseController
 
     // 可上店铺
     public function handle_4() {
-        $select = $this->db_easyA->table('cwl_shangguitips_handle')->where([
-            ['季节归集', '=', '秋季'],
-            // ['货号', '=', 'B52502002'],
-        ])->select()->toArray();
+        // $select = $this->db_easyA->table('cwl_shangguitips_handle')->where([
+        //     ['季节归集', '=', '秋季'],
+        //     // ['货号', '=', 'B52502002'],
+        // ])->select()->toArray();
+        $select = $this->db_easyA->query("
+            select * from cwl_shangguitips_handle where 季节归集 in ('秋季', '冬季')
+        ");
 
         $this->db_easyA->execute('TRUNCATE cwl_shangguitips_keshang_customer;');
         foreach ($select as $key => $val) {
@@ -1192,7 +1195,7 @@ class Shangguitips extends BaseController
                 FROM
                     cwl_shangguitips_handle 
                 WHERE 1
-                    AND 季节归集 = '秋季'
+                    AND 季节归集 in ('秋季', '冬季')
                     AND `云仓_主码齐码情况` = '可配'
                     AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
                     AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
