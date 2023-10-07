@@ -976,15 +976,17 @@ class SendReport extends BaseController
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '2', '编号' => 's101'])->find();
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
-        echo input('date');
+        echo input('get.date');
         echo '<br>';
-        echo input('user');
+        echo input('get.user');
         echo '<br>';
         echo $find['状态'];
         echo '<br>';
         echo $可推送时间范围[0];
         echo '<br>';
         echo $可推送时间范围[1];
+
+        die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
             // 需要手动传日期的话传查询日期+1天
             $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
