@@ -64,6 +64,13 @@ class Weather extends AdminController
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
+                if (!empty($where['url_2345_cid'])) {
+                    if ($where['url_2345_cid'] == '已绑') {
+                        $query->where('c.url_2345_cid', '>', 0);
+                    } else {
+                        $query->where('c.url_2345_cid', 0);
+                    }
+                }    
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
@@ -85,6 +92,13 @@ class Weather extends AdminController
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
+                if (!empty($where['url_2345_cid'])) {
+                    if ($where['url_2345_cid'] == '已绑') {
+                        $query->where('c.url_2345_cid', '>', 0);
+                    } else {
+                        $query->where('c.url_2345_cid', 0);
+                    }
+                }
                 $query->where(1);
             })
             ->where(['c.ShutOut' => 0])
@@ -276,6 +290,9 @@ class Weather extends AdminController
 
         $last_update_time = WeatherUpdateStatus2345Model::where([])->field('update_time')->order('update_time desc')->find();
 
+        //是否已绑网址
+        $bang_url_list = ['已绑'=>'已绑', '未绑'=>'未绑'];
+
         // 省列表
         // 区域列表
         $data = [
@@ -292,6 +309,7 @@ class Weather extends AdminController
                 'mathod'  => $mathod,
                 'CustomerGrade'  => $CustomerGrade,
                 'last_update_time'  => $last_update_time ? $last_update_time['update_time'] : '',
+                'bang_url_list'  => $bang_url_list,
                 'data'  => $list
             ];
         return json($data);

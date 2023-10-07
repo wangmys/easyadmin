@@ -38,6 +38,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var mathod = res.mathod;
                 var CustomerGrade = res.CustomerGrade;
                 var last_update_time = res.last_update_time;
+                var bang_url_list = res.bang_url_list;
                 var cols = [
                     // {type: "checkbox",fixed:'left'},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:province_list,laySearch:true},
@@ -49,6 +50,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     {field: 'liable', width: 100, title: '商品负责人',fixed:'left',search: 'xmSelect',selectList:liable_list},
                     {hide:true, field: 'Mathod', width: 50, title: '经营模式',fixed:'left',search: 'xmSelect',selectList:mathod},
                     {hide:true, field: 'CustomerGrade', width: 50, title: '店铺等级',fixed:'left',search: 'xmSelect',selectList:CustomerGrade,laySearch:true},
+                    {hide:true, field: 'url_2345_cid', width: 70, title: '绑网址',fixed:'left',search: false,search: 'select',selectList:bang_url_list},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},
                     // {field: 'BdCity', width: 90, title: '绑定城市',fixed:'left',search: false},
                     // {field: 'SendGoodsGroup', width: 150, title: '温度带',fixed:'left'},
@@ -144,6 +146,13 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                         $('th[data-field="'+today_date+'"]').css({
                             'background-color': 'rgb(110, 170, 46)', 'color': '#000', 'font-weight':'bold'
                         });
+
+                        res.data.forEach(function (item,index) {
+                            if (item['url_2345_cid']) {
+                                $('tr[data-index="'+index+'"] td[data-field="34"] a[data-title="绑网址"]').addClass('layui-bg-red');
+                            }
+                        })
+                        
 
                     }
                 });
