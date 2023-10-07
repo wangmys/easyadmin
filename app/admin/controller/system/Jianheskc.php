@@ -32,6 +32,11 @@ class Jianheskc extends AdminController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->create_time = date('Y-m-d H:i:s', time());
+
+        if (cache('jianheskc_data_create')) {
+            echo '数据正在更新中，请稍后再试！';
+            die;
+        } 
     }
 
     /**
