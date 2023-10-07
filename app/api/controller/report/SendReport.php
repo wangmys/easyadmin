@@ -1074,7 +1074,7 @@ class SendReport extends BaseController
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
             // 需要手动传日期的话传查询日期+1天
             $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
-            $this->servicePro->create_table_s103($date);
+            $this->servicePro->create_table_s101('S104', $date);
 
             $name = '\app\api\service\DingdingService';
             $model = new $name;
