@@ -1291,6 +1291,40 @@ class SendReport extends BaseController
         }
     }
 
+    // cwl s108b jm
+    public function run_pro_s108b_jm()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '16', '编号' => 'S108B'])->find();
+        print_r($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s108B($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '区域挑战目标完成率 表号:S108B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S108B.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送 测试
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 加盟
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+            }
+            return json($res);
+        }
+    }
+
     // s109
     public function run_pro_s109()
     {
@@ -1318,6 +1352,39 @@ class SendReport extends BaseController
                 // 推送
                 $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
                 // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // s109
+    public function run_pro_s109b_jm()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '17', '编号' => 'S109B'])->find();
+        print_r($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s109B($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '各省挑战目标完成情况-加盟 表号:S109B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S109B.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 加盟
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
             return json($res);
         }
@@ -1386,6 +1453,39 @@ class SendReport extends BaseController
                 // 推送
                 $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
                 // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // s110b
+    public function run_pro_s110b_jm()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '18', '编号' => 'S110B'])->find();
+        print_r($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s110B($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '加盟单店目标达成情况 表号:S110B',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S110B.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 加盟
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
             return json($res);
         }
