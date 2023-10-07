@@ -454,14 +454,14 @@ class SendReport extends BaseController
         $name = '\app\api\service\DingdingService';
         $model = new $name;
         $send_data = [
-            // 'S016' => [
-            //     'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
-            // ],
-            // 'S018' => [
-            //     'title' => '商品部-加盟春夏老品库存结构报表 表号:S018',
-            //     'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S018.jpg'
-            // ],
+            'S016' => [
+                'title' => '商品部-直营春夏老品库存结构报表 表号:S016',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S016.jpg'
+            ],
+            'S018' => [
+                'title' => '商品部-加盟春夏老品库存结构报表 表号:S018',
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S018.jpg'
+            ],
             'S023' => [
                 'title' => '商品部-所有年份各品类销售占比 表号:S023',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S023.jpg'
@@ -901,9 +901,9 @@ class SendReport extends BaseController
     }
 
     public function run7() {
-        // $this->service->create_table_s017();
-        // $this->service->create_table_s019();
-        // $this->send7();
+        $this->service->create_table_s017();
+        $this->service->create_table_s019();
+        $this->send7();
     }
 
     // 51 推送 11：46
