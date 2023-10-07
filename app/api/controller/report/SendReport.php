@@ -976,6 +976,8 @@ class SendReport extends BaseController
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '2', '编号' => 's101'])->find();
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        echo input('date');
+        echo '<br>';
         echo input('user');
         echo '<br>';
         echo $find['状态'];
