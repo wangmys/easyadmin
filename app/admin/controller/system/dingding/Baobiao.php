@@ -58,6 +58,7 @@ class Baobiao extends BaseController
                 FROM 
                     dd_baobiao
                 WHERE 1
+                ORDER BY `key` ASC, 编号 ASC
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);

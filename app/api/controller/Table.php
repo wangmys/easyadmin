@@ -251,7 +251,7 @@ class Table extends BaseController
             CASE WHEN EC.MathodId=7 THEN '直营' ELSE '直营' END AS 性质 ,
             EC.CustomerId ,
             LEFT(EC.CustomerName,4) AS 店铺名称,
-            '两广区' AS Region,
+            '粤桂琼区' AS Region,
             EC.State,
             CONVERT(VARCHAR,ER.RetailDate,23) AS 日期,
             SUM(ERG.Quantity*ERG.DiscountPrice) 销售
@@ -325,7 +325,7 @@ class Table extends BaseController
 
             SELECT
                     CASE WHEN EC.MathodId=4 THEN '直营' ELSE '直营' END AS 性质 ,
-                    '两广区' AS 区域 ,
+                    '粤桂琼区' AS 区域 ,
                     EC.CustomerId AS 店铺编号,
                     LEFT(EC.CustomerName,4) AS 店铺名称,
                     SUM(ERG.Quantity*ERG.DiscountPrice) AS 去年同日
@@ -389,7 +389,7 @@ class Table extends BaseController
 
             SELECT
                     CASE WHEN EC.MathodId=4 THEN '直营' ELSE '直营' END AS 性质 ,
-                    '两广区' AS 区域 ,
+                    '粤桂琼区' AS 区域 ,
                     EC.CustomerId AS 店铺编号,
                     LEFT(EC.CustomerName,4) AS 店铺名称,
                     SUM(ERG.Quantity*ERG.DiscountPrice) AS 去年同月

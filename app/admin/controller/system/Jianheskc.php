@@ -10,6 +10,8 @@ use app\common\controller\AdminController;
 use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+use app\api\controller\lufei\Jianheskc as JianheskcApi;
+
 /**
  * Class Jianheskc
  * @package app\admin\controller\system
@@ -367,5 +369,27 @@ class Jianheskc extends AdminController
         return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36]]);
     }
 
+    // 实时数据更新
+    public function updateDdata() {
+        if (! cache('jianheskc_data_create')) {
+            cache('jianheskc_data_create', true, 1800);
+            $jianheskcapi = new JianheskcApi;
+            $jianheskcapi->skc_data();
+            cache('jianheskc_data_create', null);
+            return json(['status' => 1, 'msg' => '更新成功']);
+        } else {
+            return json(['status' => 0, 'msg' => '当前数据正在更新，请稍后再试']);
+        }
 
+    }
+
+    public function testRedis()
+    {
+        // $redis = new Redis;
+        // echo '<pre>';
+        // print_r($redis);
+        // die;
+        cache('jianheskc_data_create', null);
+        // cache('jianheskc_data_create', true, 1800);
+    }
 }

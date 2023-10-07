@@ -307,7 +307,7 @@ class ReportFormsServicePro
                 'row' => count($list),          //数据的行数
                 // 'file_name' => $code . $dingName . '.jpg',   //保存的文件名
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "省份老店业绩同比 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
+                'title' => "省份老店业绩同比-分经营模式 [" . date("Y-m-d", strtotime($date . '-1day')) . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -412,7 +412,7 @@ class ReportFormsServicePro
         }
     }
 
-    // 加盟
+    // 直营ll
     public function create_table_s103C($date = '')
     {
         // 编号

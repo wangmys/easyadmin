@@ -218,26 +218,6 @@ return [
             // 数据库表前缀
             'prefix'            => '',
         ],
-        'doris' => [
-            // 数据库类型
-            'type'              => 'mysql',
-            // 服务器地址
-            'hostname'          => '192.168.9.230',
-            // 数据库名
-            'database'          => 'sg_dw',
-            // 用户名
-            'username'          => 'root',
-            // 密码
-            'password'          => 'doris@2023',
-            // 端口
-            'hostport'          => '9030',
-            // 数据库连接参数
-            'params'            => [],
-            // 数据库编码默认采用utf8
-            'charset'           => 'utf8mb4',
-            // 数据库表前缀
-            'prefix'            => '',
-        ],
         // 更多的数据库配置信息
     ],
 ];

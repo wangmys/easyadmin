@@ -947,14 +947,18 @@ class SendReport extends BaseController
     // 
     public function run_caigoudingtui_s114()
     {
-        $find = $this->db_easyA->table('dd_baobiao')->field('状态')->where(['编号' => 's114'])->find();
+        // 开关检查
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['编号' => 'S114'])->find();
         // dump($find);
-        // die;
-        if ($find && $find['状态'] == '开') {
+        $find['可推送时间范围'];
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
             $this->service->create_table_s114();
-            // 发送数据报表
+            // // 发送数据报表
             $this->sendS114();
-        } 
+        }
     }
 
     public function run_s012()
@@ -966,39 +970,296 @@ class SendReport extends BaseController
 
     }
 
-    //   cwl 101 104 102 103
-    public function run_pro_test()
+    // cwl 101
+    public function run_pro_s101()
     {
-        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
-        // echo rand_code(5);die;
-        cache('dingding_table_name', rand_code(5), 3600);
-        // 生成图片 s101
-        $this->servicePro->create_table_s101('S101', $date);
-        $this->servicePro->create_table_s102($date);
-        $this->servicePro->create_table_s103($date);
-        $this->servicePro->create_table_s101('S104', $date);
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '2', '编号' => 'S101'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s101('S101', $date);
 
-        // 发送数据报表
-        $this->send_pro_test();
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
     }
+
+    // cwl 101 加盟
+    public function run_pro_s101_jm()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '7', '编号' => 'S101'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s101('S101', $date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // 推送 加盟
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                
+            }
+            return json($res);
+        }
+    }
+
+    // cwl s102
+    public function run_pro_s102()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '3', '编号' => 'S102'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s102($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '省份老店业绩同比 表号:S102',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S102.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // cwl s104
+    public function run_pro_s103()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '4', '编号' => 'S103'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s103($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '省份老店业绩同比-分经营模式 表号:S103',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S103.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // cwl 103b 加盟
+    public function run_pro_s103b_jm()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '8', '编号' => 'S103B'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s103B($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '省份老店业绩同比-加盟 表号:S103B',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S103B.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // 推送 加盟
+                // $res[] = $model->send($send_data['title'], $send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                
+            }
+            return json($res);
+        }
+    }
+
+    // cwl 103b 加盟
+    public function run_pro_s103c_ll()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '8', '编号' => 'S103B'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s103C($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '省份老店业绩同比-直营 表号:S103C',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S103C.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // 推送 丽丽群
+                // $res[] = $model->send($send_data['title'], $send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=3e9461c0a1c013f084a1575ae487131a52717d4d259a3ec8ab65f75283d3430e');
+                
+            }
+            return json($res);
+        }
+    }
+
+    // cwl s104
+    public function run_pro_s104()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '5', '编号' => 'S104'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s101('S104', $date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '直营老店同比环比递增及完成率 表号:S104',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // cwl s104c ll
+    public function run_pro_s104c_ll()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '10', '编号' => 'S104C'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s104C($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '直营老店同比环比递增及完成率 表号:S104C',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104C.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送 测试
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+
+                // 推送 丽丽群
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=3e9461c0a1c013f084a1575ae487131a52717d4d259a3ec8ab65f75283d3430e');
+            }
+            return json($res);
+        }
+    }
+
+    //   cwl 101 104 102 103
+    // public function run_pro_test()
+    // {
+    //     $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+    //     // echo rand_code(5);die;
+    //     cache('dingding_table_name', rand_code(5), 3600);
+    //     // 生成图片 s101
+    //     $this->servicePro->create_table_s101('S101', $date);
+    //     $this->servicePro->create_table_s102($date);
+    //     $this->servicePro->create_table_s103($date);
+    //     $this->servicePro->create_table_s101('S104', $date);
+
+    //     // 发送数据报表
+    //     $this->send_pro_test();
+    // }
 
     // cwl 108 109 110 
-    public function run_pro_test2()
-    {
-        $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
-        // echo rand_code(5);die;
-        cache('dingding_table_name', rand_code(5), 3600);
-        // 生成图片 s101
+    // public function run_pro_test2()
+    // {
+    //     $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+    //     // echo rand_code(5);die;
+    //     cache('dingding_table_name', rand_code(5), 3600);
+    //     // 生成图片 s101
 
-        // 108-110
-        $this->servicePro->create_table_s108A($date);
-        $this->servicePro->create_table_s108B($date);
-        $this->servicePro->create_table_s109($date);
-        $this->servicePro->create_table_s110A($date);
-        $this->servicePro->create_table_s110B($date);
-        // 发送数据报表
-        $this->send_pro_test2();
-    }
+    //     // 108-110
+    //     $this->servicePro->create_table_s108A($date);
+    //     $this->servicePro->create_table_s108B($date);
+    //     $this->servicePro->create_table_s109($date);
+    //     $this->servicePro->create_table_s110A($date);
+    //     $this->servicePro->create_table_s110B($date);
+    //     // 发送数据报表
+    //     $this->send_pro_test2();
+    // }
 
     public function send_pro_test()
     {
@@ -1132,44 +1393,6 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    public function send_festival_test()
-    {
-        $name = '\app\api\service\DingdingService';
-        $model = new $name;
-        $send_data = [
-            'S115Ajm' => [
-                'title' => '加盟老店【国庆假期】业绩同比 表号:S115A',
-                // 'title' => '测试S108A',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Ajm.jpg?v=" . time()
-            ],
-            'S115Azy' => [
-                'title' => '直营老店【国庆假期】业绩同比 表号:S115A',
-                // 'title' => '测试S108B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Azy.jpg?v=" . time()
-            ],
-            'S115B' => [
-                'title' => '省份老店【国庆假期】业绩同比 表号:S115B',
-                // 'title' => '测试S109',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115B.jpg?v=" . time()
-            ],
-        ];
-
-        // dump($send_data);
-        // die;
-        $res = [];
-        foreach ($send_data as $k=>$v){
-            $headers = get_headers($v['jpg_url']);
-            if(substr($headers[0], 9, 3) == 200){
-                // 推送
-                // $res[] = $model->send($v['title'],$v['jpg_url']);
-                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
-                // echo $v['title'];
-                // echo '<br>';
-            }
-        }
-        return json($res);
-    }
-
     // 国庆报表
     public function run_festival10()
     {
@@ -1185,19 +1408,5 @@ class SendReport extends BaseController
         $this->send_festival();
     }
 
-    // 国庆报表 测试
-    public function run_festival_test()
-    {
-        $date = input('date') ? input('date') : date('Y-m-d', time());
-        $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1";
-        http_get($url);
-
-        $this->service->create_table_s115A('直营', $date);
-        $this->service->create_table_s115A('加盟', $date);
-        $this->service->create_table_s115B($date);
-
-        // 发送数据报表
-        $this->send_festival_test();
-    }
 
 }
