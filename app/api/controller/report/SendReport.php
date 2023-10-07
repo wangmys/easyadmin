@@ -970,6 +970,41 @@ class SendReport extends BaseController
 
     }
 
+    // cwl 101
+    public function run_pro_s101()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '2', '编号' => 's101'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s101('S101', $date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '加盟老店同比环比递增及完成率 表号:S101',
+                'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd',strtotime('+1day'))."/S101.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['title'];
+                // 推送
+                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+
+            return json($res);
+        } else {
+            echo '不可推送';
+        }
+    }
+
     //   cwl 101 104 102 103
     public function run_pro_test()
     {
