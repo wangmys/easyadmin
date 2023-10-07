@@ -280,7 +280,6 @@ class Jianheskc extends AdminController
                     cwl_jianhe_stock_skc as m
                 WHERE 
                     1
-                    AND 
                     {$map1}
                     {$map4}
                     {$map5}
