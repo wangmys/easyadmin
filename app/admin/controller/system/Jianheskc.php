@@ -119,7 +119,7 @@ class Jianheskc extends AdminController
                     {$map5}
                 GROUP BY
                     店铺名称
-                -- LIMIT 10
+                 LIMIT 100
             ";  
       
             $select_店铺名称 = $this->db_easyA->query($sql0);
@@ -207,6 +207,7 @@ class Jianheskc extends AdminController
     
    
             } else {
+
                 return json(["code" => "0", "msg" => "", "data" => []]);
             }
 
@@ -279,12 +280,13 @@ class Jianheskc extends AdminController
                     cwl_jianhe_stock_skc as m
                 WHERE 
                     1
+                    AND 
                     {$map1}
                     {$map4}
                     {$map5}
                 GROUP BY
                     店铺名称
-                -- LIMIT 10
+                 LIMIT 100
             ";  
             $select_店铺名称 = $this->db_easyA->query($sql0);
 
@@ -343,8 +345,22 @@ class Jianheskc extends AdminController
 
 
         } else {
-            return View('handle', [
+            $customer17 = $this->db_easyA->query("
+                SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_jianhe_stock_skc WHERE 商品负责人 IS NOT NULL AND 商品负责人 !='0' GROUP BY 商品负责人
+            ");
 
+
+            foreach ($customer17 as $key => $val) {
+                if (checkAdmin()) {
+                    if ($key == 0) {
+                        $customer17 = $val['name'];
+                    }
+                } elseif (session('admin.name') == $val['name']) {
+                    $customer17 = $val['name'];
+                }
+            } 
+            return View('handle', [
+                'customer17' => $customer17
             ]);
         }
     } 
@@ -362,6 +378,16 @@ class Jianheskc extends AdminController
         $customer = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_jianhe_stock_skc GROUP BY 店铺名称
         ");
+
+        foreach ($customer17 as $key => $val) {
+            if (checkAdmin()) {
+                if ($key == 0) {
+                    $customer17[$key]['selected'] = true;
+                }
+            } elseif (session('admin.name') == $val['name']) {
+                $customer17[$key]['selected'] = true;
+            }
+        } 
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
@@ -375,10 +401,9 @@ class Jianheskc extends AdminController
             cache('jianheskc_data_create', true, 1800);
             $jianheskcapi = new JianheskcApi;
             $jianheskcapi->skc_data();
-            cache('jianheskc_data_create', null);
             return json(['status' => 1, 'msg' => '更新成功']);
         } else {
-            return json(['status' => 0, 'msg' => '当前数据正在更新，请稍后再试']);
+            return json(['status' => 0, 'msg' => '当前数据正在更新中，请稍后再试']);
         }
 
     }

@@ -133,18 +133,12 @@ class Jianheskc extends BaseController
             //     'msg' => 'success',
             //     'content' => "cwl_jianhe_stock_skc 更新成功，数量：{$count}！"
             // ]);
-
+            cache('jianheskc_data_create', null);    
             return true;
         }
     }
 
-    public function test() {
-        // sleep(10);
-        $insert = $this->db_easyA->table('cwl_swoole_test')->where('id=1')->update([
-            'num' => Db::raw('num+1'),
-        ]);
-        
-    }
+
 
 
     public function test3() {
@@ -232,7 +226,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                 GROUP BY 
                 
@@ -294,7 +288,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -342,7 +336,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -388,7 +382,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -428,7 +422,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -504,7 +498,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -550,7 +544,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -602,7 +596,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -674,7 +668,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套','配饰')
                 
@@ -778,7 +772,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -824,7 +818,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -870,7 +864,7 @@ class Jianheskc extends BaseController
                 
                     AND EC.MathodId IN (4,7)
                 
-                    AND EG.TimeCategoryName1 IN (2023,2022)
+                    AND EG.TimeCategoryName1 IN (2023)
                 
                     AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 
@@ -1055,17 +1049,6 @@ class Jianheskc extends BaseController
         return $res;
 
 
-
-        die;
-        dump($res);
-        $this->db_easyA->execute('TRUNCATE cwl_jianhe_stock_skc_test;');
-        $chunk_list = array_chunk($res, 500);
-        // $this->db_easyA->startTrans();
-
-        foreach($chunk_list as $key => $val) {
-            // 基础结果 
-            $insert = $this->db_easyA->table('cwl_jianhe_stock_skc_test')->strict(false)->insertAll($val);
-        }
     
     }
 }

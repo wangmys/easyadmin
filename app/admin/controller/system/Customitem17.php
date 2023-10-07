@@ -236,7 +236,6 @@ class Customitem17 extends AdminController
         ");
        
         if (!checkAdmin()) {
-            // 省份选中
             foreach ($customer17 as $key => $val) {
                 if (session('admin.name') == $val['name']) {
                     $customer17[$key]['selected'] = true;

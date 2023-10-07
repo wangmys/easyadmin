@@ -582,7 +582,7 @@
                     ,{ field: '修订分类', title: '小类', fixed: 'left' ,align: 'center' , width: 60}
 
                 ];
-            $.get(getHeader, {}, function(dataRes) {
+            $.post(getHeader, {"检核类型": "店铺库存", '商品负责人': '{$customer17}'}, function(dataRes) {
                 // console.log(dataRes.data)
                 // var res = data.data
                 for (let key in dataRes.data) {
@@ -611,7 +611,7 @@
                     , limits: [500, 1000, 5000, 10000, 20000]
                     , height: height
                     , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                    , where: {"检核类型": "店铺库存"}
+                    , where: {"检核类型": "店铺库存", '商品负责人': '{$customer17}'}
                     , cols: [
                         colsData,
                     
