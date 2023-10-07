@@ -978,7 +978,7 @@ class ReportFormsServicePro
         }
         $field_width[0] = 30;
         $field_width[1] = 45;
-        $field_width[2] = 75;
+        $field_width[2] = 150;
         $field_width[3] = 90;
         $field_width[4] = 90;
         $field_width[5] = 90;

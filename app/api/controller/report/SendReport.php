@@ -1232,7 +1232,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '11', '编号' => 'S108A'])->find();
-        dump($find);
+        // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1252,8 +1252,8 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
@@ -1264,7 +1264,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '12', '编号' => 'S108B'])->find();
-        dump($find);
+        // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1284,8 +1284,8 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
@@ -1296,7 +1296,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '13', '编号' => 'S109'])->find();
-        dump($find);
+        // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1316,11 +1316,15 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
+    }
+
+    public function test() {
+        $this->servicePro->create_table_s110A('2023-10-07');
     }
 
     // s110a
@@ -1328,7 +1332,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '14', '编号' => 'S110A'])->find();
-        dump($find);
+        // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1348,8 +1352,8 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
@@ -1360,7 +1364,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '15', '编号' => 'S110B'])->find();
-        dump($find);
+        // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1380,8 +1384,8 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
