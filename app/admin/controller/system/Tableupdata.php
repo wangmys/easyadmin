@@ -95,14 +95,23 @@ class Tableupdata extends BaseController
             // return json(['status' => 1, 'msg' => '执行成功']);
             if (!empty($input['表名'])) {
                 if ($input['表名'] == 'sp_customer_stock_skc_2') {
-                    $sk2 = new Sk2;
-                    $res = $sk2->doris();
-                    if ($res) {
-                        $this->db_easyA->table('cwl_table_update')->where(['表名' => $input['表名']])->update(['跑数完成时间' => date('Y-m-d H:i:s')]);
-                        return json(['status' => 1, 'msg' => '执行成功']);
+                    if (! cache('sp_customer_stock_skc_2')) {
+                        cache('sp_customer_stock_skc_2', true, 300);
+                        $sk2 = new Sk2;
+                        $res = $sk2->doris();
+                        if ($res) {
+                            $this->db_easyA->table('cwl_table_update')->where(['表名' => $input['表名']])->update(['跑数完成时间' => date('Y-m-d H:i:s')]);
+                            return json(['status' => 1, 'msg' => '执行成功']);
+                        } else {
+                            return json(['status' => 2, 'msg' => '执行失败，请稍后再试']);
+                        }
+    
+                        // sleep(5);
+                        // return json(['status' => 1, 'msg' => '执行成功']);
                     } else {
-                        return json(['status' => 2, 'msg' => '执行失败，请稍后再试']);
+                        return json(['status' => 4, 'msg' => '别人正在更新此表格，请稍后再试']);    
                     }
+
                 } else {
                     return json(['status' => 3, 'msg' => '表名不存在']);
                 }

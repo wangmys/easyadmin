@@ -890,27 +890,32 @@ class sp_customer_stock_skc_2 extends BaseController
                
         ";
 
-        $result=mysqli_query($con,$sql);
+        try {
+            $result=mysqli_query($con,$sql);
 
-        // 获取数据
-        $res = mysqli_fetch_all($result,MYSQLI_ASSOC);
-        
-        // 释放结果集
-        mysqli_free_result($result);
-        mysqli_close($con);
-
-        if ($res) {
-            $this->db_bi->execute('TRUNCATE sp_customer_stock_skc_2;');
-            $chunk_list = array_chunk($res, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $this->db_bi->table('sp_customer_stock_skc_2')->strict(false)->insertAll($val);
+            // 获取数据
+            $res = mysqli_fetch_all($result,MYSQLI_ASSOC);
+            
+            // 释放结果集
+            mysqli_free_result($result);
+            mysqli_close($con);
+    
+            if ($res) {
+                $this->db_bi->execute('TRUNCATE sp_customer_stock_skc_2;');
+                $chunk_list = array_chunk($res, 500);
+                // $this->db_easyA->startTrans();
+    
+                foreach($chunk_list as $key => $val) {
+                    // 基础结果 
+                    $this->db_bi->table('sp_customer_stock_skc_2')->strict(false)->insertAll($val);
+                }
+                cache('sp_customer_stock_skc_2', null);
+                return true;
+            } else {
+                return false;   
             }
-            return true;
+        } catch (\Throwable $th) {
+            return false;
         }
-
-        return false;
     }
 }

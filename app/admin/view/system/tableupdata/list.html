@@ -149,10 +149,11 @@
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
 <script>
-    var sendDingImg = function (id, title) {
-        window.localStorage.setItem('sendDingImg_id', id);
-        window.localStorage.setItem('sendDingImg_title', title);
+    var updataHandle = function (table, title) {
+        window.localStorage.setItem('tableupdata_table', table);
+        window.localStorage.setItem('tableupdata_title', title);
     }
+
 
     // var viewUsers = function (uid) {
     //     window.localStorage.setItem('sendDingImg_uid', uid);
@@ -343,39 +344,85 @@
             })
         });
 
-        window.updataHandle = function(tableName) {
+        // window.updataHandle = function(tableName) {
 
-            alert('执行后，不能关闭界面，避免数据未执行成功');
-            // layui.use('layer', function () {
-            //         layui.layer.load();
-            //         $(".layui-layer-shade").css('background', '#000000')
-            //         $(".layui-layer-shade").css('opacity', '0.2')
-            //         $(".layui-layer-shade").click(function (event) {
-            //             event.stopPropagation();
-            //         })
-            //     })
-            $.post(url_updata, {'表名': tableName}, function(res) {  
+        //     alert('执行后，不能关闭界面，避免数据未执行成功');
+        //     // layui.use('layer', function () {
+        //     //         layui.layer.load();
+        //     //         $(".layui-layer-shade").css('background', '#000000')
+        //     //         $(".layui-layer-shade").css('opacity', '0.2')
+        //     //         $(".layui-layer-shade").click(function (event) {
+        //     //             event.stopPropagation();
+        //     //         })
+        //     //     })
+        //     $.post(url_updata, {'表名': tableName}, function(res) {  
 
-                if (res.status == 1) {
-                    alert(res.msg) 
+        //         if (res.status == 1) {
+        //             alert(res.msg) 
+        //             table.reload('table2', {
+        //                 method: 'post'
+        //                 , url: url1
+        //                 , loading: true
+        //                 , page: true
+        //                 , limit: limit
+        //             })
+        //         } else {
+        //             alert(res.msg)  
+        //         }
+        //     })
+        //     // layui.use('layer', function () {
+        //     //         setTimeout(function () {
+        //     //             layui.layer.closeAll();
+        //     //         }, 2000);
+        //     //     });
+        //     return false; 
+        // }
+
+        $(document).on('click', '.handleBtn', function(data){
+            var tableName= window.localStorage.getItem('tableupdata_table');
+            var title= window.localStorage.getItem('tableupdata_title');
+
+            console.log(tableName);
+            console.log(title);
+            //询问框
+            layer.confirm(`是否更新【${title}】`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+                // layer.close();
+                // if (!stop2) {
+                //     stop2 = true
+                $.post(url_updata, {'表名': tableName}, function(res) {
                     table.reload('table2', {
-                        method: 'post'
+                        where: data.field
+                        , method: 'post'
                         , url: url1
                         , loading: true
-                        , page: true
-                        , limit: limit
                     })
-                } else {
-                    alert(res.msg)  
-                }
-            })
-            // layui.use('layer', function () {
-            //         setTimeout(function () {
-            //             layui.layer.closeAll();
-            //         }, 2000);
-            //     });
-            return false; 
-        }
+                    // layer.msg(res.msg, {icon: 1});
+                    // setTimeout(function() {
+                    //     stop2 = false
+                    // }, 500)
+                    layui.use('layer', function () {
+                        setTimeout(function () {
+                            layui.layer.closeAll();
+                        }, 0);
+                    });
+                    alert(res.msg);
+                })
+                // }
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+        }); 
 
         // 单店不动销数据统计 
         function startTable() {
@@ -406,8 +453,8 @@
                     , { field: '跑数完成时间', title: '跑数完成时间', align:'center' } 
                     , { title: '操作', align:'center', templet:
                     function (data) {
-                        return `<button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="updataHandle('${data['表名']}')">
+                        return `<button class="handleBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="updataHandle('${data['表名']}', '${data['EXCEL表名']}')">
                                         更新
                                     </button>`;
                     }}
