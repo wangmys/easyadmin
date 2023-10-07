@@ -1391,7 +1391,7 @@ class SendReport extends BaseController
     }
 
     public function test() {
-        $this->servicePro->create_table_s110A('2023-10-07');
+        $this->servicePro->create_table_s110B('2023-10-07');
     }
 
     // s110a

@@ -398,7 +398,19 @@
                 , cols: [[
                     { field: '编号', title: '编号', align:'center' }
                     ,{ field: '标题', title: '标题', align:'center' }
-                    ,{ field: '钉群', title: '钉群' , align:'center'}
+                    ,{ field: '钉群', title: '钉群' , align:'center', templet:
+                    function (data) {
+                        // console.log(data.title)
+                        var str = "";
+                        if (data['钉群'] == '每日经营分析群') {
+                            str = `<span style="color:red">${data['钉群']}</span>`
+                        } else if (data['钉群'] == '加盟部群') {
+                            str = `<span style="color:blue">${data['钉群']}</span>`
+                        } else {
+                            str = `<span style="">${data['钉群']}</span>`
+                        }
+                        return str; 
+                    }}
                     , { field: '钉群地址', title: '钉群地址', align:'center' } 
                     , { title: '报表样图', align:'center', templet:
                     function (data) {
