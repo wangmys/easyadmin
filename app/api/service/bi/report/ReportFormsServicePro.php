@@ -412,7 +412,7 @@ class ReportFormsServicePro
         }
     }
 
-    // 加盟
+    // 直营ll
     public function create_table_s103C($date = '')
     {
         // 编号
