@@ -119,7 +119,7 @@ class Jianheskc extends AdminController
                     {$map5}
                 GROUP BY
                     店铺名称
-                 LIMIT 100
+                -- LIMIT 100
             ";  
       
             $select_店铺名称 = $this->db_easyA->query($sql0);
@@ -158,7 +158,7 @@ class Jianheskc extends AdminController
                     
                     GROUP BY
                         m.一级分类,m.二级分类,m.修订分类
-                    limit 1
+                    -- limit 1
                 ";  
     
                 // die;
@@ -285,7 +285,7 @@ class Jianheskc extends AdminController
                     {$map5}
                 GROUP BY
                     店铺名称
-                 LIMIT 100
+                -- LIMIT 100
             ";  
             $select_店铺名称 = $this->db_easyA->query($sql0);
 
