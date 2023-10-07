@@ -1296,7 +1296,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '16', '编号' => 'S108B'])->find();
-        print_r($find);
+        // print_r($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1316,10 +1316,10 @@ class SendReport extends BaseController
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送 测试
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
 
                 // 推送 加盟
-                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
             return json($res);
         }
@@ -1381,10 +1381,10 @@ class SendReport extends BaseController
             $res = [];
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
 
                 // 推送 加盟
-                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
             return json($res);
         }
@@ -1463,7 +1463,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '18', '编号' => 'S110B'])->find();
-        print_r($find);
+        // print_r($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
@@ -1482,10 +1482,10 @@ class SendReport extends BaseController
             $res = [];
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
 
                 // 推送 加盟
-                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], 'https://oapi.dingtalk.com/robot/send?access_token=881fad3de403f47f88b3d03ad5acbb72c05ef015573b4830d5aa71de88aec754');
             }
             return json($res);
         }
