@@ -1362,7 +1362,7 @@ class SendReport extends BaseController
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('编号,状态,可推送时间范围')->where(['id' => '17', '编号' => 'S109B'])->find();
-        print_r($find);
+        // print_r($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
         // die;
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
