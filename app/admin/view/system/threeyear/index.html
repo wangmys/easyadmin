@@ -92,6 +92,20 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        .layui-table-box .layui-table-header th {
+            height: 80px;
+        }
+        .layui-table-box .layui-table-header th .layui-table-cell{
+            height: 73px;
+            word-break: break-all;
+            white-space: normal;
+        }
+        .layui-table-view .layui-table td, .layui-table-view .layui-table th{
+            padding: 3px 0;
+            border-top: none;
+            border-left: none;
+        }
     </style>
 </head>
 
@@ -468,7 +482,7 @@
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
-                console.log(res);
+                // console.log(res);
 
                 //销售年份
                 // xmSelect.render({
@@ -798,50 +812,204 @@
                      { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left', width: 35}
                     , { field: '周', title: '周', align: 'center', rowspan: 1, fixed:'left', width: 43}
                     , { field: '月', title: '月', align: 'center', rowspan: 1, fixed:'left', width: 33}
-                    , { field: '周期', title: '周期', align: 'center', rowspan: 1, width: 95, fixed:'left'}
-                    , { field: '前年业绩占比', title: '前年业绩占比', align: 'center', rowspan: 1, width: 80} 
-                    , { field: '前年库存占比', title: '前年库存占比', align: 'center', rowspan: 1, width: 80}
-                    , { field: '前年效率', title: '前年效率', align: 'center', rowspan: 1, width: 60}
-                    , { field: '前年店铺数', title: '前年店铺数', align: 'center', rowspan: 1, width: 75}
-                    , { field: '前年销量(周)', title: '前年销量(周)', align: 'center', rowspan: 1, width: 80}
-                    , { field: '前年库存量', title: '前年库存量', align: 'center', rowspan: 1, width: 70}
-                    , { field: '前年折扣', title: '前年折扣', align: 'center', rowspan: 1, width: 60}
-                    , { field: '前年店均周销量', title: '前年店均周销量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '前年店均库存量', title: '前年店均库存量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '前年店周转(天)', title: '前年店周转(天)', align: 'center', rowspan: 1, width: 90}
-                    , { field: '前年最高温', title: '前年最高温', align: 'center', rowspan: 1, width: 70}
-                    , { field: '前年最低温', title: '前年最低温', align: 'center', rowspan: 1, width: 70}
+                    , { field: '周期', title: '周期', align: 'center', rowspan: 1, width: 75, fixed:'left'}
+                    , { field: '前年业绩占比', title: '前年业绩占比', align: 'center', rowspan: 1, width: 50} 
+                    , { field: '前年库存占比', title: '前年库存占比', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年效率', title: '前年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '前年店铺数', title: '前年店铺数', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年销量(周)', title: '前年销量(周)', align: 'center', rowspan: 1, width: 50}
+                    // , { field: '前年库存量', title: '前年库存量', align: 'center', rowspan: 1, width: 70}
+                    , { field: '前年折扣', title: '前年折扣', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年店均周销量', title: '前年店均周销量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年店均库存量', title: '前年店均库存量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年店周转(天)', title: '前年店周转(天)', align: 'center', rowspan: 1, width: 50}
+                    , { field: '前年最高温', title: '前年最高温', align: 'center', rowspan: 1, width: 45}
+                    , { field: '前年最低温', title: '前年最低温', align: 'center', rowspan: 1, width: 45}
 
-                    , { field: '去年业绩占比', title: '去年业绩占比', align: 'center', rowspan: 1, width: 80} 
-                    , { field: '去年库存占比', title: '去年库存占比', align: 'center', rowspan: 1, width: 80}
-                    , { field: '去年效率', title: '去年效率', align: 'center', rowspan: 1, width: 60}
-                    , { field: '去年店铺数', title: '去年店铺数', align: 'center', rowspan: 1, width: 75}
-                    , { field: '去年销量(周)', title: '去年销量(周)', align: 'center', rowspan: 1, width: 80}
-                    , { field: '去年库存量', title: '去年库存量', align: 'center', rowspan: 1, width: 70}
-                    , { field: '去年折扣', title: '去年折扣', align: 'center', rowspan: 1, width: 60}
-                    , { field: '去年店均周销量', title: '去年店均周销量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '去年店均库存量', title: '去年店均库存量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '去年店周转(天)', title: '去年店周转(天)', align: 'center', rowspan: 1, width: 90}
-                    , { field: '去年最高温', title: '去年最高温', align: 'center', rowspan: 1, width: 70}
-                    , { field: '去年最低温', title: '去年最低温', align: 'center', rowspan: 1, width: 70}
+                    , { field: '去年业绩占比', title: '去年业绩占比', align: 'center', rowspan: 1, width: 50} 
+                    , { field: '去年库存占比', title: '去年库存占比', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年效率', title: '去年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '去年店铺数', title: '去年店铺数', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年销量(周)', title: '去年销量(周)', align: 'center', rowspan: 1, width: 50}
+                    // , { field: '去年库存量', title: '去年库存量', align: 'center', rowspan: 1, width: 70}
+                    , { field: '去年折扣', title: '去年折扣', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年店均周销量', title: '去年店均周销量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年店均库存量', title: '去年店均库存量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年店周转(天)', title: '去年店周转(天)', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年最高温', title: '去年最高温', align: 'center', rowspan: 1, width: 50}
+                    , { field: '去年最低温', title: '去年最低温', align: 'center', rowspan: 1, width: 50}
 
-                    , { field: '今年业绩占比', title: '今年业绩占比', align: 'center', rowspan: 1, width: 80} 
-                    , { field: '今年库存占比', title: '今年库存占比', align: 'center', rowspan: 1, width: 80}
-                    , { field: '今年效率', title: '今年效率', align: 'center', rowspan: 1, width: 60}
-                    , { field: '今年店铺数', title: '今年店铺数', align: 'center', rowspan: 1, width: 75}
-                    , { field: '今年销量(周)', title: '今年销量(周)', align: 'center', rowspan: 1, width: 80}
-                    , { field: '今年库存量', title: '今年库存量', align: 'center', rowspan: 1, width: 70}
-                    , { field: '今年折扣', title: '今年折扣', align: 'center', rowspan: 1, width: 60}
-                    , { field: '今年店均周销量', title: '今年店均周销量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '今年店均库存量', title: '今年店均库存量', align: 'center', rowspan: 1, width: 90}
-                    , { field: '今年店周转(天)', title: '今年店周转(天)', align: 'center', rowspan: 1, width: 90}
-                    , { field: '今年最高温', title: '今年最高温', align: 'center', rowspan: 1, width: 70}
-                    , { field: '今年最低温', title: '今年最低温', align: 'center', rowspan: 1, width: 70}
+                    , { field: '今年业绩占比', title: '今年业绩占比', align: 'center', rowspan: 1, width: 50} 
+                    , { field: '今年库存占比', title: '今年库存占比', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年效率', title: '今年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '今年店铺数', title: '今年店铺数', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年销量(周)', title: '今年销量(周)', align: 'center', rowspan: 1, width: 50}
+                    // , { field: '今年库存量', title: '今年库存量', align: 'center', rowspan: 1, width: 70}
+                    , { field: '今年折扣', title: '今年折扣', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年店均周销量', title: '今年店均周销量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年店均库存量', title: '今年店均库存量', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年店周转(天)', title: '今年店周转(天)', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年最高温', title: '今年最高温', align: 'center', rowspan: 1, width: 50}
+                    , { field: '今年最低温', title: '今年最低温', align: 'center', rowspan: 1, width: 50}
 
                     ]
                 ]
                 ,done: function (res, curr, count) {
                     // $('.dateStr').text(res.create_time);
+
+                    //console.log(res);
+
+                    //前年
+                    $('th[data-key="1-0-4"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-5"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-6"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-7"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-8"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-9"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-10"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-11"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-12"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-13"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-14"]').css({
+                        'background-color': 'rgb(119 163 217)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //去年
+                    $('th[data-key="1-0-15"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-16"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-17"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-18"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-19"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-20"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-21"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-22"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-23"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-24"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-25"]').css({
+                        'background-color': 'rgb(251,184,5)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //今年
+                    $('th[data-key="1-0-26"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-27"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-28"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-29"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-30"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-31"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-32"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-33"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-34"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-35"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('th[data-key="1-0-36"]').css({
+                        'background-color': 'rgb(139 177 98)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+
+                    //效率
+                    $('td[data-key="1-0-6"]').css({
+                        'background-color': 'rgb(189 188 172)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-17"]').css({
+                        'background-color': 'rgb(189 188 172)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-28"]').css({
+                        'background-color': 'rgb(189 188 172)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //折扣
+                    $('td[data-key="1-0-9"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-20"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-31"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
+
+                    //销量(周)
+                    $('td[data-key="1-0-8"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-19"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-30"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+
+                    //店均周销量
+                    $('td[data-key="1-0-10"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-21"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-32"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
+
+
                 }
             });
         }
