@@ -732,6 +732,9 @@ class ThreeyearService
                         $tmp_arr['今年最低温'] = '';
                     }
 
+                    //处理周期“到”
+                    $tmp_arr['周期'] = str_replace([' 到 '], ['/'], $tmp_arr['周期']);
+
                     $arr[] = $tmp_arr;
 
                 }
@@ -1151,6 +1154,9 @@ class ThreeyearService
                     $tmp_arr['今年最高温'] = '';
                     $tmp_arr['今年最低温'] = '';
                 }
+
+                //处理周期“到”
+                $tmp_arr['周期'] = str_replace([' 到 '], ['/'], $tmp_arr['周期']);
 
                 $arr[] = $tmp_arr;
 
