@@ -976,7 +976,13 @@ class SendReport extends BaseController
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '2', '编号' => 's101'])->find();
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
-
+        echo input('user');
+        echo '<br>';
+        echo $find['状态'];
+        echo '<br>';
+        echo $可推送时间范围[0];
+        echo '<br>';
+        echo $可推送时间范围[1];
         if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
             // 需要手动传日期的话传查询日期+1天
             $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
@@ -993,10 +999,10 @@ class SendReport extends BaseController
             $res = [];
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
-                // echo $send_data['title'];
+                echo $send_data['jpg_url'];
                 // 推送
                 // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
 
             return json($res);
