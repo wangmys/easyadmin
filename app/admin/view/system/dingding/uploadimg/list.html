@@ -130,9 +130,12 @@
                     </div> -->
                     <div></div>
 
-                    <div class="flex row between" style="width:10%; height:35px;">
+                    <div class="flex row between" style="width:17%; height:35px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userAllBtn"
+                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">索歌全员名单
+                        </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="userBtn"
-                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">负责人名单
+                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">店铺负责人名单
                         </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="addBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">添加记录
@@ -177,6 +180,7 @@
             , url_index = "{:url('admin/system.dingding.Uploadimg/index')}"
             , url_user = "{:url('admin/system.dingding.Uploadimg/userList')}"
             , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
+            , url_DingAllUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingAllUserInfo')}"
             , sendDingImgHandle = "{:url('admin/system.dingding.Uploadimg/sendDingImgHandle')}"
             , recallImgHandle = "{:url('admin/system.dingding.Uploadimg/recallImgHandle')}"
             , getReadsHandle = "{:url('admin/system.dingding.Uploadimg/getReadsHandle')}"
@@ -229,6 +233,19 @@
                 ,type: 2
                 ,area: ['100%', '100%'] // 100%全屏
                 ,content: url_DingUsers
+            });
+            // layer.close(index)
+            return false; 
+        });
+
+        //监听保存
+        form.on('submit(userAllBtn)', function (data) {
+            
+            var testFram = layer.open({
+                title: '索歌全员钉钉信息'
+                ,type: 2
+                ,area: ['100%', '100%'] // 100%全屏
+                ,content: url_DingAllUsers
             });
             // layer.close(index)
             return false; 
