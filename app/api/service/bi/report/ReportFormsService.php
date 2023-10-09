@@ -342,15 +342,15 @@ class ReportFormsService
                 前两周销量,
                 前一周销量,
                 周转周 
-            from winter_report 
+            from winter_report_b 
             WHERE 1
                 AND 更新日期 = '{$date}'
                 -- AND 更新日期 = '2023-01-08'
             -- LIMIT 10    
             ";
         $data = $this->db_bi->Query($sql);
-        echo '<pre>';
-        print_r($data);die;
+        // echo '<pre>';
+        // print_r($data);die;
 
         $table_header = ['ID'];
         $table_header = array_merge($table_header, array_keys($data[0]));
