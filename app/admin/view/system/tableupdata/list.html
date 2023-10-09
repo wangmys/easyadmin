@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>报表</title>
+    <title>表格更新</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -135,7 +135,7 @@
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
             <div class="title_text2" style="text-align: center; color:#0051ff;">
-                钉群报表推送列表
+                数据源手动更新列表
              </div>
         </table>
     </div>
@@ -149,10 +149,11 @@
     <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
 </script>
 <script>
-    var sendDingImg = function (id, title) {
-        window.localStorage.setItem('sendDingImg_id', id);
-        window.localStorage.setItem('sendDingImg_title', title);
+    var updataHandle = function (table, title) {
+        window.localStorage.setItem('tableupdata_table', table);
+        window.localStorage.setItem('tableupdata_title', title);
     }
+
 
     // var viewUsers = function (uid) {
     //     window.localStorage.setItem('sendDingImg_uid', uid);
@@ -169,8 +170,8 @@
             , url_DingUsers = ""
             , sendDingImgHandle = ""
             , recallImgHandle = "{:url('admin/system.dingding.Baobiao/recallImgHandle')}"
-            , updateStatusHandle = "{:url('admin/system.dingding.Baobiao/updateStatusHandle')}"
-            , url1 = "{:url('admin/system.dingding.Baobiao/list')}"; 
+            , url_updata = "{:url('admin/system.Tableupdata/updataHandle')}"
+            , url1 = "{:url('admin/system.Tableupdata/list')}"; 
 
         // 表1初始化
         startTable();
@@ -267,38 +268,6 @@
             return false; 
         });
 
-        var stop = false;
-        // 监听事件 
-        $(document).on('click', '.sendDingBtn', function(data){
-            var id = window.localStorage.getItem('sendDingImg_id');
-            var title = window.localStorage.getItem('sendDingImg_title');
-
-            //询问框
-            layer.confirm(`是否推送【${title}】`, {
-                btn: ['是的','再想想'] //按钮
-            }, function(data){
-                // layer.close();
-                if (!stop) {
-                    stop = true
-                    $.post(sendDingImgHandle, {'id': id}, function(res) {
-                        table.reload('table2', {
-                            where: data.field
-                            , method: 'post'
-                            , url: url1
-                            , loading: true
-                        })
-                        layer.msg(res.msg, {icon: 1});
-                        setTimeout(function() {
-                            stop = false
-                        }, 500)
-                    })
-                }
-            }, function(){
-                console.log('关闭');
-                layer.close();
-            });
-        }); 
-
 
         window.viewUsers = function(uid, title) {
             // console.log(uid);
@@ -375,6 +344,85 @@
             })
         });
 
+        // window.updataHandle = function(tableName) {
+
+        //     alert('执行后，不能关闭界面，避免数据未执行成功');
+        //     // layui.use('layer', function () {
+        //     //         layui.layer.load();
+        //     //         $(".layui-layer-shade").css('background', '#000000')
+        //     //         $(".layui-layer-shade").css('opacity', '0.2')
+        //     //         $(".layui-layer-shade").click(function (event) {
+        //     //             event.stopPropagation();
+        //     //         })
+        //     //     })
+        //     $.post(url_updata, {'表名': tableName}, function(res) {  
+
+        //         if (res.status == 1) {
+        //             alert(res.msg) 
+        //             table.reload('table2', {
+        //                 method: 'post'
+        //                 , url: url1
+        //                 , loading: true
+        //                 , page: true
+        //                 , limit: limit
+        //             })
+        //         } else {
+        //             alert(res.msg)  
+        //         }
+        //     })
+        //     // layui.use('layer', function () {
+        //     //         setTimeout(function () {
+        //     //             layui.layer.closeAll();
+        //     //         }, 2000);
+        //     //     });
+        //     return false; 
+        // }
+
+        $(document).on('click', '.handleBtn', function(data){
+            var tableName= window.localStorage.getItem('tableupdata_table');
+            var title= window.localStorage.getItem('tableupdata_title');
+
+            console.log(tableName);
+            console.log(title);
+            //询问框
+            layer.confirm(`是否更新【${title}】`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+                // layer.close();
+                // if (!stop2) {
+                //     stop2 = true
+                $.post(url_updata, {'表名': tableName}, function(res) {
+                    table.reload('table2', {
+                        where: data.field
+                        , method: 'post'
+                        , url: url1
+                        , loading: true
+                    })
+                    // layer.msg(res.msg, {icon: 1});
+                    // setTimeout(function() {
+                    //     stop2 = false
+                    // }, 500)
+                    layui.use('layer', function () {
+                        setTimeout(function () {
+                            layui.layer.closeAll();
+                        }, 0);
+                    });
+                    alert(res.msg);
+                })
+                // }
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+        }); 
 
         // 单店不动销数据统计 
         function startTable() {
@@ -388,7 +436,7 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
-                , toolbar: true
+                , toolbar: false
                 , page: true
                 , limit: 1000
                 , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
@@ -396,48 +444,19 @@
                 // , where: {'更新日期': ''}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '编号', title: '编号', align:'center' }
-                    ,{ field: '标题', title: '标题', align:'center' }
-                    ,{ field: '钉群', title: '钉群' , align:'center', templet:
+                    { field: 'id', title: '编号', align:'center' }
+                    ,{ field: 'EXCEL表名', title: 'EXCEL表名', align:'center' }
+                    ,{ field: '表名', title: 'BI表名', align:'center' }
+                    ,{ field: '数据量预估', title: '数据量预估',align:'center' }
+                    ,{ field: '跑数时间预估', title: '跑数时间预估',align:'center' }
+                    ,{ field: '实时数据', title: '实时数据',align:'center' }
+                    , { field: '跑数完成时间', title: '跑数完成时间', align:'center' } 
+                    , { title: '操作', align:'center', templet:
                     function (data) {
-                        // console.log(data.title)
-                        var str = "";
-                        if (data['钉群'] == '每日经营分析群') {
-                            str = `<span style="color:red">${data['钉群']}</span>`
-                        } else if (data['钉群'] == '加盟部群') {
-                            str = `<span style="color:blue">${data['钉群']}</span>`
-                        } else {
-                            str = `<span style="">${data['钉群']}</span>`
-                        }
-                        return str; 
-                    }}
-                    , { field: '钉群地址', title: '钉群地址', align:'center' } 
-                    , { title: '报表样图', align:'center', templet:
-                    function (data) {
-                        // console.log(data.title)
-                        return `
-                            <span style="cursor:pointer;" onClick="previewImg('${data['path']}')">
-                                查看
-                            </span>
-                            
-                        `; 
-                    }}
-                    , { field: '可推送时间范围', title: '可推送时间范围', align:'center' } 
-                    , { field: '推送时间', title: '推送时间', align:'center' } 
-                    // , { field: '撤回时间', title: '撤回时间', align:'center' } 
-                    , { title: '状态', align:'center', templet:
-                    function (data) {
-                        var html = '';
-                        if (data['状态'] == '开') {
-                            html = `
-                                <input type="checkbox" name="switchTest" lay-skin="switch" lay-filter="switchStatus" lay-text="开|关" value="${data['编号']}" checked>      
-                            `; 
-                        } else {
-                            html = `
-                                <input type="checkbox" name="switchTest" lay-skin="switch" lay-filter="switchStatus" lay-text="开|关" value="${data['编号']}">      
-                            `; 
-                        }
-                        return html;
+                        return `<button class="handleBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="updataHandle('${data['表名']}', '${data['EXCEL表名']}')">
+                                        更新
+                                    </button>`;
                     }}
                 ]]
                 ,done: function (res, curr, count) {
