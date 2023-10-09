@@ -510,6 +510,35 @@ class Uploadimg extends AdminController
 
     }
 
+    // 获取 全员 钉钉用户信息
+    public function getDingDingAllUserInfo() {
+        if (request()->isAjax()) {
+            $sql_select = "
+                select 
+                    u.店铺名称,u.name,u.title,u.mobile,c.State, c.CustomItem17, c.Mathod as 经营模式  
+                from dd_user as u
+                left join customer as c on  u.店铺名称 = c.CustomerName
+                where 1 
+            ";
+
+            $sql_total = "
+                select 
+                    count(*) as total
+                from dd_user as u 
+                left join customer as c on  u.店铺名称 = c.CustomerName
+                where 1 
+            ";
+            $select = $this->db_easyA->query($sql_select);
+            $total = $this->db_easyA->query($sql_total);
+            return json(["code" => "0", "msg" => "", "count" => $total[0]['total'], "data" => $select]);
+        } else {
+            return View('ddalluser', [
+                // 'config' => ,
+            ]);
+        }
+
+    }
+
 
     // 发送 工作通知
     public function sendDingImgHandle() {
@@ -981,5 +1010,24 @@ class Uploadimg extends AdminController
             $header[] = [$key, $key];
         }
         return Excel::exportData($select, $header, '钉钉店铺负责人名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+    }
+
+    // 下载 钉钉 工作通知已读未读 
+    public function downloadAllDduser() {
+
+        $sql = "
+            select 
+                u.店铺名称,u.name,u.title,u.mobile,c.State, c.CustomItem17, c.Mathod as 经营模式  
+            from dd_user as u
+            left join customer as c on u.店铺名称 = c.CustomerName
+            where 1 
+        ";
+        
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '索歌全员钉钉信息_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 }

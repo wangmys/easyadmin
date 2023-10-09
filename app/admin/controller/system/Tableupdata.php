@@ -56,12 +56,10 @@ class Tableupdata extends BaseController
                     sp_customer_stock_skc_2
                 WHERE 1
             ";
-            // $总数_sql_sp_customer_stock_skc_2 = $this->db_bi->query($sql_sp_customer_stock_skc_2_count);
+            $总数_sql_sp_customer_stock_skc_2 = $this->db_bi->query($sql_sp_customer_stock_skc_2_count);
             foreach ($select as $key=>$val) {
                 if ($val['表名'] == 'sp_customer_stock_skc_2') {
-                    // $select[$key]['实时数据'] = $总数_sql_sp_customer_stock_skc_2[0]['total'];
-                    $select[$key]['实时数据'] = 'unkonow';
-
+                    $select[$key]['实时数据'] = $总数_sql_sp_customer_stock_skc_2[0]['total'];
                 }
             }
 

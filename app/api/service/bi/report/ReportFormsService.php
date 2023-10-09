@@ -1857,7 +1857,7 @@ class ReportFormsService
     {
         $code = 'S032';
         $date = date('Y-m-d');
-        $sql = "select 风格,一级分类,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,sum(前一周销量) as 前一周销量 from winter_report where 更新日期 = '$date' and  一级分类 <> '合计' group by 风格,一级分类,二级分类  order by 风格";
+        $sql = "select 风格,一级分类,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,sum(前一周销量) as 前一周销量 from winter_report_b where 更新日期 = '$date' and  一级分类 <> '合计' group by 风格,一级分类,二级分类  order by 风格";
         $data = $this->db_bi->Query($sql);
         $arr =  array_column($data, '合计库存数');
         $sum = array_sum($arr);
