@@ -124,4 +124,8 @@ class Baobiao extends BaseController
             }
         }
     }
+
+    public function test() {
+        echo 111;
+    }
 }
