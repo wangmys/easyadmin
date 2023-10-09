@@ -84,7 +84,9 @@ class ThreeyearService
         if (!$Year) {//没有选择年份，要看三年的数据
 
             if (!$from_cache) {
-                if (!$Year && !$Month && !$YunCang && !$WenDai && !$WenQu && !$State && !$Mathod && !$NewOld && !$Season && !$StyleCategoryName && !$CategoryName1 && !$CategoryName2 && !$CategoryName && !$CustomItem46) {
+                if (!$Year && !$Month && !$YunCang && !$WenDai && !$WenQu && !$State && !$Mathod && !$NewOld && !$Season && !$StyleCategoryName && !$CategoryName1 && !$CategoryName2 && !$CategoryName && !$CustomItem46
+                && !$TimeCategoryName2 && !$TimeCategoryName && !$CustomItem17 && !$CustomItem1 && !$CustomItem45 && !$CustomItem47 && !$CustomItem48
+                ) {
                     //先查缓存数据是否存在
                     $cache = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_index']])->field('cache_data')->find();
                     if ($cache && $cache['cache_data']) {
