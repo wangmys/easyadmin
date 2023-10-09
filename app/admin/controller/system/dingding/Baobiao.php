@@ -126,6 +126,6 @@ class Baobiao extends BaseController
     }
 
     public function test() {
-        echo 111;
+        echo '中文111';
     }
 }
