@@ -24,8 +24,10 @@ class Wwdata extends BaseController
     public function ea_lyp_ww_cussale14day() {
 
       ini_set('memory_limit','1024M');
-      $data = LypWwCussale14dayModel::where([])->withoutField(['id', 'create_time'], false)->select();
-      $data = $data ? $data->toArray() : [];
+      // $data = LypWwCussale14dayModel::where([['年份', '=', '2023'], ['']])->withoutField(['id', 'create_time'], false)->select();
+      // $data = $data ? $data->toArray() : [];
+      $sql = "select 店铺名称,季节,年份,单据日期,修改后风格,一级分类,二级分类,分类,数量,销售金额,零售价金额 from ea_lyp_ww_cussale14day where 年份='2023' and 季节 like '%秋%' or 季节 like '%冬%';";
+      $data = Db::connect("mysql")->Query($sql);
       return json($data);
 
     }

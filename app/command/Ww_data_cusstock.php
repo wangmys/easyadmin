@@ -60,7 +60,7 @@ class Ww_data_cusstock extends Command
 										 else 0 end   
 										 as SKC数 
 										 , cs.当前零售价*cs.合计 as 库存金额, g.货号 from sjp_customer_stock cs 
-        left join sjp_goods g on cs.货号=g.货号 
+        inner join sjp_goods g on cs.货号=g.货号 
         group by cs.店铺名称, g.货号 
         ) as T 
 				group by T.分类,T.店铺名称,T.修改后风格,T.季节,T.一级时间分类;";
