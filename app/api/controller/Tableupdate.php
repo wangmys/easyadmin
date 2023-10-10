@@ -41,13 +41,13 @@ class Tableupdate extends BaseController
     }
 
     // // sk新增领型字段
-    // public function test() {
-    //     // echo 22;
-    //     // $find = $this->db_easyA->table('sp_sk')->find();
-    //     $find = $this->db_binew->query('select * from sp_sk limit 10');
-    //     // echo $this->db_easyA->getLastSql();
-    //     dump($find);
-    // }
+    public function test() {
+        // echo 22;
+        // $find = $this->db_easyA->table('sp_sk')->find();
+        $find = $this->db_binew->query('select * from sp_sk limit 10');
+        // echo $this->db_easyA->getLastSql();
+        dump($find);
+    }
 
     // sk新增领型字段
     public function sk_lingxing() {
