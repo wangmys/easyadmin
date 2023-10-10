@@ -226,9 +226,9 @@ return [
             // 数据库名
             'database'          => 'bi',
             // 用户名
-            'username'          => 'bi_a',
+            'username'          => 'root',
             // 密码
-            'password'          => 'bi2023',
+            'password'          => '19950618xin',
             // 端口
             'hostport'          => '3306',
             // 数据库连接参数

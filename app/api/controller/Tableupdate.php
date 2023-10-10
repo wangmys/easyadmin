@@ -25,6 +25,7 @@ class Tableupdate extends BaseController
     // 数据库
     protected $db_easyA = '';
     protected $db_bi = '';
+    protected $db_binew = '';
     protected $db_sqlsrv = '';
     // 随机数
     protected $rand_code = '';
@@ -35,8 +36,18 @@ class Tableupdate extends BaseController
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
+        $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
+
+    // // sk新增领型字段
+    // public function test() {
+    //     // echo 22;
+    //     // $find = $this->db_easyA->table('sp_sk')->find();
+    //     $find = $this->db_binew->query('select * from sp_sk limit 10');
+    //     // echo $this->db_easyA->getLastSql();
+    //     dump($find);
+    // }
 
     // sk新增领型字段
     public function sk_lingxing() {
@@ -105,12 +116,12 @@ class Tableupdate extends BaseController
         if ($select_data) {
             // dump($select_data);
             // 删 easyadmin2
-            $this->db_bi->table('ww_dianpuyejihuanbi_data')->where([
+            $this->db_binew->table('ww_dianpuyejihuanbi_data')->where([
                 ['日期', '=', $date]
             ])->delete();
 
             // $this->db_bi->startTrans();
-            $insertAll = $this->db_bi->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
+            $insertAll = $this->db_binew->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
                 // $this->db_bi->commit();
                 return json([
@@ -132,7 +143,7 @@ class Tableupdate extends BaseController
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_everyday() {
         $date = date('Y-m-01');
-        $select = $this->db_bi->query("
+        $select = $this->db_binew->query("
             select 日期 from ww_dianpuyejihuanbi_data where 日期>= '{$date}' group by 日期
         ");
 
