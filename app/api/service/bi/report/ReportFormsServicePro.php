@@ -1145,9 +1145,7 @@ class ReportFormsServicePro
                 周转周 
             from winter_report_b 
             WHERE 1
-                AND 更新日期 = '{$date}'
-                -- AND 更新日期 = '2023-01-08'
-            -- LIMIT 10    
+                AND 更新日期 = '{$date}'  
             ";
         $data = $this->db_bi->Query($sql);
         // echo '<pre>';
@@ -1165,8 +1163,8 @@ class ReportFormsServicePro
         $field_width[2] = 80;
         $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
         $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $table_data= [];
 
+        // $table_data= [];
 
 
         $table_explain = [
@@ -1289,19 +1287,60 @@ class ReportFormsServicePro
             ];
 
             $table_data[]=$new;
-
         }
+
+        $data_handle = [];
+        // 新数组装最终结果
+        $data_new_cwl = [];
+        foreach ($table_data as $key => $val) {
+            if ($val['风格'] == '基本款' && $val['二级分类'] == '合计') {
+                $data_handle['基本款合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+            if ($val['风格'] == '引流款' && $val['二级分类'] == '合计') {
+                $data_handle['引流款合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+            if ($val['风格'] == '汇总合计' && $val['二级分类'] == '合计') {
+                $data_handle['汇总合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+        }
+        // dump($data_handle);
+        // echo '<pre>';
+        // print_r($table_data); 
+        
+        foreach ($table_data as $key => $val) {
+            $base = $table_data[0]['风格'];
+            if ($val['风格'] == $base) {
+                // $data_new_cwl[$key] = $table_data[$key];
+                array_push($data_new_cwl, $table_data[$key]);
+            } elseif ($val['风格'] != $base && $table_data[$key - 1]['风格'] == $base) {
+                // $data_new_cwl[$key] = $data_handle['基本款合计'];
+                array_push($data_new_cwl, $data_handle['基本款合计']);
+            } else {
+                // $data_new_cwl[$key] = $table_data[$key-1];
+                array_push($data_new_cwl, $table_data[$key-1]);
+            }
+        }
+        array_push($data_new_cwl, $table_data[count($table_data)]);
+        array_push($data_new_cwl, $data_handle['引流款合计']);
+        array_push($data_new_cwl, $data_handle['汇总合计']);
 
 
         $table_explain = [
             0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
         ];
         $params = [
-            'row' => count($table_data),          //数据的行数
+            'code' => $code,
+            'row' => count($data_new_cwl),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
             'title' => "2023 冬季货品零售汇总报表  [" . date("Y-m-d", strtotime("-1 day")) . "]",
             'table_time' => date("Y-m-d H:i:s"),
-            'data' => $table_data,
+            'data' => $data_new_cwl,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,
@@ -1425,6 +1464,18 @@ class ReportFormsServicePro
                 }
             }
 
+            if (@$params['code'] == 'S010') {
+                if (isset($item['一级分类']) && $item['一级分类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+                if (isset($item['风格']) && $item['风格'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['性质']) && $item['性质'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            }
+
             if (@$params['code'] == 'S013' || @$params['code'] == 'S014') {
                 if (isset($item['二级分类']) && $item['二级分类'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
@@ -1529,6 +1580,18 @@ class ReportFormsServicePro
             if (@$params['code'] == 'S115C' || @$params['code'] == 'S115D') {
                 if (isset($item['性质']) && $item['性质'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                }
+            }
+
+            if (@$params['code'] == 'S032') {
+                // if (isset($item['一级分类']) && $item['一级分类'] == '合计') {
+                //     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow2);
+                // }
+                if (isset($item['二级分类']) && $item['二级分类'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
+                }
+                if (isset($item['风格']) && $item['风格'] == '汇总合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }
             }
         }

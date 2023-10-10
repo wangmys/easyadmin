@@ -701,20 +701,59 @@ class ReportFormsService
         }
 
 
+        // cwl
+        $data_handle = [];
+        // 新数组装最终结果
+        $data_new_cwl = [];
+        foreach ($table_data as $key => $val) {
+            if ($val['风格'] == '基本款' && $val['二级分类'] == '合计') {
+                $data_handle['基本款合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+            if ($val['风格'] == '引流款' && $val['二级分类'] == '合计') {
+                $data_handle['引流款合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+            if ($val['风格'] == '汇总合计' && $val['二级分类'] == '合计') {
+                $data_handle['汇总合计'] = $table_data[$key];
+                // 删
+                unset($table_data[$key]);
+            }
+        }
+        // dump($data_handle);
+        // echo '<pre>';
+        // print_r($table_data); 
+        
+        foreach ($table_data as $key => $val) {
+            $base = $table_data[0]['风格'];
+            if ($val['风格'] == $base) {
+                // $data_new_cwl[$key] = $table_data[$key];
+                array_push($data_new_cwl, $table_data[$key]);
+            } elseif ($val['风格'] != $base && $table_data[$key - 1]['风格'] == $base) {
+                // $data_new_cwl[$key] = $data_handle['基本款合计'];
+                array_push($data_new_cwl, $data_handle['基本款合计']);
+            } else {
+                // $data_new_cwl[$key] = $table_data[$key-1];
+                array_push($data_new_cwl, $table_data[$key-1]);
+            }
+        }
+        array_push($data_new_cwl, $table_data[count($table_data)]);
+        array_push($data_new_cwl, $data_handle['引流款合计']);
+        array_push($data_new_cwl, $data_handle['汇总合计']);
+
         $table_explain = [
             0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
         ];
 
-
-
-
         $params = [
             'code' => $code,
-            'row' => count($table_data),          //数据的行数
+            'row' => count($data_new_cwl),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
             'title' => "2023 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
-            'data' => $table_data,
+            'data' => $data_new_cwl,
             'table_explain' => $table_explain,
             'table_header' => $table_header,
             'field_width' => $field_width,
