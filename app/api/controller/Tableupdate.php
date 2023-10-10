@@ -149,7 +149,8 @@ class Tableupdate extends BaseController
 
         foreach ($select as $key => $val) {
             // http_get("http://im.babiboy.com/api/lufei.Dianpuyejihuanbi/dianpuyejihuanbi_date_handle?date={$date}");
-            $url = "http://im.babiboy.com/api/Tableupdate/bi_dianpuyejihuanbi_data?date=" . $val['日期'];
+            // $url = "http://im.babiboy.com/api/Tableupdate/bi_dianpuyejihuanbi_data?date=" . $val['日期'];
+            $url = "http://www.easyadmin1.com/api/Tableupdate/bi_dianpuyejihuanbi_data?date=" . $val['日期'];
             
             http_get($url);
         }
