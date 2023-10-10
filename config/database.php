@@ -222,7 +222,7 @@ return [
             // 数据库类型
             'type'              => 'mysql',
             // 服务器地址
-            'hostname'          => '192.168.4.232',
+            'hostname'          => '183.6.86.105',
             // 数据库名
             'database'          => 'bi',
             // 用户名
@@ -230,7 +230,7 @@ return [
             // 密码
             'password'          => '19950618xin',
             // 端口
-            'hostport'          => '3306',
+            'hostport'          => '53306',
             // 数据库连接参数
             'params'            => [],
             // 数据库编码默认采用utf8
