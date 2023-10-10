@@ -22,6 +22,7 @@ class Duanmalv extends BaseController
     // 数据库
     protected $db_easyA = '';
     protected $db_bi = '';
+    protected $db_binew = '';
     protected $db_sqlsrv = '';
     // 随机数
     protected $rand_code = '';
@@ -35,6 +36,7 @@ class Duanmalv extends BaseController
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
+        $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
 
         $config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
@@ -1517,7 +1519,7 @@ class Duanmalv extends BaseController
                 '更新日期' => $date
             ])->delete();
 
-            $this->db_bi->table('cwl_duanmalv_table1_1')->where([
+            $this->db_binew->table('cwl_duanmalv_table1_1')->where([
                 '更新日期' => $date
             ])->delete();
             // die;
@@ -1526,7 +1528,7 @@ class Duanmalv extends BaseController
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
-                $insert = $this->db_bi->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+                $insert = $this->db_binew->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
             }
             $this->table1_1_sort();   
 
