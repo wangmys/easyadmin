@@ -21,6 +21,7 @@ class sp_customer_stock_skc_2 extends BaseController
     // 数据库
     protected $db_easyA = '';
     protected $db_bi = '';
+    protected $db_binew = '';
     protected $db_sqlsrv = '';
 
     // 随机数
@@ -32,6 +33,7 @@ class sp_customer_stock_skc_2 extends BaseController
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
+        $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
@@ -901,13 +903,13 @@ class sp_customer_stock_skc_2 extends BaseController
             mysqli_close($con);
     
             if ($res) {
-                $this->db_bi->execute('TRUNCATE sp_customer_stock_skc_2;');
+                $this->db_binew->execute('TRUNCATE sp_customer_stock_skc_2;');
                 $chunk_list = array_chunk($res, 500);
                 // $this->db_easyA->startTrans();
     
                 foreach($chunk_list as $key => $val) {
                     // 基础结果 
-                    $this->db_bi->table('sp_customer_stock_skc_2')->strict(false)->insertAll($val);
+                    $this->db_binew->table('sp_customer_stock_skc_2')->strict(false)->insertAll($val);
                 }
                 cache('sp_customer_stock_skc_2', null);
                 return true;
