@@ -49,6 +49,11 @@ class Stock2 extends Command
     //按每周划分的基础数据sql   //ff21120220830.dbo. (跑2022.08.01之前的都要加上这个)
     protected function get_sql4($current_date) {
 
+		//根据当前日期获取所在周的 周一/周日 的日期：
+		$monday_sunday = $this->return_monday_sunday($current_date);
+		$monday = $monday_sunday['monday'];
+		$sunday = $monday_sunday['sunday'];
+
         return "WITH T1 AS 
 		(
 		SELECT 
@@ -260,7 +265,7 @@ class Stock2 extends Command
 			T1.State,
 			T1.最早销售日期,
 			T1.最后销售日期,
-			COUNT(CASE WHEN '{$current_date}' BETWEEN T1.最早销售日期 AND T1.最后销售日期 THEN T1.CustomerId END ) OVER 
+			COUNT(CASE WHEN T1.最早销售日期<='{$sunday}'  AND T1.最后销售日期>='{$monday}' THEN T1.CustomerId END ) OVER 
 			(PARTITION BY T1.YunCang,
 			T1.Mathod,
 			T1.WenDai,
@@ -313,5 +318,22 @@ class Stock2 extends Command
 		;";
 
     }
+
+	protected function return_monday_sunday($cur_date) {
+
+		// $cur_date = '2023-10-09';
+		$w = date('w', strtotime($cur_date));
+		if ($w == 0) {//周日
+			$monday = date('Y-m-d', strtotime($cur_date)-(6*24*60*60));
+			$sunday = date('Y-m-d', strtotime($cur_date));
+		} else {
+			$diff_start = $w-1;
+			$monday = date('Y-m-d', strtotime($cur_date)-($diff_start*24*60*60));
+			$diff_end = 7-$w;
+			$sunday = date('Y-m-d', strtotime($cur_date)+($diff_end*24*60*60));	
+		}
+		return ['monday' => $monday, 'sunday' => $sunday];
+
+	}
 
 }
