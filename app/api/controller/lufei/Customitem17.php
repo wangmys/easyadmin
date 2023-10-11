@@ -21,6 +21,7 @@ class Customitem17 extends BaseController
     // 数据库
     protected $db_easyA = '';
     protected $db_bi = '';
+    protected $db_binew = '';
     protected $db_sqlsrv = '';
     // 随机数
     protected $rand_code = '';
@@ -31,6 +32,7 @@ class Customitem17 extends BaseController
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
+        $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
@@ -127,7 +129,7 @@ class Customitem17 extends BaseController
                 and 店铺名称 not in ('合计')
         ";
 		
-        $select = $this->db_bi->query($sql);
+        $select = $this->db_binew->query($sql);
 
 
         if ($select) {
@@ -280,7 +282,7 @@ class Customitem17 extends BaseController
             where 日期>='{$开始}' and 日期< '{$结束}'
         ";
 		
-        $select = $this->db_bi->query($sql);
+        $select = $this->db_binew->query($sql);
         // echo '<pre>';
         // print_r($select);die;
         if ($select) {
