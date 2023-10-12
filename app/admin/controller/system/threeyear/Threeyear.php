@@ -56,5 +56,28 @@ class Threeyear extends AdminController
         
     }
 
+    /**
+     * @NodeAnotation(title="三年趋势-保存筛选条件")
+     */
+    public function saveSelect() {
+
+        $params = $this->request->param();
+
+        if (request()->isAjax()) {
+            // print_r([$params]);die;
+
+            $params['from_cache'] = 1;
+
+            $res = $this->service->index($params);
+            $this->service->save_threeyear_cache($res, $params);
+            
+            return json(["code" => "0", "msg" => "", "count" => count($res), "data" => $res,  'create_time' => date('Y-m-d'), 'if_save_select'=>1]);
+        } 
+        else {
+            echo 'error';die;
+        }    
+
+    }
+
 
 }
