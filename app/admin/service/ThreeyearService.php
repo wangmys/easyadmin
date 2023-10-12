@@ -88,7 +88,7 @@ class ThreeyearService
         $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         '100.0%' as '业绩占比', '100.0%' as '库存占比', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
         $field_weather = "CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' ) as Start_time, max(d.weather_time) as End_time, b.customer_name,max(d.max_c) as max_c, min(d.min_c) as min_c, CONCAT(SUBSTRING(  CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' )  , 6, 5), ' 到 ', SUBSTRING( max(d.weather_time) , 6, 5)) as '周期'";
 
@@ -479,7 +479,7 @@ class ThreeyearService
                 $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
             CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
             sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-            CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+            CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
             sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
                 $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -1014,7 +1014,7 @@ class ThreeyearService
             $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
             $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -1477,7 +1477,7 @@ class ThreeyearService
         $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         '100.0%' as '业绩占比', '100.0%' as '库存占比', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
         $field_weather = "CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' ) as Start_time, 
         max(d.weather_time) as End_time,   b.customer_name,max(d.max_c) as max_c, min(d.min_c) as min_c, 
@@ -1778,7 +1778,7 @@ class ThreeyearService
             $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
             $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
