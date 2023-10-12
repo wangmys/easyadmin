@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>气温陈列调整配置表</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+        /* 字体超出不隐藏 */
+        .layui-table-cell{
+            /* height:auto;
+            overflow:visible;
+            text-overflow:inherit; */
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show" style="display: none !important;">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="更新日期" class="layui-input" id="setTime1" value="" placeholder="yyyy-MM-dd" lay-verify="required">
+                            </div>
+                        </div>
+                    </div>
+                    <div></div>
+
+                    <div class="flex row between" style="width:160px; height:35px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="getReadsBtn"
+                        style="background:#4a6db8;color:#ffffff; line-height: 25px; float:right; ">阅读状态
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="searchBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询记录
+                        </button>
+
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
+        <table class="layui-hide" id="table2" lay-filter="table">
+            <div class="title_text2" style="text-align: center; color:#0051ff;">
+                气温陈列调整配置表
+                <a id="uploadButton">
+                    <!-- 上传点击按你模拟事件 -->
+                </a>
+             </div>
+        </table>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="introduceHtml">
+    <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
+</script>
+<script>
+    // var uploadHandle = function (title) {
+    //     window.localStorage.setItem('weatherdisplay_title', title);
+    // }
+    // var viewUsers = function (uid) {
+    //     window.localStorage.setItem('sendDingImg_uid', uid);
+    // }
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form','upload', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , upload = layui.upload
+            , url_index = ""
+            , url_user = ""
+            , url_DingUsers = ""
+            , sendDingImgHandle = ""
+            // , recallImgHandle = "{:url('admin/system.dingding.Baobiao/recallImgHandle')}"
+            , upload_img = "{:url('admin/system.dingding.Uploadimg/upload_img')}"
+            , uploadImgHandle = "{:url('system.dingding.Weatherdisplay/uploadImgHandle')}"
+            , url1 = "{:url('system.dingding.Weatherdisplay/config')}"; 
+
+        // 表1初始化
+        startTable();
+        // initFn();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#setTime1'
+        });
+
+        $('.test1').click(function() {
+            console.log(111);
+        });
+        
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-hh', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.goodsno
+                })
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
+                
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(getReadsBtn)', function (data) {
+            var datetime = data.field['更新日期'];
+            var limit = data.field.limit;
+            //询问框
+            layer.confirm(`是否更新【${datetime}】的阅读状态？1-3分钟，请耐心等待`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                // layer.close();
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+                $.post(getReadsHandle, {'更新日期': datetime}, function(res) {  
+                    table.reload('table2', {
+                        where: {'更新日期': datetime, 'limit': limit}
+                        , method: 'post'
+                        , url: url1
+                        , loading: true
+                        , page: true
+                        , limit: limit
+                        ,done: function(res){
+                            layui.use('layer', function () {
+                                setTimeout(function () {
+                                    layui.layer.closeAll();
+                                }, 0);
+                            });
+                        }
+                    })
+                })
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+            return false; 
+        });
+
+        //监听保存
+        form.on('submit(searchBtn)', function (data) {
+            table.reload('table2', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                    , page: true
+                    , limit: data.field.limit
+                })
+            return false; 
+        });
+
+
+        window.viewUsers = function(uid, title) {
+            // console.log(uid);
+            window.localStorage.setItem('sendDingImg_uid', uid);
+            // window.localStorage.setItem('sendDingImg_title', title);
+            var testFram = layer.open({
+                title: title
+                ,type: 2
+                ,area: ['40%', '100%'] // 100%全屏
+                ,content: url_user
+            });
+            // layer.close(index)
+            return false; 
+        }
+
+        window.previewImg = function(obj) {
+            var img = new Image();
+            img.src = obj.src;
+            var height=img.height,width=img.width;
+            if(img.height > 600) {
+                height = '600px';
+                width=(600/(img.height))*(img.width);
+            }
+        
+            var imgHtml = "<img src='" + obj.src + "' height='"+height+"' width='"+width+"' />";
+            //弹出层
+            layer.open({
+                type: 1,
+                offset: 'auto',
+                area: [width,'auto'],
+                shadeClose:true,//点击外围关闭弹窗
+                scrollbar: false,//不现实滚动条
+                title: "图片预览", //不显示标题
+                content: imgHtml, //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                cancel: function () {
+                
+                }
+            });
+        }
+
+        //监听指定开关
+        form.on('switch(switchStatus)', function(data){
+            var id = data.value
+            var changeStatus = data.elem.checked ? '开' : '关';
+            $.post(updateStatusHandle, {'编号': id, "状态":changeStatus}, function(res) {  
+                layer.msg(res.msg)
+            })
+        });
+
+        window.uploadHandle = function (title) {
+            window.localStorage.setItem('weatherdisplay_title', title);
+            console.log(title);
+            $('#uploadButton').click();
+        }
+
+        upload.render({
+            elem: '#uploadButton'
+            ,url: upload_img //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            ,accept: 'file'
+            ,exts: 'jpeg|jpg|gif|png|pdf'
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+                // obj.preview(function(index, file, result){
+                //     $('#demo1').attr('src', result); //图片链接（base64）
+                // });
+                
+                // element.progress('demo', '0%'); //进度条复位
+                // layer.msg('上传中', {icon: 16, time: 0});
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                } else {
+                    // 方案
+                    var weatherdisplay_title = window.localStorage.getItem('weatherdisplay_title');
+                    $.post(uploadImgHandle, {title: weatherdisplay_title, pid: res.data.pid}, function(data) {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                    }, 'json')
+                    return layer.msg('上传成功');
+                }
+                //上传成功的一些操作
+                //……
+                $('#demoText').html(''); //置空上传失败的状态
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+            }
+        });
+            
+        // 单店不动销数据统计 
+        function startTable() {
+            var mapHeight = $('#map').height();
+            // var yc = window.localStorage.getItem('viewCustomer_yc');
+            // var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            var height = document.documentElement.clientHeight - mapHeight - 15;
+
+            table.render({
+                elem: '#table2'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                , toolbar: false
+                , page: true
+                , limit: 1000
+                , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
+                , height: height
+                // , where: {'更新日期': ''}
+                , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '类型', title: '类型', align:'center' }
+                    ,{ field: '陈列方案', title: '陈列方案', align:'center' }
+                    ,{ field: '方案图', title: '方案图', align:'center', templet:
+                    function (data) {
+                        // console.log(data)
+                        if (data.path) {
+                            return `
+                                <img src="${data.path}" style="height:50px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
+                            `; 
+                        } else {
+                            return ''
+                        }
+      
+                    }}
+                    ,{ field: 'updatetime', title: '最后修改时间',align:'center' }
+                    , { title: '操作', align:'center', templet: 
+                    function (data) {
+                        return `<button type="button" class=" layui-btn layui-btn-xs uplaodBtn" onClick="uploadHandle('${data['方案']}')">图片更新</button>`;
+                    }}
+                ]]
+                ,done: function (res, curr, count) {
+                    // layer.alert("加载完成");
+                    // console.log(res);
+                    // $('.readsNum').text(res.readsData.reads);
+                    // $('.noReadsNum').text(res.readsData.noReads);
+                }
+            });
+        }
+    });
+
+    // alert(document.documentElement.clientHeight - 30);
+
+
+
+</script>
