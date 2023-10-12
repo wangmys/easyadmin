@@ -5,6 +5,10 @@ namespace app\admin\service;
 use app\admin\model\bi\SpCustomerStockSaleWeekDateModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2Model;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekModel;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2021Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2022Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2023Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2024Model;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekCacheModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekSelectModel;
 use app\admin\model\weather\CusWeatherBase;
@@ -18,6 +22,10 @@ class ThreeyearService
     use Singleton;
     protected $easy_db;
     protected $threeyear2_week_model;
+    protected $threeyear2_week_2021_model;
+    protected $threeyear2_week_2022_model;
+    protected $threeyear2_week_2023_model;
+    protected $threeyear2_week_2024_model;
     protected $week_date_model;
     protected $weather_data_model;
     protected $weather_base_model;
@@ -25,6 +33,10 @@ class ThreeyearService
     public function __construct() {
         $this->easy_db = Db::connect("mysql");
         $this->threeyear2_week_model = new SpCustomerStockSaleThreeyear2WeekModel();
+        $this->threeyear2_week_2021_model = new SpCustomerStockSaleThreeyear2Week2021Model();
+        $this->threeyear2_week_2022_model = new SpCustomerStockSaleThreeyear2Week2022Model();
+        $this->threeyear2_week_2023_model = new SpCustomerStockSaleThreeyear2Week2023Model();
+        $this->threeyear2_week_2024_model = new SpCustomerStockSaleThreeyear2Week2024Model();
         $this->week_date_model = new SpCustomerStockSaleWeekDateModel();
         $this->weather_data_model = new CusWeatherData();
         $this->weather_base_model = new CusWeatherBase();
@@ -475,21 +487,21 @@ class ThreeyearService
             sum(SalesVolume) as '业绩', sum(StockCost) as '库存'";
 
                 if ($where_customer_2021) {
-                    $customer_threeyear_2021 = $this->threeyear2_week_model::where($where_customer_2021)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2021 = $this->threeyear2_week_2021_model::where($where_customer_2021)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2021 = $customer_threeyear_2021 ? $customer_threeyear_2021->toArray() : [];
                     $customer_threeyear_2021_weeks = $customer_threeyear_2021 ? array_column($customer_threeyear_2021, 'Week') : [];
                     $customer_threeyear_2021 = array_combine($customer_threeyear_2021_weeks, $customer_threeyear_2021);
                 }
 
                 if ($where_customer_2022) {
-                    $customer_threeyear_2022 = $this->threeyear2_week_model::where($where_customer_2022)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2022 = $this->threeyear2_week_2022_model::where($where_customer_2022)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2022 = $customer_threeyear_2022 ? $customer_threeyear_2022->toArray() : [];
                     $customer_threeyear_2022_weeks = $customer_threeyear_2022 ? array_column($customer_threeyear_2022, 'Week') : [];
                     $customer_threeyear_2022 = array_combine($customer_threeyear_2022_weeks, $customer_threeyear_2022);
                 }
 
                 if ($where_customer_2023) {
-                    $customer_threeyear_2023 = $this->threeyear2_week_model::where($where_customer_2023)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2023 = $this->threeyear2_week_2023_model::where($where_customer_2023)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2023 = $customer_threeyear_2023 ? $customer_threeyear_2023->toArray() : [];
                     $customer_threeyear_2023_weeks = $customer_threeyear_2023 ? array_column($customer_threeyear_2023, 'Week') : [];
                     $customer_threeyear_2023 = array_combine($customer_threeyear_2023_weeks, $customer_threeyear_2023);
@@ -517,7 +529,7 @@ class ThreeyearService
             $threeyear_2021 = $threeyear_2022 = $threeyear_2023 = [];
             //2021年业绩、库存等情况
             if ($where_yeji_2021) {
-                $threeyear_2021 = $this->threeyear2_week_model::where($where_yeji_2021)->group('Week')->field($field)->select();
+                $threeyear_2021 = $this->threeyear2_week_2021_model::where($where_yeji_2021)->group('Week')->field($field)->select();
                 $threeyear_2021 = $threeyear_2021 ? $threeyear_2021->toArray() : [];
                 $threeyear_2021_weeks = $threeyear_2021 ? array_column($threeyear_2021, 'Week') : [];
                 $threeyear_2021 = array_combine($threeyear_2021_weeks, $threeyear_2021);
@@ -540,7 +552,7 @@ class ThreeyearService
             //2022年业绩、库存等情况
             if ($where_yeji_2022) {
 
-                $threeyear_2022 = $this->threeyear2_week_model::where($where_yeji_2022)->group('Week')->field($field)->select();
+                $threeyear_2022 = $this->threeyear2_week_2022_model::where($where_yeji_2022)->group('Week')->field($field)->select();
                 $threeyear_2022 = $threeyear_2022 ? $threeyear_2022->toArray() : [];
                 $threeyear_2022_weeks = $threeyear_2022 ? array_column($threeyear_2022, 'Week') : [];
                 $threeyear_2022 = array_combine($threeyear_2022_weeks, $threeyear_2022);
@@ -562,7 +574,7 @@ class ThreeyearService
 
             //2023年业绩、库存等情况
             if ($where_yeji_2023) {
-                $threeyear_2023 = $this->threeyear2_week_model::where($where_yeji_2023)->group('Week')->field($field)->select();
+                $threeyear_2023 = $this->threeyear2_week_2023_model::where($where_yeji_2023)->group('Week')->field($field)->select();
                 $threeyear_2023 = $threeyear_2023 ? $threeyear_2023->toArray() : [];
                 $threeyear_2023_weeks = $threeyear_2023 ? array_column($threeyear_2023, 'Week') : [];
                 $threeyear_2023 = array_combine($threeyear_2023_weeks, $threeyear_2023);
