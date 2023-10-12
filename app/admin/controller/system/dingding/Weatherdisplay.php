@@ -99,7 +99,7 @@ class Weatherdisplay extends AdminController
             if (!empty($input['pid']) && !empty($input['title'])) {
                 $find_img = $this->db_easyA->table('dd_temp_img')->where(['pid' => $input['pid']])->find();
                 if ($find_img) {
-                    $update = $this->db_easyA->table('dd_weatherdisplay_config')->where(['方案' => $input['title']])->update([
+                    $update = $this->db_easyA->table('dd_weatherdisplay_config')->where(['陈列方案' => $input['title']])->update([
                         'path' => $find_img['path'],
                         'updatetime' => date('Y-m-d H:i:s')
                     ]);
