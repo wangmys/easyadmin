@@ -98,7 +98,7 @@ class ThreeyearService
         if (isset($search_param['from_cache'])) unset($search_param['from_cache']);
         if (isset($search_param['limit'])) unset($search_param['limit']);
         if (isset($search_param['page'])) unset($search_param['page']);
-        if ( !$search_param || ($index_search_data && $index_search_data['cache_data'] && ($index_search_data['cache_search_param'] == json_encode($search_param))) ) {
+        if ( (!$from_cache && !$search_param) || ($index_search_data && $index_search_data['cache_data'] && ($index_search_data['cache_search_param'] == json_encode($search_param))) ) {
             $cache = json_decode($index_search_data['cache_data'], true);
             if ($cache) {
                 return $cache;
