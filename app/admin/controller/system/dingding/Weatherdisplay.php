@@ -286,7 +286,7 @@ class Weatherdisplay extends AdminController
                     // 测试专用
                     if ($debug) {
                         $sql = "
-                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷')
+                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷','徐文娟')
                         ";
                     } else {
                         $sql = "
