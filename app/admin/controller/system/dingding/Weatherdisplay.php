@@ -41,7 +41,7 @@ class Weatherdisplay extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="配置")
+     * @NodeAnotation(title="气温陈列信息设置")
      */
     public function config() {
         if (request()->isAjax()) {
@@ -92,6 +92,7 @@ class Weatherdisplay extends AdminController
         }
     }
 
+    // 陈列图上传
     public function uploadImgHandle() {
         if (request()->isAjax()) {
         // if (1) {
@@ -120,46 +121,81 @@ class Weatherdisplay extends AdminController
         }        
     }
 
-    // 上传图片
-    // public function uploadImgHandle() {
-    //     if (request()->isAjax()) {
-    //     // if (1) {
-    //         $file = request()->file('file');  //这里‘file’是你提交时的name
-    //         $file->getOriginalName();
+    /**
+     * @NodeAnotation(title="添加推送信息")
+     */
+    public function addlist() {
+        return View('addlist',[
+            
+        ]);
+    }
 
-    //         $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
-    //         $save_path = app()->getRootPath() . 'public/upload/dd_img/' . date('Ymd',time()).'/';   //文件保存路径
-    //         $url = $_SERVER['HTTP_ORIGIN'] . '/upload/dd_img/' . date('Ymd',time()).'/' . $new_name;
-    //         $info = $file->move($save_path, $new_name);
+    /**
+     * @NodeAnotation(title="气温陈列推送列表")
+     */
+    public function list() {
+        if (request()->isAjax()) {
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
 
-    //         // 静态测试
-    //         // $url = app()->getRootPath() . 'public/upload/dd_img/' . date('Ymd',time()).'/17c72a9e640be14d4c6a11e8fdebd6a5_156.png';   //文件保存路径
+            // 非系统管理员
+            // if (! checkAdmin()) { 
+            //     $aname = session('admin.name');       
+            //     $aid = session('admin.id');   
+            //     $mapSuper = " AND list.aid='{$aid}'";  
+            // } else {
+            //     $mapSuper = '';
+            // }
+            // $云仓 = $input['yc'];
+            // $货号 = $input['gdno'];
+            // if (!empty($input['yc'])) {
+            //     $map1 = " AND `云仓` = '{$云仓}云仓'";                
+            // } else {
+            //     $map1 = "";
+            // }
+            $sql = "
+                SELECT 
+                    *
+                FROM 
+                    dd_weatherdisplay_list
+                WHERE 1
+                ORDER BY id desc
+ 
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
 
-    //         $time = date('Y-m-d H:i:s');
-    //         $data = [
-    //             'aid' => $this->authInfo['id'],
-    //             'aname' => $this->authInfo['name'],
-    //             'path' => $url,
-    //             'time' => $time
-    //         ];
-    //         // $pid = $this->db_easyA->table('dd_weatherdisplay')->strict(false)->insertGetId($data);
-    //         return json(['code' => 0, 'msg' => '上传成功', 'data' => [
-    //             'path' => $url,
-    //             // 'pid' => $pid
-    //         ]]);
-    //     }
-    // }
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                    FROM 
+                        dd_weatherdisplay_list
+                WHERE 1
+            ";
+            $count = $this->db_easyA->query($sql2);
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+        } else {
+            return View('list',[
+            
+            ]);
+        }
+    }
 
     // 下载用户信息模板
     public function download_excel_user_demo() {
-        $sql = "
-            SELECT
-                店铺名称, 姓名, 手机
-            from dd_temp_excel_user_demo
-            where 1
-            limit 1
-        ";
-        $select = $this->db_easyA->query($sql);
+        // $sql = "
+        //     SELECT
+        //         店铺名称, 陈列方案, 备注
+        //     from dd_temp_excel_user_demo
+        //     where 1
+        //     limit 1
+        // ";
+        // $select = $this->db_easyA->query($sql);
+        $select[0]['店铺名称'] = '店铺的名称';
+        $select[0]['陈列方案'] = '秋转冬方案二';
+        $select[0]['备注'] = '推送标题';
         $header = [];
         foreach($select[0] as $key => $val) {
             $header[] = [$key, $key];
@@ -190,7 +226,7 @@ class Weatherdisplay extends AdminController
         }
     }
 
-    // 上次用户列表
+    // 上次用户列表 测试 $debug
     public function upload_excel_user() {
         if (request()->isAjax()) {
         // if (1) {
@@ -201,20 +237,25 @@ class Weatherdisplay extends AdminController
             $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
+            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/气温陈列调整上传模板.xlsx';   //文件保存路径
+
+            $debug = true;
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
                 $read_column = [
                     'A' => '店铺名称',
-                    'B' => '姓名',
-                    'C' => '手机',
+                    'B' => '陈列方案',
+                    'C' => '备注',
                 ];
                 
                 //读取数据
                 $data = $this->readExcel_temp_excel_user($info, $read_column);
                 // echo '<pre>';
-                // print_r($data); die;
+                // print_r($data);
+                
+                
+                // die;
 
                 if ($data) {
                     $model = new DingTalk;
@@ -223,79 +264,95 @@ class Weatherdisplay extends AdminController
                     $uid = rand_code(8);
                     $time = date('Y-m-d H:i:s');
 
-
+                    $店铺str = ''; 
                     foreach ($data as $key => $val) {
-                        $data[$key]['uid'] = $uid;
-                        $data[$key]['aid'] = $this->authInfo['id'];
-                        $data[$key]['aname'] = $this->authInfo['name'];
-                        $data[$key]['店铺名称'] = @$val['店铺名称'];
-                        $data[$key]['姓名'] = @$val['姓名'];
-                        $data[$key]['手机'] = @$val['手机'];
-                        $data[$key]['time'] = $time;
+                        // $data[$key]['uid'] = $uid;
+                        // $data[$key]['aid'] = $this->authInfo['id'];
+                        // $data[$key]['aname'] = $this->authInfo['name'];
+                        // $data[$key]['店铺名称'] = @$val['店铺名称'];
+                        // $data[$key]['姓名'] = @$val['姓名'];
+                        // $data[$key]['手机'] = @$val['手机'];
+                        // $data[$key]['time'] = $time;
+                        
+                        // 最后
+                        if ($key == count($data) -1) {
+                            $店铺str .=  "'{$val['店铺名称']}'";
+                        } else {
+                            $店铺str .=  "'{$val['店铺名称']}',";    
+                        }
+
                     }
 
+                    // 测试专用
+                    if ($debug) {
+                        $sql = "
+                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷')
+                        ";
+                    } else {
+                        $sql = "
+                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
+                        ";
+                    }
+
+                    // 方案图路径
+                    $select_path = $this->db_easyA->query("
+                        select 陈列方案,path from dd_weatherdisplay_config
+                    ");
+                    // 查询推送店铺店长名单
+                    $select_customer_push = $this->db_easyA->query($sql);
+
+         
+                    // 陈列方案
+                    foreach ($select_customer_push as $k1 => $v1) {
+                        foreach ($data as $k2 => $v2) {
+                            if ($v1['店铺名称'] == $v2['店铺名称']) {
+                                $select_customer_push[$k1]['陈列方案'] = $v2['陈列方案'];
+                                $select_customer_push[$k1]['备注'] = $v2['备注'];
+                                $select_customer_push[$k1]['uid'] = $uid;
+                                $select_customer_push[$k1]['aid'] = $this->authInfo['id'];
+                                $select_customer_push[$k1]['aname'] = $this->authInfo['name'];
+                                $select_customer_push[$k1]['createtime'] = $time;
+                            }
+                        }
+                    }
+
+                    // path
+                    foreach ($select_customer_push as $k3 => $v3) {
+                        foreach ($select_path as $k4 => $v4) {
+                            if ($v3['陈列方案'] == $v4['陈列方案']) {
+                                $select_customer_push[$k3]['path'] = $v4['path'];
+                            }
+                        }
+                    }
+
+                    
                     // 删除临时excel表该用户上传的记录
-                    $select_user_temp = $this->db_easyA->execute("delete from dd_temp_excel_user where aid = '{$this->authInfo['id']}'");
 
-                    $chunk_list = array_chunk($data, 500);
+                    $chunk_list = array_chunk($select_customer_push, 500);
+                    // dump($chunk_list);
+                    $this->db_easyA->startTrans();
+                    $res = false;
                     foreach($chunk_list as $key => $val) {
-                        $this->db_easyA->table('dd_temp_excel_user')->strict(false)->insertAll($val);
-                    }
-
-                    $sql_成功名单 = "
-                        SELECT
-                            临时.*,
-                            u.title,
-                            u.userid 
-                        FROM
-                            `dd_temp_excel_user` as 临时
-                        LEFT JOIN dd_user as u on 临时.手机 = u.mobile and mobile is not null
-                        WHERE
-                            临时.手机 = u.mobile
-                            AND 临时.aid = '{$this->authInfo['id']}'
-                            AND 临时.uid = '{$uid}'
-                    ";
-                    $select_成功名单 = $this->db_easyA->query($sql_成功名单);
-
-                    if ($select_成功名单) {
-                        // 成功
-                        $chunk_list_success = array_chunk($select_成功名单, 500);
-                        foreach($chunk_list_success as $key => $val) {
-                            $this->db_easyA->table('dd_temp_excel_user_success')->strict(false)->insertAll($val);
+                        $res = $this->db_easyA->table('dd_weatherdisplay_list_user')->strict(false)->insertAll($val);
+                        if (!$res) {
+                            break;
                         }
-
-                        $sucess_data_num = count($select_成功名单);
-                    } else {
-                        $sucess_data_num = 0;
                     }
 
-                    $sql_失败名单 = "
-                        SELECT
-                            *
-                        FROM
-                            `dd_temp_excel_user`
-                        WHERE
-                            aid = '{$this->authInfo['id']}'
-                            AND uid = '{$uid}'
-                            AND 手机 not in (select mobile from dd_user where mobile is not null)
-                    ";
-                    $select_失败名单 = $this->db_easyA->query($sql_失败名单);
+                    $insert_list['uid'] = $uid;
+                    $insert_list['aid'] = $this->authInfo['id'];
+                    $insert_list['aname'] = $this->authInfo['name'];
+                    $insert_list['createtime'] = $time;
+                    $insert_list['总数'] = count($select_customer_push);
+                    $res2 = $this->db_easyA->table('dd_weatherdisplay_list')->strict(false)->insert($insert_list);
 
-                    if ($select_失败名单) {
-                        // 失败
-                        $chunk_list_error = array_chunk($select_失败名单, 500);
-                        foreach($chunk_list_error as $key => $val) {
-                            $this->db_easyA->table('dd_temp_excel_user_error')->strict(false)->insertAll($val);
-                        }
-                        $error_data_num = count($select_失败名单);
+                    if ($res && $res2) {
+                        $this->db_easyA->commit();
                     } else {
-                        $error_data_num = 0;
+                        $this->db_easyA->rollback();
                     }
-
-                    return json(['code' => 0, 'msg' => "定推名单上传成功，识别成功：{$sucess_data_num}行，识别失败：{$error_data_num}行。", 'data' => [
-                        'uid' => $uid,
-                        'error_data_num' => $error_data_num,
-                    ]]);
+                    
+                    return json(['code' => 0, 'msg' => "名单上传成功", 'data' => []]);
                 }
                 
             } else {
@@ -391,15 +448,17 @@ class Weatherdisplay extends AdminController
     }
 
     // 推送信息相关用户列表
-    public function userList() {
+    public function list_user() {
         if (request()->isAjax()) {
             // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
-            $uid = $input['uid'];
+            $id = $input['id'];
             $aid = $this->authInfo['id'];
 
+            $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->field('uid')->where(['id' => $id])->find();
+            // die;
             // 非系统管理员
             if (! checkAdmin()) { 
                 $mapSuper = " AND aid='{$aid}'";  
@@ -411,9 +470,9 @@ class Weatherdisplay extends AdminController
                 SELECT 
                     *
                 FROM 
-                    dd_temp_excel_user_success   
+                    dd_weatherdisplay_list_user   
                 WHERE 1
-                    AND uid = '{$uid}'
+                    AND uid = '{$find_list['uid']}'
                     {$mapSuper}
                 ORDER BY
                     已读 ASC,店铺名称
@@ -425,9 +484,9 @@ class Weatherdisplay extends AdminController
                 SELECT 
                     count(*) as total
                 FROM 
-                    dd_temp_excel_user_success   
+                    dd_weatherdisplay_list_user   
                 WHERE 1
-                    AND uid = '{$uid}'
+                    AND uid = '{$find_list['uid']}'
                     {$mapSuper}
                 ORDER BY
                     已读 ASC,店铺名称
@@ -436,7 +495,7 @@ class Weatherdisplay extends AdminController
             // print_r($count);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
-            return View('userList', [
+            return View('list_user', [
                 // 'config' => ,
             ]);
         }        
@@ -512,90 +571,113 @@ class Weatherdisplay extends AdminController
     }
 
 
-    // 发送 工作通知
-    public function sendDingImgHandle() {
+    // 发送 通知
+    public function sendListHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
         if (request()->isAjax() && $input['id'] && session('admin.name')) {
+        // if (1) {
             $model = new DingTalk;
  
+            // $input['id'] = 161;
+
+            $date = date('Y-m-d H:i:s');
             if (! checkAdmin()) {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                     ['aid', '=', $this->authInfo['id']],
                 ])->find();
             } else {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                 ])->find();    
             }
 
+
+            // print_r($find_list);die;
+
             if ($find_list) {
-                $find_path = $this->db_easyA->table('dd_temp_img')->where([
-                    ['pid', '=', $find_list['pid']]
-                ])->find();
-                // echo $find_path['path'];
-
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->field('userid')->where([
+                $select_group = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('陈列方案,备注')->where([
                     ['uid', '=', $find_list['uid']]
-                ])->group('userid')->select()->toArray();
+                ])->group('陈列方案,备注')->select()->toArray();
 
-                $chunk_list_success = array_chunk($select_user, 150);
-                // $chunk_list_success = array_chunk($select_user, 2);
-                $model = new DingTalk;
-                foreach($chunk_list_success as $key => $val) {
+                // $select_user = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('id,uid,userid,陈列方案,备注')->where([
+                //     ['uid', '=', $find_list['uid']]
+                // ])->select()->toArray();
 
-                    $userids = '';
-                    foreach ($val as $key2 => $val2) {
-                        if ( ($key2 + 1) < count($val) ) {
-                            $userids .= $val2['userid'] . ',';
-                        } else {
-                            // 最后一次发送  发送id xxx,xxx,xxx
-                            $userids .= $val2['userid'];
-                            $update_uids = xmSelectInput($userids);
 
-                            // 发送
-                            $res = json_decode($model->sendMarkdownImg_pro($userids, $find_list['title'], $find_path['path']), true);
+                // dump($select_group);
+                // die;
+                // dump($select_user);
 
-                            // $res['request_id'] = rand_code();
-                            // $res['task_id'] = rand_code();
-                            // $res['errmsg'] = 'ok';
-                            $this->db_easyA->table('dd_task_id')->insert([
-                                'lid' => $find_list['id'],
-                                'aid' => $find_list['aid'],
-                                'aname' => $find_list['aname'],
-                                'title' => $find_list['title'],
-                                'request_id' => $res['request_id'],
-                                'task_id' => $res['task_id'],
-                                'errmsg' => $res['errmsg'],
-                                'createtime' => date('Y-m-d H:i:s'),
-                            ]);
+                // 遍历分组
+                foreach ($select_group as $k1 => $v1) {
+                    $select_user = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('id,uid,userid,陈列方案,备注,path')->where([
+                        ['uid', '=', $find_list['uid']],
+                        ['陈列方案', '=', $v1['陈列方案']],
+                        ['备注', '=', $v1['备注']],
+                    ])->select()->toArray();
+                    // dump($select_user);
 
-           
-                            // 更新用户列表 task_id
-                            $this->db_easyA->execute("
-                                update dd_temp_excel_user_success
-                                set 
-                                    task_id = '{$res['task_id']}'
-                                where 1
-                                    AND uid = '{$find_list['uid']}'
-                                    AND userid IN ({$update_uids})
-                            ");
+                    $chunk_list_success = array_chunk($select_user, 300);
+                    // $chunk_list_success = array_chunk($select_user, 2);
+                    $model = new DingTalk;
+                    foreach($chunk_list_success as $key => $val) {
+    
+                        $userids = ''; // 发送用
+                        $ids = ''; // 更新用
+                        foreach ($val as $key2 => $val2) {
+                            if ( ($key2 + 1) < count($val) ) {
+                                $userids .= $val2['userid'] . ',';
+                                $ids .= $val2['id'] . ',';
+                            } else {
+                                // 最后一次发送  发送id xxx,xxx,xxx
+                                $userids .= $val2['userid'];
+                                $update_uids = xmSelectInput($userids);
+
+                                $ids .= $val2['id'];
+                                $ids = xmSelectInput($ids);
+    
+                                // 发送
+                                $path = $val2['path'] . '?t=' . time();
+                                $res = json_decode($model->sendMarkdownImg_pro($userids, $val2['备注'], $path), true);
+                 
+                                // $this->db_easyA->table('dd_task_id')->insert([
+                                //     'lid' => $find_list['id'],
+                                //     'aid' => $find_list['aid'],
+                                //     'aname' => $find_list['aname'],
+                                //     'title' => $find_list['title'],
+                                //     'request_id' => $res['request_id'],
+                                //     'task_id' => $res['task_id'],
+                                //     'errmsg' => $res['errmsg'],
+                                //     'createtime' => date('Y-m-d H:i:s'),
+                                // ]);
+                                    
+                                // 更新用户列表 task_id
+                                $this->db_easyA->execute("
+                                    update dd_weatherdisplay_list_user
+                                    set 
+                                        task_id = '{$res['task_id']}',
+                                        sendtime = '{$date}'
+                                    where 1
+                                        AND id IN ({$ids})
+                                        AND uid = '{$val2['uid']}'
+                                        AND userid IN ({$update_uids})
+                                ");
+                            }
                         }
                     }
                 }
-
-                $updatetime = date('Y-m-d H:i:s');
-                $sql_更新 = "
-                    update dd_userimg_list
+  
+                $this->db_easyA->execute("
+                    update dd_weatherdisplay_list
                     set 
+                        sendtime = '{$date}',
                         sendtimes = sendtimes + 1,
-                        sendtime = '{$updatetime}',
-                        撤回时间 = null
-                    where id = '{$input['id']}'
-                ";
-                $this->db_easyA->execute($sql_更新);
-
+                        撤回时间 = NULL
+                    where 1
+                        AND id = '{$input['id']}'
+                ");
                 return json(['code' => 0, 'msg' => '执行成功']);
             } else {
                 return json(['code' => 0, 'msg' => '信息有误，执行失败']);
@@ -685,7 +767,7 @@ class Weatherdisplay extends AdminController
                     set 
                         sendtimes = sendtimes + 1,
                         sendtime = '{$updatetime}',
-                        撤回时间 = null
+                        撤回时间 = NULL
                     where id = '{$input['id']}'
                 ";
                 $this->db_easyA->execute($sql_更新);
@@ -699,43 +781,51 @@ class Weatherdisplay extends AdminController
         }       
     }
 
-    // 撤回 消息
-    public function recallImgHandle() {
+    // 撤回 全部消息
+    public function recallAllHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
         if (request()->isAjax() && $input['id'] && session('admin.name')) {
+        // if (1) {
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
             
+            // $input['id'] = 167;
+            
             if (! checkAdmin()) {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                     ['aid', '=', $this->authInfo['id']],
                 ])->find();
             } else {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                 ])->find();    
             }
 
 
             if ($find_list) {
-                $select_task = $this->db_easyA->table('dd_task_id')->where([
-                    ['lid', '=', $find_list['id']]
-                ])->select()->toArray();
+                $select_user = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('task_id')->where([
+                    ['uid', '=', $find_list['uid']]
+                ])->group('task_id')->select()->toArray();
+                // ])->select()->toArray();
 
+                // echo '<pre>';
+                // print_r($select_user);
                 $model = new DingTalk;
-                foreach($select_task as $key => $val) {
+                foreach($select_user as $key => $val) {
+                    // echo  $val['task_id'];
+                    // echo '<br>';
                     $res = json_decode($model->recallMessage($val['task_id']), true);
-                    
-                    $res2 = $this->db_easyA->table('dd_task_id')->where(['lid' => $input['id']])->update([
+                    // print_r($res);
+                    $res1 = $this->db_easyA->table('dd_weatherdisplay_list_user')->where(['task_id' => $val['task_id']])->update([
                         '撤回时间' => date('Y-m-d H:i:s'),
                     ]);
-                    $res2 = $this->db_easyA->table('dd_userimg_list')->where(['id' => $input['id']])->update([
+                    $res2 = $this->db_easyA->table('dd_weatherdisplay_list')->where(['id' => $input['id']])->update([
                         '撤回时间' => date('Y-m-d H:i:s'),
+                        'sendtime' => null,
                     ]);
-                    
                 }
 
                 return json(['code' => 0, 'msg' => '执行成功']);
@@ -747,75 +837,144 @@ class Weatherdisplay extends AdminController
         }       
     }
 
+    // 撤回 单记录消息
+    public function recallHandle() {
+        $input = input();
+        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+
+        if (request()->isAjax() && $input['id'] && session('admin.name')) {
+        // if (1) {
+            $model = new DingTalk;
+            // echo $path = $this->request->domain() ;
+            
+            // $input['id'] = 167;
+            
+            if (! checkAdmin()) {
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
+                    ['id', '=', $input['id']],
+                    ['aid', '=', $this->authInfo['id']],
+                ])->find();
+            } else {
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
+                    ['id', '=', $input['id']],
+                ])->find();    
+            }
+
+
+            if ($find_list) {
+
+                $find_task_id = $this->db_easyA->table('dd_weatherdisplay_list_user')->where([
+                    ['task_id', '=', $input['task_id']],
+                    ['uid', '=', $find_list['uid']],
+                ])->find();
+
+                if ($find_task_id) {
+                    $res = json_decode($model->recallMessage($find_task_id['task_id']), true);
+                    // print_r($res);
+                    $res1 = $this->db_easyA->table('dd_weatherdisplay_list_user')->where(['id' => $input['id'],'task_id' => $find_task_id['task_id']])->update([
+                        '撤回时间' => date('Y-m-d H:i:s'),
+                    ]);
+    
+                    return json(['code' => 0, 'msg' => '执行成功']);
+                } else {
+                    return json(['code' => 1, 'msg' => '执行失败']);
+                }
+
+
+            } else {
+                return json(['code' => 2, 'msg' => '执行失败']);
+            }
+        } else {
+            return json(['code' => 3, 'msg' => '请勿非法请求']);
+        }       
+    }
+
     // 拉取 已读 未读 用户主动执行
     public function getReadsHandle() {
         $input = input();
         // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
         if (request()->isAjax() && $input['id'] && session('admin.name')) {
+        // if (1) {
         // if (request()->isAjax()) {
             $model = new DingTalk;
             // echo $path = $this->request->domain() ;
+
+            // $input['id'] = 163;
             
             if (! checkAdmin()) {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                     ['aid', '=', $this->authInfo['id']],
                 ])->find();
             } else {
-                $find_list = $this->db_easyA->table('dd_userimg_list')->where([
+                $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->where([
                     ['id', '=', $input['id']],
                 ])->find();    
             }
 
             if ($find_list) {
-                $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
+                $select_user = $this->db_easyA->table('dd_weatherdisplay_list_user')->where([
                     ['uid', '=', $find_list['uid']]
                 ])->group('task_id')->select()->toArray();
 
                 foreach($select_user as $key => $val) {
                     $res = json_decode($model->getsendresult($val['task_id']), true);
                     
-                    if ($res['errmsg'] = 'ok' && $res['send_result']) {  
-                        if (count($res['send_result']['read_user_id_list']) > 0) {
-                            // 已读
-                            $reads = arrToStr($res['send_result']['read_user_id_list']);    
-                            $this->db_easyA->execute("
-                                UPDATE 
-                                    dd_temp_excel_user_success 
-                                SET 
-                                    已读 = 'Y'
-                                WHERE 1
-                                    AND task_id = '{$val['task_id']}'
-                                    AND userid in ($reads)
-                            ");
+                    // print_r($res);
+                    try {
+                        if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+                            if (count($res['send_result']['read_user_id_list']) > 0) {
+                                // 已读
+                                $reads = arrToStr($res['send_result']['read_user_id_list']);    
+                                $this->db_easyA->execute("
+                                    UPDATE 
+                                        dd_weatherdisplay_list_user 
+                                    SET 
+                                        已读 = 'Y'
+                                    WHERE 1
+                                        AND task_id = '{$val['task_id']}'
+                                        AND userid in ($reads)
+                                ");
+                            }
+    
+                            if (count($res['send_result']['unread_user_id_list']) > 0) {
+                                // 未读
+                                $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
+                                $this->db_easyA->execute("
+                                    UPDATE 
+                                        dd_weatherdisplay_list_user 
+                                    SET 
+                                        已读 = 'N'
+                                    WHERE 1
+                                        AND task_id = '{$val['task_id']}'
+                                        AND userid in ($unReads)
+                                ");
+                            }
+    
+                        } else {
+                            return json(['code' => 0, 'msg' => '数据异常']);
                         }
-
-                        if (count($res['send_result']['unread_user_id_list']) > 0) {
-                            // 未读
-                            $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
-                            $this->db_easyA->execute("
-                                UPDATE 
-                                    dd_temp_excel_user_success 
-                                SET 
-                                    已读 = 'N'
-                                WHERE 1
-                                    AND task_id = '{$val['task_id']}'
-                                    AND userid in ($unReads)
-                            ");
-                        }
-
-                    } else {
-                        return json(['code' => 0, 'msg' => '数据异常']);
+                    } catch (\Throwable $th) {
+                        //throw $th;
                     }
                 }
                 // 统计list展示的已读未读数
                 $this->db_easyA->execute("
                     UPDATE 
-                        dd_userimg_list as l
+                        dd_weatherdisplay_list as l
                     SET 
-                        l.已读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='Y'),
-                        l.未读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='N')
+                        l.已读 = (select count(*) from dd_weatherdisplay_list_user where uid = '{$find_list['uid']}' and 已读='Y')
+                    WHERE 1
+                        AND l.id = {$find_list['id']}
+                ");
+
+                // 统计list展示的已读未读数
+                $this->db_easyA->execute("
+                    UPDATE 
+                        dd_weatherdisplay_list as l
+                    SET 
+                        l.未读 = 总数 - ifnull(已读, 0)
                     WHERE 1
                         AND l.id = {$find_list['id']}
                 ");
@@ -859,56 +1018,7 @@ class Weatherdisplay extends AdminController
         ])->find();
 
         if ($find_list) {
-            $select_user = $this->db_easyA->table('dd_temp_excel_user_success')->where([
-                ['uid', '=', $find_list['uid']]
-            ])->group('task_id')->select()->toArray();
 
-            foreach($select_user as $key => $val) {
-                $res = json_decode($model->getsendresult($val['task_id']), true);
-                
-                if ($res['errmsg'] = 'ok' && $res['send_result']) {  
-                    if (count($res['send_result']['read_user_id_list']) > 0) {
-                        // 已读
-                        $reads = arrToStr($res['send_result']['read_user_id_list']);    
-                        $this->db_easyA->execute("
-                            UPDATE 
-                                dd_temp_excel_user_success 
-                            SET 
-                                已读 = 'Y'
-                            WHERE 1
-                                AND task_id = '{$val['task_id']}'
-                                AND userid in ($reads)
-                        ");
-                    }
-
-                    if (count($res['send_result']['unread_user_id_list']) > 0) {
-                        // 未读
-                        $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
-                        $this->db_easyA->execute("
-                            UPDATE 
-                                dd_temp_excel_user_success 
-                            SET 
-                                已读 = 'N'
-                            WHERE 1
-                                AND task_id = '{$val['task_id']}'
-                                AND userid in ($unReads)
-                        ");
-                    }
-
-                } else {
-                    return json(['code' => 0, 'msg' => '数据异常']);
-                }
-            }
-            // 统计list展示的已读未读数
-            $this->db_easyA->execute("
-                UPDATE 
-                    dd_userimg_list as l
-                SET 
-                    l.已读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='Y'),
-                    l.未读 = (select count(*) from dd_temp_excel_user_success where uid = '{$find_list['uid']}' and 已读='N')
-                WHERE 1
-                    AND l.id = {$find_list['id']}
-            ");
 
             return json(['code' => 0, 'msg' => '执行成功']);
         } else {
@@ -928,17 +1038,21 @@ class Weatherdisplay extends AdminController
         $res = json_decode($model->sendFileMsg('350364576037719254', 'test', $media_id), true);
     }
 
-    // 下载 钉钉 工作通知已读未读 
-    public function downloadUserList() {
-        $uid = input('uid');
+    // 下载 未读 
+    public function downloadListUser() {
+        $id = input('id');
+        $find_list = $this->db_easyA->table('dd_weatherdisplay_list')->field('uid')->where([
+            ['id', '=', $id],
+        ])->find();
+
         $sql = "
             SELECT 
-                店铺名称,姓名,手机,title as 职位,
+                店铺名称,陈列方案,name as 姓名,mobile as 手机,title as 职位,
                 '否' as 已读
             FROM 
-                dd_temp_excel_user_success   
+                dd_weatherdisplay_list_user   
             WHERE 1
-                AND uid = '{$uid}'
+                AND uid = '{$find_list['uid']}'
                 AND 已读 = 'N'
             ORDER BY
                 已读 ASC,店铺名称
@@ -951,7 +1065,7 @@ class Weatherdisplay extends AdminController
             }
         }
 
-        return Excel::exportData($select, $header, '钉钉工作通知未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+        return Excel::exportData($select, $header, '气温陈列调整表未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 下载 钉钉 工作通知已读未读 
@@ -1002,4 +1116,5 @@ class Weatherdisplay extends AdminController
         }
         return Excel::exportData($select, $header, '索歌全员钉钉信息_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
+
 }

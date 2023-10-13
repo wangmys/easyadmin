@@ -225,6 +225,9 @@ class Organize extends BaseController
                 // dump($val);
             }
         }
+
+        // echo '<pre>';
+        // print_r($select); die;
         
         if ($select) {
             $this->db_easyA->execute('TRUNCATE dd_customer_push;');
