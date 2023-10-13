@@ -239,7 +239,8 @@ class Weatherdisplay extends AdminController
             // 静态测试
             // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/气温陈列调整上传模板.xlsx';   //文件保存路径
 
-            $debug = true;
+            // 测试用true，正式用false
+            $debug = false;
             if($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段

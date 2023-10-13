@@ -100,6 +100,14 @@
         .layui-input-inline {
             width: 40px;
         }
+
+         /*layui-table 表格内容允许换行*/
+        .layui-table-cell{
+            height: auto;
+            overflow:visible;
+            text-overflow:inherit;
+            white-space:normal;
+        }
     </style>
 </head>
 
@@ -317,8 +325,8 @@
                     }}
                     ,{ field: 'name', title: '姓名', align:'center' }
                     ,{ field: 'title', title: '职位' , align:'center' }
-                    , { field: 'mobile', title: '手机'}
-                    , { title: '状态', templet:
+                    , { field: 'mobile', title: '手机', align:'center'}
+                    , { title: '状态', align:'center',  templet:
                     function (data) {
                         var str = '';
                         if (data['已读'] == 'Y') {
