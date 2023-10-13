@@ -5,6 +5,10 @@ namespace app\admin\service;
 use app\admin\model\bi\SpCustomerStockSaleWeekDateModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2Model;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekModel;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2021Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2022Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2023Model;
+use app\admin\model\bi\SpCustomerStockSaleThreeyear2Week2024Model;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekCacheModel;
 use app\admin\model\bi\SpCustomerStockSaleThreeyear2WeekSelectModel;
 use app\admin\model\weather\CusWeatherBase;
@@ -18,6 +22,10 @@ class ThreeyearService
     use Singleton;
     protected $easy_db;
     protected $threeyear2_week_model;
+    protected $threeyear2_week_2021_model;
+    protected $threeyear2_week_2022_model;
+    protected $threeyear2_week_2023_model;
+    protected $threeyear2_week_2024_model;
     protected $week_date_model;
     protected $weather_data_model;
     protected $weather_base_model;
@@ -25,6 +33,10 @@ class ThreeyearService
     public function __construct() {
         $this->easy_db = Db::connect("mysql");
         $this->threeyear2_week_model = new SpCustomerStockSaleThreeyear2WeekModel();
+        $this->threeyear2_week_2021_model = new SpCustomerStockSaleThreeyear2Week2021Model();
+        $this->threeyear2_week_2022_model = new SpCustomerStockSaleThreeyear2Week2022Model();
+        $this->threeyear2_week_2023_model = new SpCustomerStockSaleThreeyear2Week2023Model();
+        $this->threeyear2_week_2024_model = new SpCustomerStockSaleThreeyear2Week2024Model();
         $this->week_date_model = new SpCustomerStockSaleWeekDateModel();
         $this->weather_data_model = new CusWeatherData();
         $this->weather_base_model = new CusWeatherBase();
@@ -76,10 +88,22 @@ class ThreeyearService
         $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         '100.0%' as '业绩占比', '100.0%' as '库存占比', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
         $field_weather = "CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' ) as Start_time, max(d.weather_time) as End_time, b.customer_name,max(d.max_c) as max_c, min(d.min_c) as min_c, CONCAT(SUBSTRING(  CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' )  , 6, 5), ' 到 ', SUBSTRING( max(d.weather_time) , 6, 5)) as '周期'";
 
+        //如果有保存筛选条件的，且当前筛选条件等于已保存的筛选条件，则优先查缓存
+        $index_search_data = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_search']])->field('cache_data,cache_search_param')->find();
+        $search_param = $params;
+        if (isset($search_param['from_cache'])) unset($search_param['from_cache']);
+        if (isset($search_param['limit'])) unset($search_param['limit']);
+        if (isset($search_param['page'])) unset($search_param['page']);
+        if ( (!$from_cache && !$search_param) || ($index_search_data && $index_search_data['cache_data'] && ($index_search_data['cache_search_param'] == json_encode($search_param))) ) {
+            $cache = json_decode($index_search_data['cache_data'], true);
+            if ($cache) {
+                return $cache;
+            }
+        }
 
         if (!$Year) {//没有选择年份，要看三年的数据
 
@@ -455,7 +479,7 @@ class ThreeyearService
                 $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
             CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
             sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-            CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+            CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
             sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
                 $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -463,21 +487,21 @@ class ThreeyearService
             sum(SalesVolume) as '业绩', sum(StockCost) as '库存'";
 
                 if ($where_customer_2021) {
-                    $customer_threeyear_2021 = $this->threeyear2_week_model::where($where_customer_2021)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2021 = $this->threeyear2_week_2021_model::where($where_customer_2021)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2021 = $customer_threeyear_2021 ? $customer_threeyear_2021->toArray() : [];
                     $customer_threeyear_2021_weeks = $customer_threeyear_2021 ? array_column($customer_threeyear_2021, 'Week') : [];
                     $customer_threeyear_2021 = array_combine($customer_threeyear_2021_weeks, $customer_threeyear_2021);
                 }
 
                 if ($where_customer_2022) {
-                    $customer_threeyear_2022 = $this->threeyear2_week_model::where($where_customer_2022)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2022 = $this->threeyear2_week_2022_model::where($where_customer_2022)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2022 = $customer_threeyear_2022 ? $customer_threeyear_2022->toArray() : [];
                     $customer_threeyear_2022_weeks = $customer_threeyear_2022 ? array_column($customer_threeyear_2022, 'Week') : [];
                     $customer_threeyear_2022 = array_combine($customer_threeyear_2022_weeks, $customer_threeyear_2022);
                 }
 
                 if ($where_customer_2023) {
-                    $customer_threeyear_2023 = $this->threeyear2_week_model::where($where_customer_2023)->group('Week')->field($field_customer)->select();
+                    $customer_threeyear_2023 = $this->threeyear2_week_2023_model::where($where_customer_2023)->group('Week')->field($field_customer)->select();
                     $customer_threeyear_2023 = $customer_threeyear_2023 ? $customer_threeyear_2023->toArray() : [];
                     $customer_threeyear_2023_weeks = $customer_threeyear_2023 ? array_column($customer_threeyear_2023, 'Week') : [];
                     $customer_threeyear_2023 = array_combine($customer_threeyear_2023_weeks, $customer_threeyear_2023);
@@ -505,7 +529,7 @@ class ThreeyearService
             $threeyear_2021 = $threeyear_2022 = $threeyear_2023 = [];
             //2021年业绩、库存等情况
             if ($where_yeji_2021) {
-                $threeyear_2021 = $this->threeyear2_week_model::where($where_yeji_2021)->group('Week')->field($field)->select();
+                $threeyear_2021 = $this->threeyear2_week_2021_model::where($where_yeji_2021)->group('Week')->field($field)->select();
                 $threeyear_2021 = $threeyear_2021 ? $threeyear_2021->toArray() : [];
                 $threeyear_2021_weeks = $threeyear_2021 ? array_column($threeyear_2021, 'Week') : [];
                 $threeyear_2021 = array_combine($threeyear_2021_weeks, $threeyear_2021);
@@ -528,7 +552,7 @@ class ThreeyearService
             //2022年业绩、库存等情况
             if ($where_yeji_2022) {
 
-                $threeyear_2022 = $this->threeyear2_week_model::where($where_yeji_2022)->group('Week')->field($field)->select();
+                $threeyear_2022 = $this->threeyear2_week_2022_model::where($where_yeji_2022)->group('Week')->field($field)->select();
                 $threeyear_2022 = $threeyear_2022 ? $threeyear_2022->toArray() : [];
                 $threeyear_2022_weeks = $threeyear_2022 ? array_column($threeyear_2022, 'Week') : [];
                 $threeyear_2022 = array_combine($threeyear_2022_weeks, $threeyear_2022);
@@ -550,7 +574,7 @@ class ThreeyearService
 
             //2023年业绩、库存等情况
             if ($where_yeji_2023) {
-                $threeyear_2023 = $this->threeyear2_week_model::where($where_yeji_2023)->group('Week')->field($field)->select();
+                $threeyear_2023 = $this->threeyear2_week_2023_model::where($where_yeji_2023)->group('Week')->field($field)->select();
                 $threeyear_2023 = $threeyear_2023 ? $threeyear_2023->toArray() : [];
                 $threeyear_2023_weeks = $threeyear_2023 ? array_column($threeyear_2023, 'Week') : [];
                 $threeyear_2023 = array_combine($threeyear_2023_weeks, $threeyear_2023);
@@ -990,7 +1014,7 @@ class ThreeyearService
             $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
             $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
@@ -1173,6 +1197,35 @@ class ThreeyearService
 
     public function getXmMapSelect() {
 
+        $index_search_data = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_search']])->field('cache_data,cache_search_param')->find();
+        $params = [];
+        if ($index_search_data && $index_search_data['cache_search_param']) {
+            $params = json_decode($index_search_data['cache_search_param'], true);
+        }
+
+        $params_Year = ($params && $params['Year']) ? explode(',', $params['Year']) : [];
+        $params_Month = ($params && $params['Month']) ? explode(',', $params['Month']) : [];
+        $params_YunCang = ($params && $params['YunCang']) ? explode(',', $params['YunCang']) : [];
+        $params_WenDai = ($params && $params['WenDai']) ? explode(',', $params['WenDai']) : [];
+        // print_r([$params_Year, $params_Month, $params_YunCang]);die;
+        $params_WenQu = ($params && $params['WenQu']) ? explode(',', $params['WenQu']) : [];
+        $params_State = ($params && $params['State']) ? explode(',', $params['State']) : [];
+        $params_Mathod = ($params && $params['Mathod']) ? explode(',', $params['Mathod']) : [];
+        $params_NewOld = ($params && $params['NewOld']) ? explode(',', $params['NewOld']) : [];
+        $params_Season = ($params && $params['Season']) ? explode(',', $params['Season']) : [];
+        $params_StyleCategoryName = ($params && $params['StyleCategoryName']) ? explode(',', $params['StyleCategoryName']) : [];
+        $params_CategoryName1 = ($params && $params['CategoryName1']) ? explode(',', $params['CategoryName1']) : [];
+        $params_CategoryName2 = ($params && $params['CategoryName2']) ? explode(',', $params['CategoryName2']) : [];
+        $params_CategoryName = ($params && $params['CategoryName']) ? explode(',', $params['CategoryName']) : [];
+        $params_CustomItem46 = ($params && $params['CustomItem46']) ? explode(',', $params['CustomItem46']) : [];
+        $params_TimeCategoryName2 = ($params && $params['TimeCategoryName2']) ? explode(',', $params['TimeCategoryName2']) : [];
+        $params_TimeCategoryName = ($params && $params['TimeCategoryName']) ? explode(',', $params['TimeCategoryName']) : [];
+        $params_CustomItem17 = ($params && $params['CustomItem17']) ? explode(',', $params['CustomItem17']) : [];
+        $params_CustomItem1 = ($params && $params['CustomItem1']) ? explode(',', $params['CustomItem1']) : [];
+        $params_CustomItem45 = ($params && $params['CustomItem45']) ? explode(',', $params['CustomItem45']) : [];
+        $params_CustomItem47 = ($params && $params['CustomItem47']) ? explode(',', $params['CustomItem47']) : [];
+        $params_CustomItem48 = ($params && $params['CustomItem48']) ? explode(',', $params['CustomItem48']) : [];
+
         $Year = [['name'=>'2021', 'value'=>'2021'], ['name'=>'2022', 'value'=>'2022'], ['name'=>'2023', 'value'=>'2023']];
         $Month = [
             ['name'=>'1', 'value'=>'01'], ['name'=>'2', 'value'=>'02'], ['name'=>'3', 'value'=>'03'],
@@ -1203,6 +1256,158 @@ class ThreeyearService
         }
         // print_r($selects_arr);die;
 
+
+        if ($Year) {
+            foreach ($Year as &$v_Year) {
+                if (in_array($v_Year['value'], $params_Year)) {
+                    $v_Year['selected'] = true;
+                }
+            }
+        }
+        if ($Month) {
+            foreach ($Month as &$v_Month) {
+                if (in_array($v_Month['value'], $params_Month)) {
+                    $v_Month['selected'] = true;
+                }
+            }
+        }
+        if ($YunCang) {
+            foreach ($YunCang as &$v_YunCang) {
+                if (in_array($v_YunCang['value'], $params_YunCang)) {
+                    $v_YunCang['selected'] = true;
+                }
+            }
+        }
+        if ($WenDai) {
+            foreach ($WenDai as &$v_WenDai) {
+                if (in_array($v_WenDai['value'], $params_WenDai)) {
+                    $v_WenDai['selected'] = true;
+                }
+            }
+        }
+        if ($WenQu) {
+            foreach ($WenQu as &$v_WenQu) {
+                if (in_array($v_WenQu['value'], $params_WenQu)) {
+                    $v_WenQu['selected'] = true;
+                }
+            }
+        }
+        if ($State) {
+            foreach ($State as &$v_State) {
+                if (in_array($v_State['value'], $params_State)) {
+                    $v_State['selected'] = true;
+                }
+            }
+        }
+        if ($Mathod) {
+            foreach ($Mathod as &$v_Mathod) {
+                if (in_array($v_Mathod['value'], $params_Mathod)) {
+                    $v_Mathod['selected'] = true;
+                }
+            }
+        }
+
+        if ($NewOld) {
+            foreach ($NewOld as &$v_NewOld) {
+                if (in_array($v_NewOld['value'], $params_NewOld)) {
+                    $v_NewOld['selected'] = true;
+                }
+            }
+        }
+        if ($Season) {
+            foreach ($Season as &$v_Season) {
+                if (in_array($v_Season['value'], $params_Season)) {
+                    $v_Season['selected'] = true;
+                }
+            }
+        }
+        if ($StyleCategoryName) {
+            foreach ($StyleCategoryName as &$v_StyleCategoryName) {
+                if (in_array($v_StyleCategoryName['value'], $params_StyleCategoryName)) {
+                    $v_StyleCategoryName['selected'] = true;
+                }
+            }
+        }
+        if ($CategoryName1) {
+            foreach ($CategoryName1 as &$v_CategoryName1) {
+                if (in_array($v_CategoryName1['value'], $params_CategoryName1)) {
+                    $v_CategoryName1['selected'] = true;
+                }
+            }
+        }
+        if ($CategoryName2) {
+            foreach ($CategoryName2 as &$v_CategoryName2) {
+                if (in_array($v_CategoryName2['value'], $params_CategoryName2)) {
+                    $v_CategoryName2['selected'] = true;
+                }
+            }
+        }
+        if ($CategoryName) {
+            foreach ($CategoryName as &$v_CategoryName) {
+                if (in_array($v_CategoryName['value'], $params_CategoryName)) {
+                    $v_CategoryName['selected'] = true;
+                }
+            }
+        }
+        if ($CustomItem46) {
+            foreach ($CustomItem46 as &$v_CustomItem46) {
+                if (in_array($v_CustomItem46['value'], $params_CustomItem46)) {
+                    $v_CustomItem46['selected'] = true;
+                }
+            }
+        }
+
+
+        if ($selects_arr['TimeCategoryName2']) {
+            foreach ($selects_arr['TimeCategoryName2'] as &$v_TimeCategoryName2) {
+                if (in_array($v_TimeCategoryName2['value'], $params_TimeCategoryName2)) {
+                    $v_TimeCategoryName2['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['TimeCategoryName']) {
+            foreach ($selects_arr['TimeCategoryName'] as &$v_TimeCategoryName) {
+                if (in_array($v_TimeCategoryName['value'], $params_TimeCategoryName)) {
+                    $v_TimeCategoryName['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['CustomItem17']) {
+            foreach ($selects_arr['CustomItem17'] as &$v_CustomItem17) {
+                if (in_array($v_CustomItem17['value'], $params_CustomItem17)) {
+                    $v_CustomItem17['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['CustomItem1']) {
+            foreach ($selects_arr['CustomItem1'] as &$v_CustomItem1) {
+                if (in_array($v_CustomItem1['value'], $params_CustomItem1)) {
+                    $v_CustomItem1['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['CustomItem45']) {
+            foreach ($selects_arr['CustomItem45'] as &$v_CustomItem45) {
+                if (in_array($v_CustomItem45['value'], $params_CustomItem45)) {
+                    $v_CustomItem45['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['CustomItem47']) {
+            foreach ($selects_arr['CustomItem47'] as &$v_CustomItem47) {
+                if (in_array($v_CustomItem47['value'], $params_CustomItem47)) {
+                    $v_CustomItem47['selected'] = true;
+                }
+            }
+        }
+        if ($selects_arr['CustomItem48']) {
+            foreach ($selects_arr['CustomItem48'] as &$v_CustomItem48) {
+                if (in_array($v_CustomItem48['value'], $params_CustomItem48)) {
+                    $v_CustomItem48['selected'] = true;
+                }
+            }
+        }
+
         return ['Year' => $Year, 'Month' => $Month, 'YunCang'=>$YunCang, 'WenDai'=>$WenDai, 'WenQu' => $WenQu, 
         'State' => $State, 'Mathod' => $Mathod, 'NewOld'=>$NewOld, 'Season'=>$Season, 'StyleCategoryName' => $StyleCategoryName, 
         'CategoryName1' => $CategoryName1, 'CategoryName2' => $CategoryName2, 'CategoryName'=>$CategoryName, 'CustomItem46'=>$CustomItem46,
@@ -1211,9 +1416,20 @@ class ThreeyearService
 
     }
 
+    //保存三年趋势筛选缓存
+    public function save_threeyear_cache($res, $params) {
 
+        if (isset($params['from_cache'])) unset($params['from_cache']);
+        if (isset($params['page'])) unset($params['page']);
+        if (isset($params['limit'])) unset($params['limit']);
 
+        if ($res) {
+			SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_search']])->update(['cache_data' => json_encode($res), 'cache_search_param' => json_encode($params)]);
+		} else {
+			SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_search']])->update(['cache_data' => json_encode([]), 'cache_search_param' => json_encode([])]);
+		}
 
+    }
 
 
 
@@ -1261,7 +1477,7 @@ class ThreeyearService
         $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         '100.0%' as '业绩占比', '100.0%' as '库存占比', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
         $field_weather = "CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' ) as Start_time, 
         max(d.weather_time) as End_time,   b.customer_name,max(d.max_c) as max_c, min(d.min_c) as min_c, 
@@ -1562,7 +1778,7 @@ class ThreeyearService
             $field = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 
         CONCAT(SUBSTRING(Start_time, 6, 5), ' 到 ', SUBSTRING(End_time, 6, 5)) as '周期', 
         sum(SalesVolume) as '业绩', sum(StockCost) as '库存', '100.0%' as '效率', max(NUM) as '店铺数', sum(SaleQuantity) as '销量(周)', sum(StockQuantity) as '库存量', 
-        CONCAT( Round(sum(SalesVolume)/sum(RetailAmount), 2)*100, '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
+        CONCAT( Round( Round(sum(SalesVolume)/sum(RetailAmount), 3)*100, 1), '%') as '折扣',  sum(SaleQuantity) as '店均周销量', 
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
 
             $field_customer = "Week, Start_time, End_time, Year as '年', CONCAT('第', Week, '周') as '周', CONCAT(Month, '月') as '月', 

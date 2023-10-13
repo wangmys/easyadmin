@@ -114,7 +114,7 @@
 <body class="" style="background-color: #ffffff;">
     <div class="layui-tab-item layui-show">
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
-            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8" lay-filter='searchFormHead'>
                 <div class="flex row end between">
                     <div class="flex col between al-start" style="width:95%; height: 90px;">
                         <div class="layui-form-item">
@@ -123,7 +123,7 @@
                                 <select id="xm-Year" name="Year" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $Year as $k_year => $v_year}
-                                    <option value="{$v_year['value']}">{$v_year['name']}</option>
+                                    <option value="{$v_year['value']}" {if isset($v_year['selected']) && ($v_year['selected']==1)}selected{/if}>{$v_year['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -137,7 +137,7 @@
                                 <select id="xm-YunCang" name="YunCang" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $YunCang as $k_YunCang => $v_YunCang}
-                                    <option value="{$v_YunCang['value']}">{$v_YunCang['name']}</option>
+                                    <option value="{$v_YunCang['value']}"  {if isset($v_YunCang['selected']) && ($v_YunCang['selected']==1)}selected{/if}>{$v_YunCang['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -159,7 +159,7 @@
                                 <select id="xm-Mathod" name="Mathod" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $Mathod as $k_Mathod => $v_Mathod}
-                                    <option value="{$v_Mathod['value']}">{$v_Mathod['name']}</option>
+                                    <option value="{$v_Mathod['value']}" {if isset($v_Mathod['selected']) && ($v_Mathod['selected']==1)}selected{/if}>{$v_Mathod['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -172,7 +172,7 @@
                                 <select id="xm-NewOld" name="NewOld" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $NewOld as $k_NewOld => $v_NewOld}
-                                    <option value="{$v_NewOld['value']}">{$v_NewOld['name']}</option>
+                                    <option value="{$v_NewOld['value']}" {if isset($v_NewOld['selected']) && ($v_NewOld['selected']==1)}selected{/if}>{$v_NewOld['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -186,7 +186,7 @@
                                 <select id="xm-StyleCategoryName" name="StyleCategoryName" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $StyleCategoryName as $k_StyleCategoryName => $v_StyleCategoryName}
-                                    <option value="{$v_StyleCategoryName['value']}">{$v_StyleCategoryName['name']}</option>
+                                    <option value="{$v_StyleCategoryName['value']}" {if isset($v_StyleCategoryName['selected']) && ($v_StyleCategoryName['selected']==1)}selected{/if}>{$v_StyleCategoryName['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -208,7 +208,7 @@
                                 <select id="xm-CustomItem46" name="CustomItem46" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $CustomItem46 as $k_CustomItem46 => $v_CustomItem46}
-                                    <option value="{$v_CustomItem46['value']}">{$v_CustomItem46['name']}</option>
+                                    <option value="{$v_CustomItem46['value']}" {if isset($v_CustomItem46['selected']) && ($v_CustomItem46['selected']==1)}selected{/if}>{$v_CustomItem46['name']}</option>
                                     {/foreach}	
                                 </select>
                             </div>
@@ -271,8 +271,9 @@
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button>
-      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
+      <button class="layui-btn layui-btn-sm saveselect" >保存筛选条件及筛选结果</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除 lay-event="delete" </button>
       <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
     </div>
 </script>
@@ -288,6 +289,7 @@
             , url1 = "{:url('admin/system.threeyear.threeyear/index')}" 
             , url_download_history_area = "{:url('admin/system.threeyear.threeyear/excel_cus_weather')}" 
             , url_getXmMapSelect = "{:url('admin/system.threeyear.threeyear/getXmMapSelect')}"
+            , url_saveSelect = "{:url('admin/system.threeyear.threeyear/saveSelect')}"
 
         initFn();
         startTable();
@@ -804,7 +806,8 @@
                 , loading: true
                 , method: 'post'
                 // , toolbar: '#toolbar1'
-                , toolbar: true
+                , toolbar: '#toolbar1'
+                // , toolbar: true
                 , page: true
                 , limit: 1000
                 , limits: [1000, 5000, 10000, 20000]
@@ -1010,6 +1013,39 @@
                     $('td[data-key="1-0-32"]').css({
                         'color': '#c000ffe8', 'font-weight':'bold'
                     });
+
+
+                    //保存筛选条件
+                    $('.saveselect').click(function() {
+                        var formValue = form.val("searchFormHead");
+                        // console.log('this is formvalue:', formValue);
+
+                        // $.post(url_saveSelect, formValue, function(res) {
+                        //     console.log(res);
+                        //     if (res.code == '500') {
+                        //         alert(res.msg);
+                        //     } else {
+                        //         alert('保存成功');
+                        //     }
+
+                        // }, 'json')
+
+                        table.reload('table', {
+                            where: formValue
+                            , method: 'post'
+                            , url: url_saveSelect
+                            , loading: true
+                            , page: true
+                            , limit: 1000
+                        })
+                        return false; 
+
+                    });
+
+
+                    if (res['if_save_select']) {
+                        alert('保存成功');
+                    }
 
 
                 }
