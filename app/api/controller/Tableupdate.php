@@ -1897,9 +1897,9 @@ class Tableupdate extends BaseController
                 AND ER.ReceiptDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
                 AND ER.Type= 1 
                 AND ES.SupplyName <> '南昌岳歌服饰' 
-                AND EG.TimeCategoryName1 IN ( '2023' ) 
+                AND EG.TimeCategoryName1 IN ( '2023','2024' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
+                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ,'广州过季仓') 
             GROUP BY
                 EW.WarehouseName
                 ,ES.SupplyName
@@ -1969,9 +1969,9 @@ class Tableupdate extends BaseController
                 AND ERN.ReceiptNoticeDate = DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
                 AND ERN.IsCompleted != 1
                 AND ES.SupplyName <> '南昌岳歌服饰' 
-                AND EG.TimeCategoryName1 IN ( '2023' ) 
+                AND EG.TimeCategoryName1 IN ( '2023', '2024' ) 
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓' ) 
+                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓' ) 
             GROUP BY
                 EW.WarehouseName
                 ,ES.SupplyName
