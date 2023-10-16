@@ -329,11 +329,16 @@
                     , { title: '状态', align:'center',  templet:
                     function (data) {
                         var str = '';
-                        if (data['已读'] == 'Y') {
-                            str = '<span style="color:blue">已读</span>';
+                        if (data['task_id']) {
+                            if (data['已读'] == 'Y') {
+                                str = '<span style="color:blue">已读</span>';
+                            } else {
+                                str = '<span style="color:red">未读</span>';
+                            }
                         } else {
-                            str = '<span style="color:red">未读</span>';
+                            str = '<span style="">未发送</span>';    
                         }
+
                         return str; 
                     }}
                     // , { title: '操作', align:'center', templet:

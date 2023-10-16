@@ -218,6 +218,29 @@ class DingTalk extends BaseController
         return $result;
     }
 
+    // 给4楼前端人事用的， 气温陈列调整
+    public function sendMarkdownImg_weatherdisplay($userids, $data = [])
+    {
+        $time = time();
+        $timeStr = date('Y-m-d H:i:s', time());
+        $SendToUser_config = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=' . $this->getAccessToken_cwl();
+        $SendToUser_data = [
+            'userid_list' => $userids,
+            'agent_id' => 2476262581,
+            "msg" => [
+                "msgtype" => 'markdown',
+                "markdown" => [
+                    "title" => "{$data['店铺名称']}",
+                    "text" => "## 店铺：{$data['店铺名称']}\n ### 陈列方案：{$data['陈列方案']}\n #### 窗数：{$data['窗数']}\n #### 备注：{$data['备注']}\n ![screenshot]({$data['path']}?t={$time})\n ###### 发布时间： {$timeStr}"
+                ]
+
+            ]
+        ];
+        // dump($SendToUser_data);die;
+        $result = $this->PostCurlRequest($SendToUser_config, json_encode($SendToUser_data));
+        return $result;
+    }
+
     /**
      * 获取 unionid
      * @return bool|string
