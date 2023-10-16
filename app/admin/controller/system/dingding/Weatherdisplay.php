@@ -29,7 +29,7 @@ class Weatherdisplay extends AdminController
     protected $create_time = '';
 
     // 测试用true，正式用false
-    protected $debug = true;
+    protected $debug = false;
 
     public function __construct()
     {
@@ -390,14 +390,14 @@ class Weatherdisplay extends AdminController
     public function upload_excel_user2() {
         if (request()->isAjax()) {
         // if (1) {
-            $file = request()->file('file');  //这里‘file’是你提交时的name
-            $file->getOriginalName();
-            $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
-            $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
-            $info = $file->move($save_path, $new_name);
+            // $file = request()->file('file');  //这里‘file’是你提交时的name
+            // $file->getOriginalName();
+            // $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
+            // $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
+            // $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231016_1697437700.xlsx';   //文件保存路径
+            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231016_1697437700.xlsx';   //文件保存路径
 
             if($info) {
                 //成功上传后 获取上传的数据
@@ -414,7 +414,7 @@ class Weatherdisplay extends AdminController
                 //读取数据
                 $data = $this->readExcel_temp_excel_user($info, $read_column);
     
-                // print($data);die;
+                // dump($data);die;
 
                 if ($data) {
                     $model = new DingTalk;
