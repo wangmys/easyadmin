@@ -41,8 +41,6 @@ class Weatherdisplay extends AdminController
         // $this->rand_code = $this->rand_code(10);
         $this->create_time = date('Y-m-d H:i:s', time());
 
-        // 测试用true，正式用false
-        $this->debug = true;
     }
 
     /**
@@ -300,6 +298,7 @@ class Weatherdisplay extends AdminController
                             select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
                         ";
                     }
+                    echo $sql;
 
                     // 方案图路径
                     $select_path = $this->db_easyA->query("
