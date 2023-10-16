@@ -293,40 +293,36 @@
             layer.confirm(`是否推送【编号：${id}】`, {
                 btn: ['是的','再想想'] //按钮
             }, function(data){
-                // layer.close();
-                // if (!stop) {
-                //     stop = true
-                    //开始加载效果
-                    layui.use('layer', function () {
-                        layui.layer.load();
-                        //console.log(Lodingindex) opacity
-                        $(".layui-layer-shade").css('background', '#000000')
-                        $(".layui-layer-shade").css('opacity', '0.2')
-                        $(".layui-layer-shade").click(function (event) {
-                            event.stopPropagation();
-                        })
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
                     })
-                    $.post(sendListHandle, {'id': id}, function(res) {
+                })
+                $.post(sendListHandle, {'id': id}, function(res) {
+                    // alert(res.code)
+                    if (res.code > 0) {
+                        alert(res.msg);
+                    } else {
                         table.reload('table2', {
                             where: data.field
                             , method: 'post'
                             , url: url1
                             , loading: true
                         })
-                        // layer.msg(res.msg, {icon: 1});
-                        // setTimeout(function() {
-                        //     stop = false
-                        // }, 500)
+                    }
 
-
-                        layui.use('layer', function () {
-                            setTimeout(function () {
-                                layui.layer.closeAll();
-                                // stop = false
-                            }, 0);
-                        });
-                    })
-                // }
+                    layui.use('layer', function () {
+                        setTimeout(function () {
+                            layui.layer.closeAll();
+                            // stop = false
+                        }, 0);
+                    });
+                })
             }, function(){
                 console.log('关闭');
                 layer.close();
@@ -355,12 +351,17 @@
                     })
                 })
                 $.post(recallAllHandle, {'id': id}, function(res) {
-                    table.reload('table2', {
-                        where: data.field
-                        , method: 'post'
-                        , url: url1
-                        , loading: true
-                    })
+                    if (res.code > 0) {
+                        alert(res.msg);
+                    } else {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                    }
+
                     // layer.msg(res.msg, {icon: 1});
                     // setTimeout(function() {
                     //     stop2 = false
@@ -402,12 +403,16 @@
                     })
                 })
                 $.post(getReadsHandle, {'id': id}, function(res) {
-                    table.reload('table2', {
-                        where: data.field
-                        , method: 'post'
-                        , url: url1
-                        , loading: true
-                    })
+                    if (res.code > 0) {
+                        alert(res.msg);
+                    } else {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                    }
                     // layer.msg(res.msg, {icon: 1});
                     // setTimeout(function() {
                     //     stop3 = false
@@ -547,9 +552,9 @@
                         if (data['未读'] && data['未读'] > 0) {
                             unReadNums = data['未读'];
                         }
-                        totalReadNums = readNums + unReadNums;
+                        // totalReadNums = readNums + unReadNums;
                         return `
-                            <span style="color:red;">${unReadNums}</span> / <span style="color:blue;">${readNums}</span> / <span style="color:green;">${totalReadNums}</span>  
+                            <span style="color:red;">${unReadNums}</span> / <span style="color:blue;">${readNums}</span> / <span style="color:green;">${data['总数']}</span>  
                         `; 
                     }}
                     , { field: 'sendtimes', title: '推送次数', align:'center', templet:
