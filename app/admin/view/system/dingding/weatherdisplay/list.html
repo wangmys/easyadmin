@@ -152,7 +152,7 @@
                             style="background:#4a6db8;color:#ffffff; float:right; opacity:0; cursor:default;">店铺负责人名单
                             </div>
     
-                            <button type="button" id="down_excel_user_2" class="layui-btn layui-btn-xs down_excel_user">下载模板_员工</button>
+                            <button type="button" id="down_excel_user_2" class="layui-btn layui-btn-xs down_excel_user_2">下载模板_员工</button>
                             <button type="button" id="uploadBtn_2" class="layui-btn layui-btn-xs uploadBtn_2">导入EXCEL_员工</button>
                         </div>   
                     </div>
@@ -502,8 +502,8 @@
         }
 
         upload.render({
-            elem: '#uploadBtn_2'
-            ,url: upload_excel_user2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            elem: '#uploadBtn'
+            ,url: upload_excel_user //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
             ,accept: 'file'
             ,exts: 'xlsx'
             ,before: function(obj){
@@ -535,7 +535,7 @@
         });
 
         upload.render({
-            elem: '#uploadBtn2'
+            elem: '#uploadBtn_2'
             ,url: upload_excel_user2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
             ,accept: 'file'
             ,exts: 'xlsx'
