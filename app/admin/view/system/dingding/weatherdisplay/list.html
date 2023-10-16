@@ -127,18 +127,34 @@
                                 <div id="xm-jyms" class="xm-select-demo"></div>
                             </div>
                         </div>
-                    </div> -->
+                    </div> -->  
+
                     <div></div>
 
-                    <div class="flex row between" style="width:20%; height:35px;">
-                        <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userAllBtn"
-                        style="background:#4a6db8;color:#ffffff; float:right; ">索歌全员名单
-                        </button>
-                        <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userBtn"
-                        style="background:#4a6db8;color:#ffffff; float:right; ">店铺负责人名单
-                        </button>
-                        <button type="button" id="down_excel_user" class="layui-btn layui-btn-xs down_excel_user">下载模板</button>
-                        <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uplaodBtn">导入EXCEL</button>
+                    <div class="flex col around" style="width:25%; height:70px;">
+                        <div class="flex row between" style="width:100%; height:35px;">
+                            <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userAllBtn"
+                            style="background:#4a6db8;color:#ffffff; float:right; ">索歌全员名单
+                            </button>
+                            <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userBtn"
+                            style="background:#4a6db8;color:#ffffff; float:right; ">店铺负责人名单
+                            </button>
+
+                            <button type="button" id="down_excel_user" class="layui-btn layui-btn-xs down_excel_user">下载模板_店铺</button>
+                            <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uplaodBtn">导入EXCEL_店铺</button>
+                        </div>    
+
+                        <div class="flex row between" style="width:100%; height:35px;">
+                            <div  class="" 
+                            style="background:#4a6db8;color:#ffffff; float:right; opacity:0; cursor:default;">索歌全员名单
+                            </div>
+                            <div  class=""
+                            style="background:#4a6db8;color:#ffffff; float:right; opacity:0; cursor:default;">店铺负责人名单
+                            </div>
+    
+                            <button type="button" id="down_excel_user_2" class="layui-btn layui-btn-xs down_excel_user">下载模板_员工</button>
+                            <button type="button" id="uploadBtn_2" class="layui-btn layui-btn-xs uploadBtn_2">导入EXCEL_员工</button>
+                        </div>   
                     </div>
                 </div>  
             </form>
@@ -184,7 +200,10 @@
             , getReadsHandle = "{:url('admin/system.dingding.Weatherdisplay/getReadsHandle')}"
             , recallAllHandle = "{:url('admin/system.dingding.Weatherdisplay/recallAllHandle')}"
             , upload_excel_user = "{:url('admin/system.dingding.Weatherdisplay/upload_excel_user')}"
+            , upload_excel_user2 = "{:url('admin/system.dingding.Weatherdisplay/upload_excel_user2')}"
             , download_excel_user_demo = "{:url('admin/system.dingding.Weatherdisplay/download_excel_user_demo')}" 
+            , download_excel_user_demo2 = "{:url('admin/system.dingding.Weatherdisplay/download_excel_user_demo2')}" 
+            , download_errors = "{:url('admin/system.dingding.Weatherdisplay/download_errors')}" 
             , url1 = "{:url('admin/system.dingding.Weatherdisplay/list')}" 
             , url2 = "{:url('admin/system.dingding.Weatherdisplay/list_user')}"; 
 
@@ -197,9 +216,15 @@
             elem: '#shangshiriqi'
         });
 
-        // 下载模板
+        // 下载模板 1
         $('#down_excel_user').click(function() {
             location.href = download_excel_user_demo;
+        });
+
+        
+        // 下载模板 2
+        $('#down_excel_user_2').click(function() {
+            location.href = download_excel_user_demo2;
         });
 
         function initFn() {
@@ -332,7 +357,7 @@
         // var stop2 = false;
         // 监听事件 
         $(document).on('click', '.recallBtn', function(data){
-            var id = window.localStorage.getItem('weatherdisplaylist_id', id);
+            var id = window.localStorage.getItem('weatherdisplaylist_id');
 
             //询问框
             layer.confirm(`是否撤回【编号：${id}】`, {
@@ -384,7 +409,7 @@
         // var stop3 = false;
         // 监听事件 
         $(document).on('click', '.getReadsBtn', function(data){
-            var id = window.localStorage.getItem('weatherdisplaylist_id', id);
+            var id = window.localStorage.getItem('weatherdisplaylist_id');
 
             //询问框
             layer.confirm(`是否拉取未/已读人数【编号：${id}】`, {
@@ -430,6 +455,12 @@
                 layer.close();
             });
         }); 
+
+        $(document).on('click', '.downErrors', function(data){
+            var id = window.localStorage.getItem('weatherdisplaylist_id');
+            location.href = download_errors + '?id=' + id;
+        }); 
+
         window.viewUsers = function(id) {
             // console.log(id);
             window.localStorage.setItem('weatherdisplaylist_id', id);
@@ -471,8 +502,8 @@
         }
 
         upload.render({
-            elem: '#uploadBtn'
-            ,url: upload_excel_user //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            elem: '#uploadBtn_2'
+            ,url: upload_excel_user2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
             ,accept: 'file'
             ,exts: 'xlsx'
             ,before: function(obj){
@@ -503,6 +534,38 @@
             }
         });
 
+        upload.render({
+            elem: '#uploadBtn2'
+            ,url: upload_excel_user2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            ,accept: 'file'
+            ,exts: 'xlsx'
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+                // obj.preview(function(index, file, result){
+                //     $('#demo1').attr('src', result); //图片链接（base64）
+                // });
+                
+                // element.progress('demo', '0%'); //进度条复位
+                // layer.msg('上传中', {icon: 16, time: 0});
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                } else {
+                    // 方案
+                    table.reload('table2', {
+                          method: 'post'
+                        , url: url1
+                        , loading: true
+                    })
+                    return layer.msg('上传成功');
+                }
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+            }
+        });
 
         // 单店不动销数据统计 
         function startTable() {
@@ -583,7 +646,7 @@
                             }
                             return html; 
                         }}
-                    , { title: '操作', align:'center', templet:
+                    , { title: '操作', align:'center', width:'12%', templet:
                         function (data) {
                             var html = `
                                 <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
@@ -597,15 +660,21 @@
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
                                         推送
                                     </button>
-                                    <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
+                                    <button class="recallBtn layui-btn layui-btn-xs" style="background: orange;
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
                                         撤回
                                     </button>
                                     <button class="getReadsBtn layui-btn layui-btn-xs" style="background: blue;
                                     letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                        未/已读
+                                        状态
                                     </button>
                                 `;
+                            }
+                            if (data['错误'] > 0) {
+                                html += `<button class="downErrors layui-btn layui-btn-xs" style="background: red;
+                                        letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
+                                            错误
+                                        </button>`;
                             }
                             return html; 
                         }}
