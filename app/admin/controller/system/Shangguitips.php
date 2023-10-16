@@ -110,10 +110,17 @@ class Shangguitips extends AdminController
                     货品等级_计划_直营,货品等级_计划_加盟,货品等级_计划_合计,
                     货品等级_实际_直营,货品等级_实际_加盟,货品等级_实际_合计,
                     实际铺货_直营,实际铺货_加盟,实际铺货_合计,
-                    铺货率_直营,铺货率_加盟,铺货率_合计,
-                    上柜率_直营,上柜率_加盟,上柜率_合计,
-                    货品等级上柜率_直营,货品等级上柜率_加盟,货品等级上柜率_合计,
-                    预计最大可加铺店数,单款全国日均销排名,近1周中类销售占比,
+                    concat(round(铺货率_直营 * 100, 1), '%') as `铺货率_直营`,
+                    concat(round(铺货率_加盟 * 100, 1), '%') as 铺货率_加盟,
+                    concat(round(铺货率_合计 * 100, 1), '%') as 铺货率_合计,
+                    concat(round(上柜率_直营 * 100, 1), '%') as 上柜率_直营,
+                    concat(round(上柜率_加盟 * 100, 1), '%') as 上柜率_加盟,
+                    concat(round(上柜率_合计 * 100, 1), '%') as 上柜率_合计,
+                    concat(round(货品等级上柜率_直营 * 100, 1), '%') as 货品等级上柜率_直营,
+                    concat(round(货品等级上柜率_加盟 * 100, 1), '%') as 货品等级上柜率_加盟,
+                    concat(round(货品等级上柜率_合计 * 100, 1), '%') as 货品等级上柜率_合计,
+                    预计最大可加铺店数,单款全国日均销排名,
+                    concat(round(近1周中类销售占比 * 100, 1), '%') as 近1周中类销售占比,
                     上柜提醒,
                     更新日期
                 FROM cwl_shangguitips_handle
@@ -147,6 +154,15 @@ class Shangguitips extends AdminController
                 'keshang_url' => $keshang_url,
             ]);
         }
+    }
+
+    public function handle2() {
+        $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where('id=1')->find();
+        $keshang_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.Shangguitips/keshang_customer');
+        return View('handle2', [
+            'config' => $find_config,
+            'keshang_url' => $keshang_url,
+        ]);
     }
 
     public function keshang_customer() {
