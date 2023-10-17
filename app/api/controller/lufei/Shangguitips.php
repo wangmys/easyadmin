@@ -1368,21 +1368,27 @@ class Shangguitips extends BaseController
     // 请上柜
     public function handle_5() {
         $sql_请上柜 = "
-            SELECT
-                云仓,货号,季节归集
-            FROM
-                cwl_shangguitips_handle 
-            WHERE 1
-                AND 季节归集 in ('秋季', '冬季')
-                AND `云仓_主码齐码情况` = '可配'
-                AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
-                AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
-                AND
-                    case
-                        when 一级分类 in ('内搭', '外套') then 仓库齐码个数 >= 4 
-                        when 一级分类 in ('下装') and 二级分类 in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 5 
-                        when 一级分类 in ('下装') and 二级分类 not in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 6 
-                    end
+            UPDATE cwl_shangguitips_handle as h
+            RIGHT JOIN (
+                SELECT
+                    云仓,货号,季节归集
+                FROM
+                    cwl_shangguitips_handle 
+                WHERE 1
+                    AND 季节归集 in ('秋季', '冬季')
+                    AND `云仓_主码齐码情况` = '可配'
+                    AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
+                    AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
+                    AND
+                        case
+                            when 一级分类 in ('内搭', '外套') then 仓库齐码个数 >= 4 
+                            when 一级分类 in ('下装') and 二级分类 in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 5 
+                            when 一级分类 in ('下装') and 二级分类 not in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 6 
+                        end
+            ) as t on h.云仓 = t.云仓 and h.货号 = t.货号 and h.季节归集 = t.季节归集 
+            set
+                h.上柜提醒 = '请上柜'
+            where 1
         ";
 
         $sql_重点上柜 = "

@@ -139,7 +139,6 @@ class Shangguitips extends AdminController
             $sql = "
                 SELECT
                     left(云仓, 2) as 云仓,
-                    年份,
                     季节归集,一级分类,二级分类,
                     分类,风格,二级风格,货号,
                     店铺个数_直营,店铺个数_加盟,店铺个数_合计,
@@ -159,7 +158,7 @@ class Shangguitips extends AdminController
                     concat(round(货品等级上柜率_合计 * 100, 1), '%') as 货品等级上柜率_合计,
                     预计最大可加铺店数,单款全国日均销排名,
                     concat(round(近1周中类销售占比 * 100, 1), '%') as 近1周中类销售占比,
-                    上柜提醒,
+                    上柜提醒,克重,主码最小值,
                     更新日期
                 FROM cwl_shangguitips_handle
                 WHERE 1	

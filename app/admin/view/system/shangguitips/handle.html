@@ -124,38 +124,34 @@
             color:#0879bb;
         }
         th[data-key="1-0-9"] {
-            background-color: #e5e3e3 !important;
-            /* color:#ffffff; */
-        }
-        th[data-key="1-1-2"] {
-            background-color: #e5e3e3 !important;
-            /* color:#ffffff; */
-        }
-        th[data-key="1-0-10"] {
             background-color: #f885f8 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-4"] {
+        th[data-key="1-1-2"] {
             background-color: #f885f8 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-10"] {
+            background-color: #1e71c7 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-5"] {
+            background-color: #1e71c7 !important;
             color:#ffffff;
         }
         th[data-key="1-0-11"] {
             background-color: #7cacf5 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-7"] {
+        th[data-key="1-1-8"] {
             background-color: #7cacf5 !important;
             color:#ffffff;
         }
-        th[data-field="12"][data-key="1-0-12"] {
+        th[data-key="1-0-12"] {
             background-color: #4cddaf !important;
             color:#ffffff;
         }
-        th[data-field="8"][data-key="1-1-8"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        }
-        th[data-field="8"][data-key="1-1-8"] {
+        th[data-key="1-1-9"] {
             background-color: #6baa96 !important;
             color:#ffffff;
         }
@@ -163,11 +159,19 @@
             background-color: #6baa96 !important;
             color:#ffffff;
         }
-        th[data-field="9"][data-key="1-1-9"] {
+        th[data-key="1-1-10"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-5"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-10"] {
             background-color: #2e9574 !important;
             color:#ffffff;
         }
-        th[data-field="货品等级_实际_合计"][data-key="1-2-5"] {
+        th[data-key="1-2-5"] {
             background-color: #2e9574 !important;
             color:#ffffff;
         }
@@ -175,7 +179,7 @@
             background-color: #5a9afa !important;
             color:#ffffff;
         }
-        th[data-key="1-1-12"] {
+        th[data-key="1-1-13"] {
             background-color: #5a9afa !important;
             color:#ffffff;
         }
@@ -183,7 +187,7 @@
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-key="1-1-13"] {
+        th[data-key="1-1-14"] {
             background-color: #c4b360 !important;
             color:#ffffff;
         }
@@ -191,7 +195,7 @@
             background-color: #c4b360 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-14"] {
+        th[data-key="1-1-15"] {
             background-color: #d8c35d !important;
             color:#ffffff;
         }
@@ -199,7 +203,7 @@
             background-color: #d8c35d !important;
             color:#ffffff;
         }
-        th[data-key="1-1-15"] {
+        th[data-key="1-1-16"] {
             background-color: #f5d954 !important;
             color:#b66b6b;
         }
@@ -207,19 +211,19 @@
             background-color: #f5d954 !important;
             color:#b66b6b;
         }
-        th[data-key="1-1-16"] {
+        th[data-key="1-1-17"] {
             background-color: #deef21 !important;
             /* color:#000; */
         }
-        th[data-key="1-1-17"] {
+        th[data-key="1-1-18"] {
             background-color: #ff6b6b !important;
             color:#ffffff;
         }
-        th[data-key="1-1-18"] {
+        th[data-key="1-1-19"] {
             background-color: #e6f543 !important;
             /* color:#363535; */
         }
-        th[data-key="1-1-19"] {
+        th[data-key="1-1-20"] {
             background-color: #e4f80c !important;
             color:#000;
         }
@@ -257,16 +261,21 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-ejfg" class="xm-select-demo"></div>
                             </div>
-                        </div>
-
-                        <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">货号</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-hh" class="xm-select-demo"></div>
                             </div>
+                        </div>
+
+                        <div class="layui-form-item">
+
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">主码可配</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-zmqk" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">年份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-nf" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">季节归集</label>
                             <div class="layui-input-inline" style="width: 165px !important;">
@@ -364,6 +373,20 @@
                 {name: "夏季", value: "夏季", selected: ""},
                 {name: "秋季", value: "秋季", selected: true},
                 {name: "冬季", value: "冬季", selected: true},
+            ]
+        })
+        // 季节归集
+        xmSelect.render({
+            el: '#xm-nf', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '年份',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "2023", value: "2023", selected: true},
             ]
         })
         // 一级分类
@@ -581,7 +604,6 @@
                 , cols: [
                     [
                         { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 3}
-                        ,{ field: '年份', title: '年份', fixed: 'left' ,align: 'center' , width: 40, rowspan: 3}
                         ,{ field: '季节归集', title: '季节', fixed: 'left' ,align: 'center' , width: 35, rowspan: 3}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima"></div>
@@ -604,9 +626,10 @@
                                     <div class="cima"></div>
                                     </div>`, field: '二级风格', fixed: 'left', width: 40, align: 'center' ,rowspan: 3, hide: false}
                         ,{ title: `货号`, field: '货号', fixed: 'left', width: 75, align: 'center' ,rowspan: 3}
-
+                        ,{ title: `克重`, field: '克重', fixed: 'left', width: 40, align: 'center' ,rowspan: 3}
+                        ,{ title: `仓库情况`, align: 'center', colspan: 3}
                         ,{ title: `店铺个数`, align: 'center', colspan: 3}
-                        ,{ title: `仓库情况`, align: 'center', colspan: 2}
+                        
                         ,{ title: `实际上柜情况`, align: 'center', colspan: 3}
                         ,{ title: `货品等级上柜计划`, align: 'center',  colspan: 6}
                         ,{ title: `实际铺货件数`, align: 'center',  colspan: 3}
@@ -632,18 +655,21 @@
                     ],
 
                     [
-                        // 店铺个数
-                        { field: '店铺个数_直营', title: '直营' ,align: 'center' , width: 32, rowspan: 2} 
-                        ,{ field: '店铺个数_加盟', title: '加盟' ,align: 'center' , width: 32, rowspan: 2} 
-                        ,{ field: '店铺个数_合计', title: '合计' ,align: 'center' , width: 32, rowspan: 2} 
+
 
                         // 仓库情况
-                        ,{title: `<div class="flex col around">
+                        {title: `<div class="flex col around">
                                     <div class="cima"></div>
                                     <div class="cima">可用</div>
                                     <div class="cima">数量</div>
                                     <div class="cima"></div>
                                     </div>`, field: '云仓_可用数量', align: 'center' , width: 32, rowspan: 2} 
+                        ,{title: `<div class="flex col around">
+                                    <div class="cima">主码</div>
+                                    <div class="cima">最</div>
+                                    <div class="cima">小</div>
+                                    <div class="cima">值</div>
+                                    </div>`, field: '主码最小值', align: 'center' , width: 32, rowspan: 2} 
                         ,{title: `<div class="flex col around">
                                     <div class="cima">主码</div>
                                     <div class="cima">齐码</div>
@@ -659,6 +685,11 @@
                             }
                             return str; 
                         }}
+
+                        // 店铺个数
+                        ,{ field: '店铺个数_直营', title: '直营' ,align: 'center' , width: 32, rowspan: 2} 
+                        ,{ field: '店铺个数_加盟', title: '加盟' ,align: 'center' , width: 32, rowspan: 2} 
+                        ,{ field: '店铺个数_合计', title: '合计' ,align: 'center' , width: 32, rowspan: 2} 
 
                         // 实际上柜情况
                         ,{title: `<div class="flex col around">
