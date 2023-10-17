@@ -919,6 +919,16 @@ class Shangguitips extends BaseController
                     END  
             WHERE 1
         ";
+
+        $sql_克重 = "
+            UPDATE `cwl_shangguitips_cangku` as c
+            LEFT JOIN (select 货号,克重 from cwl_shangguitips_sk group by 货号) as sk ON c.货号 = sk.货号
+            SET 
+                    c.克重 = CASE
+                        WHEN sk.克重>0 THEN sk.克重 ELSE NULL
+                    END
+            WHERE 1                        
+        ";
         $this->db_easyA->execute($sql1);
         $this->db_easyA->execute($sql_二级风格修正);
         $this->db_easyA->execute($sql2);
@@ -927,7 +937,7 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_主码最小值);
         $this->db_easyA->execute($sql_预计最大可加店数);
         $this->db_easyA->execute($sql_仓库齐码个数);
-        
+        $this->db_easyA->execute($sql_克重);
     }
 
     public function handle_1()
@@ -962,6 +972,7 @@ class Shangguitips extends BaseController
                 直营上柜数 as 实际上柜_直营上柜数,
                 加盟上柜数 as 实际上柜_加盟上柜数,
                 预计最大可加铺店数,
+                克重,
                 date_format(now(),'%Y-%m-%d') AS 更新日期
             FROM
                 cwl_shangguitips_cangku
@@ -1357,21 +1368,21 @@ class Shangguitips extends BaseController
     // 请上柜
     public function handle_5() {
         $sql_请上柜 = "
-            UPDATE cwl_shangguitips_handle as h
-            RIGHT JOIN (
-                SELECT
-                    云仓,货号,季节归集
-                FROM
-                    cwl_shangguitips_handle 
-                WHERE 1
-                    AND 季节归集 in ('秋季', '冬季')
-                    AND `云仓_主码齐码情况` = '可配'
-                    AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
-                    AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
-            ) as t on h.云仓 = t.云仓 and h.货号 = t.货号 and h.季节归集 = t.季节归集 
-            set
-                h.上柜提醒 = '请上柜'
-            where 1
+        SELECT
+            云仓,货号,季节归集
+        FROM
+            cwl_shangguitips_handle 
+        WHERE 1
+            AND 季节归集 in ('秋季', '冬季')
+            AND `云仓_主码齐码情况` = '可配'
+            AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
+            AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
+            AND
+                case
+                    when 一级分类 in ('内搭', '外套') then 仓库齐码个数 >= 4 
+                    when 一级分类 in ('下装') and 二级分类 in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 5 
+                    when 一级分类 in ('下装') and 二级分类 not in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 6 
+                end
         ";
 
         $sql_重点上柜 = "
