@@ -96,7 +96,45 @@ class Shangguitips extends AdminController
                 $map4 = "";
             }
 
-            
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $map5Str = xmSelectInput($input['季节归集']);
+                $map5 = " AND 季节归集 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+
+            if (!empty($input['一级分类'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['一级分类']);
+                $map6 = " AND 一级分类 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
+            if (!empty($input['二级分类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['二级分类']);
+                $map7 = " AND 二级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+
+            if (!empty($input['二级风格'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['二级风格']);
+                $map8 = " AND 二级风格 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+
+            if (!empty($input['云仓_主码齐码情况'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['云仓_主码齐码情况']);
+                $map9 = " AND 云仓_主码齐码情况 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
 
             $sql = "
                 SELECT
@@ -129,8 +167,13 @@ class Shangguitips extends AdminController
                     {$map2} 
                     {$map3} 
                     {$map4} 
+                    {$map5} 
+                    {$map6} 
+                    {$map7} 
+                    {$map8} 
+                    {$map9} 
                 ORDER BY 
-                    云仓,风格
+                    云仓,季节归集 DESC,风格
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";  
 
@@ -145,6 +188,11 @@ class Shangguitips extends AdminController
                     {$map2} 
                     {$map3} 
                     {$map4} 
+                    {$map5} 
+                    {$map6} 
+                    {$map7} 
+                    {$map8} 
+                    {$map9} 
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
@@ -263,9 +311,15 @@ class Shangguitips extends AdminController
         $goodsno = $this->db_easyA->query("
             SELECT 货号 as name, 货号 as value FROM cwl_shangguitips_sk WHERE 1 GROUP BY 货号
         ");
-        // $province = $this->db_easyA->query("
-        //     SELECT 省份 as name, 省份 as value FROM cwl_weathertips_customer WHERE 省份 IS NOT NULL GROUP BY 省份
-        // ");
+        $yjfl = $this->db_easyA->query("
+            SELECT 一级分类 as name, 一级分类 as value FROM cwl_shangguitips_handle WHERE 一级分类 IS NOT NULL GROUP BY 一级分类
+        ");
+        $ejfl = $this->db_easyA->query("
+            SELECT 二级分类 as name, 二级分类 as value FROM cwl_shangguitips_handle WHERE 二级分类 IS NOT NULL GROUP BY 二级分类
+        ");
+        $ejfg = $this->db_easyA->query("
+            SELECT 二级风格 as name, 二级风格 as value FROM cwl_shangguitips_handle WHERE 二级风格 IS NOT NULL GROUP BY 二级风格
+        ");
         $customer = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_shangguitips_sk GROUP BY 店铺名称
         ");
@@ -273,6 +327,6 @@ class Shangguitips extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'customer' => $customer]]);
+        return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'customer' => $customer, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'ejfg' => $ejfg]]);
     }
 }
