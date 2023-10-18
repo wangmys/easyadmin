@@ -126,11 +126,14 @@ return [
             // 数据库名
             'database'          => Env::get('database2.database', 'bi'),
             // 用户名
-            'username'          => Env::get('database2.username', 'bi'),
+            // 'username'          => Env::get('database2.username', 'bi'),
+            'username'          => Env::get('database2.username', 'root'),
             // 密码
-            'password'          => Env::get('database2.password', 'WAwFEb772YXDYAza'),
+            // 'password'          => Env::get('database2.password', 'WAwFEb772YXDYAza'),
+            'password'          => Env::get('database2.password', '19950618xin'),
             // 端口
-            'hostport'          => Env::get('database2.hostport', '3306'),
+            // 'hostport'          => Env::get('database2.hostport', '3306'),
+            'hostport'          => Env::get('database2.hostport', '53306'),
             // 数据库连接参数
             'params'            => [],
             // 数据库编码默认采用utf8
