@@ -266,8 +266,10 @@ class Weatherdisplay extends AdminController
             $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
             $info = $file->move($save_path, $new_name);
 
+            if ($this->debug) {
             // 静态测试
-            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
+                $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
+            }
 
             if($info) {
                 //成功上传后 获取上传的数据
@@ -325,7 +327,7 @@ class Weatherdisplay extends AdminController
 
                     // 方案图路径
                     $select_path = $this->db_easyA->query("
-                        select 陈列方案,path from dd_weatherdisplay_config
+                        select 陈列方案,陈列方案推,path from dd_weatherdisplay_config
                     ");
                     // 查询推送店铺店长名单
                     $select_customer_push = $this->db_easyA->query($sql);
@@ -352,6 +354,8 @@ class Weatherdisplay extends AdminController
                         foreach ($select_path as $k4 => $v4) {
                             if ($v3['陈列方案'] == $v4['陈列方案']) {
                                 $select_customer_push[$k3]['path'] = $v4['path'];
+                                $select_customer_push[$k3]['陈列方案'] = $v4['陈列方案推'];
+                                break;
                             } else {
                                 $select_customer_push[$k3]['path'] = NULL;
                             }
@@ -406,10 +410,11 @@ class Weatherdisplay extends AdminController
             $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
             $info = $file->move($save_path, $new_name);
 
-            // 静态测试
-            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231019_1697693968.xlsx';   //文件保存路径
-
-            if($info) {
+            if ($this->debug) {
+                // 静态测试
+                $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231019_1697693968.xlsx';   //文件保存路径
+            }
+            if ($info) {
                 //成功上传后 获取上传的数据
                 //要获取的数据字段
                 $read_column = [
@@ -473,9 +478,10 @@ class Weatherdisplay extends AdminController
                                 $data[$key2]['isCustomer'] = '是';
                                 $data[$key2]['createtime'] = $time;
 
-                                $find_陈列方案 = $this->db_easyA->table('dd_weatherdisplay_config')->field('path')->where(['陈列方案' => $val2['陈列方案']])->find();
+                                $find_陈列方案 = $this->db_easyA->table('dd_weatherdisplay_config')->where(['陈列方案' => $val2['陈列方案']])->find();
                                 if ($find_陈列方案) {
                                     $data[$key2]['path'] = $find_陈列方案['path'];
+                                    $data[$key]['陈列方案'] = $find_陈列方案['陈列方案推'];
                                 } else {
                                     $data[$key2]['path'] = NULL;
                                 }
