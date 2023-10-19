@@ -253,7 +253,7 @@ class Stock2 extends Command
 		LEFT JOIN (SELECT ERG.RetailID,ERG.GoodsId,AVG(ERG.DiscountPrice) AS DiscountPrice 
 		FROM ErpRetail ER 
 		LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
-		WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)='{$current_date}'
+		WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)<='{$current_date}'
 		GROUP BY ERG.RetailID,ERG.GoodsId) ERG ON ECS.BillId=ERG.RetailID AND ECS.GoodsId=ERG.GoodsId
 		LEFT JOIN (SELECT 
 			T1.CustomerId,
