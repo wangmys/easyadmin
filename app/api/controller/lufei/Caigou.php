@@ -34,451 +34,8 @@ class Caigou extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
-    // 采购收货
-    public function caigoushouhuo() {
-        $sql_采购收货 = "
-        --  采购收货
-            SELECT
-                EG.TimeCategoryName1 AS 年份,
-                CASE
-                    EG.TimeCategoryName2 
-                    WHEN '初春' THEN
-                    '春季' 
-                    WHEN '正春' THEN
-                    '春季' 
-                    WHEN '春季' THEN
-                    '春季' 
-                    WHEN '初秋' THEN
-                    '秋季' 
-                    WHEN '深秋' THEN
-                    '秋季' 
-                    WHEN '秋季' THEN
-                    '秋季' 
-                    WHEN '初夏' THEN
-                    '夏季' 
-                    WHEN '盛夏' THEN
-                    '夏季' 
-                    WHEN '夏季' THEN
-                    '夏季' 
-                    WHEN '冬季' THEN
-                    '冬季' 
-                    WHEN '初冬' THEN
-                    '冬季' 
-                    WHEN '深冬' THEN
-                    '冬季' 
-                END AS 季节归集,
-                EG.CategoryName1 AS 大类,
-                EG.CategoryName2 AS 中类,
-                EG.GoodsName AS 货品名称,
-                EG.CategoryName AS 分类,
-                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
-                EG.StyleCategoryName AS 风格,
-                EG.GoodsNo AS 货号,
-                SUM(ERG.Quantity) AS 采购入库量,
-                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
-            FROM
-                ErpReceipt AS ER
-                LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
-                LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
-                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-                LEFT JOIN erpGoodsColor AS EGC ON ERG.GoodsId = EGC.GoodsId
-                LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
-            WHERE
-                ER.CodingCodeText = '已审结' 
-                AND ER.ReceiptDate >= '2023-01-01'
-                AND ER.Type= 1 
-                AND ES.SupplyName <> '南昌岳歌服饰' 
-                AND EG.TimeCategoryName1 IN ( '2023','2024' ) 
-                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
-                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EG.StyleCategoryName = '基本款'
-                AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓','过账虚拟仓' ) 
-            GROUP BY
-                EG.GoodsNo
-                ,EG.GoodsName 
-                ,EG.TimeCategoryName1
-                ,EG.TimeCategoryName2
-                ,EG.CategoryName1
-                ,EG.CategoryName2
-                ,EG.CategoryName
-                ,EG.StyleCategoryName
-        ";
-        $select = $this->db_sqlsrv->query($sql_采购收货);
-        if ($select) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_caigoushouhuo;');
-            $chunk_list = array_chunk($select, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->strict(false)->insertAll($val);
-            }
-        }
-
-        $sql_采购入库指令单未完成 = "
-            SELECT
-                EW.WarehouseName AS 云仓,
-                EG.TimeCategoryName1 AS 年份,
-                CASE
-                    EG.TimeCategoryName2 
-                    WHEN '初春' THEN
-                    '春季' 
-                    WHEN '正春' THEN
-                    '春季' 
-                    WHEN '春季' THEN
-                    '春季' 
-                    WHEN '初秋' THEN
-                    '秋季' 
-                    WHEN '深秋' THEN
-                    '秋季' 
-                    WHEN '秋季' THEN
-                    '秋季' 
-                    WHEN '初夏' THEN
-                    '夏季' 
-                    WHEN '盛夏' THEN
-                    '夏季' 
-                    WHEN '夏季' THEN
-                    '夏季' 
-                    WHEN '冬季' THEN
-                    '冬季' 
-                    WHEN '初冬' THEN
-                    '冬季' 
-                    WHEN '深冬' THEN
-                    '冬季' 
-                END AS 季节,
-                EG.TimeCategoryName2 AS 二级时间,
-                EG.CategoryName1 AS 大类,
-                EG.CategoryName2 AS 中类,
-                EG.GoodsName AS 货号名称,
-                EG.CategoryName AS 分类,
-                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
-                EG.StyleCategoryName AS 风格,
-                EG.GoodsNo AS 货号,
-                EGC.ColorDesc AS 颜色,
-                SUM(ERNG.Quantity) AS 数量,
-                                CONVERT(varchar(10),GETDATE(),120) AS 更新日期,
-                ES.SupplyName AS 供应商 
-            FROM
-                ErpReceiptNotice AS ERN
-                LEFT JOIN ErpWarehouse AS EW ON ERN.WarehouseId = EW.WarehouseId
-                LEFT JOIN ErpReceiptNoticeGoods AS ERNG ON ERN.ReceiptNoticeId = ERNG.ReceiptNoticeId
-                LEFT JOIN erpGoods AS EG ON ERNG.GoodsId = EG.GoodsId
-                LEFT JOIN erpGoodsColor AS EGC ON ERNG.GoodsId = EGC.GoodsId
-                LEFT JOIN ErpSupply AS ES ON ERN.SupplyId = ES.SupplyId 
-            WHERE
-                ERN.CodingCodeText = '已审结' 
-                AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
-                AND ERN.IsCompleted != 1
-                AND ES.SupplyName <> '南昌岳歌服饰' 
-                AND EG.TimeCategoryName1 IN ( '2023', '2024' ) 
-                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓' ) 
-            GROUP BY
-                EW.WarehouseName
-                ,ES.SupplyName
-                ,EG.GoodsNo
-                ,EG.GoodsName 
-                ,EG.TimeCategoryName1
-                ,EG.TimeCategoryName2
-                ,EG.CategoryName1
-                ,EG.CategoryName2
-                ,EG.CategoryName
-                ,EG.StyleCategoryName
-                ,EGC.ColorDesc
-        ";
-        $select_采购入库指令单未完成 = $this->db_sqlsrv->query($sql_采购入库指令单未完成);
-        if ($select_采购入库指令单未完成) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_weiwancheng;');
-            $chunk_list2 = array_chunk($select_采购入库指令单未完成, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list2 as $key2 => $val2) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_cgzdt_weiwancheng')->strict(false)->insertAll($val2);
-            }
-        }
-    }
-
-    // 今日销，两周销，累销
-    public function retail()
-    {
-        $sql_累销 = "
-            SELECT TOP
-                1000000
-                EG.GoodsNo  AS 货号,
-                EG.GoodsName AS 货品名称,
-                EG.TimeCategoryName1 AS 年份,
-                CASE
-                    EG.TimeCategoryName2 
-                    WHEN '初春' THEN
-                    '春季' 
-                    WHEN '正春' THEN
-                    '春季' 
-                    WHEN '春季' THEN
-                    '春季' 
-                    WHEN '初秋' THEN
-                    '秋季' 
-                    WHEN '深秋' THEN
-                    '秋季' 
-                    WHEN '秋季' THEN
-                    '秋季' 
-                    WHEN '初夏' THEN
-                    '夏季' 
-                    WHEN '盛夏' THEN
-                    '夏季' 
-                    WHEN '夏季' THEN
-                    '夏季' 
-                    WHEN '冬季' THEN
-                    '冬季' 
-                    WHEN '初冬' THEN
-                    '冬季' 
-                    WHEN '深冬' THEN
-                    '冬季' 
-                END AS 季节归集,
-                EG.CategoryName1 AS 大类,
-                EG.CategoryName2 AS 中类,
-                EG.CategoryName AS 分类,
-                EG.StyleCategoryName AS 风格,
-                SUM(ERG.Quantity) AS 累销量,
-                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 累销金额,
-                concat('2023-07-01 至 ', DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) AS 累销日期,				
-                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
-            FROM
-                ErpRetail AS ER
-                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-            WHERE
-                ER.CodingCodeText = '已审结'
-                AND ER.RetailDate >=  '2023-07-01'
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
-                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
-                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
-                AND EC.CustomItem17 IS NOT NULL
-                AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023', '2024')
-                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EG.StyleCategoryName = '基本款'
-            GROUP BY
-                EG.GoodsNo
-                ,EG.GoodsName
-                ,EG.TimeCategoryName1
-                ,EG.TimeCategoryName2
-                ,EG.StyleCategoryName
-                ,EG.CategoryName1
-                ,EG.CategoryName2
-                ,EG.CategoryName
-            HAVING SUM ( ERG.Quantity ) <> 0
-        ";
-        $select_累销 = $this->db_sqlsrv->query($sql_累销);
-        if ($select_累销) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail;');
-            $chunk_list = array_chunk($select_累销, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_cgzdt_retail')->strict(false)->insertAll($val);
-            }
-        }
-
-
-        $sql_日销 = "
-                SELECT TOP
-                    1000000
-                    EG.GoodsNo  AS 货号,
-                    EG.GoodsName AS 货品名称,
-                    EG.TimeCategoryName1 AS 年份,
-                    CASE
-                    EG.TimeCategoryName2 
-                    WHEN '初春' THEN
-                    '春季' 
-                    WHEN '正春' THEN
-                    '春季' 
-                    WHEN '春季' THEN
-                    '春季' 
-                    WHEN '初秋' THEN
-                    '秋季' 
-                    WHEN '深秋' THEN
-                    '秋季' 
-                    WHEN '秋季' THEN
-                    '秋季' 
-                    WHEN '初夏' THEN
-                    '夏季' 
-                    WHEN '盛夏' THEN
-                    '夏季' 
-                    WHEN '夏季' THEN
-                    '夏季' 
-                    WHEN '冬季' THEN
-                    '冬季' 
-                    WHEN '初冬' THEN
-                    '冬季' 
-                    WHEN '深冬' THEN
-                    '冬季' 
-                END AS 季节归集,
-                EG.CategoryName1 AS 大类,
-                EG.CategoryName2 AS 中类,
-                EG.CategoryName AS 分类,
-                EG.StyleCategoryName AS 风格,
-                SUM(ERG.Quantity) AS 销量,
-                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
-                DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) AS 销售日期,				
-                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
-            FROM
-                ErpRetail AS ER
-                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
-                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
-                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
-                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-            WHERE
-                ER.CodingCodeText = '已审结'
-                AND ER.RetailDate >=  DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
-                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
-                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
-                AND EC.CustomItem17 IS NOT NULL
-                AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023', '2024')
-                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
-                AND EG.StyleCategoryName = '基本款'
-            GROUP BY
-                EG.GoodsNo
-                ,EG.GoodsName
-                ,EG.TimeCategoryName1
-                ,EG.TimeCategoryName2
-                ,EG.StyleCategoryName
-                ,EG.CategoryName1
-                ,EG.CategoryName2
-                ,EG.CategoryName
-            HAVING SUM ( ERG.Quantity ) <> 0
-        ";
-        $select_日销 = $this->db_sqlsrv->query($sql_日销);
-        if ($select_日销) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_day;');
-            $chunk_list2 = array_chunk($select_日销, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list2 as $key2 => $val2) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_cgzdt_retail_day')->strict(false)->insertAll($val2);
-            }
-        }
-    }
-
-    public function handle_1() {
-        $sql_售罄率_累销量_当天销量_云仓在途量 = "
-            update `cwl_cgzdt_caigoushouhuo` as c 
-            left join cwl_cgzdt_retail_day as d on c.货号=d.货号
-            left join cwl_cgzdt_retail as r on c.货号=r.货号
-            left join cwl_cgzdt_weiwancheng as w on c.货号=w.货号
-            set
-                c.当天销量 = d.销量,
-                c.累销量 = r.累销量,
-                c.售罄率 = case
-                    when r.累销量 > 0 then r.累销量 / c.采购入库量 else null
-                end,
-                c.云仓在途量 = w.数量
-        ";
-        $this->db_easyA->execute($sql_售罄率_累销量_当天销量_云仓在途量);
-
-        $sql_二级分类售罄 = "
-            update cwl_cgzdt_caigoushouhuo as m1 left join 
-            (
-                SELECT 
-                        a.货号,a.大类,a.售罄率,
-                        CASE
-                            WHEN 
-                                a.中类 = @中类
-                            THEN
-                                    @rank := @rank + 1 ELSE @rank := 1
-                        END AS rank,
-                        @中类 := a.中类 AS 中类
-                FROM 
-                (
-                        SELECT
-                            货号,大类,中类,售罄率 
-                        FROM
-                            cwl_cgzdt_caigoushouhuo 
-                        WHERE
-                            中类 IN ( '牛仔长裤', '休闲长裤', '松紧长裤', '卫衣', '保暖内衣', '针织衫', '夹克', '羽绒服', '大衣', '皮衣', '真皮衣')
-                            AND 售罄率 is not null
-                ) as a,
-                ( SELECT @中类 := null, @rank := 0 ) T
-                    ORDER BY
-                        a.中类, a.售罄率 desc
-            ) as m2 on m1.货号 = m2.货号
-            set 
-                m1.排名 = m2.rank
-            where 
-                m1.货号 = m2.货号
-        ";
-        $this->db_easyA->execute($sql_二级分类售罄);        
-
-        $sql_鞋履售罄率 = "
-            update cwl_cgzdt_caigoushouhuo as m1 left join 
-            (
-                SELECT 
-                    a.货号,a.中类,a.售罄率,
-                    CASE
-                        WHEN 
-                            a.大类 = @大类
-                        THEN
-                            @rank := @rank + 1 ELSE @rank := 1
-                    END AS rank,
-                    @大类 := a.大类 AS 大类
-                FROM 
-                (
-                    SELECT
-                        货号,大类,中类,售罄率 
-                    FROM
-                        cwl_cgzdt_caigoushouhuo 
-                    WHERE
-                        大类 IN ('鞋履')
-                        AND 售罄率 is not null
-                ) as a,
-                ( SELECT @大类 := null, @rank := 0 ) T
-                    ORDER BY
-                            a.大类, a.售罄率 desc
-            ) as m2 on m1.货号 = m2.货号
-            set 
-                m1.排名 = m2.rank
-            where 
-                m1.货号 = m2.货号
-        ";
-        $this->db_easyA->query($sql_鞋履售罄率); 
-
-        $sql_上柜数 = "
-            update cwl_cgzdt_caigoushouhuo as c
-            left join (
-                SELECT
-                    一级分类,二级分类,分类,货号,
-                    count(预计库存数量) as 上柜数
-                FROM
-                    sp_sk  
-                WHERE 1
-                    AND 预计库存数量 > 0
-                GROUP BY
-                    货号
-            ) as sk on c.货号 = sk.货号
-            set
-                c.上柜数 = sk.上柜数
-            where
-                c.货号 = sk.货号        
-        ";  
-        $this->db_easyA->execute($sql_上柜数);          
-    }
-
-    // 每天00点前跑
-    public function handle_2() {
+    // 每天00点前跑 采购订单
+    public function first() {
         // 采购订单  订单云仓：4春夏秋冬正品仓+过账+过季
         $sql_采购订单 = "
                 SELECT 
@@ -581,184 +138,10 @@ class Caigou extends BaseController
                 $insert = $this->db_easyA->table('cwl_cgzdt_order')->strict(false)->insertAll($val);
             }
         }
-
-        $sql_订单总量 = "
-            update cwl_cgzdt_caigoushouhuo as c
-            left join cwl_cgzdt_order as o on c.货号 = o.货号
-            set c.订单总量 = o.累计下单数
-            where
-                c.货号 = o.货号
-        ";
-        $this->db_easyA->execute($sql_订单总量);
-
-        $sql_订单未入量 = "
-            update cwl_cgzdt_caigoushouhuo 
-            set 订单未入量 = 订单总量 - 采购入库量
-            where
-                订单总量 is not null
-                and 采购入库量 is not null
-        ";
-        $this->db_easyA->execute($sql_订单未入量);
-
-    }
-
-    // 每天00点前跑
-    public function handle_3bak() {
-        // 5大云仓+过季+虚拟
-        $sql_仓库库存 = "
-                SELECT
-                    T.GoodsNo AS 货号,
-                    SUM(T.Quantity) AS 仓库库存,
-                    CONVERT(varchar(10),GETDATE(),120)  AS 查询日期_仓库库存,
-                    DATEADD(DAY, +1, CAST(GETDATE() AS DATE)) AS 更新日期
-                FROM
-                (
-                SELECT 
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EWSD.SizeId,
-                    SUM(EWSD.Quantity) AS Quantity
-                FROM ErpWarehouseStock EWS
-                LEFT JOIN ErpWarehouseStockDetail EWSD ON EWS.StockId=EWSD.StockId
-                LEFT JOIN ErpWarehouse EW ON EWS.WarehouseId=EW.WarehouseId
-                LEFT JOIN ErpGoods EG ON EG.GoodsId=EWS.GoodsId
-                WHERE EWS.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046')
-                    AND EG.TimeCategoryName1 in (2023, 2024)
-                    AND EG.TimeCategoryName2 LIKE '%冬%'
-                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                GROUP BY 
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EWSD.SizeId
-
-                UNION ALL
-
-                --出货指令单占用库存
-                SELECT
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    ESGD.SizeId,
-                    -SUM (ESGD.Quantity ) AS Quantity
-                FROM ErpSorting ES
-                LEFT JOIN ErpSortingGoods ESG ON ES.SortingID= ESG.SortingID
-                LEFT JOIN ErpSortingGoodsDetail ESGD ON ESG.SortingGoodsID=ESGD.SortingGoodsID
-                LEFT JOIN ErpGoods EG ON ESG.GoodsId= EG.GoodsId
-                LEFT JOIN ErpWarehouse EW ON ES.WarehouseId=EW.WarehouseId
-                WHERE	 (ES.CodingCode= 'StartNode1'
-                                    OR (ES.CodingCode= 'EndNode2' AND ES.IsCompleted= 0 )
-                                )
-                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046')
-                    AND EG.TimeCategoryName1 in (2023, 2024)
-                -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')		
-                GROUP BY
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    ESGD.SizeId
-                    
-                UNION ALL
-
-                    --仓库出货单占用库存
-                SELECT
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EDGD.SizeId,
-                    -SUM ( EDGD.Quantity ) AS Quantity
-                FROM ErpDelivery ED
-                LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID= EDG.DeliveryID
-                LEFT JOIN ErpDeliveryGoodsDetail EDGD ON EDG.DeliveryGoodsID=EDGD.DeliveryGoodsID
-                LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
-                LEFT JOIN ErpWarehouse EW ON ED.WarehouseId=EW.WarehouseId
-                WHERE ED.CodingCode= 'StartNode1' 
-                    AND EDG.SortingID IS NULL 
-                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046')
-                    AND EG.TimeCategoryName1 in (2023, 2024)
-                -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')	
-                GROUP BY
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EDGD.SizeId
-                    
-                UNION ALL
-
-                    --仓库调拨占用库存
-                SELECT
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EIGD.SizeId,
-                    -SUM ( EIGD.Quantity ) AS Quantity
-                FROM ErpInstruction EI
-                LEFT JOIN ErpInstructionGoods EIG ON EI.InstructionId= EIG.InstructionId
-                LEFT JOIN ErpInstructionGoodsDetail EIGD ON EIG.InstructionGoodsId=EIGD.InstructionGoodsId
-                LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
-                LEFT JOIN ErpWarehouse EW ON EI.OutItemId=EW.WarehouseId
-                WHERE EI.Type= 1
-                    AND (EI.CodingCode= 'StartNode1' OR (EI.CodingCode= 'EndNode2' AND EI.IsCompleted=0 ))
-                    AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046')
-                    AND EG.TimeCategoryName1 in (2023, 2024)
-                -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')	
-                GROUP BY
-                    EW.WarehouseName,
-                    EG.GoodsNo,
-                    EIGD.SizeId
-                ) T
-                LEFT JOIN ErpBaseGoodsSize EBGS ON T.SizeId=EBGS.SizeId
-                WHERE EBGS.IsEnable=1
-                GROUP BY
-                    T.GoodsNo
-        ";
-
-        $select_仓库库存 = $this->db_sqlsrv->query($sql_仓库库存);
-        if ($select_仓库库存) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_stock;');
-            $chunk_list = array_chunk($select_仓库库存, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_cgzdt_stock')->strict(false)->insertAll($val);
-            }
-        }
-
-        $sql_门店退仓未完成 = "
-            SELECT 
-                EG.GoodsNo AS 货号,
-                SUM (ERGD.Quantity ) AS 门店退仓未完成
-            FROM ErpReturn ER 
-            LEFT JOIN ErpReturnGoods ERG ON ER.ReturnID=ERG.ReturnID
-            LEFT JOIN ErpGoods EG ON EG.GoodsId=ERG.GoodsId
-            LEFT JOIN ErpReturnGoodsDetail ERGD ON ERG.ReturnGoodsID=ERGD.ReturnGoodsID
-            LEFT JOIN ErpBarCode EBC ON ERG.GoodsId = EBC.GoodsId AND ERGD.ColorId= EBC.ColorId AND ERGD.SizeId = EBC.SizeId
-            WHERE ER.CodingCodeText='已审结' 
-                AND (ER.IsCompleted=0 OR ER.IsCompleted IS NULL)		  
-                AND ER.ReturnID NOT IN (SELECT ER.ReturnId FROM ErpReceipt ER WHERE ER.CodingCodeText='已审结' AND ER.ReturnId!='' AND ER.ReturnId IS NOT NULL )
-            GROUP BY EG.GoodsNo        
-        ";
-        $select_门店退仓未完成 = $this->db_sqlsrv->query($sql_门店退仓未完成);
-        if ($select_门店退仓未完成) {
-            foreach($select_门店退仓未完成 as $k => $v) {
-                // 基础结果 
-                $this->db_easyA->table('cwl_cgzdt_stock')->where(['货号' => $v['货号']])->update([
-                    '门店退仓未完成' => $v['门店退仓未完成'],
-                    '查询日期_门店退仓未完成' => date('Y-m-d'),
-                ]);
-            }
-        }
-
-        $sql_库存总量 = "
-            update `cwl_cgzdt_stock`
-            set
-                总量 = ifnull(仓库库存, 0) + ifnull(门店退仓未完成, 0)
-        ";
-        $this->db_easyA->execute($sql_库存总量);
     }
 
     // 每天0点前跑  总库存量
-    public function handle_3() {
+    public function second() {
         // 总库存量：仓库库存（五大+过账+广州过季）+门店库存+仓库发货在途+店店调拨在途+门店退仓未完成
         $sql_总库存量 = "
                     select 
@@ -951,5 +334,678 @@ class Caigou extends BaseController
             }
         }
     }
+
+    // 采购收货
+    public function caigoushouhuo() {
+        $sql_采购收货 = "
+        --  采购收货
+            SELECT
+                EG.TimeCategoryName1 AS 年份,
+                CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.GoodsName AS 货品名称,
+                EG.CategoryName AS 分类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo AS 货号,
+                EG.GoodsId,
+                SUM(ERG.Quantity) AS 采购入库量,
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpReceipt AS ER
+                LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
+                LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                LEFT JOIN erpGoodsColor AS EGC ON ERG.GoodsId = EGC.GoodsId
+                LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
+            WHERE
+                ER.CodingCodeText = '已审结' 
+                AND ER.ReceiptDate >= '2023-01-01'
+                AND ER.Type= 1 
+                AND ES.SupplyName <> '南昌岳歌服饰' 
+                AND EG.TimeCategoryName1 IN ( '2023','2024' ) 
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+                AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓','过账虚拟仓', '常熟正品仓库') 
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsId
+                ,EG.GoodsName 
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+        ";
+        $select = $this->db_sqlsrv->query($sql_采购收货);
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_caigoushouhuo;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->strict(false)->insertAll($val);
+            }
+        }
+
+        $sql_采购入库指令单未完成 = "
+            SELECT
+                EW.WarehouseName AS 云仓,
+                EG.TimeCategoryName1 AS 年份,
+                CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节,
+                EG.TimeCategoryName2 AS 二级时间,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.GoodsName AS 货号名称,
+                EG.CategoryName AS 分类,
+                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
+                EG.StyleCategoryName AS 风格,
+                EG.GoodsNo AS 货号,
+                EGC.ColorDesc AS 颜色,
+                SUM(ERNG.Quantity) AS 数量,
+                                CONVERT(varchar(10),GETDATE(),120) AS 更新日期,
+                ES.SupplyName AS 供应商 
+            FROM
+                ErpReceiptNotice AS ERN
+                LEFT JOIN ErpWarehouse AS EW ON ERN.WarehouseId = EW.WarehouseId
+                LEFT JOIN ErpReceiptNoticeGoods AS ERNG ON ERN.ReceiptNoticeId = ERNG.ReceiptNoticeId
+                LEFT JOIN erpGoods AS EG ON ERNG.GoodsId = EG.GoodsId
+                LEFT JOIN erpGoodsColor AS EGC ON ERNG.GoodsId = EGC.GoodsId
+                LEFT JOIN ErpSupply AS ES ON ERN.SupplyId = ES.SupplyId 
+            WHERE
+                ERN.CodingCodeText = '已审结' 
+                AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+                AND ERN.IsCompleted != 1
+                AND ES.SupplyName <> '南昌岳歌服饰' 
+                AND EG.TimeCategoryName1 IN ( '2023', '2024' ) 
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓', '常熟正品仓库') 
+            GROUP BY
+                EW.WarehouseName
+                ,ES.SupplyName
+                ,EG.GoodsNo
+                ,EG.GoodsName 
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EG.StyleCategoryName
+                ,EGC.ColorDesc
+        ";
+        $select_采购入库指令单未完成 = $this->db_sqlsrv->query($sql_采购入库指令单未完成);
+        if ($select_采购入库指令单未完成) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_weiwancheng;');
+            $chunk_list2 = array_chunk($select_采购入库指令单未完成, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list2 as $key2 => $val2) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_weiwancheng')->strict(false)->insertAll($val2);
+            }
+        }
+
+        $sql_订单总量 = "
+            update cwl_cgzdt_caigoushouhuo as c
+            left join cwl_cgzdt_order as o on c.货号 = o.货号
+            set c.订单总量 = o.累计下单数
+            where
+                c.货号 = o.货号
+        ";
+        $this->db_easyA->execute($sql_订单总量);
+
+        $sql_订单未入量 = "
+            update cwl_cgzdt_caigoushouhuo 
+            set 订单未入量 = 订单总量 - 采购入库量
+            where
+                订单总量 is not null
+                and 采购入库量 is not null
+        ";
+        $this->db_easyA->execute($sql_订单未入量);
+
+        $sql_总库存量 = "
+            update cwl_cgzdt_caigoushouhuo as c 
+            left join cwl_cgzdt_stock as s on c.货号 = s.货号
+            SET
+                c.总库存量 = s.总库存量
+            where
+                c.货号 = s.货号
+        ";
+        $this->db_easyA->execute($sql_总库存量);
+
+        $sql_零售价_成本价_编码 = "
+            update cwl_cgzdt_caigoushouhuo as c 
+            left join sjp_goods as g on c.货号 = g.货号
+            SET
+                c.简码 = g.简码,
+                c.零售价 = g.零售价,
+                c.成本价 = g.成本价
+            where
+                c.货号 = g.货号
+        ";
+        $this->db_easyA->execute($sql_零售价_成本价_编码);
+    }
+
+    // 今日销，两周销，累销
+    public function retail()
+    {
+        $sql_累销 = "
+            SELECT TOP
+                1000000
+                EG.GoodsNo  AS 货号,
+                EG.GoodsName AS 货品名称,
+                EG.TimeCategoryName1 AS 年份,
+                CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
+                SUM(ERG.Quantity) AS 累销量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 累销金额,
+                concat('2023-07-01 至 ', DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) AS 累销日期,				
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >=  '2023-07-01'
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsName
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.StyleCategoryName
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING SUM ( ERG.Quantity ) <> 0
+        ";
+        $select_累销 = $this->db_sqlsrv->query($sql_累销);
+        if ($select_累销) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail;');
+            $chunk_list = array_chunk($select_累销, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_retail')->strict(false)->insertAll($val);
+            }
+        }
+
+
+        $sql_日销 = "
+                SELECT TOP
+                    1000000
+                    EG.GoodsNo  AS 货号,
+                    EG.GoodsName AS 货品名称,
+                    EG.TimeCategoryName1 AS 年份,
+                    CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
+                SUM(ERG.Quantity) AS 销量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) AS 销售日期,				
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >=  DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsName
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.StyleCategoryName
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING SUM ( ERG.Quantity ) <> 0
+        ";
+        $select_日销 = $this->db_sqlsrv->query($sql_日销);
+        if ($select_日销) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_day;');
+            $chunk_list2 = array_chunk($select_日销, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list2 as $key2 => $val2) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_retail_day')->strict(false)->insertAll($val2);
+            }
+        }
+
+        $sql_7天销 = "
+                SELECT TOP
+                    1000000
+                    EG.GoodsNo  AS 货号,
+                    EG.GoodsName AS 货品名称,
+                    EG.TimeCategoryName1 AS 年份,
+                    CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
+                SUM(ERG.Quantity) AS 销量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                concat(DATEADD(DAY, -7, CAST(GETDATE() AS DATE)), ' 至 ' ,DATEADD(DAY, -1, CAST(GETDATE() AS DATE))) AS 销售日期,				
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsName
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.StyleCategoryName
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING SUM ( ERG.Quantity ) <> 0
+        ";
+        $select_7天销 = $this->db_sqlsrv->query($sql_7天销);
+        if ($select_7天销) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_7day;');
+            $chunk_list3 = array_chunk($select_7天销, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list3 as $key3 => $val3) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_retail_7day')->strict(false)->insertAll($val3);
+            }
+        }
+
+        $sql_14天销 = "
+                SELECT TOP
+                    1000000
+                    EG.GoodsNo  AS 货号,
+                    EG.GoodsName AS 货品名称,
+                    EG.TimeCategoryName1 AS 年份,
+                    CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
+                SUM(ERG.Quantity) AS 销量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                concat(DATEADD(DAY, -14, CAST(GETDATE() AS DATE)), ' 至 ' ,DATEADD(DAY, -8, CAST(GETDATE() AS DATE))) AS 销售日期,				
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, -14, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate < DATEADD(DAY, -7, CAST(GETDATE() AS DATE))
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsName
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.StyleCategoryName
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+            HAVING SUM ( ERG.Quantity ) <> 0
+        ";
+        $select_14天销 = $this->db_sqlsrv->query($sql_14天销);
+        if ($select_14天销) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_14day;');
+            $chunk_list4 = array_chunk($select_14天销, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list4 as $key4 => $val4) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_retail_14day')->strict(false)->insertAll($val4);
+            }
+        }
+    }
+
+    // 售罄率 排名等
+    public function handle_1() {
+        $sql_售罄率_累销量_当天销量_云仓在途量 = "
+            update `cwl_cgzdt_caigoushouhuo` as c 
+            left join cwl_cgzdt_retail_day as d on c.货号=d.货号
+            left join cwl_cgzdt_retail_7day as d7 on c.货号=d7.货号
+            left join cwl_cgzdt_retail_14day as d14 on c.货号=d14.货号
+            left join cwl_cgzdt_retail as r on c.货号=r.货号
+            left join cwl_cgzdt_weiwancheng as w on c.货号=w.货号
+            set
+                c.当天销量 = d.销量,
+                c.累销量 = r.累销量,
+                c.近一周销量 = d7.销量,
+                c.近两周销量 = d14.销量,
+                c.售罄率 = case
+                    when r.累销量 > 0 then r.累销量 / c.采购入库量 else null
+                end,
+                c.云仓在途量 = w.数量
+        ";
+        $this->db_easyA->execute($sql_售罄率_累销量_当天销量_云仓在途量);
+
+        $sql_二级分类售罄 = "
+            update cwl_cgzdt_caigoushouhuo as m1 left join 
+            (
+                SELECT 
+                        a.货号,a.大类,a.售罄率,
+                        CASE
+                            WHEN 
+                                a.中类 = @中类
+                            THEN
+                                    @rank := @rank + 1 ELSE @rank := 1
+                        END AS rank,
+                        @中类 := a.中类 AS 中类
+                FROM 
+                (
+                        SELECT
+                            货号,大类,中类,售罄率 
+                        FROM
+                            cwl_cgzdt_caigoushouhuo 
+                        WHERE
+                            中类 IN ( '牛仔长裤', '休闲长裤', '松紧长裤', '卫衣', '保暖内衣', '针织衫', '夹克', '羽绒服', '大衣', '皮衣', '真皮衣')
+                            AND 售罄率 is not null
+                ) as a,
+                ( SELECT @中类 := null, @rank := 0 ) T
+                    ORDER BY
+                        a.中类, a.售罄率 desc
+            ) as m2 on m1.货号 = m2.货号
+            set 
+                m1.排名 = m2.rank
+            where 
+                m1.货号 = m2.货号
+        ";
+        $this->db_easyA->execute($sql_二级分类售罄);        
+
+        $sql_鞋履售罄率 = "
+            update cwl_cgzdt_caigoushouhuo as m1 left join 
+            (
+                SELECT 
+                    a.货号,a.中类,a.售罄率,
+                    CASE
+                        WHEN 
+                            a.大类 = @大类
+                        THEN
+                            @rank := @rank + 1 ELSE @rank := 1
+                    END AS rank,
+                    @大类 := a.大类 AS 大类
+                FROM 
+                (
+                    SELECT
+                        货号,大类,中类,售罄率 
+                    FROM
+                        cwl_cgzdt_caigoushouhuo 
+                    WHERE
+                        大类 IN ('鞋履')
+                        AND 售罄率 is not null
+                ) as a,
+                ( SELECT @大类 := null, @rank := 0 ) T
+                    ORDER BY
+                            a.大类, a.售罄率 desc
+            ) as m2 on m1.货号 = m2.货号
+            set 
+                m1.排名 = m2.rank
+            where 
+                m1.货号 = m2.货号
+        ";
+        $this->db_easyA->query($sql_鞋履售罄率); 
+
+        $sql_上柜数 = "
+            update cwl_cgzdt_caigoushouhuo as c
+            left join (
+                SELECT
+                    一级分类,二级分类,分类,货号,
+                    count(预计库存数量) as 上柜数
+                FROM
+                    sp_sk  
+                WHERE 1
+                    AND 预计库存数量 > 0
+                GROUP BY
+                    货号
+            ) as sk on c.货号 = sk.货号
+            set
+                c.上柜数 = sk.上柜数
+            where
+                c.货号 = sk.货号        
+        ";  
+        $this->db_easyA->execute($sql_上柜数);        
+        
+    }
+
+    public function handle_2() {
+        $select_config = $this->db_easyA->table('cwl_cgzdt_config')->select();
+        // dump($select_config);
+        foreach ($select_config as $key => $val) {
+
+            $值 = xmSelectInput($val['值']);
+            $sql = "
+                update cwl_cgzdt_caigoushouhuo 
+                    set TOP = 'Y'
+                where {$val['列']} in ({$值}) and 排名 <= {$val['排名']}
+            ";
+            $this->db_easyA->query($sql);
+        }
+    }
+
 
 }

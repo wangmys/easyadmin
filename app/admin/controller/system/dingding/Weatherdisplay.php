@@ -267,7 +267,7 @@ class Weatherdisplay extends AdminController
             $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            // $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/气温陈列调整上传模板.xlsx';   //文件保存路径
+            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
 
             if($info) {
                 //成功上传后 获取上传的数据
@@ -282,8 +282,10 @@ class Weatherdisplay extends AdminController
                 
                 //读取数据
                 $data = $this->readExcel_temp_excel_user($info, $read_column);
-   
 
+                // echo 111;
+                // echo '<pre>';
+                // dump($data);
                 if ($data) {
                     $model = new DingTalk;
                     $sucess_data = [];
@@ -350,9 +352,12 @@ class Weatherdisplay extends AdminController
                         foreach ($select_path as $k4 => $v4) {
                             if ($v3['陈列方案'] == $v4['陈列方案']) {
                                 $select_customer_push[$k3]['path'] = $v4['path'];
+                            } else {
+                                $select_customer_push[$k3]['path'] = NULL;
                             }
                         }
                     }
+                    // die;
 
                     
                     // 删除临时excel表该用户上传的记录
@@ -389,6 +394,7 @@ class Weatherdisplay extends AdminController
             }
         }   
     }
+
 
     // 上次用户列表_用户版 测试 $debug
     public function upload_excel_user2() {
