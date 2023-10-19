@@ -860,8 +860,26 @@ class Duanmalv extends BaseController
             FROM
                 `sp_ww_zt` AS zt
                 
-                left JOIN (select 货号,一级分类, 二级分类 from sjp_goods where 一级分类 is not null and 二级分类 is not null GROUP BY 货号 ) AS sk ON zt.货号 = sk.货号
-                group by zt.货号,zt.云仓        
+                left JOIN (select 货号,一级分类, 二级分类 from sjp_goods where 一级分类 is not null and 二级分类 is not null GROUP BY 货号,一级分类, 二级分类 ) AS sk ON zt.货号 = sk.货号
+                group by 
+                    zt.云仓,
+                    zt.合计,
+                    zt.货号,
+                    sk.一级分类, 
+                    sk.二级分类,
+                    zt.年份,
+                    zt.季节, 
+                    zt.`00/28/37/44/100/160/S`,
+                    zt.`29/38/46/105/165/M`,
+                    zt.`30/39/48/110/170/L`,
+                    zt.`31/40/50/115/175/XL`,
+                    zt.`32/41/52/120/180/2XL`,
+                    zt.`33/42/54/125/185/3XL`,
+                    zt.`34/43/56/190/4XL`,
+                    zt.`35/44/58/195/5XL`,
+                    zt.`36/6XL`,
+                    zt.`38/7XL`,
+                    zt.`_40`
         ";
                         
         $select = $this->db_bi->query($sql);
