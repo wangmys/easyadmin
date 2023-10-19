@@ -17,6 +17,8 @@ class Stock2 extends Command
     {
         // 指令配置
         $this->setName('Stock2')
+		->addArgument('input_start_date', Argument::OPTIONAL)//输入的开始日期
+		->addArgument('input_end_date', Argument::OPTIONAL)//输入的结束日期
             ->setDescription('the Stock2 command');
     }
 
@@ -26,8 +28,11 @@ class Stock2 extends Command
 		$db = Db::connect("mysql");
 		$db_kl = Db::connect("sqlsrv");
 
-        $start_date = date('Y-m-d', time()-24*60*60*2);//'2023-09-12';//'2021-01-03';//'2022-09-18';//'2022-07-31';//date('Y-m-d', time()-24*60*60*38);//date('Y-m-d', time()-24*60*60*2);//'2020-12-31';//填入 开始日期 的前一天
-        $end_date = date('Y-m-d', time()-24*60*60);//'2023-09-25';//'2022-07-31';//'2023-06-04';//date('Y-m-d', time()-24*60*60);//date('Y-m-d', time()-24*60*60);//'2021-12-31';
+		$input_start_date    = $input->getArgument('input_start_date') ?: '';//输入的开始日期
+		$input_end_date    = $input->getArgument('input_end_date') ?: '';//输入的结束日期
+
+        $start_date = $input_start_date ?: date('Y-m-d', time()-24*60*60*2);//'2023-09-12';//'2021-01-03';//'2022-09-18';//'2022-07-31';//date('Y-m-d', time()-24*60*60*38);//date('Y-m-d', time()-24*60*60*2);//'2020-12-31';//填入 开始日期 的前一天
+        $end_date = $input_end_date ?: date('Y-m-d', time()-24*60*60);//'2023-09-25';//'2022-07-31';//'2023-06-04';//date('Y-m-d', time()-24*60*60);//date('Y-m-d', time()-24*60*60);//'2021-12-31';
 
         $how_much_day = ( strtotime($end_date)-strtotime($start_date) )/(24*60*60);
         // echo $how_much_day;die;
@@ -253,7 +258,7 @@ class Stock2 extends Command
 		LEFT JOIN (SELECT ERG.RetailID,ERG.GoodsId,AVG(ERG.DiscountPrice) AS DiscountPrice 
 		FROM ErpRetail ER 
 		LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
-		WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)='{$current_date}'
+		WHERE CONVERT(VARCHAR(10),ER.RetailDate,23)<='{$current_date}'
 		GROUP BY ERG.RetailID,ERG.GoodsId) ERG ON ECS.BillId=ERG.RetailID AND ECS.GoodsId=ERG.GoodsId
 		LEFT JOIN (SELECT 
 			T1.CustomerId,
