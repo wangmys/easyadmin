@@ -231,7 +231,7 @@ class DingTalk extends BaseController
                 "msgtype" => 'markdown',
                 "markdown" => [
                     "title" => "{$data['店铺名称']}",
-                    "text" => "## 店铺：{$data['店铺名称']}\n ### 陈列方案：{$data['陈列方案']}\n #### 窗数：{$data['窗数']}\n #### 备注：{$data['备注']}\n ![screenshot]({$data['path']}?t={$time})\n ###### 发布时间： {$timeStr}"
+                    "text" => "### {$data['店铺名称']}气温陈列方案调整\n #### 方案：{$data['陈列方案']}\n #### 窗数：{$data['窗数']}\n #### 调整时间：{$data['调整时间']}\n #### 备注：{$data['备注']}\n ![screenshot]({$data['path']}?t={$time})\n ###### 发布时间： {$timeStr}"
                 ]
 
             ]

@@ -29,7 +29,7 @@ class Weatherdisplay extends AdminController
     protected $create_time = '';
 
     // 测试用true，正式用false
-    protected $debug = false;
+    protected $debug = true;
 
     public function __construct()
     {
@@ -198,8 +198,9 @@ class Weatherdisplay extends AdminController
         // $select = $this->db_easyA->query($sql);
         $select[0]['店铺名称'] = '店铺的名称';
         $select[0]['陈列方案'] = '秋转冬方案二';
-        $select[0]['窗数'] = 2;
-        $select[0]['备注'] = '推送备注';
+        $select[0]['窗数'] = '相关文案';
+        $select[0]['调整时间'] = '相关文案';
+        $select[0]['备注'] = '相关文案';
         $header = [];
         foreach($select[0] as $key => $val) {
             $header[] = [$key, $key];
@@ -221,8 +222,9 @@ class Weatherdisplay extends AdminController
         $select[0]['姓名'] = '钉钉昵称';
         $select[0]['手机'] = '手机';
         $select[0]['陈列方案'] = '秋转冬方案二';
-        $select[0]['窗数'] = 3;
-        $select[0]['备注'] = '推送备注';
+        $select[0]['窗数'] = '相关文案';
+        $select[0]['调整时间'] = '相关文案';
+        $select[0]['备注'] = '相关文案';
         $header = [];
         foreach($select[0] as $key => $val) {
             $header[] = [$key, $key];
@@ -274,7 +276,8 @@ class Weatherdisplay extends AdminController
                     'A' => '店铺名称',
                     'B' => '陈列方案',
                     'C' => '窗数',
-                    'D' => '备注',
+                    'D' => '调整时间',
+                    'E' => '备注',
                 ];
                 
                 //读取数据
@@ -333,6 +336,7 @@ class Weatherdisplay extends AdminController
                                 $select_customer_push[$k1]['陈列方案'] = $v2['陈列方案'];
                                 $select_customer_push[$k1]['窗数'] = $v2['窗数'];
                                 $select_customer_push[$k1]['备注'] = $v2['备注'];
+                                $select_customer_push[$k1]['调整时间'] = $v2['调整时间'];
                                 $select_customer_push[$k1]['uid'] = $uid;
                                 $select_customer_push[$k1]['aid'] = $this->authInfo['id'];
                                 $select_customer_push[$k1]['aname'] = $this->authInfo['name'];
@@ -390,14 +394,14 @@ class Weatherdisplay extends AdminController
     public function upload_excel_user2() {
         if (request()->isAjax()) {
         // if (1) {
-            // $file = request()->file('file');  //这里‘file’是你提交时的name
-            // $file->getOriginalName();
-            // $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
-            // $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
-            // $info = $file->move($save_path, $new_name);
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $file->getOriginalName();
+            $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
 
             // 静态测试
-            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231016_1697437700.xlsx';   //文件保存路径
+            $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/用户版_陈列调整推送模板20231019_1697693968.xlsx';   //文件保存路径
 
             if($info) {
                 //成功上传后 获取上传的数据
@@ -408,13 +412,15 @@ class Weatherdisplay extends AdminController
                     'C' => 'mobile',
                     'D' => '陈列方案',
                     'E' => '窗数',
-                    'F' => '备注',
+                    'F' => '调整时间',
+                    'G' => '备注',
                 ];
                 
                 //读取数据
                 $data = $this->readExcel_temp_excel_user($info, $read_column);
     
-                // dump($data);die;
+                // echo '<pre>';
+                // print_r($data);die;
 
                 if ($data) {
                     $model = new DingTalk;
@@ -450,7 +456,7 @@ class Weatherdisplay extends AdminController
                     $selct_dd_user = $this->db_easyA->query($sql_dd_user);
 
                     foreach ($data as $key2 => $val2) {
-                        foreach ($selct_dd_user as $key2 => $val3) {
+                        foreach ($selct_dd_user as $key3 => $val3) {
                             // 最后
                             if ($val3['mobile'] == $val2['mobile']) {
                                 $data[$key2]['userid'] = $val3['userid'];
@@ -472,51 +478,6 @@ class Weatherdisplay extends AdminController
                         }
                     }
 
-                    // dump($data);die;
-                    // 测试专用
-                    // if ($this->debug) {
-                    //     $sql = "
-                    //         select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷','徐文娟')
-                    //     ";
-                    // } else {
-                    //     $sql = "
-                    //         select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
-                    //     ";
-                    // }
-                    // echo $sql;
-
-                    // 方案图路径
-                    // $select_path = $this->db_easyA->query("
-                    //     select 陈列方案,path from dd_weatherdisplay_config
-                    // ");
-                    // // 查询推送店铺店长名单
-                    // $select_customer_push = $this->db_easyA->query($sql);
-
-            
-                    // 陈列方案
-                    // foreach ($data as $k1 => $v1) {
-                    //     foreach ($data as $k2 => $v2) {
-                    //         if ($v1['店铺名称'] == $v2['店铺名称']) {
-                    //             $select_customer_push[$k1]['陈列方案'] = $v2['陈列方案'];
-                    //             $select_customer_push[$k1]['窗数'] = $v2['窗数'];
-                    //             $select_customer_push[$k1]['备注'] = $v2['备注'];
-                    //             $select_customer_push[$k1]['uid'] = $uid;
-                    //             $select_customer_push[$k1]['aid'] = $this->authInfo['id'];
-                    //             $select_customer_push[$k1]['aname'] = $this->authInfo['name'];
-                    //             $select_customer_push[$k1]['createtime'] = $time;
-                    //         }
-                    //     }
-                    // }
-
-                    // // path
-                    // foreach ($select_customer_push as $k3 => $v3) {
-                    //     foreach ($select_path as $k4 => $v4) {
-                    //         if ($v3['陈列方案'] == $v4['陈列方案']) {
-                    //             $select_customer_push[$k3]['path'] = $v4['path'];
-                    //         }
-                    //     }
-                    // }
-
                     
                     // 删除临时excel表该用户上传的记录
 
@@ -534,7 +495,7 @@ class Weatherdisplay extends AdminController
                     // 统计错上传数
                     $错误num = 0;
                     foreach ($data as $k => $v) {
-                        if (empty($v['userid'])) {
+                        if (empty($v['userid']) || empty($v['path'])) {
                             $错误num += 1; 
                         }
                     }
@@ -785,7 +746,7 @@ class Weatherdisplay extends AdminController
         // if (1) {
             $model = new DingTalk;
  
-            // $input['id'] = 161;
+            // $input['id'] = 226;
 
             $date = date('Y-m-d H:i:s');
             if (! checkAdmin()) {
@@ -804,22 +765,13 @@ class Weatherdisplay extends AdminController
 
             if ($find_list) {
                 $select_group = $this->db_easyA->query("
-                    select 店铺名称,陈列方案,窗数,备注 from dd_weatherdisplay_list_user
+                    select 店铺名称,陈列方案,窗数,调整时间,备注 from dd_weatherdisplay_list_user
                     where 
                         uid= '{$find_list['uid']}'
                         and userid is not null
                         and 陈列方案 is not null 
-                    group by 店铺名称,陈列方案,窗数,备注
+                    group by 店铺名称,陈列方案,调整时间,窗数,备注
                 ");
-                // $select_group = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('店铺名称,陈列方案,窗数,备注')->where([
-                //     ['uid', '=', $find_list['uid']]
-                // ])->group('店铺名称,陈列方案,窗数,备注')->select()->toArray();
-
-
-                // $select_user = $this->db_easyA->table('dd_weatherdisplay_list_user')->field('id,uid,userid,陈列方案,备注')->where([
-                //     ['uid', '=', $find_list['uid']]
-                // ])->select()->toArray();
-
 
                 // dump($select_group);
                 // die;
@@ -831,10 +783,12 @@ class Weatherdisplay extends AdminController
                         ['uid', '=', $find_list['uid']],
                         ['陈列方案', '=', $v1['陈列方案']],
                         ['店铺名称', '=', $v1['店铺名称']],
+                        ['调整时间', '=', $v1['调整时间']],
                         ['窗数', '=', $v1['窗数']],
                         ['备注', '=', $v1['备注']],
                     ])->select()->toArray();
                     // dump($select_user);
+                    // die;
 
                     $chunk_list_success = array_chunk($select_user, 300);
                     // $chunk_list_success = array_chunk($select_user, 2);
@@ -861,8 +815,12 @@ class Weatherdisplay extends AdminController
                                 $dataVal['店铺名称'] = $val2['店铺名称'];
                                 $dataVal['陈列方案'] = $val2['陈列方案'];
                                 $dataVal['窗数'] = $val2['窗数'];
+                                $dataVal['调整时间'] = $val2['调整时间'];
                                 $dataVal['备注'] = $val2['备注'];
                                 $dataVal['path'] = $path;
+
+                                // dump($dataVal);
+                                // die;
                                 $res = json_decode($model->sendMarkdownImg_weatherdisplay($userids, $dataVal), true);
                                    
                                 if ($res) {
