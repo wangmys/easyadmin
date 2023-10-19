@@ -29,7 +29,7 @@ class Weatherdisplay extends AdminController
     protected $create_time = '';
 
     // 测试用true，正式用false
-    protected $debug = true;
+    protected $debug = false;
 
     public function __construct()
     {
