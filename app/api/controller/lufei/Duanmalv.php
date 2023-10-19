@@ -554,7 +554,7 @@ class Duanmalv extends BaseController
 
         // die;
 		
-        $select_sk = $this->db_bi->query($sql);
+        $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);
 
         if ($select_sk) {
