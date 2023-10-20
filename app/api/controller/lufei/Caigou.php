@@ -65,8 +65,9 @@ class Caigou extends BaseController
                                                 LEFT JOIN ErpGoods EG ON EPG.GoodsId=EG.GoodsId
                                                 WHERE EG.TimeCategoryName1 IN (2022,2023,2024)
                                                     -- AND EG.TimeCategoryName2 IN ('初春','正春','春季','初夏','盛夏','夏季','初秋','深秋','秋季','初冬','深冬','冬季')
+                                                    AND EP.PurchaseDate >= '2023-01-01'
                                                     AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                                                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014')
+                                                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014','K391000055')
                                                     AND EP.CodingCodeText='已审结'
                                                 ) T1
                                 WHERE T.GoodsNo = T1.GoodsNo AND T1.IsCompleted=0
@@ -91,8 +92,9 @@ class Caigou extends BaseController
                                                 LEFT JOIN ErpGoods EG ON EPG.GoodsId=EG.GoodsId
                                                 WHERE EG.TimeCategoryName1 IN (2022,2023,2024)
                                                     -- AND EG.TimeCategoryName2 IN ('初春','正春','春季','初夏','盛夏','夏季','初秋','深秋','秋季','初冬','深冬','冬季')
+                                                    AND EP.PurchaseDate >= '2023-01-01'
                                                     AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                                                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014')
+                                                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014','K391000055')
                                                     AND EP.CodingCodeText='已审结'
                                                 ) T1
                                 WHERE T.GoodsNo = T1.GoodsNo AND T1.IsCompleted=0
@@ -117,8 +119,9 @@ class Caigou extends BaseController
                 LEFT JOIN ErpGoods EG ON EPG.GoodsId=EG.GoodsId
                 WHERE EG.TimeCategoryName1 IN (2022,2023,2024)
                     -- AND EG.TimeCategoryName2 IN ('初春','正春','春季','初夏','盛夏','夏季','初秋','深秋','秋季','初冬','深冬','冬季')
+                    AND EP.PurchaseDate >= '2023-01-01'
                     AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014')
+                    AND EP.ReceiptWareId IN ('K391000031','K391000032','K391000033','K391000034','K391000046','K391000014','K391000055')
                     AND EP.CodingCodeText='已审结'
                 ) T
                 GROUP BY 
@@ -168,67 +171,6 @@ class Caigou extends BaseController
                                             AND EG.TimeCategoryName2 LIKE '%冬%'
                                             AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                                     GROUP BY 
-                                            EG.GoodsNo
-                    
-                                    UNION ALL
-                    
-                                    --出货指令单占用库存
-                                    SELECT
-                                            EG.GoodsNo,
-                                            -SUM (ESGD.Quantity ) AS Quantity
-                                    FROM ErpSorting ES
-                                    LEFT JOIN ErpSortingGoods ESG ON ES.SortingID= ESG.SortingID
-                                    LEFT JOIN ErpSortingGoodsDetail ESGD ON ESG.SortingGoodsID=ESGD.SortingGoodsID
-                                    LEFT JOIN ErpGoods EG ON ESG.GoodsId= EG.GoodsId
-                                    LEFT JOIN ErpWarehouse EW ON ES.WarehouseId=EW.WarehouseId
-                                    WHERE	 (ES.CodingCode= 'StartNode1'
-                                                                            OR (ES.CodingCode= 'EndNode2' AND ES.IsCompleted= 0 )
-                                                                    )
-                                            AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046', 'K391000015')
-                                            AND EG.TimeCategoryName1 in (2023, 2024)
-                                    -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                                            AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')		
-                                    GROUP BY
-                                            EG.GoodsNo
-                                            
-                                    UNION ALL
-                    
-                                            --仓库出货单占用库存
-                                    SELECT
-                                            EG.GoodsNo,
-                                            -SUM ( EDGD.Quantity ) AS Quantity
-                                    FROM ErpDelivery ED
-                                    LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID= EDG.DeliveryID
-                                    LEFT JOIN ErpDeliveryGoodsDetail EDGD ON EDG.DeliveryGoodsID=EDGD.DeliveryGoodsID
-                                    LEFT JOIN ErpGoods EG ON EDG.GoodsId= EG.GoodsId
-                                    LEFT JOIN ErpWarehouse EW ON ED.WarehouseId=EW.WarehouseId
-                                    WHERE ED.CodingCode= 'StartNode1' 
-                                            AND EDG.SortingID IS NULL 
-                                            AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046', 'K391000015')
-                                            AND EG.TimeCategoryName1 in (2023, 2024)
-                                    -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                                            AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')	
-                                    GROUP BY
-                                            EG.GoodsNo
-                                            
-                                    UNION ALL
-                    
-                                            --仓库调拨占用库存
-                                    SELECT
-                                            EG.GoodsNo,
-                                            -SUM ( EIGD.Quantity ) AS Quantity
-                                    FROM ErpInstruction EI
-                                    LEFT JOIN ErpInstructionGoods EIG ON EI.InstructionId= EIG.InstructionId
-                                    LEFT JOIN ErpInstructionGoodsDetail EIGD ON EIG.InstructionGoodsId=EIGD.InstructionGoodsId
-                                    LEFT JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
-                                    LEFT JOIN ErpWarehouse EW ON EI.OutItemId=EW.WarehouseId
-                                    WHERE EI.Type= 1
-                                            AND (EI.CodingCode= 'StartNode1' OR (EI.CodingCode= 'EndNode2' AND EI.IsCompleted=0 ))
-                                            AND EW.WarehouseId IN ('K391000040','K391000041','K391000042','K391000043','K391000044','K391000014', 'K391000046', 'K391000015')
-                                            AND EG.TimeCategoryName1 in (2023, 2024)
-                                    -- 	AND EG.TimeCategoryName2 LIKE '%冬%'
-                                            AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')	
-                                    GROUP BY
                                             EG.GoodsNo
                                 ) m1
                                 
@@ -377,7 +319,7 @@ class Caigou extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo AS 货号,
                 EG.GoodsId,
-                SUM(ERG.Quantity) AS 采购入库量,
+                -- SUM(ERG.Quantity) AS 采购入库量,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
                 ErpReceipt AS ER
@@ -422,9 +364,90 @@ class Caigou extends BaseController
             }
         }
 
+        $sql_采购收货pro = "
+                --仓库收采购单
+                SELECT 
+                    t.GoodsNo as 货号,
+                    SUM(t.采购收货量) AS 采购收货量,
+                    SUM(t.采购退货量) AS 采购退货量,
+                    SUM(t.采购入库量) AS 采购入库量,
+                    CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+                FROM 
+                (
+                    SELECT
+                        EG.GoodsNo,
+                        SUM(ERG.Quantity) AS 采购收货量,
+                        0 AS 采购退货量,
+                        SUM(ERG.Quantity) AS 采购入库量
+                    FROM ErpReceipt ER 
+                    LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
+                    LEFT JOIN ErpReceiptGoods ERG ON ER.ReceiptId=ERG.ReceiptId
+                    LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+                    WHERE EG.TimeCategoryName1=2023
+                        AND ER.ReceiptDate >= '2023-01-01'
+                        AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
+                        AND EG.TimeCategoryName2 IN ('初冬','深冬','冬季')
+                        AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                        AND ER.Type=1 
+                        AND ER.CodingCodeText='已审结'
+                        AND EG.StyleCategoryName = '基本款'
+                        AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓','过账虚拟仓', '常熟正品仓库') 
+                        AND ER.SupplyId !='K191000638'
+                    GROUP BY EG.GoodsNo
+
+                    UNION ALL
+                    --采购退货
+
+                    SELECT 
+                        EG.GoodsNo,
+                        0 AS 采购收货量,
+                        SUM(EPRG.Quantity) AS 采购退货量,
+                        -SUM(EPRG.Quantity)  AS 采购入库量
+                    FROM ErpPurchaseReturn EPR 
+                    LEFT JOIN ErpWarehouse AS EW ON EPR.WarehouseId = EW.WarehouseId
+                    LEFT JOIN ErpPurchaseReturnGoods EPRG ON EPR.PurchaseReturnId=EPRG.PurchaseReturnId
+                    LEFT JOIN ErpGoods EG ON EPRG.GoodsId=EG.GoodsId
+                    WHERE EG.TimeCategoryName1=2023
+                        AND EPR.PurchaseReturnDate >= '2023-01-01'
+                        AND EPR.PurchaseReturnDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
+                        AND EG.TimeCategoryName2 IN ('初冬','深冬','冬季')
+                        AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                        AND EPR.CodingCodeText='已审结'
+                        AND EG.StyleCategoryName = '基本款'
+                        AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓','过账虚拟仓', '常熟正品仓库') 
+                        AND EPR.SupplyId !='K191000638'
+                    GROUP BY EG.GoodsNo
+                ) as t
+                GROUP BY t.GoodsNo
+        ";
+        $select_采购收货pro = $this->db_sqlsrv->query($sql_采购收货pro);
+        if ($select_采购收货pro) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_caigoushouhuo_data;');
+            $chunk_list5 = array_chunk($select_采购收货pro, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list5 as $key5 => $val5) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo_data')->strict(false)->insertAll($val5);
+            }
+        }
+
+        $sql_更新采购入库量  = "
+            update cwl_cgzdt_caigoushouhuo as c
+            left join cwl_cgzdt_caigoushouhuo_data as d on c.货号=d.货号
+            set
+                c.采购入库量 = d.采购入库量
+            where 
+                c.货号=d.货号
+        ";
+        $this->db_easyA->execute($sql_更新采购入库量);
+
+        // die;
+
         $sql_采购入库指令单未完成 = "
-            SELECT
-                EW.WarehouseName AS 云仓,
+                SELECT
                 EG.TimeCategoryName1 AS 年份,
                 CASE
                     EG.TimeCategoryName2 
@@ -481,8 +504,7 @@ class Caigou extends BaseController
                 AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
                 AND EW.WarehouseName IN ( '过账虚拟仓', '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓','广州过季仓', '常熟正品仓库') 
             GROUP BY
-                EW.WarehouseName
-                ,ES.SupplyName
+                ES.SupplyName
                 ,EG.GoodsNo
                 ,EG.GoodsName 
                 ,EG.TimeCategoryName1
@@ -992,9 +1014,6 @@ class Caigou extends BaseController
         ";  
         $this->db_easyA->execute($sql_上柜数);        
         
-    }
-
-    public function handle_2() {
         $select_config = $this->db_easyA->table('cwl_cgzdt_config')->select();
         // dump($select_config);
         foreach ($select_config as $key => $val) {
@@ -1006,11 +1025,10 @@ class Caigou extends BaseController
             ";
             $this->db_easyA->query($sql);
         }
-
-        
     }
 
-    public function handle_3() {
+
+    public function handle_2() {
         $sql_TOP = "
             SELECT
                 GoodsId 
