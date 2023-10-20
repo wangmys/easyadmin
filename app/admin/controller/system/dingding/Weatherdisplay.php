@@ -197,7 +197,7 @@ class Weatherdisplay extends AdminController
         // ";
         // $select = $this->db_easyA->query($sql);
         $select[0]['店铺名称'] = '店铺的名称';
-        $select[0]['陈列方案'] = '秋转冬方案二';
+        $select[0]['陈列方案'] = '秋转冬方案二3';
         $select[0]['窗数'] = '相关文案';
         $select[0]['调整时间'] = '相关文案';
         $select[0]['备注'] = '相关文案';
@@ -221,7 +221,7 @@ class Weatherdisplay extends AdminController
         $select[0]['店铺名称'] = '店铺的名称';
         $select[0]['姓名'] = '钉钉昵称';
         $select[0]['手机'] = '手机';
-        $select[0]['陈列方案'] = '秋转冬方案二';
+        $select[0]['陈列方案'] = '秋转冬方案二3';
         $select[0]['窗数'] = '相关文案';
         $select[0]['调整时间'] = '相关文案';
         $select[0]['备注'] = '相关文案';
