@@ -345,6 +345,7 @@ class Weatherdisplay extends AdminController
                                 $select_customer_push[$k1]['aid'] = $this->authInfo['id'];
                                 $select_customer_push[$k1]['aname'] = $this->authInfo['name'];
                                 $select_customer_push[$k1]['createtime'] = $time;
+                                break;
                             }
                         }
                     }
@@ -507,7 +508,7 @@ class Weatherdisplay extends AdminController
                     // 统计错上传数
                     $错误num = 0;
                     foreach ($data as $k => $v) {
-                        if (empty($v['userid']) || empty($v['path'])) {
+                        if (empty($v['userid'])) {
                             $错误num += 1; 
                         }
                     }
