@@ -12,6 +12,9 @@ use app\admin\model\bi\SpLypPuhuoColdtohotModel;
 use app\admin\model\bi\SpLypPuhuoHottocoldModel;
 use app\admin\model\bi\SpLypPuhuoTiGoodsTypeModel;
 use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
+use app\admin\model\bi\SpLypPuhuoZdySetModel;
+use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
+use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
 
@@ -371,6 +374,105 @@ class PuhuoService
     }
 
     /**
+     * 获取各云仓 自定义铺货货品 配置列表
+     */
+    public function get_zdy_goods($Yuncang) {
+
+        $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield')->select();
+        $res = $res ? $res->toArray() : [];
+        $select_list = $this->get_select_data($Yuncang);
+        if ($res) {
+            foreach ($res as &$v_res) {//0全部店  、 1多店、2多省、3商品专员、4经营模式
+                $Commonfield_arr = $v_res['Commonfield'] ? explode(',', $v_res['Commonfield']) : [];
+                $Commonfield_select = [];
+                switch ($v_res['Selecttype']) {
+                    case 1: //多店
+                        if ($select_list['customer_list']) {
+                            foreach ($select_list['customer_list'] as $v_customer_list) {
+                                if (in_array($v_customer_list['value'], $Commonfield_arr)) {
+                                    $v_customer_list['selected'] = true;
+                                }
+                                $Commonfield_select[] = $v_customer_list;
+                            }
+                        }
+                        $v_res['Selecttype_str'] = '多店';
+                        break;
+
+                    case 2: //多省
+                        if ($select_list['province_list']) {
+                            foreach ($select_list['province_list'] as $v_province_list) {
+                                if (in_array($v_province_list['value'], $Commonfield_arr)) {
+                                    $v_province_list['selected'] = true;
+                                }
+                                $Commonfield_select[] = $v_province_list;
+                            }
+                        }
+                        $v_res['Selecttype_str'] = '多省';
+                        break;    
+
+                    case 3: //商品专员
+                        if ($select_list['goods_manager_list']) {
+                            foreach ($select_list['goods_manager_list'] as $v_goods_manager_list) {
+                                if (in_array($v_goods_manager_list['value'], $Commonfield_arr)) {
+                                    $v_goods_manager_list['selected'] = true;
+                                }
+                                $Commonfield_select[] = $v_goods_manager_list;
+                            }
+                        }
+                        $v_res['Selecttype_str'] = '商品专员';
+                        break;        
+
+                    case 4: //经营模式
+                        if ($select_list['mathod_list']) {
+                            foreach ($select_list['mathod_list'] as $v_mathod_list) {
+                                if (in_array($v_mathod_list['value'], $Commonfield_arr)) {
+                                    $v_mathod_list['selected'] = true;
+                                }
+                                $Commonfield_select[] = $v_mathod_list;
+                            }
+                        }
+                        $v_res['Selecttype_str'] = '经营模式';
+                        break;    
+                    default:
+                    $v_res['Selecttype_str'] = '';
+                    break;
+
+                }
+
+                $v_res['Commonfield_select'] = $Commonfield_select;
+
+            }
+        }
+        $return = [];
+        if ($Yuncang == '武汉云仓') {
+            $return = ['wuhan_goods_config' => $res, 'wuhan_select_list' => $select_list];
+        } elseif ($Yuncang == '贵阳云仓') {
+            $return = ['guiyang_goods_config' => $res, 'guiyang_select_list' => $select_list];
+        } elseif ($Yuncang == '广州云仓') {
+            $return = ['guangzhou_goods_config' => $res, 'guangzhou_select_list' => $select_list];
+        } elseif ($Yuncang == '南昌云仓') {
+            $return = ['nanchang_goods_config' => $res, 'nanchang_select_list' => $select_list];
+        } elseif ($Yuncang == '长沙云仓') {
+            $return = ['changsha_goods_config' => $res, 'changsha_select_list' => $select_list];
+        }
+
+        return $return;
+
+    }
+
+    //获取多店、多省、商品专员、经营模式 下拉数据
+    public function get_select_data($yuncang) {
+
+        $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
+        $customer_list = $this->easy_db->Query("select CustomerName as name, CustomerId as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomerName;");
+        $province_list = $this->easy_db->Query("select State as name, State as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
+        $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, CustomItem17 as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
+        $mathod_list = $this->easy_db->Query("select Mathod as name, Mathod as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
+        return ['customer_list' => $customer_list, 'province_list' => $province_list, 'goods_manager_list' => $goods_manager_list, 'mathod_list' => $mathod_list];
+
+    }
+
+    /**
      * 保存各个云仓指定铺货货品配置
      */
     public function saveZhidingGoodsConfig($data) {
@@ -399,6 +501,114 @@ class PuhuoService
         }
 
         return $Yuncang;
+
+    }
+
+    /*
+    检测货号是否已存在
+    */
+    public function checkPuhuoZdySetGoods($post) {
+
+        $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoodsModel();
+
+        $return = ['error'=>'0', 'goodsno_str'=>''];
+        if ($post['id']) {
+
+            $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
+            
+        } else {
+            
+            $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
+
+        }
+
+        $goods = $post['GoodsNo'] ? explode(' ', $post['GoodsNo']) : [];
+        $intersect_goods = array_intersect($goods, $exist_goods);
+        if ($intersect_goods) {
+            $return['error'] = 1;
+            $return['goodsno_str'] = implode(',', $intersect_goods);
+        }
+
+        return $return;
+
+    }
+
+    /**
+     * 保存各个云仓铺货配置(多店/多省/商品专员/经营模式)
+     */
+    public function savePuhuoZdySet($data) {
+
+        $id = $data['id'];
+        $Yuncang = $data['Yuncang'];
+        $Selecttype = $data['Selecttype'] ? $data['Selecttype'] : 0;
+        $Commonfield = $data['Commonfield'] ?? '';
+        $GoodsNo = $data['GoodsNo'] ? trim($data['GoodsNo']) : '';
+        $GoodsNo_arr = [];
+        if ($GoodsNo) {
+            $GoodsNo_arr = explode(' ', $GoodsNo);
+        }
+
+        $add_data = [
+            'Yuncang' => $Yuncang,
+            'GoodsNo' => $GoodsNo,
+            'Selecttype' => $Selecttype,
+            'Commonfield' => $Commonfield,
+        ];
+
+        $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoodsModel();
+
+        Db::startTrans();
+        try {
+            if ($id) {//修改
+                
+                SpLypPuhuoZdySetModel::where([['id', '=', $id]])->update($add_data);
+                $ZdyYuncangGoodsModel::where([['set_id', '=', $id]])->delete();
+
+            } else {//新增
+
+                $res = SpLypPuhuoZdySetModel::create($add_data);
+                $id = $res->id;
+
+            }
+
+            $insert_data = [];
+            if ($GoodsNo_arr) {
+                foreach ($GoodsNo_arr as $v_goodsno) {
+                    $insert_data[] = [
+                        'Yuncang' => $Yuncang,
+                        'GoodsNo' => $v_goodsno,
+                        'set_id' => $id,
+                    ];
+                }
+            }
+            $ZdyYuncangGoodsModel->saveAll($insert_data);
+
+            Db::commit();
+
+        } catch (\Exception $e) {
+            Db::rollback();
+        }
+
+        return $id;
+
+    }
+
+    /**
+     * 删除铺货配置(多店/多省/商品专员/经营模式)
+     */
+    public function delPuhuoZdySet($id) {
+
+        Db::startTrans();
+        try {
+
+            $res = SpLypPuhuoZdySetModel::where([['id', '=', $id]])->delete();
+            SpLypPuhuoZdyYuncangGoodsModel::where([['set_id', '=', $id]])->delete();
+
+            Db::commit();
+
+        } catch (\Exception $e) {
+            Db::rollback();
+        }
 
     }
 

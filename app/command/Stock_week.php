@@ -227,6 +227,7 @@ class Stock_week extends Command
 		$start_time = date('Y-m-d', time()-24*60*60*7);
 		$end_time = date('Y-m-d', time()-24*60*60);
 		$date_arr = [['start_time' => $start_time, 'end_time' => $end_time]];
+		// $date_arr = [['start_time' => '2023-09-25', 'end_time' => '2023-10-08'], ['start_time' => '2023-10-09', 'end_time' => '2023-10-15']];
 
 		$week_date = $this->get_week_date();
 		$year_start_time = array_column($week_date, 'year_start_time');

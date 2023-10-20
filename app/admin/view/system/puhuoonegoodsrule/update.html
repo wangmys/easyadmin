@@ -1,0 +1,30 @@
+<div class="layuimini-container">
+    <form class="layui-form layuimini-form" lay-filter="app-form">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">货号</label>
+            <div class="layui-input-block">
+                <input type="text" readonly name="GoodsNo" class="layui-input" value="{$rulea_info['GoodsNo']}">
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">指定铺货规则</label>
+            <div class="layui-input-block">
+                <select name="rule_id" lay-verify="" lay-search="">
+                    <option value="">请选择</option>
+                    {foreach $puhuo_rule_b_list as $vo}
+                    <option value="{$vo['id']}" {if $rulea_info['rule_id'] == $vo['id']}selected=""{/if}>{$vo['Yuncang']}-{$vo['State']}-{$vo['StyleCategoryName']}-{$vo['CategoryName1']}-{$vo['CategoryName2']}-{$vo['CustomerGrade']}-{$vo['Stock_00']}-{$vo['Stock_29']}-{$vo['Stock_30']}-{$vo['Stock_31']}-{$vo['Stock_32']}-{$vo['Stock_33']}-{$vo['Stock_34']}-{$vo['Stock_35']}-{$vo['Stock_36']}-{$vo['Stock_38']}-{$vo['Stock_40']}-{$vo['Stock_42']}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item text-center">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>
+        </div>
+
+    </form>
+</div>
