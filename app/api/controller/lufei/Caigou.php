@@ -337,6 +337,7 @@ class Caigou extends BaseController
 
     // 采购收货
     public function caigoushouhuo() {
+        // 1月1至 昨天的
         $sql_采购收货 = "
         --  采购收货
             SELECT
@@ -388,6 +389,7 @@ class Caigou extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结' 
                 AND ER.ReceiptDate >= '2023-01-01'
+                AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
                 AND ER.Type= 1 
                 AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023','2024' ) 
@@ -996,7 +998,6 @@ class Caigou extends BaseController
         $select_config = $this->db_easyA->table('cwl_cgzdt_config')->select();
         // dump($select_config);
         foreach ($select_config as $key => $val) {
-
             $值 = xmSelectInput($val['值']);
             $sql = "
                 update cwl_cgzdt_caigoushouhuo 
@@ -1005,6 +1006,51 @@ class Caigou extends BaseController
             ";
             $this->db_easyA->query($sql);
         }
+
+        
+    }
+
+    public function handle_3() {
+        $sql_TOP = "
+            SELECT
+                GoodsId 
+            FROM
+                `cwl_cgzdt_caigoushouhuo` 
+            WHERE
+                TOP = 'Y'
+        ";
+        $select_TOP = $this->db_easyA->query($sql_TOP);
+        $goodsId = '';
+        foreach ($select_TOP as $key => $val) {
+            if ($key + 1 < count($select_TOP)) {
+                $goodsId .= $val['GoodsId'].',';
+            } else {
+                $goodsId .= $val['GoodsId'];
+            }
+        }
+
+        $sql_图片 = "
+            SELECT
+                GoodsId,Img 
+            FROM
+                ErpGoodsImg 
+            WHERE
+                GoodsId IN ( {$goodsId} )
+        ";
+        $select_图片 = $this->db_sqlsrv->query($sql_图片);
+        $select_data = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->field('GoodsId')->where(['TOP' => 'Y'])->select();
+
+        foreach ($select_data as $k1 => $v1) {
+            foreach ($select_图片 as $k2 => $v2) {
+                if ($v1['GoodsId'] == $v2['GoodsId']) {
+                    $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->where(['GoodsId' => $v1['GoodsId']])->update([
+                        '图片路径' => $v2['Img']
+                    ]);
+                    break;
+                }
+            }
+        }
+        
     }
 
 
