@@ -543,6 +543,8 @@ class ReportFormsService
         $field_width[11] = 80;
         $field_width[12] = 100;
 
+        // 修复
+        $this->db_bi->execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
         // 计算占比用
         $sql2 = "
             select 
