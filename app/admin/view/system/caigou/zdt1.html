@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购自动推-移动端</title>
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        table {
+            text-align: center;
+        }
+        
+        table thead tr th {
+            padding: 5px 20px;
+            background-color: yellowgreen;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        table tbody tr td {
+            /* padding: 5px 20px; */
+            padding: 5px 10px;
+            border-top: 1px solid yellowgreen;
+        }
+        
+        table tbody tr:nth-child(2n) td {
+            background-color: lightblue;
+        }
+        
+        table tbody tr:last-child td {
+            border-bottom: 1px solid yellowgreen;
+        }
+
+        .xiaoshou_left {
+            width:65%; text-align: left; padding-left: 5px;  float:left; 
+        } 
+        .xiaoshou_right {
+            width:25%; text-align: left; float:left;
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th>货号/简码</th>
+                <th>图片</th>
+                <th style="width:140px;">零售/成本价</th>
+                <th style="width:100px;">分类</th>
+                <th style="width:250px;">销售信息</th>
+                <th style="width:250px;">近两周销量</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name="data" id="vo"}
+                <tr>
+                    <td>
+                        <div>{$vo['货号']}</div>
+                        <hr>
+                        <div style="color:red;">{$vo['简码']}</div>
+                    </td>
+                    <td>
+                        <img src="{$vo['图片路径']}" style="width: 150px;">
+                    </td>
+                    <td>
+                        <div>{$vo['零售价']}</div>
+                        <hr>
+                        <div style="color:red;">{$vo['成本价']}</div>
+                    </td>
+                    <td>{$vo['分类']}</td>
+                    <td class="" style="width:200px;">
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">当天销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['当天销量']}</div>
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">售罄率：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['售罄率']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">总销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['累销量']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">总库存量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['总库存量']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">云仓在途量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['云仓在途量']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">订单未入量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['订单未入量']}</div> 
+                        </div>
+                    </td>
+                    <td style="width:200px;">
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">近一周销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['近一周销量']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">近两周销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['近两周销量']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">上柜数：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['上柜数']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
+                        </div>
+                    </td>
+                </tr>
+            {/volist}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -410,10 +410,13 @@ class ReportFormsService
         $date = date('Y-m-d');
         // $sql = "select 一级分类,二级分类,分类,总库存量,店库存数量,仓库库存,仓库可用库存,收仓在途,已配未发,昨天销,前四周销量,前三周销量,前两周销量,前一周销量,周转周 from accessories_report where 更新日期 = '$date'";
         $sql = "select 一级分类,分类,总库存量,昨天销,前一周销量,前两周销量,前三周销量,前四周销量,周转周,店库存数量,仓库库存,仓库可用库存,收仓在途,已配未发,二级分类 from accessories_report
-         where 更新日期 = '$date' order by 一级分类 desc,二级分类 asc";
-        $data = $this->db_bi->Query($sql);
+         where 更新日期 = '{$date}' order by 一级分类 desc,二级分类 asc";
+
+         
+        $data = $this->db_bi->query($sql);
         // echo "<pre>"; 
         // print_r($data);
+        // die;
         
         $table_header = ['ID'];
         $table_header = array_merge($table_header, array_keys($data[0]));
@@ -540,6 +543,8 @@ class ReportFormsService
         $field_width[11] = 80;
         $field_width[12] = 100;
 
+        // 修复
+        $this->db_bi->execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
         // 计算占比用
         $sql2 = "
             select 
@@ -553,7 +558,7 @@ class ReportFormsService
                     accessories_report 
                 WHERE
                     更新日期 = '{$date}' 
-                GROUP BY 一级分类,二级分类
+                GROUP BY 一级分类,分类,二级分类
                 ORDER BY
                     一级分类 DESC,二级分类 ASC
             ) as t

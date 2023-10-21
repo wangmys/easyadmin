@@ -158,7 +158,7 @@ class Shangguitips extends AdminController
                     concat(round(货品等级上柜率_合计 * 100, 1), '%') as 货品等级上柜率_合计,
                     预计最大可加铺店数,单款全国日均销排名,
                     concat(round(近1周中类销售占比 * 100, 1), '%') as 近1周中类销售占比,
-                    上柜提醒,克重,主码最小值,
+                    上柜提醒,克重,主码最小值,主码最小值码数,
                     更新日期
                 FROM cwl_shangguitips_handle
                 WHERE 1	

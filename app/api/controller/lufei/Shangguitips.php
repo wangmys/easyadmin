@@ -1412,4 +1412,63 @@ class Shangguitips extends BaseController
 
 
     }
+
+    // 主码最小值码数
+    public function handle_6() {
+        $sql_handle = "
+            SELECT
+                云仓,一级分类,二级分类,分类,货号,主码最小值 
+            FROM
+                cwl_shangguitips_handle 
+            WHERE
+                `主码最小值` IS NOT NULL
+            -- limit 1
+        ";
+        $select_handle = $this->db_easyA->query($sql_handle);
+
+        foreach($select_handle as $key => $val) {
+            $主码最小值码数 = '';
+            $find_cangku = $this->db_easyA->table('cwl_shangguitips_cangku')->where([
+                ['云仓', '=', $val['云仓']],
+                ['一级分类', '=', $val['一级分类']],
+                ['二级分类', '=', $val['二级分类']],
+                ['分类', '=', $val['分类']],
+                ['货号', '=', $val['货号']],
+            ])->find();
+
+            if ($find_cangku['可用库存_00/28/37/44/100/160/S'] == $val['主码最小值']) {
+                $主码最小值码数 = '00';
+            } elseif ($find_cangku['可用库存_29/38/46/105/165/M'] == $val['主码最小值']) {
+                $主码最小值码数 = '29';
+            } elseif ($find_cangku['可用库存_30/39/48/110/170/L'] == $val['主码最小值']) {
+                $主码最小值码数 = '30';
+            } elseif ($find_cangku['可用库存_31/40/50/115/175/XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '31';
+            } elseif ($find_cangku['可用库存_32/41/52/120/180/2XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '32';
+            } elseif ($find_cangku['可用库存_33/42/54/125/185/3XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '33';
+            } elseif ($find_cangku['可用库存_34/43/56/190/4XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '34';
+            } elseif ($find_cangku['可用库存_35/44/58/195/5X'] == $val['主码最小值']) {
+                $主码最小值码数 = '35';
+            } elseif ($find_cangku['可用库存_36/6XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '36';
+            } elseif ($find_cangku['可用库存_38/7XL'] == $val['主码最小值']) {
+                $主码最小值码数 = '38';
+            } elseif ($find_cangku['可用库存_40'] == $val['主码最小值']) {
+                $主码最小值码数 = '40';
+            }
+
+            $find_cangku = $this->db_easyA->table('cwl_shangguitips_handle')->where([
+                ['云仓', '=', $val['云仓']],
+                ['一级分类', '=', $val['一级分类']],
+                ['二级分类', '=', $val['二级分类']],
+                ['分类', '=', $val['分类']],
+                ['货号', '=', $val['货号']],
+            ])->update([
+                '主码最小值码数' => $主码最小值码数
+            ]);
+        }
+    }
 }

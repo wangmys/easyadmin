@@ -65,7 +65,7 @@ class Index
                 'CustomItem36' => $v['CustomItem36'],
                 'ShutOut' => $v['ShutOut'],
                 'Mathod' => $v['Mathod'],
-                'CustomerGrade' => $v['CustomerGrade'],
+                'CustomerGrade' => $v['CustomerGrade'] ?: '',
                 'State' => $v['State'],
                 'City' => $v['City'],
                 'liable' => $v['CustomItem17'],
