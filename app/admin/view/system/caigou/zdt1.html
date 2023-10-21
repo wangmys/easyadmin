@@ -5,8 +5,67 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>采购自动推-移动端</title>
-    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <!-- <link rel="stylesheet" href="__STATIC__/admin/css/flex.css"> -->
     <style>
+        /* 布局类 */
+        *{margin:0; padding: 0;}
+        .flex { display: flex; justify-content: center; align-items: center; }
+
+        .flex.line25>div { height: 25px; line-height: 25px; }
+        .flex.line30>div { height: 30px; line-height: 30px; }
+        .flex.line35>div { height: 35px; line-height: 35px; }
+        .flex.line40>div { height: 40px; line-height: 40px; }
+        .flex.line45>div { height: 45px; line-height: 45px; }
+        .flex.line50>div { height: 50px; line-height: 50px; }
+
+        .flex.row { flex-direction: row; }
+        .flex.col { flex-direction: column; }
+        .flex.row-re { flex-direction: row-reverse; }
+        .flex.col-re { flex-direction: column-reverse; }
+        .flex.start { justify-content: flex-start; }
+        .flex.end { justify-content: flex-end; }
+        .flex.between { justify-content: space-between; }
+        .flex.around { justify-content: space-around; }
+        .flex.wrap { flex-wrap: wrap; }
+        .flex.al-full { align-items: stretch; }
+        .flex.al-start { align-items: flex-start; }
+        .flex.al-end { align-items: flex-end; }
+        .flex.tx-center { text-align: center; }
+
+        .flex.mar5>div { margin: 0 5px; }
+        .flex.mar10>div { margin: 0 10px; }
+        .flex.mar15>div { margin: 0 15px; }
+        .flex.mar20>div { margin: 0 20px; }
+        .flex.mar25>div { margin: 0 25px; }
+        .flex.mar30>div { margin: 0 30px; }
+
+        .flex.pad5>div { padding: 0 5px; }
+        .flex.pad10>div { padding: 0 10px; }
+        .flex.pad15>div { padding: 0 15px; }
+        .flex.pad20>div { padding: 0 20px; }
+        .flex.pad25>div { padding: 0 25px; }
+        .flex.pad30>div { padding: 0 30px; }
+
+        /* 文字类 */
+        .font-theme { color: #3078f0; }
+        .font-max { font-size: 24px; }
+        .font-lg { font-size: 20px; }
+        .font-md { font-size: 16px; }
+        .font-nm { font-size: 14px; }
+        .font-sm { font-size: 12px; }
+        .font-bold { font-weight: bold; }
+        .bold { font-weight: bold; }
+
+        .test {border: 1px solid red;}
+        .test1 {border: 1px solid yellow;}
+        .test2 {border: 1px solid blue;}
+        .test3 {border: 1px solid green;}
+        .width100 { width:100%; }
+
+        img {
+        display: block;
+        width: 100%;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -78,7 +137,7 @@
                     </td>
                     <td>{$vo['分类']}</td>
                     <td class="" style="width:200px;">
-                        <div class="" style="width: 100%;">
+                        <div class="flex row" style="width: 100%;">
                             <span class="" style="width:70%; text-align: left; padding-left: 20px;">当天销量：</span> 
                             <span class="" style="width:30%; text-align: left;">{$vo['当天销量']}</span>
                         </div>
@@ -87,7 +146,7 @@
                             <span class="" style="width:30%; text-align: left;">{$vo['售罄率']}</span>
                         </div>
                         <div class="flex row " style="width: 100%;">
-                            <span class="blue" style="width:70%; text-align: left; padding-left: 20px;">总销量：</span> 
+                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">总销量：</span> 
                             <span class="" style="width:30%; text-align: left;">{$vo['累销量']}</span>
                         </div>
                         <div class="flex row " style="width: 100%;">
