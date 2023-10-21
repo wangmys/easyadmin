@@ -37,20 +37,12 @@
         table tbody tr:last-child td {
             border-bottom: 1px solid yellowgreen;
         }
-        .xiaoshou {
-            position: relative;
-        }
+
         .xiaoshou_left {
-            position: absolute;
-            width:70%; 
-            text-align: left; 
-            left: 0;
-        }
+            width:60%; text-align: left; padding-left: 10px;  float:left; 
+        } 
         .xiaoshou_right {
-            position: absolute;
-            width:30%; 
-            text-align: left;
-            right:0;
+            width:30%; text-align: left; float:right;
         }
     </style>
 </head>
@@ -60,7 +52,7 @@
             <tr>
                 <th>货号/简码</th>
                 <th>图片</th>
-                <th>零售价/成本价</th>
+                <th style="width:200px;">零售价/成本价</th>
                 <th>分类</th>
                 <th>销售信息</th>
                 <th>近两周销量</th>
@@ -85,42 +77,54 @@
                     <td>{$vo['分类']}</td>
                     <td class="" style="width:200px;">
                         <div class="" style="width: 100%;">
-                            <div class=" test1" style="width:70%; text-align: left; float:left;">当天销量：</div> 
-                            <div class=" test2" style="width:27%; text-align: left; float:right;">{$vo['当天销量']}</div>
+                            <div class="xiaoshou_left" style="">当天销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['当天销量']}</div>
                         </div>
                         <div class="" style="width: 100%;">
-                            <div class=" test1" style="width:70%; text-align: left; float:left;">售罄率：</div> 
-                            <div class=" test2" style="width:27%; text-align: left; float:right;">{$vo['售罄率']}</div> 
+                            <div class="xiaoshou_left" style="">售罄率：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['售罄率']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">总销量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['累销量']}</span>
+                            <div class="xiaoshou_left" style="">总销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['累销量']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">总库存量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['总库存量']}</span>
+                            <div class="xiaoshou_left" style="">总库存量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['总库存量']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">云仓在途量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['云仓在途量']}</span>
+                            <div class="xiaoshou_left" style="">云仓在途量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['云仓在途量']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">订单未入量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['订单未入量']}</span>
+                            <div class="xiaoshou_left" style="">订单未入量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['订单未入量']}</div> 
                         </div>
                     </td>
                     <td style="width:200px;">
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">近一周销量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['近一周销量']}</span>
+                            <div class="xiaoshou_left" style="">近一周销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['近一周销量']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">近两周销量：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['近两周销量']}</span>
+                            <div class="xiaoshou_left" style="">近两周销量：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['近两周销量']}</div> 
                         </div>
                         <div class="" style="width: 100%;">
-                            <span class="" style="width:70%; text-align: left; padding-left: 20px;">上柜数：</span> 
-                            <span class="" style="width:30%; text-align: left;">{$vo['上柜数']}</span>
+                            <div class="xiaoshou_left" style="">上柜数：</div> 
+                            <div class="xiaoshou_right" style="">{$vo['上柜数']}</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
+                        </div>
+                        <div class="" style="width: 100%;">
+                            <div class="xiaoshou_left" style="">&nbsp;</div> 
+                            <div class="xiaoshou_right" style="">&nbsp;</div> 
                         </div>
                     </td>
                 </tr>
