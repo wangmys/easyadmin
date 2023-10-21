@@ -198,6 +198,10 @@ class Zdconfig extends AdminController
             return $this->error('以下货号在该云仓已存在，请剔除:'.$check_info['goodsno_str']);
         }
 
+        if ($check_info['error'] == 2) {
+            return $this->error('套装套西的货号个数必须是双数，请检查');
+        }
+
         $res_id = $this->service->savePuhuoZdySet($post);
 
         return $this->success('成功',['id' => $res_id, 'Yuncang'=>$post['Yuncang']]);

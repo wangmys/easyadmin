@@ -85,6 +85,12 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="guiyang_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
             html += '</td>';
+            html += '<td class="if_taozhuang">';
+            html += '<select name="if_taozhuang">';
+            html += '<option value="2">否</option>';
+            html += '<option value="1">是</option>';
+            html += '</select>';
+            html += '</td>';
 
             //点击添加 操作
             $('.add_guiyang_goods_config').on('click', function(){
@@ -145,12 +151,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        if_taozhuang:if_taozhuang,
                         id:id
                     }
                     // 保存配置
@@ -184,12 +192,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
                         id:id,
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -243,6 +253,12 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="Commonfield"></td>';
             html += '<td class="wuhan_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
+            html += '</td>';
+            html += '<td class="if_taozhuang">';
+            html += '<select name="if_taozhuang">';
+            html += '<option value="2">否</option>';
+            html += '<option value="1">是</option>';
+            html += '</select>';
             html += '</td>';
 
             //点击添加 操作
@@ -304,12 +320,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        if_taozhuang:if_taozhuang,
                         id:id
                     }
                     // 保存配置
@@ -343,12 +361,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
     
                     var _data = {
                         id:id,
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -402,6 +422,12 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="Commonfield"></td>';
             html += '<td class="guangzhou_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
+            html += '</td>';
+            html += '<td class="if_taozhuang">';
+            html += '<select name="if_taozhuang">';
+            html += '<option value="2">否</option>';
+            html += '<option value="1">是</option>';
+            html += '</select>';
             html += '</td>';
 
             //点击添加 操作
@@ -463,12 +489,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        if_taozhuang:if_taozhuang,
                         id:id
                     }
                     // 保存配置
@@ -502,12 +530,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
                         id:id,
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -561,6 +591,12 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="Commonfield"></td>';
             html += '<td class="nanchang_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
+            html += '</td>';
+            html += '<td class="if_taozhuang">';
+            html += '<select name="if_taozhuang">';
+            html += '<option value="2">否</option>';
+            html += '<option value="1">是</option>';
+            html += '</select>';
             html += '</td>';
 
             //点击添加 操作
@@ -622,12 +658,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        if_taozhuang:if_taozhuang,
                         id:id
                     }
                     // 保存配置
@@ -661,12 +699,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
                         id:id,
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -725,6 +765,12 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="Commonfield"></td>';
             html += '<td class="changsha_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
+            html += '</td>';
+            html += '<td class="if_taozhuang">';
+            html += '<select name="if_taozhuang">';
+            html += '<option value="2">否</option>';
+            html += '<option value="1">是</option>';
+            html += '</select>';
             html += '</td>';
 
             //点击添加 操作
@@ -786,12 +832,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        if_taozhuang:if_taozhuang,
                         id:id
                     }
                     // 保存配置
@@ -825,12 +873,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
                         id:id,
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置

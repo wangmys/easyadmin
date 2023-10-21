@@ -378,7 +378,7 @@ class PuhuoService
      */
     public function get_zdy_goods($Yuncang) {
 
-        $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield')->select();
+        $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,if_taozhuang')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -512,6 +512,15 @@ class PuhuoService
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoodsModel();
 
         $return = ['error'=>'0', 'goodsno_str'=>''];
+
+        $goods = $post['GoodsNo'] ? explode(' ', $post['GoodsNo']) : [];
+
+        //如果是套装套西，则货品个数必须是双数
+        if ($post['if_taozhuang'] == SpLypPuhuoZdySetModel::IF_TAOZHUANG['is_taozhuang'] && (count($goods)%2)) {
+            $return['error'] = 2;
+            return $return;
+        }
+
         if ($post['id']) {
 
             $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
@@ -522,7 +531,6 @@ class PuhuoService
 
         }
 
-        $goods = $post['GoodsNo'] ? explode(' ', $post['GoodsNo']) : [];
         $intersect_goods = array_intersect($goods, $exist_goods);
         if ($intersect_goods) {
             $return['error'] = 1;
@@ -542,6 +550,7 @@ class PuhuoService
         $Yuncang = $data['Yuncang'];
         $Selecttype = $data['Selecttype'] ? $data['Selecttype'] : 0;
         $Commonfield = $data['Commonfield'] ?? '';
+        $if_taozhuang = $data['if_taozhuang'] ?? 2;
         $GoodsNo = $data['GoodsNo'] ? trim($data['GoodsNo']) : '';
         $GoodsNo_arr = [];
         if ($GoodsNo) {
@@ -553,6 +562,7 @@ class PuhuoService
             'GoodsNo' => $GoodsNo,
             'Selecttype' => $Selecttype,
             'Commonfield' => $Commonfield,
+            'if_taozhuang' => $if_taozhuang,
         ];
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoodsModel();
