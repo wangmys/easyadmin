@@ -58,7 +58,7 @@ class Caigou extends AdminController
                 concat(round(售罄率 * 100, 1), '%') as 售罄率
             from cwl_cgzdt_caigoushouhuo
             where TOP = 'Y'
-                AND 中类 = '牛仔长裤'
+                AND 中类 = '大衣'
             order by 排名 ASC
         ";
         $select = $this->db_easyA->query($sql);
