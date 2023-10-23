@@ -523,15 +523,17 @@ class Push extends BaseController
 
         $sql = "select * from cwl_cgzdt_config";
         $select = $this->db_easyA->query($sql);
+        
         if ($select) {
             foreach ($select as $key => $val) {
                 // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
 
                 $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg?v=" . time();
 
+                $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
                 $headers = get_headers($jpg_url);
                 if (substr($headers[0], 9, 3) == 200) {
-                    $model->sendMarkdownImg($userids, $val['值'], $jpg_url);
+                    $model->sendMarkdownImg($userids, $val['值'] . " " . $更新日期 . " S119 " , $jpg_url);
                 }
             }
         }
