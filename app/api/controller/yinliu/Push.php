@@ -8,6 +8,7 @@ use app\api\service\bi\yinliu\YinliuDataService;
 use app\api\service\dingding\Sample;
 use app\api\service\bi\report\ReportFormsService;
 use think\Request;
+use think\facade\Db;
 
 /**
  * 引流数据推送
@@ -24,6 +25,10 @@ class Push extends BaseController
     // 日期
     protected $Date = '';
 
+    protected $db_easyA = '';
+    protected $db_bi = '';
+    protected $db_sqlsrv = '';
+
     /**
      * 初始化参数
      * Push constructor.
@@ -34,6 +39,10 @@ class Push extends BaseController
         $this->Date = date('Y-m-d');
         $this->service = new YinliuDataService;
         $this->request = $request;
+
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
+        $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
     /**
@@ -518,12 +527,12 @@ class Push extends BaseController
             foreach ($select as $key => $val) {
                 // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
 
-                echo $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg";
-                echo '<br>';
+                $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg?v=" . time();
+
                 $headers = get_headers($jpg_url);
-                // if (substr($headers[0], 9, 3) == 200) {
-                //     $model->sendMarkdownImg($userids, $val['值'], $jpg_url);
-                // }
+                if (substr($headers[0], 9, 3) == 200) {
+                    $model->sendMarkdownImg($userids, $val['值'], $jpg_url);
+                }
             }
         }
 
