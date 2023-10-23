@@ -524,7 +524,8 @@ class Push extends BaseController
         $sql = "select * from cwl_cgzdt_config";
         $select = $this->db_easyA->query($sql);
 
-        $find = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->field('更新日期')->find();
+        $find = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->field('更新日期')->where(['风格' => '基本款'])->find();
+        // dump($find);die;
         
         if ($select) {
             foreach ($select as $key => $val) {
