@@ -85,7 +85,7 @@ class Caigou extends AdminController
         $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
         return View('zdt1', [
             'data' => $select,
-            'title' => $title . " 【{$更新日期}】" . "表名：S119A"
+            'title' => $title . " 【{$更新日期}】" . "表名：S119"
         ]);
     }
 }

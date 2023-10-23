@@ -404,11 +404,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            // [
-            //     'name' => '李逢生',
-            //     'tel' => '13927687768',
-            //     'userid' => '010946151826588427'
-            // ],
+            [
+                'name' => '李逢生',
+                'tel' => '13927687768',
+                'userid' => '010946151826588427'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -472,6 +472,97 @@ class Push extends BaseController
         foreach ($parms as $key => $val) {
             $model->sendMarkdownImg($val['userid'], '鞋履报表', $path);
         } 
+    }
+
+    /**
+     * 采购定推
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function cgdt_s119()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            // [
+            //     'name' => '王威',
+            //     'tel' => '15880012590',
+            //     'userid' => '0812473564939990'
+            // ],
+            // [
+            //     'name' => '李雅婷',
+            //     'tel' => '15298454189',
+            //     'userid' => '284616312226634272'
+            // ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        $userids = "";
+        foreach ($parms as $key => $val) {
+            if (count($parms) == $key + 1 ) {
+                $userids .= $val['userid'];
+            } else {
+                $userids .= $val['userid'] . ',';
+            }
+        } 
+
+        $sql = "select * from cwl_cgzdt_config";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            foreach ($select as $key => $val) {
+                // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
+
+                echo $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg";
+                echo '<br>';
+                $headers = get_headers($jpg_url);
+                // if (substr($headers[0], 9, 3) == 200) {
+                //     $model->sendMarkdownImg($userids, $val['值'], $jpg_url);
+                // }
+            }
+        }
+
+        // $send_data = [
+        //     'S007' => [
+        //         'title' => '2023 春季货品销售报表 表号:S007',
+        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S007.jpg'
+        //     ],
+        //     'S008' => [
+        //         'title' => '2023 夏季货品销售报表 表号:S008',
+        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S008.jpg'
+        //     ],
+        //     'S013' => [
+        //         'title' => '2023 春季货品零售汇总报表 表号:S013',
+        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S013.jpg'
+        //     ],
+        //     'S014' => [
+        //         'title' => '2023 夏季货品零售汇总报表 表号:S014',
+        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S014.jpg'
+        //     ],
+        // ];
+
+
+        // $res = [];
+
+        // foreach ($send_data as $k=>$v){
+        //     $headers = get_headers($v['jpg_url']);
+        //     if(substr($headers[0], 9, 3) == 200){
+        //         // 推送
+        //         // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
+        //         $res[] = $model->send($v['title'],$v['jpg_url']);
+        //         // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+        //     }
+        // }
+        // return json($res);
+
+
+        
+        // $model->sendMarkdownImg($val['userid'], '鞋履报表', $path);
     }
 
     /**
