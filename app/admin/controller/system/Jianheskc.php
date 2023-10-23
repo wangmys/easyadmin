@@ -375,6 +375,9 @@ class Jianheskc extends AdminController
         $customer17 = $this->db_easyA->query("
             SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_jianhe_stock_skc WHERE 商品负责人 IS NOT NULL AND 商品负责人 !='0' GROUP BY 商品负责人
         ");
+        $province = $this->db_easyA->query("
+            SELECT 省份 as name, 省份 as value FROM cwl_jianhe_stock_skc WHERE 省份 IS NOT NULL GROUP BY 省份
+        ");
         $customer36 = $this->db_easyA->query("
             SELECT 温区 as name, 温区 as value FROM cwl_jianhe_stock_skc WHERE 温区 IS NOT NULL GROUP BY 温区
         ");
@@ -395,7 +398,7 @@ class Jianheskc extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36, 'province' => $province]]);
     }
 
     // 实时数据更新

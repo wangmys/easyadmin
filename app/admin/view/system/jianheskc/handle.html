@@ -223,6 +223,10 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-spzy" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-sf" class="xm-select-demo"></div>
+                            </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-dpmc" class="xm-select-demo"></div>
@@ -231,6 +235,8 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-fg" class="xm-select-demo"></div>
                             </div>
+                        </div>
+                        <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-season" class="xm-select-demo"></div>
@@ -308,6 +314,20 @@
             filterable: true,
             toolbar: {show: true},
             name: '商品专员',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-sf', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '省份',
             // showCount: 1,
             theme: {
                 color: '#1cbbb4',
@@ -400,6 +420,17 @@
                     // showCount: 1,
                     name:'店铺名称',
                     data: res.data.customer
+                })
+                xmSelect.render({
+                    el: '#xm-sf', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: res.data.province
                 })
 
             }, 'json')
