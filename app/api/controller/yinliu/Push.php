@@ -523,6 +523,8 @@ class Push extends BaseController
 
         $sql = "select * from cwl_cgzdt_config";
         $select = $this->db_easyA->query($sql);
+
+        $find = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->field('更新日期')->find();
         
         if ($select) {
             foreach ($select as $key => $val) {
@@ -530,7 +532,7 @@ class Push extends BaseController
 
                 $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg?v=" . time();
 
-                $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
+                $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($find['更新日期'])));
                 $headers = get_headers($jpg_url);
                 if (substr($headers[0], 9, 3) == 200) {
                     $model->sendMarkdownImg($userids, $val['值'] . " " . $更新日期 . " S119 " , $jpg_url);
