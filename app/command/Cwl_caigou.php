@@ -44,7 +44,7 @@ class Cwl_caigou extends Command
             foreach ($select as $key => $val) {
                 // $path = "/data/web/cwl/cgzdt_{$val['值']}.jpg";
                 $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
-                
+                echo "wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}";die;
                 $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
                 // print $result;//输出命令的结果状态码
                 // print $res;//输出命令输出的最后一行
