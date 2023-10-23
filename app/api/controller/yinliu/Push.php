@@ -498,16 +498,21 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            // [
-            //     'name' => '王威',
-            //     'tel' => '15880012590',
-            //     'userid' => '0812473564939990'
-            // ],
-            // [
-            //     'name' => '李雅婷',
-            //     'tel' => '15298454189',
-            //     'userid' => '284616312226634272'
-            // ],
+            [
+                'name' => '王威',
+                'tel' => '15880012590',
+                'userid' => '0812473564939990'
+            ],
+            [
+                'name' => '李雅婷',
+                'tel' => '15298454189',
+                'userid' => '284616312226634272'
+            ],
+            [
+                'name' => '何发惠',
+                'tel' => '15019347538',
+                'userid' => '111131100920206916'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -536,7 +541,7 @@ class Push extends BaseController
                 $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($find['更新日期'])));
                 $headers = get_headers($jpg_url);
                 if (substr($headers[0], 9, 3) == 200) {
-                    $model->sendMarkdownImg($userids, $val['值'] . " " . $更新日期 . " S119 " , $jpg_url);
+                    $model->sendMarkdownImg($userids, $val['值'] . " 基本款 " . $更新日期 . " 表：S119 " , $jpg_url);
                 }
             }
         }
