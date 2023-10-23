@@ -1027,7 +1027,7 @@ class Caigou extends BaseController
         }
     }
 
-
+    // 更新图片路径
     public function handle_2() {
         $sql_TOP = "
             SELECT
@@ -1071,5 +1071,13 @@ class Caigou extends BaseController
         
     }
 
+    // 创建图片
+    public function createImg() {
+        // $res = system("pwd",$result);
+        $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=保暖内衣 /data/web/cwl/demo23.jpg", $result);
+
+        print $result;//输出命令的结果状态码
+        print $res;//输出命令输出的最后一行
+    }
 
 }
