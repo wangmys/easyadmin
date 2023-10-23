@@ -998,7 +998,7 @@ class Table extends BaseController
             LEFT JOIN customer_month_qiannian_ww QNBY ON CFD.CustomerName=QNBY.`店铺名称`
             LEFT JOIN customer_day_qiannian_ww QNBR ON CFD.CustomerName=QNBR.`店铺名称`
             WHERE CFD.CustomerName NOT LIKE '%停用%'
-            GROUP BY  CFD.`性质` ,CFD.State,CFD.CustomerName,CFD.first_date
+            GROUP BY  CFD.`性质` ,CFD.State,CFD.CustomerName
             WITH ROLLUP
             ) AS A
             ;
