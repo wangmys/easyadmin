@@ -220,9 +220,8 @@ class Jianheskc extends AdminController
         } 
     } 
 
-        /**
-     * @NodeAnotation(title="门店提醒-全") 
-     * 
+    /**
+     * @NodeAnotation(title="检核SKC") 
      */
     public function handle() {
         if (request()->isAjax()) {

@@ -14,7 +14,7 @@ use jianyan\excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Class ShopbuhuoB
+ * Class Jianheycky
  * @package app\admin\controller\system
  * @ControllerAnnotation(title="检核云仓可用")
  */
@@ -42,6 +42,9 @@ class Jianheycky extends AdminController
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
+    /**
+     * @NodeAnotation(title="检核云仓可用") 
+     */
     public function ycky() {
         if (request()->isAjax()) {
             $input = input();

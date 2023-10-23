@@ -1027,7 +1027,7 @@ class Caigou extends BaseController
         }
     }
 
-
+    // 更新图片路径
     public function handle_2() {
         $sql_TOP = "
             SELECT
@@ -1071,5 +1071,36 @@ class Caigou extends BaseController
         
     }
 
+    // 创建图片
+    public function createImg() {
+        // $select_config = $this->db_easyA->table('cwl_cgzdt_config')->select();
+        // // dump($select_config);
+        // foreach ($select_config as $key => $val) {
+        //     $值 = xmSelectInput($val['值']);
+        //     $sql = "
+        //         update cwl_cgzdt_caigoushouhuo 
+        //             set TOP = 'Y'
+        //         where {$val['列']} in ({$值}) and 排名 <= {$val['排名']}
+        //     ";
+        //     $this->db_easyA->query($sql);
+        // }
+        // $res = system("pwd",$result);
+        // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=保暖内衣 /data/web/cwl/demo23.jpg", $result);
+
+        // print $result;//输出命令的结果状态码
+        // print $res;//输出命令输出的最后一行
+
+        $sql = "
+            select * from cwl_cgzdt_config
+        ";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            foreach ($select as $key => $val) {
+                $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} /data/web/cwl/demo_{$val['值']}.jpg", $result);
+                // print $result;//输出命令的结果状态码
+                // print $res;//输出命令输出的最后一行
+            }
+        }
+    }
 
 }

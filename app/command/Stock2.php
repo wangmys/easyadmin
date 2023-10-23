@@ -245,8 +245,8 @@ class Stock2 extends Command
 		-SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23)='{$current_date}' THEN ECSD.Quantity*EGPT.[零售价] ELSE 0 END) AS RetailAmount,
 		-SUM(CASE WHEN ECS.BillType='ErpRetail' AND CONVERT(VARCHAR(10),ECS.StockDate,23)='{$current_date}' THEN ECSD.Quantity*EGPT.[成本价] ELSE 0 END) AS CostAmount
 		FROM ErpCustomer EC 
-		LEFT JOIN ff21120220830.dbo.ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
-		LEFT JOIN ff21120220830.dbo.ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
+		LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
+		LEFT JOIN ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
 		LEFT JOIN ErpBaseGoodsSize EBGS ON ECSD.SizeId=EBGS.SizeId
 		LEFT JOIN ErpGoods EG ON ECS.GoodsId = EG.GoodsId
 		LEFT JOIN (SELECT 

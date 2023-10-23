@@ -79,7 +79,7 @@ class Jianheskc extends BaseController
         $select = $this->doris();
         $count = count($select);
 
-        // dump($select);die;
+        // print_r($select);die;
 
         if ($select) {
             // 删除历史数据
@@ -92,6 +92,7 @@ class Jianheskc extends BaseController
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_jianhe_stock_skc')->strict(false)->insertAll($val);
             }
+
 
             $sql_update1 = "
                 update cwl_jianhe_stock_skc
@@ -128,18 +129,52 @@ class Jianheskc extends BaseController
             ";
             $this->db_easyA->execute($sql_update_17_36);
 
-            // return json([
-            //     'status' => 1,
-            //     'msg' => 'success',
-            //     'content' => "cwl_jianhe_stock_skc 更新成功，数量：{$count}！"
-            // ]);
-            cache('jianheskc_data_create', null);    
-            return true;
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "cwl_jianhe_stock_skc 更新成功，数量：{$count}！"
+            ]);
+            // cache('jianheskc_data_create', null);    
+            // return true;
         }
     }
 
+    public function test2() {
+        $sql_update1 = "
+        update cwl_jianhe_stock_skc
+            set 
+                修订季节 = right(二级时间分类, 1),
+                修订风格 = left(调整风格, 2),
+                合并 = concat(二级时间分类,调整风格,一级分类,二级分类,分类)
+            where 1
+        ";
+        $this->db_easyA->execute($sql_update1);
 
+        $sql_update2 = "
+            update cwl_jianhe_stock_skc as sk
+            LEFT JOIN (
+                SELECT
+                    分类,修订分类
+                FROM	cwl_jianhe_skc_biaozhun_1 where 分类 is not null group by 分类
+            ) as b ON sk.分类 = b.分类
+            set 
+                sk.修订分类 = b.修订分类
+            where 
+                sk.修订分类 is null
+        ";
+        $this->db_easyA->execute($sql_update2);
 
+        $sql_update_17_36 = "
+            update cwl_jianhe_stock_skc as s
+            left join customer as c on s.店铺名称 = c.CustomerName
+            set
+                s.商品负责人 = CustomItem17,
+                s.温区 = c.CustomItem36
+            where 
+                s.商品负责人 is null or s.温区 is null
+        ";
+        $this->db_easyA->execute($sql_update_17_36);
+    }
 
     public function test3() {
         $host     = '192.168.9.230:9030';
