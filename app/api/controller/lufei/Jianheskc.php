@@ -79,7 +79,7 @@ class Jianheskc extends BaseController
         $select = $this->doris();
         $count = count($select);
 
-        // dump($select);die;
+        // print_r($select);die;
 
         if ($select) {
             // 删除历史数据
@@ -92,6 +92,8 @@ class Jianheskc extends BaseController
                 // 基础结果 
                 $insert = $this->db_easyA->table('cwl_jianhe_stock_skc')->strict(false)->insertAll($val);
             }
+
+            die;
 
             $sql_update1 = "
                 update cwl_jianhe_stock_skc
@@ -133,7 +135,7 @@ class Jianheskc extends BaseController
             //     'msg' => 'success',
             //     'content' => "cwl_jianhe_stock_skc 更新成功，数量：{$count}！"
             // ]);
-            cache('jianheskc_data_create', null);    
+            // cache('jianheskc_data_create', null);    
             return true;
         }
     }
