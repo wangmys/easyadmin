@@ -1415,17 +1415,8 @@ class Shangguitips extends BaseController
 
     // 主码最小值码数
     public function handle_6() {
-        $sql_handle = "
-            SELECT
-                云仓,一级分类,二级分类,分类,货号,主码最小值 
-            FROM
-                cwl_shangguitips_handle 
-            WHERE
-                `主码最小值` IS NOT NULL
-            -- limit 1
-        ";
+        $sql_handle = " SELECT 云仓,一级分类,二级分类,分类,货号,主码最小值 FROM cwl_shangguitips_handle  WHERE  `主码最小值` IS NOT NULL ";
         $select_handle = $this->db_easyA->query($sql_handle);
-
         foreach($select_handle as $key => $val) {
             $主码最小值码数 = '';
             $find_cangku = $this->db_easyA->table('cwl_shangguitips_cangku')->where([
@@ -1435,7 +1426,6 @@ class Shangguitips extends BaseController
                 ['分类', '=', $val['分类']],
                 ['货号', '=', $val['货号']],
             ])->find();
-
             if ($find_cangku['可用库存_00/28/37/44/100/160/S'] == $val['主码最小值']) {
                 $主码最小值码数 = '00';
             } elseif ($find_cangku['可用库存_29/38/46/105/165/M'] == $val['主码最小值']) {
@@ -1459,7 +1449,6 @@ class Shangguitips extends BaseController
             } elseif ($find_cangku['可用库存_40'] == $val['主码最小值']) {
                 $主码最小值码数 = '40';
             }
-
             $find_cangku = $this->db_easyA->table('cwl_shangguitips_handle')->where([
                 ['云仓', '=', $val['云仓']],
                 ['一级分类', '=', $val['一级分类']],

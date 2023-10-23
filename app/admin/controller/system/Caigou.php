@@ -54,17 +54,19 @@ class Caigou extends AdminController
     public function zdt1() {
         $sql = "
             select 
-                货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,
+                货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
                 concat(round(售罄率 * 100, 1), '%') as 售罄率
             from cwl_cgzdt_caigoushouhuo
             where TOP = 'Y'
-                AND 中类 = '牛仔长裤'
+                AND 中类 = '大衣'
             order by 排名 ASC
         ";
         $select = $this->db_easyA->query($sql);
-        // dump($select);
+        // dump($select);die;
+        $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
         return View('zdt1', [
-            'data' => $select
+            'data' => $select,
+            'title' => $select[0]['中类'] . " 【{$更新日期}】" . "表名：S119A"
         ]);
     }
 }
