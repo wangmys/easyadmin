@@ -112,6 +112,14 @@ class Jianheskc extends AdminController
                 $map5 = "";
             }
 
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['省份']);
+                $map6 = " AND m.省份 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
             $sql0 = "
                 SELECT
                     店铺名称
@@ -122,6 +130,7 @@ class Jianheskc extends AdminController
                     {$map1}
                     {$map4}
                     {$map5}
+                    {$map6}
                 GROUP BY
                     店铺名称
                 -- LIMIT 100
@@ -277,6 +286,14 @@ class Jianheskc extends AdminController
                 $map5 = "";
             }
 
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['省份']);
+                $map6 = " AND m.省份 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
             $sql0 = "
                 SELECT
                     店铺名称
@@ -287,6 +304,7 @@ class Jianheskc extends AdminController
                     {$map1}
                     {$map4}
                     {$map5}
+                    {$map6}
                 GROUP BY
                     店铺名称
                 -- LIMIT 100
@@ -329,6 +347,7 @@ class Jianheskc extends AdminController
                         {$map3}
                         {$map4}
                         {$map5}
+                        {$map6}
                     GROUP BY
                         m.一级分类,m.二级分类,m.修订分类
                         WITH ROLLUP
