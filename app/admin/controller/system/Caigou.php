@@ -52,21 +52,40 @@ class Caigou extends AdminController
 
     // 自动推
     public function zdt1() {
-        $sql = "
-            select 
-                货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
-                concat(round(售罄率 * 100, 1), '%') as 售罄率
-            from cwl_cgzdt_caigoushouhuo
-            where TOP = 'Y'
-                AND 中类 = '大衣'
-            order by 排名 ASC
-        ";
+        $input = input();
+        if (!empty($input['中类'])) {
+            $title = $input['中类'];
+            $sql = "
+                select 
+                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
+                    concat(round(售罄率 * 100, 1), '%') as 售罄率
+                from cwl_cgzdt_caigoushouhuo
+                where TOP = 'Y'
+                    AND 中类 = '{$input['中类']}'
+                order by 排名 ASC
+            ";
+        } elseif (!empty($input['大类'])) {
+            $title = $input['大类'];
+            $sql = "
+                select 
+                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
+                    concat(round(售罄率 * 100, 1), '%') as 售罄率
+                from cwl_cgzdt_caigoushouhuo
+                where TOP = 'Y'
+                    AND 大类 = '{$input['大类']}'
+                order by 排名 ASC
+            ";
+        } else {
+            die;
+        }
+
+
         $select = $this->db_easyA->query($sql);
         // dump($select);die;
         $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
         return View('zdt1', [
             'data' => $select,
-            'title' => $select[0]['中类'] . " 【{$更新日期}】" . "表名：S119A"
+            'title' => $title . " 【{$更新日期}】" . "表名：S119A"
         ]);
     }
 }
