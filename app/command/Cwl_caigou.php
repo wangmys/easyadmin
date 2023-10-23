@@ -43,7 +43,7 @@ class Cwl_caigou extends Command
         if ($select) {
             foreach ($select as $key => $val) {
                 // $path = "/data/web/cwl/cgzdt_{$val['值']}.jpg";
-                $path = "./img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
+                $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
                 
                 $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
                 // print $result;//输出命令的结果状态码
