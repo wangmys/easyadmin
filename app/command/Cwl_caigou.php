@@ -33,10 +33,6 @@ class Cwl_caigou extends Command
     protected function execute(Input $input, Output $output)
     {
         ini_set('memory_limit','512M');
-        // echo 111;
-        // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=保暖内衣 /data/web/cwl/demo23.jpg", $result);
-        // print $result;//输出命令的结果状态码
-        // print $res;//输出命令输出的最后一行
 
         $sql = "select * from cwl_cgzdt_config";
         $select = $this->db_easyA->query($sql);

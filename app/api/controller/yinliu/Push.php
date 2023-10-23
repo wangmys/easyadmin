@@ -504,15 +504,20 @@ class Push extends BaseController
                 'userid' => '0812473564939990'
             ],
             [
-                'name' => '李雅婷',
-                'tel' => '15298454189',
-                'userid' => '284616312226634272'
+                'name' => '俞有岳',
+                'tel' => '13757775761',
+                'userid' => '051218272920490024'
             ],
-            [
-                'name' => '何发惠',
-                'tel' => '15019347538',
-                'userid' => '111131100920206916'
-            ],
+            // [
+            //     'name' => '李雅婷',
+            //     'tel' => '15298454189',
+            //     'userid' => '284616312226634272'
+            // ],
+            // [
+            //     'name' => '何发惠',
+            //     'tel' => '15019347538',
+            //     'userid' => '111131100920206916'
+            // ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -535,7 +540,6 @@ class Push extends BaseController
         if ($select) {
             foreach ($select as $key => $val) {
                 // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
-
                 $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg?v=" . time();
 
                 $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($find['更新日期'])));
@@ -545,43 +549,6 @@ class Push extends BaseController
                 }
             }
         }
-
-        // $send_data = [
-        //     'S007' => [
-        //         'title' => '2023 春季货品销售报表 表号:S007',
-        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S007.jpg'
-        //     ],
-        //     'S008' => [
-        //         'title' => '2023 夏季货品销售报表 表号:S008',
-        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S008.jpg'
-        //     ],
-        //     'S013' => [
-        //         'title' => '2023 春季货品零售汇总报表 表号:S013',
-        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S013.jpg'
-        //     ],
-        //     'S014' => [
-        //         'title' => '2023 夏季货品零售汇总报表 表号:S014',
-        //         'jpg_url' => $this->request->domain()."/img/".date('Ymd').'/S014.jpg'
-        //     ],
-        // ];
-
-
-        // $res = [];
-
-        // foreach ($send_data as $k=>$v){
-        //     $headers = get_headers($v['jpg_url']);
-        //     if(substr($headers[0], 9, 3) == 200){
-        //         // 推送
-        //         // 测试群 https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2
-        //         $res[] = $model->send($v['title'],$v['jpg_url']);
-        //         // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
-        //     }
-        // }
-        // return json($res);
-
-
-        
-        // $model->sendMarkdownImg($val['userid'], '鞋履报表', $path);
     }
 
     /**
