@@ -1072,35 +1072,23 @@ class Caigou extends BaseController
     }
 
     // 创建图片
-    // public function createImg() {
-    //     // $select_config = $this->db_easyA->table('cwl_cgzdt_config')->select();
-    //     // // dump($select_config);
-    //     // foreach ($select_config as $key => $val) {
-    //     //     $值 = xmSelectInput($val['值']);
-    //     //     $sql = "
-    //     //         update cwl_cgzdt_caigoushouhuo 
-    //     //             set TOP = 'Y'
-    //     //         where {$val['列']} in ({$值}) and 排名 <= {$val['排名']}
-    //     //     ";
-    //     //     $this->db_easyA->query($sql);
-    //     // }
-    //     // $res = system("pwd",$result);
-    //     // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=保暖内衣 /data/web/cwl/demo23.jpg", $result);
+    public function createImg() {
+        $sql = "select * from cwl_cgzdt_config";
+        $select = $this->db_easyA->query($sql);
+        if ($select) {
+            foreach ($select as $key => $val) {
+                $path = "/data/web/cwl/img/cgzdt_{$val['值']}.jpg";
 
-    //     // print $result;//输出命令的结果状态码
-    //     // print $res;//输出命令输出的最后一行
+                // $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
 
-    //     $sql = "
-    //         select * from cwl_cgzdt_config
-    //     ";
-    //     $select = $this->db_easyA->query($sql);
-    //     if ($select) {
-    //         foreach ($select as $key => $val) {
-    //             $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} /data/web/cwl/demo_{$val['值']}.jpg", $result);
-    //             // print $result;//输出命令的结果状态码
-    //             // print $res;//输出命令输出的最后一行
-    //         }
-    //     }
-    // }
+                // echo "wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}";die;
+                // wkhtmltoimage --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=羽绒服 /data/web/cwl/cgzdt_test1.jpg
+
+                $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
+                // print $result;//输出命令的结果状态码
+                // print $res;//输出命令输出的最后一行
+            }
+        }
+    }
 
 }
