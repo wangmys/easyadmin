@@ -81,7 +81,7 @@ class Table extends BaseController
                             WHEN day(NOW())=30 THEN R.s30
                             WHEN day(NOW())=31 THEN R.s31
                             END AS 今日目标,
-            date_format(now(),'%Y-%m-%d') AS 更新日期
+            date_format(DATE_ADD(now(),INTERVAL 1 DAY),  '%Y-%m-%d') AS 更新日期
             from wechat.shopdaytasknewtz R
             left join wechat.shopstask N on R.pid=N.id
             WHERE (concat(N.start , '-01') = DATE_ADD(DATE_ADD(curdate(), interval -1 DAY),interval -day(DATE_ADD(curdate(), interval -1 DAY))+1 day)
@@ -137,8 +137,7 @@ class Table extends BaseController
                         WHEN SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) >0 
                             THEN  SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END)/DATEDIFF(DAY, CONVERT(VARCHAR(10),MIN(ER.RetailDate),23), CONVERT(VARCHAR(10),GETDATE()+1,23))
                         END AS 近七天日均,
-                    DATEDIFF(DAY, CONVERT(VARCHAR(10),MIN(ER.RetailDate),23), CONVERT(VARCHAR(10),GETDATE()+1,23)) 最大可除天数,
-                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+                DATEADD(DAY, +1, CAST(GETDATE() AS DATE)) AS 更新日期
             FROM ErpCustomer EC 
             LEFT JOIN ErpRetail ER ON EC.CustomerId= ER.CustomerId
             LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
