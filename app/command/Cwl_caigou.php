@@ -38,9 +38,9 @@ class Cwl_caigou extends Command
         $select = $this->db_easyA->query($sql);
         if ($select) {
             foreach ($select as $key => $val) {
-                // $path = "/data/web/cwl/cgzdt_{$val['值']}.jpg";
+                $path = "/data/web/cwl/cgzdt_{$val['值']}.jpg";
 
-                $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
+                // $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
 
                 // echo "wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}";die;
                 // wkhtmltoimage --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=羽绒服 /data/web/cwl/cgzdt_test1.jpg
