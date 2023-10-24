@@ -1077,12 +1077,12 @@ class Caigou extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             foreach ($select as $key => $val) {
-                $path = "/data/web/cwl/img/cgzdt_{$val['值']}.jpg";
+                // $path = "/data/web/cwl/img/cgzdt_{$val['值']}.jpg";
 
-                // $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
+                $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
 
-                echo "wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}";
-                echo '<br>';
+                // echo "wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}";
+                // echo '<br>';
                 // wkhtmltoimage --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=羽绒服 /data/web/cwl/cgzdt_test1.jpg
 
                 $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
