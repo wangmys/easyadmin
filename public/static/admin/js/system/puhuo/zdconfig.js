@@ -65,6 +65,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var that = this;
             var html = '';
 
+            var rule_type_hidden = JSON.parse($('#rule_type_hidden').val());
             var Selecttype_hidden = JSON.parse($('#Selecttype_hidden').val());
             var guiyang_select_list_hidden = JSON.parse($('#guiyang_select_list_hidden').val());
             var customer_list_hidden = guiyang_select_list_hidden['customer_list'];
@@ -85,6 +86,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="guiyang_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
             html += '</td>';
+
+            html += '<td class="rule_type">';
+            html += '<select name="rule_type">';
+            $.each(rule_type_hidden, function (key, value) {
+                html += '<option value="'+key+'">'+value+'</option>';
+            });	
+            html += '</select>';
+            html += '</td>';
+
             html += '<td class="if_taozhuang">';
             html += '<select name="if_taozhuang">';
             html += '<option value="2">否</option>';
@@ -151,6 +161,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var rule_type = element.find('select[name="rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
@@ -158,6 +169,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         id:id
                     }
@@ -192,6 +204,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var rule_type = $(element).find('select[name="rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
@@ -199,6 +212,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
@@ -234,6 +248,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var that = this;
             var html = '';
 
+            var rule_type_hidden = JSON.parse($('#rule_type_hidden').val());
             var Selecttype_hidden = JSON.parse($('#Selecttype_hidden').val());
             var wuhan_select_list_hidden = JSON.parse($('#wuhan_select_list_hidden').val());
             var customer_list_hidden = wuhan_select_list_hidden['customer_list'];
@@ -254,6 +269,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="wuhan_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
             html += '</td>';
+
+            html += '<td class="rule_type">';
+            html += '<select name="rule_type">';
+            $.each(rule_type_hidden, function (key, value) {
+                html += '<option value="'+key+'">'+value+'</option>';
+            });	
+            html += '</select>';
+            html += '</td>';
+
             html += '<td class="if_taozhuang">';
             html += '<select name="if_taozhuang">';
             html += '<option value="2">否</option>';
@@ -320,6 +344,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var rule_type = element.find('select[name="rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
@@ -327,6 +352,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         id:id
                     }
@@ -361,6 +387,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var rule_type = $(element).find('select[name="rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
     
                     var _data = {
@@ -368,6 +395,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
@@ -403,6 +431,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var that = this;
             var html = '';
 
+            var rule_type_hidden = JSON.parse($('#rule_type_hidden').val());
             var Selecttype_hidden = JSON.parse($('#Selecttype_hidden').val());
             var guangzhou_select_list_hidden = JSON.parse($('#guangzhou_select_list_hidden').val());
             var customer_list_hidden = guangzhou_select_list_hidden['customer_list'];
@@ -423,6 +452,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="guangzhou_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
             html += '</td>';
+
+            html += '<td class="rule_type">';
+            html += '<select name="rule_type">';
+            $.each(rule_type_hidden, function (key, value) {
+                html += '<option value="'+key+'">'+value+'</option>';
+            });	
+            html += '</select>';
+            html += '</td>';
+
             html += '<td class="if_taozhuang">';
             html += '<select name="if_taozhuang">';
             html += '<option value="2">否</option>';
@@ -489,6 +527,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var rule_type = element.find('select[name="rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
@@ -496,6 +535,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         id:id
                     }
@@ -530,6 +570,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var rule_type = $(element).find('select[name="rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
@@ -537,6 +578,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
@@ -572,6 +614,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var that = this;
             var html = '';
 
+            var rule_type_hidden = JSON.parse($('#rule_type_hidden').val());
             var Selecttype_hidden = JSON.parse($('#Selecttype_hidden').val());
             var nanchang_select_list_hidden = JSON.parse($('#nanchang_select_list_hidden').val());
             var customer_list_hidden = nanchang_select_list_hidden['customer_list'];
@@ -592,6 +635,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="nanchang_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
             html += '</td>';
+
+            html += '<td class="rule_type">';
+            html += '<select name="rule_type">';
+            $.each(rule_type_hidden, function (key, value) {
+                html += '<option value="'+key+'">'+value+'</option>';
+            });	
+            html += '</select>';
+            html += '</td>';
+
             html += '<td class="if_taozhuang">';
             html += '<select name="if_taozhuang">';
             html += '<option value="2">否</option>';
@@ -658,6 +710,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var rule_type = element.find('select[name="rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
@@ -665,6 +718,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         id:id
                     }
@@ -699,6 +753,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var rule_type = $(element).find('select[name="rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
@@ -706,6 +761,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }
@@ -741,6 +797,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var that = this;
             var html = '';
 
+            var rule_type_hidden = JSON.parse($('#rule_type_hidden').val());
             var Selecttype_hidden = JSON.parse($('#Selecttype_hidden').val());
             // var customer_list_hidden = JSON.parse($('#customer_list_hidden').val());
             // var province_list_hidden = JSON.parse($('#province_list_hidden').val());
@@ -766,6 +823,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '<td class="changsha_goods">';
             html += '<input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
             html += '</td>';
+
+            html += '<td class="rule_type">';
+            html += '<select name="rule_type">';
+            $.each(rule_type_hidden, function (key, value) {
+                html += '<option value="'+key+'">'+value+'</option>';
+            });	
+            html += '</select>';
+            html += '</td>';
+
             html += '<td class="if_taozhuang">';
             html += '<select name="if_taozhuang">';
             html += '<option value="2">否</option>';
@@ -832,6 +898,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = element.find('input[name="Selecttype"]').val();
                     var Commonfield = element.find('input[name="Commonfield"]').val();
                     var GoodsNo = element.find('input[name="GoodsNo"]').val();
+                    var rule_type = element.find('select[name="rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
@@ -839,6 +906,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
                         GoodsNo:GoodsNo,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         id:id
                     }
@@ -873,6 +941,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var Selecttype = $(element).find('input[name="Selecttype"]').val();
                     var Commonfield = $(element).find('input[name="Commonfield"]').val();
                     var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
+                    var rule_type = $(element).find('select[name="rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
 
                     var _data = {
@@ -880,6 +949,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
                         Commonfield:Commonfield,
+                        rule_type:rule_type,
                         if_taozhuang:if_taozhuang,
                         GoodsNo:GoodsNo
                     }

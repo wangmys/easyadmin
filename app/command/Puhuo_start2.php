@@ -164,10 +164,11 @@ class Puhuo_start2 extends Command
 
             //开始尝试自动铺货模式
             foreach ($data as $v_data_each) {
-                // print_r($v_data);die;
+                // print_r($v_data_each);die;
                 $v_data = $v_data_each['goods'] ?? [];
                 $Selecttype = $v_data_each['Selecttype'] ?? 0;//0-该云仓所有店 1-多店 2-多省 3-商品专员 4-经营模式
                 $Commonfield = $v_data_each['Commonfield'] ?? '';
+                $rule_type = $v_data_each['rule_type'] ?? 1;//1-A方案 2-B方案
 
                 $GoodsNo = $v_data['GoodsNo'] ?: '';//货号
                 $WarehouseName = $v_data['WarehouseName'] ?: '';//云仓
@@ -245,10 +246,10 @@ class Puhuo_start2 extends Command
                 ['CategoryName1', '=', $CategoryName1], ['CategoryName2', '=', $CategoryName2], ['StyleCategoryName', '=', $StyleCategoryName]])->column('*', 'CustomerName');
 
                 //先查看单款是否已经指定了特定的铺货规则,优先选择已指定的特定铺货规则
-                $if_exist_onegoods_rule = $this->puhuo_onegoods_rule_model::where([['por.Yuncang', '=', $WarehouseName], ['por.GoodsNo', '=', $GoodsNo]])->alias('por')
-                ->join(['sp_lyp_puhuo_rule_b' => 'prb'], 'por.rule_id=prb.id', 'inner')
-                ->field('prb.*')->find();
-                $if_exist_onegoods_rule = $if_exist_onegoods_rule ? $if_exist_onegoods_rule->toArray() : [];
+                // $if_exist_onegoods_rule = $this->puhuo_onegoods_rule_model::where([['por.Yuncang', '=', $WarehouseName], ['por.GoodsNo', '=', $GoodsNo]])->alias('por')
+                // ->join(['sp_lyp_puhuo_rule_b' => 'prb'], 'por.rule_id=prb.id', 'inner')
+                // ->field('prb.*')->find();
+                // $if_exist_onegoods_rule = $if_exist_onegoods_rule ? $if_exist_onegoods_rule->toArray() : [];
 
                 if ($all_customers) {
                     $add_all_arr = $daxiaoma_customer_sort =  [];
@@ -407,22 +408,22 @@ class Puhuo_start2 extends Command
                             foreach ($add_all_arr as $v_customer) {
 
                                 $rule = [];
-                                if ($if_exist_onegoods_rule) {//如单款指定了铺货规则，则优先使用该铺货规则
-                                    $rule = $if_exist_onegoods_rule;
+                                $where = [
+                                    ['Yuncang', '=', $WarehouseName], 
+                                    ['State', '=', $v_customer['State']], 
+                                    ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                    ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                    ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                    ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                    ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                ];
+                                //查询对应的铺货标准
+                                if ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
+                                    $rule = $this->puhuo_rule_b_model::where($where)->find();
                                 } else {
-                                    //查询对应的铺货标准
-                                    $where = [
-                                        ['Yuncang', '=', $WarehouseName], 
-                                        ['State', '=', $v_customer['State']], 
-                                        ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
-                                        ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
-                                        ['CategoryName1', '=', $v_data['CategoryName1']], 
-                                        ['CategoryName2', '=', $v_data['CategoryName2']], 
-                                        ['CustomerGrade', '=', $v_customer['CustomerGrade']]
-                                    ];
                                     $rule = $this->puhuo_rule_model::where($where)->find();
-                                    $rule = $rule ? $rule->toArray() : [];
                                 }
+                                $rule = $rule ? $rule->toArray() : [];
                                 // print_r($where);die;
 
                                 //该店该款 库存数
@@ -463,7 +464,7 @@ class Puhuo_start2 extends Command
                                         'GoodsNo' => $GoodsNo,
                                         'CustomerName' => $v_customer['CustomerName'],
                                         'CustomerId' => $v_customer['CustomerId'],
-                                        'rule_type' => $if_exist_onegoods_rule ? $this->puhuo_cur_log_model::RULE_Type['type_b'] : $this->puhuo_cur_log_model::RULE_Type['type_a'],
+                                        'rule_type' => ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) ? $this->puhuo_cur_log_model::RULE_TYPE['type_b'] : $this->puhuo_cur_log_model::RULE_TYPE['type_a'],
                                         'rule_id' => $rule['id'],
                                         'Stock_00_puhuo' => $data['Stock_00_puhuo'] ?? 0,
                                         'Stock_29_puhuo' => $data['Stock_29_puhuo'] ?? 0,
@@ -493,7 +494,7 @@ class Puhuo_start2 extends Command
                                         'GoodsNo' => $GoodsNo,
                                         'CustomerName' => $v_customer['CustomerName'],
                                         'CustomerId' => $v_customer['CustomerId'],
-                                        'rule_type' => $if_exist_onegoods_rule ? $this->puhuo_cur_log_model::RULE_Type['type_b'] : $this->puhuo_cur_log_model::RULE_Type['type_a'],
+                                        'rule_type' => ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) ? $this->puhuo_cur_log_model::RULE_TYPE['type_b'] : $this->puhuo_cur_log_model::RULE_TYPE['type_a'],
                                         'rule_id' => 0,
                                         'Stock_00_puhuo' => 0,
                                         'Stock_29_puhuo' => 0,
@@ -626,7 +627,49 @@ class Puhuo_start2 extends Command
         // $zhiding_goods = array_combine($yuncang_goods, $zhiding_goods);
 
         //改为从新的 自定义铺货设置表 获取
-        $zdy_yuncang_goods = $this->puhuo_zdy_set_model::where([])->alias('pzs')
+        $zdy_yuncang_goods = $this->puhuo_zdy_set_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set_model::IF_TAOZHUANG['not_taozhuang']]])->alias('pzs')
+        ->join(['sp_lyp_puhuo_zdy_yuncang_goods' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
+        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
+        $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
+        $yuncang_goods = $zdy_yuncang_goods ? array_column($zdy_yuncang_goods, 'yuncang_goods') : [];
+        $zdy_yuncang_goods = array_combine($yuncang_goods, $zdy_yuncang_goods);
+        // print_r($zdy_yuncang_goods);die;
+
+        $res_data = [];
+        $yuncangs = $this->puhuo_zdy_yuncang_goods_model::where([])->distinct(true)->column('Yuncang');
+        if ($yuncangs) {
+            foreach ($yuncangs as $v_yuncang) {
+                $yuncang_goods = $this->puhuo_zdy_yuncang_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
+                if ($yuncang_goods) {
+                    $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang)->where([['GoodsNo', 'in', $yuncang_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+                        'list_rows'=> $list_rows,//每页条数
+                        'page' => $this->page,//当前页
+                    ]);
+                    $res = $res ? $res->toArray() : [];
+                    $res = $res ? $res['data'] : [];
+                    if ($res) {
+                        foreach ($res as $v_res) {
+                            // $res_data[] = $v_res;
+                            $res_data[] = [
+                                'goods' => $v_res,
+                                'Selecttype' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Selecttype'] : 0,
+                                'Commonfield' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Commonfield'] : '',
+                                'rule_type' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['rule_type'] : 1,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        return $res_data;
+
+    }
+
+    //获取套装套西铺货配置
+    protected function get_wait_goods_data_taozhuang($list_rows) {
+
+        //改为从新的 自定义铺货设置表 获取
+        $zdy_yuncang_goods = $this->puhuo_zdy_set_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set_model::IF_TAOZHUANG['is_taozhuang']]])->alias('pzs')
         ->join(['sp_lyp_puhuo_zdy_yuncang_goods' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
         ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];

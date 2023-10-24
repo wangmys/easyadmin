@@ -28,6 +28,16 @@ class SpLypPuhuoZdySetModel extends TimeModel
         self::SELECT_TYPE['much_mathod']  => '经营模式',
     ];
 
+    const RULE_TYPE = [
+        'type_a'    => 1, #A方案
+        'type_b'    => 2 #B方案
+    ];
+
+    const RULE_TYPE_TEXT = [
+        self::RULE_TYPE['type_a']  => 'A方案',
+        self::RULE_TYPE['type_b']  => 'B方案'
+    ];
+
     const IF_TAOZHUANG = [
         'is_taozhuang'    => 1, #是套装
         'not_taozhuang'    => 2, #非套装

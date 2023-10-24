@@ -378,7 +378,7 @@ class PuhuoService
      */
     public function get_zdy_goods($Yuncang) {
 
-        $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,if_taozhuang')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -550,6 +550,7 @@ class PuhuoService
         $Yuncang = $data['Yuncang'];
         $Selecttype = $data['Selecttype'] ? $data['Selecttype'] : 0;
         $Commonfield = $data['Commonfield'] ?? '';
+        $rule_type = $data['rule_type'] ?? 1;
         $if_taozhuang = $data['if_taozhuang'] ?? 2;
         $GoodsNo = $data['GoodsNo'] ? trim($data['GoodsNo']) : '';
         $GoodsNo_arr = [];
@@ -562,6 +563,7 @@ class PuhuoService
             'GoodsNo' => $GoodsNo,
             'Selecttype' => $Selecttype,
             'Commonfield' => $Commonfield,
+            'rule_type' => $rule_type,
             'if_taozhuang' => $if_taozhuang,
         ];
 

@@ -5,6 +5,7 @@ namespace app\admin\controller\system\puhuo;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
+use app\admin\model\bi\SpLypPuhuoZdySetModel;
 use think\App;
 use think\facade\Db;
 use app\admin\service\PuhuoService;
@@ -58,6 +59,7 @@ class Zdconfig extends AdminController
             'changsha_select_list' => $res_changsha['changsha_select_list'],
 
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
         ])
         );
 
@@ -76,6 +78,7 @@ class Zdconfig extends AdminController
         [
             'guiyang_goods_config' => $res['guiyang_goods_config'],
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
             'guiyang_select_list' => $res['guiyang_select_list'],
         ])
         );
@@ -96,6 +99,7 @@ class Zdconfig extends AdminController
         [
             'wuhan_goods_config' => $res['wuhan_goods_config'],
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
             'wuhan_select_list' => $res['wuhan_select_list'],
         ])
         );
@@ -115,6 +119,7 @@ class Zdconfig extends AdminController
         [
             'guangzhou_goods_config' => $res['guangzhou_goods_config'],
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
             'guangzhou_select_list' => $res['guangzhou_select_list'],
         ])
         );
@@ -135,6 +140,7 @@ class Zdconfig extends AdminController
         [
             'nanchang_goods_config' => $res['nanchang_goods_config'],
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
             'nanchang_select_list' => $res['nanchang_select_list'],
         ])
         );
@@ -155,6 +161,7 @@ class Zdconfig extends AdminController
         [
             'changsha_goods_config' => $res['changsha_goods_config'],
             'Selecttype' => $this->Selecttype,
+            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
             'changsha_select_list' => $res['changsha_select_list'],
         ])
         );

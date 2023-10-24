@@ -7,13 +7,14 @@
                     <th style="width: 120px;">铺货类型</th>
                     <th style="width: 120px;">值</th>
                     <th style="width: 120px;">货号</th>
+                    <th style="width: 80px;">铺货规则</th>
                     <th style="width: 120px;">是否套装套西</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                         <select id="xm-Selecttype1" name="Selecttype1" lay-verify="" lay-filter="Selecttype1">
                             <option value="">请选择铺货类型</option>
                             {foreach $Selecttype as $k_Selecttype => $v_Selecttype}
@@ -38,6 +39,13 @@
                     <td class="guiyang_goods">
                         <input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
+                    <td class="rule_type">
+                        <select name="rule_type">
+                            {foreach $rule_type as $vo_key=>$vo_rule}
+                            <option value="{$vo_key}" {if ($vo['rule_type']==$vo_key)}selected{/if}>{$vo_rule}</option>
+                            {/foreach}
+                        </select>
+                    </td>
                     <td class="if_taozhuang">
                         <select name="if_taozhuang">
                             <option value="2" {if ($vo['if_taozhuang']==2)}selected{/if}>否</option>
@@ -60,5 +68,6 @@
     </table>
     </form>
     <input type="text" id="guiyang_goods_config" class="layui-hide" value="{:htmlspecialchars(json_encode($guiyang_goods_config))}">
+    <input type="text" id="rule_type_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($rule_type))}">
     <input type="text" id="Selecttype_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($Selecttype))}">
     <input type="text" id="guiyang_select_list_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($guiyang_select_list))}">
