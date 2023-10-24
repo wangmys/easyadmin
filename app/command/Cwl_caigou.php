@@ -38,7 +38,7 @@ class Cwl_caigou extends Command
         $select = $this->db_easyA->query($sql);
         if ($select) {
             foreach ($select as $key => $val) {
-                $path = "/data/web/cwl/cgzdt_{$val['值']}.jpg";
+                $path = "/data/web/cwl/img/cgzdt_{$val['值']}.jpg";
 
                 // $path = "/data/web/easyadmin2/easyadmin/public/img/".date('Ymd').'/'. "cgzdt_{$val['值']}.jpg";
 
