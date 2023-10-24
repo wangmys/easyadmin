@@ -1085,8 +1085,8 @@ class Caigou extends BaseController
                 // wkhtmltoimage --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?中类=羽绒服 /data/web/cwl/cgzdt_test1.jpg
 
                 $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
-                // print $result;//输出命令的结果状态码
-                // print $res;//输出命令输出的最后一行
+                print $result;//输出命令的结果状态码
+                print $res;//输出命令输出的最后一行
             }
         }
     }
