@@ -17,7 +17,7 @@ return [
         'stock_week_select' => 'app\command\Stock_week_select',
         'duanma_sk' => 'app\command\Duanma_sk',
         'cwl_caigou' => 'app\command\Cwl_caigou',
-        'cwl_caigou2' => 'app\command\Cwl_caigou2',
+        'cwl_caigou_test' => 'app\command\Cwl_caigou_test',
         'stock_size' => 'app\command\Stock_size',
         'sendpic' => 'app\command\Sendpic',
         'create_daogou_aim' => 'app\command\Create_daogou_aim',
