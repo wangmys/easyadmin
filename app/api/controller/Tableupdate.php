@@ -2216,11 +2216,17 @@ class Tableupdate extends BaseController
         $select = $this->db_easyA->query($sql);
 
         foreach ($select as $key => $val) {
-            echo '--------------<br>';
-            echo '<pre>';
-            echo $val['编号'];
+            // echo '--------------<br>';
+            // echo '<pre>';
+            // echo $val['编号'];
             $find = $this->db_bi->table($val['跑数表'])->field($val['跑数表字段'])->where(1)->order("{$val['跑数表字段']} DESC")->find();
-            print_r($find);
+            // print_r($find);
+            $this->db_easyA->table('dd_baobiao')->where([
+                'id' => $val['id'],
+                '编号' => $val['编号']
+            ])->update([
+                '跑数日期' => date('Y-m-d', strtotime('-1 day', strtotime($find[$val['跑数表字段']])))
+            ]);
         }
     }
 
