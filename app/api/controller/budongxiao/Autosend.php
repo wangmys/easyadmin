@@ -63,6 +63,7 @@ class Autosend extends BaseController
         $this->db_bi->table('ww_budongxiao_result')->where(1)->delete();
         // 删除所有详情结果
         $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->delete();
+        $this->db_bi->table('ww_budongxiao_history_sys')->where(1)->delete();
         // 删除所有统计结果
         CwlBudongxiaoStatisticsSys::delStatic();
 
@@ -347,13 +348,14 @@ class Autosend extends BaseController
             $yujiSkc = $yujiSkc_res;
 
             // die;
-            $this->db_easyA->startTrans();
+            // $this->db_easyA->startTrans();
             $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys')->insertAll($insert_history_data);
-            if ($insert_history) {
-                $this->db_easyA->commit();
-            } else {
-                $this->db_easyA->rollback();
-            }
+            $insert_history2 = $this->db_bi->table('ww_budongxiao_history_sys')->insertAll($insert_history_data);
+            // if ($insert_history) {
+            //     $this->db_easyA->commit();
+            // } else {
+            //     $this->db_easyA->rollback();
+            // }
 
             $res_end['商品负责人'] = !empty($res_all_new[0]['商品负责人']) ? $res_all_new[0]['商品负责人'] : '';
             $res_end['省份'] = !empty($res_all_new[0]['省份']) ? $res_all_new[0]['省份'] : 0;
