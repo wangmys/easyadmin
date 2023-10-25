@@ -82,7 +82,7 @@ class Caigou extends AdminController
 
         $select = $this->db_easyA->query($sql);
         // dump($select);die;
-        $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($select[0]['更新日期'])));
+        $更新日期 = date('Y-m-d', time());
         return View('zdt1', [
             'data' => $select,
             'title' => $title . " 【{$更新日期}】" . "表名：S119"
