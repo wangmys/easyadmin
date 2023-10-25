@@ -3188,7 +3188,7 @@ class ReportFormsService
         $params = [
             'row' => count($list),          //数据的行数
             'file_name' => $code . '.jpg',   //保存的文件名
-            'title' => "鞋履报表 [" . date("Y-m-d") . ']',
+            'title' => "鞋履报表 [" . date("Y-m-d", strtotime(date('-1 day'))) . ']',
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $list,
             'table_explain' => $table_explain,
