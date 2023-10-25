@@ -1092,8 +1092,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // echo $send_data['jpg_url'];
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         } else {
@@ -1234,8 +1234,8 @@ class SendReport extends BaseController
             if(substr($headers[0], 9, 3) == 200){
                 // echo $send_data['jpg_url'];
                 // 推送
-                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
-                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         } else {
