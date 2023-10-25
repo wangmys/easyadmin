@@ -331,7 +331,7 @@ class Caigou extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结' 
                 AND ER.ReceiptDate >= '2023-01-01'
-                AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
+                -- AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
                 AND ER.Type= 1 
                 AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023','2024' ) 
@@ -385,7 +385,7 @@ class Caigou extends BaseController
                     LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
                     WHERE EG.TimeCategoryName1=2023
                         AND ER.ReceiptDate >= '2023-01-01'
-                        AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
+                        -- AND ER.ReceiptDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
                         AND EG.TimeCategoryName2 IN ('初冬','深冬','冬季')
                         AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                         AND ER.Type=1 
@@ -409,7 +409,7 @@ class Caigou extends BaseController
                     LEFT JOIN ErpGoods EG ON EPRG.GoodsId=EG.GoodsId
                     WHERE EG.TimeCategoryName1=2023
                         AND EPR.PurchaseReturnDate >= '2023-01-01'
-                        AND EPR.PurchaseReturnDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
+                        -- AND EPR.PurchaseReturnDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) )
                         AND EG.TimeCategoryName2 IN ('初冬','深冬','冬季')
                         AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                         AND EPR.CodingCodeText='已审结'
@@ -497,7 +497,7 @@ class Caigou extends BaseController
                 LEFT JOIN ErpSupply AS ES ON ERN.SupplyId = ES.SupplyId 
             WHERE
                 ERN.CodingCodeText = '已审结' 
-                AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
+                -- AND ERN.ReceiptNoticeDate < DATEADD( DAY, 0, CAST ( GETDATE( ) AS DATE ) ) 
                 AND ERN.IsCompleted != 1
                 AND ES.SupplyName <> '南昌岳歌服饰' 
                 AND EG.TimeCategoryName1 IN ( '2023', '2024' ) 
@@ -623,7 +623,7 @@ class Caigou extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 AND ER.RetailDate >=  '2023-07-01'
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                -- AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
                 AND EC.CustomItem17 IS NOT NULL
@@ -706,8 +706,8 @@ class Caigou extends BaseController
                 LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
             WHERE
                 ER.CodingCodeText = '已审结'
-                AND ER.RetailDate >=  DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                -- AND ER.RetailDate >=  DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate = DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
                 AND EC.CustomItem17 IS NOT NULL

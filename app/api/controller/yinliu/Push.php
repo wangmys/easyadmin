@@ -542,7 +542,7 @@ class Push extends BaseController
                 // $res = system("wkhtmltoimage  --encoding utf-8 http://im.babiboy.com/admin/system.Caigou/zdt1?{$val['列']}={$val['值']} {$path}", $result);
                 $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_{$val['值']}.jpg?v=" . time();
 
-                $更新日期 = date('Y-m-d', strtotime('-1 day', strtotime($find['更新日期'])));
+                $更新日期 = date('Y-m-d', time());
                 $headers = get_headers($jpg_url);
                 if (substr($headers[0], 9, 3) == 200) {
                     $model->sendMarkdownImg($userids, $val['值'] . " 基本款 " . $更新日期 . " 表：S119 " , $jpg_url);

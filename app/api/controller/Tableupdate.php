@@ -2211,7 +2211,7 @@ class Tableupdate extends BaseController
     // 数据报表时间更新
     public function tableTime() {
         $sql = "
-            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null
+            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null and 数据表 = '新BI'
         ";
         $select = $this->db_easyA->query($sql);
 
@@ -2228,6 +2228,14 @@ class Tableupdate extends BaseController
                 '跑数日期' => date('Y-m-d', strtotime('-1 day', strtotime($find[$val['跑数表字段']])))
             ]);
         }
+
+        $sql_康雷表 = "
+            update dd_baobiao 
+                set 跑数日期 = '康雷实时数据'
+            where 
+                数据库 = '康雷'    
+        ";
+        $this->db_easyA->execute($sql_康雷表);
     }
 
 }
