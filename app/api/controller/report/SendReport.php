@@ -974,6 +974,80 @@ class SendReport extends BaseController
 
     }
 
+    // cwl 007
+    public function run_pro_s007()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '21', '编号' => 'S007'])->find();
+        
+        // dump($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // echo '可推';
+            // die;
+            $date = input('date') ? input('date') : date('Y-m-d');
+            $this->service->create_table_s007($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '2023 春季货品销售报表 表号:S007',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S007.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        } else {
+            echo '不可推';
+        }
+    }
+
+    // cwl 008
+    public function run_pro_s008()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '22', '编号' => 'S008'])->find();
+        
+        // dump($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // echo '可推';
+            // die;
+            $date = input('date') ? input('date') : date('Y-m-d');
+            $this->service->create_table_s008($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '2023 夏季货品销售报表 表号:S008',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S008.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        } else {
+            echo '不可推';
+        }
+    }
+
     // cwl 010
     public function run_pro_s010()
     {
@@ -1002,6 +1076,80 @@ class SendReport extends BaseController
                 // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
+        }
+    }
+
+    // cwl 013
+    public function run_pro_s013()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '23', '编号' => 'S013'])->find();
+        
+        // dump($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // echo '可推';
+            // die;
+            $date = input('date') ? input('date') : date('Y-m-d');
+            $this->service->create_table_s013($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '2023 春季货品零售汇总报表 表号:S013',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S013.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        } else {
+            echo '不可推';
+        }
+    }
+
+    // cwl 014
+    public function run_pro_s014()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '24', '编号' => 'S014'])->find();
+        
+        // dump($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // echo '可推';
+            // die;
+            $date = input('date') ? input('date') : date('Y-m-d');
+            $this->service->create_table_s014($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '2023 夏季货品零售汇总报表 表号:S014',
+                'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S014.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        } else {
+            echo '不可推';
         }
     }
 
