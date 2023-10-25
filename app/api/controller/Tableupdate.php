@@ -2208,4 +2208,26 @@ class Tableupdate extends BaseController
         ";
     }
 
+    // 数据报表时间更新
+    public function tableTime() {
+        $sql = "
+            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null
+        ";
+        $select = $this->db_easyA->query($sql);
+
+        foreach ($select as $key => $val) {
+            // echo '--------------<br>';
+            // echo '<pre>';
+            // echo $val['编号'];
+            $find = $this->db_bi->table($val['跑数表'])->field($val['跑数表字段'])->where(1)->order("{$val['跑数表字段']} DESC")->find();
+            // print_r($find);
+            $this->db_easyA->table('dd_baobiao')->where([
+                'id' => $val['id'],
+                '编号' => $val['编号']
+            ])->update([
+                '跑数日期' => date('Y-m-d', strtotime('-1 day', strtotime($find[$val['跑数表字段']])))
+            ]);
+        }
+    }
+
 }

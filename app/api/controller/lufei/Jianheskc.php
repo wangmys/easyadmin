@@ -122,10 +122,10 @@ class Jianheskc extends BaseController
                 update cwl_jianhe_stock_skc as s
                 left join customer as c on s.店铺名称 = c.CustomerName
                 set
-                    s.商品负责人 = CustomItem17,
-                    s.温区 = c.CustomItem36
-                where 
-                    s.商品负责人 is null or s.温区 is null
+                        s.商品负责人 = CustomItem17,
+                        s.温区 = c.CustomItem36,
+                        s.省份 = left(c.State, 2)
+                where 1
             ";
             $this->db_easyA->execute($sql_update_17_36);
 

@@ -35,12 +35,14 @@ class Stock_week extends Command
 		ini_set('memory_limit','1024M');
 
 		//生成上周数据入week表
-		$this->add_every_week();
+		// $this->add_every_week();
 
-		//重新生成三年趋势首页缓存数据
-		$this->generate_index_data();
+		// //重新生成三年趋势首页缓存数据
+		// $this->generate_index_data();
 
-		echo 'okk';die;
+		// echo 'okk';die;
+
+
 
 
 		//test....
@@ -51,31 +53,35 @@ class Stock_week extends Command
 		// print_r($weather_data);die;
 
 		//跑三年数据使用：
-		// $week_date = $this->get_week_date();
-		// $year_start_time = array_column($week_date, 'year_start_time');
-		// $week_date = array_combine($year_start_time, $week_date);
-		// $this->deal_week_data_2021($week_date);
-		// $this->deal_week_data_2022($week_date);
-		// $this->deal_week_data_2023($week_date);
+		$week_date = $this->get_week_date();
+		$year_start_time = array_column($week_date, 'year_start_time');
+		$week_date = array_combine($year_start_time, $week_date);
+		// print_r($week_date);die;
+		$this->deal_week_data_2021($week_date);
+		$this->deal_week_data_2022($week_date);
+		$this->deal_week_data_2023($week_date);
+
+		//重新生成三年趋势首页缓存数据
+		$this->generate_index_data();
 
     }
 
 	protected function deal_week_data_2021($week_date) {
 
 		$date_arr = [
-			// ['start_time' => '2021-01-04', 'end_time' => '2021-01-31'],
-			// ['start_time' => '2021-02-01', 'end_time' => '2021-02-28'],
-			// ['start_time' => '2021-03-01', 'end_time' => '2021-04-04'],
-			// ['start_time' => '2021-04-05', 'end_time' => '2021-05-02'],
-			// ['start_time' => '2021-05-03', 'end_time' => '2021-05-30'],
-			// ['start_time' => '2021-05-31', 'end_time' => '2021-06-27'],
-			// ['start_time' => '2021-06-28', 'end_time' => '2021-07-25'],
+			['start_time' => '2021-01-04', 'end_time' => '2021-01-31'],
+			['start_time' => '2021-02-01', 'end_time' => '2021-02-28'],
+			['start_time' => '2021-03-01', 'end_time' => '2021-04-04'],
+			['start_time' => '2021-04-05', 'end_time' => '2021-05-02'],
+			['start_time' => '2021-05-03', 'end_time' => '2021-05-30'],
+			['start_time' => '2021-05-31', 'end_time' => '2021-06-27'],
+			['start_time' => '2021-06-28', 'end_time' => '2021-07-25'],
 
-			// ['start_time' => '2021-07-26', 'end_time' => '2021-08-29'],
-			// ['start_time' => '2021-08-30', 'end_time' => '2021-09-26'],
-			// ['start_time' => '2021-09-27', 'end_time' => '2021-10-31'],
-			// ['start_time' => '2021-11-01', 'end_time' => '2021-11-28'],
-			// ['start_time' => '2021-11-29', 'end_time' => '2022-01-02'],
+			['start_time' => '2021-07-26', 'end_time' => '2021-08-29'],
+			['start_time' => '2021-08-30', 'end_time' => '2021-09-26'],
+			['start_time' => '2021-09-27', 'end_time' => '2021-10-31'],
+			['start_time' => '2021-11-01', 'end_time' => '2021-11-28'],
+			['start_time' => '2021-11-29', 'end_time' => '2022-01-02'],
 		];
 
 		$this->deal_week_data_common($date_arr, $week_date, '2021');
@@ -85,19 +91,19 @@ class Stock_week extends Command
 	protected function deal_week_data_2022($week_date) {
 
 		$date_arr = [
-			// ['start_time' => '2022-01-03', 'end_time' => '2022-01-30'],
-			// ['start_time' => '2022-01-31', 'end_time' => '2022-03-06'],
-			// ['start_time' => '2022-03-07', 'end_time' => '2022-04-03'],
-			// ['start_time' => '2022-04-04', 'end_time' => '2022-05-01'],
-			// ['start_time' => '2022-05-02', 'end_time' => '2022-05-29'],
-			// ['start_time' => '2022-05-30', 'end_time' => '2022-06-26'],
-			// ['start_time' => '2022-06-27', 'end_time' => '2022-07-31'],
+			['start_time' => '2022-01-03', 'end_time' => '2022-01-30'],
+			['start_time' => '2022-01-31', 'end_time' => '2022-03-06'],
+			['start_time' => '2022-03-07', 'end_time' => '2022-04-03'],
+			['start_time' => '2022-04-04', 'end_time' => '2022-05-01'],
+			['start_time' => '2022-05-02', 'end_time' => '2022-05-29'],
+			['start_time' => '2022-05-30', 'end_time' => '2022-06-26'],
+			['start_time' => '2022-06-27', 'end_time' => '2022-07-31'],
 
-			// ['start_time' => '2022-08-01', 'end_time' => '2022-09-04'],
-			// ['start_time' => '2022-09-05', 'end_time' => '2022-10-02'],
-			// ['start_time' => '2022-10-03', 'end_time' => '2022-10-30'],
-			// ['start_time' => '2022-10-31', 'end_time' => '2022-11-27'],
-			// ['start_time' => '2022-11-28', 'end_time' => '2023-01-01'],
+			['start_time' => '2022-08-01', 'end_time' => '2022-09-04'],
+			['start_time' => '2022-09-05', 'end_time' => '2022-10-02'],
+			['start_time' => '2022-10-03', 'end_time' => '2022-10-30'],
+			['start_time' => '2022-10-31', 'end_time' => '2022-11-27'],
+			['start_time' => '2022-11-28', 'end_time' => '2023-01-01'],
 		];
 
 		$this->deal_week_data_common($date_arr, $week_date, '2022');
@@ -107,17 +113,20 @@ class Stock_week extends Command
 	protected function deal_week_data_2023($week_date) {
 
 		$date_arr = [
-			// ['start_time' => '2023-01-02', 'end_time' => '2023-02-05'],
-			// ['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
-			// ['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
-			// ['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
-			// ['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
-			// ['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
+			['start_time' => '2023-01-02', 'end_time' => '2023-02-05'],
+			['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
+			['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
+			['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
+			['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
+			['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
 
-			// ['start_time' => '2023-06-05', 'end_time' => '2023-07-02'],
-			// ['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
-			// ['start_time' => '2023-07-31', 'end_time' => '2023-09-03'],
-			// ['start_time' => '2023-09-04', 'end_time' => '2023-10-01'],
+			['start_time' => '2023-06-05', 'end_time' => '2023-07-02'],
+			['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
+			['start_time' => '2023-07-31', 'end_time' => '2023-09-03'],
+			['start_time' => '2023-09-04', 'end_time' => '2023-09-17'],
+			['start_time' => '2023-09-18', 'end_time' => '2023-10-01'],
+			['start_time' => '2023-10-02', 'end_time' => '2023-10-15'],
+			['start_time' => '2023-10-16', 'end_time' => '2023-10-22'],
 		];
 
 		//test...

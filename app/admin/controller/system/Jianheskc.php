@@ -112,6 +112,14 @@ class Jianheskc extends AdminController
                 $map5 = "";
             }
 
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['省份']);
+                $map6 = " AND m.省份 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
             $sql0 = "
                 SELECT
                     店铺名称
@@ -122,6 +130,7 @@ class Jianheskc extends AdminController
                     {$map1}
                     {$map4}
                     {$map5}
+                    {$map6}
                 GROUP BY
                     店铺名称
                 -- LIMIT 100
@@ -277,6 +286,14 @@ class Jianheskc extends AdminController
                 $map5 = "";
             }
 
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['省份']);
+                $map6 = " AND m.省份 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
             $sql0 = "
                 SELECT
                     店铺名称
@@ -287,6 +304,7 @@ class Jianheskc extends AdminController
                     {$map1}
                     {$map4}
                     {$map5}
+                    {$map6}
                 GROUP BY
                     店铺名称
                 -- LIMIT 100
@@ -329,6 +347,7 @@ class Jianheskc extends AdminController
                         {$map3}
                         {$map4}
                         {$map5}
+                        {$map6}
                     GROUP BY
                         m.一级分类,m.二级分类,m.修订分类
                         WITH ROLLUP
@@ -352,6 +371,8 @@ class Jianheskc extends AdminController
                 SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_jianhe_stock_skc WHERE 商品负责人 IS NOT NULL AND 商品负责人 !='0' GROUP BY 商品负责人
             ");
 
+            // dump($customer17);die;
+
 
             foreach ($customer17 as $key => $val) {
                 if (checkAdmin()) {
@@ -360,6 +381,8 @@ class Jianheskc extends AdminController
                     }
                 } elseif (session('admin.name') == $val['name']) {
                     $customer17 = $val['name'];
+                } else {
+                    $customer17 = '曹太阳';
                 }
             } 
             return View('handle', [
@@ -375,6 +398,9 @@ class Jianheskc extends AdminController
         $customer17 = $this->db_easyA->query("
             SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_jianhe_stock_skc WHERE 商品负责人 IS NOT NULL AND 商品负责人 !='0' GROUP BY 商品负责人
         ");
+        $province = $this->db_easyA->query("
+            SELECT 省份 as name, 省份 as value FROM cwl_jianhe_stock_skc WHERE 省份 IS NOT NULL GROUP BY 省份
+        ");
         $customer36 = $this->db_easyA->query("
             SELECT 温区 as name, 温区 as value FROM cwl_jianhe_stock_skc WHERE 温区 IS NOT NULL GROUP BY 温区
         ");
@@ -382,20 +408,36 @@ class Jianheskc extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_jianhe_stock_skc GROUP BY 店铺名称
         ");
 
+        $find_name = false;
         foreach ($customer17 as $key => $val) {
             if (checkAdmin()) {
                 if ($key == 0) {
                     $customer17[$key]['selected'] = true;
+                    $find_name = true;
+                    break;
                 }
             } elseif (session('admin.name') == $val['name']) {
                 $customer17[$key]['selected'] = true;
+                $find_name = true;
+                break;
             }
         } 
+
+        // 如果找不到名字
+        if ($find_name == false) {
+            foreach ($customer17 as $key2 => $val2) {
+                if ( '曹太阳' == $val2['name']) {
+                    $customer17[$key2]['selected'] = true;
+                    $find_name = true;
+                    break;
+                }
+            } 
+        }
         
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36, 'province' => $province]]);
     }
 
     // 实时数据更新

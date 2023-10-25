@@ -823,6 +823,29 @@ class Skauto extends BaseController
             $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update([
                 'skauto_res_updatetime' => date('Y-m-d H:i:s')
             ]);  
+
+            // 同步bi的表
+            $sql_ww = "
+                SELECT
+                        *
+                from cwl_skauto_res 
+                where 1
+                    AND 在途库存 + 已配未发 <= 0
+                    AND 售空提醒 IN ('售空', '即将售空')
+            ";
+            $select_ww = $this->db_easyA->query($sql_ww);
+
+            if ($select_ww) {
+                $this->db_bi->execute('TRUNCATE ww_skauto_res;');
+
+                $chunk_list2 = array_chunk($select_ww, 500);
+
+                foreach($chunk_list2 as $key2 => $val2) {
+                    // 基础结果 
+                    $insert = $this->db_bi->table('ww_skauto_res')->strict(false)->insertAll($val2);
+                }
+            }
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -835,5 +858,34 @@ class Skauto extends BaseController
                 'content' => "cwl_skauto_res  更新失败，数量：{$count}！"
             ]);
         }       
+    }
+
+    public function updateTable() {
+        $sql = "
+            SELECT
+                    *
+            from cwl_skauto_res 
+            where 1
+                AND 在途库存 + 已配未发 <= 0
+                AND 售空提醒 IN ('售空', '即将售空')
+        ";
+        $select = $this->db_easyA->query($sql);
+        $count = count($select);
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE ww_skauto_res;');
+
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_bi->table('ww_skauto_res')->strict(false)->insertAll($val);
+            }
+
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => "ww_skauto_res 1 更新成功，数量：{$count}！"
+            ]);
+        }
     }
 }

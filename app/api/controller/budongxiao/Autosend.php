@@ -60,6 +60,7 @@ class Autosend extends BaseController
 
         // 删除所有基础计算结果
         $this->db_easyA->table('cwl_budongxiao_result_sys')->where(1)->delete();
+        $this->db_bi->table('ww_budongxiao_result')->where(1)->delete();
         // 删除所有详情结果
         $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->delete();
         // 删除所有统计结果
@@ -91,9 +92,10 @@ class Autosend extends BaseController
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_budongxiao_result_sys')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_budongxiao_result')->strict(false)->insertAll($val);
             }
             echo 1;
-
+            
         }
 
     }
