@@ -32,7 +32,7 @@ class Stock_week extends Command
 
 	protected function execute(Input $input, Output $output)
     {
-		ini_set('memory_limit','1024M');
+		ini_set('memory_limit','2048M');
 
 		//生成上周数据入week表
 		// $this->add_every_week();
@@ -98,13 +98,14 @@ class Stock_week extends Command
 			// ['start_time' => '2022-04-04', 'end_time' => '2022-05-01'],
 			// ['start_time' => '2022-05-02', 'end_time' => '2022-05-29'],
 			// ['start_time' => '2022-05-30', 'end_time' => '2022-06-26'],
-			['start_time' => '2022-06-27', 'end_time' => '2022-07-17'],
-			['start_time' => '2022-07-18', 'end_time' => '2022-07-31'],
+			// ['start_time' => '2022-06-27', 'end_time' => '2022-07-17'],
+			// ['start_time' => '2022-07-18', 'end_time' => '2022-07-31'],
 
-			['start_time' => '2022-08-01', 'end_time' => '2022-09-04'],
-			['start_time' => '2022-09-05', 'end_time' => '2022-09-18'],
-			['start_time' => '2022-09-19', 'end_time' => '2022-10-02'],
-			['start_time' => '2022-10-03', 'end_time' => '2022-10-30'],
+			// ['start_time' => '2022-08-01', 'end_time' => '2022-09-04'],
+			// ['start_time' => '2022-09-05', 'end_time' => '2022-09-18'],
+			// ['start_time' => '2022-09-19', 'end_time' => '2022-10-02'],
+			['start_time' => '2022-10-03', 'end_time' => '2022-10-16'],
+			['start_time' => '2022-10-17', 'end_time' => '2022-10-30'],
 			['start_time' => '2022-10-31', 'end_time' => '2022-11-27'],
 			['start_time' => '2022-11-28', 'end_time' => '2023-12-18'],
 			['start_time' => '2022-12-19', 'end_time' => '2023-01-01'],
@@ -124,7 +125,8 @@ class Stock_week extends Command
 			['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
 			['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
 
-			['start_time' => '2023-06-05', 'end_time' => '2023-07-02'],
+			['start_time' => '2023-06-05', 'end_time' => '2023-06-18'],
+			['start_time' => '2023-06-19', 'end_time' => '2023-07-02'],
 			['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
 			['start_time' => '2023-07-31', 'end_time' => '2023-09-03'],
 			['start_time' => '2023-09-04', 'end_time' => '2023-09-17'],
