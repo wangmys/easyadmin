@@ -32,15 +32,15 @@ class Stock_week extends Command
 
 	protected function execute(Input $input, Output $output)
     {
-		ini_set('memory_limit','2048M');
+		ini_set('memory_limit','1024M');
 
 		//生成上周数据入week表
-		// $this->add_every_week();
+		$this->add_every_week();
 
-		// //重新生成三年趋势首页缓存数据
-		// $this->generate_index_data();
+		//重新生成三年趋势首页缓存数据
+		$this->generate_index_data();
 
-		// echo 'okk';die;
+		echo 'okk';die;
 
 
 
@@ -53,16 +53,17 @@ class Stock_week extends Command
 		// print_r($weather_data);die;
 
 		//跑三年数据使用：
-		$week_date = $this->get_week_date();
-		$year_start_time = array_column($week_date, 'year_start_time');
-		$week_date = array_combine($year_start_time, $week_date);
+		// ini_set('memory_limit','2048M');
+		// $week_date = $this->get_week_date();
+		// $year_start_time = array_column($week_date, 'year_start_time');
+		// $week_date = array_combine($year_start_time, $week_date);
 		// print_r($week_date);die;
 		// $this->deal_week_data_2021($week_date);
-		$this->deal_week_data_2022($week_date);
-		$this->deal_week_data_2023($week_date);
+		// $this->deal_week_data_2022($week_date);
+		// $this->deal_week_data_2023($week_date);
 
 		//重新生成三年趋势首页缓存数据
-		$this->generate_index_data();
+		// $this->generate_index_data();
 
     }
 
@@ -104,10 +105,10 @@ class Stock_week extends Command
 			// ['start_time' => '2022-08-01', 'end_time' => '2022-09-04'],
 			// ['start_time' => '2022-09-05', 'end_time' => '2022-09-18'],
 			// ['start_time' => '2022-09-19', 'end_time' => '2022-10-02'],
-			['start_time' => '2022-10-03', 'end_time' => '2022-10-16'],
-			['start_time' => '2022-10-17', 'end_time' => '2022-10-30'],
-			['start_time' => '2022-10-31', 'end_time' => '2022-11-27'],
-			['start_time' => '2022-11-28', 'end_time' => '2023-12-18'],
+			// ['start_time' => '2022-10-03', 'end_time' => '2022-10-16'],
+			// ['start_time' => '2022-10-17', 'end_time' => '2022-10-30'],
+			// ['start_time' => '2022-10-31', 'end_time' => '2022-11-27'],
+			['start_time' => '2022-11-28', 'end_time' => '2022-12-18'],
 			['start_time' => '2022-12-19', 'end_time' => '2023-01-01'],
 		];
 
@@ -119,16 +120,19 @@ class Stock_week extends Command
 
 		$date_arr = [
 			['start_time' => '2023-01-02', 'end_time' => '2023-02-05'],
-			['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
-			['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
-			['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
-			['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
-			['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
 
-			['start_time' => '2023-06-05', 'end_time' => '2023-06-18'],
-			['start_time' => '2023-06-19', 'end_time' => '2023-07-02'],
-			['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
-			['start_time' => '2023-07-31', 'end_time' => '2023-09-03'],
+			// ['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
+			// ['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
+			// ['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
+			// ['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
+			// ['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
+
+			// ['start_time' => '2023-06-05', 'end_time' => '2023-06-18'],
+			// ['start_time' => '2023-06-19', 'end_time' => '2023-07-02'],
+			// ['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
+
+			['start_time' => '2023-07-31', 'end_time' => '2023-08-13'],
+			['start_time' => '2023-08-14', 'end_time' => '2023-09-03'],
 			['start_time' => '2023-09-04', 'end_time' => '2023-09-17'],
 			['start_time' => '2023-09-18', 'end_time' => '2023-10-01'],
 			['start_time' => '2023-10-02', 'end_time' => '2023-10-15'],
