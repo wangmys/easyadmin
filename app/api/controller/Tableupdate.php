@@ -2211,7 +2211,7 @@ class Tableupdate extends BaseController
     // 数据报表时间更新
     public function tableTime() {
         $sql = "
-            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null and 数据表 = '新BI'
+            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null and 数据库 = '新BI'
         ";
         $select = $this->db_easyA->query($sql);
 
