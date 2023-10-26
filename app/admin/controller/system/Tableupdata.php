@@ -154,4 +154,10 @@ class Tableupdata extends BaseController
         $sk2 = new Sk2;
         $sk2->doris();
     }
+
+    // 强制清空缓存
+    public function clean() {
+        cache('sp_customer_stock_skc_2', null);
+        cache('sp_ww_shop_stock_sales', null);
+    }
 }
