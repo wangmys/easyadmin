@@ -6,6 +6,7 @@ use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
 use app\api\controller\lufei\updatatable\sp_customer_stock_skc_2 as Sk2;
+use app\api\controller\lufei\updatatable\SpWwShopStockSales as Stock_sales;
 
 /**
  * 报表自动更新
@@ -58,10 +59,20 @@ class Tableupdata extends BaseController
                     sp_customer_stock_skc_2
                 WHERE 1
             ";
+            $sql_sp_ww_shop_stock_sales_count = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    sp_ww_shop_stock_sales
+                WHERE 1
+            ";
             $总数_sql_sp_customer_stock_skc_2 = $this->db_binew->query($sql_sp_customer_stock_skc_2_count);
+            $总数_sql_sp_ww_shop_stock_sales = $this->db_binew->query($sql_sp_ww_shop_stock_sales_count);
             foreach ($select as $key=>$val) {
                 if ($val['表名'] == 'sp_customer_stock_skc_2') {
                     $select[$key]['实时数据'] = $总数_sql_sp_customer_stock_skc_2[0]['total'];
+                } elseif ($val['表名'] == 'sp_ww_shop_stock_sales') {
+                    $select[$key]['实时数据'] = $总数_sql_sp_ww_shop_stock_sales[0]['total'];
                 }
             }
 
@@ -114,6 +125,23 @@ class Tableupdata extends BaseController
                         return json(['status' => 4, 'msg' => '别人正在更新此表格，请稍后再试']);    
                     }
 
+                } elseif ($input['表名'] == 'sp_ww_shop_stock_sales') {
+                    if (! cache('sp_ww_shop_stock_sales')) {
+                        cache('sp_ww_shop_stock_sales', true, 600);
+                        $stock_sales = new Stock_sales;
+                        $res = $stock_sales->updateDb();
+                        if ($res) {
+                            $this->db_easyA->table('cwl_table_update')->where(['表名' => $input['表名']])->update(['跑数完成时间' => date('Y-m-d H:i:s')]);
+                            return json(['status' => 1, 'msg' => '执行成功']);
+                        } else {
+                            return json(['status' => 2, 'msg' => '执行失败，请稍后再试']);
+                        }
+    
+                        // sleep(5);
+                        // return json(['status' => 1, 'msg' => '执行成功']);
+                    } else {
+                        return json(['status' => 4, 'msg' => '别人正在更新此表格，请稍后再试']);    
+                    }
                 } else {
                     return json(['status' => 3, 'msg' => '表名不存在']);
                 }
