@@ -134,7 +134,7 @@ class Tableupdata extends BaseController
                             $this->db_easyA->table('cwl_table_update')->where(['表名' => $input['表名']])->update(['跑数完成时间' => date('Y-m-d H:i:s')]);
                             return json(['status' => 1, 'msg' => '执行成功']);
                         } else {
-                            return json(['status' => 2, 'msg' => '执行失败，请稍后再试']);
+                            return json(['status' => 2, 'msg' => '执行失败（线程死锁），请稍后再试']);
                         }
     
                         // sleep(5);

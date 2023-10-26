@@ -262,23 +262,30 @@ class SpWwShopStockSales extends BaseController
             ;    
         ";
 
-        $select = $this->db_sqlsrv->query($sql);
-        if ($select) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_bi->execute('TRUNCATE sp_ww_shop_stock_sales;');
-            $chunk_list = array_chunk($select, 500);
-            // $this->db_easyA->startTrans();
-
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_bi->table('sp_ww_shop_stock_sales')->strict(false)->insertAll($val);
+        try {
+            $select = $this->db_sqlsrv->query($sql);
+            if ($select) {
+                // 删除历史数据
+                // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+                $this->db_bi->execute('TRUNCATE sp_ww_shop_stock_sales;');
+                $chunk_list = array_chunk($select, 500);
+                // $this->db_easyA->startTrans();
+    
+                foreach($chunk_list as $key => $val) {
+                    // 基础结果 
+                    $insert = $this->db_bi->table('sp_ww_shop_stock_sales')->strict(false)->insertAll($val);
+                }
+    
+                cache('sp_customer_stock_skc_2', null);
+                return true;
+            } else {
+                return false;
             }
-
+        } catch (\Throwable $th) {
+            //throw $th;
             cache('sp_customer_stock_skc_2', null);
-            return true;
-        } else {
             return false;
         }
+
     }
 }
