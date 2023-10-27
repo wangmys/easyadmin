@@ -10,7 +10,7 @@ use app\api\controller\lufei\updatatable\SpWwShopStockSales as Stock_sales;
 
 /**
  * 报表自动更新
- * Class Stockskc2
+ * Class Tableupdata
  * @package app\dingtalk
  */
 class Tableupdata extends BaseController
@@ -34,6 +34,9 @@ class Tableupdata extends BaseController
         $this->db_tianqi = Db::connect('tianqi');
     }
 
+    /**
+     * @NodeAnotation(title="报表自动更新列表")
+     */
     public function list() {
         if (request()->isAjax()) {
             // 筛选条件

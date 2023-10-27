@@ -2211,16 +2211,20 @@ class Tableupdate extends BaseController
     // 数据报表时间更新
     public function tableTime() {
         $sql = "
-            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null and 数据库 = '新BI'
+            select id,编号,跑数表,跑数表字段 from dd_baobiao where 跑数表 is not null and 数据库 = '新BI' AND 跑数表字段 is not null
         ";
         $select = $this->db_easyA->query($sql);
 
+        // dump($select);die;
         foreach ($select as $key => $val) {
             // echo '--------------<br>';
             // echo '<pre>';
             // echo $val['编号'];
+            // echo 1;die; 
+            // dump($select[$key]);
             $find = $this->db_bi->table($val['跑数表'])->field($val['跑数表字段'])->where(1)->order("{$val['跑数表字段']} DESC")->find();
             // print_r($find);
+            // die;
             $this->db_easyA->table('dd_baobiao')->where([
                 'id' => $val['id'],
                 '编号' => $val['编号']

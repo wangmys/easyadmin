@@ -6,10 +6,12 @@ use think\facade\Db;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
+use jianyan\excel\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
  * 报表
- * Class Baobiao
+ * Class Tiaojia
  * @package app\dingtalk
  */
 class Tiaojia extends BaseController
@@ -18,6 +20,8 @@ class Tiaojia extends BaseController
     protected $db_bi = '';
     protected $db_sqlsrv = '';
     protected $db_tianqi = '';
+
+    public $debug = false;
     
     /**
      * 构造函数
@@ -33,7 +37,6 @@ class Tiaojia extends BaseController
 
     public function list() {
         if (request()->isAjax()) {
-            // 筛选条件
             $input = input();
             $pageParams1 = ($input['page'] - 1) * $input['limit'];
             $pageParams2 = input('limit');
@@ -46,19 +49,21 @@ class Tiaojia extends BaseController
             // } else {
             //     $mapSuper = '';
             // }
-            // if (!empty($input['更新日期'])) {
-            //     $map1 = " AND `更新日期` = '{$input['更新日期']}'";                
+            // $云仓 = $input['yc'];
+            // $货号 = $input['gdno'];
+            // if (!empty($input['yc'])) {
+            //     $map1 = " AND `云仓` = '{$云仓}云仓'";                
             // } else {
-            //     $today = date('Y-m-d');
-            //     $map1 = " AND `更新日期` = '{$today}'";            
+            //     $map1 = "";
             // }
             $sql = "
                 SELECT 
-                   *
+                    *
                 FROM 
-                    dd_baobiao
+                    dd_tiaojia_list
                 WHERE 1
-                ORDER BY `key` ASC, 钉群, 编号 ASC
+                ORDER BY id desc
+ 
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
             $select = $this->db_easyA->query($sql);
@@ -66,76 +71,160 @@ class Tiaojia extends BaseController
             $sql2 = "
                 SELECT 
                     count(*) as total
-                FROM 
-                    dd_baobiao
+                    FROM 
+                        dd_tiaojia_list
                 WHERE 1
             ";
             $count = $this->db_easyA->query($sql2);
-
-            // $reads = $this->db_easyA->table('dd_customer_push_weather')->where([
-            //     ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
-            //     ['已读', '=', 'Y'],
-            // ])->count('*');
-
-            // $noReads = $this->db_easyA->table('dd_customer_push_weather')->where([
-            //     ['更新日期', '=', $input['更新日期'] ? $input['更新日期'] : date('Y-m-d')],
-            //     ['已读', '=', 'N'],
-            // ])->count('*');
             // print_r($count);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
-            // $time = time();
-            // if ($time < strtotime(date('Y-m-d 20:30:00'))) {
-            //     // echo '显示昨天';
-            //     $today = date('Y-m-d', strtotime('-1 day', $time));
-            // } else {
-            //     // echo '显示今天';
-            //     $today = date('Y-m-d');
-            // }
-            return View('list', [
-                // 'today' => $today,
+            return View('list',[
+            
             ]);
-        }        
+        }      
     }
 
-    public function upload2() {
-        $slq_info2 = "
-            SELECT 
-                EG.GoodsNo as 货号,
-                EG.GoodsId,
-                EGPT.UnitPrice as 零售价,
-                EGC.ColorDesc as 颜色,
-                EGI.Img
-            FROM ErpGoods AS EG
-            LEFT JOIN ErpGoodsColor AS EGC ON EG.GoodsId = EGC.GoodsId
-            LEFT JOIN ErpGoodsPriceType AS EGPT ON EG.GoodsId = EGPT.GoodsId AND EGPT.PriceId = 1
-            LEFT JOIN ErpGoodsImg AS EGI ON EG.GoodsId = EGI.GoodsId
-            where EG.GoodsNo in ('214504023','214504024','214504025','214504026','214504027','214504028')
-        ";
+    public function upload_excel1() {
+        if (request()->isAjax() || $this->debug) {
+        // if (1) {
+            if ($this->debug) {
+            // 静态测试
+                $info = app()->getRootPath() . 'public/upload/dd_tiaojia/'.date('Ymd',time()).'/调价上传模板.xlsx';   //文件保存路径
+            } else {
+                $file = request()->file('file');  //这里‘file’是你提交时的name
+                $file->getOriginalName();
+                $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
+                $save_path = app()->getRootPath() . 'public/upload/dd_tiaojia/' . date('Ymd',time()).'/';   //文件保存路径
+                $info = $file->move($save_path, $new_name);
+            }
+
+            if($info) {
+                //成功上传后 获取上传的数据
+                //要获取的数据字段
+                $read_column = [
+                    'A' => '货号',
+                    'B' => '调价',
+                    'C' => '调价时间范围',
+
+                ];
+                
+                //读取数据
+                $data = $this->readExcel_temp_excel($info, $read_column);
+
+                // echo 111;
+                // echo '<pre>';
+                // dump($data);
+                if ($data) {
+                    $model = new DingTalk;
+                    $sucess_data = [];
+                    $error_data = [];
+                    $uid = rand_code(8);
+                    $time = date('Y-m-d H:i:s');
+
+                    $货号str = ''; 
+                    foreach ($data as $key => $val) {
+                        $data[$key]['uid'] = $uid;
+                        // $data[$key]['aid'] = $this->authInfo['id'];
+                        // $data[$key]['aname'] = $this->authInfo['name'];
+                        // $data[$key]['店铺名称'] = @$val['店铺名称'];
+                        // $data[$key]['姓名'] = @$val['姓名'];
+                        // $data[$key]['手机'] = @$val['手机'];
+                        $data[$key]['createtime'] = $time;
+
+                        if ($key + 1 == count($data)) {
+                            $货号str .= "'" . $val['货号'] . "'";
+                        } else {
+                            $货号str .= "'" . $val['货号'] . "',";
+                        }
+                    }
+
+
+                    // 删除临时excel表该用户上传的记录
+                    $chunk_list = array_chunk($data, 500);
+                    // dump($chunk_list);
+                    // $this->db_easyA->startTrans();
+                    $res = false;
+                    foreach($chunk_list as $key => $val) {
+                        $res = $this->db_easyA->table('dd_tiaojia_temp')->strict(false)->insertAll($val);
+                        if (!$res) {
+                            break;
+                        }
+                    }
+
+                    if ($res) {
+                        // 顺序不能变
+                        $this->getCustomer($uid, $货号str);
+                        $总店铺数 = $this->db_easyA->query("
+                            SELECT 店铺名称 as total FROM `dd_tiaojia_customer_temp` where uid='{$uid}' group by 店铺名称
+                        ");
+                        $res = $this->db_easyA->table('dd_tiaojia_list')->insert([
+                            'aid' => session('admin.id'),
+                            'aname' => session('admin.name'),
+                            'uid' => $uid,
+                            'createtime' => $time,
+                            '总数' => count($总店铺数)
+                        ]);
+                    }
+                    
+
+                    // $insert_list['uid'] = $uid;
+                    // $insert_list['aid'] = $this->authInfo['id'];
+                    // $insert_list['aname'] = $this->authInfo['name'];
+                    // $insert_list['createtime'] = $time;
+                    // $insert_list['总数'] = count($select_customer_push);
+                    // $res2 = $this->db_easyA->table('dd_weatherdisplay_list')->strict(false)->insert($insert_list);
+
+                    // if ($res) {
+                    //     $this->db_easyA->commit();
+                    // } else {
+                    //     $this->db_easyA->rollback();
+                    // }
+                    
+                    return json(['code' => 0, 'msg' => "名单上传成功", 'data' => []]);
+                }
+                
+            } else {
+                echo '没数据';
+            }
+        }   
+    }
+
+    public function test() {
+        $总店铺数 = $this->db_easyA->query("
+            SELECT 店铺名称 as total FROM `dd_tiaojia_customer_temp` where uid='68466592' group by 店铺名称
+        ");
+        // dump($总店铺数 );
+        echo count($总店铺数);
     }
 
     // 更新调价模板店铺信息
-    public function getCustomer() {
-        $id = 6636;
-        $sql_temp = "
-            select 货号 from dd_tiaojia_temp
-            where id = '{$id}'
-        ";
-        $select_temp = $this->db_easyA->query($sql_temp);
-
-        $货号str = "";
-        foreach ($select_temp as $key => $val) {
-            if ($key + 1 == count($select_temp)) {
-                $货号str .= "'" . $val['货号'] . "'";
-            } else {
-                $货号str .= "'" . $val['货号'] . "',";
-            }
+    private function getCustomer($uid = "", $货号str = "") {
+        if (empty($uid) || empty($货号str)) {
+            return false;
         }
+        // $uid = 6636;
+        // $sql_temp = "
+        //     select 货号 from dd_tiaojia_temp
+        //     where id = '{$id}'
+        // ";
+        // $select_temp = $this->db_easyA->query($sql_temp);
 
+        // $货号str = "";
+        // foreach ($select_temp as $key => $val) {
+        //     if ($key + 1 == count($select_temp)) {
+        //         $货号str .= "'" . $val['货号'] . "'";
+        //     } else {
+        //         $货号str .= "'" . $val['货号'] . "',";
+        //     }
+        // }
+
+        $time = date('Y-m-d H:i:s');
         // $货号str;
         $sql_店铺可用库存 = "
                 SELECT 
-                    '{$id}' as id,
+                    '{$uid}' as uid,
+                    '{$time}' as createtime,
                     T.CustomerName AS 店铺名称,
                     T.货号,
                     SUM(T.店铺库存) as 店铺库存,
@@ -225,7 +314,7 @@ class Tiaojia extends BaseController
             $select_店铺可用库存 = $this->db_sqlsrv->query($sql_店铺可用库存);
             if ($select_店铺可用库存) {
                 // 删除历史数据
-                $this->db_easyA->table('dd_tiaojia_customer_temp')->where(['id' => $id])->delete();
+                $this->db_easyA->table('dd_tiaojia_customer_temp')->where(['uid' => $uid])->delete();
                 // $this->db_easyA->execute('TRUNCATE dd_tiaojia_customer_temp;');
                 $chunk_list = array_chunk($select_店铺可用库存, 500);
                 // $this->db_easyA->startTrans();
@@ -237,9 +326,9 @@ class Tiaojia extends BaseController
     
                 $sql_分组货号 = "
                      select
-                        id,货号
+                        uid,货号
                     from dd_tiaojia_customer_temp
-                    where id='{$id}'
+                    where uid='{$uid}'
                     group by 货号
                 ";
                 $select_分组货号 = $this->db_easyA->query($sql_分组货号);
@@ -253,7 +342,7 @@ class Tiaojia extends BaseController
                 }
                 $sql_信息明细2 = "
                     SELECT 
-                        '{$id}' as id,
+                        '{$uid}' as uid,
                         EG.GoodsNo as 货号,
                         EG.GoodsId,
                         EGPT.UnitPrice as 零售价,
@@ -267,7 +356,7 @@ class Tiaojia extends BaseController
                 ";
                 $select_信息明细2 = $this->db_sqlsrv->query($sql_信息明细2);
                 if ($select_信息明细2) {
-                    $this->db_easyA->table('dd_tiaojia_goods_info')->where(['id' => $id])->delete();
+                    $this->db_easyA->table('dd_tiaojia_goods_info')->where(['uid' => $uid])->delete();
                     $chunk_list2 = array_chunk($select_信息明细2, 500);
                     foreach($chunk_list2 as $key3 => $val3) {
                         // 基础结果 
@@ -276,8 +365,8 @@ class Tiaojia extends BaseController
 
                     $sql_调价_零售价_颜色_图片 = "
                         update dd_tiaojia_customer_temp as c 
-                        left join dd_tiaojia_goods_info as i on c.id = i.id and c.货号 = i.货号
-                        left join dd_tiaojia_temp as t on c.id = t.id and c.货号 = t.货号  
+                        left join dd_tiaojia_goods_info as i on c.uid = i.uid and c.货号 = i.货号
+                        left join dd_tiaojia_temp as t on c.uid = t.uid and c.货号 = t.货号  
                         SET
                             c.调价 = t.调价,
                             c.调价时间范围 = t.调价时间范围,
@@ -297,5 +386,69 @@ class Tiaojia extends BaseController
             // return false;
         }
         
+    }
+
+    /** 
+     * 读取excel里面的内容保存为数组
+     * @param string $file_path  导入文件的路径
+     * @param array $read_column  要返回的字段
+     * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public function readExcel_temp_excel($file_path = '/', $read_column = array())
+    {
+        $reader = IOFactory::createReader('Xlsx');
+    
+        $reader->setReadDataOnly(TRUE);
+    
+        //载入excel表格
+        $spreadsheet = $reader->load($file_path);
+    
+        // 读取第一個工作表
+        $sheet = $spreadsheet->getSheet(0);
+    
+        // 取得总行数
+        $highest_row = $sheet->getHighestRow();
+    
+        // 取得总列数
+        $highest_column = $sheet->getHighestColumn();
+    
+        //读取内容
+        $data_origin = array();
+        $data = array();
+        for ($row = 2; $row <= $highest_row; $row++) { //行号从2开始
+            for ($column = 'A'; $column <= $highest_column; $column++) { //列数是以A列开始
+                $str = $sheet->getCell($column . $row)->getValue();
+                //保存该行的所有列
+                $data_origin[$column] = $str;
+                // if ($column == "C" || $column == "D") {
+                //     if (is_numeric($data_origin[$column])) {
+                //         $t1 = intval(($data_origin[$column]- 25569) * 3600 * 24); //转换成1970年以来的秒数
+                //         $data_origin[$column] = gmdate('Y/m/d',$t1);
+                //     } else {
+                //         $data_origin[$column] = $data_origin[$column];
+                //     }
+                // }
+            }
+
+            // 删除空行，好用的很
+            if(!implode('', $data_origin)){
+                //删除空行
+                continue;
+            }
+
+            //取出指定的数据
+            foreach ($read_column as $key => $val) {
+                $data[$row - 2][$val] = @$data_origin[$key] ? $data_origin[$key] : '';
+            }
+        }
+        return $data;
+    }
+
+    public function res() {
+        return View('res',[
+            
+        ]);
     }
 }

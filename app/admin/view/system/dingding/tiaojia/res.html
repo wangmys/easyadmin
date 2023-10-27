@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1">
+    <title>调价</title>
+    <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
+    <link rel="stylesheet" href="__STATIC__/admin/css/dd_tiaojia_res.css" />
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script>
+        setRem();
+        // 横屏竖屏适配
+        window.addEventListener('orientationchange', setRem);
+        window.addEventListener('resize', setRem);
+        function setRem() {
+            var html = document.querySelector('html');
+            var width = html.getBoundingClientRect().width;
+            html.style.fontSize = width / 16 + 'px';
+        }
+
+    </script>
+</head>
+<body >
+    <section class="wrap">
+        <div class="content flex col test">
+            <div class="head test1">1</div>
+            <div class="title test2">2</div>
+        </div>
+    </section>
+</body>
+</html>
