@@ -189,9 +189,9 @@ class Puhuo_start2 extends Command
                         $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                         break;
                     case 1: //多店
-                        $Commonfield = $Commonfield ? explode(',', $Commonfield) : [];
-                        if ($Commonfield) {
-                            foreach ($Commonfield as $v_Commonfield) {
+                        $ex_store = $Commonfield ? explode(',', $Commonfield) : [];
+                        if ($ex_store) {
+                            foreach ($ex_store as $v_Commonfield) {
                                 foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
                                     if ($v_Commonfield == $v_cus['CustomerId']) {
                                         $all_customers[] = $v_cus;
@@ -617,9 +617,9 @@ class Puhuo_start2 extends Command
                                     $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                                     break;
                                 case 1: //多店
-                                    $Commonfield = $Commonfield ? explode(',', $Commonfield) : [];
-                                    if ($Commonfield) {
-                                        foreach ($Commonfield as $v_Commonfield) {
+                                    $ex_store = $Commonfield ? explode(',', $Commonfield) : [];
+                                    if ($ex_store) {
+                                        foreach ($ex_store as $v_Commonfield) {
                                             foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
                                                 if ($v_Commonfield == $v_cus['CustomerId']) {
                                                     $all_customers[] = $v_cus;
