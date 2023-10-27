@@ -11,7 +11,8 @@ use app\api\controller\lufei\updatatable\SpWwShopStockSales as Stock_sales;
 /**
  * 报表自动更新
  * Class Tableupdata
- * @package app\dingtalk
+ * @package app\admin\controller\system
+ * @ControllerAnnotation(title="报表自动更新")
  */
 class Tableupdata extends BaseController
 {
