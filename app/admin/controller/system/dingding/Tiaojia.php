@@ -447,8 +447,16 @@ class Tiaojia extends BaseController
     }
 
     public function res() {
+        $uid = '52144067';
+        $sql = "
+            select * from dd_tiaojia_customer_temp
+            where 1
+                AND uid = '{$uid}'
+                AND 店铺名称 IN ('安顺二店')
+        ";
+        $select = $this->db_easyA->query($sql);
         return View('res',[
-            
+            'select' => $select
         ]);
     }
 }

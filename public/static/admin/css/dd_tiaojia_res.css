@@ -5,7 +5,56 @@
   overflow-y: scroll;
 }
 .content {
-  background-color: aqua;
+  width: 15.936rem;
+  height: auto;
+  margin-bottom: 10px;
+  border: 1px solid #585858;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.head {
   width: 16rem;
+  height: 1.06666667rem;
+  line-height: 0.896rem;
+  height: auto;
+  font-size: 0.55466667rem;
+  padding-left: 0.42666667rem;
+  padding-bottom: 0.21333333rem;
+  background-color: #f2f5ff;
+}
+.title {
+  width: 16rem;
+  height: auto;
+}
+.left {
+  width: 8rem;
+  height: auto;
+}
+.left_1 {
+  width: 38%;
+}
+.left_1 .item {
+  height: 1.09866667rem;
+  line-height: 1.184rem;
+  font-size: 0.55466667rem;
+  padding-left: 5px;
+  border-top: 1px solid #dedede;
+  border-left: 1px solid #dedede;
+  border-right: 1px solid #dedede;
+}
+.left_2 {
+  width: 62%;
+}
+.left_2 .item {
+  height: 1.10293333rem;
+  line-height: 1.184rem;
+  font-size: 0.55466667rem;
+  padding-left: 5px;
+  border-top: 1px solid #dedede;
+  border-left: 1px solid #dedede;
+  border-right: 1px solid #dedede;
+}
+.right {
+  width: 8rem;
   height: auto;
 }

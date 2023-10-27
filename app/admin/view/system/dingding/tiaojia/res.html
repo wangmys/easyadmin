@@ -7,7 +7,7 @@
     <title>调价</title>
     <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/dd_tiaojia_res.css" />
-    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css?v=1">
     <script>
         setRem();
         // 横屏竖屏适配
@@ -23,10 +23,36 @@
 </head>
 <body >
     <section class="wrap">
-        <div class="content flex col test">
-            <div class="head test1">1</div>
-            <div class="title test2">2</div>
-        </div>
+        {volist name="select" id="vo"}
+            <div class="content flex col">
+                <div class="head"><a style="color:rgb(211, 2, 253); font-weight: bold;">调价时间：</a>{$vo['调价时间范围']}</div>
+                <div class="title flex row">    
+                    <div class="left flex row">
+                        <div class="left_1">
+                            <div class="item">分类：</div>
+                            <div class="item"><a style="color:rgb(3, 110, 233); font-weight: bold;">货号：</a></div>
+                            <div class="item"><a style="color:rgb(20, 238, 129); font-weight: bold;">颜色：</a></div>
+                            <div class="item">零售价：</div>
+                            <div class="item"><a style="color:red; font-weight: bold;">调价：</a></div>
+                            <div class="item">店铺库存：</div>
+                            <div class="item">在途库存：</div>
+                        </div>
+                        <div class="left_2">
+                            <div class="item">{$vo['分类']}</div>
+                            <div class="item">{$vo['货号']}</div>
+                            <div class="item">{$vo['颜色']}</div>
+                            <div class="item">{$vo['零售价']}</div>
+                            <div class="item">{$vo['调价']}</div>
+                            <div class="item">{$vo['店铺库存']}</div>
+                            <div class="item">{$vo['在途库存']}</div>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <img src="{$vo['Img']}" alt="">
+                    </div>
+                </div>
+            </div>
+        {/volist}
     </section>
 </body>
 </html>
