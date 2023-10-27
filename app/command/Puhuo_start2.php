@@ -107,7 +107,8 @@ class Puhuo_start2 extends Command
         $list_rows    = $input->getArgument('list_rows') ?: 2000;//每页条数
         
         $data = $this->get_wait_goods_data($list_rows);
-        // print_r($data);die;
+        $data_taozhuang = $this->get_wait_goods_data_taozhuang($list_rows);//套装套西
+        // print_r([$data, $data_taozhuang]);die;
 
         //先清空旧数据再跑
         $this->db_easy->Query("truncate table sp_lyp_puhuo_customer_sort;");
@@ -115,52 +116,53 @@ class Puhuo_start2 extends Command
         $this->db_easy->Query("truncate table sp_lyp_puhuo_cur_log;");
         $this->db_easy->Query("truncate table sp_lyp_puhuo_log;");
 
+
+        $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
+        $new_customers = $this->db_easy->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
+        and CustomerName not in (select 店铺名称 from customer_first);");//剔除新店
+        $new_customers = $new_customers ? array_column($new_customers, 'CustomerName') : [];
+        $new_customers = get_goods_str($new_customers);
+        $new_customers_sql = $new_customers ? " and CustomerName not in ($new_customers) " : '';
+
+        $all_customers = $this->db_easy->Query("select * from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 $new_customers_sql;");
+        //云仓归类、按省份归类店铺
+        $all_customer_arr = $all_customer_arr_state = [];
+        if ($all_customers) {
+            foreach ($all_customers as $v_customer) {
+                $all_customer_arr[$v_customer['CustomItem15']][] = $v_customer;
+                $all_customer_arr_state[$v_customer['State']][] = $v_customer;
+            }
+        }
+
+        $customer_level = $this->puhuo_score_model::where([['config_str', '=', 'customer_level']])->column('*', 'key');
+        $fill_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'fill_rate']])->column('*', 'key_level');
+        $dongxiao_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'dongxiao_rate']])->column('*', 'key_level');
+        // print_r($fill_rate_level);die;
+        //剔除的货品
+        $ti_goods = $this->puhuo_ti_goods_model::where([])->column('GoodsNo');
+        $ti_goods = $this->get_goods_str($ti_goods);
+        // print_r($ti_goods);die;
+
+        $qiwen_config = [];
+        if ($puhuo_config['if_hottocold'] == 1) {//hottocold
+            $qiwen_config = SpLypPuhuoHottocoldModel::where([])->select();   
+            $qiwen_config = $qiwen_config ? $qiwen_config->toArray() : [];
+        } else {//coldtohot
+            $qiwen_config = SpLypPuhuoColdtohotModel::where([])->select();   
+            $qiwen_config = $qiwen_config ? $qiwen_config->toArray() : [];
+        }
+        $qiwen_config_arr = [];
+        if ($qiwen_config) {
+            foreach ($qiwen_config as $v_qiwen_config) {
+                $qiwen_config_arr[$v_qiwen_config['yuncang'].$v_qiwen_config['province'].$v_qiwen_config['wenqu']] = $v_qiwen_config;
+            }
+        }
+        // print_r($qiwen_config_arr);die;
+
+        //大小码店信息
+        $daxiao_res = $this->get_daxiao_handle();
+
         if ($data) {
-
-            $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
-            $new_customers = $this->db_easy->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
-            and CustomerName not in (select 店铺名称 from customer_first);");//剔除新店
-            $new_customers = $new_customers ? array_column($new_customers, 'CustomerName') : [];
-            $new_customers = get_goods_str($new_customers);
-            $new_customers_sql = $new_customers ? " and CustomerName not in ($new_customers) " : '';
-
-            $all_customers = $this->db_easy->Query("select * from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 $new_customers_sql;");
-            //云仓归类、按省份归类店铺
-            $all_customer_arr = $all_customer_arr_state = [];
-            if ($all_customers) {
-                foreach ($all_customers as $v_customer) {
-                    $all_customer_arr[$v_customer['CustomItem15']][] = $v_customer;
-                    $all_customer_arr_state[$v_customer['State']][] = $v_customer;
-                }
-            }
-
-            $customer_level = $this->puhuo_score_model::where([['config_str', '=', 'customer_level']])->column('*', 'key');
-            $fill_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'fill_rate']])->column('*', 'key_level');
-            $dongxiao_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'dongxiao_rate']])->column('*', 'key_level');
-            // print_r($fill_rate_level);die;
-            //剔除的货品
-            $ti_goods = $this->puhuo_ti_goods_model::where([])->column('GoodsNo');
-            $ti_goods = $this->get_goods_str($ti_goods);
-            // print_r($ti_goods);die;
-
-            $qiwen_config = [];
-            if ($puhuo_config['if_hottocold'] == 1) {//hottocold
-                $qiwen_config = SpLypPuhuoHottocoldModel::where([])->select();   
-                $qiwen_config = $qiwen_config ? $qiwen_config->toArray() : [];
-            } else {//coldtohot
-                $qiwen_config = SpLypPuhuoColdtohotModel::where([])->select();   
-                $qiwen_config = $qiwen_config ? $qiwen_config->toArray() : [];
-            }
-            $qiwen_config_arr = [];
-            if ($qiwen_config) {
-                foreach ($qiwen_config as $v_qiwen_config) {
-                    $qiwen_config_arr[$v_qiwen_config['yuncang'].$v_qiwen_config['province'].$v_qiwen_config['wenqu']] = $v_qiwen_config;
-                }
-            }
-            // print_r($qiwen_config_arr);die;
-
-            //大小码店信息
-            $daxiao_res = $this->get_daxiao_handle();
 
             //开始尝试自动铺货模式
             foreach ($data as $v_data_each) {
@@ -556,6 +558,15 @@ class Puhuo_start2 extends Command
         }
 
 
+
+        ######################套装套西处理start##########################
+        //铺 套装套西
+        $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
+    $dongxiao_rate_level, $daxiao_res, $puhuo_config);
+        ######################套装套西处理end##########################
+
+        
+
         //最终铺货数据清洗
         $this->generate_end_data();
 
@@ -563,6 +574,572 @@ class Puhuo_start2 extends Command
 
         echo 'okk';die;
         
+    }
+
+
+    //铺 套装套西
+    protected function puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
+    $dongxiao_rate_level, $daxiao_res, $puhuo_config) {
+
+        if ($data_taozhuang) {
+
+            //开始尝试自动铺货模式
+            foreach ($data_taozhuang as $v_data_each) {
+                // print_r($v_data_each);die;
+                $goods = $v_data_each['goods'] ?? [];
+                $Selecttype = $v_data_each['Selecttype'] ?? 0;//0-该云仓所有店 1-多店 2-多省 3-商品专员 4-经营模式
+                $Commonfield = $v_data_each['Commonfield'] ?? '';
+                $rule_type = $v_data_each['rule_type'] ?? 1;//1-A方案 2-B方案
+
+                if ($goods) {
+
+                    foreach ($goods as $v_goods) {//每两个货号为一对(上衣+裤子，必须同时满足连码要求才能铺)
+
+                        $res_taozhuang = [];
+                        $wait_goods_stock = [];
+                        foreach ($v_goods as $v_data) {
+
+
+                            $GoodsNo = $v_data['GoodsNo'] ?: '';//货号
+                            $WarehouseName = $v_data['WarehouseName'] ?: '';//云仓
+                            $TimeCategoryName1 = $v_data['TimeCategoryName1'] ?: '';//一级时间分类
+                            $TimeCategoryName2 = $v_data['TimeCategoryName2'] ?: '';//二级时间分类(季节)
+                            $CategoryName1 = $v_data['CategoryName1'] ?: '';//一级分类
+                            $CategoryName2 = $v_data['CategoryName2'] ?: '';//二级分类
+                            $StyleCategoryName = $v_data['StyleCategoryName'] ?: '';//(风格)基本款
+                            $StyleCategoryName1 = $v_data['StyleCategoryName1'] ?: '';//一级风格
+                            $StyleCategoryName2 = $v_data['StyleCategoryName2'] ?: '';//二级风格（货品等级）
+    
+                            $all_customers = [];
+    
+                            switch ($Selecttype) {
+                                case 0: 
+                                    $all_customers = $all_customer_arr[$WarehouseName] ?? [];
+                                    break;
+                                case 1: //多店
+                                    $Commonfield = $Commonfield ? explode(',', $Commonfield) : [];
+                                    if ($Commonfield) {
+                                        foreach ($Commonfield as $v_Commonfield) {
+                                            foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
+                                                if ($v_Commonfield == $v_cus['CustomerId']) {
+                                                    $all_customers[] = $v_cus;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case 2: //多省
+    
+                                    $ex_State = $Commonfield ? explode(',', $Commonfield) : [];
+                                    foreach ($ex_State as $v_ex_State) {
+                                        if (isset($all_customer_arr_state[$v_ex_State])) {
+                                            foreach ($all_customer_arr_state[$v_ex_State] as $v_each_customer) $all_customers[] = $v_each_customer;
+                                        }
+                                    }
+    
+                                    break;
+                                case 3: //商品专员
+    
+                                    $ex_goods_manager = $Commonfield ? explode(',', $Commonfield) : [];
+                                    if (isset($all_customer_arr[$WarehouseName])) {
+                                        foreach ($all_customer_arr[$WarehouseName] as $v_customer) {
+                                            if (in_array($v_customer['CustomItem17'], $ex_goods_manager)) {
+                                                $all_customers[] = $v_customer;
+                                            }
+                                        }
+                                    }
+    
+                                    break;
+                                case 4: //经营模式
+    
+                                    $ex_mathod = $Commonfield ? explode(',', $Commonfield) : [];
+                                    if (isset($all_customer_arr[$WarehouseName])) {
+                                        foreach ($all_customer_arr[$WarehouseName] as $v_customer) {
+                                            if (in_array($v_customer['Mathod'], $ex_mathod)) {
+                                                $all_customers[] = $v_customer;
+                                            }
+                                        }
+                                    }
+    
+                                    break;
+                            }
+                            // print_r($all_customers);die;
+    
+                            //大小码-满足率-分母
+                            $season = $this->get_season_str($TimeCategoryName2);
+                            $season = $season ? $season.'季' : '';
+                            $daxiaoma_skcnum_info = $this->puhuo_daxiaoma_skcnum_model::where([['WarehouseName', '=', $WarehouseName], ['TimeCategoryName1', '=', $TimeCategoryName1], ['season', '=', $season], 
+                            ['CategoryName1', '=', $CategoryName1], ['CategoryName2', '=', $CategoryName2], ['StyleCategoryName', '=', $StyleCategoryName]])->find();
+    
+                            //是否已存在 daxiaoma_customer_sort
+                            $if_exist_daxiaoma_customer_sort = $this->puhuo_daxiaoma_customer_sort_model::where([['WarehouseName', '=', $WarehouseName], ['TimeCategoryName1', '=', $TimeCategoryName1], ['season', '=', $season], 
+                            ['CategoryName1', '=', $CategoryName1], ['CategoryName2', '=', $CategoryName2], ['StyleCategoryName', '=', $StyleCategoryName]])->column('*', 'CustomerName');
+    
+                            //先查看单款是否已经指定了特定的铺货规则,优先选择已指定的特定铺货规则
+                            // $if_exist_onegoods_rule = $this->puhuo_onegoods_rule_model::where([['por.Yuncang', '=', $WarehouseName], ['por.GoodsNo', '=', $GoodsNo]])->alias('por')
+                            // ->join(['sp_lyp_puhuo_rule_b' => 'prb'], 'por.rule_id=prb.id', 'inner')
+                            // ->field('prb.*')->find();
+                            // $if_exist_onegoods_rule = $if_exist_onegoods_rule ? $if_exist_onegoods_rule->toArray() : [];
+    
+                            if ($all_customers) {
+                                $add_all_arr = $daxiaoma_customer_sort =  [];
+                                foreach ($all_customers as $v_customer) {
+    
+                                    //test...
+                                    // $v_customer['State'] = '广东省';
+                                    // $v_customer['CustomerGrade'] = 'S';
+                                    // $v_customer['CustomItem36'] = '南二';
+                                    // $v_customer['CustomerName'] = '广州一店';
+                                    // $WarehouseName = '广州云仓';
+                                    // $TimeCategoryName1 = '2023';
+                                    // $TimeCategoryName2 = '盛夏';
+                                    // $CategoryName1 = '内搭';
+                                    // $CategoryName2 = '短T';
+                                    // $StyleCategoryName = '基本款';
+    
+                                    $CustomerGradeScore = isset($customer_level[$v_customer['CustomerGrade']]) ? $customer_level[$v_customer['CustomerGrade']]['score'] : 0;
+    
+                                    $qiwen_score = 0;
+                                    $qiwen_str = ($v_customer['CustomItem15'] ? trim($v_customer['CustomItem15']) : '').($v_customer['State'] ? trim($v_customer['State']) : '').($v_customer['CustomItem36'] ? trim($v_customer['CustomItem36']) : '');
+                                    // echo $qiwen_str;die;
+                                    if (isset($qiwen_config_arr[$qiwen_str])) {
+                                        $qiwen_score = $qiwen_config_arr[$qiwen_str]['qiwen_score'];
+                                    }
+    
+                                    //满足率计算
+                                    //满足率-单店skc
+                                    $dandian_skc = $this->db_easy->Query($this->get_dandian_skc(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods));
+                                    //查询该店已经铺的货
+                                    // $already_puhuo_goods = $this->puhuo_cur_log_model::where([['CustomerId', '=', $v_customer['CustomerId']], ['total', '>', 0]])->distinct(true)->column('GoodsNo');
+                                    $already_puhuo_goods = $this->return_already_puhuo_goods(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
+                                    if ($already_puhuo_goods) {
+                                        $dandian_skc_goods_str = $dandian_skc[0]['goods_str'] ?? 0;
+                                        $dandian_skc_goods_str = $dandian_skc_goods_str ? explode(',', $dandian_skc_goods_str) : [];
+                                        $merge_dandian_skc = array_unique(array_merge(array_column($already_puhuo_goods, 'GoodsNo'), $dandian_skc_goods_str));
+                                        $dandian_skc = count($merge_dandian_skc);
+                                    } else {
+                                        $dandian_skc = $dandian_skc[0]['store_skc_num'] ?? 0;
+                                    }
+                                    // print_r($dandian_skc);die;
+                                    //满足率-(云仓可用+云仓下门店预计库存的总skc数）
+                                    $yuncangkeyong_skc = $this->get_yuncangkeyong_skc(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '云仓' => $WarehouseName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
+                                    // print_r($yuncangkeyong_skc);die;
+                                    $fill_rate = $yuncangkeyong_skc ? round($dandian_skc/$yuncangkeyong_skc, 2) : 0;
+                                    $fill_rate_score = $this->get_fill_rate_score($fill_rate, $fill_rate_level);
+                                    // echo $fill_rate_score;die;
+    
+                                    //动销率
+                                    //动销率-2周销skc数
+                                    $store_sale_skc_num = $this->db_easy->Query($this->get_store_sale_skc_num(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods));
+                                    // print_r($store_sale_skc_num);die;
+                                    $store_sale_skc_num = $store_sale_skc_num[0]['skc_num'] ?? 0;
+                                    //动销率-店铺预计skc数
+                                    $store_yuji_skc_num = $this->db_easy->Query($this->get_store_yuji_skc_num(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods));
+                                    $store_yuji_skc_num = $store_yuji_skc_num[0]['store_yuji_skc_num'] ?? 0;
+                                    // print_r($store_yuji_skc_num);die;
+                                    $dongxiao_rate = $store_yuji_skc_num ? round($store_sale_skc_num/$store_yuji_skc_num, 2) : 0;
+                                    $dongxiao_rate_score = $this->get_dongxiao_rate_score($dongxiao_rate, $dongxiao_rate_level);
+                                    // echo $dongxiao_rate_score;die;
+    
+                                    $add_data = [
+                                        'Yuncang' => $WarehouseName,
+                                        'State' => $v_customer['State'] ?: '',
+                                        'GoodsNo' => $GoodsNo,
+                                        'CustomerName' => $v_customer['CustomerName'] ?: '',
+                                        'CustomerId' => $v_customer['CustomerId'] ?: '',
+                                        'CustomerGrade' => $v_customer['CustomerGrade'] ?: '',
+                                        'CustomerGradeScore' => $CustomerGradeScore,
+                                        'fill_rate' => $fill_rate,
+                                        'fill_rate_score' => $fill_rate_score,
+                                        'dongxiao_rate' => $dongxiao_rate,
+                                        'dongxiao_rate_score' => $dongxiao_rate_score,
+                                        'qiwen_score' => $qiwen_score,
+                                        'total_score' => $CustomerGradeScore + $fill_rate_score + $dongxiao_rate_score + $qiwen_score,
+                                        'score_sort' => 0,
+                                        'Mathod' => $v_customer['Mathod'] ?: '',
+                                        'StoreArea' => $v_customer['StoreArea'] ?: 0,
+                                        'xiuxian_num' => $v_customer['CustomItem10'] ?: 0,
+                                    ];
+                                    $add_all_arr[] = $add_data;
+    
+    
+                                    //大小码逻辑
+    
+                                    //大小码店类型（大/正/小）
+                                    // $daxiaodian_info = $this->puhuo_daxiaoma_customer_model::where([['customer_name', '=', $v_customer['CustomerName']]])->field('big_small_store')->find();
+                                    // $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
+                                    // $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->puhuo_daxiaoma_customer_sort_model::store_type[$daxiaodian_info['big_small_store']] ?? 0) : 0;
+    
+                                    // $daxiaodian_info = $this->cwl_daxiao_handle_model::where([['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $CategoryName1], ['二级分类', '=', $CategoryName2], 
+                                    // ['风格', '=', $StyleCategoryName], ['一级风格', '=', $StyleCategoryName1], ['季节归集', '=', $season]])->field('店铺名称,大小码提醒 as big_small_store')->find();
+                                    // $daxiaodian_info = $daxiaodian_info ? $daxiaodian_info->toArray() : [];
+                                    // $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->cwl_daxiao_handle_model::store_type_text[$daxiaodian_info['big_small_store']] ?? 0) : 2;//1-大码店 2-正常店 3-小码店
+                                    $daxiaodian_info = $daxiao_res[$v_customer['CustomerName'].$CategoryName1.$CategoryName2.$StyleCategoryName.$StyleCategoryName1.$season] ?? [];
+                                    $store_type = ($daxiaodian_info&&$daxiaodian_info['big_small_store']) ? ($this->cwl_daxiao_handle_model::store_type_text[$daxiaodian_info['big_small_store']] ?? 0) : 2;//1-大码店 2-正常店 3-小码店
+    
+                                    //大小码 满足率 分母
+                                    $daxiaoma_stock_skcnum = $this->return_daxiaoma_stock_skcnum($daxiaoma_skcnum_info, $daxiaodian_info);
+                                    // print_r($daxiaoma_stock_skcnum);die;
+    
+                                    //已有的 店铺库存skc数
+                                    if (isset($if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']])) {
+    
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_00_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_00_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_00_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_29_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_29_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_29_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_34_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_34_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_34_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_35_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_35_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_35_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_36_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_36_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_36_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_38_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_38_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_38_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_40_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_40_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_40_goods_str_arr']) : [];
+                                        $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_42_goods_str_arr'] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_42_goods_str_arr'] ? explode(',', $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']]['Stock_42_goods_str_arr']) : [];
+                                        $daxiaoma_customer_sort[] = $if_exist_daxiaoma_customer_sort[$v_customer['CustomerName']];
+    
+                                    } else {
+    
+                                        $dandian_skc = $this->db_easy->Query($this->get_dandian_skc(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods, 
+                                        ' group_concat(case when stock_00_goods_str!="" then stock_00_goods_str else null end) as stock_00_goods_str
+                                        , group_concat(case when stock_29_goods_str!="" then stock_29_goods_str else null end) as stock_29_goods_str
+                                        , group_concat(case when stock_34_goods_str!="" then stock_34_goods_str else null end) as stock_34_goods_str
+                                        , group_concat(case when stock_35_goods_str!="" then stock_35_goods_str else null end) as stock_35_goods_str
+                                        , group_concat(case when stock_36_goods_str!="" then stock_36_goods_str else null end) as stock_36_goods_str
+                                        , group_concat(case when stock_38_goods_str!="" then stock_38_goods_str else null end) as stock_38_goods_str
+                                        , group_concat(case when stock_40_goods_str!="" then stock_40_goods_str else null end) as stock_40_goods_str  '));
+    
+                                        // $dandian_skc = $yuncang_skc[$v_customer['CustomerName']] ?? [];
+    
+                                        $daxiaoma_customer_sort[] = $this->return_add_daxiaoma_customer_sort($dandian_skc, $daxiaoma_stock_skcnum, $v_data, $v_customer, $store_type);
+    
+                                    }
+    
+                                }
+                                //排序
+                                $add_all_arr = sort_arr($add_all_arr, 'total_score', SORT_DESC);
+                                foreach ($add_all_arr as $k_add_all_arr => &$v_add_all_arr) {
+                                    $v_add_all_arr['score_sort'] = ++$k_add_all_arr;
+                                }
+                                // print_r($daxiaoma_customer_sort);die;
+                                
+                                if ($add_all_arr) {
+                                    $chunk_list = array_chunk($add_all_arr, 500);
+                                    foreach($chunk_list as $key => $val) {
+                                        $insert = $this->db_easy->table('sp_lyp_puhuo_customer_sort')->strict(false)->insertAll($val);
+                                    }
+    
+                                    //大小码店 排序入库
+                                    $daxiaoma_skcnum_score_sort = $this->return_daxiaoma_skcnum_score_sort($daxiaoma_customer_sort);
+    
+                                    //------------------------start铺货逻辑------------------------
+    
+    
+                                    $add_puhuo_log = $daxiaoma_puhuo_log = [];
+                                    Db::startTrans();
+                                    try {
+    
+                                        foreach ($add_all_arr as $v_customer) {
+    
+                                            $rule = [];
+                                            $where = [
+                                                ['Yuncang', '=', $WarehouseName], 
+                                                ['State', '=', $v_customer['State']], 
+                                                ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                                ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                                ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                                ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                                ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                            ];
+                                            //查询对应的铺货标准
+                                            if ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
+                                                $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                            } else {
+                                                $rule = $this->puhuo_rule_model::where($where)->find();
+                                            }
+                                            $rule = $rule ? $rule->toArray() : [];
+                                            // print_r($where);die;
+    
+                                            //该店该款 库存数
+                                            // print_r([['省份', '=', $v_customer['State']], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $v_data['CategoryName1']], ['二级分类', '=', $v_data['CategoryName2']], ['分类', '=', $v_data['CategoryName']], ['货号', '=', $GoodsNo]]);die;
+                                            $goods_yuji_stock = $this->sp_ww_chunxia_stock_model::where([['省份', '=', $v_customer['State']], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $v_data['CategoryName1']], ['二级分类', '=', $v_data['CategoryName2']], ['分类', '=', $v_data['CategoryName']], ['货号', '=', $GoodsNo]])->field('预计库存')->find();
+                                            $goods_yuji_stock = $goods_yuji_stock ? $goods_yuji_stock['预计库存'] : 0;
+                                            // print_r($goods_yuji_stock);die;
+                                            //近14天有无上柜过
+                                            $current_14days = $this->puhuo_shangshiday_model::where([['CustomerId', '=', $v_customer['CustomerId']], ['GoodsNo', '=', $GoodsNo],  ['StockDate', '>=', date('Y-m-d H:i:s', strtotime("-{$puhuo_config['listing_days']} days"))]])->field('GoodsNo')->find();
+                                            // print_r($current_14days);die;
+    
+                                            //满足条件的才铺货
+                                            $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, $goods_yuji_stock, $current_14days);
+                                            // print_r($can_puhuo);die;
+                                            $uuid = uuid();
+                                            if ($can_puhuo['if_can_puhuo']) {
+    
+                                                $data = $can_puhuo['data'] ?: [];
+                                                $cut_stock = 0;
+                                                if ($data) {
+                                                    foreach ($data as $k_puhuo_data=>$v_puhuo_data) {
+                                                        if (isset($v_data[$k_puhuo_data])) {
+                                                            $v_data[$k_puhuo_data] = $v_data[$k_puhuo_data]-$v_puhuo_data;
+                                                            $cut_stock += $v_puhuo_data;
+                                                        }
+                                                    }
+                                                    $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
+                                                    //sp_lyp_puhuo_wait_goods处理
+                                                    unset($v_data['create_time']);
+                                                    // print_r($v_data);die;
+                                                    $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+                                                }
+    
+                                                //sp_lyp_puhuo_log、sp_lyp_puhuo_cur_log处理
+                                                $puhuo_log = [
+                                                    'uuid' => $uuid,
+                                                    'WarehouseName' => $WarehouseName,
+                                                    'GoodsNo' => $GoodsNo,
+                                                    'CustomerName' => $v_customer['CustomerName'],
+                                                    'CustomerId' => $v_customer['CustomerId'],
+                                                    'rule_type' => ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) ? $this->puhuo_cur_log_model::RULE_TYPE['type_b'] : $this->puhuo_cur_log_model::RULE_TYPE['type_a'],
+                                                    'rule_id' => $rule['id'],
+                                                    'Stock_00_puhuo' => $data['Stock_00_puhuo'] ?? 0,
+                                                    'Stock_29_puhuo' => $data['Stock_29_puhuo'] ?? 0,
+                                                    'Stock_30_puhuo' => $data['Stock_30_puhuo'] ?? 0,
+                                                    'Stock_31_puhuo' => $data['Stock_31_puhuo'] ?? 0,
+                                                    'Stock_32_puhuo' => $data['Stock_32_puhuo'] ?? 0,
+                                                    'Stock_33_puhuo' => $data['Stock_33_puhuo'] ?? 0,
+                                                    'Stock_34_puhuo' => $data['Stock_34_puhuo'] ?? 0,
+                                                    'Stock_35_puhuo' => $data['Stock_35_puhuo'] ?? 0,
+                                                    'Stock_36_puhuo' => $data['Stock_36_puhuo'] ?? 0,
+                                                    'Stock_38_puhuo' => $data['Stock_38_puhuo'] ?? 0,
+                                                    'Stock_40_puhuo' => $data['Stock_40_puhuo'] ?? 0,
+                                                    'Stock_42_puhuo' => $data['Stock_42_puhuo'] ?? 0,
+                                                    'total' => $cut_stock,
+                                                ];
+    
+                                                //大小码
+                                                $puhuo_log_tmp = $puhuo_log;
+                                                $puhuo_log_tmp['rule'] = $rule;
+                                                $daxiaoma_puhuo_log[] = $puhuo_log_tmp;
+                                                
+                                            } else {//不铺
+                                                
+                                                $puhuo_log = [
+                                                    'uuid' => $uuid,
+                                                    'WarehouseName' => $WarehouseName,
+                                                    'GoodsNo' => $GoodsNo,
+                                                    'CustomerName' => $v_customer['CustomerName'],
+                                                    'CustomerId' => $v_customer['CustomerId'],
+                                                    'rule_type' => ($rule_type == $this->puhuo_zdy_set_model::RULE_TYPE['type_b']) ? $this->puhuo_cur_log_model::RULE_TYPE['type_b'] : $this->puhuo_cur_log_model::RULE_TYPE['type_a'],
+                                                    'rule_id' => 0,
+                                                    'Stock_00_puhuo' => 0,
+                                                    'Stock_29_puhuo' => 0,
+                                                    'Stock_30_puhuo' => 0,
+                                                    'Stock_31_puhuo' => 0,
+                                                    'Stock_32_puhuo' => 0,
+                                                    'Stock_33_puhuo' => 0,
+                                                    'Stock_34_puhuo' => 0,
+                                                    'Stock_35_puhuo' => 0,
+                                                    'Stock_36_puhuo' => 0,
+                                                    'Stock_38_puhuo' => 0,
+                                                    'Stock_40_puhuo' => 0,
+                                                    'Stock_42_puhuo' => 0,
+                                                    'total' => 0,
+                                                ];
+                                                
+                                            }
+    
+                                            $add_puhuo_log[] = $puhuo_log;
+                                            // print_r($add_puhuo_log);die;
+                                            $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
+    
+                                        }
+                                        // print_r([$add_puhuo_log, $v_data]);die;
+    
+                                        ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
+                                        
+                                        $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
+                                        $res_taozhuang[] = $add_puhuo_log;
+                                        //要查询最新的库存数据出来
+                                        $cur_goods = $this->puhuo_wait_goods_model::where([['id', '=', $v_data['id']]])->find();
+                                        $wait_goods_stock[] = $cur_goods ? $cur_goods->toArray() : [];
+
+                                        ######################大小码铺货逻辑end################################################################
+    
+    
+    
+                                        //铺货日志批量入库
+                                        $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
+                                        if ($chunk_list) {
+                                            foreach($chunk_list as $key => $val) {
+                                                $this->db_easy->table('sp_lyp_puhuo_cur_log')->strict(false)->insertAll($val);
+                                                $this->db_easy->table('sp_lyp_puhuo_log')->strict(false)->insertAll($val);
+                                            }
+                                        }
+    
+                                        Db::commit();
+                                    } catch (\Exception $e) {
+                                        Db::rollback();
+                                    }
+    
+    
+                                    //-------------------------end铺货逻辑-------------------------------
+    
+    
+                                }
+    
+                            }
+    
+                        }
+                        // print_r(json_encode(['res_taozhuang'=>$res_taozhuang, 'wait_goods_stock'=>$wait_goods_stock]));die;
+
+
+                        //对套装套西铺货结果 处理，同个店铺必须满足上衣+裤子 都齐码 才能铺货
+                        $can_puhuo_taozhuang = [];
+                        if ($res_taozhuang && count($res_taozhuang)==2) {
+
+                            $shangyi = $res_taozhuang[0] ?? [];
+                            $kuzi = $res_taozhuang[1] ?? [];
+                            $shangyi_stock = $wait_goods_stock[0] ?? [];
+                            $kuzi_stock = $wait_goods_stock[1] ?? [];
+
+                            // print_r($shangyi);die;
+                            foreach ($shangyi as &$v_shangyi) {
+
+                                $if_puhuo_shangyi = $v_shangyi['total'] ? 1 : 0;
+                                $customer_if_puhuo_shangyi = $v_shangyi['CustomerName'].$if_puhuo_shangyi;
+                                $match_shangyi_sign = 0;
+                                foreach ($kuzi as $v_kuzi) {
+                                    $if_puhuo_kuzi = $v_kuzi['total'] ? 1 : 0;
+                                    $customer_if_puhuo_kuzi = $v_kuzi['CustomerName'].$if_puhuo_kuzi;
+
+                                    if ($if_puhuo_shangyi && $if_puhuo_kuzi && ($customer_if_puhuo_shangyi == $customer_if_puhuo_kuzi)) {
+                                        $can_puhuo_taozhuang[] = [
+                                            'CustomerName' => $v_shangyi['CustomerName'],
+                                            'shangyi_uuid' => $v_shangyi['uuid'],
+                                            'kuzi_uuid' => $v_kuzi['uuid'], 
+                                        ];
+                                        $match_shangyi_sign = 1;
+                                    }
+                                }
+
+                                if ($match_shangyi_sign == 0) {//(上衣) 若单店 上衣或裤子其中一个不满足连码，都不铺
+
+                                    //wait_goods表库存处理
+                                    $shangyi_stock['Stock_00_puhuo'] += $v_shangyi['Stock_00_puhuo'];
+                                    $shangyi_stock['Stock_29_puhuo'] += $v_shangyi['Stock_29_puhuo'];
+                                    $shangyi_stock['Stock_30_puhuo'] += $v_shangyi['Stock_30_puhuo'];
+                                    $shangyi_stock['Stock_31_puhuo'] += $v_shangyi['Stock_31_puhuo'];
+                                    $shangyi_stock['Stock_32_puhuo'] += $v_shangyi['Stock_32_puhuo'];
+                                    $shangyi_stock['Stock_33_puhuo'] += $v_shangyi['Stock_33_puhuo'];
+                                    $shangyi_stock['Stock_34_puhuo'] += $v_shangyi['Stock_34_puhuo'];
+                                    $shangyi_stock['Stock_35_puhuo'] += $v_shangyi['Stock_35_puhuo'];
+                                    $shangyi_stock['Stock_36_puhuo'] += $v_shangyi['Stock_36_puhuo'];
+                                    $shangyi_stock['Stock_38_puhuo'] += $v_shangyi['Stock_38_puhuo'];
+                                    $shangyi_stock['Stock_40_puhuo'] += $v_shangyi['Stock_40_puhuo'];
+                                    $shangyi_stock['Stock_42_puhuo'] += $v_shangyi['Stock_42_puhuo'];
+                                    $shangyi_stock['Stock_Quantity_puhuo'] += $v_shangyi['total'];
+
+                                    $v_shangyi['Stock_00_puhuo'] = 0;
+                                    $v_shangyi['Stock_29_puhuo'] = 0;
+                                    $v_shangyi['Stock_30_puhuo'] = 0;
+                                    $v_shangyi['Stock_31_puhuo'] = 0;
+                                    $v_shangyi['Stock_32_puhuo'] = 0;
+                                    $v_shangyi['Stock_33_puhuo'] = 0;
+                                    $v_shangyi['Stock_34_puhuo'] = 0;
+                                    $v_shangyi['Stock_35_puhuo'] = 0;
+                                    $v_shangyi['Stock_36_puhuo'] = 0;
+                                    $v_shangyi['Stock_38_puhuo'] = 0;
+                                    $v_shangyi['Stock_40_puhuo'] = 0;
+                                    $v_shangyi['Stock_42_puhuo'] = 0;
+                                    $v_shangyi['total'] = 0;
+
+                                }
+
+                            }
+
+                            //(裤子) 若单店 上衣或裤子其中一个不满足连码，都不铺 处理
+                            $kuzi_uuid = [];
+                            if ($can_puhuo_taozhuang) {
+                                $kuzi_uuid = $can_puhuo_taozhuang ? array_column($can_puhuo_taozhuang, 'kuzi_uuid') : [];
+                            }
+                            foreach ($kuzi as &$v_kuzi) {
+                                if ( !in_array($v_kuzi['uuid'], $kuzi_uuid) ) {
+                                        //wait_goods表库存处理
+                                        $kuzi_stock['Stock_00_puhuo'] += $v_kuzi['Stock_00_puhuo'];
+                                        $kuzi_stock['Stock_29_puhuo'] += $v_kuzi['Stock_29_puhuo'];
+                                        $kuzi_stock['Stock_30_puhuo'] += $v_kuzi['Stock_30_puhuo'];
+                                        $kuzi_stock['Stock_31_puhuo'] += $v_kuzi['Stock_31_puhuo'];
+                                        $kuzi_stock['Stock_32_puhuo'] += $v_kuzi['Stock_32_puhuo'];
+                                        $kuzi_stock['Stock_33_puhuo'] += $v_kuzi['Stock_33_puhuo'];
+                                        $kuzi_stock['Stock_34_puhuo'] += $v_kuzi['Stock_34_puhuo'];
+                                        $kuzi_stock['Stock_35_puhuo'] += $v_kuzi['Stock_35_puhuo'];
+                                        $kuzi_stock['Stock_36_puhuo'] += $v_kuzi['Stock_36_puhuo'];
+                                        $kuzi_stock['Stock_38_puhuo'] += $v_kuzi['Stock_38_puhuo'];
+                                        $kuzi_stock['Stock_40_puhuo'] += $v_kuzi['Stock_40_puhuo'];
+                                        $kuzi_stock['Stock_42_puhuo'] += $v_kuzi['Stock_42_puhuo'];
+                                        $kuzi_stock['Stock_Quantity_puhuo'] += $v_kuzi['total'];
+
+                                        $v_kuzi['Stock_00_puhuo'] = 0;
+                                        $v_kuzi['Stock_29_puhuo'] = 0;
+                                        $v_kuzi['Stock_30_puhuo'] = 0;
+                                        $v_kuzi['Stock_31_puhuo'] = 0;
+                                        $v_kuzi['Stock_32_puhuo'] = 0;
+                                        $v_kuzi['Stock_33_puhuo'] = 0;
+                                        $v_kuzi['Stock_34_puhuo'] = 0;
+                                        $v_kuzi['Stock_35_puhuo'] = 0;
+                                        $v_kuzi['Stock_36_puhuo'] = 0;
+                                        $v_kuzi['Stock_38_puhuo'] = 0;
+                                        $v_kuzi['Stock_40_puhuo'] = 0;
+                                        $v_kuzi['Stock_42_puhuo'] = 0;
+                                        $v_kuzi['total'] = 0;
+                                }
+                            }
+
+                            Db::startTrans();
+                            try {
+                                //删除旧数据 重新入库
+                                $this->puhuo_log_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_cur_log_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_log_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_cur_log_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
+                                
+                                //铺货日志重新批量入库
+                                $chunk_list = $shangyi ? array_chunk($shangyi, 500) : [];
+                                if ($chunk_list) {
+                                    foreach($chunk_list as $key => $val) {
+                                        $this->db_easy->table('sp_lyp_puhuo_cur_log')->strict(false)->insertAll($val);
+                                        $this->db_easy->table('sp_lyp_puhuo_log')->strict(false)->insertAll($val);
+                                    }
+                                }
+
+                                $chunk_list = $kuzi ? array_chunk($kuzi, 500) : [];
+                                if ($chunk_list) {
+                                    foreach($chunk_list as $key => $val) {
+                                        $this->db_easy->table('sp_lyp_puhuo_cur_log')->strict(false)->insertAll($val);
+                                        $this->db_easy->table('sp_lyp_puhuo_log')->strict(false)->insertAll($val);
+                                    }
+                                }
+
+                                //wait_goods表库存处理
+                                unset($shangyi_stock['create_time']);
+		                        unset($kuzi_stock['create_time']);
+                                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->update($shangyi_stock);
+                                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->update($kuzi_stock);
+
+                                Db::commit();
+                            } catch (\Exception $e) {
+                                Db::rollback();
+                            }
+
+                        }
+
+
+                    }
+
+                    
+                }
+                
+
+            }
+
+
+        }
+
     }
 
 
@@ -635,28 +1212,31 @@ class Puhuo_start2 extends Command
         $zdy_yuncang_goods = array_combine($yuncang_goods, $zdy_yuncang_goods);
         // print_r($zdy_yuncang_goods);die;
 
-        $res_data = [];
-        $yuncangs = $this->puhuo_zdy_yuncang_goods_model::where([])->distinct(true)->column('Yuncang');
-        if ($yuncangs) {
-            foreach ($yuncangs as $v_yuncang) {
-                $yuncang_goods = $this->puhuo_zdy_yuncang_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
-                if ($yuncang_goods) {
-                    $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang)->where([['GoodsNo', 'in', $yuncang_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-                        'list_rows'=> $list_rows,//每页条数
-                        'page' => $this->page,//当前页
-                    ]);
-                    $res = $res ? $res->toArray() : [];
-                    $res = $res ? $res['data'] : [];
-                    if ($res) {
-                        foreach ($res as $v_res) {
-                            // $res_data[] = $v_res;
-                            $res_data[] = [
-                                'goods' => $v_res,
-                                'Selecttype' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Selecttype'] : 0,
-                                'Commonfield' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Commonfield'] : '',
-                                'rule_type' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['rule_type'] : 1,
-                            ];
-                        }
+        //按云仓分组
+        $res_yuncang = $res_data = [];
+        if ($zdy_yuncang_goods) {
+            foreach ($zdy_yuncang_goods as $v_yuncang_goods) {
+                $res_yuncang[$v_yuncang_goods['Yuncang']][] = $v_yuncang_goods;
+            }
+
+            foreach ($res_yuncang as $k_yuncang=>$v_yuncang) {
+                $arr_goods = array_column($v_yuncang, 'GoodsNo');
+
+                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $k_yuncang)->where([['GoodsNo', 'in', $arr_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+                    'list_rows'=> $list_rows,//每页条数
+                    'page' => $this->page,//当前页
+                ]);
+                $res = $res ? $res->toArray() : [];
+                $res = $res ? $res['data'] : [];
+                if ($res) {
+                    foreach ($res as $v_res) {
+                        // $res_data[] = $v_res;
+                        $res_data[] = [
+                            'goods' => $v_res,
+                            'Selecttype' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['Selecttype'] : 0,
+                            'Commonfield' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['Commonfield'] : '',
+                            'rule_type' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['rule_type'] : 1,
+                        ];
                     }
                 }
             }
@@ -668,41 +1248,26 @@ class Puhuo_start2 extends Command
     //获取套装套西铺货配置
     protected function get_wait_goods_data_taozhuang($list_rows) {
 
-        //改为从新的 自定义铺货设置表 获取
-        $zdy_yuncang_goods = $this->puhuo_zdy_set_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set_model::IF_TAOZHUANG['is_taozhuang']]])->alias('pzs')
-        ->join(['sp_lyp_puhuo_zdy_yuncang_goods' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
-        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
+        $zdy_yuncang_goods = $this->puhuo_zdy_set_model::where([['if_taozhuang', '=', $this->puhuo_zdy_set_model::IF_TAOZHUANG['is_taozhuang']]])
+        ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, if_taozhuang')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
-        $yuncang_goods = $zdy_yuncang_goods ? array_column($zdy_yuncang_goods, 'yuncang_goods') : [];
-        $zdy_yuncang_goods = array_combine($yuncang_goods, $zdy_yuncang_goods);
-        // print_r($zdy_yuncang_goods);die;
+        if ($zdy_yuncang_goods) {
+            foreach ($zdy_yuncang_goods as &$v_yuncang_goods) {
+                $v_yuncang_goods['goods'] = [];
+                $arr_goods = $v_yuncang_goods['GoodsNo'] ? explode(' ', $v_yuncang_goods['GoodsNo']) : [];
 
-        $res_data = [];
-        $yuncangs = $this->puhuo_zdy_yuncang_goods_model::where([])->distinct(true)->column('Yuncang');
-        if ($yuncangs) {
-            foreach ($yuncangs as $v_yuncang) {
-                $yuncang_goods = $this->puhuo_zdy_yuncang_goods_model::where([['Yuncang', '=', $v_yuncang]])->distinct(true)->column('GoodsNo');
-                if ($yuncang_goods) {
-                    $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang)->where([['GoodsNo', 'in', $yuncang_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-                        'list_rows'=> $list_rows,//每页条数
-                        'page' => $this->page,//当前页
-                    ]);
-                    $res = $res ? $res->toArray() : [];
-                    $res = $res ? $res['data'] : [];
-                    if ($res) {
-                        foreach ($res as $v_res) {
-                            // $res_data[] = $v_res;
-                            $res_data[] = [
-                                'goods' => $v_res,
-                                'Selecttype' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Selecttype'] : 0,
-                                'Commonfield' => isset($zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_yuncang.$v_res['GoodsNo']]['Commonfield'] : '',
-                            ];
-                        }
-                    }
-                }
+                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang_goods['Yuncang'])->where([['GoodsNo', 'in', $arr_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+                    'list_rows'=> $list_rows,//每页条数
+                    'page' => $this->page,//当前页
+                ]);
+                $res = $res ? $res->toArray() : [];
+                $res = $res ? $res['data'] : [];
+                if (count($res)%2 > 0) continue;
+                $v_yuncang_goods['goods'] = array_chunk($res, 2);
             }
         }
-        return $res_data;
+        // print_r($zdy_yuncang_goods);die;
+        return $zdy_yuncang_goods;
 
     }
 

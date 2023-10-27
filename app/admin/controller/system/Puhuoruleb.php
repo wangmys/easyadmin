@@ -64,6 +64,24 @@ class Puhuoruleb extends AdminController
             $list = $list ? $list->toArray() : [];
             // print_r($list);die;
 
+            if ($list && $list['data']) {
+                foreach ($list['data'] as &$v_data) {
+                    $v_data['Stock_00'] = $v_data['Stock_00'] ?: '';
+                    $v_data['Stock_29'] = $v_data['Stock_29'] ?: '';
+                    $v_data['Stock_30'] = $v_data['Stock_30'] ?: '';
+                    $v_data['Stock_31'] = $v_data['Stock_31'] ?: '';
+                    $v_data['Stock_32'] = $v_data['Stock_32'] ?: '';
+                    $v_data['Stock_33'] = $v_data['Stock_33'] ?: '';
+                    $v_data['Stock_34'] = $v_data['Stock_34'] ?: '';
+                    $v_data['Stock_35'] = $v_data['Stock_35'] ?: '';
+                    $v_data['Stock_36'] = $v_data['Stock_36'] ?: '';
+                    $v_data['Stock_38'] = $v_data['Stock_38'] ?: '';
+                    $v_data['Stock_40'] = $v_data['Stock_40'] ?: '';
+                    $v_data['Stock_42'] = $v_data['Stock_42'] ?: '';
+                    $v_data['total'] = $v_data['total'] ?: '';
+                }
+            }
+
             $data = [
                 'code'  => 0,
                 'msg'   => '',
