@@ -245,6 +245,7 @@ class WeatherService
 
             $if_exist = CityUrl::where([['province', '=', $province.'天气预报40天'], ['city', '=', $city]])->find();
             if ($if_exist) {
+                CityUrl::where([['province', '=', $province.'天气预报40天'], ['city', '=', $city]])->update(['url_2345' => $url, 'url_2345_15day' => $url]);
                 $cid = $if_exist['cid'];
             } else {
                 //入库city_url表
