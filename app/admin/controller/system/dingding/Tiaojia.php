@@ -345,6 +345,9 @@ class Tiaojia extends BaseController
                         '{$uid}' as uid,
                         EG.GoodsNo as 货号,
                         EG.GoodsId,
+                        EG.CategoryName1 as 一级分类,
+                        EG.CategoryName2 as 二级分类,
+                        EG.CategoryName as 分类,
                         EGPT.UnitPrice as 零售价,
                         EGC.ColorDesc as 颜色,
                         EGI.Img
@@ -372,7 +375,10 @@ class Tiaojia extends BaseController
                             c.调价时间范围 = t.调价时间范围,
                             c.零售价 = i.零售价,
                             c.颜色 = i.颜色,
-                            c.Img = i.Img
+                            c.Img = i.Img,
+                            c.一级分类 = i.一级分类,
+                            c.二级分类 = i.二级分类,
+                            c.分类 = i.分类
                         where 1
                     ";
                     $this->db_easyA->execute($sql_调价_零售价_颜色_图片);
@@ -447,16 +453,24 @@ class Tiaojia extends BaseController
     }
 
     public function res() {
-        $uid = '52144067';
-        $sql = "
-            select * from dd_tiaojia_customer_temp
-            where 1
-                AND uid = '{$uid}'
-                AND 店铺名称 IN ('安顺二店')
-        ";
-        $select = $this->db_easyA->query($sql);
-        return View('res',[
-            'select' => $select
-        ]);
+        // $uid = '13698126';
+        $input = input();
+        if (!empty($input['uid']) && !empty($input['店铺名称'])) {
+            $sql = "
+                select * from dd_tiaojia_customer_temp
+                where 1
+                    AND uid = '{$input['uid']}'
+                    AND 店铺名称 IN ('{$input['店铺名称']}')
+                ORDER BY `key`,二级分类,分类
+            ";
+            // die;
+            $select = $this->db_easyA->query($sql);
+            return View('res',[
+                'select' => $select
+            ]);
+        } else {
+            echo '参数有误，请勿非法访问';
+        }
+
     }
 }

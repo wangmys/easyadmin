@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1">
-    <title>调价</title>
+    <title>调价提醒</title>
     <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/dd_tiaojia_res.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css?v=1">
@@ -24,35 +24,60 @@
 <body >
     <section class="wrap">
         {volist name="select" id="vo"}
-            <div class="content flex col">
-                <div class="head"><a style="color:rgb(211, 2, 253); font-weight: bold;">调价时间：</a>{$vo['调价时间范围']}</div>
+            <a class="category">{$vo['一级分类']} - {$vo['二级分类']}</a>
+            <div class="content shadow flex col">
+                <div class="head" style="background-color: rgb(30, 125, 250);"><a style="color:rgb(254, 252, 255); font-weight: bold;">调价时间：{$vo['调价时间范围']}</a></div>
                 <div class="title flex row">    
                     <div class="left flex row">
                         <div class="left_1">
                             <div class="item">分类：</div>
-                            <div class="item"><a style="color:rgb(3, 110, 233); font-weight: bold;">货号：</a></div>
-                            <div class="item"><a style="color:rgb(20, 238, 129); font-weight: bold;">颜色：</a></div>
+                            <div class="item" style="color:rgb(0, 4, 255); font-weight: bold;">货号：</div>
+                            <div class="item" style="color:red;background-color: yellow;font-weight: bold;">颜色：</div>
                             <div class="item">零售价：</div>
-                            <div class="item"><a style="color:red; font-weight: bold;">调价：</a></div>
+                            <div class="item" style="background-color: yellow;"><a style="color:red; font-weight: bold;">调价：</a></div>
                             <div class="item">店铺库存：</div>
                             <div class="item">在途库存：</div>
                         </div>
                         <div class="left_2">
                             <div class="item">{$vo['分类']}</div>
-                            <div class="item">{$vo['货号']}</div>
-                            <div class="item">{$vo['颜色']}</div>
+                            <div class="item" style="color:rgb(0, 4, 255); font-weight: bold;">{$vo['货号']}</div>
+                            <div class="item" style="color:red;background-color: yellow;font-weight: bold;">{$vo['颜色']}</div>
                             <div class="item">{$vo['零售价']}</div>
-                            <div class="item">{$vo['调价']}</div>
+                            <div class="item" style="background-color: yellow;"><a style="color:red; font-weight: bold;">{$vo['调价']}</a></div>
                             <div class="item">{$vo['店铺库存']}</div>
                             <div class="item">{$vo['在途库存']}</div>
                         </div>
                     </div>
                     <div class="right">
-                        <img src="{$vo['Img']}" alt="">
+                        <img src="{$vo['Img']}" alt="" onclick="viewImg(this)">
                     </div>
                 </div>
             </div>
         {/volist}
     </section>
+    <!--遮罩层-->
+    <!-- <div class="window" style="position: absolute; top: 0; left: 0; background-color:rgba(255,255,255,0.8); width: 100%; height: 100%; z-index: 90; display: block;"></div> -->
+    <div class="window" onclick="closeImg(this)">
+        <img src="https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71106001.jpg"  alt="" id="windowImg">
+    </div>
 </body>
 </html>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/javascript" src="__STATIC__/admin/js/jquery-3.2.1.min.js"></script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+</script>
+<script>
+
+$(function() {
+    window.viewImg = function (obj) {
+        console.log(obj.src)
+        $('.window').css('display', 'flex');
+        $('#windowImg').attr('src', obj.src);
+    }
+
+    window.closeImg = function (obj) {
+        $('.window').css('display', 'none');
+    }
+})
+</script>
