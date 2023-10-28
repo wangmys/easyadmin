@@ -465,9 +465,14 @@ class Tiaojia extends BaseController
             ";
             // die;
             $select = $this->db_easyA->query($sql);
-            return View('res',[
-                'select' => $select
-            ]);
+            if ($select ) {
+                return View('res',[
+                    'select' => $select,
+                    'customerName' => $input['店铺名称']
+                ]);
+            } else {
+                echo '参数有误，请勿非法访问';    
+            }
         } else {
             echo '参数有误，请勿非法访问';
         }
