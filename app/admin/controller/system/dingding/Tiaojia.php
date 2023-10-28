@@ -382,6 +382,49 @@ class Tiaojia extends BaseController
                         where 1
                     ";
                     $this->db_easyA->execute($sql_调价_零售价_颜色_图片);
+
+                    // 分组排名
+                    $sql_更新排名 = "
+                        update dd_tiaojia_customer_temp as T1
+                        LEFT JOIN (
+                            SELECT
+                                a.uid,
+                                a.店铺名称,
+                                a.货号,
+                                a.零售价,
+                                CASE
+                                        WHEN 
+                                                a.一级分类 = @一级分类 AND
+                                                a.二级分类 = @二级分类 
+                                        THEN
+                                                @rank := @rank + 1 ELSE @rank := 1
+                                END AS 排名,
+                                @`一级分类` := a.`一级分类` AS `一级分类`,
+                                @二级分类 := a.二级分类 AS 二级分类
+                            FROM
+                                    (select 
+                                            uid,
+                                            店铺名称,
+                                            货号,
+                                            一级分类,
+                                            二级分类,
+                                            零售价,
+                                            `key`
+                                    from dd_tiaojia_customer_temp
+                                    where 1
+                                            AND uid = '{$uid}'
+                                    GROUP BY 店铺名称,一级分类,二级分类,货号
+                                    ) as a,
+                                    ( SELECT @一级分类 := null,  @二级分类 := null,  @rank := 0 ) as T
+                            WHERE
+                                1
+                            ORDER BY
+                                    a.店铺名称,`key`, a.二级分类 ASC, a.零售价 ASC
+                        ) AS T2 ON T1.uid = T2.uid AND T1.店铺名称=T2.店铺名称 AND T1.货号=T2.货号
+                        SET
+                            T1.分组排名=T2.排名
+                    ";
+                    $this->db_easyA->execute($sql_更新排名);
                 }
                 // return true;
             } else {
@@ -456,19 +499,41 @@ class Tiaojia extends BaseController
         // $uid = '13698126';
         $input = input();
         if (!empty($input['uid']) && !empty($input['店铺名称'])) {
-            $sql = "
+            $sql_基础数据 = "
                 select * from dd_tiaojia_customer_temp
                 where 1
                     AND uid = '{$input['uid']}'
                     AND 店铺名称 IN ('{$input['店铺名称']}')
-                ORDER BY `key`,二级分类,分类
+                    ORDER BY `key`,二级分类,分组排名,分类
             ";
             // die;
-            $select = $this->db_easyA->query($sql);
-            if ($select ) {
+            $select_基础数据 = $this->db_easyA->query($sql_基础数据);
+            if ($select_基础数据 ) {
+                $sql_二级分类分组 = "
+                    select 
+                        二级分类,
+                        sum(case when 二级分类 is not null then 1 else 0 end) as 二级分类总数
+                    from dd_tiaojia_customer_temp
+                    where 1
+                        AND uid = '{$input['uid']}'
+                        AND 店铺名称 IN ('{$input['店铺名称']}')
+                    GROUP BY 二级分类
+                    ORDER BY `key`ASC,二级分类 ASC, 零售价 ASC,分类 ASC
+                ";
+                $select_二级分类分组 = $this->db_easyA->query($sql_二级分类分组);
+
+                $二级分类数组 = [];
+                foreach ($select_二级分类分组 as $key => $val) {
+                    $二级分类数组[$val['二级分类']] = $val;
+                }
+
+                // $二级分类数组
+                // dump($二级分类数组);die;
+
                 return View('res',[
-                    'select' => $select,
-                    'customerName' => $input['店铺名称']
+                    'select' => $select_基础数据,
+                    'customerName' => $input['店铺名称'],
+                    'categoryName2' => $二级分类数组,
                 ]);
             } else {
                 echo '参数有误，请勿非法访问';    
@@ -476,6 +541,31 @@ class Tiaojia extends BaseController
         } else {
             echo '参数有误，请勿非法访问';
         }
-
     }
+
+    // public function res_pc() {
+    //     // $uid = '13698126';
+    //     $input = input();
+    //     if (!empty($input['uid']) && !empty($input['店铺名称'])) {
+    //         $sql = "
+    //             select * from dd_tiaojia_customer_temp
+    //             where 1
+    //                 AND uid = '{$input['uid']}'
+    //                 AND 店铺名称 IN ('{$input['店铺名称']}')
+    //             ORDER BY `key`,二级分类,零售价 ASC,分类
+    //         ";
+    //         // die;
+    //         $select = $this->db_easyA->query($sql);
+    //         if ($select ) {
+    //             return View('res_pc',[
+    //                 'select' => $select,
+    //                 'customerName' => $input['店铺名称']
+    //             ]);
+    //         } else {
+    //             echo '参数有误，请勿非法访问';    
+    //         }
+    //     } else {
+    //         echo '参数有误，请勿非法访问';
+    //     }
+    // }
 }

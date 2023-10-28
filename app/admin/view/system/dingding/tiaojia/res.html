@@ -24,9 +24,14 @@
 <body >
     <section class="wrap">
         {volist name="select" id="vo"}
-            <a class="category">{$vo['一级分类']} - {$vo['二级分类']}</a>
+            <div class="category flex row between">
+                <div>{$vo['一级分类']} - {$vo['二级分类']}（{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}件） No.{$vo['分组排名']}</div>
+                <div></div>
+            </div>
             <div class="content shadow flex col">
-                <div class="head" style="background-color: rgb(30, 125, 250);"><a style="color:rgb(254, 252, 255); font-weight: bold;">调价时间：{$vo['调价时间范围']}</a></div>
+                <div class="head" style="background-color: rgb(30, 125, 250);">
+                    <a style="color:rgb(254, 252, 255); font-weight: bold;">调价时间：{$vo['调价时间范围']}</a>
+                </div>
                 <div class="title flex row">    
                     <div class="left flex row">
                         <div class="left_1">
