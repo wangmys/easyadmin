@@ -17,14 +17,14 @@
   overflow-y: scroll;
 }
 .category {
-  width: 15.91466667rem;
+  width: 15.872rem;
   font-weight: bold;
   font-size: 0.64rem;
   display: block;
   text-align: center;
 }
 .content {
-  width: 15.91466667rem;
+  width: 15.872rem;
   height: auto;
   margin-bottom: 25px;
   border: 1px solid #b3b3b3;
@@ -36,7 +36,7 @@
   border: 1px solid #ccc;
 }
 .head {
-  width: 15.91466667rem;
+  width: 15.872rem;
   height: 1.06666667rem;
   line-height: 0.896rem;
   height: auto;
@@ -47,11 +47,11 @@
   background-color: #f2f5ff;
 }
 .title {
-  width: 15.91466667rem;
+  width: 15.872rem;
   height: auto;
 }
 .left {
-  width: 7.95733333rem;
+  width: 7.936rem;
   height: auto;
 }
 .left_1 {
@@ -79,6 +79,6 @@
   background-color: #fcfcfc;
 }
 .right {
-  width: 7.95733333rem;
+  width: 7.936rem;
   height: auto;
 }
