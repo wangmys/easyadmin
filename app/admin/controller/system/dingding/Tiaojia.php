@@ -496,6 +496,8 @@ class Tiaojia extends BaseController
     }
 
     public function res() {
+        dump(isMobile());
+        die;
         // $uid = '13698126';
         $input = input();
         if (!empty($input['uid']) && !empty($input['店铺名称'])) {
