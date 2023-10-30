@@ -63,7 +63,11 @@
                             <div class="item">{$vo['零售价']}</div>
                             <div class="item" style="background-color: yellow;"><a style="color:red; font-weight: bold;">{$vo['调价']}</a></div>
                             <div class="item">{$vo['店铺库存']}</div>
-                            <div class="item">{$vo['在途库存']}</div>
+                            <div class="item">
+                                {php} if(!empty($vo['在途库存'])) { {/php}
+                                    {$vo['在途库存']}
+                                {php} } {/php}
+                            </div>
                         </div>
                     </div>
                     <div class="right">

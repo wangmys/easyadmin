@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>气温陈列推送列表</title>
+    <title>【{$customerName}】调价通知</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -108,53 +108,31 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <!-- <div class="flex col between al-start" style="width:95%; height: 70px;">
+                    <div class="flex col between al-start" style="width:95%; height: 35px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">一级分类</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-yc" class="xm-select-demo"></div>
+                                <div id="xm-yjfl" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">二级分类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-ejfl" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-hh" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-customer" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">经营模式</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-jyms" class="xm-select-demo"></div>
+                                <div id="xm-jjgj" class="xm-select-demo"></div>
                             </div>
                         </div>
-                    </div> -->  
+                    </div> 
 
-                    <div></div>
-
-                    <div class="flex col around" style="width:25%; height:35px;">
-                        <div class="flex row between" style="width:100%; height:35px;">
-                            <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userAllBtn"
-                            style="background:#4a6db8;color:#ffffff; float:right; ">索歌全员名单
-                            </button>
-                            <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userBtn"
-                            style="background:#4a6db8;color:#ffffff; float:right; ">店铺负责人名单
-                            </button>
-
-                            <button type="button" id="down_excel_user" class="layui-btn layui-btn-xs down_excel_user">下载模板</button>
-                            <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uplaodBtn">导入EXCEL</button>
-                        </div>    
-
-                        <!-- <div class="flex row between" style="width:100%; height:35px;">
-                            <div  class="" 
-                            style="background:#4a6db8;color:#ffffff; float:right; opacity:0; cursor:default;">索歌全员名单
-                            </div>
-                            <div  class=""
-                            style="background:#4a6db8;color:#ffffff; float:right; opacity:0; cursor:default;">店铺负责人名单
-                            </div>
-    
-                            <button type="button" id="down_excel_user_2" class="layui-btn layui-btn-xs down_excel_user_2">下载模板_员工</button>
-                            <button type="button" id="uploadBtn_2" class="layui-btn layui-btn-xs uploadBtn_2">导入EXCEL_员工</button>
-                        </div>    -->
+                    <div class="flex col between" style="width:5%; height:35px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
                     </div>
                 </div>  
             </form>
@@ -163,7 +141,7 @@
 
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
-            <div class="title_text2" style="text-align: center; color:#0051ff;">货品调价推送列表  <a class="dateStr"></a></div>
+            <div class="title_text2" style="text-align: center; color:#0051ff;">【{$customerName}】货品调价列表  <a class="dateStr">{$createtime}</a></div>
         </table>
     </div>
 </body>
@@ -172,9 +150,7 @@
 <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
-<script type="text/html" id="introduceHtml">
-    <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
-</script>
+
 <script>
     var sendWeatherDisplay = function (id) {
         window.localStorage.setItem('weatherdisplaylist_id', id);
@@ -185,50 +161,82 @@
     //     window.localStorage.setItem('weatherdisplaylist_id', id);
     // }
     watermark({ "watermark_txt": '南昌索歌服饰' });
-    layui.use(['form', 'upload', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
         let form = layui.form
             , $ = layui.$
             , layer = layui.layer
             , table = layui.table
-            , upload = layui.upload
             , laydate = layui.laydate
-            , url_addlist = "{:url('admin/system.dingding.tiaojia/addlist')}"
-            , url_DingUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingUserInfo')}"
-            , url_DingAllUsers = "{:url('admin/system.dingding.Uploadimg/getDingDingAllUserInfo')}"
-            , sendListHandle = "{:url('admin/system.dingding.tiaojia/sendListHandle')}"
-            , recallHandle = "{:url('admin/system.dingding.tiaojia/recallHandle')}"
-            , getReadsHandle = "{:url('admin/system.dingding.tiaojia/getReadsHandle')}"
-            , recallAllHandle = "{:url('admin/system.dingding.tiaojia/recallAllHandle')}"
-            , upload_excel1 = "{:url('admin/system.dingding.tiaojia/upload_excel1')}"
-            , upload_excel2 = "{:url('admin/system.dingding.tiaojia/upload_excel2')}"
-            , download_excel_user_demo = "{:url('admin/system.dingding.tiaojia/download_excel_user_demo')}" 
-            , download_excel_user_demo2 = "{:url('admin/system.dingding.tiaojia/download_excel_user_demo2')}" 
-            , download_errors = "{:url('admin/system.dingding.tiaojia/download_errors')}" 
-            , url1 = "{:url('admin/system.dingding.tiaojia/list')}" 
-            , url2 = "{:url('admin/system.dingding.tiaojia/list_user')}"; 
+            , uid = '{$uid}'
+            , customerName = '{$customerName}'
+            , url1 = "{:url('admin/system.dingding.tiaojia/pcAjax')}" 
+            , statusHandle = "{:url('admin/system.dingding.tiaojia/statusHandle')}"
+            , url_getXmMapSelect = "{:url('admin/system.dingding.tiaojia/getXmMapSelect')}"
 
         // 表1初始化
         startTable();
-        // initFn();
+        initFn();
 
         // 日期选择器
         laydate.render({
             elem: '#shangshiriqi'
         });
 
-        // 下载模板 1
-        $('#down_excel_user').click(function() {
-            location.href = download_excel_user_demo;
-        });
+        xmSelect.render({
+            el: '#xm-yjfl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '一级分类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
 
-        
-        // 下载模板 2
-        $('#down_excel_user_2').click(function() {
-            location.href = download_excel_user_demo2;
-        });
+        xmSelect.render({
+            el: '#xm-ejfl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '二级分类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
+
+        xmSelect.render({
+            el: '#xm-hh', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '货号',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
+
+        xmSelect.render({
+            el: '#xm-jjgj', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '季节归集',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "春季", value: "春季", selected: ""},
+                {name: "夏季", value: "夏季", selected: ""},
+                {name: "秋季", value: "秋季", selected: ""},
+                {name: "冬季", value: "冬季", selected: ""},
+            ]
+        })
 
         function initFn() {
-            $.get(url_getXmMapSelect, {}, function(res) {
+            $.get(url_getXmMapSelect, {uid:uid, customerName:customerName}, function(res) {
                 // 渲染所有省份
                 xmSelect.render({
                     el: '#xm-hh', 
@@ -239,19 +247,31 @@
                     },
                     // showCount: 1,
                     name:'货号',
-                    data: res.data.goodsno
+                    data: res.data.hh
                 })
                 // // 渲染所有店铺
                 xmSelect.render({
-                    el: '#xm-customer', 
+                    el: '#xm-yjfl', 
                     filterable: true,
                     toolbar: {show: true},
                     theme: {
                         color: '#1cbbb4',
                     },
                     // showCount: 1,
-                    name:'店铺名称',
-                    data: res.data.customer
+                    name:'一级分类',
+                    data: res.data.yjfl
+                })
+
+                xmSelect.render({
+                    el: '#xm-ejfl', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'二级分类',
+                    data: res.data.ejfl
                 })
                 
             }, 'json')
@@ -501,85 +521,57 @@
             });
         }
 
-        upload.render({
-            elem: '#uploadBtn'
-            ,url: upload_excel1 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
-            ,accept: 'file'
-            ,exts: 'xlsx'
-            ,before: function(obj){
-            //预读本地文件示例，不支持ie8
-                // obj.preview(function(index, file, result){
-                //     $('#demo1').attr('src', result); //图片链接（base64）
-                // });
-                
-                // element.progress('demo', '0%'); //进度条复位
-                // layer.msg('上传中', {icon: 16, time: 0});
-                layui.use('layer', function () {
-                    layui.layer.load();
-                    $(".layui-layer-shade").css('background', '#000000')
-                    $(".layui-layer-shade").css('opacity', '0.2')
-                    $(".layui-layer-shade").click(function (event) {
-                        event.stopPropagation();
-                    })
-                })
-            }
-            ,done: function(res){
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 0);
-                });
-                //如果上传失败
-                if(res.code > 0){
-                    return layer.msg('上传失败');
-                } else {
-                    // 方案
-                    table.reload('table2', {
-                          method: 'post'
-                        , url: url1
-                        , loading: true
-                    })
-                    return layer.msg('上传成功');
-                }
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table2', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
 
-            }
-            ,error: function(){
-                //演示失败状态，并实现重传
-            }
+            return false; 
         });
 
-        // upload.render({
-        //     elem: '#uploadBtn_2'
-        //     ,url: upload_excel_user2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
-        //     ,accept: 'file'
-        //     ,exts: 'xlsx'
-        //     ,before: function(obj){
-        //     //预读本地文件示例，不支持ie8
-        //         // obj.preview(function(index, file, result){
-        //         //     $('#demo1').attr('src', result); //图片链接（base64）
-        //         // });
-                
-        //         // element.progress('demo', '0%'); //进度条复位
-        //         // layer.msg('上传中', {icon: 16, time: 0});
-        //     }
-        //     ,done: function(res){
-        //         //如果上传失败
-        //         if(res.code > 0){
-        //             return layer.msg('上传失败');
-        //         } else {
-        //             // 方案
-        //             table.reload('table2', {
-        //                   method: 'post'
-        //                 , url: url1
-        //                 , loading: true
-        //             })
-        //             return layer.msg('上传成功');
-        //         }
-        //     }
-        //     ,error: function(){
-        //         //演示失败状态，并实现重传
-        //     }
-        // });
+        //监听指定开关
+        form.on('switch(switchStatus)', function(data){
+            // console.log(data.elem); //得到checkbox原始DOM对象
+            // console.log(data.othis); //得到美化后的DOM对象
+            console.log(data.elem.checked); //开关是否开启，true或者false
+            console.log(data.value); //开关value值，也可以通过data.elem.value得到
+
+            var valueStr = data.value
+            var valueArr = valueStr.split(",");
+            // layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+            // offset: '6px'
+            // });
+            // layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+
+            var changeStatus = data.elem.checked ? '开' : '关';
+            $.post(statusHandle, {uid: valueArr[0], customerName:  valueArr[1], goodsNo: valueArr[2]}, function(data) {
+                layer.msg('操作成功')
+            }, 'json');
+            // $.post(statusHandle, {'编号': id}, function(res) {  
+            //     layer.msg(res.msg)
+            //     // table.reload('table2', {
+            //     //     where: {'更新日期': datetime, 'limit': limit}
+            //     //     , method: 'post'
+            //     //     , url: url1
+            //     //     , loading: true
+            //     //     , page: true
+            //     //     , limit: limit
+            //     //     ,done: function(res){
+            //     //         layui.use('layer', function () {
+            //     //             setTimeout(function () {
+            //     //                 layui.layer.closeAll();
+            //     //             }, 0);
+            //     //         });
+            //     //     }
+            //     // })
+            // })
+        });
 
         // 单店不动销数据统计 
         function startTable() {
@@ -595,104 +587,48 @@
                 , method: 'post'
                 , toolbar: true
                 , page: true
-                , limit: 100
+                , limit: 1000
                 , limits: [100, 500, 1000, 2000, 5000, 10000, 20000]
                 , height: height
-                , where: {}
+                , where: {uid:uid, customerName:customerName}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: 'id', title: '编号', align:'center' }
-                    , { field: 'aname', title: '创建人', align:'center' }
-                    // ,{ field: 'path', title: '图片' , align:'center' , templet:
-                    // function (data) {
-                    //     // console.log(data)
-                    //     return `
-                    //         <img src="${data.path}" style="height:50px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
-                    //     `; 
-                    // }}
-                    , { field: '接收方', title: '接收方', align:'center', templet:
+                    { title: '货品图' , align:'center' , templet:
                     function (data) {
+                        // console.log(data)
                         return `
-                            <span style="cursor:pointer;" onClick="viewUsers('${data['id']}')">
-                                查看
-                            </span>
+                            <img src="${data.Img}" style="height:50px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
                         `; 
                     }}
-                    , {title: `<span style="color:red;">未读</span> / <span style="color:blue;">已读</span> / <span style="color:green;">总数</span>`, align:'center', templet:
-                    function (data) {
-                        var readNums = 0;
-                        var unReadNums = 0;
-                        var totalReadNums = 0;
-                        if (data['已读'] && data['已读'] > 0) {
-                            readNums = data['已读'];
-                        }
-                        if (data['未读'] && data['未读'] > 0) {
-                            unReadNums = data['未读'];
-                        }
-                        // totalReadNums = readNums + unReadNums;
-                        return `
-                            <span style="color:red;">${unReadNums}</span> / <span style="color:blue;">${readNums}</span> / <span style="color:green;">${data['总数']}</span>  
-                        `; 
-                    }}
-                    , { field: 'sendtimes', title: '推送次数', align:'center', templet:
-                        function (data) {
-                            var res = data.sendtimes > 0 ? `<span style="color:red; font-weight:bold;">${data.sendtimes}</span>` : data.sendtimes;
-                            return res; 
-                        }}
+                    , { field: '季节归集', title: '季节', align:'center' }
+                    , { field: '一级分类', title: '一级分类', align:'center' }
+                    , { field: '二级分类', title: '二级分类', align:'center' }
+
+                    , { field: '分类', title: '分类', align:'center' }
+                    , { field: '货号', title: '货号', align:'center'}
+                    , { field: '颜色', title: '颜色', align:'center'}
+                    , { field: '店铺库存', title: '店铺库存', align:'center'}
+                    , { field: '在途库存', title: '在途库存', align:'center'}
+                    , { field: '店铺可用库存', title: '可用库存', align:'center'}
+                    
+                    , { field: '零售价', title: '零售价', align:'center' } 
+                    , { field: '调价', title: '调价', align:'center' } 
                     , { field: 'createtime', title: '创建时间', align:'center' } 
-                    , { field: 'sendtime', title: '发送时间', align:'center' } 
-                    , { field: '撤回时间', title: '撤回时间', align:'center' } 
                     , { title: '状态', align:'center', templet:
                         function (data) {
                             var html = '';
-                            if (data.sendtime && !data['撤回时间']) {
+                            if (data['status'] == 'Y') {
                                 html = `
-                                    <span style="color:blue;">已发送</span>
-                                `;
-                            } else if (data['撤回时间'])  {
+                                    <input type="checkbox" name="switchTest" lay-skin="switch" lay-filter="switchStatus" lay-text="OK|NO" value="${data['uid']},${data['店铺名称']},${data['货号']}" checked>      
+                                `; 
+                            } else {
                                 html = `
-                                <span style="color:red;">已撤回</span>
-                                `;
-                            } else  {
-                                html = `
-                                    未发送
-                                `;
+                                    <input type="checkbox" name="switchTest" lay-skin="switch" lay-filter="switchStatus" lay-text="OK|NO" value="${data['uid']},${data['店铺名称']},${data['货号']}">      
+                                `; 
                             }
-                            return html; 
+                            return html;
                         }}
-                    , { title: '操作', align:'center', width:'12%', templet:
-                        function (data) {
-                            var html = `
-                                <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
-                                letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                    推送
-                                </button>
-                            `;
-                            if (data.sendtime) {
-                                var html = `
-                                    <button class="sendDingBtn layui-btn layui-btn-xs" style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                        推送
-                                    </button>
-                                    <button class="recallBtn layui-btn layui-btn-xs" style="background: orange;
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                        撤回
-                                    </button>
-                                    <button class="getReadsBtn layui-btn layui-btn-xs" style="background: blue;
-                                    letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                        状态
-                                    </button>
-                                `;
-                            }
-                            if (data['错误'] > 0) {
-                                html += `<button class="downErrors layui-btn layui-btn-xs" style="background: red;
-                                        letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="sendWeatherDisplay('${data['id']}')">
-                                            错误
-                                        </button>`;
-                            }
-                            return html; 
-                        }}
-                ]]
+                    ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
                     // console.log(res);
