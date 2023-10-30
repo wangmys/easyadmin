@@ -16,12 +16,52 @@
   overflow-x: hidden;
   overflow-y: scroll;
 }
+.menu {
+  position: fixed;
+  width: 15.872rem;
+  height: 1.49333333rem;
+  z-index: 100;
+  background-color: #1e7dfa;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), -2px -2px 4px rgba(255, 255, 255, 0.5);
+  border: 0.8px solid #ccc;
+}
+.niceButton {
+  display: inline-block;
+  padding: 0.17066667rem 0.53333333rem;
+  font-size: 0.46933333rem;
+  font-weight: bold;
+  width: 22%;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #1e7dfa;
+  background-color: #ddfd29;
+  border: none;
+  border-radius: 0.32rem;
+  box-shadow: 0 0.192rem #999999;
+}
+.niceButton:hover {
+  background-color: #eeea0f;
+}
+.niceButton:active {
+  background-color: #eeea0f;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.space {
+  margin-top: 1.92rem;
+}
 .category {
   width: 15.872rem;
   font-weight: bold;
   font-size: 0.64rem;
   display: block;
   text-align: center;
+}
+.category:nth-of-type(0) {
+  margin-top: 100px;
 }
 .content {
   width: 15.872rem;

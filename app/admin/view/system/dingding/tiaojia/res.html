@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1">
     <title>【{$customerName}】调价通知</title>
     <!-- head 中 -->
+    
+    <!--引入css样式文件-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.css"/>
     <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css">
     <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css">     -->
     <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
@@ -28,6 +31,24 @@
 </head>
 <body >
     <section class="wrap">
+        <!-- <div class="page">
+            <div class="page__hd">
+                <h1 class="page__title">Picker</h1>
+                <p class="page__desc">多列选择器，需要配合js实现</p>
+            </div>
+            <div class="page__bd page__bd_spacing">
+                <a href="javascript:" role="button" class="weui-btn weui-btn_default" id="showPicker">单列选择器</a>
+                <a href="javascript:" role="button" class="weui-btn weui-btn_default" id="showDatePicker">日期选择器</a>
+            </div>
+        </div>     -->
+        <div class="menu flex row around">
+            <button class="niceButton">一级分类</button>
+            <button class="niceButton">二级分类</button>
+            <button class="niceButton">货号</button>
+            <button class="niceButton">季节</button>
+        </div>
+        <div class="space"></div>
+
         {volist name="select" id="vo"}
             <div class="category flex row between">
                 <div>&nbsp;{$vo['一级分类']} - {$vo['二级分类']}<a style="color:red; font-weight: bold;">（调价共计{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}款）</a> No.<a style="font-weight: bold;">{$vo['分组排名']}</a></div>
@@ -89,9 +110,18 @@
 <script type="text/javascript" src="__STATIC__/admin/js/honeySwitch.js"></script>
 
 <!-- <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script> -->
-<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script>
-<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script> -->
+
+<!-- <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script> -->
+
+
+<!--引入微信的两个js-->
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--weui.min.js有版本之分，在低版本的js中有些功能不完善，在高版本会支持-->
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+<!--<script src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>-->
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
 </script>
@@ -159,4 +189,45 @@ $(function() {
         $('.window').css('display', 'none');
     }
 })
+</script>
+<script type="text/javascript">
+    $('#showPicker').on('click', function () {
+        weui.picker([{
+            label: '飞机票',
+            value: 0
+        }, {
+            label: '火车票',
+            value: 1
+        }, {
+            label: '的士票',
+            value: 2
+        },{
+            label: '公交票 (disabled)',
+            disabled: true,
+            value: 3
+        }, {
+            label: '其他',
+            value: 4
+        }], {
+            onChange: function (result) {
+                console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+            }
+        });
+    });
+    
+    $('#showDatePicker').on('click', function () {
+        weui.datePicker({
+            start: 1990,
+            end: new Date().getFullYear(),
+            onChange: function (result) {
+                console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+            }
+        });
+    });
 </script>

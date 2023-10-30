@@ -732,4 +732,11 @@ class Tiaojia extends BaseController
 
         return json(["code" => "0", "msg" => "", "data" => ['yjfl' => $一级分类, 'ejfl' => $二级分类,  'hh' => $货号]]);
     }
+
+    public function picker() {
+        return View('picker', [
+            
+        ]);
+     
+    }
 }

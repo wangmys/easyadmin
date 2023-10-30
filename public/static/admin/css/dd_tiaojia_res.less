@@ -10,10 +10,51 @@
     // position: relative; 
     width: 100vh;
     height: 100vh;
-
     // // display: flex;
     overflow-x: hidden;
     overflow-y: scroll;
+}
+.menu {
+    position: fixed;
+    width: 744/@rem;
+    height: 70/@rem;
+    z-index: 100;
+    background-color: rgb(30, 125, 250);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5), -2px -2px 4px rgba(255,255,255,0.5);
+    border: 0.8px solid #ccc;
+}
+// 按钮
+.niceButton{
+    display: inline-block;
+    padding: 8/@rem 25/@rem;
+    font-size: 22/@rem;
+    font-weight: bold;
+    width: 22%;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color:rgb(30, 125, 250);
+    // background-color: rgb(16, 185, 214);
+    background-color: rgb(221, 253, 41);
+    border: none;
+    border-radius: 15/@rem;
+    box-shadow: 0 9/@rem #999;
+}
+.niceButton:hover{
+// background-color: #1795bb;
+background-color: #eeea0f;
+}
+.niceButton:active{
+    // background-color: #1795bb;
+    background-color: #eeea0f;
+    box-shadow: 0 5px #666;
+    transform:translateY(4px);
+}
+
+.space {
+    margin-top: 90/@rem;
 }
 .category {
     width: 744/@rem;
@@ -23,6 +64,9 @@
     font-size: 30/@rem;
     display: block;
     text-align: center;
+}
+.category:nth-of-type(0) {
+    margin-top: 100px;
 }
 .content { 
     // background-color: aqua;
