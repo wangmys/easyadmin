@@ -19,7 +19,7 @@
 .menu {
   position: fixed;
   width: 15.872rem;
-  height: 1.49333333rem;
+  height: 1.81333333rem;
   z-index: 100;
   background-color: #1e7dfa;
   border-radius: 0 0 10px 10px;
@@ -51,7 +51,7 @@
   transform: translateY(4px);
 }
 .space {
-  margin-top: 1.92rem;
+  margin-top: 2.56rem;
 }
 .category {
   width: 15.872rem;

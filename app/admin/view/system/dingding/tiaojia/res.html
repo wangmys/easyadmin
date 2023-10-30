@@ -42,7 +42,7 @@
             </div>
         </div>     -->
         <div class="menu flex row around">
-            <button class="niceButton">一级分类</button>
+            <button class="niceButton" id="showPicker">一级分类</button>
             <button class="niceButton">二级分类</button>
             <button class="niceButton">货号</button>
             <button class="niceButton">季节</button>
@@ -193,21 +193,20 @@ $(function() {
 <script type="text/javascript">
     $('#showPicker').on('click', function () {
         weui.picker([{
-            label: '飞机票',
-            value: 0
+            label: '全选',
+            value: ''
         }, {
-            label: '火车票',
-            value: 1
+            label: '内搭',
+            value: '内搭'
         }, {
-            label: '的士票',
-            value: 2
+            label: '外套',
+            value: '外套'
+        }, {
+            label: '下装',
+            value: '下装'
         },{
-            label: '公交票 (disabled)',
-            disabled: true,
-            value: 3
-        }, {
-            label: '其他',
-            value: 4
+            label: '鞋履',
+            value: '鞋履'
         }], {
             onChange: function (result) {
                 console.log(result);
