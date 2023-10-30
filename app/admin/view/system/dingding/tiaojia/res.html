@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/dd_tiaojia_res.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css?v=1">
-    <link rel="stylesheet" href="__STATIC__/admin/css/honeySwitch.css?v=1">
+    <link rel="stylesheet" href="__STATIC__/admin/css/honeySwitch.css?v=2">
 
     <script>
         setRem();
@@ -30,7 +30,7 @@
     <section class="wrap">
         {volist name="select" id="vo"}
             <div class="category flex row between">
-                <div>{$vo['一级分类']} - {$vo['二级分类']}<a style="color:red; font-weight: bold;">（调价共计{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}款）</a> No.<a style="font-weight: bold;">{$vo['分组排名']}</a></div>
+                <div>&nbsp;{$vo['一级分类']} - {$vo['二级分类']}<a style="color:red; font-weight: bold;">（调价共计{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}款）</a> No.<a style="font-weight: bold;">{$vo['分组排名']}</a></div>
                 <div>
                     <!-- switch -->
                     {php} if ($vo['status'] == 'N') { {/php}
