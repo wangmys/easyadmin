@@ -5,9 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1">
     <title>【{$customerName}】调价通知</title>
+    <!-- head 中 -->
+    <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css">     -->
     <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/dd_tiaojia_res.css" />
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css?v=1">
+    <link rel="stylesheet" href="__STATIC__/admin/css/honeySwitch.css">
+
     <script>
         setRem();
         // 横屏竖屏适配
@@ -25,8 +30,17 @@
     <section class="wrap">
         {volist name="select" id="vo"}
             <div class="category flex row between">
-                <div>{$vo['一级分类']} - {$vo['二级分类']}<a style="color:red; font-weight: bold;">（调价共计{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}款）</a> No.<a style="color:red; font-weight: bold;">{$vo['分组排名']}</a></div>
-                <div></div>
+                <div>{$vo['一级分类']} - {$vo['二级分类']}<a style="color:red; font-weight: bold;">（调价共计{php} echo $categoryName2[$vo['二级分类']]['二级分类总数'] {/php}款）</a> No.<a style="font-weight: bold;">{$vo['分组排名']}</a></div>
+                <div>
+                    <!-- switch -->
+                    {php} if ($vo['status'] == 'N') { {/php}
+                    <span class="switch-off" themeColor="#39f" id="switch" name="switch" style="zoom:1;" data-val="{$vo['货号']}" onclick="switchBtn(`{$vo['uid']}`,`{$vo['店铺名称']}`,`{$vo['货号']}`,`{$vo['status']}`)"></span>
+                    {php} } else { {/php}
+                    <span class="switch-on" themeColor="#39f" id="switch" name="switch" style="zoom:1;" data-val="{$vo['货号']}" onclick="switchBtn(`{$vo['uid']}`,`{$vo['店铺名称']}`,`{$vo['货号']}`,`{$vo['status']}`)"></span>
+                    {php} } {/php}
+                    <!-- 状态 -->
+                    <!-- <h1 id="status"></h1> -->
+                </div>
             </div>
             <div class="content shadow flex col">
                 <div class="head" style="background-color: rgb(30, 125, 250);">
@@ -69,18 +83,75 @@
 </html>
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script type="text/javascript" src="__STATIC__/admin/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="__STATIC__/admin/js/honeySwitch.js"></script>
+
+<!-- <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script> -->
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
 </script>
 <script>
 
+
 $(function() {
+    var statusHandle = "{:url('admin/system.dingding.tiaojia/statusHandle')}"
+    // var switch_status = null;
+    
+    // 监听swich切换事件
+    switchEvent("span[name=switch]",
+        function(){
+            console.log('开');
+            // switch_status = "N"
+
+        }
+        ,function(){
+            console.log('关');
+            // switch_status = "Y"
+        }
+    );
+
+
+    // // 从服务器获取状态
+    // // 在服务器返回status
+    // var status = 2;
+    // if(status == 1){
+    //     // 1开
+    //     honeySwitch.showOn("#switch");
+    //     // $('#status').text('开');
+    // }else{
+    //     // 2关
+    //     honeySwitch.showOff("#switch");
+    //     // $('#status').text('关');
+    // }
+
+    // 开关 
+    window.switchBtn = function(uid = '',customerName = '',goodsNo = '') {
+        // 监听swich切换事件
+        // console.log(uid,customerName,goodsNo);
+        // console.log(switch_status);
+
+        // if (switch_status == 'Y') {
+        //     switch_status = 'N';
+        // } else {
+        //     switch_status = 'Y';
+        // }
+
+        $.post(statusHandle, {uid: uid, customerName: customerName, goodsNo:goodsNo}, function(data) {
+                
+        }, 'json');
+
+    }
+
+    // 图片放大
     window.viewImg = function (obj) {
         console.log(obj.src)
         $('.window').css('display', 'flex');
         $('#windowImg').attr('src', obj.src);
     }
 
+    // 图片关闭
     window.closeImg = function (obj) {
         $('.window').css('display', 'none');
     }

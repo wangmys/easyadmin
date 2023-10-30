@@ -543,6 +543,44 @@ class Tiaojia extends BaseController
         }
     }
 
+    public function statusHandle() {
+        if (request()->isAjax()) {
+            $input = input();
+            // print_r($input); 
+            
+            $map1 = " AND uid='{$input['uid']}'";
+            $map2 = " AND 店铺名称='{$input['customerName']}'";
+            $map3 = " AND 货号='{$input['goodsNo']}'";
+
+            $sql = "
+                select `status` from dd_tiaojia_customer_temp
+                where 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+            ";
+            $select = $this->db_easyA->query($sql);
+            // print_r($select);
+            $new_status = '';
+            if ($select[0]['status'] == 'Y') {
+                $new_status = 'N';
+            } else {
+                $new_status = 'Y';
+            }
+
+            $sql_更新 = "
+                update dd_tiaojia_customer_temp
+                set 
+                    `status` = '{$new_status}'
+                where 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+            ";
+            $this->db_easyA->execute($sql_更新);
+        }
+    }
+
     // public function res_pc() {
     //     // $uid = '13698126';
     //     $input = input();

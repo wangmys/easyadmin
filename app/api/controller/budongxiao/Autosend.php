@@ -330,8 +330,14 @@ class Autosend extends BaseController
                     $考核合计 = $day5_10 + $day10_15 + $day20_30 + $day30;
                 }
 
-                if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
-                    if (($res_all_new[$key]['不动销区间'] == '30天以上' ||  $res_all_new[$key]['不动销区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                // if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                //     if (($res_all_new[$key]['不动销区间'] == '30天以上' ||  $res_all_new[$key]['不动销区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } 
+
+                if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天' || $this->params['考核区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                    if (($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天'|| $res_all_new[$key]['不动销区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
                         $insert_history_data[] = $res_all_new[$key];
                     }
                 } 
