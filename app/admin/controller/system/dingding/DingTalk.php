@@ -409,23 +409,26 @@ class DingTalk extends BaseController
      */
     public function getContent($data)
     {
-        $content = "你的订单" . $data['order_sn'] . " 的物流信息超过7天未更新，可能存在异常，单号：" . $data['tracking_num'];//文本内容
-        $title = "订单物流异常提醒";//标题
-        $picUrl = $data['url'];//图片链接
-        $messageUrl = "http://www.321.design/user/#/order-management";//跳转链接
+        // $content = "你的订单" . 11 . " 的物流信息超过7天未更新，可能存在异常，单号：" . 22;//文本内容
+        // $title = "订单物流异常提醒";//标题
+        // $picUrl = 'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71202028.jpg';//图片链接
+        // $messageUrl = "http://im.babiboy.com/admin/system.dingding.Tiaojia/res?uid=24853080&%E5%BA%97%E9%93%BA%E5%90%8D%E7%A7%B0=%E5%AE%89%E9%A1%BA%E4%BA%8C%E5%BA%97";//跳转链接
         $type = "link";
         $textString = json_encode([
             "agent_id" => $this->AgentId,
             "msg" => [
                 "msgtype" => $type,
                 "link" => [
-                    "text" => $content,
-                    "title" => $title,
-                    "picUrl" => $picUrl,//图片链接
-                    "messageUrl" => $messageUrl,//跳转链接
+                    "text" => date('Y-m-d H:i:s') .' 尽快调价！尽快调价！尽快调价！',
+                    "title" => "【{$data['店铺名称']}】调价通知",
+                    // "picUrl" => 'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71202028.jpg',//图片链接
+                    "picUrl" => "{$data['path']}",//图片链接
+                    // "messageUrl" => 'http://im.babiboy.com/admin/system.dingding.Tiaojia/res?uid=24853080&%E5%BA%97%E9%93%BA%E5%90%8D%E7%A7%B0=%E5%AE%89%E9%A1%BA%E4%BA%8C%E5%BA%97',//跳转链接
+                    "messageUrl" => "{$data['url']}",//跳转链接
                 ]
             ],
-            "userid_list" => "191902624820360246",//接受用户ID
+            // "userid_list" => "350364576037719254,0812473564939990,284616312226634272,111131100920206916,01041546130633121381",//接受用户ID
+            "userid_list" => "{$data['userid']}",//接受用户ID
         ]);
 
         return $textString;
@@ -530,7 +533,7 @@ class DingTalk extends BaseController
      */
     public function sendLinkMsg($data)
     {
-        $webhook = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $this->getAccessToken();
+        $webhook = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $this->getAccessToken_cwl();
         $SendToUser_data = $this->getContent($data);
         $result = $this->PostCurlRequest($webhook, $SendToUser_data);
         return $result;

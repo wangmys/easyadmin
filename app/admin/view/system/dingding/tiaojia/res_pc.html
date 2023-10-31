@@ -141,7 +141,7 @@
 
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
-            <div class="title_text2" style="text-align: center; color:#0051ff;">【{$customerName}】货品调价列表  <a class="dateStr">{$createtime}</a></div>
+            <div class="title_text2" style="text-align: center; color:#0051ff;">【{$customerName}】货品调价列表  <a class="dateStr">&nbsp;添加时间：{$createtime}</a></div>
         </table>
     </div>
 </body>
@@ -621,7 +621,7 @@
                     , { field: '店铺可用库存', title: '可用库存', align:'center'}
                     
                     , { field: '零售价', title: '零售价', align:'center' } 
-                    , { field: '调价', title: `<a style="color:red;">条件</a>`, align:'center', templet:
+                    , { field: '调价', title: `<a style="color:red;">调价</a>`, align:'center', templet:
                         function (data) {
                             var html = '';
                             if ( data['调价']) {
@@ -641,7 +641,6 @@
                             }
                             return html;
                         }}
-                    , { field: 'createtime', title: '创建时间', align:'center' } 
                     , { title: '状态', align:'center', templet:
                         function (data) {
                             var html = '';
