@@ -518,22 +518,60 @@ class Tiaojia extends BaseController
 
     public function res() {
         // $uid = '13698126';
+        // echo '<pre>';
+        // print_r($_SERVER);die;
         $input = input();
+        
         if (empty($input['uid']) || empty($input['店铺名称'])) {
             die('参数有误，请勿非法访问');
         }
+        $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . "/admin/system.dingding.Tiaojia/res"; 
 
         if (isMobile()) {
+            
+            if (!empty($input['一级分类']) && $input['一级分类'] != '大类') {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['一级分类']);
+                $map1 = " AND 一级分类 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+            if (!empty($input['二级分类']) && $input['二级分类'] != '中类') {
+                // echo $input['商品负责人'];
+                $map2Str = xmSelectInput($input['二级分类']);
+                $map2 = " AND 二级分类 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }
+            if (!empty($input['货号']) && $input['货号'] != '货号') {
+                // echo $input['商品负责人'];
+                $map3Str = xmSelectInput($input['货号']);
+                $map3 = " AND 货号 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }
+            if (!empty($input['季节归集']) && $input['季节归集'] != '季节') {
+                // echo $input['商品负责人'];
+                $map4Str = xmSelectInput($input['季节归集']);
+                $map4 = " AND 季节归集 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
             $sql_基础数据 = "
                 select * from dd_tiaojia_customer_temp
                 where 1
                     AND uid = '{$input['uid']}'
                     AND 店铺名称 IN ('{$input['店铺名称']}')
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
                     ORDER BY `key`,二级分类,分组排名,分类
             ";
             // die;
             $select_基础数据 = $this->db_easyA->query($sql_基础数据);
             if ($select_基础数据 ) {
+                // **分组不要带货号查询，影响共计款数量**
                 $sql_二级分类分组 = "
                     select 
                         二级分类,
@@ -542,6 +580,10 @@ class Tiaojia extends BaseController
                     where 1
                         AND uid = '{$input['uid']}'
                         AND 店铺名称 IN ('{$input['店铺名称']}')
+                        {$map1}
+                        {$map2}
+                 
+                        {$map4}
                     GROUP BY 二级分类
                     ORDER BY `key`ASC,二级分类 ASC, 零售价 ASC,分类 ASC
                 ";
@@ -557,11 +599,20 @@ class Tiaojia extends BaseController
 
                 return View('res',[
                     'select' => $select_基础数据,
+                    'uid' => $input['uid'],
                     'customerName' => $input['店铺名称'],
                     'categoryName2' => $二级分类数组,
+                    'url' => $url
                 ]);
             } else {
-                echo '参数有误，请勿非法访问';    
+                // echo '参数有误，请勿非法访问[2]';  
+                return View('res',[
+                    'select' => $select_基础数据,
+                    'uid' => $input['uid'],
+                    'customerName' => $input['店铺名称'],
+                    'categoryName2' => [],
+                    'url' => $url
+                ]);  
             }
         } else {
 
@@ -725,6 +776,29 @@ class Tiaojia extends BaseController
         ");
         $货号 = $this->db_easyA->query("
             SELECT 货号 as name, 货号 as value FROM dd_tiaojia_customer_temp WHERE  货号 IS NOT NULL {$map1} {$map2} GROUP BY 货号
+        ");
+        
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['yjfl' => $一级分类, 'ejfl' => $二级分类,  'hh' => $货号]]);
+    }
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect_mobile() {
+        $input = input();
+        // print_r($input); 
+        $map1 = " AND uid='{$input['uid']}'";
+        $map2 = " AND 店铺名称='{$input['customerName']}'";
+
+        $一级分类 = $this->db_easyA->query("
+            SELECT 一级分类 as label, 一级分类 as value FROM dd_tiaojia_customer_temp WHERE  一级分类 IS NOT NULL {$map1} {$map2} GROUP BY 一级分类
+        ");
+        $二级分类 = $this->db_easyA->query("
+            SELECT 二级分类 as label, 二级分类 as value FROM dd_tiaojia_customer_temp WHERE  二级分类 IS NOT NULL {$map1} {$map2} GROUP BY 二级分类
+        ");
+        $货号 = $this->db_easyA->query("
+            SELECT 货号 as label, 货号 as value FROM dd_tiaojia_customer_temp WHERE  货号 IS NOT NULL {$map1} {$map2} GROUP BY 货号
         ");
         
         // 门店

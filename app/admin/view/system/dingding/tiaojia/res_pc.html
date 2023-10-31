@@ -608,11 +608,39 @@
                     , { field: '货号', title: '货号', align:'center'}
                     , { field: '颜色', title: '颜色', align:'center'}
                     , { field: '店铺库存', title: '店铺库存', align:'center'}
-                    , { field: '在途库存', title: '在途库存', align:'center'}
+                    , { field: '在途库存', title: '在途库存', align:'center', templet:
+                        function (data) {
+                            var html = '';
+                            if (data['在途库存'] > 0) {
+                                html = data['在途库存']; 
+                            } else {
+                                html = ``; 
+                            }
+                            return html;
+                        }}
                     , { field: '店铺可用库存', title: '可用库存', align:'center'}
                     
                     , { field: '零售价', title: '零售价', align:'center' } 
-                    , { field: '调价', title: '调价', align:'center' } 
+                    , { field: '调价', title: `<a style="color:red;">条件</a>`, align:'center', templet:
+                        function (data) {
+                            var html = '';
+                            if ( data['调价']) {
+                                html = `<a style="color:red; font-weight:bold;">${data['调价']}</a>`; 
+                            } else {
+                                html = ``; 
+                            }
+                            return html;
+                        }}
+                    , { field: '调价时间范围', title: `<a style="color:red;">调价时间范围</a>`, align:'center', templet:
+                        function (data) {
+                            var html = '';
+                            if (data['调价时间范围']) {
+                                html = `<a style="color:red; font-weight:bold;">${data['调价时间范围']}</a>`; 
+                            } else {
+                                html = ``; 
+                            }
+                            return html;
+                        }}
                     , { field: 'createtime', title: '创建时间', align:'center' } 
                     , { title: '状态', align:'center', templet:
                         function (data) {
