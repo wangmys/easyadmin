@@ -91,6 +91,62 @@ class Tiaojia extends BaseController
         }      
     }
 
+    // 推送信息相关用户列表
+    public function list_user() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+            $id = $input['id'];
+            $aid = $this->authInfo['id'];
+
+            $find_list = $this->db_easyA->table('dd_tiaojia_list')->field('uid')->where(['id' => $id])->find();
+            // die;
+            // 非系统管理员
+            if (! checkAdmin()) { 
+                $mapSuper = " AND aid='{$aid}'";  
+            } else {
+                $mapSuper = '';
+            }
+    
+            $sql = "
+                SELECT 
+                    *
+                FROM 
+                    dd_tiaojia_list_user   
+                WHERE 1
+                    AND uid = '{$find_list['uid']}'
+                    AND userid is not null
+                    {$mapSuper}
+                ORDER BY
+                    已读 ASC,店铺名称
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM 
+                    dd_tiaojia_list_user   
+                WHERE 1
+                    AND uid = '{$find_list['uid']}'
+                    AND userid is not null
+                    {$mapSuper}
+                ORDER BY
+                    已读 ASC,店铺名称
+            ";
+            $count = $this->db_easyA->query($sql2);
+            // print_r($count);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+        } else {
+            return View('list_user', [
+                // 'config' => ,
+            ]);
+        }        
+    }
+
     public function upload_excel1() {
         if (request()->isAjax() || $this->debug) {
         // if (1) {
@@ -871,11 +927,12 @@ class Tiaojia extends BaseController
             // print_r($find_list);die;
 
             if ($find_list) {
+                // 测试推送这里修改条件
                 $select_user = $this->db_easyA->query("
                     select * from dd_tiaojia_list_user
                     where 
                         uid = '{$find_list['uid']}'
-                    limit 10
+                    -- limit 10
                 ");
 
                 // dump($select_user);
@@ -1079,6 +1136,56 @@ class Tiaojia extends BaseController
         } else {
             return json(['code' => 2, 'msg' => '请勿非法请求']);
         }       
+    }
+
+    // 下载用户信息模板
+    public function download_excel_user_demo() {
+        // $sql = "
+        //     SELECT
+        //         店铺名称, 陈列方案, 备注
+        //     from dd_temp_excel_user_demo
+        //     where 1
+        //     limit 1
+        // ";
+        // $select = $this->db_easyA->query($sql);
+        $select[0]['货号'] = 'F82109030';
+        $select[0]['调价价格'] = 69;
+        $select[0]['调价时间范围'] = '调价相关时间说明文案';
+        $header = [];
+        foreach($select[0] as $key => $val) {
+            $header[] = [$key, $key];
+        }
+        return Excel::exportData($select, $header, '店铺版_陈列调整推送模板_' . date('Ymd') . '_' . time() , 'xlsx');
+    }
+
+    // 下载 未读 
+    public function downloadListUser() {
+        $id = input('id');
+        $find_list = $this->db_easyA->table('dd_tiaojia_list')->field('uid')->where([
+            ['id', '=', $id],
+        ])->find();
+
+        $sql = "
+            SELECT 
+                店铺名称,name as 姓名,mobile as 手机,title as 职位, url as 推送链接,
+                '否' as 已读
+            FROM 
+                dd_tiaojia_list_user   
+            WHERE 1
+                AND uid = '{$find_list['uid']}'
+                AND 已读 = 'N'
+            ORDER BY
+                已读 ASC,店铺名称
+        ";
+        $select = $this->db_easyA->query($sql);
+        $header = [];
+        if ($select) {
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+        }
+
+        return Excel::exportData($select, $header, '调价通知表未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     public function sendTest() {

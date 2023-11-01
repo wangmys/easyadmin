@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>调价通知-已读未读名单</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+
+         /*layui-table 表格内容允许换行*/
+        .layui-table-cell{
+            height: auto;
+            overflow:visible;
+            text-overflow:inherit;
+            white-space:normal;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div></div>
+                    <div class="flex col between" style="width:5%; height:35px; display: none;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">导出未读
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 0px; display:block;">
+        <table class="layui-hide" id="table2" lay-filter="table">
+            <div class="title_text2" style="text-align: center; color:#0051ff;">接收方列表  <a class="dateStr"></a></div>
+        </table>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/html" id="introduceHtml">
+    <td title="{{d.introduce}}" class="layui-table-link">{{d.name}}</td>
+</script>
+<!-- tools -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+       <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="download">导出未读</button>
+    </div>
+</script>
+<script>
+    // var sendDingImg = function (id, title) {
+    //     window.localStorage.setItem('sendDingImg_id', id);
+    //     window.localStorage.setItem('sendDingImg_title', title);
+    // }
+    var recallBtnTask = function (task_id) {
+        window.localStorage.setItem('weatherdisplay_list_user_taskid', task_id);
+    }
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , list_user = "{:url('admin/system.dingding.Tiaojia/list_user')}"
+            , recallHandle = "{:url('admin/system.dingding.Tiaojia/recallHandle')}"
+            , downloadUrl = "{:url('admin/system.dingding.Tiaojia/downloadListUser')}";
+
+
+        // 表1初始化
+        startTable();
+        // initFn();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-hh', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.goodsno
+                })
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
+                
+            }, 'json')
+        }
+
+
+        window.previewImg = function(obj) {
+            var img = new Image();
+            img.src = obj.src;
+            var height=img.height,width=img.width;
+            if(img.height > 600) {
+                height = '600px';
+                width=(600/(img.height))*(img.width);
+            }
+        
+            var imgHtml = "<img src='" + obj.src + "' height='"+height+"' width='"+width+"' />";
+            //弹出层
+            layer.open({
+                type: 1,
+                offset: 'auto',
+                area: [width,'auto'],
+                shadeClose:true,//点击外围关闭弹窗
+                scrollbar: false,//不现实滚动条
+                title: "图片预览", //不显示标题
+                content: imgHtml, //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                cancel: function () {
+                
+                }
+            });
+        }
+
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var id = window.localStorage.getItem('weatherdisplaylist_id');
+            switch(obj.event){
+                case 'download':
+                    location.href = downloadUrl + '?id=' + id;
+                    alert('请耐心等待~');
+                break;
+                case 'budongxiao_total':
+                    console.log(url_total)
+                    layer.open({
+                        title: '单店不动销汇总'
+                        ,type: 2
+                        ,area: ['100%', '100%'] // 100%全屏
+                        ,content: url_total
+                    });   
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        var stop2 = false;
+        // 监听事件 
+        $(document).on('click', '.recallBtn', function(data){
+            var id = window.localStorage.getItem('weatherdisplaylist_id', id);
+            var task_id = window.localStorage.getItem('weatherdisplay_list_user_taskid');
+            
+            console.log(task_id);
+            //询问框
+            layer.confirm(`是否撤回`, {
+                btn: ['是的','再想想'] //按钮
+            }, function(data){
+                // layer.close();
+                if (!stop2) {
+                    stop2 = true
+                    $.post(recallHandle, {'id' : id, 'task_id': task_id}, function(res) {
+                        table.reload('table2', {
+                            where: data.field
+                            , method: 'post'
+                            , url: url1
+                            , loading: true
+                        })
+                        layer.msg(res.msg, {icon: 1});
+                        setTimeout(function() {
+                            stop2 = false
+                        }, 500)
+                    })
+                }
+            }, function(){
+                console.log('关闭');
+                layer.close();
+            });
+        }); 
+
+        function startTable() {
+            var mapHeight = $('#map').height();
+            // var yc = window.localStorage.getItem('viewCustomer_yc');
+            // var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            var height = document.documentElement.clientHeight - mapHeight - 15;
+            var id =  window.localStorage.getItem('weatherdisplaylist_id');
+            table.render({
+                elem: '#table2'
+                ,url: list_user
+                , loading: true
+                , method: 'post'
+                , toolbar: '#toolbar1'
+                , page: true
+                , limit: 2000
+                , limits: [2000, 500, 1000, 2000, 5000, 10000, 20000]
+                , height: height
+                , where: {id: id}
+                , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '店铺名称', title: '店铺名称', align:'center' }
+                    ,{ field: 'name', title: '姓名', align:'center' }
+                    ,{ field: 'title', title: '职位' , align:'center' }
+                    , { field: 'mobile', title: '手机', align:'center'}
+                    // ,{ field: '方案图', title: '方案图', align:'center', templet:
+                    // function (data) {
+                    //     // console.log(data)
+                    //     if (data.path) {
+                    //         return `
+                    //             <img src="${data.path}" style="height:30px; width:auto; cursor:pointer;" onclick="previewImg(this)" />
+                    //         `; 
+                    //     } else {
+                    //         return ''
+                    //     }
+      
+                    // }}
+                    ,{ field: 'url', title: '推送链接', align:'center', templet:
+                    function (data) {
+                        // console.log(data)
+                        if (data.url) {
+                            return `
+                                <a href="${data['url']}" target="_blank">查看</a>   
+                            `; 
+                        } else {
+                            return ''
+                        }
+      
+                    }}
+                    , { field: 'sendtime', title: '发送时间', align:'center'}
+                    , { title: '状态', align:'center',  templet:
+                    function (data) {
+                        var str = '';
+                        if (data['task_id']) {
+                            if (data['已读'] == 'Y') {
+                                str = '<span style="color:blue">已读</span>';
+                            } else {
+                                str = '<span style="color:red">未读</span>';
+                            }
+                        } else {
+                            str = '<span style="">未发送</span>';    
+                        }
+
+                        return str; 
+                    }}
+                    // , { title: '操作', align:'center', templet:
+                    //     function (data) {
+                    //         var html = ``;
+                    //         if (data.sendtime) {
+                    //             var html = `
+                    //                 <button class="recallBtn layui-btn layui-btn-xs" style="background: red;
+                    //                 letter-spacing:1px;color: #ffffff; line-height: 25px;"  onClick="recallBtnTask('${data['task_id']}')">
+                    //                     撤回
+                    //                 </button>
+                    //             `;
+                    //         }
+                    //         return html; 
+                    //     }}
+                ]]
+                ,done: function (res, curr, count) {
+                    // layer.alert("加载完成");
+                    console.log(res);
+                }
+            });
+        }
+    });
+
+    // alert(document.documentElement.clientHeight - 30);
+
+</script>
