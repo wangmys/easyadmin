@@ -1155,7 +1155,7 @@ class Tiaojia extends BaseController
         foreach($select[0] as $key => $val) {
             $header[] = [$key, $key];
         }
-        return Excel::exportData($select, $header, '店铺版_陈列调整推送模板_' . date('Ymd') . '_' . time() , 'xlsx');
+        return Excel::exportData($select, $header, '调价通知推送模板_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     // 下载 未读 
