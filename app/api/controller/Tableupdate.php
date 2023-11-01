@@ -143,6 +143,7 @@ class Tableupdate extends BaseController
     // 更新每日业绩到bi店铺业绩环比上 cwl_dianpuyejihuanbi_data
     public function bi_dianpuyejihuanbi_everyday() {
         $date = date('Y-m-01');
+        // $date = '2023-10-01';
         $select = $this->db_binew->query("
             select 日期 from ww_dianpuyejihuanbi_data where 日期>= '{$date}' group by 日期
         ");

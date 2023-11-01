@@ -105,7 +105,6 @@ class Customitem17 extends BaseController
         }
     }
 
-    // 老店业绩同比
     public function getCustomer2()
     {
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
