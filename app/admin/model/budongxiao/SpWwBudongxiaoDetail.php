@@ -55,6 +55,10 @@ class SpWwBudongxiaoDetail extends TimeModel
             $mapArr = arrToStr(explode(',', $map['不考核门店']));
             $where[] = ['店铺名称', 'exp', new Raw("NOT IN ({$mapArr})")]; 
         }
+        if (!empty($map['不考核货号'])) {
+            $mapArr = arrToStr(explode(',', $map['不考核货号']));
+            $where[] = ['货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+        }
         // echo '<pre>';    
         // print_r($where);die;
         $res = self::where($where)

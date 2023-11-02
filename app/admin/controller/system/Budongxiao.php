@@ -132,8 +132,11 @@ class Budongxiao extends AdminController
         $provinceAll = SpWwBudongxiaoDetail::getMapProvince();
         // 门店
         $storeAll = SpWwBudongxiaoDetail::getMapStore();
+        $货号 = $this->db_easyA->query("
+            SELECT 货号 as name, 货号 as value FROM sp_ww_budongxiao_detail WHERE  货号 IS NOT NULL GROUP BY 货号
+        ");
 
-        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
+        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll, 'goodsno' => $货号]]);
     }
 
     // 单店不动销

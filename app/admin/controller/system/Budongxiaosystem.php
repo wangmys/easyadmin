@@ -417,11 +417,15 @@ class Budongxiaosystem extends AdminController
         $provinceAll = SpWwBudongxiaoDetail::getMapProvince();
         // 门店
         $storeAll = SpWwBudongxiaoDetail::getMapStore();
+        $goodsnoAll = $this->db_easyA->query("
+            SELECT 货号 as name, 货号 as value FROM sp_ww_budongxiao_detail WHERE  货号 IS NOT NULL GROUP BY 货号
+        ");
 
-        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店,不考核货号')->where('id=1')->find();
 
         $select_nostore = explode(',', $select_config['不考核门店']);
         $select_province = explode(',', $select_config['省份']);
+        $select_goodsno = explode(',', $select_config['不考核货号']);
         // dump($select_province);
 
         // 省份选中
@@ -442,7 +446,16 @@ class Budongxiaosystem extends AdminController
             } 
         }
 
-        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll]]);
+        // 不考核货号
+        foreach ($select_goodsno as $key => $val) {
+            foreach ($goodsnoAll as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsnoAll[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll, 'goodsnoAll' => $goodsnoAll]]);
     }
 
     // 单店不动销

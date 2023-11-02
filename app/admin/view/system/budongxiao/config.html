@@ -178,6 +178,12 @@
                             <div class="layui-input-inline" style="width: 250px !important;">
                                 <input type="text" name="上市时间" class="layui-input" id="shangshiriqi" value="{$config['上市时间']}" placeholder="yyyy-MM-dd">
                             </div>
+
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">合格率%<=</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <input type="number" name='合格率' autocomplete="off" value="{$config['合格率']}" maxlength="3"
+                                    class="layui-input" lay-verify="required">
+                            </div>
                         </div>    
         
                         <div class="layui-form-item">
@@ -191,12 +197,11 @@
                             <div class="layui-input-inline" style="width: 250px !important;">
                                 <div id="xm-nostore" class="xm-select-demo"></div>
                             </div>
-        
-                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">合格率%<=</label>
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">不考核货号</label>
                             <div class="layui-input-inline" style="width: 250px !important;">
-                                <input type="number" name='合格率' autocomplete="off" value="{$config['合格率']}" maxlength="3"
-                                    class="layui-input" lay-verify="required">
+                                <div id="xm-nogoodsno" class="xm-select-demo"></div>
                             </div>
+        
                         </div>
 
                         <div class="layui-form-item">
@@ -449,18 +454,30 @@
             $.get(url_getXmMapSelect, {}, function(res) {
                 // console.log(res.data.provinceAll);
                 storeData = res.data.storeAll
-                provinceData = res.data.provinceAll    
+                provinceData = res.data.provinceAll  
+                goodsnoData = res.data.goodsnoAll  
                 // 渲染所有店铺
                 xmSelect.render({
                     el: '#xm-nostore', 
                     filterable: true,
                     toolbar: {show: true},
                     theme: {
-                        color: '#1cbbb4',
+                        color: '#f11566',
                     },
                     // showCount: 1,
                     name:'不考核门店',
                     data: storeData
+                })
+                xmSelect.render({
+                    el: '#xm-nogoodsno', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f11566',
+                    },
+                    // showCount: 1,
+                    name:'不考核货号',
+                    data: goodsnoData
                 })
                 // 渲染所有省份
                 xmSelect.render({
