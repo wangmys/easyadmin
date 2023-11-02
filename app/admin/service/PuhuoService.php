@@ -467,7 +467,7 @@ class PuhuoService
      */
     public function get_zdy_goods2($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -527,6 +527,59 @@ class PuhuoService
 
     }
 
+    /**
+     * 获取各云仓 自定义铺货货品 配置列表2zh
+     */
+    public function get_zdy_goods2zh($Yuncang) {
+
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = $res ? $res->toArray() : [];
+        $select_list = $this->get_select_data2($Yuncang);
+        // print_r($select_list);die;
+        if ($res) {
+            foreach ($res as &$v_res) {//1组合(多省、商品专员、经营模式) 2多店
+                $Commonfield_arr = $v_res['Commonfield'] ? explode(',', $v_res['Commonfield']) : [];
+                $Commonfield_select = [];
+                switch ($v_res['Selecttype']) {
+                    case 1: //组合
+                        if ($select_list['merge_list']) {
+                            foreach ($select_list['merge_list'] as $v_customer_list) {
+                                if (in_array($v_customer_list['value'], $Commonfield_arr)) {
+                                    $v_customer_list['selected'] = true;
+                                }
+                                $Commonfield_select[] = $v_customer_list;
+                            }
+                        }
+                        $v_res['Selecttype_str'] = '组合';
+                        break;
+
+                    default:
+                    $v_res['Selecttype_str'] = '';
+                    break;
+
+                }
+
+                $v_res['Commonfield_select'] = $Commonfield_select;
+
+            }
+        }
+        $return = [];
+        if ($Yuncang == '武汉云仓') {
+            $return = ['wuhan_goods_config' => $res, 'wuhan_select_list' => $select_list];
+        } elseif ($Yuncang == '贵阳云仓') {
+            $return = ['guiyang_goods_config' => $res, 'guiyang_select_list' => $select_list];
+        } elseif ($Yuncang == '广州云仓') {
+            $return = ['guangzhou_goods_config' => $res, 'guangzhou_select_list' => $select_list];
+        } elseif ($Yuncang == '南昌云仓') {
+            $return = ['nanchang_goods_config' => $res, 'nanchang_select_list' => $select_list];
+        } elseif ($Yuncang == '长沙云仓') {
+            $return = ['changsha_goods_config' => $res, 'changsha_select_list' => $select_list];
+        }
+
+        return $return;
+
+    }
+
     //获取多店、多省、商品专员、经营模式 下拉数据
     public function get_select_data($yuncang) {
 
@@ -536,6 +589,19 @@ class PuhuoService
         $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, CustomItem17 as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
         $mathod_list = $this->easy_db->Query("select Mathod as name, Mathod as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
         return ['customer_list' => $customer_list, 'province_list' => $province_list, 'goods_manager_list' => $goods_manager_list, 'mathod_list' => $mathod_list];
+
+    }
+
+    //获取组合（多省、商品专员、经营模式）下拉数据
+    public function get_select_data2($yuncang) {
+
+        $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
+        $province_list = $this->easy_db->Query("select State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
+        $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, concat('商品专员-', CustomItem17) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
+        $mathod_list = $this->easy_db->Query("select Mathod as name, concat('经营模式-', Mathod) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
+        $merge = array_merge($mathod_list, $province_list, $goods_manager_list);
+
+        return ['merge_list' => $merge];
 
     }
 
