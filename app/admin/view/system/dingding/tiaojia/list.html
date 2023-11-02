@@ -131,10 +131,11 @@
 
                     <div></div>
 
-                    <div class="flex row around" style="width:10%; height:35px;">
-                        
-                        <button type="button" id="down_excel_user" class="layui-btn layui-btn-xs down_excel_user">下载模板</button>
-                        <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uplaodBtn">导入EXCEL</button>
+                    <div class="flex row around" style="width:25%; height:35px;">
+                        <button type="button" id="down_excel_user2" class="layui-btn layui-btn-xs down_excel_user" style="background: #175ff8;">下载-指定店铺</button>
+                        <button type="button" id="uploadBtn2" class="layui-btn layui-btn-xs uplaodBtn" style="background: #175ff8;">导入-指定店铺</button>
+                        <button type="button" id="down_excel_user" class="layui-btn layui-btn-xs down_excel_user">下载-货号匹店</button>
+                        <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uplaodBtn">导入-货号匹店</button>
                         <!-- <div class="flex row between" style="width:20%; height:35px;">
                              <button lay-submit class="layui-btn layui-btn-xs" lay-filter="userAllBtn"
                             style="background:#4a6db8;color:#ffffff; float:right; ">索歌全员名单
@@ -222,6 +223,11 @@
         // 下载模板 1
         $('#down_excel_user').click(function() {
             location.href = download_excel_user_demo;
+        });
+
+        // 下载模板 2
+        $('#down_excel_user2').click(function() {
+            location.href = download_excel_user_demo2;
         });
 
         
@@ -507,6 +513,53 @@
         upload.render({
             elem: '#uploadBtn'
             ,url: upload_excel1 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            ,accept: 'file'
+            ,exts: 'xlsx'
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+                // obj.preview(function(index, file, result){
+                //     $('#demo1').attr('src', result); //图片链接（base64）
+                // });
+                
+                // element.progress('demo', '0%'); //进度条复位
+                // layer.msg('上传中', {icon: 16, time: 0});
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,done: function(res){
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 0);
+                });
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                } else {
+                    // 方案
+                    table.reload('table2', {
+                          method: 'post'
+                        , url: url1
+                        , loading: true
+                    })
+                    return layer.msg('上传成功');
+                }
+
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+            }
+        });
+
+        upload.render({
+            elem: '#uploadBtn2'
+            ,url: upload_excel2 //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
             ,accept: 'file'
             ,exts: 'xlsx'
             ,before: function(obj){
