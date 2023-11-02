@@ -169,7 +169,23 @@ class Autosend extends BaseController
     }
 
     public function test() {
-        $this->store('兴国一店');
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
+        $params = array_merge($select_config, $static_qima);
+        // dump($params);
+        // die;
+        // dump($select_config);
+        // dump($static_qima);
+        
+        // 删除空参数
+        foreach ($params as $key => $val) {
+            if (empty($val)) {
+                unset($params[$key]);
+            }
+        }
+        $this->params = $params;
+        
+        $this->store('三江一店');
     }
 
     // 单店不动销
@@ -184,6 +200,7 @@ class Autosend extends BaseController
             ['大类' , '<>', '配饰'],
             ['店铺库存数量' , '>', 1],
         ];
+
         if (! empty($this->params['风格'])) {
             $map[] = ['d.风格' , '=', $this->params['风格']];
             // map2计算skc用
@@ -206,13 +223,21 @@ class Autosend extends BaseController
             ];
         }
 
-        // dump($map); die;
+        if (!empty($this->params['不考核货号'])) {
+            $mapArr = arrToStr(explode(',', $this->params['不考核货号']));
+            $map[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+            $map2[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+        }
+        // dump($map); 
+        // dump($map2); 
+        // die;
 
         // 没有上市日期就直接使用上市天数
         if (empty($this->params['上市时间'])) {
             $map[] = ['上市天数' , '>=', $this->params['上市天数']];
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+            // die;
             // 预计skc
             $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
             $res_all_new = [];
@@ -254,6 +279,8 @@ class Autosend extends BaseController
                 }
             }
         }
+
+
 
         // echo '<pre>';
         // print_r($res_all_new);die;
