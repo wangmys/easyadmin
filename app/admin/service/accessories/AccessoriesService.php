@@ -163,7 +163,7 @@ class AccessoriesService
         // 超级管理员ID
         $admin_id = AdminConstant::SUPER_ADMIN_ID;
         // 如果用户不为超管,则进行商品负责人筛选
-        if($user['id'] != $admin_id){
+        if(isset($user['id']) && $user['id'] != $admin_id){
             $model->where([
                 'CustomItem17' => $user['name']
             ]);

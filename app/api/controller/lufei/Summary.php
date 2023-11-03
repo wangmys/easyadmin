@@ -67,6 +67,7 @@ class Summary extends BaseController
         return $seasionStr;
     }
 
+    // 几秒
     public function getData0() {
         $目标月份 = date('Y-m');
 
@@ -91,7 +92,7 @@ class Summary extends BaseController
         }
     }
 
-    // 业绩表现情况
+    // 业绩表现情况 几十秒
     public function getData1()
     {
          // 每月1号
@@ -147,7 +148,7 @@ class Summary extends BaseController
         }
     }
 
-    // 近三天季节销售占比
+    // 近三天季节销售占比 1-2几分钟
     public function getData2() {
         $sql_data = "
             SELECT
@@ -257,6 +258,7 @@ class Summary extends BaseController
         }
     }
 
+    // 几秒
     public function getData3() {
         $sql_更新销售占比 = "
             update cwl_summary as s 
@@ -321,11 +323,11 @@ class Summary extends BaseController
         }
 
         // 引流
-        $res = http_get('http://www.easyadmin1.com/admin/system.dress.dress/index_api');
-        $res = http_get('http://im.babiboy.com/admin/system.dress.dress/index_api');
+        // $res = http_get('http://www.easyadmin1.com/admin/system.dress.dresscwl/index_api');
+        $res = http_get('http://im.babiboy.com/admin/system.dress.dresscwl/index_api');
         // 配饰
-        $res = http_get('http://www.easyadmin1.com/admin/system.dress.index/list_api');
-        $res = http_get('http://im.babiboy.com/admin/system.dress.index/list_api');
+        // $res = http_get('http://www.easyadmin1.com/admin/system.dress.indexcwl/list_api');
+        $res = http_get('http://im.babiboy.com/admin/system.dress.indexcwl/list_api');
 
         $sql_大小码缺码提醒 = "
             update cwl_summary as s left join
