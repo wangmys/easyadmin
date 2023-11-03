@@ -17,6 +17,7 @@ use app\admin\model\bi\SpLypPuhuoZdySet2Model;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
+use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
 
@@ -797,6 +798,41 @@ class PuhuoService
             $Commonfield = $Commonfield ? implode(',', explode(' ', $Commonfield)) : '';
         }
 
+        $CustomerNames = null;
+        if ($Selecttype == SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']) {//组合的情况  处理组合店铺入库
+            $Commonfield_arr = $Commonfield ? explode(',', $Commonfield) : [];
+            $province_arr = $goods_manager_arr = $mathod_arr = [];
+            if ($Commonfield_arr) {
+                foreach ($Commonfield_arr as $v_common) {
+                    if (strstr($v_common, '省份')) {
+                        $province_arr[] = str_replace(['省份-'], [''], $v_common);
+                    } elseif (strstr($v_common, '商品专员')) {
+                        $goods_manager_arr[] = str_replace(['商品专员-'], [''], $v_common);
+                    } else {
+                        $mathod_arr[] = str_replace(['经营模式-'], [''], $v_common);
+                    }
+                }
+
+                $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
+                $new_customers = Db::connect("mysql")->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
+                and CustomerName not in (select 店铺名称 from customer_first);");//剔除新店
+                $new_customers = $new_customers ? array_column($new_customers, 'CustomerName') : [];
+                $where = [['Region', 'not in', explode(',', $customer_regionid_notin_text)], ['ShutOut', '=', 0], ['CustomerName', 'not in', $new_customers]];
+                if ($province_arr) {
+                    $where[] = ['State', 'in', $province_arr];
+                }
+                if ($goods_manager_arr) {
+                    $where[] = ['CustomItem17', 'in', $goods_manager_arr];
+                }
+                if ($mathod_arr) {
+                    $where[] = ['Mathod', 'in', $mathod_arr];
+                }
+                $CustomerNames = CustomerModel::where($where)->column('CustomerName');
+                $CustomerNames = $CustomerNames ? implode(',', $CustomerNames) : null;
+                // print_r([$where, $CustomerNames]);die;
+            }
+        }
+
         $add_data = [
             'Yuncang' => $Yuncang,
             'GoodsNo' => $GoodsNo,
@@ -806,6 +842,7 @@ class PuhuoService
             'remain_store' => $remain_store,
             'remain_rule_type' => $remain_rule_type,
             'if_taozhuang' => $if_taozhuang,
+            'zuhe_customer' => $CustomerNames,
         ];
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoods2Model();

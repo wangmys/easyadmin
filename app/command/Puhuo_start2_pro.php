@@ -180,6 +180,7 @@ class Puhuo_start2_pro extends Command
                 $rule_type = $v_data_each['rule_type'] ?? 1;//1-A方案 2-B方案
                 $remain_store = $v_data_each['remain_store'] ?? 2;//剩余门店 1-铺 2-不铺
                 $remain_rule_type = $v_data_each['remain_rule_type'] ?? 0;//铺货方案2 0-不选 1-A  2-B
+                $zuhe_customer = $v_data_each['zuhe_customer'] ?? '';//指定类型1-组合 的店铺
 
                 $GoodsNo = $v_data['GoodsNo'] ?: '';//货号
                 $WarehouseName = $v_data['WarehouseName'] ?: '';//云仓
@@ -198,30 +199,30 @@ class Puhuo_start2_pro extends Command
                         $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                         break;
                     case 1: //组合（多省、商品专员、经营模式）
-                        // $ex_State = $Commonfield ? explode(',', $Commonfield) : [];
-                        // foreach ($ex_State as $v_ex_State) {
-                        //     if (isset($all_customer_arr_state[$v_ex_State])) {
-                        //         foreach ($all_customer_arr_state[$v_ex_State] as $v_each_customer) $all_customers[] = $v_each_customer;
-                        //     }
-                        // }
+
+                        $ex_store = $zuhe_customer ? explode(',', $zuhe_customer) : [];
+
                         break;
                     case 2: //单店
+
                         $ex_store = $Commonfield ? explode(',', $Commonfield) : [];
-                        if ($ex_store) {
-                            foreach ($ex_store as $v_Commonfield) {
-                                foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
-                                    if ($v_Commonfield == $v_cus['CustomerName']) {
-                                        $all_customers[] = $v_cus;
-                                    }
-                                }
-                            }
-                        }
-                        if ($remain_store == $this->puhuo_zdy_set2_model::REMAIN_STORE['puhuo']) {//如果剩余门店：铺 则店铺应该要获取该云仓的全部店铺
-                            $all_customers = $all_customer_arr[$WarehouseName] ?? [];
-                        }
 
                         break;
                 }
+
+                if ($ex_store) {
+                    foreach ($ex_store as $v_Commonfield) {
+                        foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
+                            if ($v_Commonfield == $v_cus['CustomerName']) {
+                                $all_customers[] = $v_cus;
+                            }
+                        }
+                    }
+                }
+                if ($remain_store == $this->puhuo_zdy_set2_model::REMAIN_STORE['puhuo']) {//如果剩余门店：铺 则店铺应该要获取该云仓的全部店铺
+                    $all_customers = $all_customer_arr[$WarehouseName] ?? [];
+                }
+
                 // print_r($all_customers);die;
 
                 //大小码-满足率-分母
@@ -524,6 +525,10 @@ class Puhuo_start2_pro extends Command
 
                                 $add_puhuo_log[] = $puhuo_log;
                                 // print_r($add_puhuo_log);die;
+
+                                //记录铺货日志：
+                                Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['uuid'=>$uuid, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$v_customer['CustomerName'],  'rule'=>$rule, 'v_data'=>$v_data, 'puhuo_config'=>$puhuo_config, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo结果：'=>$can_puhuo]) );
+
                                 $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
 
                             }
@@ -535,7 +540,8 @@ class Puhuo_start2_pro extends Command
                             
                             ######################大小码铺货逻辑end################################################################
 
-
+                            //记录铺货日志：
+                            Log::channel('puhuo')->write('##############普通-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.json_encode(['add_puhuo_log'=>$add_puhuo_log]) );
 
                             //铺货日志批量入库
                             $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
@@ -602,7 +608,7 @@ class Puhuo_start2_pro extends Command
                 $rule_type = $v_data_each['rule_type'] ?? 1;//1-A方案 2-B方案
                 $remain_store = $v_data_each['remain_store'] ?? 2;//剩余门店 1-铺 2-不铺
                 $remain_rule_type = $v_data_each['remain_rule_type'] ?? 0;//铺货方案2 0-不选 1-A  2-B
-
+                $zuhe_customer = $v_data_each['zuhe_customer'] ?? '';//指定类型1-组合 的店铺
 
                 if ($goods) {
 
@@ -629,29 +635,28 @@ class Puhuo_start2_pro extends Command
                                     $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                                     break;
                                 case 1: //组合（多省、商品专员、经营模式）
-                                    // $ex_State = $Commonfield ? explode(',', $Commonfield) : [];
-                                    // foreach ($ex_State as $v_ex_State) {
-                                    //     if (isset($all_customer_arr_state[$v_ex_State])) {
-                                    //         foreach ($all_customer_arr_state[$v_ex_State] as $v_each_customer) $all_customers[] = $v_each_customer;
-                                    //     }
-                                    // }
+
+                                    $ex_store = $zuhe_customer ? explode(',', $zuhe_customer) : [];
+
                                     break;
                                 case 2: //单店
+
                                     $ex_store = $Commonfield ? explode(',', $Commonfield) : [];
-                                    if ($ex_store) {
-                                        foreach ($ex_store as $v_Commonfield) {
-                                            foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
-                                                if ($v_Commonfield == $v_cus['CustomerName']) {
-                                                    $all_customers[] = $v_cus;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if ($remain_store == $this->puhuo_zdy_set2_model::REMAIN_STORE['puhuo']) {//如果剩余门店：铺 则店铺应该要获取该云仓的全部店铺
-                                        $all_customers = $all_customer_arr[$WarehouseName] ?? [];
-                                    }
                             
                                     break;
+                            }
+
+                            if ($ex_store) {
+                                foreach ($ex_store as $v_Commonfield) {
+                                    foreach ($all_customer_arr[$WarehouseName] as $v_cus) {
+                                        if ($v_Commonfield == $v_cus['CustomerName']) {
+                                            $all_customers[] = $v_cus;
+                                        }
+                                    }
+                                }
+                            }
+                            if ($remain_store == $this->puhuo_zdy_set2_model::REMAIN_STORE['puhuo']) {//如果剩余门店：铺 则店铺应该要获取该云仓的全部店铺
+                                $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                             }
 
                             // print_r($all_customers);die;
@@ -1222,7 +1227,7 @@ class Puhuo_start2_pro extends Command
         //改为从新的 自定义铺货设置表 获取
         $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['not_taozhuang']]])->alias('pzs')
         ->join(['sp_lyp_puhuo_zdy_yuncang_goods2' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
-        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
+        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzs.zuhe_customer, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         $yuncang_goods = $zdy_yuncang_goods ? array_column($zdy_yuncang_goods, 'yuncang_goods') : [];
         $zdy_yuncang_goods = array_combine($yuncang_goods, $zdy_yuncang_goods);
@@ -1255,6 +1260,7 @@ class Puhuo_start2_pro extends Command
                             'rule_type' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['rule_type'] : 1,
                             'remain_store' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['remain_store'] : 2,
                             'remain_rule_type' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['remain_rule_type'] : 0,
+                            'zuhe_customer' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['zuhe_customer'] : '',
                         ];
                     }
                 }
@@ -1268,7 +1274,7 @@ class Puhuo_start2_pro extends Command
     protected function get_wait_goods_data_taozhuang($list_rows) {
 
         $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['is_taozhuang']]])
-        ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, remain_store, remain_rule_type, if_taozhuang')->select();
+        ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, remain_store, remain_rule_type, if_taozhuang, zuhe_customer')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         if ($zdy_yuncang_goods) {
             foreach ($zdy_yuncang_goods as &$v_yuncang_goods) {
