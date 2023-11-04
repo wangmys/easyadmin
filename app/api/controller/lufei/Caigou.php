@@ -656,8 +656,94 @@ class Caigou extends BaseController
             }
         }
 
+        $sql_日销_店铺 = "
+                SELECT TOP
+                    1000000
+                    EG.GoodsNo  AS 货号,
+                    EG.GoodsName AS 货品名称,
+                     EC.CustomerName AS 店铺名称,
+                    EG.TimeCategoryName1 AS 年份,
+                    CASE
+                    EG.TimeCategoryName2 
+                    WHEN '初春' THEN
+                    '春季' 
+                    WHEN '正春' THEN
+                    '春季' 
+                    WHEN '春季' THEN
+                    '春季' 
+                    WHEN '初秋' THEN
+                    '秋季' 
+                    WHEN '深秋' THEN
+                    '秋季' 
+                    WHEN '秋季' THEN
+                    '秋季' 
+                    WHEN '初夏' THEN
+                    '夏季' 
+                    WHEN '盛夏' THEN
+                    '夏季' 
+                    WHEN '夏季' THEN
+                    '夏季' 
+                    WHEN '冬季' THEN
+                    '冬季' 
+                    WHEN '初冬' THEN
+                    '冬季' 
+                    WHEN '深冬' THEN
+                    '冬季' 
+                END AS 季节归集,
+                EG.CategoryName1 AS 大类,
+                EG.CategoryName2 AS 中类,
+                EG.CategoryName AS 分类,
+                EG.StyleCategoryName AS 风格,
+                SUM(ERG.Quantity) AS 销量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                DATEADD(DAY, 0, CAST(GETDATE() AS DATE)) AS 销售日期,				
+                CONVERT(varchar(10),GETDATE(),120) AS 更新日期
+            FROM
+                ErpRetail AS ER
+                LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId
+                LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+            WHERE
+                ER.CodingCodeText = '已审结'
+                AND ER.RetailDate >= DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EC.CustomItem17 IS NOT NULL
+                AND EBC.Mathod IN ('直营', '加盟')
+                AND EG.TimeCategoryName1 IN ('2023', '2024')
+                AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                AND EG.StyleCategoryName = '基本款'
+            GROUP BY
+                EG.GoodsNo
+                ,EG.GoodsName
+                ,EG.TimeCategoryName1
+                ,EG.TimeCategoryName2
+                ,EG.StyleCategoryName
+                ,EG.CategoryName1
+                ,EG.CategoryName2
+                ,EG.CategoryName
+                ,EC.CustomerName
+            HAVING SUM ( ERG.Quantity ) <> 0
+            ORDER BY
+                EG.GoodsNo
+        ";
+        // $select_日销_店铺 = $this->db_sqlsrv->query($sql_日销_店铺);
+        // if ($select_日销_店铺) {
+        //     // 删除历史数据
+        //     // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+        //     $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_day_customer;');
+        //     $chunk_list10 = array_chunk($select_日销_店铺, 500);
+        //     // $this->db_easyA->startTrans();
 
-        $sql_日销 = "
+        //     foreach($chunk_list10 as $key10 => $val10) {
+        //         // 基础结果 
+        //         $insert = $this->db_easyA->table('cwl_cgzdt_retail_day_customer')->strict(false)->insertAll($val10);
+        //     }
+        // }
+
+
+        $sql_日销_不要了 = "
                 SELECT TOP
                     1000000
                     EG.GoodsNo  AS 货号,
@@ -696,7 +782,7 @@ class Caigou extends BaseController
                 EG.StyleCategoryName AS 风格,
                 SUM(ERG.Quantity) AS 销量,
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
-                DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) AS 销售日期,				
+                DATEADD(DAY, 0, CAST(GETDATE() AS DATE)) AS 销售日期,				
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
                 ErpRetail AS ER
@@ -707,7 +793,7 @@ class Caigou extends BaseController
             WHERE
                 ER.CodingCodeText = '已审结'
                 -- AND ER.RetailDate >=  DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND ER.RetailDate = DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
+                AND ER.RetailDate >= DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
                 AND EC.CustomItem17 IS NOT NULL
@@ -726,7 +812,15 @@ class Caigou extends BaseController
                 ,EG.CategoryName
             HAVING SUM ( ERG.Quantity ) <> 0
         ";
-        $select_日销 = $this->db_sqlsrv->query($sql_日销);
+
+        $sql_日销 = "
+            SELECT 货号,货品名称,年份,季节归集,大类,中类,分类,风格,
+            sum(销量) as 销量,
+            sum(销售金额) as 销售金额,
+            销售日期,更新日期
+            FROM `cwl_cgzdt_retail_day_customer` group by 货号
+        ";
+        $select_日销 = $this->db_easyA->query($sql_日销);
         if ($select_日销) {
             // 删除历史数据
             // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
@@ -739,6 +833,25 @@ class Caigou extends BaseController
                 $insert = $this->db_easyA->table('cwl_cgzdt_retail_day')->strict(false)->insertAll($val2);
             }
         }
+
+        $sql_销售店铺数 = "
+            update `cwl_cgzdt_retail_day` as t1
+                left join (select 货号, count(*) as 数量 from cwl_cgzdt_retail_day_customer group by 货号) as t2 on t1.货号=t2.货号
+                set
+                    t1.销售店铺数=t2.数量
+                where 
+                    t1.货号 = t2.货号
+        ";
+        $this->db_easyA->execute($sql_销售店铺数);
+
+        $sql_店均销 = "
+            update `cwl_cgzdt_retail_day`
+            set
+                店均销 = 销量/销售店铺数
+            where 
+                1
+        ";
+        $this->db_easyA->execute($sql_店均销);
 
         $sql_7天销 = "
                 SELECT TOP
@@ -924,35 +1037,37 @@ class Caigou extends BaseController
                 c.售罄率 = case
                     when r.累销量 > 0 then r.累销量 / c.采购入库量 else null
                 end,
-                c.云仓在途量 = w.数量
+                c.云仓在途量 = w.数量,
+                c.销售店铺数=d.销售店铺数,
+                c.店均销=d.店均销
         ";
         $this->db_easyA->execute($sql_售罄率_累销量_当天销量_云仓在途量);
-
+        // die;
         $sql_二级分类售罄 = "
             update cwl_cgzdt_caigoushouhuo as m1 left join 
             (
                 SELECT 
-                        a.货号,a.大类,a.售罄率,
-                        CASE
-                            WHEN 
-                                a.中类 = @中类
-                            THEN
-                                    @rank := @rank + 1 ELSE @rank := 1
-                        END AS rank,
-                        @中类 := a.中类 AS 中类
+				a.货号,a.大类,a.售罄率,a.店均销,
+				CASE
+                    WHEN 
+                        a.中类 = @中类
+                    THEN
+                        @rank := @rank + 1 ELSE @rank := 1
+				END AS rank,
+				@中类 := a.中类 AS 中类
                 FROM 
                 (
-                        SELECT
-                            货号,大类,中类,售罄率 
-                        FROM
+                    SELECT
+                            货号,大类,中类,售罄率,店均销 
+                    FROM
                             cwl_cgzdt_caigoushouhuo 
-                        WHERE
+                    WHERE
                             中类 IN ( '牛仔长裤', '休闲长裤', '松紧长裤', '卫衣', '保暖内衣', '针织衫', '夹克', '羽绒服', '大衣', '皮衣', '真皮衣')
-                            AND 售罄率 is not null
+                            AND 店均销 is not null
                 ) as a,
                 ( SELECT @中类 := null, @rank := 0 ) T
-                    ORDER BY
-                        a.中类, a.售罄率 desc
+                        ORDER BY
+                                a.中类, a.店均销 desc
             ) as m2 on m1.货号 = m2.货号
             set 
                 m1.排名 = m2.rank
