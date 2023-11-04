@@ -17,6 +17,7 @@ use app\admin\model\bi\SpLypPuhuoZdySet2Model;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
+use app\admin\model\bi\SpLypPuhuoRunModel;
 use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
@@ -965,6 +966,26 @@ class PuhuoService
             }
         }
         return ['id'=>$id, 'msg'=>$msg];
+
+    }
+
+    /**
+     * 获取手动铺货执行记录
+     */
+    public function get_puhuo_run() {
+
+        $res = SpLypPuhuoRunModel::where([])->order('id desc')->find();
+        $res = $res ? $res->toArray() : [];
+        return $res;
+
+    }
+
+    /**
+     * 获取铺货货品个数
+     */
+    public function get_puhuo_goods_count() {
+
+        return SpLypPuhuoZdyYuncangGoods2Model::where([])->count();
 
     }
 
