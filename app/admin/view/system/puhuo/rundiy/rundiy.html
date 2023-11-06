@@ -1,0 +1,36 @@
+<form id="app-form" class="layui-form layuimini-form">
+    <table class="layui-table">
+    
+        <table id="form-guiyang_goods-config" class="layui-table">
+            <thead>
+                <tr>
+                    <th style="width: 150px;">最近一次铺货时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- <tr>
+                    <td colspan="1">
+                    </td>
+                    <td colspan="1">
+                        <div class="layui-btn-group">
+                            <button type="button" class="layui-btn add_guiyang_goods_config">增加</button>
+                        </div>
+                    </td>
+                </tr> -->
+
+                <tr class="rundiy-select" >
+                    <td class="guiyang_goods">
+                        {$res['update_time']}
+                    </td>
+                    <td class="handler">
+                        <input type="text" name="Selecttype" class="layui-hide" value="1">
+                        <button type="button" class="layui-btn layui-btn-normal get_rundiy">立即执行铺货</button>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </table>
+    </form>
+    

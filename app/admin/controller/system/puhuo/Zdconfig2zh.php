@@ -5,17 +5,17 @@ namespace app\admin\controller\system\puhuo;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
-use app\admin\model\bi\SpLypPuhuoZdySetModel;
+use app\admin\model\bi\SpLypPuhuoZdySet2Model;
 use think\App;
 use think\facade\Db;
 use app\admin\service\PuhuoService;
 
 /**
- * Class Zdconfig
+ * Class Zdconfig2zh
  * @package app\admin\controller\system\puhuo
- * @ControllerAnnotation(title="指定铺货货品配置")
+ * @ControllerAnnotation(title="指定铺货货品配置2zh")
  */
-class Zdconfig extends AdminController
+class Zdconfig2zh extends AdminController
 {
 
     protected $service;
@@ -25,19 +25,19 @@ class Zdconfig extends AdminController
     {
         parent::__construct($app);
         $this->service = new PuhuoService;
-        $this->Selecttype = [['name'=>'多店', 'value'=>'1'], ['name'=>'多省', 'value'=>'2'], ['name'=>'商品专员', 'value'=>'3'], ['name'=>'经营模式', 'value'=>'4']];
+        $this->Selecttype = [['name'=>'组合', 'value'=>'1'], ['name'=>'单店', 'value'=>'2']];
     }
 
     /**
-     * @NodeAnotation(title="指定铺货货品配置")
+     * @NodeAnotation(title="指定铺货货品配置zh")
      */
     public function index() {
 
-        $res_guiyang = $this->service->get_zdy_goods('贵阳云仓');
-        $res_wuhan = $this->service->get_zdy_goods('武汉云仓');
-        $res_guangzhou = $this->service->get_zdy_goods('广州云仓');
-        $res_nanchang = $this->service->get_zdy_goods('南昌云仓');
-        $res_changsha = $this->service->get_zdy_goods('长沙云仓');
+        $res_guiyang = $this->service->get_zdy_goods2zh('贵阳云仓');
+        $res_wuhan = $this->service->get_zdy_goods2zh('武汉云仓');
+        $res_guangzhou = $this->service->get_zdy_goods2zh('广州云仓');
+        $res_nanchang = $this->service->get_zdy_goods2zh('南昌云仓');
+        $res_changsha = $this->service->get_zdy_goods2zh('长沙云仓');
 
         $this->assign(
         array_merge(
@@ -59,7 +59,7 @@ class Zdconfig extends AdminController
             'changsha_select_list' => $res_changsha['changsha_select_list'],
 
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
         ])
         );
 
@@ -72,13 +72,13 @@ class Zdconfig extends AdminController
      */
     public function guiyang_goods_config() {
 
-        $res = $this->service->get_zdy_goods('贵阳云仓');
+        $res = $this->service->get_zdy_goods2zh('贵阳云仓');
         $this->assign(
         array_merge(
         [
             'guiyang_goods_config' => $res['guiyang_goods_config'],
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
             'guiyang_select_list' => $res['guiyang_select_list'],
         ])
         );
@@ -93,13 +93,14 @@ class Zdconfig extends AdminController
      */
     public function wuhan_goods_config() {
 
-        $res = $this->service->get_zdy_goods('武汉云仓');
+        $res = $this->service->get_zdy_goods2zh('武汉云仓');
+        // print_r($res);die;
         $this->assign(
         array_merge(
         [
             'wuhan_goods_config' => $res['wuhan_goods_config'],
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
             'wuhan_select_list' => $res['wuhan_select_list'],
         ])
         );
@@ -113,13 +114,13 @@ class Zdconfig extends AdminController
      */
     public function guangzhou_goods_config() {
 
-        $res = $this->service->get_zdy_goods('广州云仓');
+        $res = $this->service->get_zdy_goods2zh('广州云仓');
         $this->assign(
         array_merge(
         [
             'guangzhou_goods_config' => $res['guangzhou_goods_config'],
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
             'guangzhou_select_list' => $res['guangzhou_select_list'],
         ])
         );
@@ -134,13 +135,13 @@ class Zdconfig extends AdminController
      */
     public function nanchang_goods_config() {
 
-        $res = $this->service->get_zdy_goods('南昌云仓');
+        $res = $this->service->get_zdy_goods2zh('南昌云仓');
         $this->assign(
         array_merge(
         [
             'nanchang_goods_config' => $res['nanchang_goods_config'],
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
             'nanchang_select_list' => $res['nanchang_select_list'],
         ])
         );
@@ -155,13 +156,13 @@ class Zdconfig extends AdminController
      */
     public function changsha_goods_config() {
 
-        $res = $this->service->get_zdy_goods('长沙云仓');
+        $res = $this->service->get_zdy_goods2zh('长沙云仓');
         $this->assign(
         array_merge(
         [
             'changsha_goods_config' => $res['changsha_goods_config'],
             'Selecttype' => $this->Selecttype,
-            'rule_type' => SpLypPuhuoZdySetModel::RULE_TYPE_TEXT,
+            'rule_type' => SpLypPuhuoZdySet2Model::RULE_TYPE_TEXT,
             'changsha_select_list' => $res['changsha_select_list'],
         ])
         );
@@ -191,15 +192,20 @@ class Zdconfig extends AdminController
     public function savePuhuoZdySet() {
 
         $post = $this->request->post();
-        if (!$post['Yuncang'] || !$post['GoodsNo']) {
-            return $this->error('存在货号为空的情况，请检查');
-        }
 
         //test...
-        // return $this->success('成功',['id' => $post, 'Yuncang'=>$post['Yuncang']]);
+        // return $this->success('成功', $post);die;
+
+        if (!$post['Yuncang'] || !$post['GoodsNo'] || !$post['Commonfield']) {
+            return $this->error('存在货号或店铺为空的情况，请检查');
+        }
+
+        if (($post['remain_store'] == SpLypPuhuoZdySet2Model::REMAIN_STORE['puhuo']) && ($post['remain_rule_type']==SpLypPuhuoZdySet2Model::REMAIN_RULE_TYPE['no_select'])) {//剩余门店铺货，则铺货规则必选
+            return $this->error('您已选择剩余门店铺货，请选择剩余门店铺货方案');
+        }
 
         //检测是否GoodsNo已经存在
-        $check_info = $this->service->checkPuhuoZdySetGoods($post);
+        $check_info = $this->service->checkPuhuoZdySetGoods2($post);
 
         if ($check_info['error'] == 1) {
             return $this->error('以下货号在该云仓已存在，请剔除:'.$check_info['goodsno_str']);
@@ -209,7 +215,7 @@ class Zdconfig extends AdminController
             return $this->error('套装套西的货号个数必须是双数，请检查');
         }
 
-        $res_id = $this->service->savePuhuoZdySet($post);
+        $res_id = $this->service->savePuhuoZdySet2($post);
 
         return $this->success('成功',['id' => $res_id, 'Yuncang'=>$post['Yuncang']]);
 
@@ -225,7 +231,7 @@ class Zdconfig extends AdminController
             return $this->error('ID为空');
         }
          try {
-            $this->service->delPuhuoZdySet($id);
+            $this->service->delPuhuoZdySet2($id);
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }

@@ -14,10 +14,15 @@ class Run extends BaseController
 
   public function puhuo() {
 
-    $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_yuncangkeyong");
-    sleep(25);
-    $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_start1 1000");
-    echo '临时使用，每次执行一次即可';die;
+    if (env('ENV_SIGN') == 'local') {
+
+      $res = exec("cd D:/wwwroot/suoge/sg_easyadmin/easyadmin && php think puhuo_start2_merge");
+      
+    } elseif (env('ENV_SIGN') == 'product') {
+
+      $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_start2_merge");
+
+    }
 
   }
 
@@ -29,6 +34,5 @@ class Run extends BaseController
     print_r([$res, $res2]);die;
 
   }
-
 
 }
