@@ -78,24 +78,24 @@ class DuanmalvWinter extends BaseController
 
     // 自动更新
     public function autoUpdate() {
-        // $this->zt_1();
-        // $this->retail_first();
-        // $this->retail_first();
-        // $this->retail_second();
+        $this->zt_1();
+        $this->retail_first();
+        $this->retail_first();
+        $this->retail_second();
 
-        // $this->sk_first();
-        // $this->sk_second();
-        // $this->sk_third();
+        $this->sk_first();
+        $this->sk_second();
+        $this->sk_third();
 
-        // $this->handle_1_new(); 
-        // $this->handle_2(); 
-        // $this->handle_3();
+        $this->handle_1_new(); 
+        $this->handle_2(); 
+        $this->handle_3();
 
-        // $this->table6();
-        // $this->table4();
-        // $this->table1();
-        // $this->table1_2();
-        // $this->table1_3();
+        $this->table6();
+        $this->table4();
+        $this->table1();
+        $this->table1_2();
+        $this->table1_3();
 
         $log_data = $this->config;
         $log_data['更新时间'] = date('Y-m-d H:i:s');
