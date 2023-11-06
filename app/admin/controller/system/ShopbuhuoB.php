@@ -398,7 +398,7 @@ class ShopbuhuoB extends AdminController
                 EC.ShutOut= 0 
                 AND EC.CustomerName = '{$CustomerName}' 
                 AND EG.GoodsNo = '{$GoodsNo}' 
-                AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023,2024) 
+                AND EG.TimeCategoryName1 IN ('2020', '2021', '2022', '2023','2024') 
                 AND EIA.CodingCodeText='已审结'
                 AND EIA.IsCompleted=0
             GROUP BY
@@ -557,7 +557,7 @@ class ShopbuhuoB extends AdminController
             WHERE  EC.ShutOut=0
                 AND EG.GoodsNo = '{$GoodsNo}'
                 AND EC.CustomerName = '{$CustomerName}'
-                AND EG.TimeCategoryName1 in (2020,2021,2022,2023,2024)
+                AND EG.TimeCategoryName1 in ('2020','2021','2022','2023','2024')
             GROUP BY 
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -583,7 +583,7 @@ class ShopbuhuoB extends AdminController
             WHERE
                 EC.ShutOut= 0 
                 AND EC.CustomItem17 = '{$diaochufuzheren}' 
-                AND EG.TimeCategoryName1= in (2020,2021,2022,2023,2024)
+                AND EG.TimeCategoryName1= in ('2020','2021','2022','2023','2024')
             GROUP BY
                 EC.CustomItem17,
                 EC.CustomerName,
@@ -735,7 +735,7 @@ class ShopbuhuoB extends AdminController
                     LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId=ECS.CustomerId
                     LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
                 WHERE EC.CustomerName in ({$store_in_map})
-                    AND EG.TimeCategoryName1 in (2023, 2022, 2021, 2020, 2024)
+                    AND EG.TimeCategoryName1 in ('2023', '2022', '2021', '2020', '2024')
                     ) T
                     WHERE T.[清空时间] > GETDATE()-7
             ");
@@ -1080,7 +1080,7 @@ class ShopbuhuoB extends AdminController
                     LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
                     WHERE
                     EC.ShutOut= 0 
-                    AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023, 2024) 
+                    AND EG.TimeCategoryName1 IN ('2020', '2021', '2022', '2023', '2024') 
                     AND EIA.CodingCodeText='已审结'
                     AND EIA.IsCompleted=0
                     GROUP BY
@@ -1496,7 +1496,7 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
                 WHERE
                 EC.ShutOut= 0 
-                AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023, 2024) 
+                AND EG.TimeCategoryName1 IN ('2020', '2021', '2022', '2023', '2024') 
                 AND EIA.CodingCodeText='已审结'
                 AND EIA.IsCompleted=0
                 GROUP BY
@@ -1624,7 +1624,7 @@ class ShopbuhuoB extends AdminController
     // 补货测试
     public function redExcel_test_buhuo_new() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/新系统出货指令单.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '仓库编号',
@@ -1682,8 +1682,9 @@ class ShopbuhuoB extends AdminController
             ['aid', '=', $this->authInfo['id']]
         ])->delete();  
 
+        
         // 同步康雷最新在途
-        $sql = "
+        echo $sql = "
             SELECT
                 TOP 20000
                 EC.CustomItem17,
@@ -1700,7 +1701,7 @@ class ShopbuhuoB extends AdminController
                 LEFT JOIN ErpGoods EG ON EG.GoodsId = EIAG.GoodsId
                 WHERE
                 EC.ShutOut= 0 
-                AND EG.TimeCategoryName1 IN (2020, 2021, 2022, 2023, 2024) 
+                AND EG.TimeCategoryName1 IN ('2020', '2021', '2022', '2023', '2024') 
                 AND EIA.CodingCodeText='已审结'
                 AND EIA.IsCompleted=0
                 GROUP BY
@@ -1710,7 +1711,7 @@ class ShopbuhuoB extends AdminController
                 EIA.InstructionApplyId
         ";
         $select_zaitu = $this->db_sqlsrv->query($sql);
-
+        die;    
 
         // 先别删
         // $del3 = $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->where([
