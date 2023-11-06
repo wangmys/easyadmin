@@ -49,7 +49,7 @@ class Duanmalv extends AdminController
 
         // // 
         // $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['id' => 1])->find();
         // $this->top = $config['top'];
         
         // dump($select_config );die;
@@ -64,7 +64,7 @@ class Duanmalv extends AdminController
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('status=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('id=1')->find();
         $select_noCustomer = explode(',', $select_config['不考核门店']);
 
         // 不考核门店选中

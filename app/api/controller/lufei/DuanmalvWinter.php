@@ -1246,32 +1246,32 @@ class DuanmalvWinter extends BaseController
                 总断码数 as 领型断码数,
                 1 - 总断码数 / SKC数 as 领型齐码率
             FROM
-                cwl_duanmalv_handle_1 
+                cwl_duanmalv_handle_1_winter 
             ORDER BY
                 商品负责人 ASC
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
-            $this->db_easyA->table('cwl_duanmalv_table6')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table6_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table6')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table6_winter')->strict(false)->insertAll($val);
             }
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table6_updatetime' => date('Y-m-d H:i:s')
             ]);  
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'cwl_duanmalv_table6 更新成功！'
+                'content' => 'cwl_duanmalv_table6_winter 更新成功！'
             ]);
         } else {
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'cwl_duanmalv_table6 更新失败！'
+                'content' => 'cwl_duanmalv_table6_winter 更新失败！'
             ]);
         }
     }
@@ -1291,18 +1291,18 @@ class DuanmalvWinter extends BaseController
                 ROUND( SUM(h.TOP断码SKC数) / h.店铺总SKC数, 4 ) AS TOP断码率,
                 SUM(h.全部断码SKC数) AS 全部断码SKC数,
                 ROUND( SUM(h.全部断码SKC数) / h.店铺总SKC数, 4 ) AS 全部断码率
-            from cwl_duanmalv_handle_1 as h
+            from cwl_duanmalv_handle_1_winter as h
             left join customer as c on h.店铺名称 = c.CustomerName
             GROUP BY h.店铺名称
             ORDER BY h.商品负责人
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
-            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table5_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table5_winter')->strict(false)->insertAll($val);
             }
             
             // 全部断码率排名sql
@@ -1322,16 +1322,16 @@ class DuanmalvWinter extends BaseController
                         when t5.商品负责人 = @商品负责人 then @rank := @rank + 1 ELSE @rank := 1
                     end as 全部断码排名,
                     @商品负责人 := t5.商品负责人 AS 商品负责人
-                from cwl_duanmalv_table5 as t5,
+                from cwl_duanmalv_table5_winter as t5,
                 ( SELECT @商品负责人 := null, @rank := 0 ) T
                 order by t5.商品负责人 ASC, t5.`全部断码SKC数` DESC	
             ";
             $select2 = $this->db_easyA->query($sql2);
-            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table5_winter')->where(1)->delete();
             $chunk_list2 = array_chunk($select2, 500);
             foreach($chunk_list2 as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table5_winter')->strict(false)->insertAll($val);
             }
 
             // 全部断码率排名sql
@@ -1352,28 +1352,28 @@ class DuanmalvWinter extends BaseController
                         when t5.商品负责人 = @商品负责人  then @rank := @rank + 1 ELSE @rank := 1
                     end as TOP断码排名,
                     @商品负责人 := t5.商品负责人 AS 商品负责人
-                from cwl_duanmalv_table5 as t5,
+                from cwl_duanmalv_table5_winter as t5,
                 ( SELECT @商品负责人 := null, @rank := 0 ) T
                 order by t5.商品负责人 ASC, t5.`TOP断码SKC数` DESC
             ";
             $select3 = $this->db_easyA->query($sql3);
-            $this->db_easyA->table('cwl_duanmalv_table5')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table5_winter')->where(1)->delete();
             $chunk_list3 = array_chunk($select3, 500);
             foreach($chunk_list3 as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table5')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table5_winter')->strict(false)->insertAll($val);
             }
 
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'cwl_duanmalv_table5 更新成功！'
+                'content' => 'cwl_duanmalv_table5_winter 更新成功！'
             ]);
         } else {
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'cwl_duanmalv_table5 更新失败！'
+                'content' => 'cwl_duanmalv_table5_winter 更新失败！'
             ]);
         }
     }
@@ -1402,7 +1402,7 @@ class DuanmalvWinter extends BaseController
                 (SELECT
                 sum(销售数量) as 销售数量
                 FROM
-                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    cwl_duanmalv_retail_winter where `商品代码` = sk.货号
                     AND 省份 = sk.省份
                     group by 省份,商品代码
                 ) AS 销售数量,
@@ -1410,12 +1410,12 @@ class DuanmalvWinter extends BaseController
                 sum(sk.`预计库存数量`) / (SELECT
                 sum(销售数量) as 销售数量
                 FROM
-                    cwl_duanmalv_retail where `商品代码` = sk.货号
+                    cwl_duanmalv_retail_winter where `商品代码` = sk.货号
                     AND 省份 = sk.省份
                     group by 省份,商品代码
                 ) as 周转
             FROM
-                cwl_duanmalv_sk AS sk
+                cwl_duanmalv_sk_winter AS sk
             --  where sk.省份='浙江省'
             --  and sk.货号='B32502003'
             GROUP BY
@@ -1424,27 +1424,27 @@ class DuanmalvWinter extends BaseController
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
-            $this->db_easyA->table('cwl_duanmalv_table4')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table4_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table4')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table4_winter')->strict(false)->insertAll($val);
             }
 
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table4_updatetime' => date('Y-m-d H:i:s')
             ]);  
 
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'cwl_duanmalv_table4 更新成功！'
+                'content' => 'cwl_duanmalv_table4_winter 更新成功！'
             ]);
         } else {
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'cwl_duanmalv_table4 更新失败！'
+                'content' => 'cwl_duanmalv_table4_winter 更新失败！'
             ]);
         }
     }
@@ -1479,7 +1479,7 @@ class DuanmalvWinter extends BaseController
                     sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) AS 断码家数,
                     round(sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) / sum( sk.`店铺SKC计数` ), 4) AS 断码率
                 FROM
-                    cwl_duanmalv_sk AS sk 
+                    cwl_duanmalv_sk_winter AS sk 
                 GROUP BY
                     sk.货号 
                 ORDER BY
@@ -1489,21 +1489,21 @@ class DuanmalvWinter extends BaseController
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
-            $this->db_easyA->table('cwl_duanmalv_table3')->where(1)->delete();
+            $this->db_easyA->table('cwl_duanmalv_table3_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $this->db_easyA->table('cwl_duanmalv_table3')->strict(false)->insertAll($val);
+                $this->db_easyA->table('cwl_duanmalv_table3_winter')->strict(false)->insertAll($val);
             }
 
             $sql2 = "
-                UPDATE cwl_duanmalv_table3 AS A
+                UPDATE cwl_duanmalv_table3_winter AS A
                 LEFT JOIN (
                     SELECT
                         风格,大类,中类,领型,
                         MAX(单款排名) AS 最后排名 
                     FROM
-                        `cwl_duanmalv_table3` 
+                        `cwl_duanmalv_table3_winter` 
                     GROUP BY
                     风格,大类,中类,领型) AS B ON A.风格 = B.风格 
                     AND A.大类 = B.大类 
@@ -1517,13 +1517,13 @@ class DuanmalvWinter extends BaseController
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'cwl_duanmalv_table3 更新成功！'
+                'content' => 'cwl_duanmalv_table3_winter 更新成功！'
             ]);
         } else {
             return json([
                 'status' => 0,
                 'msg' => 'error',
-                'content' => 'cwl_duanmalv_table3 更新失败！'
+                'content' => 'cwl_duanmalv_table3_winter 更新失败！'
             ]);
         }
     }
@@ -1534,8 +1534,8 @@ class DuanmalvWinter extends BaseController
         $sql = "
             SELECT 
                 h1.*,
-                -- (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码') AS '断码数-整体',
-                1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
+                -- (SELECT COUNT(*) FROM cwl_duanmalv_sk_winter WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码') AS '断码数-整体',
+                1 - (SELECT COUNT(*) FROM cwl_duanmalv_sk_winter WHERE 店铺名称=h1.店铺名称 AND `标准齐码识别修订`='断码' AND 风格 in ('基本款')) / `SKC数-整体` AS '齐码率-整体',
                 1 - ROUND(`SKC数-TOP实际` / {$this->top}, 4)AS '齐码率-TOP实际',
                 1 - ROUND(`SKC数-TOP考核` / {$this->top}, 4)AS '齐码率-TOP考核',
                 date_format(now(),'%Y-%m-%d') AS 更新日期
@@ -1550,7 +1550,7 @@ class DuanmalvWinter extends BaseController
                             h0.店铺总SKC数 AS 'SKC数-整体',
                             SUM(h0.`全部断码SKC数`) AS 'SKC数-TOP实际',
                             SUM(h0.`TOP断码SKC数`) AS 'SKC数-TOP考核'
-                    FROM cwl_duanmalv_handle_1 h0 
+                    FROM cwl_duanmalv_handle_1_winter h0 
                     LEFT JOIN customer_first f ON h0.店铺名称 = f.店铺名称 
                     WHERE 
                             h0.风格 in ('基本款')
@@ -1568,11 +1568,11 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_1')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_1_winter')->where([
                 '更新日期' => $date
             ])->delete();
 
-            $this->db_binew->table('cwl_duanmalv_table1_1')->where([
+            $this->db_binew->table('cwl_duanmalv_table1_1_winter')->where([
                 '更新日期' => $date
             ])->delete();
             // die;
@@ -1580,14 +1580,14 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
-                $insert = $this->db_binew->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_1_winter')->strict(false)->insertAll($val);
+                $insert = $this->db_binew->table('cwl_duanmalv_table1_1_winter')->strict(false)->insertAll($val);
             }
             $this->table1_1_sort();   
 
             $this->table1_avg();
 
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table1_updatetime' => date('Y-m-d H:i:s'),
                 'table1_month_updatetime' => date('Y-m-d H:i:s'),
             ]);  
@@ -1630,7 +1630,7 @@ class DuanmalvWinter extends BaseController
                     AVG( zy.`齐码率-TOP考核` ) AS `直营-TOP考核`,
                     jm.`加盟-TOP考核` 
                 FROM
-                    cwl_duanmalv_table1_1 AS zy
+                    cwl_duanmalv_table1_1_winter_winter AS zy
                     LEFT JOIN (
                     SELECT
                         云仓,商品负责人,
@@ -1638,7 +1638,7 @@ class DuanmalvWinter extends BaseController
                         AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
                         AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核` 
                     FROM
-                        cwl_duanmalv_table1_1 
+                        cwl_duanmalv_table1_1_winter 
                     WHERE
                         经营模式 = '加盟' 
                         AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1663,7 +1663,7 @@ class DuanmalvWinter extends BaseController
                     zy.`直营-TOP考核`,
                     date_format(now(),'%Y-%m-%d') as 更新日期 
             FROM
-                    cwl_duanmalv_table1_1 AS hj
+                    cwl_duanmalv_table1_1_winter AS hj
                     LEFT JOIN (
                         SELECT
                                 云仓,商品负责人,
@@ -1671,7 +1671,7 @@ class DuanmalvWinter extends BaseController
                                 AVG( case when `齐码率-TOP实际` >0 then `齐码率-TOP实际` end ) AS `加盟-TOP实际`,
                                 AVG( case when `齐码率-TOP考核` >0 then `齐码率-TOP考核` end ) AS `加盟-TOP考核` 
                         FROM
-                                cwl_duanmalv_table1_1 
+                                cwl_duanmalv_table1_1_winter 
                         WHERE
                                 经营模式 = '加盟' 
                                 AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1683,7 +1683,7 @@ class DuanmalvWinter extends BaseController
                                 AVG( case when `齐码率-TOP实际` > 0 then `齐码率-TOP实际` end ) AS `直营-TOP实际`,
                                 AVG( case when `齐码率-TOP考核` > 0 then `齐码率-TOP考核` end ) AS `直营-TOP考核` 
                         FROM
-                                cwl_duanmalv_table1_1 
+                                cwl_duanmalv_table1_1_winter 
                         WHERE
                                 经营模式 = '直营' 
                                 AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1693,14 +1693,14 @@ class DuanmalvWinter extends BaseController
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
-            $this->db_easyA->table('cwl_duanmalv_table1_avg')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_avg_winter')->where([
                 '更新日期' => $date
             ])->delete();
             $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_avg')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_avg_winter')->strict(false)->insertAll($val);
             }
         }
     }
@@ -1729,7 +1729,7 @@ class DuanmalvWinter extends BaseController
                 END AS 单店排名, 
                 @商品负责人 := a.商品负责人 AS 商品负责人
             FROM
-                cwl_duanmalv_table1_1 a,
+                cwl_duanmalv_table1_1_winter a,
                 ( SELECT @商品负责人 := null, @rank := 0 ) T 
             WHERE a.更新日期='{$date}'
             ORDER BY
@@ -1740,7 +1740,7 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_1')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_1_winter')->where([
                 '更新日期' => $date
             ])->delete();
 
@@ -1748,7 +1748,7 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_1')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_1_winter')->strict(false)->insertAll($val);
             }
         }
     }
@@ -1790,7 +1790,7 @@ class DuanmalvWinter extends BaseController
                         AVG( zy.`齐码率-TOP考核` ) AS `直营-TOP考核`,
                         jm.`加盟-TOP考核` 
                     FROM
-                        cwl_duanmalv_table1_1 AS zy
+                        cwl_duanmalv_table1_1_winter AS zy
                         LEFT JOIN (
                         SELECT
                             云仓,商品负责人,
@@ -1798,7 +1798,7 @@ class DuanmalvWinter extends BaseController
                             AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
                             AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核` 
                         FROM
-                            cwl_duanmalv_table1_1 
+                            cwl_duanmalv_table1_1_winter 
                         WHERE
                             经营模式 = '加盟' 
                             AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1829,7 +1829,7 @@ class DuanmalvWinter extends BaseController
                     zy.`直营-TOP考核`,
                     date_format(now(),'%Y-%m-%d') as 更新日期
             FROM
-                    cwl_duanmalv_table1_1 AS hj
+                    cwl_duanmalv_table1_1_winter AS hj
                     LEFT JOIN (
                         SELECT
                                 云仓,商品负责人,
@@ -1837,7 +1837,7 @@ class DuanmalvWinter extends BaseController
                                 AVG( case when `齐码率-TOP实际`>0 then `齐码率-TOP实际` end ) AS `加盟-TOP实际`,
                                 AVG( case when `齐码率-TOP考核`>0 then `齐码率-TOP考核` end ) AS `加盟-TOP考核` 
                         FROM
-                                cwl_duanmalv_table1_1 
+                                cwl_duanmalv_table1_1_winter 
                         WHERE
                                 经营模式 = '加盟' 
                                 AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1851,7 +1851,7 @@ class DuanmalvWinter extends BaseController
                                 AVG( case when `齐码率-TOP实际`>0 then `齐码率-TOP实际` end ) AS `直营-TOP实际`,
                                 AVG( case when `齐码率-TOP考核`>0 then `齐码率-TOP考核` end ) AS `直营-TOP考核` 
                         FROM
-                                cwl_duanmalv_table1_1 
+                                cwl_duanmalv_table1_1_winter 
                         WHERE
                                 经营模式 in ('直营') 
                                 AND `更新日期` = date_format(now(),'%Y-%m-%d')
@@ -1867,7 +1867,7 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_2')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_2_winter')->where([
                 '更新日期' => $date
             ])->delete();
             // die;
@@ -1875,10 +1875,10 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2_winter')->strict(false)->insertAll($val);
             }
             $this->table1_2_sort();   
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table1_2_updatetime' => date('Y-m-d H:i:s')
             ]);  
         }
@@ -1902,7 +1902,7 @@ class DuanmalvWinter extends BaseController
                 a.`更新日期`,
                 @rank := @rank + 1 AS 齐码排名 
             FROM
-                cwl_duanmalv_table1_2 a,
+                cwl_duanmalv_table1_2_winter a,
                 ( SELECT @rank := 0 ) T 
             WHERE a.更新日期='{$date}'
             ORDER BY
@@ -1912,7 +1912,7 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_2')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_2_winter')->where([
                 '更新日期' => $date
             ])->delete();
 
@@ -1920,7 +1920,7 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_2_winter')->strict(false)->insertAll($val);
             }
         }
     }
@@ -1961,7 +1961,7 @@ class DuanmalvWinter extends BaseController
                 jm.`加盟-TOP实际`,
                 jm.`加盟-TOP考核`
             FROM
-                cwl_duanmalv_table1_1 t1
+                cwl_duanmalv_table1_1_winter t1
             LEFT JOIN (
             SELECT
                 省份,
@@ -1970,7 +1970,7 @@ class DuanmalvWinter extends BaseController
                 AVG( `齐码率-TOP实际` ) AS `直营-TOP实际`,
                 AVG( `齐码率-TOP考核` ) AS `直营-TOP考核`
             FROM
-                cwl_duanmalv_table1_1 
+                cwl_duanmalv_table1_1_winter 
             where 
                 经营模式 = '直营' 
                 AND 更新日期 = date_format(now(),'%Y-%m-%d')
@@ -1983,7 +1983,7 @@ class DuanmalvWinter extends BaseController
                         AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
                         AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核`
                 FROM
-                    cwl_duanmalv_table1_1 
+                    cwl_duanmalv_table1_1_winter 
                 where 
                     经营模式 = '加盟' 
                     AND 更新日期 = date_format(now(),'%Y-%m-%d')
@@ -2007,7 +2007,7 @@ class DuanmalvWinter extends BaseController
                     hj.`合计-TOP考核`,
                     date_format(now(),'%Y-%m-%d') as 更新日期
             FROM
-                    cwl_duanmalv_table1_1 t1
+                    cwl_duanmalv_table1_1_winter t1
             LEFT JOIN (
                 SELECT
                         省份,
@@ -2016,7 +2016,7 @@ class DuanmalvWinter extends BaseController
                         AVG( `齐码率-TOP实际` ) AS `直营-TOP实际`,
                         AVG( `齐码率-TOP考核` ) AS `直营-TOP考核`
                 FROM
-                        cwl_duanmalv_table1_1 
+                        cwl_duanmalv_table1_1_winter 
                 where 
                         经营模式 = '直营' 
                         AND 更新日期 = date_format(now(),'%Y-%m-%d')
@@ -2029,7 +2029,7 @@ class DuanmalvWinter extends BaseController
                             AVG( `齐码率-TOP实际` ) AS `加盟-TOP实际`,
                             AVG( `齐码率-TOP考核` ) AS `加盟-TOP考核`
                     FROM
-                            cwl_duanmalv_table1_1 
+                            cwl_duanmalv_table1_1_winter 
                     where 
                             经营模式 = '加盟' 
                             AND 更新日期 = date_format(now(),'%Y-%m-%d')
@@ -2042,7 +2042,7 @@ class DuanmalvWinter extends BaseController
                             AVG( case when `齐码率-TOP实际` > 0 then `齐码率-TOP实际` end ) AS `合计-TOP实际`,
                             AVG( case when `齐码率-TOP考核` > 0 then `齐码率-TOP考核` end ) AS `合计-TOP考核`
                     FROM
-                            cwl_duanmalv_table1_1 
+                            cwl_duanmalv_table1_1_winter 
                     where 
                             更新日期 = date_format(now(),'%Y-%m-%d')
                     GROUP BY 省份, 商品负责人 )  AS hj  ON hj.商品负责人 = t1.`商品负责人` and hj.省份 = t1.`省份`	
@@ -2054,7 +2054,7 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_3')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_3_winter')->where([
                 '更新日期' => $date
             ])->delete();
             // die;
@@ -2062,13 +2062,13 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3_winter')->strict(false)->insertAll($val);
             }
 
             $sql_del = "
                 DELETE 
                 FROM
-                    cwl_duanmalv_table1_3 
+                    cwl_duanmalv_table1_3_winter 
                 WHERE
                     `直营-整体` IS NULL 
                     AND `加盟-整体` IS NULL 
@@ -2083,7 +2083,7 @@ class DuanmalvWinter extends BaseController
             $this->db_easyA->execute($sql_del);
             $this->table1_3_sort();   
 
-            $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->strict(false)->update([
+            $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table1_3_updatetime' => date('Y-m-d H:i:s')
             ]); 
         }
@@ -2107,7 +2107,7 @@ class DuanmalvWinter extends BaseController
                 a.`更新日期`,
                 @rank := @rank + 1 AS 齐码排名 
             FROM
-                cwl_duanmalv_table1_3 a,
+                cwl_duanmalv_table1_3_winter a,
                 ( SELECT @rank := 0 ) T 
             WHERE a.更新日期='{$date}'
             ORDER BY
@@ -2117,7 +2117,7 @@ class DuanmalvWinter extends BaseController
         // dump($select); die;
         if ($select) {
             // 只删除当天
-            $this->db_easyA->table('cwl_duanmalv_table1_3')->where([
+            $this->db_easyA->table('cwl_duanmalv_table1_3_winter')->where([
                 '更新日期' => $date
             ])->delete();
                 
@@ -2125,7 +2125,7 @@ class DuanmalvWinter extends BaseController
 
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
-                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3')->strict(false)->insertAll($val);
+                $insert = $this->db_easyA->table('cwl_duanmalv_table1_3_winter')->strict(false)->insertAll($val);
             }
         }
     }
