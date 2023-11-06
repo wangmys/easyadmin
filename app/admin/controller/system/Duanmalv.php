@@ -32,7 +32,7 @@ class Duanmalv extends AdminController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->create_time = date('Y-m-d H:i:s', time());
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where(['id' => 1])->find();
         $this->config = $select_config;
     }
 
