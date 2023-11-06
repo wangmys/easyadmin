@@ -1,0 +1,104 @@
+<div class="layuimini-container">
+    <form class="layui-form layuimini-form" lay-filter="app-form">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">云仓：</label>
+            <div class="layui-input-block">
+                <select name="Yuncang" lay-verify="" lay-search="">
+                    {foreach $Yuncang_list as $vo}
+                    <option value="{$vo}">{$vo}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">经营模式:</label>
+            <div class="layui-input-block">
+                <select name="Mathod" lay-verify="" lay-search="">
+                    {foreach $Mathod_list as $vo}
+                    <option value="{$vo}">{$vo}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label ">B级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="B" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">A1级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="A1" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">A2级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="A2" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">A3级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="A3" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">N级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="N" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">H3级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="H3" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">H6级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="H6" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">K1级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="K1" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">K2级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="K2" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">X1级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="X1" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">X2级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="X2" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">X3级:</label>
+            <div class="layui-input-block">
+                <input type="text" name="X3" placeholder="请输入" class="layui-input" value="">
+            </div>
+        </div>
+
+        <div class="layui-form-item text-center">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>
+        </div>
+
+    </form>
+</div>

@@ -469,7 +469,7 @@ class PuhuoService
      */
     public function get_zdy_goods2($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -534,7 +534,7 @@ class PuhuoService
      */
     public function get_zdy_goods2zh($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data2($Yuncang);
         // print_r($select_list);die;
@@ -790,6 +790,7 @@ class PuhuoService
         $remain_store = $data['remain_store'] ?? 2;
         $remain_rule_type = $data['remain_rule_type'] ?? 0;
         $if_taozhuang = $data['if_taozhuang'] ?? 2;
+        $if_zdmd = $data['if_zdmd'] ?? 1;
         $GoodsNo = $data['GoodsNo'] ? trim($data['GoodsNo']) : '';
         $GoodsNo_arr = [];
         if ($GoodsNo) {
@@ -843,6 +844,7 @@ class PuhuoService
             'remain_store' => $remain_store,
             'remain_rule_type' => $remain_rule_type,
             'if_taozhuang' => $if_taozhuang,
+            'if_zdmd' => $if_zdmd,
             'zuhe_customer' => $CustomerNames,
         ];
 

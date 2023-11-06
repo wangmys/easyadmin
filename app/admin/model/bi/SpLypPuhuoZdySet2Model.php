@@ -66,4 +66,14 @@ class SpLypPuhuoZdySet2Model extends TimeModel
         self::IF_TAOZHUANG['not_taozhuang']  => '非套装',
     ];
 
+    const IF_ZDMD = [
+        'is_zhiding'    => 1, #是
+        'not_zhiding'    => 2, #否
+    ];
+
+    const IF_ZDMD_TEXT = [
+        self::IF_ZDMD['is_zhiding']  => '是',
+        self::IF_ZDMD['not_zhiding']  => '否',
+    ];
+
 }
