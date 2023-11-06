@@ -122,13 +122,45 @@ class Table extends BaseController
 
     public function liushui_data()
     {
-        $sql = "
+        // $sql_旧的_保留 = "
+        //     SELECT 
+        //         CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' END AS  经营模式,
+        //         EC.State 省份,
+        //         SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) ) 店铺名称,
+        //         EC.CustomerCode 店铺编号,
+        //         ISNULL(EC.CustomItem18,0) 督导,
+        //         SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 今天流水,
+        //         SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) 本月流水,
+        //         SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 近七天流水,
+        //         CASE WHEN CONVERT(VARCHAR(10),MIN(ER.RetailDate),23)<= CONVERT(VARCHAR(10),GETDATE()-6,23)  AND SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) >0 
+        //                                                 THEN SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END)/7
+        //                 WHEN SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) >0 
+        //                     THEN  SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END)/DATEDIFF(DAY, CONVERT(VARCHAR(10),MIN(ER.RetailDate),23), CONVERT(VARCHAR(10),GETDATE()+1,23))
+        //                 END AS 近七天日均,
+        //         DATEADD(DAY, +1, CAST(GETDATE() AS DATE)) AS 更新日期
+        //     FROM ErpCustomer EC 
+        //     LEFT JOIN ErpRetail ER ON EC.CustomerId= ER.CustomerId
+        //     LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+        //     WHERE EC.MathodId IN (4,7)
+        //         AND ER.CodingCodeText='已审结'
+        //         AND ER.RetailDate > GETDATE()-32
+        //     GROUP BY 
+        //         EC.MathodId,
+        //         EC.State,
+        //         EC.CustomerName,
+        //         EC.CustomerCode,
+        //         EC.CustomItem18
+        //     HAVING SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) IS NOT NULL
+        //     ;
+        // ";
+
+        $sql_新的_用这 = "
             SELECT 
-                CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' END AS  经营模式,
+                CASE WHEN EC.MathodId=4 OR SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' THEN '直营' WHEN EC.MathodId=7 THEN '加盟' END  经营模式,
                 EC.State 省份,
                 SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) ) 店铺名称,
-                EC.CustomerCode 店铺编号,
-                ISNULL(EC.CustomItem18,0) 督导,
+                CASE WHEN EC.CustomerCode='M0453' THEN 'Y1092' ELSE EC.CustomerCode END 店铺编号,
+                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '徐科' ELSE ISNULL(EC.CustomItem18,0) END 督导,
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 今天流水,
                 SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) 本月流水,
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 近七天流水,
@@ -137,24 +169,24 @@ class Table extends BaseController
                         WHEN SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) >0 
                             THEN  SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END)/DATEDIFF(DAY, CONVERT(VARCHAR(10),MIN(ER.RetailDate),23), CONVERT(VARCHAR(10),GETDATE()+1,23))
                         END AS 近七天日均,
-                DATEADD(DAY, +1, CAST(GETDATE() AS DATE)) AS 更新日期
+                    DATEDIFF(DAY, CONVERT(VARCHAR(10),MIN(ER.RetailDate),23), CONVERT(VARCHAR(10),GETDATE()+1,23)) 最大可除天数 
             FROM ErpCustomer EC 
             LEFT JOIN ErpRetail ER ON EC.CustomerId= ER.CustomerId
             LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
             WHERE EC.MathodId IN (4,7)
                 AND ER.CodingCodeText='已审结'
                 AND ER.RetailDate > GETDATE()-32
+                AND EC.CustomerCode NOT IN ('M0863','M0632')
             GROUP BY 
-                EC.MathodId,
+                CASE WHEN EC.MathodId=4 OR SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' THEN '直营' WHEN EC.MathodId=7 THEN '加盟' END,
                 EC.State,
-                EC.CustomerName,
-                EC.CustomerCode,
-                EC.CustomItem18
+                SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) ),
+                CASE WHEN EC.CustomerCode='M0453' THEN 'Y1092' ELSE EC.CustomerCode END,
+                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '徐科' ELSE ISNULL(EC.CustomItem18,0) END
             HAVING SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) IS NOT NULL
-            ;
         ";
         // 查康雷
-        $select_data = $this->db_sqlsrv->query($sql);
+        $select_data = $this->db_sqlsrv->query($sql_新的_用这);
         $count = count($select_data);
         if ($select_data) {
             // dump($select_data); die;
