@@ -14,7 +14,7 @@ use app\api\service\dingding\Sample;
 /**
  * Class Uploadimg
  * @package app\admin\controller\system\dingding
- * @ControllerAnnotation(title="钉钉操作")
+ * @ControllerAnnotation(title="钉钉图片消息推送")
  */
 class Uploadimg extends AdminController
 {

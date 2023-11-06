@@ -9,9 +9,9 @@ use app\BaseController;
 use jianyan\excel\Excel;
 
 /**
- * 店铺天气
  * Class Weather
- * @package app\dingtalk
+ * @package app\admin\controller\system\dingding
+ * @ControllerAnnotation(title="钉钉未来七天气温推送")
  */
 class Weather extends BaseController
 {

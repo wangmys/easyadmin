@@ -11,9 +11,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\admin\controller\system\dingding\DingTalk;
 
 /**
- * 报表
  * Class Tiaojia
- * @package app\dingtalk
+ * @package app\admin\controller\system\dingding
+ * @ControllerAnnotation(title="钉钉调价推送")
  */
 class Tiaojia extends BaseController
 {
@@ -41,6 +41,9 @@ class Tiaojia extends BaseController
         $this->authInfo = session('admin');
     }
 
+    /**
+     * @NodeAnotation(title="调价推送列表")
+     */
     public function list() {
         if (request()->isAjax()) {
             $input = input();
