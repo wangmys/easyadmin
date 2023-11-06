@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>冬-断码率配置</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .test {
+            border: 1px solid red !important;
+        }
+        xm-select .xm-body .xm-option .xm-option-icon {
+            height: 15px !important;
+            width: 15px !important;
+            font-size: 15px !important;
+        }
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 120px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+       
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+    <!-- <div class="layui-tab layui-tab-card" lay-filter="docDemoTabBrief"> -->
+    <div class="layui-tab-content" style="height: 100px;">
+        <div style="height:3px; width:100%;"></div>
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start " style="width:95%; height: 150px;">
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">下装连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='下装' autocomplete="off" value="{$config['下装']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div>
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">内搭连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='内搭' autocomplete="off" value="{$config['内搭']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div>
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">外套连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='外套' autocomplete="off" value="{$config['外套']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">鞋履连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='鞋履' autocomplete="off" value="{$config['鞋履']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">松紧长裤连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='松紧长裤' autocomplete="off" value="{$config['松紧长裤']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+  
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">松紧短裤连码数</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='松紧短裤' autocomplete="off" value="{$config['松紧短裤']}" maxlength="1"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核门店</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-no-customer" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <!-- <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <select id="season_id" name="季节归集" lay-verify="required">
+                                        <option value="春季">春季</option>
+                                        <option value="夏季">夏季</option>
+                                        <option value="秋季">秋季</option>
+                                        <option value="冬季">冬季</option>
+                                    </select>
+                                </div> -->
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">季节归集</label>
+                                <div class="layui-input-inline" style="width: 250px !important;">
+                                    <div id="xm-season" class="xm-select-demo"></div>
+                                </div>
+
+                                <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">折率（计算排名用）>=</label>
+                                <div class="layui-input-inline" style="width: 80px !important;">
+                                    <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" maxlength="4" placeholder="0"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+
+                                <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">TOP</label>
+                                <div class="layui-input-inline" style="width: 80px !important;">
+                                    <input type="number" name='top' autocomplete="off" value="{$config['top']}" maxlength="4" placeholder="0"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="" style="width:5%; height:150px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div> 
+</body>
+
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'element'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , url_saveMap = "{:url('admin/system.DuanmalvWinter/saveMap')}"  
+            , getConfigMapData = "{:url('admin/system.DuanmalvWinter/getConfigMapData')}"
+
+        // 数据初始化
+        initFn(); 
+
+        // 选择店铺
+        xmSelect.render({
+            el: '#xm-no-customer', 
+            filterable: true,
+            name: '不考核门店',
+            // showCount: 1,
+            data: []
+        })
+
+        // 选择货号
+        xmSelect.render({
+            el: '#xm-nohuohao', 
+            filterable: true,
+            name: '不考核货号',
+            // showCount: 1,
+            data: []
+        })
+
+        xmSelect.render({
+            el: '#xm-season', 
+            filterable: true,
+            toolbar: {show: true},
+            theme: {
+                color: '#1cbbb4',
+            },
+            // showCount: 1,
+            name:'季节归集',
+            data: [
+                {name: "春季", value: "春季", selected: false},
+                {name: "夏季", value: "夏季", selected: false},
+                {name: "秋季", value: "秋季", selected: false},
+                {name: "冬季", value: "冬季", selected: false},
+            ]
+        })
+
+
+        //监听保存
+        form.on('submit(saveMap)', function (res) {
+            $.post(url_saveMap, res.field, function(res) {
+                if (res.status) {
+                    layer.msg(res.msg, {time: 2000, icon:1});
+                } else {
+                    layer.msg(res.msg, {time: 2000, icon:2});
+                }
+            }, 'json');
+            return false;
+        });
+
+        function initFn() {
+            $.get(getConfigMapData, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                // storeData = res.data.storeAll
+                // provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+
+                xmSelect.render({
+                    el: '#xm-no-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'不考核门店',
+                    data: res.data.customer
+                })
+                // console.log(res.data.customer);
+
+                // 渲染所有货号
+                xmSelect.render({
+                    el: '#xm-nohuohao', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'不考核货号',
+                    data: res.data.goodsNo
+                })
+
+                xmSelect.render({
+                    el: '#xm-season', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'季节归集',
+                    data: res.data.season
+                })
+            })
+            $("#season_id").val("{$config['季节归集']}");
+            form.render();
+        }
+
+    });
+
+</script>
