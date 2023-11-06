@@ -14,7 +14,7 @@ use app\api\service\dingding\Sample;
 /**
  * Class Weatherdisplay
  * @package app\admin\controller\system\dingding
- * @ControllerAnnotation(title="气温陈列调整表")
+ * @ControllerAnnotation(title="钉钉气温陈列调整表")
  */
 class Weatherdisplay extends AdminController
 {
