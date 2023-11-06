@@ -48,12 +48,41 @@ class Ldkdjd extends BaseController
         return $seasionStr;
     }
 
-    // 每日数据源
-    public function dataHandle()
-    {
+    // 每天自动更新
+    public function autoUpdate() {
+        $time = time();
         $current_today = input('date') ? input('date') : date('Y-m-d', time());
         $lastyear_today = date('Y-m-d', strtotime('-1YEAR', strtotime($current_today)));
+        if ($time >= strtotime('Y-m-d 23:25:00') && $time <= strtotime('Y-m-d 23:59:59')) {
+            echo '不更新';
+        } else {
+            echo '可更新';
+            $this->dataHandle($current_today, $lastyear_today);
+        }
+    }
 
+    // 每日数据源
+    public function dataHandle($sys_current_today = '', $sys_lastyear_today = '')
+    {
+        // 非自动更新
+        if (empty($sys_current_today)) {
+            $current_today = input('date') ? input('date') : date('Y-m-d', time());
+        } else {
+            $current_today = $sys_current_today;
+        }
+
+        // 非自动更新
+        if (empty($sys_lastyear_today)) {
+            $lastyear_today = date('Y-m-d', strtotime('-1YEAR', strtotime($current_today)));
+        } else {
+            $lastyear_today = $sys_lastyear_today;
+        }
+        // echo $current_today;
+        // echo '<br>';
+        // echo $lastyear_today;
+        // echo '<br>';
+        
+        
         $sql_今年 = "
             SELECT 
                 T.Region,
@@ -65,7 +94,8 @@ class Ldkdjd extends BaseController
             SUM(T.[count]) AS 单数,
             SUM(T.[sales_f]) AS 正品业绩,
             T.销售日期,
-            '{$lastyear_today}' AS 去年销售日期
+            '{$lastyear_today}' AS 去年销售日期,
+            CONVERT(varchar(20),GETDATE(),120) AS '更新日期PRO' 
             FROM 
             (
             SELECT  
@@ -151,7 +181,8 @@ class Ldkdjd extends BaseController
             SUM(T.[quantity]) AS 销量,
             SUM(T.[count]) AS 单数,
             SUM(T.[sales_f]) AS 正品业绩,
-            T.销售日期
+            T.销售日期,
+            CONVERT(varchar(20),GETDATE(),120) AS '更新日期PRO' 
             FROM 
             (
             SELECT  
@@ -239,12 +270,16 @@ class Ldkdjd extends BaseController
             $this->db_easyA->table('cwl_ldkdjd_current_data')->where([
                 ['销售日期', '=', date('Y-m-d', strtotime($current_today))]
             ])->delete();
+            $this->db_bi->table('ww_ldkdjd_current_data')->where([
+                ['销售日期', '=', date('Y-m-d', strtotime($current_today))]
+            ])->delete();
 
             $chunk_list = array_chunk($select今年, 500);
             // $this->db_easyA->startTrans();
 
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('cwl_ldkdjd_current_data')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_ldkdjd_current_data')->strict(false)->insertAll($val);
             }
 
         }
@@ -255,12 +290,16 @@ class Ldkdjd extends BaseController
             $this->db_easyA->table('cwl_ldkdjd_lastyear_data')->where([
                 ['销售日期', '=', date('Y-m-d', strtotime($lastyear_today))]
             ])->delete();
+            $this->db_bi->table('ww_ldkdjd_lastyear_data')->where([
+                ['销售日期', '=', date('Y-m-d', strtotime($lastyear_today))]
+            ])->delete();
 
             $chunk_list = array_chunk($select去年, 500);
             // $this->db_easyA->startTrans();
 
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('cwl_ldkdjd_lastyear_data')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_ldkdjd_lastyear_data')->strict(false)->insertAll($val);
             }
         }
 
