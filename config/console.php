@@ -35,6 +35,8 @@ return [
         'puhuo_spsk_stock' => 'app\command\Puhuo_spsk_stock',
         'puhuo_start1' => 'app\command\Puhuo_start1',
         'puhuo_start2' => 'app\command\Puhuo_start2',
+        'puhuo_start2_pro' => 'app\command\Puhuo_start2_pro',
+        'puhuo_start2_merge' => 'app\command\Puhuo_start2_merge',
         'puhuo_start3' => 'app\command\Puhuo_start3',
         'puhuo_start4' => 'app\command\Puhuo_start4',
         'puhuo_start5' => 'app\command\Puhuo_start5',

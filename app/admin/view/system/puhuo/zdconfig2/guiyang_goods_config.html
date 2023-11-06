@@ -4,23 +4,18 @@
         <table id="form-guiyang_goods-config" class="layui-table">
             <thead>
                 <tr>
-                    <th style="width: 80px;">铺货类型</th>
-                    <th style="width: 120px;">值</th>
-                    <th style="width: 120px;">货号</th>
-                    <th style="width: 80px;">铺货规则</th>
+                    <th style="width: 100px;">货号</th>
+                    <th style="width: 100px;">店铺</th>
+                    <th style="width: 90px;">铺货方案</th>
+                    <th style="width: 80px;">剩余门店</th>
+                    <th style="width: 80px;">铺货方案</th>
                     <th style="width: 120px;">是否套装套西</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="5">
-                        <select id="xm-Selecttype1" name="Selecttype1" lay-verify="" lay-filter="Selecttype1">
-                            <option value="">请选择铺货类型</option>
-                            {foreach $Selecttype as $k_Selecttype => $v_Selecttype}
-                            <option value="{$v_Selecttype['value']}">{$v_Selecttype['name']}</option>
-                            {/foreach}
-                        </select>
+                    <td colspan="6">
                         <!-- <span>添加操作</span> -->
                     </td>
                     <td colspan="1">
@@ -32,13 +27,14 @@
 
                 {foreach $guiyang_goods_config as $vo}
                 <tr class="guiyang_goods_config-select" lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
-                    <td class="Selecttype">
-                        <span class="span_Selecttype">{$vo['Selecttype_str']}</span>
-                    </td>
-                    <td class="Commonfield"></td>
                     <td class="guiyang_goods">
-                        <input type="text" style="width:900px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="{$vo['GoodsNo']}" class="layui-input">
+                        <input type="text" style="width:500px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
+
+                    <td class="Commonfield">
+                        <input type="text" style="width:500px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万州一店 忠县一店 祥云一店" value="{$vo['Commonfield']}" class="layui-input">
+                    </td>
+                    
                     <td class="rule_type">
                         <select name="rule_type">
                             {foreach $rule_type as $vo_key=>$vo_rule}
@@ -46,6 +42,23 @@
                             {/foreach}
                         </select>
                     </td>
+
+                    <td class="remain_store">
+                        <select name="remain_store">
+                            <option value="2" {if ($vo['remain_store']==2)}selected{/if}>不铺</option>
+                            <option value="1" {if ($vo['remain_store']==1)}selected{/if}>铺</option>
+                        </select>
+                    </td>
+
+                    <td class="remain_rule_type">
+                        <select name="remain_rule_type">
+                            <option value="0">请选择</option>
+                            {foreach $rule_type as $vo_key=>$vo_rule}
+                            <option value="{$vo_key}" {if ($vo['remain_rule_type']==$vo_key)}selected{/if}>{$vo_rule}</option>
+                            {/foreach}
+                        </select>
+                    </td>
+
                     <td class="if_taozhuang">
                         <select name="if_taozhuang">
                             <option value="2" {if ($vo['if_taozhuang']==2)}selected{/if}>否</option>
@@ -54,7 +67,7 @@
                     </td>
                     <td class="handler">
                         <input type="text" name="id" class="layui-hide" value="{$vo.id}">
-                        <input type="text" name="Selecttype" class="layui-hide" value="{$vo['Selecttype']}">
+                        <input type="text" name="Selecttype" class="layui-hide" value="2">
                         <input type="text" name="Yuncang" class="layui-hide" value="贵阳云仓">
                         <button type="button" class="layui-btn layui-btn-normal get_guiyang_goods_config">保存</button>
                         <button type="button" class="layui-btn layui-btn-danger del_guiyang_goods_config">删除</button>
@@ -71,3 +84,4 @@
     <input type="text" id="rule_type_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($rule_type))}">
     <input type="text" id="Selecttype_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($Selecttype))}">
     <input type="text" id="guiyang_select_list_hidden" class="layui-hide" value="{:htmlspecialchars(json_encode($guiyang_select_list))}">
+    
