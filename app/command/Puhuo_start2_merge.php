@@ -554,7 +554,7 @@ class Puhuo_start2_merge extends Command
                                 // print_r($add_puhuo_log);die;
 
                                 //记录铺货日志：
-                                Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.serialize(['uuid'=>$uuid, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$v_customer['CustomerName'],  'rule'=>$rule, 'v_data'=>$v_data, 'puhuo_config'=>$puhuo_config, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo结果：'=>$can_puhuo]) );
+                                Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
                                 $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
 
@@ -568,7 +568,7 @@ class Puhuo_start2_merge extends Command
                             ######################大小码铺货逻辑end################################################################
 
                             //记录铺货日志：
-                            Log::channel('puhuo')->write('##############普通-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.serialize(['add_puhuo_log'=>$add_puhuo_log]) );
+                            Log::channel('puhuo')->write('##############普通-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.json_encode(['add_puhuo_log'=>$add_puhuo_log]) );
 
                             //铺货日志批量入库
                             $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
@@ -1005,7 +1005,7 @@ class Puhuo_start2_merge extends Command
                                             // print_r($add_puhuo_log);die;
 
                                             //记录铺货日志：
-                                            Log::channel('puhuo')->write('##############套装套西-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.serialize(['uuid'=>$uuid, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$v_customer['CustomerName'],  'rule'=>$rule, 'v_data'=>$v_data, 'puhuo_config'=>$puhuo_config, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo结果：'=>$can_puhuo]) );
+                                            Log::channel('puhuo')->write('##############套装套西-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
                                             $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
     
@@ -1022,7 +1022,7 @@ class Puhuo_start2_merge extends Command
                                         ######################大小码铺货逻辑end################################################################
 
                                         //记录铺货日志：
-                                        Log::channel('puhuo')->write('##############套装套西-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.serialize(['add_puhuo_log'=>$add_puhuo_log]) );
+                                        Log::channel('puhuo')->write('##############套装套西-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.json_encode(['add_puhuo_log'=>$add_puhuo_log]) );
     
                                         //铺货日志批量入库
                                         $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
@@ -1047,7 +1047,7 @@ class Puhuo_start2_merge extends Command
                             }
     
                         }
-                        // print_r(serialize(['res_taozhuang'=>$res_taozhuang, 'wait_goods_stock'=>$wait_goods_stock]));die;
+                        // print_r(json_encode(['res_taozhuang'=>$res_taozhuang, 'wait_goods_stock'=>$wait_goods_stock]));die;
 
 
                         //对套装套西铺货结果 处理，同个店铺必须满足上衣+裤子 都齐码 才能铺货
