@@ -429,9 +429,20 @@ class Puhuo_start2_merge extends Command
                                     ['Yuncang', '=', $WarehouseName], 
                                     ['State', '=', $v_customer['State']], 
                                     ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
-                                    ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                    // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
                                     ['CategoryName1', '=', $v_data['CategoryName1']], 
                                     ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                    ['CategoryName', '=', $v_data['CategoryName']], 
+                                    ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                ];
+                                $where_qita = [
+                                    ['Yuncang', '=', $WarehouseName], 
+                                    ['State', '=', $v_customer['State']], 
+                                    ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                    // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                    ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                    ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                    ['CategoryName', '=', '其它'], 
                                     ['CustomerGrade', '=', $v_customer['CustomerGrade']]
                                 ];
 
@@ -440,8 +451,10 @@ class Puhuo_start2_merge extends Command
                                     //查询对应的铺货标准
                                     if ($rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                         $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                        if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                     } else {
                                         $rule = $this->puhuo_rule_model::where($where)->find();
+                                        if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                     }
                                     $rule = $rule ? $rule->toArray() : [];
                                     $insert_rule_type = $rule_type;
@@ -450,9 +463,11 @@ class Puhuo_start2_merge extends Command
                                         //查询对应的铺货标准
                                         if ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                             $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                            if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                             $rule = $rule ? $rule->toArray() : [];
                                         } elseif ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_a']) {
                                             $rule = $this->puhuo_rule_model::where($where)->find();
+                                            if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                             $rule = $rule ? $rule->toArray() : [];
                                         } else {
                                             $rule = [];
@@ -532,7 +547,7 @@ class Puhuo_start2_merge extends Command
                                         'CustomerName' => $v_customer['CustomerName'],
                                         'CustomerId' => $v_customer['CustomerId'],
                                         'rule_type' => $insert_rule_type,
-                                        'rule_id' => 0,
+                                        'rule_id' => $rule ? $rule['id'] : 0,
                                         'Stock_00_puhuo' => 0,
                                         'Stock_29_puhuo' => 0,
                                         'Stock_30_puhuo' => 0,
@@ -879,9 +894,20 @@ class Puhuo_start2_merge extends Command
                                                 ['Yuncang', '=', $WarehouseName], 
                                                 ['State', '=', $v_customer['State']], 
                                                 ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
-                                                ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                                // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
                                                 ['CategoryName1', '=', $v_data['CategoryName1']], 
                                                 ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                                ['CategoryName', '=', $v_data['CategoryName']], 
+                                                ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                            ];
+                                            $where_qita = [
+                                                ['Yuncang', '=', $WarehouseName], 
+                                                ['State', '=', $v_customer['State']], 
+                                                ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                                // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                                ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                                ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                                ['CategoryName', '=', '其它'], 
                                                 ['CustomerGrade', '=', $v_customer['CustomerGrade']]
                                             ];
 
@@ -890,8 +916,10 @@ class Puhuo_start2_merge extends Command
                                                 //查询对应的铺货标准
                                                 if ($rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                                     $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                                    if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                                 } else {
                                                     $rule = $this->puhuo_rule_model::where($where)->find();
+                                                    if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                                 }
                                                 $rule = $rule ? $rule->toArray() : [];
                                                 $insert_rule_type = $rule_type;
@@ -900,9 +928,11 @@ class Puhuo_start2_merge extends Command
                                                     //查询对应的铺货标准
                                                     if ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                                         $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                                        if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                                         $rule = $rule ? $rule->toArray() : [];
                                                     } elseif ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_a']) {
                                                         $rule = $this->puhuo_rule_model::where($where)->find();
+                                                        if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                                         $rule = $rule ? $rule->toArray() : [];
                                                     } else {
                                                         $rule = [];
@@ -983,7 +1013,7 @@ class Puhuo_start2_merge extends Command
                                                     'CustomerName' => $v_customer['CustomerName'],
                                                     'CustomerId' => $v_customer['CustomerId'],
                                                     'rule_type' => $insert_rule_type,
-                                                    'rule_id' => 0,
+                                                    'rule_id' => $rule ? $rule['id'] : 0,
                                                     'Stock_00_puhuo' => 0,
                                                     'Stock_29_puhuo' => 0,
                                                     'Stock_30_puhuo' => 0,
