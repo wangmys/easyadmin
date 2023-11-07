@@ -728,19 +728,19 @@ class Caigou extends BaseController
             ORDER BY
                 EG.GoodsNo
         ";
-        // $select_日销_店铺 = $this->db_sqlsrv->query($sql_日销_店铺);
-        // if ($select_日销_店铺) {
-        //     // 删除历史数据
-        //     // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-        //     $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_day_customer;');
-        //     $chunk_list10 = array_chunk($select_日销_店铺, 500);
-        //     // $this->db_easyA->startTrans();
+        $select_日销_店铺 = $this->db_sqlsrv->query($sql_日销_店铺);
+        if ($select_日销_店铺) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
+            $this->db_easyA->execute('TRUNCATE cwl_cgzdt_retail_day_customer;');
+            $chunk_list10 = array_chunk($select_日销_店铺, 500);
+            // $this->db_easyA->startTrans();
 
-        //     foreach($chunk_list10 as $key10 => $val10) {
-        //         // 基础结果 
-        //         $insert = $this->db_easyA->table('cwl_cgzdt_retail_day_customer')->strict(false)->insertAll($val10);
-        //     }
-        // }
+            foreach($chunk_list10 as $key10 => $val10) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_cgzdt_retail_day_customer')->strict(false)->insertAll($val10);
+            }
+        }
 
 
         $sql_日销_不要了 = "
