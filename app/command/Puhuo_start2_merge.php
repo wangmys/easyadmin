@@ -35,8 +35,11 @@ use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\admin\model\bi\SpLypPuhuoRunModel;
+use app\admin\model\bi\SpLypPuhuoZdkphmdModel;
+use app\admin\model\bi\SpLypPuhuoDdUserModel;
 use app\admin\model\bi\CwlDaxiaoHandleModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
+use app\api\service\dingding\Sample;
 // use app\admin\model\CustomerModel;
 //自动铺货2.0版
 //合并 puhuo_yuncangkeyong、puhuo_start2_pro 逻辑
@@ -73,6 +76,7 @@ class Puhuo_start2_merge extends Command
     {
         // 指令配置
         $this->setName('Puhuo_start2_merge')
+            ->addArgument('if_deal_yuncangkeyong', Argument::OPTIONAL)//是否处理云仓可用
             ->addArgument('list_rows', Argument::OPTIONAL)//每页条数
             ->setDescription('the Puhuo_start2_merge command');
             $this->db_easy = Db::connect("mysql");
@@ -104,11 +108,16 @@ class Puhuo_start2_merge extends Command
         ini_set('memory_limit','1024M');
         $db = Db::connect("mysql");
 
+        $if_deal_yuncangkeyong    = $input->getArgument('if_deal_yuncangkeyong') ?? 1;//是否处理云仓可用
+        $list_rows    = $input->getArgument('list_rows') ?: 1000;//每页条数
+
         //铺货开始 更新铺货状态
         $puhuo_run_res = SpLypPuhuoRunModel::create(['puhuo_status' => SpLypPuhuoRunModel::PUHUO_STATUS['running']]);
 
         //先处理 puhuo_yuncangkeyong 
-        $this->puhuo_yuncangkeyong();
+        if ($if_deal_yuncangkeyong) {
+            $this->puhuo_yuncangkeyong();
+        }
 
         //铺货规则获取
         $puhuo_config = SpLypPuhuoConfigModel::where([['config_str', '=', 'puhuo_config']])->find();
@@ -118,8 +127,6 @@ class Puhuo_start2_merge extends Command
         } else {
             $this->puhuo_rule_model = new SpLypPuhuoRuleBModel();
         }
-
-        $list_rows    = $input->getArgument('list_rows') ?: 1000;//每页条数
         
         $data = $this->get_wait_goods_data($list_rows);
         $data_taozhuang = $this->get_wait_goods_data_taozhuang($list_rows);//套装套西
@@ -130,7 +137,6 @@ class Puhuo_start2_merge extends Command
         $this->db_easy->Query("truncate table sp_lyp_puhuo_daxiaoma_customer_sort;");
         $this->db_easy->Query("truncate table sp_lyp_puhuo_cur_log;");
         $this->db_easy->Query("truncate table sp_lyp_puhuo_log;");
-
 
         $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
         $new_customers = $this->db_easy->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
@@ -156,7 +162,6 @@ class Puhuo_start2_merge extends Command
         //剔除的货品
         $ti_goods = $this->puhuo_ti_goods_model::where([])->column('GoodsNo');
         $ti_goods = $this->get_goods_str($ti_goods);
-        // print_r($ti_goods);die;
 
         $qiwen_config = [];
         if ($puhuo_config['if_hottocold'] == 1) {//hottocold
@@ -172,10 +177,14 @@ class Puhuo_start2_merge extends Command
                 $qiwen_config_arr[$v_qiwen_config['yuncang'].$v_qiwen_config['province'].$v_qiwen_config['wenqu']] = $v_qiwen_config;
             }
         }
-        // print_r($qiwen_config_arr);die;
 
         //大小码店信息
         $daxiao_res = $this->get_daxiao_handle();
+
+        //指定门店信息
+        $puhuo_zdkphmd = SpLypPuhuoZdkphmdModel::where([])->field('B,A1,A2,A3,N,H3,H6,K1,K2,X1,X2,X3')->select();
+        $puhuo_zdkphmd = $puhuo_zdkphmd ? $puhuo_zdkphmd->toArray() : [];
+        // print_r($puhuo_zdkphmd);die;
 
         if ($data) {
 
@@ -189,6 +198,7 @@ class Puhuo_start2_merge extends Command
                 $remain_store = $v_data_each['remain_store'] ?? 2;//剩余门店 1-铺 2-不铺
                 $remain_rule_type = $v_data_each['remain_rule_type'] ?? 0;//铺货方案2 0-不选 1-A  2-B
                 $zuhe_customer = $v_data_each['zuhe_customer'] ?? '';//指定类型1-组合 的店铺
+                $if_zdmd = $v_data_each['if_zdmd'] ?? 1;//是否指定门店 1-是 2-否
 
                 $GoodsNo = $v_data['GoodsNo'] ?: '';//货号
                 $WarehouseName = $v_data['WarehouseName'] ?: '';//云仓
@@ -199,6 +209,9 @@ class Puhuo_start2_merge extends Command
                 $StyleCategoryName = $v_data['StyleCategoryName'] ?: '';//(风格)基本款
                 $StyleCategoryName1 = $v_data['StyleCategoryName1'] ?: '';//一级风格
                 $StyleCategoryName2 = $v_data['StyleCategoryName2'] ?: '';//二级风格（货品等级）
+                $StyleCategoryName2_sign = $StyleCategoryName2 ? mb_substr($StyleCategoryName2, 0, -1) : '';
+                $StyleCategoryName2_customer = $StyleCategoryName2_sign ? array_column($puhuo_zdkphmd, $StyleCategoryName2_sign) : [];
+                $StyleCategoryName2_customer = $StyleCategoryName2_customer ? array_unique(array_filter($StyleCategoryName2_customer)) : [];
 
                 $all_customers = $ex_store = [];
 
@@ -231,7 +244,15 @@ class Puhuo_start2_merge extends Command
                     $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                 }
 
-                // print_r($all_customers);die;
+                //如果是指定门店铺货
+                if ($if_zdmd == $this->puhuo_zdy_set2_model::IF_ZDMD['is_zhiding']) {
+                    $all_customers_intersect = array_intersect($StyleCategoryName2_customer, $all_customers ? array_column($all_customers, 'CustomerName') : []);
+                    $all_customers_arr = [];
+                    foreach ($all_customers as $v_cus) {
+                        if (in_array($v_cus['CustomerName'], $all_customers_intersect)) $all_customers_arr[] = $v_cus;
+                    }
+                    $all_customers = $all_customers_arr;
+                }
 
                 //大小码-满足率-分母
                 $season = $this->get_season_str($TimeCategoryName2);
@@ -410,9 +431,20 @@ class Puhuo_start2_merge extends Command
                                     ['Yuncang', '=', $WarehouseName], 
                                     ['State', '=', $v_customer['State']], 
                                     ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
-                                    ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                    // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
                                     ['CategoryName1', '=', $v_data['CategoryName1']], 
                                     ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                    ['CategoryName', '=', $v_data['CategoryName']], 
+                                    ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                ];
+                                $where_qita = [
+                                    ['Yuncang', '=', $WarehouseName], 
+                                    ['State', '=', $v_customer['State']], 
+                                    ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                    // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                    ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                    ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                    ['CategoryName', '=', '其它'], 
                                     ['CustomerGrade', '=', $v_customer['CustomerGrade']]
                                 ];
 
@@ -421,8 +453,10 @@ class Puhuo_start2_merge extends Command
                                     //查询对应的铺货标准
                                     if ($rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                         $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                        if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                     } else {
                                         $rule = $this->puhuo_rule_model::where($where)->find();
+                                        if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                     }
                                     $rule = $rule ? $rule->toArray() : [];
                                     $insert_rule_type = $rule_type;
@@ -431,9 +465,11 @@ class Puhuo_start2_merge extends Command
                                         //查询对应的铺货标准
                                         if ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                             $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                            if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                             $rule = $rule ? $rule->toArray() : [];
                                         } elseif ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_a']) {
                                             $rule = $this->puhuo_rule_model::where($where)->find();
+                                            if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                             $rule = $rule ? $rule->toArray() : [];
                                         } else {
                                             $rule = [];
@@ -513,7 +549,7 @@ class Puhuo_start2_merge extends Command
                                         'CustomerName' => $v_customer['CustomerName'],
                                         'CustomerId' => $v_customer['CustomerId'],
                                         'rule_type' => $insert_rule_type,
-                                        'rule_id' => 0,
+                                        'rule_id' => $rule ? $rule['id'] : 0,
                                         'Stock_00_puhuo' => 0,
                                         'Stock_29_puhuo' => 0,
                                         'Stock_30_puhuo' => 0,
@@ -535,7 +571,7 @@ class Puhuo_start2_merge extends Command
                                 // print_r($add_puhuo_log);die;
 
                                 //记录铺货日志：
-                                Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.serialize(['uuid'=>$uuid, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$v_customer['CustomerName'],  'rule'=>$rule, 'v_data'=>$v_data, 'puhuo_config'=>$puhuo_config, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo结果：'=>$can_puhuo]) );
+                                Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
                                 $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
 
@@ -549,7 +585,7 @@ class Puhuo_start2_merge extends Command
                             ######################大小码铺货逻辑end################################################################
 
                             //记录铺货日志：
-                            Log::channel('puhuo')->write('##############普通-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.serialize(['add_puhuo_log'=>$add_puhuo_log]) );
+                            Log::channel('puhuo')->write('##############普通-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.json_encode(['add_puhuo_log'=>$add_puhuo_log]) );
 
                             //铺货日志批量入库
                             $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
@@ -585,7 +621,7 @@ class Puhuo_start2_merge extends Command
         ######################套装套西处理start##########################
         //铺 套装套西
         $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
-    $dongxiao_rate_level, $daxiao_res, $puhuo_config);
+    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd);
         ######################套装套西处理end##########################
 
         //记录铺货日志：
@@ -597,6 +633,16 @@ class Puhuo_start2_merge extends Command
         //铺货完成 修改puhuo_run状态
         SpLypPuhuoRunModel::where([['id', '=', $puhuo_run_res->id]])->update(['puhuo_status' => SpLypPuhuoRunModel::PUHUO_STATUS['finish']]);
 
+        //铺货完成钉钉通知
+        $sample = new Sample();
+        $users = SpLypPuhuoDdUserModel::where([])->select();
+        $users = $users ? $users->toArray() : [];
+        if ($users) {
+            foreach ($users as $val) {
+                $sample->sendMarkdownImg($val['userid'], '铺货完成通知------'.date('Y-m-d H:i:s'), '');
+            }
+        }
+
         echo 'okk';die;
         
     }
@@ -604,7 +650,7 @@ class Puhuo_start2_merge extends Command
 
     //铺 套装套西
     protected function puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
-    $dongxiao_rate_level, $daxiao_res, $puhuo_config) {
+    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd) {
 
         if ($data_taozhuang) {
 
@@ -618,6 +664,7 @@ class Puhuo_start2_merge extends Command
                 $remain_store = $v_data_each['remain_store'] ?? 2;//剩余门店 1-铺 2-不铺
                 $remain_rule_type = $v_data_each['remain_rule_type'] ?? 0;//铺货方案2 0-不选 1-A  2-B
                 $zuhe_customer = $v_data_each['zuhe_customer'] ?? '';//指定类型1-组合 的店铺
+                $if_zdmd = $v_data_each['if_zdmd'] ?? 1;//是否指定门店 1-是 2-否
 
                 if ($goods) {
 
@@ -636,6 +683,9 @@ class Puhuo_start2_merge extends Command
                             $StyleCategoryName = $v_data['StyleCategoryName'] ?: '';//(风格)基本款
                             $StyleCategoryName1 = $v_data['StyleCategoryName1'] ?: '';//一级风格
                             $StyleCategoryName2 = $v_data['StyleCategoryName2'] ?: '';//二级风格（货品等级）
+                            $StyleCategoryName2_sign = $StyleCategoryName2 ? mb_substr($StyleCategoryName2, 0, -1) : '';
+                            $StyleCategoryName2_customer = $StyleCategoryName2_sign ? array_column($puhuo_zdkphmd, $StyleCategoryName2_sign) : [];
+                            $StyleCategoryName2_customer = $StyleCategoryName2_customer ? array_unique(array_filter($StyleCategoryName2_customer)) : [];
     
                             $all_customers = $ex_store = [];
     
@@ -668,6 +718,15 @@ class Puhuo_start2_merge extends Command
                                 $all_customers = $all_customer_arr[$WarehouseName] ?? [];
                             }
 
+                            //如果是指定门店铺货
+                            if ($if_zdmd == $this->puhuo_zdy_set2_model::IF_ZDMD['is_zhiding']) {
+                                $all_customers_intersect = array_intersect($StyleCategoryName2_customer, $all_customers ? array_column($all_customers, 'CustomerName') : []);
+                                $all_customers_arr = [];
+                                foreach ($all_customers as $v_cus) {
+                                    if (in_array($v_cus['CustomerName'], $all_customers_intersect)) $all_customers_arr[] = $v_cus;
+                                }
+                                $all_customers = $all_customers_arr;
+                            }
                             // print_r($all_customers);die;
     
                             //大小码-满足率-分母
@@ -847,9 +906,20 @@ class Puhuo_start2_merge extends Command
                                                 ['Yuncang', '=', $WarehouseName], 
                                                 ['State', '=', $v_customer['State']], 
                                                 ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
-                                                ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                                // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
                                                 ['CategoryName1', '=', $v_data['CategoryName1']], 
                                                 ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                                ['CategoryName', '=', $v_data['CategoryName']], 
+                                                ['CustomerGrade', '=', $v_customer['CustomerGrade']]
+                                            ];
+                                            $where_qita = [
+                                                ['Yuncang', '=', $WarehouseName], 
+                                                ['State', '=', $v_customer['State']], 
+                                                ['StyleCategoryName', '=', $v_data['StyleCategoryName']], 
+                                                // ['StyleCategoryName1', '=', $v_data['StyleCategoryName1']], 
+                                                ['CategoryName1', '=', $v_data['CategoryName1']], 
+                                                ['CategoryName2', '=', $v_data['CategoryName2']], 
+                                                ['CategoryName', '=', '其它'], 
                                                 ['CustomerGrade', '=', $v_customer['CustomerGrade']]
                                             ];
 
@@ -858,8 +928,10 @@ class Puhuo_start2_merge extends Command
                                                 //查询对应的铺货标准
                                                 if ($rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                                     $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                                    if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                                 } else {
                                                     $rule = $this->puhuo_rule_model::where($where)->find();
+                                                    if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                                 }
                                                 $rule = $rule ? $rule->toArray() : [];
                                                 $insert_rule_type = $rule_type;
@@ -868,9 +940,11 @@ class Puhuo_start2_merge extends Command
                                                     //查询对应的铺货标准
                                                     if ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_b']) {//如单款指定了铺货规则B
                                                         $rule = $this->puhuo_rule_b_model::where($where)->find();
+                                                        if (!$rule) $rule = $this->puhuo_rule_b_model::where($where_qita)->find();
                                                         $rule = $rule ? $rule->toArray() : [];
                                                     } elseif ($remain_rule_type == $this->puhuo_zdy_set2_model::RULE_TYPE['type_a']) {
                                                         $rule = $this->puhuo_rule_model::where($where)->find();
+                                                        if (!$rule) $rule = $this->puhuo_rule_model::where($where_qita)->find();
                                                         $rule = $rule ? $rule->toArray() : [];
                                                     } else {
                                                         $rule = [];
@@ -951,7 +1025,7 @@ class Puhuo_start2_merge extends Command
                                                     'CustomerName' => $v_customer['CustomerName'],
                                                     'CustomerId' => $v_customer['CustomerId'],
                                                     'rule_type' => $insert_rule_type,
-                                                    'rule_id' => 0,
+                                                    'rule_id' => $rule ? $rule['id'] : 0,
                                                     'Stock_00_puhuo' => 0,
                                                     'Stock_29_puhuo' => 0,
                                                     'Stock_30_puhuo' => 0,
@@ -973,7 +1047,7 @@ class Puhuo_start2_merge extends Command
                                             // print_r($add_puhuo_log);die;
 
                                             //记录铺货日志：
-                                            Log::channel('puhuo')->write('##############套装套西-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.serialize(['uuid'=>$uuid, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$v_customer['CustomerName'],  'rule'=>$rule, 'v_data'=>$v_data, 'puhuo_config'=>$puhuo_config, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo结果：'=>$can_puhuo]) );
+                                            Log::channel('puhuo')->write('##############套装套西-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
                                             $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
     
@@ -990,7 +1064,7 @@ class Puhuo_start2_merge extends Command
                                         ######################大小码铺货逻辑end################################################################
 
                                         //记录铺货日志：
-                                        Log::channel('puhuo')->write('##############套装套西-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.serialize(['add_puhuo_log'=>$add_puhuo_log]) );
+                                        Log::channel('puhuo')->write('##############套装套西-大小码铺货逻辑处理完毕后：add_puhuo_log##############'.json_encode(['add_puhuo_log'=>$add_puhuo_log]) );
     
                                         //铺货日志批量入库
                                         $chunk_list = $add_puhuo_log ? array_chunk($add_puhuo_log, 500) : [];
@@ -1015,7 +1089,7 @@ class Puhuo_start2_merge extends Command
                             }
     
                         }
-                        // print_r(serialize(['res_taozhuang'=>$res_taozhuang, 'wait_goods_stock'=>$wait_goods_stock]));die;
+                        // print_r(json_encode(['res_taozhuang'=>$res_taozhuang, 'wait_goods_stock'=>$wait_goods_stock]));die;
 
 
                         //对套装套西铺货结果 处理，同个店铺必须满足上衣+裤子 都齐码 才能铺货
@@ -1236,7 +1310,7 @@ class Puhuo_start2_merge extends Command
         //改为从新的 自定义铺货设置表 获取
         $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['not_taozhuang']]])->alias('pzs')
         ->join(['sp_lyp_puhuo_zdy_yuncang_goods2' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
-        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzs.zuhe_customer, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
+        ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzs.zuhe_customer, pzs.if_zdmd, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         $yuncang_goods = $zdy_yuncang_goods ? array_column($zdy_yuncang_goods, 'yuncang_goods') : [];
         $zdy_yuncang_goods = array_combine($yuncang_goods, $zdy_yuncang_goods);
@@ -1270,6 +1344,7 @@ class Puhuo_start2_merge extends Command
                             'remain_store' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['remain_store'] : 2,
                             'remain_rule_type' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['remain_rule_type'] : 0,
                             'zuhe_customer' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['zuhe_customer'] : '',
+                            'if_zdmd' => isset($zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]) ? $zdy_yuncang_goods[$v_res['WarehouseName'].$v_res['GoodsNo']]['if_zdmd'] : 1,
                         ];
                     }
                 }
@@ -1283,7 +1358,7 @@ class Puhuo_start2_merge extends Command
     protected function get_wait_goods_data_taozhuang($list_rows) {
 
         $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['is_taozhuang']]])
-        ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, remain_store, remain_rule_type, if_taozhuang, zuhe_customer')->select();
+        ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, remain_store, remain_rule_type, if_taozhuang, zuhe_customer, if_zdmd')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         if ($zdy_yuncang_goods) {
             foreach ($zdy_yuncang_goods as &$v_yuncang_goods) {
