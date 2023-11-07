@@ -120,7 +120,7 @@
                 <form class="layui-form layui-form-pane ok-form layui-col-space8">
                     <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
+                            <!-- <label class="layui-form-label" style="width: 120px !important; text-align: center;">季节归集</label>
                             <div class="layui-input-inline" style="width: 250px !important;">
                                 <select id="season_id" name="季节归集" lay-verify="required">
                                     <option value="春季">春季</option>
@@ -128,6 +128,10 @@
                                     <option value="秋季">秋季</option>
                                     <option value="冬季">冬季</option>
                                 </select>
+                            </div> -->
+                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 250px !important;">
+                                <div id="xm-jj" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 120px !important; text-align: center;">风格</label>
                             <div class="layui-input-inline" style="width: 250px !important;">
@@ -351,6 +355,28 @@
             // showCount: 1,
             data: []
         })
+        // 选择季节
+        xmSelect.render({
+            el: '#xm-jj', 
+            filterable: true,
+            // showCount: 1,
+            toolbar: {show: true},
+            name:'季节',
+            data: [
+                {name: "初春", value: "初春"},
+                {name: "正春", value: "正春"},
+                {name: "春季", value: "春季"},
+                {name: "初夏", value: "初夏"},
+                {name: "盛夏", value: "盛夏"},
+                {name: "夏季", value: "夏季"},
+                {name: "初秋", value: "初秋"},
+                {name: "深秋", value: "深秋"},
+                {name: "秋季", value: "秋季"},
+                {name: "初冬", value: "初冬"},
+                {name: "深冬", value: "深冬"},
+                {name: "冬季", value: "冬季"},
+            ]
+        })
 
         // tab菜单
         $('.site-demo-active').on('click', function(){
@@ -456,6 +482,7 @@
                 storeData = res.data.storeAll
                 provinceData = res.data.provinceAll  
                 goodsnoData = res.data.goodsnoAll  
+                jjData = res.data.jjAll  
                 // 渲染所有店铺
                 xmSelect.render({
                     el: '#xm-nostore', 
@@ -490,6 +517,18 @@
                     // showCount: 1,
                     name:'省份',
                     data: provinceData
+                })
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-jj', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name: '季节',
+                    data: jjData
                 })
                 // xmSelect.render({
                 //     el: '#xm-nostore', 

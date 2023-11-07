@@ -72,6 +72,7 @@ class Autosend extends BaseController
         // die;
 
         foreach($storeArr as $key => $val) {
+            // 主要逻辑计算
             $res = $this->store($val['店铺名称']);
             if ($res) {
                 $data[] = $res;
@@ -185,8 +186,247 @@ class Autosend extends BaseController
         }
         $this->params = $params;
         
-        $this->store('三江一店');
+        $this->store_pro('三江一店');
     }
+
+    // 单店不动销
+    // public function store($store) {
+    //     // 1. 预计库存大于1SKC   改规则，店铺库存数量>1并且上市天数满足的货号算一个skc
+    //     // $yujiSkc = SpCustomerStockSkc::getSkc($store, $this->params);
+
+    //     // =IF(L89<30,0,IF(N89="","30天以上",IF(S89="","20-30天",IF(R89="","15-20天",IF(Q89="","10-15天",IF(P89="","5-10天",))))))
+    //     $map = [
+    //         ['店铺名称', '=', $store],
+    //         ['季节归集', '=', $this->params['季节归集']],
+    //         ['大类' , '<>', '配饰'],
+    //         ['店铺库存数量' , '>', 1],
+    //     ];
+
+    //     if (! empty($this->params['风格'])) {
+    //         $map[] = ['d.风格' , '=', $this->params['风格']];
+    //         // map2计算skc用
+    //         $map2 = [
+    //             ['店铺名称', '=', $store],
+    //             ['季节归集', '=', $this->params['季节归集']],
+    //             ['大类' , '<>', '配饰'],
+    //             ['店铺库存数量' , '>', 1],
+    //             ['d.风格', '=', $this->params['风格']],
+    //             ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+    //         ];
+    //     } else {
+    //         // map2计算skc用
+    //         $map2 = [
+    //             ['店铺名称', '=', $store],
+    //             ['季节归集', '=', $this->params['季节归集']],
+    //             ['大类' , '<>', '配饰'],
+    //             ['店铺库存数量' , '>', 1],
+    //             ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+    //         ];
+    //     }
+
+    //     if (!empty($this->params['不考核货号'])) {
+    //         $mapArr = arrToStr(explode(',', $this->params['不考核货号']));
+    //         $map[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+    //         $map2[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+    //     }
+    //     // dump($map); 
+    //     // dump($map2); 
+    //     // die;
+
+    //     // 没有上市日期就直接使用上市天数
+    //     if (empty($this->params['上市时间'])) {
+    //         $map[] = ['上市天数' , '>=', $this->params['上市天数']];
+    //         $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
+    //         $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+    //         // die;
+    //         // 预计skc
+    //         $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
+    //         $res_all_new = [];
+
+    //         // echo '<pre>';
+    //         // print_r($res_all);
+    //         // die;
+
+    //         // echo SpWwBudongxiaoDetail::getLastSql(); die;
+            
+    //         // 赋值 上市时间修正 上市天数修正
+    //         foreach($res_all as $key => $val) {
+    //             $res_all[$key]['上市时间修正'] = $val['上市时间'];
+    //             $res_all[$key]['上市天数修正'] = $val['上市天数'];
+    //             $res_all_new[] = $res_all[$key];
+    //         }
+    //     } else {
+    //         $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
+    //         $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+    //         // 预计skc
+    //         $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
+    //         $res_all_new = [];
+    //         foreach($res_all as $key => $val) {
+    //             $diffDay1 = $this->diffDay($val['上市时间'], $this->params['上市时间']);
+    //             // 设置日期大于真实日期
+    //             if ($diffDay1 >= 0) {
+    //                 // 设置日期到昨天 上市天数改
+    //                 $diffDay2 = $this->diffDay($this->params['上市时间'], date('Y-m-d', strtotime('-1day')));
+    //                 $res_all[$key]['上市时间修正'] = $this->params['上市时间'];
+    //                 $res_all[$key]['上市天数修正'] = $diffDay2;
+    //             } else {
+    //                 $res_all[$key]['上市时间修正'] = $this->params['上市时间'];
+    //                 $res_all[$key]['上市天数修正'] = $val['上市天数'];
+    //             }
+
+    //             // 修正之后的天数>=设置天数
+    //             if ($res_all[$key]['上市天数修正'] >= $this->params['上市天数']) {
+    //                 $res_all_new[] = $res_all[$key];
+    //             }
+    //         }
+    //     }
+
+
+
+    //     // echo '<pre>';
+    //     // print_r($res_all_new);die;
+
+    //     if ($res_all_new) {
+    //         // 货号累计不动销天数
+    //         $day5_10 = 0;
+    //         $day10_15 = 0;
+    //         $day15_20 = 0;
+    //         $day20_30 = 0;
+    //         $day30 = 0;
+    //         // 相关天数对应skc相加
+    //         $考核合计 = 0; 
+
+    //         // 考核标准才插入历史记录
+    //         $insert_history_data = [];
+    //         foreach ($res_all_new as $key => $val) {
+    //             // 30天以上
+    //             if (empty($val['累销量']) 
+    //             && $val['上市天数'] >= 30 ) {
+    //                 $res_all_new[$key]['不动销区间'] = '30天以上';
+                    
+    //             // 20-30天
+    //             } elseif ( (!empty($val['累销量']) && empty($val['二十天销量'])) 
+    //             && ($val['上市天数'] >= 20 && $val['上市天数'] < 30) ) {
+    //                 $res_all_new[$key]['不动销区间'] = '20-30天';
+                    
+    //             // 15-20天
+    //             } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && empty($val['十五天销量']))
+    //                 && ($val['上市天数'] >= 15 && $val['上市天数'] < 20) ) {
+    //                 $res_all_new[$key]['不动销区间'] = '15-20天';
+                    
+    //             // 10-15天
+    //             } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && empty($val['十天销量']))
+    //                 && ($val['上市天数'] >= 10 && $val['上市天数'] < 15) ) {
+    //                 $res_all_new[$key]['不动销区间'] = '10-15天';
+                    
+    //             // 5-10天
+    //             } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && !empty($val['十天销量']) && !empty($val['十天销量']) && empty($val['五天销量'])) 
+    //                 && ($val['上市天数'] >= 5 && $val['上市天数'] < 10) ) {
+    //                 $res_all_new[$key]['不动销区间'] = '5-10天';
+    //             } else {
+    //                 $res_all_new[$key]['不动销区间'] = '';
+    //             }
+
+    //             $res_all_new[$key]['不动销区间修订'] = $this->checkQiMa($res_all_new[$key]);
+    //             $res_all_new[$key]['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+    //             $res_all_new[$key]['create_time'] = $this->create_time;
+    //             $res_all_new[$key]['rand_code'] = $this->rand_code;
+
+    //             // 累销天数计算 
+    //             if ($res_all_new[$key]['不动销区间修订'] == '30天以上') {
+    //                 $day30 ++;
+    //             } elseif ($res_all_new[$key]['不动销区间修订'] == '20-30天') {
+    //                 $day20_30 ++;
+    //             } elseif ($res_all_new[$key]['不动销区间修订'] == '15-20天') {
+    //                 $day15_20 ++;
+    //             } elseif ($res_all_new[$key]['不动销区间修订'] == '10-15天') {
+    //                 $day10_15 ++;
+    //             } elseif ($res_all_new[$key]['不动销区间修订'] == '5-10天') {
+    //                 $day5_10 ++;
+    //             }
+
+    //             // cwl新增  考核合计
+    //             if ($res_all_new[$key]['考核标准'] == '30天以上') {
+    //                 $考核合计 = $day30;
+    //             } elseif ($res_all_new[$key]['考核标准'] == '20-30天') {
+    //                 $考核合计 = $day20_30 + $day30;
+    //             } elseif ($res_all_new[$key]['考核标准'] == '15-20天') {
+    //                 $考核合计 = $day15_20 + $day20_30 + $day30;
+    //             } elseif ($res_all_new[$key]['考核标准'] == '10-15天') {
+    //                 $考核合计 = $day10_15 + $day20_30 + $day30;
+    //             } elseif ($res_all_new[$key]['考核标准'] == '5-10天') {
+    //                 $考核合计 = $day5_10 + $day10_15 + $day20_30 + $day30;
+    //             }
+
+    //             // if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+    //             //     if (($res_all_new[$key]['不动销区间'] == '30天以上' ||  $res_all_new[$key]['不动销区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+    //             //         $insert_history_data[] = $res_all_new[$key];
+    //             //     }
+    //             // } 
+
+    //             if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天' || $this->params['考核区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+    //                 if (($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天'|| $res_all_new[$key]['不动销区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+    //                     $insert_history_data[] = $res_all_new[$key];
+    //                 }
+    //             } 
+
+    //         }
+
+    //         // echo '<pre>';
+    //         // print_r($insert_history_data);
+    //         // dump($insert_history_data);
+    //         // die;
+
+    //         // 预计skc数
+    //         // $yujiSkc = count($res_all_new);
+    //         $yujiSkc = $yujiSkc_res;
+
+    //         // die;
+    //         // $this->db_easyA->startTrans();
+    //         $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys')->insertAll($insert_history_data);
+    //         $insert_history2 = $this->db_bi->table('ww_budongxiao_history_sys')->insertAll($insert_history_data);
+    //         // if ($insert_history) {
+    //         //     $this->db_easyA->commit();
+    //         // } else {
+    //         //     $this->db_easyA->rollback();
+    //         // }
+
+    //         $res_end['商品负责人'] = !empty($res_all_new[0]['商品负责人']) ? $res_all_new[0]['商品负责人'] : '';
+    //         $res_end['省份'] = !empty($res_all_new[0]['省份']) ? $res_all_new[0]['省份'] : 0;
+    //         $res_end['云仓简称'] = !empty($res_all_new[0]['云仓']) ? $res_all_new[0]['云仓'] : 0;
+    //         $res_end['店铺简称'] = !empty($res_all_new[0]['店铺名称']) ? $res_all_new[0]['店铺名称'] : 0;
+    //         $res_end['经营性质'] = !empty($res_all_new[0]['经营模式']) ? $res_all_new[0]['经营模式'] : 0;
+    //         $res_end['季节归集'] = $this->params['季节归集'];
+    //         $res_end['预计SKC数'] = $yujiSkc;
+    //         $res_end['5-10天'] = $day5_10;
+    //         $res_end['10-15天'] = $day10_15;
+    //         $res_end['15-20天'] = $day15_20;
+    //         $res_end['20-30天'] = $day20_30;
+    //         $res_end['30天以上'] = $day30;
+    //         // cwl 新
+    //         $res_end['考核合计'] = $考核合计;
+
+    //         $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+    //         // $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
+    //         // cwl 新
+    //         $res_end['考核标准占比'] = round($this->zeroHandle($res_end['考核合计'], $res_end['预计SKC数'])  * 100, 2);
+    //         $res_end['考核结果'] = $res_end['考核标准占比'] > $this->params['合格率'] ? '不合格' : '合格';
+    //         $res_end['合格率'] = $res_end['考核标准占比'] > $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
+    //         $res_end['合格率2'] = $this->params['合格率'];
+    //         $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? ceil((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数']) : '';
+    //         $res_end['create_time'] = $this->create_time;
+    //         $res_end['rand_code'] = $this->rand_code;
+
+    //         // dump($res_end);die;
+    //         // 统计插入
+    //         $addPeople = CwlBudongxiaoStatisticsSys::addStatic($res_end);
+
+    //         return $res_end;
+    //     } else {
+    //         return false;
+    //     }
+
+    // }
 
     // 单店不动销
     public function store($store) {
@@ -194,9 +434,12 @@ class Autosend extends BaseController
         // $yujiSkc = SpCustomerStockSkc::getSkc($store, $this->params);
 
         // =IF(L89<30,0,IF(N89="","30天以上",IF(S89="","20-30天",IF(R89="","15-20天",IF(Q89="","10-15天",IF(P89="","5-10天",))))))
+        $季节 = xmSelectInput($this->params['季节']); 
+        
         $map = [
             ['店铺名称', '=', $store],
-            ['季节归集', '=', $this->params['季节归集']],
+            // ['季节归集', '=', $this->params['季节归集']],
+            ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
             ['大类' , '<>', '配饰'],
             ['店铺库存数量' , '>', 1],
         ];
@@ -206,7 +449,8 @@ class Autosend extends BaseController
             // map2计算skc用
             $map2 = [
                 ['店铺名称', '=', $store],
-                ['季节归集', '=', $this->params['季节归集']],
+                // ['季节归集', '=', $this->params['季节归集']],
+                ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
                 ['大类' , '<>', '配饰'],
                 ['店铺库存数量' , '>', 1],
                 ['d.风格', '=', $this->params['风格']],
@@ -216,7 +460,8 @@ class Autosend extends BaseController
             // map2计算skc用
             $map2 = [
                 ['店铺名称', '=', $store],
-                ['季节归集', '=', $this->params['季节归集']],
+                // ['季节归集', '=', $this->params['季节归集']],
+                ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
                 ['大类' , '<>', '配饰'],
                 ['店铺库存数量' , '>', 1],
                 ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
@@ -236,8 +481,9 @@ class Autosend extends BaseController
         if (empty($this->params['上市时间'])) {
             $map[] = ['上市天数' , '>=', $this->params['上市天数']];
             $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
+            
             $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
-            // die;
+           
             // 预计skc
             $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
             $res_all_new = [];
@@ -363,7 +609,11 @@ class Autosend extends BaseController
                 //     }
                 // } 
 
-                if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天' || $this->params['考核区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                if (($this->params['考核区间'] == '30天以上' || 
+                    $this->params['考核区间'] == '20-30天' || 
+                    $this->params['考核区间'] == '15-20天' ||
+                    $this->params['考核区间'] == '10-15天' ||
+                    $this->params['考核区间'] == '5-10天' ) && !empty($res_all_new[$key]['不动销区间修订'])) {
                     if (($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天'|| $res_all_new[$key]['不动销区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
                         $insert_history_data[] = $res_all_new[$key];
                     }
@@ -395,7 +645,9 @@ class Autosend extends BaseController
             $res_end['云仓简称'] = !empty($res_all_new[0]['云仓']) ? $res_all_new[0]['云仓'] : 0;
             $res_end['店铺简称'] = !empty($res_all_new[0]['店铺名称']) ? $res_all_new[0]['店铺名称'] : 0;
             $res_end['经营性质'] = !empty($res_all_new[0]['经营模式']) ? $res_all_new[0]['经营模式'] : 0;
+            // $res_end['二级时间分类'] = !empty($res_all_new[0]['二级时间分类']) ? $res_all_new[0]['二级时间分类'] : '';
             $res_end['季节归集'] = $this->params['季节归集'];
+            $res_end['季节'] = $this->params['季节'];
             $res_end['预计SKC数'] = $yujiSkc;
             $res_end['5-10天'] = $day5_10;
             $res_end['10-15天'] = $day10_15;
@@ -416,6 +668,263 @@ class Autosend extends BaseController
             $res_end['create_time'] = $this->create_time;
             $res_end['rand_code'] = $this->rand_code;
 
+            // echo '<pre>';
+            // print_r($res_end);
+            // die;
+            // dump($res_end);die;
+            // 统计插入
+            $addPeople = CwlBudongxiaoStatisticsSys::addStatic($res_end);
+
+            return $res_end;
+        } else {
+            return false;
+        }
+
+    }
+
+    // 单店不动销
+    public function store_pro($store) {
+        // 1. 预计库存大于1SKC   改规则，店铺库存数量>1并且上市天数满足的货号算一个skc
+        // $yujiSkc = SpCustomerStockSkc::getSkc($store, $this->params);
+
+        // =IF(L89<30,0,IF(N89="","30天以上",IF(S89="","20-30天",IF(R89="","15-20天",IF(Q89="","10-15天",IF(P89="","5-10天",))))))
+        $季节 = xmSelectInput($this->params['季节']); 
+        
+        $map = [
+            ['店铺名称', '=', $store],
+            // ['季节归集', '=', $this->params['季节归集']],
+            ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
+            ['大类' , '<>', '配饰'],
+            ['店铺库存数量' , '>', 1],
+        ];
+
+        if (! empty($this->params['风格'])) {
+            $map[] = ['d.风格' , '=', $this->params['风格']];
+            // map2计算skc用
+            $map2 = [
+                ['店铺名称', '=', $store],
+                // ['季节归集', '=', $this->params['季节归集']],
+                ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['d.风格', '=', $this->params['风格']],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ];
+        } else {
+            // map2计算skc用
+            $map2 = [
+                ['店铺名称', '=', $store],
+                // ['季节归集', '=', $this->params['季节归集']],
+                ['d.二级时间分类', 'exp', new Raw("IN ({$季节})")],
+                ['大类' , '<>', '配饰'],
+                ['店铺库存数量' , '>', 1],
+                ['商品负责人' , 'exp', new Raw('IS NOT NULL')]
+            ];
+        }
+
+        if (!empty($this->params['不考核货号'])) {
+            $mapArr = arrToStr(explode(',', $this->params['不考核货号']));
+            $map[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+            $map2[] = ['d.货号', 'exp', new Raw("NOT IN ({$mapArr})")]; 
+        }
+        // dump($map); 
+        // dump($map2); 
+        // die;
+
+        // 没有上市日期就直接使用上市天数
+        if (empty($this->params['上市时间'])) {
+            $map[] = ['上市天数' , '>=', $this->params['上市天数']];
+            $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
+            
+            $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+           
+            // 预计skc
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
+            $res_all_new = [];
+
+            // echo '<pre>';
+            // print_r($res_all);
+            // die;
+
+            // echo SpWwBudongxiaoDetail::getLastSql(); die;
+            
+            // 赋值 上市时间修正 上市天数修正
+            foreach($res_all as $key => $val) {
+                $res_all[$key]['上市时间修正'] = $val['上市时间'];
+                $res_all[$key]['上市天数修正'] = $val['上市天数'];
+                $res_all_new[] = $res_all[$key];
+            }
+        } else {
+            $map[] = ['商品负责人' , 'exp', new Raw('IS NOT NULL')];
+            $res_all = SpWwBudongxiaoDetail::joinYuncang_all($map);
+            // 预计skc
+            $yujiSkc_res = SpWwBudongxiaoDetail::joinYuncang_all_count($map2);
+            $res_all_new = [];
+            foreach($res_all as $key => $val) {
+                $diffDay1 = $this->diffDay($val['上市时间'], $this->params['上市时间']);
+                // 设置日期大于真实日期
+                if ($diffDay1 >= 0) {
+                    // 设置日期到昨天 上市天数改
+                    $diffDay2 = $this->diffDay($this->params['上市时间'], date('Y-m-d', strtotime('-1day')));
+                    $res_all[$key]['上市时间修正'] = $this->params['上市时间'];
+                    $res_all[$key]['上市天数修正'] = $diffDay2;
+                } else {
+                    $res_all[$key]['上市时间修正'] = $this->params['上市时间'];
+                    $res_all[$key]['上市天数修正'] = $val['上市天数'];
+                }
+
+                // 修正之后的天数>=设置天数
+                if ($res_all[$key]['上市天数修正'] >= $this->params['上市天数']) {
+                    $res_all_new[] = $res_all[$key];
+                }
+            }
+        }
+
+
+
+        // echo '<pre>';
+        // print_r($res_all_new);die;
+
+        if ($res_all_new) {
+            // 货号累计不动销天数
+            $day5_10 = 0;
+            $day10_15 = 0;
+            $day15_20 = 0;
+            $day20_30 = 0;
+            $day30 = 0;
+            // 相关天数对应skc相加
+            $考核合计 = 0; 
+
+            // 考核标准才插入历史记录
+            $insert_history_data = [];
+            foreach ($res_all_new as $key => $val) {
+                // 30天以上
+                if (empty($val['累销量']) 
+                && $val['上市天数'] >= 30 ) {
+                    $res_all_new[$key]['不动销区间'] = '30天以上';
+                    
+                // 20-30天
+                } elseif ( (!empty($val['累销量']) && empty($val['二十天销量'])) 
+                && ($val['上市天数'] >= 20 && $val['上市天数'] < 30) ) {
+                    $res_all_new[$key]['不动销区间'] = '20-30天';
+                    
+                // 15-20天
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && empty($val['十五天销量']))
+                    && ($val['上市天数'] >= 15 && $val['上市天数'] < 20) ) {
+                    $res_all_new[$key]['不动销区间'] = '15-20天';
+                    
+                // 10-15天
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && empty($val['十天销量']))
+                    && ($val['上市天数'] >= 10 && $val['上市天数'] < 15) ) {
+                    $res_all_new[$key]['不动销区间'] = '10-15天';
+                    
+                // 5-10天
+                } elseif ( (!empty($val['累销量']) && !empty($val['二十天销量']) && !empty($val['十五天销量']) && !empty($val['十天销量']) && !empty($val['十天销量']) && empty($val['五天销量'])) 
+                    && ($val['上市天数'] >= 5 && $val['上市天数'] < 10) ) {
+                    $res_all_new[$key]['不动销区间'] = '5-10天';
+                } else {
+                    $res_all_new[$key]['不动销区间'] = '';
+                }
+
+                $res_all_new[$key]['不动销区间修订'] = $this->checkQiMa($res_all_new[$key]);
+                $res_all_new[$key]['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+                $res_all_new[$key]['create_time'] = $this->create_time;
+                $res_all_new[$key]['rand_code'] = $this->rand_code;
+
+                // 累销天数计算 
+                if ($res_all_new[$key]['不动销区间修订'] == '30天以上') {
+                    $day30 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '20-30天') {
+                    $day20_30 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '15-20天') {
+                    $day15_20 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '10-15天') {
+                    $day10_15 ++;
+                } elseif ($res_all_new[$key]['不动销区间修订'] == '5-10天') {
+                    $day5_10 ++;
+                }
+
+                // cwl新增  考核合计
+                if ($res_all_new[$key]['考核标准'] == '30天以上') {
+                    $考核合计 = $day30;
+                } elseif ($res_all_new[$key]['考核标准'] == '20-30天') {
+                    $考核合计 = $day20_30 + $day30;
+                } elseif ($res_all_new[$key]['考核标准'] == '15-20天') {
+                    $考核合计 = $day15_20 + $day20_30 + $day30;
+                } elseif ($res_all_new[$key]['考核标准'] == '10-15天') {
+                    $考核合计 = $day10_15 + $day20_30 + $day30;
+                } elseif ($res_all_new[$key]['考核标准'] == '5-10天') {
+                    $考核合计 = $day5_10 + $day10_15 + $day20_30 + $day30;
+                }
+
+                // if (($this->params['考核区间'] == '30天以上' || $this->params['考核区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                //     if (($res_all_new[$key]['不动销区间'] == '30天以上' ||  $res_all_new[$key]['不动销区间'] == '20-30天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                //         $insert_history_data[] = $res_all_new[$key];
+                //     }
+                // } 
+
+                if (($this->params['考核区间'] == '30天以上' || 
+                    $this->params['考核区间'] == '20-30天' || 
+                    $this->params['考核区间'] == '15-20天' ||
+                    $this->params['考核区间'] == '10-15天' ||
+                    $this->params['考核区间'] == '5-10天' ) && !empty($res_all_new[$key]['不动销区间修订'])) {
+                    if (($res_all_new[$key]['不动销区间'] == '30天以上' || $res_all_new[$key]['不动销区间'] == '20-30天'|| $res_all_new[$key]['不动销区间'] == '15-20天') && !empty($res_all_new[$key]['不动销区间修订'])) {
+                        $insert_history_data[] = $res_all_new[$key];
+                    }
+                } 
+
+            }
+
+            // echo '<pre>';
+            // print_r($insert_history_data);
+            // dump($insert_history_data);
+            // die;
+
+            // 预计skc数
+            // $yujiSkc = count($res_all_new);
+            $yujiSkc = $yujiSkc_res;
+
+            // die;
+            // $this->db_easyA->startTrans();
+            $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys')->insertAll($insert_history_data);
+            $insert_history2 = $this->db_bi->table('ww_budongxiao_history_sys')->insertAll($insert_history_data);
+            // if ($insert_history) {
+            //     $this->db_easyA->commit();
+            // } else {
+            //     $this->db_easyA->rollback();
+            // }
+
+            $res_end['商品负责人'] = !empty($res_all_new[0]['商品负责人']) ? $res_all_new[0]['商品负责人'] : '';
+            $res_end['省份'] = !empty($res_all_new[0]['省份']) ? $res_all_new[0]['省份'] : 0;
+            $res_end['云仓简称'] = !empty($res_all_new[0]['云仓']) ? $res_all_new[0]['云仓'] : 0;
+            $res_end['店铺简称'] = !empty($res_all_new[0]['店铺名称']) ? $res_all_new[0]['店铺名称'] : 0;
+            $res_end['经营性质'] = !empty($res_all_new[0]['经营模式']) ? $res_all_new[0]['经营模式'] : 0;
+            // $res_end['二级时间分类'] = !empty($res_all_new[0]['二级时间分类']) ? $res_all_new[0]['二级时间分类'] : '';
+            $res_end['季节归集'] = $this->params['季节归集'];
+            $res_end['季节'] = $this->params['季节'];
+            $res_end['预计SKC数'] = $yujiSkc;
+            $res_end['5-10天'] = $day5_10;
+            $res_end['10-15天'] = $day10_15;
+            $res_end['15-20天'] = $day15_20;
+            $res_end['20-30天'] = $day20_30;
+            $res_end['30天以上'] = $day30;
+            // cwl 新
+            $res_end['考核合计'] = $考核合计;
+
+            $res_end['考核标准'] = $this->params['考核区间'] ? $this->params['考核区间'] : '30天以上';
+            // $res_end['考核标准占比'] = round($this->zeroHandle($res_end[$res_end['考核标准']], $res_end['预计SKC数'])  * 100, 2);
+            // cwl 新
+            $res_end['考核标准占比'] = round($this->zeroHandle($res_end['考核合计'], $res_end['预计SKC数'])  * 100, 2);
+            $res_end['考核结果'] = $res_end['考核标准占比'] > $this->params['合格率'] ? '不合格' : '合格';
+            $res_end['合格率'] = $res_end['考核标准占比'] > $this->params['合格率'] ? "<span style='color: red;'>不合格</span>" : '';
+            $res_end['合格率2'] = $this->params['合格率'];
+            $res_end['需要调整SKC数'] = $res_end['考核标准占比'] >= $this->params['合格率'] ? ceil((  $res_end['考核标准占比'] - $this->params['合格率'])/100  * $res_end['预计SKC数']) : '';
+            $res_end['create_time'] = $this->create_time;
+            $res_end['rand_code'] = $this->rand_code;
+
+            // echo '<pre>';
+            // print_r($res_end);
+            // die;
             // dump($res_end);die;
             // 统计插入
             $addPeople = CwlBudongxiaoStatisticsSys::addStatic($res_end);

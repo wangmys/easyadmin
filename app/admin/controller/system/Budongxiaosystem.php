@@ -420,12 +420,27 @@ class Budongxiaosystem extends AdminController
         $goodsnoAll = $this->db_easyA->query("
             SELECT 货号 as name, 货号 as value FROM sp_ww_budongxiao_detail WHERE  货号 IS NOT NULL GROUP BY 货号
         ");
+        $jjAll = [
+            ['name' => '初春', 'value' => '初春'],
+            ['name' => '正春', 'value' => '正春'],
+            ['name' => '春季', 'value' => '春季'],
+            ['name' => '初夏', 'value' => '初夏'],
+            ['name' => '盛夏', 'value' => '盛夏'],
+            ['name' => '夏季', 'value' => '夏季'],
+            ['name' => '初秋', 'value' => '初秋'],
+            ['name' => '深秋', 'value' => '深秋'],
+            ['name' => '秋季', 'value' => '秋季'],
+            ['name' => '初冬', 'value' => '初冬'],
+            ['name' => '深冬', 'value' => '深冬'],
+            ['name' => '冬季', 'value' => '冬季'],
+        ];
 
-        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店,不考核货号')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店,不考核货号,季节')->where('id=1')->find();
 
         $select_nostore = explode(',', $select_config['不考核门店']);
         $select_province = explode(',', $select_config['省份']);
         $select_goodsno = explode(',', $select_config['不考核货号']);
+        $select_jj = explode(',', $select_config['季节']);
         // dump($select_province);
 
         // 省份选中
@@ -455,7 +470,16 @@ class Budongxiaosystem extends AdminController
             } 
         }
 
-        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll, 'goodsnoAll' => $goodsnoAll]]);
+        // 考核季节
+        foreach ($select_jj as $key => $val) {
+            foreach ($jjAll as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $jjAll[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        return json(["code" => "0", "msg" => "", "data" => ['provinceAll' => $provinceAll, 'storeAll' => $storeAll, 'goodsnoAll' => $goodsnoAll, 'jjAll' => $jjAll]]);
     }
 
     // 单店不动销
