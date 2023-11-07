@@ -36,8 +36,10 @@ use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\admin\model\bi\SpLypPuhuoRunModel;
 use app\admin\model\bi\SpLypPuhuoZdkphmdModel;
+use app\admin\model\bi\SpLypPuhuoDdUserModel;
 use app\admin\model\bi\CwlDaxiaoHandleModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
+use app\api\service\dingding\Sample;
 // use app\admin\model\CustomerModel;
 //自动铺货2.0版
 //合并 puhuo_yuncangkeyong、puhuo_start2_pro 逻辑
@@ -630,6 +632,16 @@ class Puhuo_start2_merge extends Command
 
         //铺货完成 修改puhuo_run状态
         SpLypPuhuoRunModel::where([['id', '=', $puhuo_run_res->id]])->update(['puhuo_status' => SpLypPuhuoRunModel::PUHUO_STATUS['finish']]);
+
+        //铺货完成钉钉通知
+        $sample = new Sample();
+        $users = SpLypPuhuoDdUserModel::where([])->select();
+        $users = $users ? $users->toArray() : [];
+        if ($users) {
+            foreach ($users as $val) {
+                $sample->sendMarkdownImg($val['userid'], '铺货完成通知------'.date('Y-m-d H:i:s'), '');
+            }
+        }
 
         echo 'okk';die;
         
