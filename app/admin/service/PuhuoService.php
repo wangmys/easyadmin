@@ -18,6 +18,8 @@ use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\admin\model\bi\SpLypPuhuoRunModel;
+use app\admin\model\bi\SpLypPuhuoDdUserModel;
+use app\admin\model\bi\DdUserModel;
 use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
@@ -991,5 +993,36 @@ class PuhuoService
 
     }
 
+    /**
+     * 获取钉钉推送用户
+     */
+    public function get_dingding_user() {
+
+        $dd_user = $this->easy_db->query("select name as name, userid as value from dd_user  group by userid;");
+        $sel_dd_user = SpLypPuhuoDdUserModel::where([])->column('userid');
+        foreach ($dd_user as &$v_user) {
+            if (in_array($v_user['value'], $sel_dd_user)) {
+                $v_user['selected'] = true;
+            }
+        }
+        return $dd_user;
+
+    }
+
+    /**
+     * 保存钉钉推送用户
+     */
+    public function save_dingding_user($dingding) {
+
+        $this->easy_db->query("truncate table sp_lyp_puhuo_dd_user;");
+        $select_dd_user = DdUserModel::where([['userid', 'in', $dingding ? explode(',', $dingding) : []]])->field('userid,name')->select();
+        $select_dd_user = $select_dd_user ? $select_dd_user->toArray() : [];
+        if ($select_dd_user) {
+            foreach ($select_dd_user as $v_sel) {
+                SpLypPuhuoDdUserModel::create($v_sel);
+            }
+        }
+
+    }
 
 }
