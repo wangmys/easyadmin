@@ -9,8 +9,8 @@
                     <th style="width: 90px;">铺货方案</th>
                     <th style="width: 80px;">剩余门店</th>
                     <th style="width: 80px;">铺货方案</th>
-                    <th style="width: 90px;">是否套装套西</th>
-                    <th style="width: 90px;">是否指定门店</th>
+                    <th style="width: 60px;">是否套装套西</th>
+                    <th style="width: 60px;">是否指定门店</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -29,11 +29,11 @@
                 {foreach $changsha_goods_config as $vo}
                 <tr class="changsha_goods_config-select" lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
                     <td class="changsha_goods">
-                        <input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="{$vo['GoodsNo']}" class="layui-input">
+                        <input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
 
                     <td class="Commonfield">
-                        <input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="{$vo['Commonfield']}" class="layui-input">
+                        <input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="{$vo['Commonfield']}" class="layui-input">
                     </td>
                     
                     <td class="rule_type">

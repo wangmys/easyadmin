@@ -74,10 +74,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = guiyang_select_list_hidden['mathod_list'];
 
             html += '<td class="guiyang_goods">';
-            html += '<input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万州一店 忠县一店 祥云一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万州一店 忠县一店 祥云一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
             html += '<select name="rule_type">';
@@ -261,10 +261,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             // html += '</td>';
             
             html += '<td class="wuhan_goods">';
-            html += '<input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
             html += '<select name="rule_type">';
@@ -473,10 +473,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = guangzhou_select_list_hidden['mathod_list'];
 
             html += '<td class="guangzhou_goods">';
-            html += '<input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：百色一店 茂名二店 桂平一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：百色一店 茂名二店 桂平一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
             html += '<select name="rule_type">';
@@ -650,10 +650,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = nanchang_select_list_hidden['mathod_list'];
 
             html += '<td class="nanchang_goods">';
-            html += '<input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万年一店 万年二店 上饶一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万年一店 万年二店 上饶一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
             html += '<select name="rule_type">';
@@ -827,10 +827,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = changsha_select_list_hidden['mathod_list'];
 
             html += '<td class="changsha_goods">';
-            html += '<input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
             html += '<select name="rule_type">';
