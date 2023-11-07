@@ -73,6 +73,37 @@ class Duanmalv extends BaseController
         return $seasionStr;
     }
 
+    // 自动更新
+    public function autoUpdate() {
+        $this->zt_1();
+        $this->retail_first();
+        $this->retail_first();
+        $this->retail_second();
+
+        $this->sk_first();
+        $this->sk_second();
+        $this->sk_third();
+
+        $this->handle_1_new(); 
+        $this->handle_2(); 
+        $this->handle_3();
+
+        $this->table6();
+        $this->table4();
+        $this->table1();
+        $this->table1_2();
+        $this->table1_3();
+
+        $log_data = $this->config;
+        $log_data['更新时间'] = date('Y-m-d H:i:s');
+        $log_data['更新日期'] = date('Y-m-d');
+        $log_data['cid'] = $this->config['id'];
+        $this->db_easyA->table('cwl_duanmalv_config_log')->where(['更新日期' => $log_data['更新日期']])->delete();
+        $this->db_easyA->table('cwl_duanmalv_config_log')->strict(false)->insert(
+            $log_data
+        );
+    }
+
     // 更新周销 断码率专用 初步加工康雷表 groub by合并插入自己的retail表里
     public function retail_first() {
         $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
@@ -154,7 +185,7 @@ class Duanmalv extends BaseController
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('2023')
+                AND EG.TimeCategoryName1 IN ('{$select_config['年份']}')
                 AND ER.CustomerName NOT IN ( {$noCustomer} )
                 AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
