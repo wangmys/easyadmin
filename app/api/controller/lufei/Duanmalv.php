@@ -31,6 +31,7 @@ class Duanmalv extends BaseController
 
     // top50
     private $top = 50;
+    private $config = [];
 
     public function __construct()
     {
@@ -39,8 +40,9 @@ class Duanmalv extends BaseController
         $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
 
-        $config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1])->find();
+        $config = $this->db_easyA->table('cwl_duanmalv_config')->where(['status' => 1, 'id' => 1])->find();
         $this->top = $config['top'];
+        $this->config = $config;
     }
 
     public function seasionHandle($seasion = "夏季,秋季") {
@@ -98,7 +100,7 @@ class Duanmalv extends BaseController
         $log_data['更新时间'] = date('Y-m-d H:i:s');
         $log_data['更新日期'] = date('Y-m-d');
         $log_data['cid'] = $this->config['id'];
-        $this->db_easyA->table('cwl_duanmalv_config_log')->where(['更新日期' => $log_data['更新日期']])->delete();
+        $this->db_easyA->table('cwl_duanmalv_config_log')->where(['更新日期' => $log_data['更新日期'], 'cid' => $this->config['id']])->delete();
         $this->db_easyA->table('cwl_duanmalv_config_log')->strict(false)->insert(
             $log_data
         );

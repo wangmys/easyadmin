@@ -31,7 +31,7 @@ class DuanmalvWinter extends BaseController
 
     // top50
     private $top = 50;
-    private $config = 50;
+    private $config = [];
 
     public function __construct()
     {
@@ -101,7 +101,7 @@ class DuanmalvWinter extends BaseController
         $log_data['更新时间'] = date('Y-m-d H:i:s');
         $log_data['更新日期'] = date('Y-m-d');
         $log_data['cid'] = $this->config['id'];
-        $this->db_easyA->table('cwl_duanmalv_config_log')->where(['更新日期' => $log_data['更新日期']])->delete();
+        $this->db_easyA->table('cwl_duanmalv_config_log')->where(['更新日期' => $log_data['更新日期'], 'cid' => $this->config['id']])->delete();
         $this->db_easyA->table('cwl_duanmalv_config_log')->strict(false)->insert(
             $log_data
         );

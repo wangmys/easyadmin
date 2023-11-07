@@ -125,7 +125,7 @@ class Autosend extends BaseController
         foreach ($select_history_sys as $key => $val) {
             // $map[] = ['省份', '=', $val['省份']];
             // $map[] = ['中类', '=', $val['中类']];
-            $map_str = "店铺库存数量>1 AND 省份='{$val['省份']}' AND 季节归集='{$select_config['季节归集']}' AND 中类='{$val['中类']}'";
+            $map_str = "店铺库存数量>1 AND 省份='{$val['省份']}' AND 季节归集 in ('{$select_config['季节归集']}') AND 中类='{$val['中类']}'";
             $sql = "
                 SELECT
                     count(*) AS 相同中类数 
