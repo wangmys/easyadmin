@@ -9,13 +9,14 @@
                     <th style="width: 90px;">铺货方案</th>
                     <th style="width: 80px;">剩余门店</th>
                     <th style="width: 80px;">铺货方案</th>
-                    <th style="width: 90px;">是否套装套西</th>
+                    <th style="width: 60px;">是否套装套西</th>
+                    <th style="width: 60px;">是否指定门店</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <!-- <span>添加操作</span> -->
                     </td>
                     <td colspan="1">
@@ -28,11 +29,11 @@
                 {foreach $wuhan_goods_config as $vo}
                 <tr class="wuhan_goods_config-select" lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
                     <td class="wuhan_goods">
-                        <input type="text" style="width:465px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="{$vo['GoodsNo']}" class="layui-input">
+                        <input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
 
                     <td class="Commonfield">
-                        <input type="text" style="width:465px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="{$vo['Commonfield']}" class="layui-input">
+                        <input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="{$vo['Commonfield']}" class="layui-input">
                     </td>
                     
                     <td class="rule_type">
@@ -63,6 +64,13 @@
                         <select name="if_taozhuang">
                             <option value="2" {if ($vo['if_taozhuang']==2)}selected{/if}>否</option>
                             <option value="1" {if ($vo['if_taozhuang']==1)}selected{/if}>是</option>
+                        </select>
+                    </td>
+
+                    <td class="if_zdmd">
+                        <select name="if_zdmd">
+                            <option value="1" {if ($vo['if_zdmd']==1)}selected{/if}>是</option>
+                            <option value="2" {if ($vo['if_zdmd']==2)}selected{/if}>否</option>
                         </select>
                     </td>
                     <td class="handler">

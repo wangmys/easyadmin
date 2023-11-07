@@ -5,6 +5,7 @@
             <thead>
                 <tr>
                     <th style="width: 150px;">最近一次铺货时间</th>
+                    <th style="width: 350px;">铺货完成钉钉通知</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -19,9 +20,11 @@
                     </td>
                 </tr> -->
 
-                <tr class="rundiy-select" >
+                <tr class="rundiy-select" lay-data="{:htmlspecialchars(json_encode($res_dingding_user))}">
                     <td class="guiyang_goods">
                         {$res['update_time']}
+                    </td>
+                    <td class="dingding">
                     </td>
                     <td class="handler">
                         <input type="text" name="Selecttype" class="layui-hide" value="1">

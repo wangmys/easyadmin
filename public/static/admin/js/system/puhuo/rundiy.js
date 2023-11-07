@@ -78,13 +78,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
         },
 
         bind:function (element) {
-            var gender = element.find('.Commonfield')[0];
+            var gender = element.find('.dingding')[0];
             var that = this;
             var data = JSON.parse(element.attr('lay-data'));
+            // console.log(data);
             var genderSelect = xmSelect.render({
                 el: gender,
                 filterable: true,
-                name: 'Commonfield',
+                name: 'dingding',
                 data: function(){
                     return data
                 }
@@ -102,10 +103,18 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 //编辑 保存
                 $(element).find('.get_rundiy').on('click', function(){
                     var _url_get = url.getPuhuoRun_url;
-                    var _data = {}
+                    var dingding = $(element).find('input[name="dingding"]').val();
+                    var _data = {
+                        dingding:dingding
+                    }
                     var return_msg = that.getPuhuoRun($(element), _url_get, _data);
 
                 })// .bind(genderSelect)
+
+                //多选下拉绑定
+                // if (JSON.parse($(element).attr('lay-data')).length != 0) {
+                    that.bind($(element));
+                // }
 
             });
                 

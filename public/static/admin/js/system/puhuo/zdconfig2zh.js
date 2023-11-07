@@ -109,6 +109,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</select>';
             html += '</td>';
 
+            html += '<td class="if_zdmd">';
+            html += '<select name="if_zdmd">';
+            html += '<option value="1">是</option>';
+            html += '<option value="2">否</option>';
+            html += '</select>';
+            html += '</td>';
+
             //点击添加 操作
             $('.add_guiyang_goods_config').on('click', function(){
 
@@ -147,6 +154,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = element.find('select[name="remain_store"]').val();
                     var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
@@ -157,6 +165,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         id:id
                     }
                     // 保存配置
@@ -194,6 +203,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = $(element).find('select[name="remain_store"]').val();
                     var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
 
                     var _data = {
                         id:id,
@@ -204,6 +214,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -292,6 +303,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</select>';
             html += '</td>';
 
+            html += '<td class="if_zdmd">';
+            html += '<select name="if_zdmd">';
+            html += '<option value="1">是</option>';
+            html += '<option value="2">否</option>';
+            html += '</select>';
+            html += '</td>';
+
             //点击添加 操作
             $('.add_wuhan_goods_config').on('click', function(){
 
@@ -355,6 +373,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = element.find('select[name="remain_store"]').val();
                     var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
@@ -365,6 +384,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         id:id
                     }
                     // 保存配置
@@ -402,6 +422,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = $(element).find('select[name="remain_store"]').val();
                     var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
     
                     var _data = {
                         id:id,
@@ -412,6 +433,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -490,6 +512,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</select>';
             html += '</td>';
 
+            html += '<td class="if_zdmd">';
+            html += '<select name="if_zdmd">';
+            html += '<option value="1">是</option>';
+            html += '<option value="2">否</option>';
+            html += '</select>';
+            html += '</td>';
+
             //点击添加 操作
             $('.add_guangzhou_goods_config').on('click', function(){
 
@@ -528,6 +557,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = element.find('select[name="remain_store"]').val();
                     var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
@@ -538,6 +568,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         id:id
                     }
                     // 保存配置
@@ -575,6 +606,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = $(element).find('select[name="remain_store"]').val();
                     var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
 
                     var _data = {
                         id:id,
@@ -585,6 +617,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -663,6 +696,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</select>';
             html += '</td>';
 
+            html += '<td class="if_zdmd">';
+            html += '<select name="if_zdmd">';
+            html += '<option value="1">是</option>';
+            html += '<option value="2">否</option>';
+            html += '</select>';
+            html += '</td>';
+
             //点击添加 操作
             $('.add_nanchang_goods_config').on('click', function(){
 
@@ -701,6 +741,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = element.find('select[name="remain_store"]').val();
                     var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
@@ -711,6 +752,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         id:id
                     }
                     // 保存配置
@@ -748,6 +790,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = $(element).find('select[name="remain_store"]').val();
                     var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
 
                     var _data = {
                         id:id,
@@ -758,6 +801,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置
@@ -836,6 +880,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</select>';
             html += '</td>';
 
+            html += '<td class="if_zdmd">';
+            html += '<select name="if_zdmd">';
+            html += '<option value="1">是</option>';
+            html += '<option value="2">否</option>';
+            html += '</select>';
+            html += '</td>';
+
             //点击添加 操作
             $('.add_changsha_goods_config').on('click', function(){
 
@@ -874,6 +925,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = element.find('select[name="remain_store"]').val();
                     var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
                     var id = element.find('input[name="id"]').val();
                     var _data = {
                         Yuncang:Yuncang,
@@ -884,6 +936,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         id:id
                     }
                     // 保存配置
@@ -921,6 +974,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var remain_store = $(element).find('select[name="remain_store"]').val();
                     var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
                     var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
 
                     var _data = {
                         id:id,
@@ -931,6 +985,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         remain_store:remain_store,
                         remain_rule_type:remain_rule_type,
                         if_taozhuang:if_taozhuang,
+                        if_zdmd:if_zdmd,
                         GoodsNo:GoodsNo
                     }
                     // 保存配置

@@ -33,12 +33,14 @@ class Rundiy extends AdminController
     public function index() {
 
         $res = $this->service->get_puhuo_run();
+        $res_dingding_user = $this->service->get_dingding_user();
         // print_r($res);die;
 
         $this->assign(
         array_merge(
         [
             'res' => $res,
+            'res_dingding_user' => $res_dingding_user,
         ])
         );
 
@@ -52,11 +54,14 @@ class Rundiy extends AdminController
     public function rundiy() {
 
         $res = $this->service->get_puhuo_run();
+        $res_dingding_user = $this->service->get_dingding_user();
+        // print_r($res_dingding_user);die;
 
         $this->assign(
         array_merge(
         [
             'res' => $res,
+            'res_dingding_user' => $res_dingding_user,
         ])
         );
 
@@ -108,6 +113,11 @@ class Rundiy extends AdminController
             $second = $need_time%60;
             $msg = $local_sign.'大约需要 '.$minute.' 分 '.$second.' 秒 铺完，请耐心等待';
 
+        }
+
+        //保存钉钉推送用户
+        if ($post['dingding']) {
+            $this->service->save_dingding_user($post['dingding']);
         }
 
         return $this->success('成功', ['msg' => $msg]);

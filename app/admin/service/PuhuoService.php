@@ -18,6 +18,8 @@ use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
 use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\admin\model\bi\SpLypPuhuoRunModel;
+use app\admin\model\bi\SpLypPuhuoDdUserModel;
+use app\admin\model\bi\DdUserModel;
 use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
 use think\facade\Db;
@@ -469,7 +471,7 @@ class PuhuoService
      */
     public function get_zdy_goods2($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -534,7 +536,7 @@ class PuhuoService
      */
     public function get_zdy_goods2zh($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data2($Yuncang);
         // print_r($select_list);die;
@@ -790,6 +792,7 @@ class PuhuoService
         $remain_store = $data['remain_store'] ?? 2;
         $remain_rule_type = $data['remain_rule_type'] ?? 0;
         $if_taozhuang = $data['if_taozhuang'] ?? 2;
+        $if_zdmd = $data['if_zdmd'] ?? 1;
         $GoodsNo = $data['GoodsNo'] ? trim($data['GoodsNo']) : '';
         $GoodsNo_arr = [];
         if ($GoodsNo) {
@@ -843,6 +846,7 @@ class PuhuoService
             'remain_store' => $remain_store,
             'remain_rule_type' => $remain_rule_type,
             'if_taozhuang' => $if_taozhuang,
+            'if_zdmd' => $if_zdmd,
             'zuhe_customer' => $CustomerNames,
         ];
 
@@ -989,5 +993,36 @@ class PuhuoService
 
     }
 
+    /**
+     * 获取钉钉推送用户
+     */
+    public function get_dingding_user() {
+
+        $dd_user = $this->easy_db->query("select name as name, userid as value from dd_user  group by userid;");
+        $sel_dd_user = SpLypPuhuoDdUserModel::where([])->column('userid');
+        foreach ($dd_user as &$v_user) {
+            if (in_array($v_user['value'], $sel_dd_user)) {
+                $v_user['selected'] = true;
+            }
+        }
+        return $dd_user;
+
+    }
+
+    /**
+     * 保存钉钉推送用户
+     */
+    public function save_dingding_user($dingding) {
+
+        $this->easy_db->query("truncate table sp_lyp_puhuo_dd_user;");
+        $select_dd_user = DdUserModel::where([['userid', 'in', $dingding ? explode(',', $dingding) : []]])->field('userid,name')->select();
+        $select_dd_user = $select_dd_user ? $select_dd_user->toArray() : [];
+        if ($select_dd_user) {
+            foreach ($select_dd_user as $v_sel) {
+                SpLypPuhuoDdUserModel::create($v_sel);
+            }
+        }
+
+    }
 
 }
