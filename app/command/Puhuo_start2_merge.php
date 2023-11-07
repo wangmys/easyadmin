@@ -211,6 +211,7 @@ class Puhuo_start2_merge extends Command
                 $StyleCategoryName2 = $v_data['StyleCategoryName2'] ?: '';//二级风格（货品等级）
                 $StyleCategoryName2_sign = $StyleCategoryName2 ? mb_substr($StyleCategoryName2, 0, -1) : '';
                 $StyleCategoryName2_customer = $StyleCategoryName2_sign ? array_column($puhuo_zdkphmd, $StyleCategoryName2_sign) : [];
+                $StyleCategoryName2_customer = $StyleCategoryName2_customer ? $StyleCategoryName2_customer : array_column($puhuo_zdkphmd, 'B');
                 $StyleCategoryName2_customer = $StyleCategoryName2_customer ? array_unique(array_filter($StyleCategoryName2_customer)) : [];
 
                 $all_customers = $ex_store = [];
@@ -685,6 +686,7 @@ class Puhuo_start2_merge extends Command
                             $StyleCategoryName2 = $v_data['StyleCategoryName2'] ?: '';//二级风格（货品等级）
                             $StyleCategoryName2_sign = $StyleCategoryName2 ? mb_substr($StyleCategoryName2, 0, -1) : '';
                             $StyleCategoryName2_customer = $StyleCategoryName2_sign ? array_column($puhuo_zdkphmd, $StyleCategoryName2_sign) : [];
+                            $StyleCategoryName2_customer = $StyleCategoryName2_customer ? $StyleCategoryName2_customer : array_column($puhuo_zdkphmd, 'B');
                             $StyleCategoryName2_customer = $StyleCategoryName2_customer ? array_unique(array_filter($StyleCategoryName2_customer)) : [];
     
                             $all_customers = $ex_store = [];
