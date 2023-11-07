@@ -152,7 +152,7 @@
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">冬季-单省单款断码情况 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;"><a style="color:red;">（冬季）</a>单省单款断码情况 <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -179,7 +179,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.DuanmalvWinter/table4')}" 
-            , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_table4')}" 
+            , url_download_history_area = "{:url('admin/system.Duanmalv_excel/excel_table4_winter')}" 
             , url_getXmMapSelect = "{:url('admin/system.DuanmalvWinter/getXmMapSelect')}"
 
         initFn();
