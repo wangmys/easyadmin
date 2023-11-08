@@ -43,7 +43,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 data:_data
             },function (res) {
                 // console.log('savePuhuoRun。。。。。..', res);
-                alert(res.data.msg);
+                //alert(res.data.msg);
              });
         },
 
