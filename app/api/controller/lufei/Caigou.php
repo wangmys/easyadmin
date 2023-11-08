@@ -1020,6 +1020,39 @@ class Caigou extends BaseController
         }
     }
 
+    // 单款全国日均排名 单款日均销=单款全国累销量 / 全国上柜家数  / 上市天数
+    public function rank() {
+        $select_retail = $this->db_easyA->table('cwl_cgzdt_retail')->field('货号')->select();
+        $货号str = "";
+        foreach ($select_retail as $key => $val) {
+            if ($key + 1 == count($select_retail)) {
+                $货号str .=  '"' . $val['货号'] . '"';
+            } else {
+                $货号str .= '"' . $val['货号'] . '",';
+            }
+        }
+
+        $sql_上架店数 = "
+            select 货号,sum(t.上架店数) as 上架店数,date_format(now(),'%Y-%m-%d') AS 更新日期 from (
+                SELECT 省份,货号,上架店数 FROM `sp_ww_budongxiao_detail` where 货号 in ({$货号str}) GROUP BY 省份,货号
+            ) as t
+            GROUP BY t.货号
+        ";
+        $select_上架店数 = $this->db_easyA->query($sql_上架店数);
+        // dump($select_上架店数);
+        $this->db_easyA->execute('TRUNCATE cwl_cgzdt_shangjia;');
+        $insert = $this->db_easyA->table('cwl_cgzdt_shangjia')->strict(false)->insertAll($select_上架店数);
+
+        $sql_上市天数 = "
+            SELECT 店铺名称,货号,max(上市天数) as 上市天数, min(上市时间) as 上市时间,date_format(now(),'%Y-%m-%d') AS 更新日期 FROM `sp_ww_budongxiao_detail` where 货号 in ({$货号str}) GROUP BY 货号
+        ";
+        $select_上市天数 = $this->db_easyA->query($sql_上市天数);
+        // dump($select_上架店数);
+        $this->db_easyA->execute('TRUNCATE cwl_cgzdt_shangshi;');
+        $insert = $this->db_easyA->table('cwl_cgzdt_shangshi')->strict(false)->insertAll($select_上市天数);
+        
+    }
+
     // 售罄率 排名等
     public function handle_1() {
         $sql_售罄率_累销量_当天销量_云仓在途量 = "
@@ -1029,6 +1062,8 @@ class Caigou extends BaseController
             left join cwl_cgzdt_retail_14day as d14 on c.货号=d14.货号
             left join cwl_cgzdt_retail as r on c.货号=r.货号
             left join cwl_cgzdt_weiwancheng as w on c.货号=w.货号
+            left join cwl_cgzdt_shangjia as sj on c.货号=sj.货号
+            left join cwl_cgzdt_shangshi as ss on c.货号=ss.货号
             set
                 c.当天销量 = d.销量,
                 c.累销量 = r.累销量,
@@ -1039,75 +1074,83 @@ class Caigou extends BaseController
                 end,
                 c.云仓在途量 = w.数量,
                 c.销售店铺数=d.销售店铺数,
-                c.店均销=d.店均销
+                c.店均销=d.店均销,
+                c.上架店数=sj.上架店数,
+                c.上市天数=ss.上市天数,
+                c.上市时间=ss.上市时间
         ";
         $this->db_easyA->execute($sql_售罄率_累销量_当天销量_云仓在途量);
-        // die;
-        $sql_二级分类售罄 = "
-            update cwl_cgzdt_caigoushouhuo as m1 left join 
-            (
-                SELECT 
-				a.货号,a.大类,a.售罄率,a.店均销,
-				CASE
-                    WHEN 
-                        a.中类 = @中类
-                    THEN
-                        @rank := @rank + 1 ELSE @rank := 1
-				END AS rank,
-				@中类 := a.中类 AS 中类
-                FROM 
-                (
-                    SELECT
-                            货号,大类,中类,售罄率,店均销 
-                    FROM
-                            cwl_cgzdt_caigoushouhuo 
-                    WHERE
-                            中类 IN ( '牛仔长裤', '休闲长裤', '松紧长裤', '卫衣', '保暖内衣', '针织衫', '夹克', '羽绒服', '大衣', '皮衣', '真皮衣')
-                            AND 店均销 is not null
-                ) as a,
-                ( SELECT @中类 := null, @rank := 0 ) T
-                        ORDER BY
-                                a.中类, a.店均销 desc
-            ) as m2 on m1.货号 = m2.货号
-            set 
-                m1.排名 = m2.rank
-            where 
-                m1.货号 = m2.货号
-        ";
-        $this->db_easyA->execute($sql_二级分类售罄);        
 
-        $sql_鞋履售罄率 = "
+        $sql_单款日均销 = "
+            update `cwl_cgzdt_caigoushouhuo`
+            set	 
+                单款日均销 = 累销量 / 上架店数 / 上市天数
+            where
+                累销量  is not null 
+                and 上架店数 is not null 
+                and 上市天数 is not null 
+        ";
+        $this->db_easyA->execute($sql_单款日均销);
+        // die;
+        $sql_单款日均销排名 = "
             update cwl_cgzdt_caigoushouhuo as m1 left join 
             (
-                SELECT 
-                    a.货号,a.中类,a.售罄率,
-                    CASE
-                        WHEN 
-                            a.大类 = @大类
-                        THEN
-                            @rank := @rank + 1 ELSE @rank := 1
+                SELECT
+                a.货号,
+                a.大类,
+                a.单款日均销,
+            CASE
+                WHEN a.中类 = @中类 THEN
+                    @rank := @rank + 1 ELSE @rank := 1 
                     END AS rank,
-                    @大类 := a.大类 AS 大类
-                FROM 
-                (
+                    @中类 := a.中类 AS 中类 
+                FROM
+                    (
                     SELECT
-                        货号,大类,中类,售罄率 
+                        货号,大类,中类,单款日均销 
                     FROM
                         cwl_cgzdt_caigoushouhuo 
                     WHERE
-                        大类 IN ('鞋履')
-                        AND 售罄率 is not null
-                ) as a,
-                ( SELECT @大类 := null, @rank := 0 ) T
-                    ORDER BY
-                            a.大类, a.售罄率 desc
+                        中类 IN ( '牛仔长裤', '休闲长裤', '松紧长裤', '卫衣', '保暖内衣', '针织衫', '夹克', '羽绒服', '大衣', '皮衣', '真皮衣' ) 
+                        AND 单款日均销 IS NOT NULL 
+                    ) AS a,
+                    ( SELECT @中类 := NULL, @rank := 0 ) T 
+                ORDER BY
+                    a.中类,
+                    a.单款日均销 DESC
             ) as m2 on m1.货号 = m2.货号
             set 
                 m1.排名 = m2.rank
             where 
                 m1.货号 = m2.货号
         ";
-        $this->db_easyA->query($sql_鞋履售罄率); 
+        $this->db_easyA->execute($sql_单款日均销排名);        
+
+        $sql_鞋履单款日均销排名 = "
+            update cwl_cgzdt_caigoushouhuo as m1 left join 
+            (
+                SELECT
+                    a.货号,
+                    a.中类,
+                    a.单款日均销,
+                    CASE
+                        WHEN a.大类 = @大类 THEN
+                        @rank := @rank + 1 ELSE @rank := 1 
+                    END AS rank,
+                    @大类 := a.大类 AS 大类 
+                FROM
+                    ( SELECT 货号,大类,中类,单款日均销 FROM cwl_cgzdt_caigoushouhuo WHERE 大类 IN ( '鞋履' ) AND 单款日均销 IS NOT NULL ) AS a,
+                    ( SELECT @大类 := NULL, @rank := 0 ) T 
+                ORDER BY
+                    a.大类,
+                    a.单款日均销 DESC
+            ) as m2 on m1.货号 = m2.货号
+            set 
+                m1.排名 = m2.rank
+            where 
+                m1.货号 = m2.货号
+        ";
+        $this->db_easyA->query($sql_鞋履单款日均销排名); 
 
         $sql_上柜数 = "
             update cwl_cgzdt_caigoushouhuo as c
