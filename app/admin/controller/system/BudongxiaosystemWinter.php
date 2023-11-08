@@ -5,7 +5,7 @@ use think\facade\Db;
 use think\cache\driver\Redis;
 use app\admin\model\budongxiao\SpWwBudongxiaoDetail;
 use app\admin\model\budongxiao\SpXwBudongxiaoYuncangkeyong;
-use app\admin\model\budongxiao\CwlBudongxiaoStatisticsSys;
+use app\admin\model\budongxiao\CwlBudongxiaoStatisticsSysWinter;
 use think\db\Raw;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
@@ -16,9 +16,9 @@ use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 /**
  * Class Budongxiao
  * @package app\admin\controller\system
- * @ControllerAnnotation(title="不动销系统推送_秋季")
+ * @ControllerAnnotation(title="不动销系统推送_冬季")
  */
-class Budongxiaosystem extends AdminController
+class BudongxiaosystemWinter extends AdminController
 {
     // 接收筛选参数
     public $params = [];
@@ -63,7 +63,7 @@ class Budongxiaosystem extends AdminController
         
         // dump($select_config );die;
 
-        return View('system/budongxiao/config', [
+        return View('system/budongxiao_winter/config', [
             'config' => $select_config,
             'typeQima' => $typeQima,
             'people' => $people,
@@ -85,11 +85,11 @@ class Budongxiaosystem extends AdminController
                 ];
             }
             // 超管
-            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
             if (checkAdmin()) {
-                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where($map)->select()->toArray();
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->select()->toArray();
             } else {
-                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys')->where($map)->where([
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->where([
                     ['商品负责人', '=', session('admin.name')],
                 ])->select()->toArray();
             }
@@ -97,14 +97,14 @@ class Budongxiaosystem extends AdminController
             // $select_static = $this->single_statistics($select_map['rand_code']);
             return json(["code" => "0", "msg" => "", "count" => count($select_result), "data" => $select_result, 'rand_code' => $select_map['rand_code'], 'create_time' => $select_map['create_time']]);
         } else {
-            $find_result_sys = $this->db_easyA->table('cwl_budongxiao_result_sys')->where(1)->find();
+            $find_result_sys = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where(1)->find();
             if ($find_result_sys) {
                 $success_percent = $find_result_sys['合格率2'];
             } else {
                 $success_percent = "";
             }
             $total_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.Budongxiaosystem/open_dandian_total');
-            return View('system/budongxiao/sys_result', [
+            return View('system/budongxiao_winter/sys_result', [
                 // 'config' => $select_config,
                 // 'typeQima' => $typeQima,
                 'total_url' => $total_url,
@@ -118,9 +118,9 @@ class Budongxiaosystem extends AdminController
         // 超管
         // dump($_SERVER);
         // echo $_SERVER['HTTP_HOST']  . url('admin/system.Budongxiaosystem/open_dandian_total'); die;
-        $find_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+        $find_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
 
-        return View('system/budongxiao/open_dandian_total', [
+        return View('system/budongxiao_winter/open_dandian_total', [
             // 'config' => $select_config,
             // 'typeQima' => $typeQima,
             'rand_code' => $find_map['rand_code'],
@@ -159,7 +159,7 @@ class Budongxiaosystem extends AdminController
         if (request()->isAjax()) {
             $input = input();
              
-            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+            $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
             $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
             $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
             $params = array_merge($select_config, $static_qima);
@@ -242,7 +242,7 @@ class Budongxiaosystem extends AdminController
                     a.二十天销量,
                     a.三十天销量 
                 FROM
-                    `cwl_budongxiao_history_sys` AS a
+                    `cwl_budongxiao_history_sys_winter` AS a
                     LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
                 WHERE 
                     " . $map1 . $map2 . $map3 . $map4. $map5 . "
@@ -261,7 +261,7 @@ class Budongxiaosystem extends AdminController
                         b.相同中类数,
                         FORMAT( a.品类排名 / b.相同中类数 * 100, 2 ) AS rank_b 
                     FROM
-                        `cwl_budongxiao_history_sys` AS a
+                        `cwl_budongxiao_history_sys_winter` AS a
                         LEFT JOIN cwl_budongxiao_areanum_sys AS b ON a.省份 = b.省份 
                         AND a.中类 = b.中类 
                     WHERE
@@ -278,7 +278,7 @@ class Budongxiaosystem extends AdminController
             // die;
             return json(["code" => "0", "msg" => '', "count" => $count[0]['tatalCount'], "data" => $select_history_area, 'create_time' => $select_map['create_time']]);
         } else {
-            return View('system/budongxiao/sys_area_result', [
+            return View('system/budongxiao_winter/sys_area_result', [
                 // 'config' => $select_config,
                 // 'typeQima' => $typeQima,
                 // 'people' => $people,
@@ -290,9 +290,9 @@ class Budongxiaosystem extends AdminController
      */
     public function excel_history_detail() {
         if (checkAdmin()) {
-            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where(1)->select()->toArray();
+            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys_winter')->where(1)->select()->toArray();
         } else {
-            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys')->where([
+            $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys_winter')->where([
                 ['商品负责人', '=', session('admin.name')]
             ])->select()->toArray();
         }
@@ -301,14 +301,14 @@ class Budongxiaosystem extends AdminController
         foreach($select_result[0] as $key => $val) {
             $header[] = [$key, $key];
         }
-        return Excel::exportData($select_result, $header, '秋_单店不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+        return Excel::exportData($select_result, $header, '冬_单店不动销明细_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
     }
 
     /**
      * 区域不动销计算明细 导出
      */
     public function excel_history_detail_area() {
-        $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys')->where(1)->order('id desc')->find();
+        $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
         $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
         $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
         $params = array_merge($select_config, $static_qima);
@@ -384,7 +384,7 @@ class Budongxiaosystem extends AdminController
             a.二十天销量,
             a.三十天销量 
         FROM
-            `cwl_budongxiao_history_sys` AS a
+            `cwl_budongxiao_history_sys_winter` AS a
             LEFT JOIN cwl_budongxiao_areanum_sys as b on a.省份=b.省份 and a.中类=b.中类
         WHERE 
             " . $map1 . $map2 . $map3 . $map4. $map5 . "
@@ -435,7 +435,7 @@ class Budongxiaosystem extends AdminController
             ['name' => '冬季', 'value' => '冬季'],
         ];
 
-        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店,不考核货号,季节')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->field('省份,不考核门店,不考核货号,季节')->where('id=2')->find();
 
         $select_nostore = explode(',', $select_config['不考核门店']);
         $select_province = explode(',', $select_config['省份']);
@@ -626,7 +626,7 @@ class Budongxiaosystem extends AdminController
 
             // die;
             $this->db_easyA->startTrans();
-            $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys')->insertAll($insert_history_data);
+            $insert_history = $this->db_easyA->table('cwl_budongxiao_history_sys_winter')->insertAll($insert_history_data);
             if ($insert_history) {
                 $this->db_easyA->commit();
             } else {
@@ -655,7 +655,7 @@ class Budongxiaosystem extends AdminController
             $res_end['rand_code'] = $this->rand_code;
 
             // 统计插入
-            $addPeople = CwlBudongxiaoStatisticsSys::addStatic($res_end);
+            $addPeople = CwlBudongxiaoStatisticsSysWinter::addStatic($res_end);
 
             return $res_end;
         } else {
@@ -712,15 +712,15 @@ class Budongxiaosystem extends AdminController
                     IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
                     CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
                 FROM
-                    cwl_budongxiao_statistics_sys a
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                    cwl_budongxiao_statistics_sys_winter a
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                    LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
                 WHERE a.rand_code = '{$rand_code}'    
                 GROUP BY
                     a.商品负责人 
@@ -791,15 +791,15 @@ class Budongxiaosystem extends AdminController
                         IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
                         CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
                     FROM
-                        cwl_budongxiao_statistics_sys a
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                        cwl_budongxiao_statistics_sys_winter a
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
                     WHERE a.rand_code = '{$rand_code}'    
                     GROUP BY
                         a.商品负责人 
@@ -865,15 +865,15 @@ class Budongxiaosystem extends AdminController
                         IFNULL( i.`加盟不合格家数`, 0 ) AS 加盟不合格家数,
                         CONCAT(FORMAT(IFNULL( h.`加盟合格家数` / g.`加盟总家数`, 0 ) * 100, 2), '%') AS 加盟合格率 
                     FROM
-                        cwl_budongxiao_statistics_sys a
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
-                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
+                        cwl_budongxiao_statistics_sys_winter a
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '合格' AND rand_code = '{$rand_code}'  GROUP BY 商品负责人 ) AS b ON a.商品负责人 = b.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS c ON a.商品负责人 = c.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS d ON a.商品负责人 = d.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS e ON a.商品负责人 = e.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 直营不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '直营' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS f ON a.商品负责人 = f.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟总家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS g ON `a`.`商品负责人` = g.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS h ON a.商品负责人 = h.商品负责人
+                        LEFT JOIN ( SELECT 商品负责人, count(*) AS 加盟不合格家数 FROM cwl_budongxiao_statistics_sys_winter WHERE 经营性质 = '加盟' AND 考核结果 = '不合格' AND rand_code = '{$rand_code}' GROUP BY 商品负责人 ) AS i ON a.商品负责人 = i.商品负责人 
                     WHERE a.rand_code = '{$rand_code}' 
                         AND a.商品负责人 = '{$name}'
                     GROUP BY
@@ -1039,7 +1039,7 @@ class Budongxiaosystem extends AdminController
                 }
             }
 
-            $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->strict(false)->update($params);     
+            $this->db_easyA->table('cwl_budongxiao_config')->where('id=2')->strict(false)->update($params);     
 
             // 保存map，清空缓存
             cache('static_qima_sys', null);

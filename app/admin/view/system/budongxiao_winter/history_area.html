@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>单店不动销-历史</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-col-md12 layui-col-space8" style="display:block;">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8">
+            <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                <div class="layui-form-item">
+                    <!-- <label class="layui-form-label">查询码</label>
+                    <div class="layui-input-inline">
+                        <select name="rand_code" lay-verify="" lay-filter="select_code" id='select_code'>
+                            <option value="">请选择</option>
+                            {foreach $select_map as $key=>$vo}
+                                <option value="{$vo['rand_code']}">{$vo['rand_code']}</option>
+                            {/foreach} 
+                        </select>
+                    </div> -->
+
+                    <label class="layui-form-label" style="width: 90px !important; text-align: center;">查询日期</label>
+                    <div class="layui-input-inline" style="width: 175px !important;">
+                        <select name="create_time" lay-verify="required" lay-filter="select_date" id='select_date'>
+                            <option value="">请选择</option>
+                            {foreach $select_map as $key=>$vo}
+                                <option value="{$vo['create_time']}">{$vo['create_time']}</option>
+                            {/foreach} 
+                        </select>
+                    </div>
+
+             
+                    <label class="layui-form-label">上柜率(%) >=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='上柜率' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
+                    <label class="layui-form-label" style="overflow:visible;">省份售罄率(%) <=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='省份售罄' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+
+                    <label class="layui-form-label" style="overflow:visible;">排名率(%) >=</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name='排名率' autocomplete="off" value="0" maxlength="1"
+                            class="layui-input" lay-verify="required">
+                    </div>
+                    
+                </div>
+
+                <div class="">
+                    <span style="color:#0051ff;">查询条件：</span>
+                    <span id="tiaojian_str" style="font-size: 12px;"></span>
+                </div>
+
+                <!-- <hr>    -->
+                <div class="layui-col-md1 layui-col-sm11"
+                    style="border:0px solid red; float: right; text-align: right;">
+                    <button lay-submit class="layui-btn layui-btn-xs" lay-filter="formDemo"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff">数据筛选
+                    </button>
+                    <button type="reset" class="layui-btn layui-btn-xs"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff">重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" >
+            <div style="text-align: center; color:#0051ff;">区域不动销明细</div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            ,url1 = "{:url('admin/system.Budongxiao/history_area')}" // 区域不动销
+            ,url_map_1 = "{:url('admin/system.Budongxiao/history_map')}"
+
+        startTable();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            data.field.isAjax = true
+
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: 5000
+                , limits: [1000, 5000, 10000, 20000]
+            })
+            return false;
+        });
+
+        form.on('select(select_code)', function (data) {
+            let rand_code = $("#select_code").val()
+            let url = url_map_1
+            console.log(rand_code);
+            $.post(url, {type:1, rand_code:rand_code}, function(res) {
+                // console.log(res.str);
+                $('#tiaojian_str').html(res.str);
+            }, 'json');
+            return false;
+        });
+
+        form.on('select(select_date)', function (data) {
+            let create_time = $("#select_date").val()
+            let url = url_map_1
+            $.post(url, {type:2, create_time:create_time}, function(res) {
+                // console.log(res.str);
+                $('#tiaojian_str').html(res.str);
+            }, 'json');
+            return false;
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                // ,url: url1
+                , loading: false
+                , method: 'post'
+                , toolbar: true
+                , limit: 0
+                , height: 620
+                , cellMinWidth: 75 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '商品负责人', title: '商品负责人', fixed: 'left'}
+                    , { field: '省份', title: '省份', fixed: 'left' }
+                    , { field: '季节归集', title: '季节归集', fixed: 'left' }
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' }
+                    , { field: '经营模式', title: '经营模式', fixed: 'left' }
+                    , { field: '云仓', title: '云仓', fixed: 'left' }
+                    , { field: '货号', title: '货号', fixed: 'left' }
+                    , { field: '相同货号数', title: '相同货号数', fixed: 'left' }
+                    , { field: '大类', title: '大类', fixed: 'left' }
+                    , { field: '中类', title: '中类', fixed: 'left' }
+                    , { field: '小类', title: '小类', fixed: 'left' }
+                    , { field: '上架店数', title: '上架店数' }
+                    , { field: '总店数', title: '总店数' }
+                    , { field: '上柜率', title: '上柜率' }
+                    , { field: '省份售罄', title: '省份售罄' }
+                    , { field: '品类排名', title: '品类排名' }
+                    , { field: '排名率', title: '排名率' }
+                    , { field: '累销量', title: '累销量' }
+                    , { field: '月销量', title: '月销量' }
+                    , { field: '五天销量', title: '五天销量' }
+                    , { field: '十天销量', title: '十天销量' }
+                    , { field: '十五天销量', title: '十五天销量' }
+                    , { field: '二十天销量', title: '二十天销量' }
+                    , { field: '三十天销量', title: '三十天销量' }
+                    , { field: '上架店数', title: '上架店数' }
+                    , { field: '店铺库存数量', title: '店铺库存数量' }
+                    , { field: '可用库存Quantity', title: '云仓可用库存' }
+                    , { field: '齐码情况', title: '齐码情况' }
+                    , { field: '上市时间', title: '上市时间' }
+                    , { field: '上市时间修正', title: '上市时间修正' }
+                    , { field: '上市天数', title: '上市天数' }
+                    , { field: '上市天数修正', title: '上市天数修正' }
+                    , { field: '考核标准', title: '考核标准' }
+                    , { field: '不动销区间', title: '不动销区间' }
+                    , { field: '不动销区间修订', title: '不动销区间修订' }
+                    
+                    , { field: 'create_time', title: '生成时间' }
+                ]]
+            });
+        }
+    });
+
+</script>
