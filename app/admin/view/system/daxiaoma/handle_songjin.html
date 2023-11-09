@@ -204,7 +204,7 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -231,9 +231,17 @@
                                 <div id="xm-dxmtx" class="xm-select-demo"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex col between" style="width:5%; height:35px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-jjgj" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
@@ -302,6 +310,23 @@
         //         {name: "长沙云仓", value: "长沙云仓", selected: ""},
         //     ]
         // })
+
+        xmSelect.render({
+            el: '#xm-jjgj', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '季节归集',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "春季", value: "春季", selected: ""},
+                {name: "夏季", value: "夏季", selected: ""},
+                {name: "秋季", value: "秋季", selected: ""},
+                {name: "冬季", value: "冬季", selected: true},
+            ]
+        })
 
         xmSelect.render({
             el: '#xm-fg', 
@@ -485,7 +510,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: {"类型": "松紧" , "风格" : '基本款'}
+                , where: {"类型": "松紧" , "风格" : '基本款', '季节归集': '冬季'}
                 , cols: [
                     [
                         { title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
