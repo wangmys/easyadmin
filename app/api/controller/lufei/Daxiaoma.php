@@ -330,7 +330,7 @@ class Daxiaoma extends BaseController
             FROM
                 `sp_sk`
             WHERE 1 
-                季节归集 in ('秋季','冬季')
+                AND 季节归集 in ('秋季','冬季')
             GROUP BY 季节归集,省份,店铺名称,风格,一级分类,二级分类,一级风格
             ORDER BY 季节归集,省份,店铺名称, 风格, 一级分类,二级分类,一级风格
 
