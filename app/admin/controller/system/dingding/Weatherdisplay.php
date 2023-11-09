@@ -258,17 +258,19 @@ class Weatherdisplay extends AdminController
 
     // 上次用户列表_店铺版 测试 $debug
     public function upload_excel_user() {
-        if (request()->isAjax()) {
+        if (request()->isAjax() || $this->debug) {
         // if (1) {
-            $file = request()->file('file');  //这里‘file’是你提交时的name
-            $file->getOriginalName();
-            $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
-            $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
-            $info = $file->move($save_path, $new_name);
+
 
             if ($this->debug) {
             // 静态测试
-                $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/666.xlsx';   //文件保存路径
+                $info = app()->getRootPath() . 'public/upload/dd_excel_user/'.date('Ymd',time()).'/店铺版_陈列调整推送模板_20231109_1699532001.xlsx';   //文件保存路径
+            } else {
+                $file = request()->file('file');  //这里‘file’是你提交时的name
+                $file->getOriginalName();
+                $new_name = md5($file->getOriginalName()) . '_' . rand(100, 999) . '.' . $file->getOriginalExtension();
+                $save_path = app()->getRootPath() . 'public/upload/dd_excel_user/' . date('Ymd',time()).'/';   //文件保存路径
+                $info = $file->move($save_path, $new_name);
             }
 
             if($info) {
@@ -288,6 +290,7 @@ class Weatherdisplay extends AdminController
                 // echo 111;
                 // echo '<pre>';
                 // dump($data);
+                // die;
                 if ($data) {
                     $model = new DingTalk;
                     $sucess_data = [];
@@ -314,15 +317,18 @@ class Weatherdisplay extends AdminController
                     }
 
                     // 测试专用
-                    if ($this->debug) {
-                        $sql = "
-                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷','徐文娟')
-                        ";
-                    } else {
-                        $sql = "
-                            select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
-                        ";
-                    }
+                    // if ($this->debug) {
+                    //     $sql = "
+                    //         select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str}) and `name` in ('陈威良','王威','李雅婷','徐文娟')
+                    //     ";
+                    // } else {
+                    //     $sql = "
+                    //         select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
+                    //     ";
+                    // }
+                    $sql = "
+                        select * from dd_customer_push where isCustomer = '是' and 店铺名称 in ({$店铺str})
+                    ";
                     // echo $sql;
 
                     // 方案图路径
