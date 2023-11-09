@@ -24,15 +24,17 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                 var StyleCategoryName_list = res.StyleCategoryName_list;
                 var CategoryName1_list = res.CategoryName1_list;
                 var CategoryName2_list = res.CategoryName2_list;
+                var CategoryName_list = res.CategoryName_list;
 
                 var cols = [
                     {type: "checkbox",fixed:'left'},
                     {field: 'Yuncang', width: 70, title: '云仓',fixed:'left',search: 'select',selectList:Yuncang_list,laySearch:true},
                     {field: 'State', width: 70, title: '省份',fixed:'left',search: 'select',selectList:State_list,laySearch:true},
                     {field: 'StyleCategoryName', width: 70, title: '风格',search: false,search: 'select',selectList:StyleCategoryName_list},
-                    {field: 'StyleCategoryName1', width: 70, title: '一级风格',search: false},
+                    // {field: 'StyleCategoryName1', width: 70, title: '一级风格',search: false},
                     {field: 'CategoryName1', width: 90, title: '一级分类',search: 'xmSelect',selectList:CategoryName1_list,laySearch:true},
                     {field: 'CategoryName2', width: 100, title: '二级分类',search: 'xmSelect',selectList:CategoryName2_list,laySearch:true},
+                    {field: 'CategoryName', width: 100, title: '分类',search: 'xmSelect',selectList:CategoryName_list,laySearch:true},
                     {field: 'CustomerGrade', width: 50, title: '店铺等级',search: false},
                     {field: 'Stock_00', width: 50, title: '28',search: false},
                     {field: 'Stock_29', width: 50, title: '29',search: false},

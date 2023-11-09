@@ -214,6 +214,7 @@ class Puhuoruleb extends AdminController
 
             $CategoryName_list = array_unique(array_column($goods_info_list,'CategoryName'));
             $CategoryName_list = array_combine($CategoryName_list,$CategoryName_list);
+            $CategoryName_list['其它'] = '其它' ;
 
             $CustomerGrade_list = array_unique(array_column($info_list,'CustomerGrade'));
             $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
@@ -340,6 +341,7 @@ class Puhuoruleb extends AdminController
 
             $CategoryName_list = array_unique(array_column($goods_info_list,'CategoryName'));
             $CategoryName_list = array_combine($CategoryName_list,$CategoryName_list);
+            $CategoryName_list['其它'] = '其它' ;
 
             $CustomerGrade_list = array_unique(array_column($info_list,'CustomerGrade'));
             $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
