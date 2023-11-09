@@ -330,9 +330,9 @@ class Daxiaoma extends BaseController
             FROM
                 `sp_sk`
             WHERE 1 
-                AND 季节归集 in ('冬季')
-            GROUP BY 省份,店铺名称,风格,一级分类,二级分类,一级风格
-            ORDER BY 省份,店铺名称, 风格, 一级分类,二级分类,一级风格
+                季节归集 in ('秋季','冬季')
+            GROUP BY 季节归集,省份,店铺名称,风格,一级分类,二级分类,一级风格
+            ORDER BY 季节归集,省份,店铺名称, 风格, 一级分类,二级分类,一级风格
 
         ";
         $select = $this->db_easyA->query($sql);
