@@ -4,7 +4,8 @@
         <div class="layui-form-item">
             <label class="layui-form-label required">云仓：</label>
             <div class="layui-input-block">
-                <select name="Yuncang" lay-verify="" lay-search="">
+                <select name="Yuncang" lay-verify="" lay-search="" lay-filter="Yuncang">
+                    <option value="">请选择</option>
                     {foreach $Yuncang_list as $vo}
                     <option value="{$vo}">{$vo}</option>
                     {/foreach}
@@ -15,7 +16,8 @@
         <div class="layui-form-item">
             <label class="layui-form-label required">省份:</label>
             <div class="layui-input-block">
-                <select name="State" lay-verify="" lay-search="">
+                <select name="State" lay-verify="" lay-search="" id="State">
+                    <option value="全部">全部</option>
                     {foreach $State_list as $vo}
                     <option value="{$vo}">{$vo}</option>
                     {/foreach}
@@ -68,6 +70,17 @@
         </div>
 
         <div class="layui-form-item">
+            <label class="layui-form-label required">分类:</label>
+            <div class="layui-input-block">
+                <select name="CategoryName" lay-verify="" lay-search="">
+                    {foreach $CategoryName_list as $vo}
+                    <option value="{$vo}">{$vo}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
             <label class="layui-form-label required">店铺等级:</label>
             <div class="layui-input-block">
                 <select name="CustomerGrade" lay-verify="" lay-search="">
@@ -79,83 +92,83 @@
         </div>
 
         <div class="layui-form-item">
-            <label class="layui-form-label required">28:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">28/37/44/100/160/S:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_00" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_00" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">29:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">29/38/46/105/165/M:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_29" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_29" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">30:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">30/39/48/110/170/L:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_30" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_30" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">31:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">31/40/50/115/175/XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_31" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_31" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">32:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">32/41/52/120/180/2XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_32" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_32" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">33:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">33/42/54/125/185/3XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_33" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_33" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">34:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">34/43/56/190/4XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_34" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_34" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">35:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">35/44/58/195/5XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_35" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_35" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">36:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">36/6XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_36" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_36" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">38:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">38/7XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_38" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_38" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">40:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">40/8XL:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_40" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_40" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label required">42:</label>
+            <label class="layui-form-label required" style="word-wrap:break-word;word-break:break-all;overflow:hidden;">42:</label>
             <div class="layui-input-block">
-                <input type="text" name="Stock_42" placeholder="请输入" class="layui-input" value="">
+                <input type="text" name="Stock_42" placeholder="请输入" class="layui-input" value="0">
             </div>
         </div>
-        <div class="layui-form-item">
+        <!-- <div class="layui-form-item">
             <label class="layui-form-label required">合计:</label>
             <div class="layui-input-block">
                 <input type="text" name="total" placeholder="请输入" class="layui-input" value="">
             </div>
-        </div>
+        </div> -->
 
         <div class="layui-form-item text-center">
             <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>
@@ -163,3 +176,52 @@
 
     </form>
 </div>
+
+
+<script>
+
+    layui.use(['form', 'jquery', 'layer'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , url1 = "{:url('admin/system.Puhuorulea/get_province_by_yuncang')}"
+        ;
+
+        //监听下拉
+        form.on('select(Yuncang)', function (data) {
+
+            var Yuncang = data.value;
+            // alert(Yuncang);
+            $.ajax({
+                type: "POST",
+                url: url1,
+                data: {'Yuncang':Yuncang},
+                dataType: 'json',
+                success: function (res) {
+                    // console.log(res);
+
+                    $('#State').empty();
+                    $('#State').next().empty();
+
+                    var append_str = '<option value="全部">全部</option>';
+                    var dd_append_str = '<div class="layui-select-title"><input type="text" placeholder="请选择" value="全部" class="layui-input"><i class="layui-edge"></i></div>';
+                    dd_append_str += '<dl class="layui-anim layui-anim-upbit">';
+                    dd_append_str += '<dd lay-value="全部" class="layui-this">全部</dd>';
+
+                    $.each(res.data, function(key, val){
+                        append_str += '<option value="'+val+'">'+val+'</option>';
+                        dd_append_str += '<dd lay-value="'+val+'" class="">'+val+'</dd>';
+                    });
+                    dd_append_str += '</dl></div>';
+                    $('#State').append(append_str);
+                    $('#State').next().append(dd_append_str);
+                    form.render('select');
+
+                }
+            });
+
+        });
+
+    });
+
+</script>
