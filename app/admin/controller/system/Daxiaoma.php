@@ -162,6 +162,14 @@ class Daxiaoma extends AdminController
             } else {
                 $map6 = "";
             }
+            
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['季节归集']);
+                $map7 = " AND 季节归集 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
 
             $sql = "
                 SELECT 
@@ -191,6 +199,7 @@ class Daxiaoma extends AdminController
                     {$map4}
                     {$map5}
                     {$map6}
+                    {$map7}
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";  
 
@@ -209,6 +218,7 @@ class Daxiaoma extends AdminController
                     {$map4}
                     {$map5}
                     {$map6}
+                    {$map7}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();

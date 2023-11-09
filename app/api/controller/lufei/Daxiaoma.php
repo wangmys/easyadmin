@@ -64,6 +64,18 @@ class Daxiaoma extends BaseController
         return $seasionStr;
     }
 
+    // 自动更新
+    public function autoUpdate() {
+        $this->hpzl_1();
+        $this->hpzl_2();
+        $this->retail();
+
+        $this->handle_1();
+        $this->handle_2();
+        $this->handle_3();
+        $this->handle_4();
+    }
+
     // 货品资料
     public function hpzl_1()
     {
