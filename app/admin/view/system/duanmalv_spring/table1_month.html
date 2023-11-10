@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>春-断码率-整体</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+        th[data-field="5"][data-key="1-0-5"], th[data-field="7"][data-key="1-0-7"] , th[data-field="9"][data-key="1-0-9"] , th[data-field="11"][data-key="1-0-11"], th[data-field="13"][data-key="1-0-13"]{
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="单店排名-新"][data-key="1-1-0"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="6"][data-key="1-0-6"], th[data-field="8"][data-key="1-0-8"] ,th[data-field="10"][data-key="1-0-10"], th[data-field="12"][data-key="1-0-12"], th[data-field="14"][data-key="1-0-14"]{
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="单店排名-旧"][data-key="1-1-4"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="layui-col-md12 layui-col-sm12 layui-col-space8">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">商品专员</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-customer17" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">云仓</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-yc" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">省份</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-province" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">店铺名称</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-customer" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">经营模式</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-jyms" class="xm-select-demo"></div>
+                        </div>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+    
+                    </div>  
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 内容 -->
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 20px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;"><a style="color:red;">（春季）</a>整体-单店月份 统计 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】整体情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.DuanmalvSpring/table1_month')}" 
+            , url_download_history_area = "{:url('admin/system.DuanmalvSpring/excel_table1')}" 
+            , url_getXmMapSelect = "{:url('admin/system.DuanmalvSpring/getXmMapSelect')}"
+            , url_setTime = "{:url('admin/system.DuanmalvSpring/duanmalvDateHandle')}"
+            , select_date_num = "{:count($select_date)}" // 显示的日期数
+
+            console.log(select_date_num);
+
+        initFn();
+        startTable();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#setTime1'
+        });
+
+        laydate.render({
+            elem: '#setTime2'
+        });
+
+        // 选择云仓
+        xmSelect.render({
+            el: '#xm-yc', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "南昌云仓", value: "南昌云仓", selected: ""},
+                {name: "广州云仓", value: "广州云仓", selected: ""},
+                {name: "武汉云仓", value: "武汉云仓", selected: ""},
+                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+                {name: "长沙云仓", value: "长沙云仓", selected: ""},
+            ]
+        })
+        // 
+        xmSelect.render({
+            el: '#xm-jyms', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '经营模式',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "直营", value: "直营", selected: ""},
+                {name: "加盟", value: "加盟", selected: ""},
+            ]
+        })
+        // 选择省份
+        xmSelect.render({
+            el: '#xm-province', 
+            filterable: true,
+            name: '省份',
+            // showCount: 1,
+            data: []
+        })
+
+        // 选择店铺
+        xmSelect.render({
+            el: '#xm-customer', 
+            filterable: true,
+            name: '店铺名称',
+            // showCount: 1,
+            data: []
+        })
+
+        // 选择负责人
+        xmSelect.render({
+            el: '#xm-customer17', 
+            filterable: true,
+            // showCount: 1,
+            data: []
+        })
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // console.log(res.data.provinceAll);
+                // storeData = res.data.storeAll
+                // provinceData = res.data.provinceAll    
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer17', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'商品负责人',
+                    data: res.data.customer17
+                })
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-province', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: res.data.province
+                })
+                // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-customer', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
+            }, 'json')
+        }
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            let newDateStr = '未选择';
+            let oldDateStr = '未选择';
+            $.post(url_setTime, data.field, function(res) {
+                newDateStr = `【${res.setTime1Str}】 ${res.setTime1}`;
+                if (res.setTime2Str && res.setTime2) {
+                    oldDateStr = `【${res.setTime2Str}】 ${res.setTime2}`;
+                }
+                
+                table.reload('table', {
+                    where: data.field
+                    , method: 'post'
+                    , url: url1
+                    , loading: true
+                    , page: true
+                    , limit: data.field.limit
+                })
+            }, 'json');
+
+            return false; 
+        });
+
+        function startTable() {
+            let cols = '';
+            if (select_date_num == 9) {
+
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    
+                    , { title: '【{php} echo @$select_date[8]["weekStr"] ? @$select_date[8]["weekStr"] : "未来"; {/php}】{php}echo " " . @$select_date[8]["weekStr"] ? @$select_date[8]["更新日期"] : "未来可期";{/php}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t9', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t9', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t9', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]
+            } else if (select_date_num == 10) {
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { title: '【{php} echo @$select_date[9]["weekStr"] ? @$select_date[9]["weekStr"] : "未来"; {/php}】{php}echo " " . @$select_date[9]["weekStr"] ? @$select_date[9]["更新日期"] : "未来可期";{/php}', align: 'center' ,colspan: 3}
+                    , { title: '【{php} echo @$select_date[8]["weekStr"] ? @$select_date[8]["weekStr"] : "未来"; {/php}】{php}echo " " . @$select_date[8]["weekStr"] ? @$select_date[8]["更新日期"] : "未来可期";{/php}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t10', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t10', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t10', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        ,{ field: '齐码率-整体-t9', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t9', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t9', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]
+            } else {
+                cols = [[
+                    { field: '商品负责人', title: '商品专员', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '省份', title: '省份', fixed: 'left' ,align: 'center' ,rowspan: 3}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { field: '经营模式', title: '经营模式', fixed: 'left', align: 'center' ,rowspan: 3}
+                    , { title: '【{$select_date[7]["weekStr"]}】 {$select_date[7]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[6]["weekStr"]}】 {$select_date[6]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[5]["weekStr"]}】 {$select_date[5]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[4]["weekStr"]}】 {$select_date[4]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[3]["weekStr"]}】 {$select_date[3]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[2]["weekStr"]}】 {$select_date[2]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[1]["weekStr"]}】 {$select_date[1]["更新日期"]}', align: 'center' ,colspan: 3}
+                    , { title: '【{$select_date[0]["weekStr"]}】 {$select_date[0]["更新日期"]}', align: 'center' ,colspan: 3}
+                    ],
+                    [ 
+                        { field: '齐码率-整体-t8', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t8', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t8', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t7', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t7', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t7', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t6', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t6', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t6', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t5', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t5', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t5', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t4', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t4', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t4', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t3', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t3', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t3', title: 'TOP考核齐码率', align: 'center' , width:100}
+
+                        , { field: '齐码率-整体-t2', title: '整体齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP实际-t2', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t2', title: 'TOP考核齐码率', align: 'center', width:100}
+
+                        , { field: '齐码率-整体-t1', title: '整体齐码率', align: 'center', width:100}
+                        , { field: '齐码率-TOP实际-t1', title: 'TOP实际齐码率', align: 'center' , width:100}
+                        , { field: '齐码率-TOP考核-t1', title: 'TOP考核齐码率', align: 'center' , width:100}
+                    ],
+                ]                
+            }
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                , toolbar: false
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 750
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: cols
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>断码率-周销</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">周销明细 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有周销明细</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Duanmalv/zhouxiao')}" // 区域不动销
+            , url_download_history_area = "{:url('admin/system.Duanmalv/excel_zhouxiao')}" 
+
+        startTable();
+
+        // 日期选择器
+        laydate.render({
+            elem: '#shangshiriqi'
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                , toolbar: '#toolbar1'
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: 780
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    { field: '商品负责人', title: '商品负责人', fixed: 'left', align: 'center'}
+                    , { field: '省份', title: '省份', fixed: 'left', width: 100, align: 'center' }
+                    , { field: '渠道属性', title: '渠道属性', fixed: 'left', align: 'center'}
+                    , { field: '店铺云仓', title: '店铺云仓', fixed: 'left' , align: 'center'}
+                    , { field: '店铺名称', title: '店铺名称', fixed: 'left' , align: 'center'}
+                    , { field: '年份', title: '年份', fixed: 'left', align: 'center' }
+                    , { field: '季节归集', title: '季节归集', fixed: 'left', align: 'center' }
+                    , { field: '二级时间分类', title: '二级时间分类', fixed: 'left', align: 'center' }
+                    , { field: '大类', title: '大类', fixed: 'left', align: 'center' }
+                    , { field: '中类', title: '中类', fixed: 'left', align: 'center' }
+                    , { field: '小类', title: '小类', fixed: 'left', align: 'center' }
+                    , { field: '领型', title: '领型' ,fixed:'left', align: 'center'}
+                    , { field: '风格', title: '风格' ,fixed:'left', align: 'center'} 
+                    , { field: '商品代码', title: '商品代码' ,fixed:'left', align: 'center' }
+                    , { field: '零售价', title: '零售价', align: 'center' }
+                    , { field: '当前零售价', title: '当前零售价', align: 'center' }
+                    , { field: '销售数量', title: '销售数量', align: 'center' }
+                    , { field: '销售金额', title: '销售金额', align: 'center' }
+                    , { field: '折率', title: '折率', align: 'center' }
+                    , { field: '排名', title: '排名', align: 'center' }
+                ]]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>
