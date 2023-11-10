@@ -393,5 +393,100 @@ class Puhuoruleb extends AdminController
 
     }
 
+    /**
+     * @NodeAnotation(title="导入铺货规则")
+     */
+    public function import_rule() {
+
+        if (request()->isAjax()) {
+            $file = request()->file('file');
+            $new_name = "铺货规则" . '_' . uuid('puhuo') . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+
+            if ($info) {
+
+                $read_column = [
+
+                    'A' => '云仓',
+                    'B' => '省份',
+                    'D' => '风格',
+                    'E' => '一级分类',
+                    'F' => '二级分类',
+                    'G' => '分类',
+                    'H' => '等级',
+                    'I' => '44/28/',
+                    'J' => '46/29/165/38/M/105',
+                    'K' => '48/30/170/39/L/110',
+                    'L' => '50/31/175/40/XL/115',
+                    'M' => '52/32/180/41/2XL/120',
+                    'N' => '54/33/185/42/3XL/125',
+                    'O' => '56/34/190/43/4XL/130',
+                    'P' => '58/35/195/44/5XL/',
+                    'Q' => '60/36/6XL/',
+                    'R' => '38/7XL',
+                    'S' => '40',
+                    'T' => '42',
+                    'U' => '合计',
+
+                ];
+
+                $data = importExcel($info, $read_column);
+                if (!$data) {
+                    return json(['code' => 500, 'msg'=>'error,读取不到数据']);
+                }
+                //入库
+                $add_data = [];
+                foreach ($data as $v_data) {
+                    $add_data[] = [
+
+                        'Yuncang' => $v_data['云仓'],
+                        'State' => $v_data['省份'],
+                        'StyleCategoryName' => $v_data['风格'],
+                        // 'StyleCategoryName1' => $v_data['一级分类'],
+                        'CategoryName1' => $v_data['一级分类'],
+                        'CategoryName2' => $v_data['二级分类'],
+                        'CategoryName' => $v_data['分类'],
+                        'CustomerGrade' => $v_data['等级'],
+
+                        'Stock_00' => $v_data['44/28/'],
+                        'Stock_29' => $v_data['46/29/165/38/M/105'],
+                        'Stock_30' => $v_data['48/30/170/39/L/110'],
+                        'Stock_31' => $v_data['50/31/175/40/XL/115'],
+                        'Stock_32' => $v_data['52/32/180/41/2XL/120'],
+                        'Stock_33' => $v_data['54/33/185/42/3XL/125'],
+                        'Stock_34' => $v_data['56/34/190/43/4XL/130'],
+                        'Stock_35' => $v_data['58/35/195/44/5XL/'],
+                        'Stock_36' => $v_data['60/36/6XL/'],
+                        'Stock_38' => $v_data['38/7XL'],
+                        'Stock_40' => $v_data['40'],
+                        'Stock_42' => $v_data['42'],
+                        'total' => $v_data['合计'],
+
+                    ];
+
+                }
+
+                //清空表
+                $db = Db::connect("mysql");
+                $db->Query("truncate table sp_lyp_puhuo_rule_b;");
+
+                $chunk_list = array_chunk($add_data, 1000);
+                foreach($chunk_list as $key => $val) {
+                    $db->table('sp_lyp_puhuo_rule_b')->insertAll($val);
+                }
+
+                return json(['code' => 0, 'msg'=>'导入成功', 'data'=>$add_data]);
+
+            } else {
+
+                return json(['code' => 500, 'msg'=>'error,请联系系统管理员']);
+
+            }
+
+        }
+
+    }
+
 
 }
