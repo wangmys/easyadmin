@@ -109,6 +109,10 @@ class Puhuorulea extends AdminController
             $State_list = array_unique(array_column($cus_info_list,'State'));
             $State_list = array_combine($State_list,$State_list);
 
+            $CustomerGrade_list = array_unique(array_column($cus_info_list,'CustomerGrade'));
+            $CustomerGrade_list = array_filter($CustomerGrade_list);
+            $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
+
             $StyleCategoryName_list = array_unique(array_column($info_list,'StyleCategoryName'));
             $StyleCategoryName_list = array_combine($StyleCategoryName_list,$StyleCategoryName_list);
 
@@ -126,6 +130,7 @@ class Puhuorulea extends AdminController
             'msg'   => '',
             'Yuncang_list'  => $Yuncang_list,
             'State_list'  => $State_list,
+            'CustomerGrade_list'  => $CustomerGrade_list,
             'StyleCategoryName_list'  => $StyleCategoryName_list,
             'CategoryName1_list'  => $CategoryName1_list,
             'CategoryName2_list'  => $CategoryName2_list,
