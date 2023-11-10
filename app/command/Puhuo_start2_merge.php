@@ -2592,6 +2592,7 @@ class Puhuo_start2_merge extends Command
                     'Lingxing' => $v_data['Lingxing'],
                     'UnitPrice' => $v_data['UnitPrice'],
                     'ColorDesc' => $v_data['ColorDesc'],
+                    'CustomItem17' => '',
                     'State' => '',
                     'CustomerName' => $v_data['WarehouseName'],
                     'CustomerId' => '',
@@ -2635,6 +2636,7 @@ class Puhuo_start2_merge extends Command
                     'Lingxing' => $v_data['Lingxing'],
                     'UnitPrice' => $v_data['UnitPrice'],
                     'ColorDesc' => $v_data['ColorDesc'],
+                    'CustomItem17' => '',
                     'State' => '',
                     'CustomerName' => '余量',
                     'CustomerId' => '',
@@ -2693,6 +2695,7 @@ class Puhuo_start2_merge extends Command
         , lpwg.Lingxing 
         , lpwg.UnitPrice 
         , lpwg.ColorDesc 
+        , c.CustomItem17 
         , left(lpcs.State, 2) as State
         , lpcs.CustomerName
         , lpcs.CustomerId 
@@ -2719,6 +2722,7 @@ class Puhuo_start2_merge extends Command
         from sp_lyp_puhuo_customer_sort lpcs 
         left join sp_lyp_puhuo_cur_log lpcl on lpcs.cur_log_uuid=lpcl.uuid 
         left join sp_lyp_puhuo_wait_goods lpwg on (lpcs.Yuncang=lpwg.WarehouseName and lpcs.GoodsNo=lpwg.GoodsNo)  
+        left join customer c on lpcs.CustomerId=c.CustomerId  
         where 1 and lpwg.WarehouseName='{$WarehouseName}' and lpwg.GoodsNo='{$GoodsNo}'";
 
     }

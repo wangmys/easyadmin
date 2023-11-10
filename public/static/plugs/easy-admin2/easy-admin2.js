@@ -267,6 +267,8 @@ define(["jquery", "tableSelect","xmSelect", "ckeditor"], function ($, tableSelec
                         }
                     } else if (v === 'custom_export') {
                         toolbarHtml += '<button class="layui-btn layui-btn-sm layui-btn-success easyadmin-export-btn" data-url="' + init.export_url + '" data-table-export="' + tableId + '"><i class="fa fa-file-excel-o"></i> 导出</button>\n';
+                    } else if (v === 'custom_import') {
+                        toolbarHtml += '<button class="layui-btn layui-btn-sm layui-btn-success easyadmin-import-btn" data-url="' + init.import_url + '" data-table-import="' + tableId + '"><i class="fa fa-file-excel-o"></i> 导入</button>\n';
                     } else if (v === 'export') {
                         if (admin.checkAuth('export', elem)) {
                             toolbarHtml += '<button class="layui-btn layui-btn-sm layui-btn-success easyadmin-export-btn" data-url="' + init.export_url + '" data-table-export="' + tableId + '"><i class="fa fa-file-excel-o"></i> 导出</button>\n';

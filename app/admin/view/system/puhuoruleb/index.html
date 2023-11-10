@@ -32,6 +32,7 @@
         width: 130px;
     }
 </style>
+<button id="import_rule" style="display:none;">【导入】铺货规则</button>
 <div class="layuimini-container">
     <div class="layuimini-main">
         <table id="currentTable"
@@ -44,13 +45,63 @@
 
 <script>
 
-    layui.use(['form', 'jquery', 'layer'], function () {
+    layui.use(['form', 'jquery', 'layer', 'upload'], function () {
         let form = layui.form
             , $ = layui.$
             , layer = layui.layer
-            , url1 = "{:url('admin/system.Weather/get_wenqu')}"
-            , url2 = "{:url('admin/system.Weather/get_wendai')}"
+            , table = layui.table
+            , upload = layui.upload
+            , url = "{:url('admin/system.puhuoruleb/index')}"
+            , url_import = "{:url('admin/system.puhuoruleb/import_rule')}"
         ;
+
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#import_rule'
+            ,url: url_import //此处配置你自己的上传接口即可
+            ,accept: 'file' //普通文件
+            ,before: function (obj) {
+                // console.log(obj);
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
+            ,done: function(res) {
+                // console.log('res:....', res);
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    alert(res.msg);
+                    window.location.reload();//重新刷新页面
+                }
+            }
+        });
+
+        //导入操作
+        $('body').on('click', '[data-table-import]', function () {
+            $('#import_rule').click();
+        });
 
         //监听温带下拉
         // form.on('select(CustomItem30)', function (data) {
