@@ -1630,7 +1630,7 @@ class DuanmalvSpring extends BaseController
                     AVG( zy.`齐码率-TOP考核` ) AS `直营-TOP考核`,
                     jm.`加盟-TOP考核` 
                 FROM
-                    cwl_duanmalv_table1_1_spring_spring AS zy
+                    cwl_duanmalv_table1_1_spring AS zy
                     LEFT JOIN (
                     SELECT
                         云仓,商品负责人,
