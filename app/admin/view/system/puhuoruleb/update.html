@@ -34,16 +34,6 @@
             </div>
         </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label required">一级风格:</label>
-            <div class="layui-input-block">
-                <select name="StyleCategoryName1" lay-verify="" lay-search="">
-                    {foreach $StyleCategoryName1_list as $vo}
-                    <option value="{$vo}" {if $rulea_info['StyleCategoryName1'] == $vo}selected=""{/if}>{$vo}</option>
-                    {/foreach}
-                </select>
-            </div>
-        </div>
 
         <div class="layui-form-item">
             <label class="layui-form-label required">一级分类:</label>
