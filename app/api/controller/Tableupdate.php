@@ -1090,6 +1090,274 @@ class Tableupdate extends BaseController
         }
     }
 
+    public function update_sp_ww_chunxia_sales() {
+
+        $sql = "
+            -- 王威数据源
+            -- 2023春夏库存数据源
+            SELECT 
+                T.CustomItem15 云仓,
+                T.State 省份,
+                T.CustomItem17 商品负责人,
+                T.CustomerName 店铺名称,
+                CASE WHEN T.MathodId=7 THEN '加盟' WHEN T.MathodId=4 THEN '直营' END AS 经营模式,
+                EG.TimeCategoryName1 一级时间分类,
+                EG.TimeCategoryName2 二级时间分类,
+                EG.StyleCategoryName1 一级风格,
+                EG.StyleCategoryName2 二级风格,
+                EG.CategoryName1 一级分类,
+                EG.CategoryName2 二级分类,
+                EG.CategoryName 分类,
+                EG.StyleCategoryName 风格,
+                EG.GoodsNo 货号,
+                EGPT.UnitPrice 零售价,
+                -- ISNULL(TT.Price,EGPT.UnitPrice) 当前零售价,
+                SUM(店铺库存) 店铺库存,
+                SUM(在途库存) 在途库存,
+                SUM(已配未发数量) 已配未发数量,
+                SUM(在途量合计) 在途量合计,
+                SUM(预计库存) 预计库存,
+                CASE WHEN SUM(预计库存)<2 THEN '无效' END AS 无效识别,
+                CASE WHEN ISNULL(SUM(店铺库存),0)=0 AND SUM(在途量合计)>2 THEN 1 END AS 新增SKC识别,
+                CASE WHEN SUM(店库存加在途)>2 THEN 1 END AS 库存SKC数,
+                CASE WHEN EG.TimeCategoryName2 LIKE '%春%' THEN '春季' 
+                        WHEN EG.TimeCategoryName2 LIKE '%夏%' THEN '夏季'
+                        WHEN EG.TimeCategoryName2 LIKE '%秋%' THEN '秋季'
+                        WHEN EG.TimeCategoryName2 LIKE '%冬%' THEN '冬季'
+                            END AS 季节归集,
+                T.CustomerGrade AS 店铺等级,
+                CASE WHEN EG.CategoryName2='短T' AND EG.CategoryName LIKE '%翻领%' THEN '翻领' 
+                        WHEN EG.CategoryName2='短T' AND EG.CategoryName LIKE '%圆领%' THEN '圆领' 
+                        WHEN EG.CategoryName2='短T' THEN '其他'
+                        ELSE EG.CategoryName2 END AS 领型,
+                GETDATE() 更新时间
+            FROM 
+            (
+            -- 店铺库存
+            SELECT 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo,
+                SUM(ECS.Quantity) 店铺库存,
+                NULL 在途库存,
+                NULL 已配未发数量,
+                NULL 在途量合计,
+                SUM(ECS.Quantity) 预计库存,
+                SUM(ECS.Quantity) 店库存加在途
+            FROM ErpCustomer EC 
+            LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
+            LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+            WHERE EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND EG.TimeCategoryName1=2023
+                -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+                AND EC.RegionId!=55
+            GROUP BY
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo
+            HAVING SUM(ECS.Quantity)!=0
+            UNION ALL 
+            -- 仓库发货在途
+            SELECT 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo,
+                NULL AS 店铺库存,
+                SUM(EDG.Quantity) AS 在途库存,
+                NULL 已配未发数量,
+                SUM(EDG.Quantity) 在途量合计,
+                SUM(EDG.Quantity) 预计库存,
+                SUM(EDG.Quantity) 店库存加在途
+            FROM ErpDelivery ED 
+            LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+            LEFT JOIN ErpCustomer EC ON ED.CustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON EDG.GoodsId=EG.GoodsId
+            WHERE ED.CodingCode='EndNode2'
+                AND ED.IsCompleted=0
+                --AND ED.IsReceipt IS NULL
+                AND ED.DeliveryID NOT IN (SELECT ERG.DeliveryId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.DeliveryId IS NOT NULL AND ERG.DeliveryId!='' GROUP BY ERG.DeliveryId)
+                AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND EG.TimeCategoryName1=2023
+                -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+                AND EC.RegionId!=55
+            GROUP BY
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo
+            UNION ALL
+            --店店调拨在途
+            SELECT
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo,
+                NULL AS 店铺库存,
+                SUM(EIG.Quantity) AS 在途库存,
+                NULL 已配未发数量,
+                SUM(EIG.Quantity) 在途量合计,
+                SUM(EIG.Quantity) 预计库存,
+                SUM(EIG.Quantity) 店库存加在途
+            FROM ErpCustOutbound EI 
+            LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+            LEFT JOIN ErpCustomer EC ON EI.InCustomerId=EC.CustomerId
+            LEFT JOIN ErpGoods EG ON EIG.GoodsId=EG.GoodsId
+            WHERE EI.CodingCodeText='已审结'
+                AND EI.IsCompleted=0
+                AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
+                AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND EG.TimeCategoryName1=2023
+                -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+                AND EC.RegionId!=55
+            GROUP BY 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo
+            UNION ALL 
+            --店铺已配未发
+            SELECT 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo,
+                NULL AS 店铺库存,
+                NULL AS 在途库存,
+                SUM(ESG.Quantity) 已配未发数量,
+                SUM(ESG.Quantity) 在途量合计,
+                SUM(ESG.Quantity) 预计库存,
+                NULL 店库存加在途
+            FROM ErpCustomer EC
+            LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+            LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+            LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+            WHERE EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                AND EG.TimeCategoryName1=2023
+                -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+                AND EC.ShutOut=0 
+                AND EC.MathodId IN (4,7)
+                AND ES.IsCompleted=0
+                AND EC.RegionId!=55
+            GROUP BY 
+                EC.CustomItem15,
+                EC.State,
+                EC.CustomItem17,
+                EC.CustomerId,
+                EC.CustomerName,
+                EC.MathodId,
+                EC.CustomerGrade,
+                EG.GoodsNo
+            ) T 
+            LEFT JOIN ErpGoods EG ON T.GoodsNo=EG.GoodsNo
+            LEFT JOIN ErpGoodsPriceType EGPT ON EG.GoodsId=EGPT.GoodsId
+            -- LEFT JOIN 
+            -- (
+            -- SELECT 
+            -- 	T.CustomerId,
+            -- 	T.CustomerCode,
+            -- 	T.GoodsNo,
+            -- 	T.Price,
+            -- 	T.RN
+            -- FROM 
+            -- (
+            -- SELECT 
+            -- 				EC.CustomerId,
+            -- 				EC.CustomerCode,
+            -- 				EG.GoodsNo,
+            -- 				EPT.Price,
+            -- 				EPTT.BDate,
+            -- 				CONVERT(VARCHAR(10),EP.CreateTime,23) AS CreateTime,
+            -- 				Row_Number() OVER (partition by EPC.CustomerId,EPT.GoodsId ORDER BY EP.CreateTime desc) RN
+            -- 		 FROM ErpPromotion EP
+            -- 		 LEFT JOIN ErpPromotionCustomer EPC ON EP.PromotionId=EPC.PromotionId
+            -- 		 LEFT JOIN ErpCustomer EC ON EPC.CustomerId=EC.CustomerId
+            -- 		 LEFT JOIN ErpPromotionTypeEx1 EPT ON EP.PromotionId=EPT.PromotionId
+            -- 		 LEFT JOIN ErpGoods EG ON EPT.GoodsId=EG.GoodsId
+            -- 		 LEFT JOIN ErpPromotionTime  EPTT ON EP.PromotionId=EPTT.PromotionId 
+            -- 		 WHERE  EP.PromotionTypeId=1
+            -- 			 AND EP.IsDisable=0
+            -- 			 AND EP.CodingCodeText='已审结'
+            -- 			 AND EC.MathodId IN (4,7)
+            -- 			 AND EC.ShutOut=0
+            -- 			 AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+            -- 			 AND EG.TimeCategoryName1=2023
+            -- 			 -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+            -- 			 AND CONVERT(VARCHAR,GETDATE(),23) BETWEEN EPTT.BDate AND EPTT.EDate
+            -- 			 -- AND EC.RegionId='91'
+            --  ) T
+            --  WHERE T.RN=1
+            -- ) TT ON EG.GoodsNo=TT.GoodsNo AND T.CustomerId=TT.CustomerId
+            WHERE EGPT.PriceId=1
+            GROUP BY
+                T.CustomItem15,
+                T.CustomItem15,
+                T.State,
+                T.CustomItem17,
+                T.CustomerId,
+                T.CustomerName,
+                T.MathodId,
+                EG.TimeCategoryName1,
+                EG.TimeCategoryName2,
+                EG.StyleCategoryName1,
+                EG.StyleCategoryName2,
+                EG.CategoryName1,
+                EG.CategoryName2,
+                EG.CategoryName,
+                EG.StyleCategoryName,
+                EG.GoodsNo,
+                EGPT.UnitPrice,
+                -- TT.Price,
+                T.CustomerGrade;
+        ";
+        $select = $this->db_sqlsrv->query($sql);
+        // $this->db_sqlsrv->table('sp_ww_chunxia_stock_test')->strict(false)->insertAll($select);
+
+        $select = array_chunk($select, 1500);
+        // 12:08:00 13分钟 
+        foreach($select as $key => $val) {
+            $insert = $this->db_bi->table('sp_ww_chunxia_stock_test')->strict(false)->insertAll($val);
+        }
+        echo date('Y-m-d H:i:s');
+        
+    }
+
     // 更新 窗数
     public function getChuangshu() {
         $sql = "
