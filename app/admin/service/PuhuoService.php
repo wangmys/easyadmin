@@ -612,7 +612,8 @@ class PuhuoService
         $province_list = $this->easy_db->Query("select State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
         $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, concat('商品专员-', CustomItem17) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
         $mathod_list = $this->easy_db->Query("select Mathod as name, concat('经营模式-', Mathod) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
-        $merge = array_merge($mathod_list, $province_list, $goods_manager_list);
+        $wenqu_list = $this->easy_db->Query("select CustomItem36 as name, concat('温区-', CustomItem36) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem36;");//温区
+        $merge = array_merge($mathod_list, $province_list, $goods_manager_list, $wenqu_list);
 
         return ['merge_list' => $merge];
 
@@ -814,13 +815,15 @@ class PuhuoService
         $CustomerNames = null;
         if ($Selecttype == SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']) {//组合的情况  处理组合店铺入库
             $Commonfield_arr = $Commonfield ? explode(',', $Commonfield) : [];
-            $province_arr = $goods_manager_arr = $mathod_arr = [];
+            $province_arr = $goods_manager_arr = $mathod_arr = $wenqu_arr = [];
             if ($Commonfield_arr) {
                 foreach ($Commonfield_arr as $v_common) {
                     if (strstr($v_common, '省份')) {
                         $province_arr[] = str_replace(['省份-'], [''], $v_common);
                     } elseif (strstr($v_common, '商品专员')) {
                         $goods_manager_arr[] = str_replace(['商品专员-'], [''], $v_common);
+                    } elseif (strstr($v_common, '温区')) {
+                        $wenqu_arr[] = str_replace(['温区-'], [''], $v_common);
                     } else {
                         $mathod_arr[] = str_replace(['经营模式-'], [''], $v_common);
                     }
@@ -839,6 +842,9 @@ class PuhuoService
                 }
                 if ($mathod_arr) {
                     $where[] = ['Mathod', 'in', $mathod_arr];
+                }
+                if ($wenqu_arr) {
+                    $where[] = ['CustomItem36', 'in', $wenqu_arr];
                 }
                 $CustomerNames = CustomerModel::where($where)->column('CustomerName');
                 $CustomerNames = $CustomerNames ? implode(',', $CustomerNames) : null;
