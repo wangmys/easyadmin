@@ -134,7 +134,7 @@ class Jianhediaobo extends AdminController
             ]);
         }
     }  
-    
+
     /**
      * @NodeAnotation(title="调拨历史记录")
      */
@@ -745,6 +745,15 @@ class Jianhediaobo extends AdminController
                     continue;
                 }
 
+                // 2 调入店铺7天内清空过
+                if (!empty($val['清空时间'])) {
+                    $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
+                    // $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
+                    $select_qudaodiaobo[$key]['信息反馈'] = "调入店7天内清空过"; 
+                    $wrongData[] = $select_qudaodiaobo[$key];
+                    continue;
+                }
+
                 // 1 调出店调拨未完成，调空，并且有在途
                 $weiwancheng = $this->qudaodiaobo_weiwancheng($val['调出店商品负责人'], $val['调出店铺名称'], $val['货号']);
 
@@ -840,15 +849,6 @@ class Jianhediaobo extends AdminController
                     } else {
                         // 没调空
                     }
-                }
-                
-                // 2 调入店铺7天内清空过
-                if (!empty($val['清空时间'])) {
-                    $select_qudaodiaobo[$key]['本次调拨量'] = $val['总数量'];
-                    // $select_qudaodiaobo[$key]['信息反馈'] = "【调入店铺7天内清空过】"; 
-                    $select_qudaodiaobo[$key]['信息反馈'] = "调入店7天内清空过"; 
-                    $wrongData[] = $select_qudaodiaobo[$key];
-                    continue;
                 }
             }
             return $wrongData;
