@@ -43,6 +43,8 @@ class PuhuoService
         $GoodsNo = $params['GoodsNo'] ?? '';//货号
         $CustomerName = $params['CustomerName'] ?? '';//店铺名称
         $is_puhuo = $params['is_puhuo'] ?? '';
+        $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
+        $score_sort = $params['score_sort'] ?? '';//店铺排名
 
         $where = $list = [];
         if ($WarehouseName) {
@@ -56,6 +58,12 @@ class PuhuoService
         }
         if ($CustomerName) {
             $where[] = ['CustomerName', 'in', $CustomerName];
+        }
+        if ($CustomItem17) {
+            $where[] = ['CustomItem17', 'in', $CustomItem17];
+        }
+        if ($score_sort) {
+            $where[] = ['score_sort', '<=', $score_sort];
         }
         if ($is_puhuo) {
             if ($is_puhuo == '可铺') {//可铺
@@ -119,9 +127,10 @@ class PuhuoService
         $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");
         $CategoryName1 = $this->easy_db->query("select CategoryName1 as name, CategoryName1 as value from sp_lyp_puhuo_wait_goods where CategoryName1!='' and (TimeCategoryName2 like '%秋%' or TimeCategoryName2 like '%冬%') group by CategoryName1;");
         $GoodsNo = $this->easy_db->query("select GoodsNo as name, GoodsNo as value from sp_lyp_puhuo_end_data  group by GoodsNo;");
-        $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data  group by CustomerName;");
+        $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data where CustomerName!='余量' and CustomerName not like '%云仓%' group by CustomerName;");
+        $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_end_data where CustomItem17!='' group by CustomItem17;");
 
-        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
+        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'CustomItem17'=>$CustomItem17, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
 
     }
 
