@@ -1351,6 +1351,8 @@ class Tableupdate extends BaseController
 
         $select = array_chunk($select, 1500);
         // 12:08:00 13分钟 
+        // 12:48:12 13：05：25 17分钟
+        // 13:29:00 13:46:12 17分钟
         foreach($select as $key => $val) {
             $insert = $this->db_bi->table('sp_ww_chunxia_stock_test')->strict(false)->insertAll($val);
         }
