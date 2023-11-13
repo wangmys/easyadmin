@@ -346,6 +346,7 @@ class Caigou extends BaseController
                 ,EG.GoodsName 
                 ,EG.TimeCategoryName1
                 ,EG.TimeCategoryName2
+                ,EG.TimeCategoryName
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName
