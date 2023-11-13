@@ -558,6 +558,91 @@ class ReportFormsServicePro
         }
     }
 
+    // 直营
+    public function create_table_s104Z($date = '')
+    {
+        $code = 'S104Z';
+        $date = $date ?: date('Y-m-d', strtotime('+1day'));
+        $dingName = cache('dingding_table_name');
+
+        $title = "下水道店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
+
+        // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
+        // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
+        // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+        $sql = "
+            SELECT
+                店铺名称,
+                concat(round(今日达成率 * 100, 1), '%') as 今日达成率,
+                concat(round(本月达成率 * 100, 1), '%') as 本月达成率,
+                昨日递增率 AS `22年日同比`,
+                前年对比今年昨日递增率 AS `21年日同比`,
+                累销递增率 AS `22年月累同比`,
+                前年对比今年累销递增率 AS `21年月累同比`,
+                昨天销量 as 今日流水,
+                今日目标,
+                本月业绩 as 本月流水,
+                本月目标
+            from xiashui_old_customer_state_detail_ww where 更新时间 = '{$date}'
+        ";
+
+        $data = Db::connect("mysql2")->query($sql);
+        if ($data) {
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 100;
+            }
+
+            $field_width[0] = 45;
+            // $field_width[1] = 80;
+            // $field_width[2] = 90;
+            // $field_width[3] = 90;
+
+            // $field_width[13] = 150;
+            // $field_width[14] = 120;
+            // $field_width[15] = 90;
+
+            // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
+
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                0 => " ",
+            ];
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($data),          //数据的行数
+                // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'file_name' =>  $code . '.jpg',      //保存的文件名
+                'title' => $title,
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '                 ' . $code,
+                'file_path' => "./img/cwl/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+            ];
+
+            // 生成图片
+            return $this->create_image_bgcolor($params,
+                [
+                    // '前年日增长' => 3,
+                    // '去年日增长' => 4,
+                    // '前年月增长' => 5,
+                    // '去年月增长' => 6,
+                ]
+            );
+        }
+    }
+
     // s108 督导挑战目标
     public function create_table_s108A($date = '')
     {
@@ -1900,6 +1985,12 @@ class ReportFormsServicePro
                 if (isset($item['经营']) && $item['经营'] == '总计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }   
+            }
+
+            if (@$params['code'] == 'S104Z') {
+                if (isset($item['店铺名称']) && $item['店铺名称'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                } 
             }
 
             if (@$params['code'] == 'S108A') {

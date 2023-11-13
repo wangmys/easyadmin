@@ -203,7 +203,9 @@ class SendReport extends BaseController
             $this->servicePro->create_table_s101('S104', $date);
         } elseif ($name =='S104C') {
             $this->servicePro->create_table_s104C($date);
-        }elseif ($name =='S108A') {
+        } elseif ($name =='S104Z') {
+            $this->servicePro->create_table_s104Z($date);
+        } elseif ($name =='S108A') {
             $this->servicePro->create_table_s108A($date);
         } elseif ($name =='S108B') {
             $this->servicePro->create_table_s108B($date);
@@ -1892,6 +1894,37 @@ class SendReport extends BaseController
                 // 推送
                 $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
                 // $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        }
+    }
+
+    // cwl s104z
+    public function run_pro_s104z()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '40', '编号' => 'S104Z'])->find();
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // 需要手动传日期的话传查询日期+1天
+            $date = input('date') ? input('date') : date('Y-m-d', strtotime('+1day'));
+            $this->servicePro->create_table_s104Z($date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '下水道店业绩同比 表号:S104Z',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd',strtotime('+1day'))."/S104Z.jpg?v=" . time()
+            ];
+
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // 推送
+                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                $res[] = $model->send($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
             }
             return json($res);
         }
