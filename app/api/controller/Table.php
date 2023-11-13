@@ -1202,6 +1202,9 @@ class Table extends BaseController
             foreach($select_chunk13 as $key13 => $val13) {
                 $this->db_bi->table('old_customer_state_2_ww')->strict(false)->insertAll($val13);
             }
+
+            // 更新下水道店铺
+            $this->xiashui_data();
         }
     }
 
