@@ -27,8 +27,8 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             },function (res) {
                 //console.log(122, res);
                 element.attr('lay-id',res.data.id);
-                element.find('input[name="Yuncang"]').val(res.data.Yuncang)
-                element.find('input[name="id"]').val(res.data.id)
+                element.find('input[name="Yuncang[]"]').val(res.data.Yuncang)
+                element.find('input[name="id[]"]').val(res.data.id)
                 element.find('button[id="save_button"]').addClass('layui-btn-disabled')
                 ea.msg.success(res.msg);
              });
