@@ -248,6 +248,7 @@ class Table extends BaseController
                 AND EC.MathodId IN (4,7) 		--加盟店和直营店
                 AND EC.RegionId !=55				--不属于闭店区
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND ER.RetailDate<CONVERT(VARCHAR,(select dateAdd(DD,-364,getdate())),23)
             GROUP BY
@@ -294,6 +295,7 @@ class Table extends BaseController
             WHERE EC.ShutOut=1			--店铺营业中
                 AND EC.RegionId =55				--属于闭店区
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 --AND ShopNature=0       --店铺性质实体店
                 AND ER.RetailDate<CONVERT(VARCHAR,(select dateAdd(DD,-364,getdate())),23)
             GROUP BY
@@ -344,6 +346,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)= CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
@@ -369,6 +372,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -408,6 +412,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-12, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
@@ -433,6 +438,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-12, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -473,6 +479,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0)),23) AND CONVERT(VARCHAR,getdate(),23) --零售核销单时间
                 --AND EC.State='广东省'
@@ -531,6 +538,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,GETDATE(),23)
             GROUP BY
@@ -553,6 +561,7 @@ class Table extends BaseController
             LEFT JOIN ErpBaseCustomerRegion EBCR ON EC.RegionId=EBCR.RegionId
             WHERE EC.ShutOut=0
             AND EC.MathodId IN (4,7)
+            AND EC.CustomerName  NOT IN ('绥阳一店')
             ORDER BY
             EC.MathodId,
             EBCR.Region ,
@@ -578,6 +587,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -603,6 +613,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -629,6 +640,7 @@ class Table extends BaseController
                 --AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-24, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -654,6 +666,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 --AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-24, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -691,6 +704,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0)),23) AND CONVERT(VARCHAR,getdate(),23) --零售核销单时间
             GROUP BY
@@ -756,6 +770,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) = CONVERT(VARCHAR,getdate(),23) --零售核销单时间
             GROUP BY
