@@ -733,7 +733,7 @@ class Jianhebuhuo extends AdminController
                             break;
                         } 
                         if ($key2 == count($select_customer) -1) {
-                            return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
+                            return json(['code' => -1, 'msg' => '店铺编号不存在:' . $val['店铺编号']]);
                         }
                     }
                 }
@@ -1172,7 +1172,7 @@ class Jianhebuhuo extends AdminController
                     break;
                 } 
                 if ($key2 == count($select_customer) -1) {
-                    return json(['code' => -1, 'msg' => '调出店铺号不存在:' . $val['店铺编号']]);
+                    return json(['code' => -1, 'msg' => '店铺编号不存在:' . $val['店铺编号']]);
                 }
             }
         }
