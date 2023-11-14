@@ -248,6 +248,7 @@ class Table extends BaseController
                 AND EC.MathodId IN (4,7) 		--加盟店和直营店
                 AND EC.RegionId !=55				--不属于闭店区
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND ER.RetailDate<CONVERT(VARCHAR,(select dateAdd(DD,-364,getdate())),23)
             GROUP BY
@@ -294,6 +295,7 @@ class Table extends BaseController
             WHERE EC.ShutOut=1			--店铺营业中
                 AND EC.RegionId =55				--属于闭店区
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 --AND ShopNature=0       --店铺性质实体店
                 AND ER.RetailDate<CONVERT(VARCHAR,(select dateAdd(DD,-364,getdate())),23)
             GROUP BY
@@ -344,6 +346,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)= CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
@@ -369,6 +372,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -408,6 +412,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-12, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
@@ -433,6 +438,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-12, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-365,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -473,6 +479,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0)),23) AND CONVERT(VARCHAR,getdate(),23) --零售核销单时间
                 --AND EC.State='广东省'
@@ -531,6 +538,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,GETDATE(),23)
             GROUP BY
@@ -553,6 +561,7 @@ class Table extends BaseController
             LEFT JOIN ErpBaseCustomerRegion EBCR ON EC.RegionId=EBCR.RegionId
             WHERE EC.ShutOut=0
             AND EC.MathodId IN (4,7)
+            AND EC.CustomerName  NOT IN ('绥阳一店')
             ORDER BY
             EC.MathodId,
             EBCR.Region ,
@@ -578,6 +587,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -603,6 +613,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
                 EC.MathodId,
@@ -629,6 +640,7 @@ class Table extends BaseController
                 --AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-24, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -654,6 +666,7 @@ class Table extends BaseController
                 AND EC.RegionId =55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 --AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate())-24, 0)),23) AND CONVERT(VARCHAR,(select dateAdd(DD,-730,getdate())),23)
             GROUP BY
@@ -691,6 +704,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR,(SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0)),23) AND CONVERT(VARCHAR,getdate(),23) --零售核销单时间
             GROUP BY
@@ -756,6 +770,7 @@ class Table extends BaseController
                 AND EC.RegionId !=55				--不属于闭店区
                 AND ER.CodingCodeText='已审结'
                 AND EC.CustomerName  NOT LIKE '%内购%'
+                AND EC.CustomerName  NOT IN ('绥阳一店')
                 AND ShopNature=0
                 AND CONVERT(VARCHAR,ER.RetailDate,23) = CONVERT(VARCHAR,getdate(),23) --零售核销单时间
             GROUP BY
@@ -1187,11 +1202,162 @@ class Table extends BaseController
             foreach($select_chunk13 as $key13 => $val13) {
                 $this->db_bi->table('old_customer_state_2_ww')->strict(false)->insertAll($val13);
             }
+
+            // 更新下水道店铺
+            $this->xiashui_data();
         }
     }
 
+    // 下水道店数据源
+    public function xiashui_data() {
+        $updateTime = date('Y-m-d', strtotime('+1 day', time()));
+        $sql = "
+            SELECT
+                *
+            from old_customer_state_detail_ww 
+            where 
+                更新时间 = '{$updateTime}' 
+                and 店铺名称 not in ('合计') 
+                and 店铺名称 in ('上高一店','玉山二店','柳城一店','南丹一店','昭平一店','良庆一店','宜州一店','灵山一店',
+            '都安一店','宾阳一店','贵港一店','兴宁一店','英德一店','蕉岭一店','丰顺一店','紫金一店','乐昌一店','翁源一店','龙华一店','狮岭一店')
+        ";
+
+        $select = $this->db_bi->query($sql);
+        if ($select) {
+            $this->db_bi->table('xiashui_old_customer_state_detail_ww')->where([
+                ['更新时间', '=', $updateTime]
+            ])->delete();
+            $this->db_bi->table('xiashui_old_customer_state_detail_ww')->strict(false)->insertAll($select);
+
+            $sql_更新1 = "
+                update
+                `xiashui_old_customer_state_detail_ww` as x
+                LEFT JOIN sp_customer_mubiao_ww as m on x.店铺名称=m.店铺名称 and x.更新时间=m.更新日期
+                set 
+                    x.本月目标 = m.本月目标,
+                    x.今日目标 = m.今日目标
+                where 
+                    x.更新时间 = '{$updateTime}'
+            ";
+            $this->db_bi->execute($sql_更新1);
+
+
+            // 更新汇总
+            $sql_合计_昨天销量 = "
+                select sum(昨天销量) as 昨天销量 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+            ";
+
+            $sql_合计_本月业绩 = "
+                select sum(本月业绩) as 本月业绩 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+            ";
+
+            $sql_合计_今日目标 = "
+                select sum(今日目标) as 今日目标 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+            ";
+
+            $sql_合计_本月目标 = "
+                select sum(本月目标) as 本月目标 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+            ";
+
+            $select_合计_昨天销量 = $this->db_bi->query($sql_合计_昨天销量);
+            $select_合计_本月业绩 = $this->db_bi->query($sql_合计_本月业绩);
+            $select_合计_今日目标 = $this->db_bi->query($sql_合计_今日目标);
+            $select_合计_本月目标 = $this->db_bi->query($sql_合计_本月目标);
+
+            $合计_昨天销量 = $select_合计_昨天销量[0]['昨天销量'];
+            $合计_本月业绩 = $select_合计_本月业绩[0]['本月业绩'];
+            $合计_今日目标 = $select_合计_今日目标[0]['今日目标'];
+            $合计_本月目标 = $select_合计_本月目标[0]['本月目标'];
+    
+            $this->db_bi->table('xiashui_old_customer_state_detail_ww')->where([
+                ['更新时间', '=', $updateTime],
+                ['店铺名称', '=', '合计']
+            ])->delete();
+            $this->db_bi->table('xiashui_old_customer_state_detail_ww')->insert([
+                '店铺名称' => '合计',
+                '更新时间' => $updateTime,
+                '昨天销量' => $合计_昨天销量,
+                '本月业绩' => $合计_本月业绩,
+                '今日目标' => $合计_今日目标,
+                '本月目标' => $合计_本月目标,
+            ]);
+
+
+            $sql_更新_今日达成率_本月达成率 = "
+                update
+                    `xiashui_old_customer_state_detail_ww`
+                set 
+                    今日达成率 = 昨天销量 / 今日目标,
+                    本月达成率 = 本月业绩 / 本月目标
+                where 
+                    更新时间 = '{$updateTime}'
+            ";
+            $this->db_bi->execute($sql_更新_今日达成率_本月达成率);
+
+        }
+
+        // 表格查询的sql
+        $sql_table = "
+            SELECT
+                店铺名称,
+                今日达成率,
+                本月达成率,
+                昨日递增率 AS `22年同日比`,
+                前年对比今年昨日递增率 AS `21年同日比`,
+                累销递增率 AS `22年月累同比`,
+                前年对比今年累销递增率 AS `21年月累同比`,
+                昨天销量 as 今日流水,
+                今日目标,
+                本月业绩 as 本月流水,
+                本月目标
+            from xiashui_old_customer_state_detail_ww where 更新时间 = '{$updateTime}'
+
+        ";
+    }
+
     public function test2() {
-        echo date('Y-m-d', strtotime('+1 day', time()));
+        $updateTime = date('Y-m-d', strtotime('+1 day', time()));
+        // 更新汇总
+        $sql_合计_昨天销量 = "
+            select sum(昨天销量) as 昨天销量 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+        ";
+
+        $sql_合计_本月业绩 = "
+            select sum(本月业绩) as 本月业绩 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+        ";
+
+        $sql_合计_今日目标 = "
+            select sum(今日目标) as 今日目标 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+        ";
+
+        $sql_合计_本月目标 = "
+            select sum(本月目标) as 本月目标 from xiashui_old_customer_state_detail_ww where 更新时间='{$updateTime}' and 店铺名称 not in ('合计')
+        ";
+
+        $select_合计_昨天销量 = $this->db_bi->query($sql_合计_昨天销量);
+        $select_合计_本月业绩 = $this->db_bi->query($sql_合计_本月业绩);
+        $select_合计_今日目标 = $this->db_bi->query($sql_合计_今日目标);
+        $select_合计_本月目标 = $this->db_bi->query($sql_合计_本月目标);
+
+        $合计_昨天销量 = $select_合计_昨天销量[0]['昨天销量'];
+        $合计_本月业绩 = $select_合计_本月业绩[0]['本月业绩'];
+        $合计_今日目标 = $select_合计_今日目标[0]['今日目标'];
+        $合计_本月目标 = $select_合计_本月目标[0]['本月目标'];
+
+        $this->db_bi->table('xiashui_old_customer_state_detail_ww')->where([
+            ['更新时间', '=', date('Y-m-d', strtotime('+1 day', time()))],
+            ['店铺名称', '=', '合计']
+        ])->delete();
+        $this->db_bi->table('xiashui_old_customer_state_detail_ww')->insert([
+            '店铺名称' => '合计',
+            '更新时间' => $updateTime,
+            '昨天销量' => $合计_昨天销量,
+            '本月业绩' => $合计_本月业绩,
+            '今日目标' => $合计_今日目标,
+            '本月目标' => $合计_本月目标,
+        ]);
+
+
     }
 
 }

@@ -57,7 +57,7 @@ class Caigou extends AdminController
             $title = $input['中类'];
             $sql = "
                 select 
-                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
+                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,上市波段,
                     concat(round(售罄率 * 100, 1), '%') as 售罄率
                 from cwl_cgzdt_caigoushouhuo
                 where TOP = 'Y'
@@ -68,7 +68,7 @@ class Caigou extends AdminController
             $title = $input['大类'];
             $sql = "
                 select 
-                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,
+                    货号,简码,图片路径,零售价,成本价,分类,当天销量,累销量,总库存量,云仓在途量,订单未入量,近一周销量,近两周销量,上柜数,中类,大类,更新日期,上市波段,
                     concat(round(售罄率 * 100, 1), '%') as 售罄率
                 from cwl_cgzdt_caigoushouhuo
                 where TOP = 'Y'
