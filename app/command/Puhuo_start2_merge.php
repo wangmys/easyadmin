@@ -581,6 +581,7 @@ class Puhuo_start2_merge extends Command
 
                             ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
                             
+                            //echo json_encode(['daxiaoma_puhuo_log'=>$daxiaoma_puhuo_log, 'daxiaoma_skcnum_score_sort'=>$daxiaoma_skcnum_score_sort,  'add_puhuo_log'=>$add_puhuo_log,  'v_data'=>$v_data,  'puhuo_config'=>$puhuo_config]);die;
                             $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
                             
                             ######################大小码铺货逻辑end################################################################
@@ -1993,6 +1994,9 @@ class Puhuo_start2_merge extends Command
                 ];
                 // print_r([$init_puhuo_stock, count($last_daxiaoma_puhuo_log), $last_daxiaoma_puhuo_log]);die;
 
+                //记录铺货日志：
+                Log::channel('puhuo')->write('##############普通(大小码)-init_puhuo_stock:'.'##############'.json_encode(['init_puhuo_stock'=>$init_puhuo_stock]) );
+
                 //先铺能满足连码的
                 $merge_lianma_arr = [];
                 $merge_not_lianma_arr = [];
@@ -2166,8 +2170,11 @@ class Puhuo_start2_merge extends Command
 
                 }
 
+                //记录铺货日志：
+                Log::channel('puhuo')->write('##############普通(大小码)-云仓-货号:'.$v_data['WarehouseName'].$v_data['GoodsNo'].'##############'.json_encode(['init_puhuo_stock'=>$init_puhuo_stock]) );
+
                 //wait_goods 库存处理
-                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock);
+                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock); 
 
                 //$daxiaoma_skcnum_score_sort 大小码铺货后 重新排序
                 //大小码店 排序入库
