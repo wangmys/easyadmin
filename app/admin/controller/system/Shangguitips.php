@@ -297,11 +297,175 @@ class Shangguitips extends AdminController
             ]);
         }
     }
-
+    
     public function keshang_customer_all() {
         return View('keshang_all', [
             // 'config' => ,
         ]);
+    }
+
+    /**
+     * @NodeAnotation(title="新品上柜提醒_钉钉推送") 
+     * 
+     */
+    public function handle_push() {
+        $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where('id=1')->find();
+        $keshang_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.Shangguitips/keshang_customer');
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+            foreach ($input as $key => $val) {
+                // echo $val;
+                if ( $key != '在途库存') {
+                    if (empty($val)) {
+                        unset($input[$key]);
+                    }
+                }
+            }
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['云仓']);
+                $map1 = " AND 云仓 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+            if (!empty($input['风格'])) {
+                // echo $input['商品负责人'];
+                $map2Str = xmSelectInput($input['风格']);
+                $map2 = " AND 风格 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }   
+            if (!empty($input['货号'])) {
+                // echo $input['商品负责人'];
+                $map3Str = xmSelectInput($input['货号']);
+                $map3 = " AND 货号 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }
+            
+            if (!empty($input['上柜提醒'])) {
+                // echo $input['商品负责人'];
+                $map4Str = xmSelectInput($input['上柜提醒']);
+                $map4 = " AND 上柜提醒 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $map5Str = xmSelectInput($input['季节归集']);
+                $map5 = " AND 季节归集 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+
+            if (!empty($input['一级分类'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['一级分类']);
+                $map6 = " AND 一级分类 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
+            if (!empty($input['二级分类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['二级分类']);
+                $map7 = " AND 二级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+
+            if (!empty($input['二级风格'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['二级风格']);
+                $map8 = " AND 二级风格 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+
+            if (!empty($input['云仓_主码齐码情况'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['云仓_主码齐码情况']);
+                $map9 = " AND 云仓_主码齐码情况 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+
+            $sql = "
+                select
+                    p.*,
+                    
+                    gzrk.入库时间 as `广州云仓_入库时间`,
+                    gz.`云仓_可用数量` as `广州云仓_可用数量`,
+                    gz.`实际上柜_上柜家数` as `广州云仓_实际上柜_上柜家数`,
+                    gz.上柜提醒 as `广州云仓_上柜提醒`,
+                    
+                    ncrk.入库时间 as `南昌云仓_入库时间`,
+                    nc.`云仓_可用数量` as `南昌云仓_可用数量`,
+                    nc.`实际上柜_上柜家数` as `南昌云仓_实际上柜_上柜家数`,
+                    nc.上柜提醒 as `南昌云仓_上柜提醒`,
+                    
+                    gyrk.入库时间 as `贵阳云仓_入库时间`,
+                    gy.`云仓_可用数量` as `贵阳云仓_可用数量`,
+                    gy.`实际上柜_上柜家数` as `贵阳云仓_实际上柜_上柜家数`,
+                    gy.上柜提醒 as `贵阳云仓_上柜提醒`,
+                    
+                    csrk.入库时间 as `长沙云仓_入库时间`,
+                    cs.`云仓_可用数量` as `长沙云仓_可用数量`,
+                    cs.`实际上柜_上柜家数` as `长沙云仓_实际上柜_上柜家数`,
+                    cs.上柜提醒 as `长沙云仓_上柜提醒`,
+                    
+                    whrk.入库时间 as `武汉云仓_入库时间`,
+                    wh.`云仓_可用数量` as `武汉云仓_可用数量`,
+                    wh.`实际上柜_上柜家数` as `武汉云仓_实际上柜_上柜家数`,
+                    wh.上柜提醒 as `武汉云仓_上柜提醒`
+                from
+                cwl_shangguitips_handle_push as p
+                left join cwl_shangguitips_handle as gz on gz.云仓 = '广州云仓' and p.一级分类 = gz.一级分类 and p.二级分类 = gz.二级分类 and p.分类 = gz.分类 and p.货号 = gz.货号
+                left join cwl_shangguitips_handle as nc on nc.云仓 = '南昌云仓' and p.一级分类 = nc.一级分类 and p.二级分类 = nc.二级分类 and p.分类 = nc.分类 and p.货号 = nc.货号
+                left join cwl_shangguitips_handle as gy on gy.云仓 = '贵阳云仓' and p.一级分类 = gy.一级分类 and p.二级分类 = gy.二级分类 and p.分类 = gy.分类 and p.货号 = gy.货号
+                left join cwl_shangguitips_handle as cs on cs.云仓 = '长沙云仓' and p.一级分类 = cs.一级分类 and p.二级分类 = cs.二级分类 and p.分类 = cs.分类 and p.货号 = cs.货号
+                left join cwl_shangguitips_handle as wh on wh.云仓 = '武汉云仓' and p.一级分类 = wh.一级分类 and p.二级分类 = wh.二级分类 and p.分类 = wh.分类 and p.货号 = wh.货号
+                left join cwl_shangguitips_handle_push_ruku as gzrk on gzrk.云仓 = '广州云仓' and p.货号=gzrk.货号
+                left join cwl_shangguitips_handle_push_ruku as ncrk on ncrk.云仓 = '南昌云仓' and p.货号=ncrk.货号
+                left join cwl_shangguitips_handle_push_ruku as gyrk on gyrk.云仓 = '贵阳云仓' and p.货号=gyrk.货号
+                left join cwl_shangguitips_handle_push_ruku as csrk on csrk.云仓 = '长沙云仓' and p.货号=csrk.货号
+                left join cwl_shangguitips_handle_push_ruku as whrk on whrk.云仓 = '武汉云仓' and p.货号=whrk.货号
+                where 1
+                LIMIT {$pageParams1}, {$pageParams2}  
+            ";  
+
+            $select = $this->db_easyA->query($sql);
+
+            $sql2 = "
+                select
+                    count(*) as total
+                from
+                cwl_shangguitips_handle_push as p
+                left join cwl_shangguitips_handle as gz on gz.云仓 = '广州云仓' and p.一级分类 = gz.一级分类 and p.二级分类 = gz.二级分类 and p.分类 = gz.分类 and p.货号 = gz.货号
+                left join cwl_shangguitips_handle as nc on nc.云仓 = '南昌云仓' and p.一级分类 = nc.一级分类 and p.二级分类 = nc.二级分类 and p.分类 = nc.分类 and p.货号 = nc.货号
+                left join cwl_shangguitips_handle as gy on gy.云仓 = '贵阳云仓' and p.一级分类 = gy.一级分类 and p.二级分类 = gy.二级分类 and p.分类 = gy.分类 and p.货号 = gy.货号
+                left join cwl_shangguitips_handle as cs on cs.云仓 = '长沙云仓' and p.一级分类 = cs.一级分类 and p.二级分类 = cs.二级分类 and p.分类 = cs.分类 and p.货号 = cs.货号
+                left join cwl_shangguitips_handle as wh on wh.云仓 = '武汉云仓' and p.一级分类 = wh.一级分类 and p.二级分类 = wh.二级分类 and p.分类 = wh.分类 and p.货号 = wh.货号
+                left join cwl_shangguitips_handle_push_ruku as gzrk on gzrk.云仓 = '广州云仓' and p.货号=gzrk.货号
+                left join cwl_shangguitips_handle_push_ruku as ncrk on ncrk.云仓 = '南昌云仓' and p.货号=ncrk.货号
+                left join cwl_shangguitips_handle_push_ruku as gyrk on gyrk.云仓 = '贵阳云仓' and p.货号=gyrk.货号
+                left join cwl_shangguitips_handle_push_ruku as csrk on csrk.云仓 = '长沙云仓' and p.货号=csrk.货号
+                left join cwl_shangguitips_handle_push_ruku as whrk on whrk.云仓 = '武汉云仓' and p.货号=whrk.货号
+                where 1
+            ";
+            $count = $this->db_easyA->query($sql2);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
+        } else {
+            return View('handle_push', [
+                // 'config' => $find_config,
+                'keshang_url' => $keshang_url,
+            ]);
+        }
     }
 
     // 获取筛选栏多选参数

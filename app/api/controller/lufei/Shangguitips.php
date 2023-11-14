@@ -1548,7 +1548,6 @@ class Shangguitips extends BaseController
                         LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
                         LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
                         LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
-                        LEFT JOIN erpGoodsColor AS EGC ON ERG.GoodsId = EGC.GoodsId
                         LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
                 WHERE
                         ER.CodingCodeText = '已审结' 
