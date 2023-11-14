@@ -581,6 +581,7 @@ class Puhuo_start2_merge extends Command
 
                             ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
                             
+                            //echo json_encode(['daxiaoma_puhuo_log'=>$daxiaoma_puhuo_log, 'daxiaoma_skcnum_score_sort'=>$daxiaoma_skcnum_score_sort,  'add_puhuo_log'=>$add_puhuo_log,  'v_data'=>$v_data,  'puhuo_config'=>$puhuo_config]);die;
                             $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
                             
                             ######################大小码铺货逻辑end################################################################
@@ -1993,6 +1994,9 @@ class Puhuo_start2_merge extends Command
                 ];
                 // print_r([$init_puhuo_stock, count($last_daxiaoma_puhuo_log), $last_daxiaoma_puhuo_log]);die;
 
+                //记录铺货日志：
+                Log::channel('puhuo')->write('##############普通(大小码)-init_puhuo_stock:'.'##############'.json_encode(['init_puhuo_stock'=>$init_puhuo_stock]) );
+
                 //先铺能满足连码的
                 $merge_lianma_arr = [];
                 $merge_not_lianma_arr = [];
@@ -2166,8 +2170,11 @@ class Puhuo_start2_merge extends Command
 
                 }
 
+                //记录铺货日志：
+                Log::channel('puhuo')->write('##############普通(大小码)-云仓-货号:'.$v_data['WarehouseName'].$v_data['GoodsNo'].'##############'.json_encode(['init_puhuo_stock'=>$init_puhuo_stock]) );
+
                 //wait_goods 库存处理
-                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock);
+                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock); 
 
                 //$daxiaoma_skcnum_score_sort 大小码铺货后 重新排序
                 //大小码店 排序入库
@@ -2603,6 +2610,7 @@ class Puhuo_start2_merge extends Command
                     'xiuxian_num' => 0,
                     'score_sort' => 0,
                     'is_total' => 1,
+                    'kepu_sort' => -2,
                     'Stock_00_puhuo' => $v_data['Stock_00'],
                     'Stock_29_puhuo' => $v_data['Stock_29'],
                     'Stock_30_puhuo' => $v_data['Stock_30'],
@@ -2647,6 +2655,7 @@ class Puhuo_start2_merge extends Command
                     'xiuxian_num' => 0,
                     'score_sort' => 0,
                     'is_total' => 1,
+                    'kepu_sort' => -1,
                     'Stock_00_puhuo' => $v_data['Stock_00_puhuo'],
                     'Stock_29_puhuo' => $v_data['Stock_29_puhuo'],
                     'Stock_30_puhuo' => $v_data['Stock_30_puhuo'],
@@ -2670,6 +2679,22 @@ class Puhuo_start2_merge extends Command
             //该云仓下 各个货品铺货情况获取
             $ware_goods = $this->db_easy->Query($this->get_ware_goods_sql($v_data['WarehouseName'], $v_data['GoodsNo']));
             if ($ware_goods) {
+
+                $tmp_arr = [];
+                $cur_sort = 0;
+                foreach ($ware_goods as $v_ware_goods) {
+                    if ($v_ware_goods['Stock_Quantity_puhuo'] > 0) {
+                        $cur_sort++;
+                        $tmp_arr[$v_ware_goods['uuid']] = $cur_sort;
+                    }
+                }   
+
+                foreach ($ware_goods as &$vv_ware_goods) {
+                    if (isset($tmp_arr[$vv_ware_goods['uuid']])) {
+                        $vv_ware_goods['kepu_sort'] = $tmp_arr[$vv_ware_goods['uuid']];
+                    }
+                }
+
                 $add_data = array_merge($add_data, $ware_goods);
             }
 
@@ -2705,6 +2730,7 @@ class Puhuo_start2_merge extends Command
         , lpcs.xiuxian_num 
         , lpcs.score_sort
         , 0 as is_total 
+        , 0 as kepu_sort 
         , lpcl.Stock_00_puhuo 
         , lpcl.Stock_29_puhuo 
         , lpcl.Stock_30_puhuo 

@@ -43,6 +43,9 @@ class PuhuoService
         $GoodsNo = $params['GoodsNo'] ?? '';//货号
         $CustomerName = $params['CustomerName'] ?? '';//店铺名称
         $is_puhuo = $params['is_puhuo'] ?? '';
+        $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
+        // $score_sort = $params['score_sort'] ?? '';//店铺排名
+        $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
 
         $where = $list = [];
         if ($WarehouseName) {
@@ -57,16 +60,27 @@ class PuhuoService
         if ($CustomerName) {
             $where[] = ['CustomerName', 'in', $CustomerName];
         }
+        if ($CustomItem17) {
+            $where[] = ['CustomItem17', 'in', $CustomItem17];
+        }
+        // if ($score_sort) {
+        //     $where[] = ['score_sort', '<=', $score_sort];
+        // }
         if ($is_puhuo) {
             if ($is_puhuo == '可铺') {//可铺
 
-                $where[] = ['Stock_Quantity_puhuo', '>', 0];
+                if ($kepu_sort) {
+                    $where[] = ['kepu_sort', '<>', 0];
+                    $where[] = ['kepu_sort', '<=', $kepu_sort];
+                } else {
+                    $where[] = ['Stock_Quantity_puhuo', '>', 0];
+                }
                 $list = SpLypPuhuoEndDataModel::where($where)->field('*')
-                ->paginate([
-                    'list_rows'=> $pageLimit,
-                    'page' => $page,
-                ]);
-                $list = $list ? $list->toArray() : [];
+                    ->paginate([
+                        'list_rows'=> $pageLimit,
+                        'page' => $page,
+                    ]);
+                    $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 
@@ -119,9 +133,10 @@ class PuhuoService
         $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");
         $CategoryName1 = $this->easy_db->query("select CategoryName1 as name, CategoryName1 as value from sp_lyp_puhuo_wait_goods where CategoryName1!='' and (TimeCategoryName2 like '%秋%' or TimeCategoryName2 like '%冬%') group by CategoryName1;");
         $GoodsNo = $this->easy_db->query("select GoodsNo as name, GoodsNo as value from sp_lyp_puhuo_end_data  group by GoodsNo;");
-        $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data  group by CustomerName;");
+        $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data where CustomerName!='余量' and CustomerName not like '%云仓%' group by CustomerName;");
+        $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_end_data where CustomItem17!='' group by CustomItem17;");
 
-        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
+        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'CustomItem17'=>$CustomItem17, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
 
     }
 
@@ -603,7 +618,8 @@ class PuhuoService
         $province_list = $this->easy_db->Query("select State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
         $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, concat('商品专员-', CustomItem17) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
         $mathod_list = $this->easy_db->Query("select Mathod as name, concat('经营模式-', Mathod) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
-        $merge = array_merge($mathod_list, $province_list, $goods_manager_list);
+        $wenqu_list = $this->easy_db->Query("select CustomItem36 as name, concat('温区-', CustomItem36) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem36;");//温区
+        $merge = array_merge($mathod_list, $province_list, $goods_manager_list, $wenqu_list);
 
         return ['merge_list' => $merge];
 
@@ -805,13 +821,15 @@ class PuhuoService
         $CustomerNames = null;
         if ($Selecttype == SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']) {//组合的情况  处理组合店铺入库
             $Commonfield_arr = $Commonfield ? explode(',', $Commonfield) : [];
-            $province_arr = $goods_manager_arr = $mathod_arr = [];
+            $province_arr = $goods_manager_arr = $mathod_arr = $wenqu_arr = [];
             if ($Commonfield_arr) {
                 foreach ($Commonfield_arr as $v_common) {
                     if (strstr($v_common, '省份')) {
                         $province_arr[] = str_replace(['省份-'], [''], $v_common);
                     } elseif (strstr($v_common, '商品专员')) {
                         $goods_manager_arr[] = str_replace(['商品专员-'], [''], $v_common);
+                    } elseif (strstr($v_common, '温区')) {
+                        $wenqu_arr[] = str_replace(['温区-'], [''], $v_common);
                     } else {
                         $mathod_arr[] = str_replace(['经营模式-'], [''], $v_common);
                     }
@@ -830,6 +848,9 @@ class PuhuoService
                 }
                 if ($mathod_arr) {
                     $where[] = ['Mathod', 'in', $mathod_arr];
+                }
+                if ($wenqu_arr) {
+                    $where[] = ['CustomItem36', 'in', $wenqu_arr];
                 }
                 $CustomerNames = CustomerModel::where($where)->column('CustomerName');
                 $CustomerNames = $CustomerNames ? implode(',', $CustomerNames) : null;

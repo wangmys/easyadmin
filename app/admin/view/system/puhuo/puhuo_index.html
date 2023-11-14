@@ -121,28 +121,23 @@
                     <div class="flex col between al-start" style="width:80%; height: 36px;">
                         
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 90px !important;">
                                 <div id="xm-WarehouseName" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">大类选择</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">大类选择</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
                                 <div id="xm-CategoryName1" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称：</label>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">店铺名称</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-CustomerName" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">货号：</label>
+                            <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">货号</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-GoodsNo" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">是否铺货：</label>
-                            <!-- <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-is_puhuo" class="xm-select-demo"></div>
-                            </div> -->
-
-
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">是否铺货</label>
                             <div class="layui-input-inline" style="width: 120px !important;">
                                 <select name="is_puhuo" lay-verify="">
                                     <option value="">请选择</option>
@@ -150,7 +145,15 @@
                                     <option value="不可铺">不可铺</option>
                                 </select>
                             </div>
-
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">商品专员</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <div id="xm-CustomItem17" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">可铺排名</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <input type="number" name='kepu_sort' autocomplete="off" value="" maxlength="10" placeholder="0"
+                                    class="layui-input" lay-verify="">
+                            </div>
                         </div>
 
                     </div>
@@ -251,6 +254,15 @@
         //     data: []
         // })
 
+        //商品专员
+        xmSelect.render({
+            el: '#xm-CustomItem17', 
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'CustomItem17',
+            data: []
+        })
+
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
 
@@ -316,6 +328,19 @@
                 //     data: res.data.is_puhuo
                 // })
 
+                //货号
+                xmSelect.render({
+                    el: '#xm-CustomItem17', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'CustomItem17',
+                    data: res.data.CustomItem17
+                })
+
             }, 'json')
         }
 
@@ -360,7 +385,7 @@
                      , { field: 'StyleCategoryName', title: '风格', align: 'center', width: 45}
                     //  ,{field: 'img', width: 80, title: '图片', search: false, templet: table.image,imageHeight:30,merge: true}
                     //  ,{field: 'img', width: 80, title: '图片', search: false, templet: '<div><img src="{}"/></div>',imageHeight:30,merge: true}
-                     , { field: 'CustomItem17', title: '商品负责人', align: 'center', width: 50}
+                     , { field: 'CustomItem17', title: '商品专员', align: 'center', width: 50}
                      , { field: 'State', title: '省份', align: 'center', width: 35}
                      , { field: 'CustomerName', title: '店铺名称', align: 'center', width: 70}
                      , { field: 'Mathod', title: '经营模式', align: 'center', width: 55}

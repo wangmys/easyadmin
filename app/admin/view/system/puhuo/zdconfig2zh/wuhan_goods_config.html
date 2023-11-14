@@ -1,4 +1,4 @@
-<form id="app-form" class="layui-form layuimini-form">
+<form id="app-form_wuhan_goods_config" class="layui-form layuimini-form">
     <table class="layui-table">
     
         <table id="form-wuhan_goods-config" class="layui-table">
@@ -23,19 +23,22 @@
                         <div class="layui-btn-group">
                             <button type="button" class="layui-btn add_wuhan_goods_config">增加</button>
                         </div>
+                        <div class="layui-btn-group">
+                            <button type="button" class="layui-btn add_wuhan_goods_config_all">一键保存全部</button>
+                        </div>
                     </td>
                 </tr>
 
                 {foreach $wuhan_goods_config as $vo}
                 <tr class="wuhan_goods_config-select" lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
                     <td class="wuhan_goods">
-                        <input type="text" style="width:500px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="{$vo['GoodsNo']}" class="layui-input">
+                        <input type="text" style="width:500px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
 
                     <td class="Commonfield"></td>
                     
                     <td class="rule_type">
-                        <select name="rule_type">
+                        <select name="rule_type[]">
                             {foreach $rule_type as $vo_key=>$vo_rule}
                             <option value="{$vo_key}" {if ($vo['rule_type']==$vo_key)}selected{/if}>{$vo_rule}</option>
                             {/foreach}
@@ -43,14 +46,14 @@
                     </td>
 
                     <td class="remain_store">
-                        <select name="remain_store">
+                        <select name="remain_store[]">
                             <option value="2" {if ($vo['remain_store']==2)}selected{/if}>不铺</option>
                             <option value="1" {if ($vo['remain_store']==1)}selected{/if}>铺</option>
                         </select>
                     </td>
 
                     <td class="remain_rule_type">
-                        <select name="remain_rule_type">
+                        <select name="remain_rule_type[]">
                             <option value="0">请选择</option>
                             {foreach $rule_type as $vo_key=>$vo_rule}
                             <option value="{$vo_key}" {if ($vo['remain_rule_type']==$vo_key)}selected{/if}>{$vo_rule}</option>
@@ -59,23 +62,23 @@
                     </td>
 
                     <td class="if_taozhuang">
-                        <select name="if_taozhuang">
+                        <select name="if_taozhuang[]">
                             <option value="2" {if ($vo['if_taozhuang']==2)}selected{/if}>否</option>
                             <option value="1" {if ($vo['if_taozhuang']==1)}selected{/if}>是</option>
                         </select>
                     </td>
 
                     <td class="if_zdmd">
-                        <select name="if_zdmd">
+                        <select name="if_zdmd[]">
                             <option value="1" {if ($vo['if_zdmd']==1)}selected{/if}>是</option>
                             <option value="2" {if ($vo['if_zdmd']==2)}selected{/if}>否</option>
                         </select>
                     </td>
                     <td class="handler">
-                        <input type="text" name="id" class="layui-hide" value="{$vo.id}">
-                        <input type="text" name="Selecttype" class="layui-hide" value="1">
-                        <input type="text" name="Yuncang" class="layui-hide" value="武汉云仓">
-                        <button type="button" class="layui-btn layui-btn-normal get_wuhan_goods_config">保存</button>
+                        <input type="text" name="id[]" class="layui-hide" value="{$vo.id}">
+                        <input type="text" name="Selecttype[]" class="layui-hide" value="1">
+                        <input type="text" name="Yuncang[]" class="layui-hide" value="武汉云仓">
+                        <button type="button" class="layui-btn layui-btn-normal get_wuhan_goods_config" id="save_button">保存</button>
                         <button type="button" class="layui-btn layui-btn-danger del_wuhan_goods_config">删除</button>
                         <!-- <button type="button" class="layui-btn layui-btn-danger del">删除</button> -->
                     </td>

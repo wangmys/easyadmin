@@ -197,8 +197,24 @@ class Zdconfig2 extends AdminController
             return $this->error('存在货号或店铺为空的情况，请检查');
         }
 
+        if (($post['remain_store'] == SpLypPuhuoZdySet2Model::REMAIN_STORE['puhuo']) && ($post['remain_rule_type']==SpLypPuhuoZdySet2Model::REMAIN_RULE_TYPE['no_select'])) {//剩余门店铺货，则铺货规则必选
+            return $this->error('您已选择剩余门店铺货，请选择剩余门店铺货方案');
+        }
+
         //test...
         // return $this->success('成功',['id' => $post, 'Yuncang'=>$post['Yuncang']]);
+
+        $post_goods1 = $post['GoodsNo'] ? explode(' ', trim($post['GoodsNo'])) : [];
+        $post_goods1 = array_count_values($post_goods1);
+        $post_goods_repeat = [];
+        foreach ($post_goods1 as $k_goods_num => $v_goods_num) {
+            if ($v_goods_num > 1) {
+                $post_goods_repeat[] = $k_goods_num;
+            }
+        }
+        if ($post_goods_repeat) {
+            return $this->error('检测到有重复货号，请剔除:'.implode(',', $post_goods_repeat));
+        }
 
         //检测是否GoodsNo已经存在
         $check_info = $this->service->checkPuhuoZdySetGoods2($post);
@@ -214,6 +230,83 @@ class Zdconfig2 extends AdminController
         $res_id = $this->service->savePuhuoZdySet2($post);
 
         return $this->success('成功',['id' => $res_id, 'Yuncang'=>$post['Yuncang']]);
+
+    }
+
+    /**
+     * @NodeAnotation(title="一键保存铺货配置(多店/多省/商品专员/经营模式)")
+     */
+    public function savePuhuoZdySetAll() {
+
+        $post_all = $this->request->post();
+
+        //判断所传参数是否符合
+        if ($post_all) {
+            $post_all_arr = [];
+            $post_goods1 = $post_goods_repeat = [];
+            foreach ($post_all['GoodsNo'] as $k_goods=>$v_goods) {
+                $post_goods1 = array_merge($post_goods1, $v_goods ? explode(' ', trim($v_goods)) : []);
+
+                $post_all_arr[] = [
+                    'Yuncang' => $post_all['Yuncang'][$k_goods],
+                    'GoodsNo' => $v_goods,
+                    'Selecttype' => $post_all['Selecttype'][$k_goods],
+                    'Commonfield' => $post_all['Commonfield'][$k_goods],
+                    'rule_type' => $post_all['rule_type'][$k_goods],
+                    'remain_store' => $post_all['remain_store'][$k_goods],
+                    'remain_rule_type' => $post_all['remain_rule_type'][$k_goods],
+                    'if_taozhuang' => $post_all['if_taozhuang'][$k_goods],
+                    'if_zdmd' => $post_all['if_zdmd'][$k_goods],
+                    'id' => $post_all['id'][$k_goods],
+                ];
+            }
+
+            $post_goods1 = array_count_values($post_goods1);
+            foreach ($post_goods1 as $k_goods_num => $v_goods_num) {
+                if ($v_goods_num > 1) {
+                    $post_goods_repeat[] = $k_goods_num;
+                }
+            }
+            if ($post_goods_repeat) {
+                return $this->error('检测到有重复货号，请剔除:'.implode(',', $post_goods_repeat));
+            }
+
+            foreach ($post_all_arr as $post) {
+
+                if (!$post['Yuncang'] || !$post['GoodsNo'] || !$post['Commonfield']) {
+                    return $this->error('存在货号或店铺为空的情况，请检查');
+                }
+        
+                if (($post['remain_store'] == SpLypPuhuoZdySet2Model::REMAIN_STORE['puhuo']) && ($post['remain_rule_type']==SpLypPuhuoZdySet2Model::REMAIN_RULE_TYPE['no_select'])) {//剩余门店铺货，则铺货规则必选
+                    return $this->error('您已选择剩余门店铺货，请选择剩余门店铺货方案');
+                }
+        
+                //检测是否GoodsNo已经存在
+                $check_info = $this->service->checkPuhuoZdySetGoods2($post);
+        
+                if ($check_info['error'] == 2) {
+                    return $this->error('套装套西的货号个数必须是双数，请检查');
+                }
+    
+            }
+
+            //没有问题再入库
+            $res_arr = [];
+            foreach ($post_all_arr as $post) {
+                $res_id = $this->service->savePuhuoZdySet2($post);                
+                $res_arr[] = [
+                    'id' => $res_id,
+                    'Yuncang' => $post_all['Yuncang'][0] ?? '',
+                ];
+            }
+
+            return $this->success('成功',['id' => $res_id, 'Yuncang'=>$post_all['Yuncang'][0] ?? '',  'post_all_arr' => $post_all_arr, 'res_arr'=>$res_arr]);
+
+        } else {
+
+            return $this->error('无数据');
+
+        }
 
     }
 

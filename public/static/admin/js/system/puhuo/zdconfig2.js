@@ -4,6 +4,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
     table = layui.table,
     url = {
         savePuhuoZdySet_url:ea.url('system.puhuo.Zdconfig2/savePuhuoZdySet'),
+        savePuhuoZdySetAll_url:ea.url('system.puhuo.Zdconfig2/savePuhuoZdySetAll'),
         del_url:ea.url('/system.puhuo.Zdconfig2/delPuhuoZdySet')
     }
 
@@ -26,11 +27,32 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             },function (res) {
                 //console.log(122, res);
                 element.attr('lay-id',res.data.id);
-                element.find('input[name="Yuncang"]').val(res.data.Yuncang)
-                element.find('input[name="id"]').val(res.data.id)
+                element.find('input[name="Yuncang[]"]').val(res.data.Yuncang)
+                element.find('input[name="id[]"]').val(res.data.id)
+                element.find('button[id="save_button"]').addClass('layui-btn-disabled')
                 ea.msg.success(res.msg);
              });
         },
+
+        //一键保存仓库预留参数配置
+        savePuhuoZdySetAll:function (element,_url,_data) {
+            ea.request.post({
+                url:_url,
+                data:_data
+            },function (res) {
+                // console.log('save all.....', res);
+                var res_arr = res.data.res_arr;
+                $.each(element, function (key, val) {
+                    // console.log(key, '===>>>', res_arr[key], '=====>', val);
+                    $(val).attr('lay-id', res_arr[key].id);
+                    $(val).find('input[name="Yuncang[]"]').val(res_arr[key].Yuncang)
+                    $(val).find('input[name="id[]"]').val(res_arr[key].id)
+                    $(val).find('button[id="save_button"]').addClass('layui-btn-disabled')
+                });
+                ea.msg.success(res.msg);
+             });
+        },
+
         // 删除配置
         delConfig:function (_this,_url,_id) {
             ea.request.get({
@@ -53,7 +75,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var genderSelect = xmSelect.render({
                 el: gender,
                 filterable: true,
-                name: 'Commonfield',
+                name: 'Commonfield[]',
                 data: function(){
                     return data
                 }
@@ -74,13 +96,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = guiyang_select_list_hidden['mathod_list'];
 
             html += '<td class="guiyang_goods">';
-            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万州一店 忠县一店 祥云一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield[]" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万州一店 忠县一店 祥云一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
-            html += '<select name="rule_type">';
+            html += '<select name="rule_type[]">';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
             });	
@@ -88,7 +110,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</td>';
 
             html += '<td class="remain_store">';
-            html += '<select name="remain_store">';
+            html += '<select name="remain_store[]">';
             html += '<option value="2">不铺</option>';
             html += '<option value="1">铺</option>';
             html += '</select>';
@@ -96,7 +118,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="remain_rule_type">';
-            html += '<select name="remain_rule_type">';
+            html += '<select name="remain_rule_type[]">';
             html += '<option value="0">请选择</option>';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
@@ -106,14 +128,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="if_taozhuang">';
-            html += '<select name="if_taozhuang">';
+            html += '<select name="if_taozhuang[]">';
             html += '<option value="2">否</option>';
             html += '<option value="1">是</option>';
             html += '</select>';
             html += '</td>';
 
             html += '<td class="if_zdmd">';
-            html += '<select name="if_zdmd">';
+            html += '<select name="if_zdmd[]">';
             html += '<option value="1">是</option>';
             html += '<option value="2">否</option>';
             html += '</select>';
@@ -123,13 +145,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             $('.add_guiyang_goods_config').on('click', function(){
 
             var element = $([
-                '<tr>',
+                '<tr class="guiyang_goods_config-select">',
                     ,html,
                     '<td class="handler">',
-                        '<input type="text" name="id" class="layui-hide" value="">',
-                        '<input type="text" name="Yuncang" class="layui-hide" value="贵阳云仓">',
-                        '<input type="text" name="Selecttype" class="layui-hide" value="2">',
-                        '<button type="button" class="layui-btn layui-btn-normal get_guiyang_goods_config" id="">保存</button>',
+                        '<input type="text" name="id[]" class="layui-hide" value="">',
+                        '<input type="text" name="Yuncang[]" class="layui-hide" value="贵阳云仓">',
+                        '<input type="text" name="Selecttype[]" class="layui-hide" value="2">',
+                        '<button type="button" class="layui-btn layui-btn-normal get_guiyang_goods_config" id="save_button">保存</button>',
                         '<button type="button" class="layui-btn layui-btn-danger del_guiyang_goods_config">删除</button>',
                     '</td>',
                 '</tr>',
@@ -139,16 +161,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.get_guiyang_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
 
-                    var Yuncang = element.find('input[name="Yuncang"]').val();
-                    var Selecttype = element.find('input[name="Selecttype"]').val();
-                    var Commonfield = element.find('input[name="Commonfield"]').val();
-                    var GoodsNo = element.find('input[name="GoodsNo"]').val();
-                    var rule_type = element.find('select[name="rule_type"]').val();
-                    var remain_store = element.find('select[name="remain_store"]').val();
-                    var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
-                    var id = element.find('input[name="id"]').val();
+                    var Yuncang = element.find('input[name="Yuncang[]"]').val();
+                    var Selecttype = element.find('input[name="Selecttype[]"]').val();
+                    var Commonfield = element.find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = element.find('input[name="GoodsNo[]"]').val();
+                    var rule_type = element.find('select[name="rule_type[]"]').val();
+                    var remain_store = element.find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = element.find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd[]"]').val();
+                    var id = element.find('input[name="id[]"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
@@ -168,7 +190,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.del_guiyang_goods_config').on('click', function(){
                 var _this = $(this);
                 layer.confirm('是否删除',{},function () {
-                        var id = element.find('input[name="id"]').val();
+                        var id = element.find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -181,22 +203,29 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             ea.listen();
             });
 
+            //一键保存全部
+            $('.add_guiyang_goods_config_all').on('click', function(){
+                var _url = url.savePuhuoZdySetAll_url;
+                var all_data = $('form[id="app-form_guiyang_goods_config"]').serializeArray();
+                that.savePuhuoZdySetAll($('.guiyang_goods_config-select'), _url, all_data);
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.guiyang_goods_config-select'), function (key, element) {
 
                 //编辑 保存
                 $(element).find('.get_guiyang_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
-                    var id = $(element).find('input[name="id"]').val();
-                    var Yuncang = $(element).find('input[name="Yuncang"]').val();
-                    var Selecttype = $(element).find('input[name="Selecttype"]').val();
-                    var Commonfield = $(element).find('input[name="Commonfield"]').val();
-                    var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
-                    var rule_type = $(element).find('select[name="rule_type"]').val();
-                    var remain_store = $(element).find('select[name="remain_store"]').val();
-                    var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
+                    var id = $(element).find('input[name="id[]"]').val();
+                    var Yuncang = $(element).find('input[name="Yuncang[]"]').val();
+                    var Selecttype = $(element).find('input[name="Selecttype[]"]').val();
+                    var Commonfield = $(element).find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = $(element).find('input[name="GoodsNo[]"]').val();
+                    var rule_type = $(element).find('select[name="rule_type[]"]').val();
+                    var remain_store = $(element).find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = $(element).find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd[]"]').val();
 
                     var _data = {
                         id:id,
@@ -218,7 +247,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.del_guiyang_goods_config').on('click', function(){
                     var _this = $(this);
                     layer.confirm('是否删除',{},function () {
-                        var id = $(element).find('input[name="id"]').val();
+                        var id = $(element).find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -261,13 +290,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             // html += '</td>';
             
             html += '<td class="wuhan_goods">';
-            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52502014 B52109004 B52106003" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield[]" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：吴忠一店 阳新一店 利川一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
-            html += '<select name="rule_type">';
+            html += '<select name="rule_type[]">';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
             });	
@@ -275,7 +304,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</td>';
 
             html += '<td class="remain_store">';
-            html += '<select name="remain_store">';
+            html += '<select name="remain_store[]">';
             html += '<option value="2">不铺</option>';
             html += '<option value="1">铺</option>';
             html += '</select>';
@@ -283,7 +312,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="remain_rule_type">';
-            html += '<select name="remain_rule_type">';
+            html += '<select name="remain_rule_type[]">';
             html += '<option value="0">请选择</option>';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
@@ -293,14 +322,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="if_taozhuang">';
-            html += '<select name="if_taozhuang">';
+            html += '<select name="if_taozhuang[]">';
             html += '<option value="2">否</option>';
             html += '<option value="1">是</option>';
             html += '</select>';
             html += '</td>';
 
             html += '<td class="if_zdmd">';
-            html += '<select name="if_zdmd">';
+            html += '<select name="if_zdmd[]">';
             html += '<option value="1">是</option>';
             html += '<option value="2">否</option>';
             html += '</select>';
@@ -327,13 +356,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 // }
 
                var element = $([
-                   '<tr>',
+                   '<tr class="wuhan_goods_config-select">',
                        ,html,
                        '<td class="handler">',
-                           '<input type="text" name="id" class="layui-hide" value="">',
-                           '<input type="text" name="Yuncang" class="layui-hide" value="武汉云仓">',
-                           '<input type="text" name="Selecttype" class="layui-hide" value="2">',
-                           '<button type="button" class="layui-btn layui-btn-normal get_wuhan_goods_config" id="">保存</button>',
+                           '<input type="text" name="id[]" class="layui-hide" value="">',
+                           '<input type="text" name="Yuncang[]" class="layui-hide" value="武汉云仓">',
+                           '<input type="text" name="Selecttype[]" class="layui-hide" value="2">',
+                           '<button type="button" class="layui-btn layui-btn-normal get_wuhan_goods_config" id="save_button">保存</button>',
                            '<button type="button" class="layui-btn layui-btn-danger del_wuhan_goods_config">删除</button>',
                        '</td>',
                    '</tr>',
@@ -361,16 +390,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.get_wuhan_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
 
-                    var Yuncang = element.find('input[name="Yuncang"]').val();
-                    var Selecttype = element.find('input[name="Selecttype"]').val();
-                    var Commonfield = element.find('input[name="Commonfield"]').val();
-                    var GoodsNo = element.find('input[name="GoodsNo"]').val();
-                    var rule_type = element.find('select[name="rule_type"]').val();
-                    var remain_store = element.find('select[name="remain_store"]').val();
-                    var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
-                    var id = element.find('input[name="id"]').val();
+                    var Yuncang = element.find('input[name="Yuncang[]"]').val();
+                    var Selecttype = element.find('input[name="Selecttype[]"]').val();
+                    var Commonfield = element.find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = element.find('input[name="GoodsNo[]"]').val();
+                    var rule_type = element.find('select[name="rule_type[]"]').val();
+                    var remain_store = element.find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = element.find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd[]"]').val();
+                    var id = element.find('input[name="id[]"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
@@ -390,7 +419,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.del_wuhan_goods_config').on('click', function(){
                    var _this = $(this);
                    layer.confirm('是否删除',{},function () {
-                        var id = element.find('input[name="id"]').val();
+                        var id = element.find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -403,22 +432,29 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                ea.listen();
            });
 
+            //一键保存全部
+            $('.add_wuhan_goods_config_all').on('click', function(){
+                var _url = url.savePuhuoZdySetAll_url;
+                var all_data = $('form[id="app-form_wuhan_goods_config"]').serializeArray();
+                that.savePuhuoZdySetAll($('.wuhan_goods_config-select'), _url, all_data);
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.wuhan_goods_config-select'), function (key, element) {
 
                 //编辑 保存
                 $(element).find('.get_wuhan_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
-                    var id = $(element).find('input[name="id"]').val();
-                    var Yuncang = $(element).find('input[name="Yuncang"]').val();
-                    var Selecttype = $(element).find('input[name="Selecttype"]').val();
-                    var Commonfield = $(element).find('input[name="Commonfield"]').val();
-                    var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
-                    var rule_type = $(element).find('select[name="rule_type"]').val();
-                    var remain_store = $(element).find('select[name="remain_store"]').val();
-                    var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
+                    var id = $(element).find('input[name="id[]"]').val();
+                    var Yuncang = $(element).find('input[name="Yuncang[]"]').val();
+                    var Selecttype = $(element).find('input[name="Selecttype[]"]').val();
+                    var Commonfield = $(element).find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = $(element).find('input[name="GoodsNo[]"]').val();
+                    var rule_type = $(element).find('select[name="rule_type[]"]').val();
+                    var remain_store = $(element).find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = $(element).find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd[]"]').val();
     
                     var _data = {
                         id:id,
@@ -440,7 +476,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.del_wuhan_goods_config').on('click', function(){
                     var _this = $(this);
                     layer.confirm('是否删除',{},function () {
-                         var id = $(element).find('input[name="id"]').val();
+                         var id = $(element).find('input[name="id[]"]').val();
                          if (id != '') {
                              that.delConfig(_this, url.del_url, id)
                          }
@@ -473,13 +509,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = guangzhou_select_list_hidden['mathod_list'];
 
             html += '<td class="guangzhou_goods">';
-            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B62612205 B62501005 B52109011" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：百色一店 茂名二店 桂平一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield[]" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：百色一店 茂名二店 桂平一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
-            html += '<select name="rule_type">';
+            html += '<select name="rule_type[]">';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
             });	
@@ -487,7 +523,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</td>';
 
             html += '<td class="remain_store">';
-            html += '<select name="remain_store">';
+            html += '<select name="remain_store[]">';
             html += '<option value="2">不铺</option>';
             html += '<option value="1">铺</option>';
             html += '</select>';
@@ -495,7 +531,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="remain_rule_type">';
-            html += '<select name="remain_rule_type">';
+            html += '<select name="remain_rule_type[]">';
             html += '<option value="0">请选择</option>';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
@@ -505,14 +541,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="if_taozhuang">';
-            html += '<select name="if_taozhuang">';
+            html += '<select name="if_taozhuang[]">';
             html += '<option value="2">否</option>';
             html += '<option value="1">是</option>';
             html += '</select>';
             html += '</td>';
 
             html += '<td class="if_zdmd">';
-            html += '<select name="if_zdmd">';
+            html += '<select name="if_zdmd[]">';
             html += '<option value="1">是</option>';
             html += '<option value="2">否</option>';
             html += '</select>';
@@ -522,13 +558,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             $('.add_guangzhou_goods_config').on('click', function(){
 
             var element = $([
-                '<tr>',
+                '<tr class="guangzhou_goods_config-select">',
                     ,html,
                     '<td class="handler">',
-                        '<input type="text" name="id" class="layui-hide" value="">',
-                        '<input type="text" name="Yuncang" class="layui-hide" value="广州云仓">',
-                        '<input type="text" name="Selecttype" class="layui-hide" value="2">',
-                        '<button type="button" class="layui-btn layui-btn-normal get_guangzhou_goods_config" id="">保存</button>',
+                        '<input type="text" name="id[]" class="layui-hide" value="">',
+                        '<input type="text" name="Yuncang[]" class="layui-hide" value="广州云仓">',
+                        '<input type="text" name="Selecttype[]" class="layui-hide" value="2">',
+                        '<button type="button" class="layui-btn layui-btn-normal get_guangzhou_goods_config" id="save_button">保存</button>',
                         '<button type="button" class="layui-btn layui-btn-danger del_guangzhou_goods_config">删除</button>',
                     '</td>',
                 '</tr>',
@@ -538,16 +574,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.get_guangzhou_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
 
-                    var Yuncang = element.find('input[name="Yuncang"]').val();
-                    var Selecttype = element.find('input[name="Selecttype"]').val();
-                    var Commonfield = element.find('input[name="Commonfield"]').val();
-                    var GoodsNo = element.find('input[name="GoodsNo"]').val();
-                    var rule_type = element.find('select[name="rule_type"]').val();
-                    var remain_store = element.find('select[name="remain_store"]').val();
-                    var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
-                    var id = element.find('input[name="id"]').val();
+                    var Yuncang = element.find('input[name="Yuncang[]"]').val();
+                    var Selecttype = element.find('input[name="Selecttype[]"]').val();
+                    var Commonfield = element.find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = element.find('input[name="GoodsNo[]"]').val();
+                    var rule_type = element.find('select[name="rule_type[]"]').val();
+                    var remain_store = element.find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = element.find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd[]"]').val();
+                    var id = element.find('input[name="id[]"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
@@ -567,7 +603,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.del_guangzhou_goods_config').on('click', function(){
                 var _this = $(this);
                 layer.confirm('是否删除',{},function () {
-                        var id = element.find('input[name="id"]').val();
+                        var id = element.find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -580,22 +616,29 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             ea.listen();
             });
 
+            //一键保存全部
+            $('.add_guangzhou_goods_config_all').on('click', function(){
+                var _url = url.savePuhuoZdySetAll_url;
+                var all_data = $('form[id="app-form_guangzhou_goods_config"]').serializeArray();
+                that.savePuhuoZdySetAll($('.guangzhou_goods_config-select'), _url, all_data);
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.guangzhou_goods_config-select'), function (key, element) {
 
                 //编辑 保存
                 $(element).find('.get_guangzhou_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
-                    var id = $(element).find('input[name="id"]').val();
-                    var Yuncang = $(element).find('input[name="Yuncang"]').val();
-                    var Selecttype = $(element).find('input[name="Selecttype"]').val();
-                    var Commonfield = $(element).find('input[name="Commonfield"]').val();
-                    var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
-                    var rule_type = $(element).find('select[name="rule_type"]').val();
-                    var remain_store = $(element).find('select[name="remain_store"]').val();
-                    var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
+                    var id = $(element).find('input[name="id[]"]').val();
+                    var Yuncang = $(element).find('input[name="Yuncang[]"]').val();
+                    var Selecttype = $(element).find('input[name="Selecttype[]"]').val();
+                    var Commonfield = $(element).find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = $(element).find('input[name="GoodsNo[]"]').val();
+                    var rule_type = $(element).find('select[name="rule_type[]"]').val();
+                    var remain_store = $(element).find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = $(element).find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd[]"]').val();
 
                     var _data = {
                         id:id,
@@ -617,7 +660,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.del_guangzhou_goods_config').on('click', function(){
                     var _this = $(this);
                     layer.confirm('是否删除',{},function () {
-                        var id = $(element).find('input[name="id"]').val();
+                        var id = $(element).find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -650,13 +693,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = nanchang_select_list_hidden['mathod_list'];
 
             html += '<td class="nanchang_goods">';
-            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52109006 B52106011 B51501023" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万年一店 万年二店 上饶一店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield[]" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：万年一店 万年二店 上饶一店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
-            html += '<select name="rule_type">';
+            html += '<select name="rule_type[]">';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
             });	
@@ -664,7 +707,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</td>';
 
             html += '<td class="remain_store">';
-            html += '<select name="remain_store">';
+            html += '<select name="remain_store[]">';
             html += '<option value="2">不铺</option>';
             html += '<option value="1">铺</option>';
             html += '</select>';
@@ -672,7 +715,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="remain_rule_type">';
-            html += '<select name="remain_rule_type">';
+            html += '<select name="remain_rule_type[]">';
             html += '<option value="0">请选择</option>';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
@@ -682,14 +725,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="if_taozhuang">';
-            html += '<select name="if_taozhuang">';
+            html += '<select name="if_taozhuang[]">';
             html += '<option value="2">否</option>';
             html += '<option value="1">是</option>';
             html += '</select>';
             html += '</td>';
 
             html += '<td class="if_zdmd">';
-            html += '<select name="if_zdmd">';
+            html += '<select name="if_zdmd[]">';
             html += '<option value="1">是</option>';
             html += '<option value="2">否</option>';
             html += '</select>';
@@ -699,13 +742,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             $('.add_nanchang_goods_config').on('click', function(){
 
             var element = $([
-                '<tr>',
+                '<tr class="nanchang_goods_config-select">',
                     ,html,
                     '<td class="handler">',
-                        '<input type="text" name="id" class="layui-hide" value="">',
-                        '<input type="text" name="Yuncang" class="layui-hide" value="南昌云仓">',
-                        '<input type="text" name="Selecttype" class="layui-hide" value="2">',
-                        '<button type="button" class="layui-btn layui-btn-normal get_nanchang_goods_config" id="">保存</button>',
+                        '<input type="text" name="id[]" class="layui-hide" value="">',
+                        '<input type="text" name="Yuncang[]" class="layui-hide" value="南昌云仓">',
+                        '<input type="text" name="Selecttype[]" class="layui-hide" value="2">',
+                        '<button type="button" class="layui-btn layui-btn-normal get_nanchang_goods_config" id="save_button">保存</button>',
                         '<button type="button" class="layui-btn layui-btn-danger del_nanchang_goods_config">删除</button>',
                     '</td>',
                 '</tr>',
@@ -715,16 +758,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.get_nanchang_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
 
-                    var Yuncang = element.find('input[name="Yuncang"]').val();
-                    var Selecttype = element.find('input[name="Selecttype"]').val();
-                    var Commonfield = element.find('input[name="Commonfield"]').val();
-                    var GoodsNo = element.find('input[name="GoodsNo"]').val();
-                    var rule_type = element.find('select[name="rule_type"]').val();
-                    var remain_store = element.find('select[name="remain_store"]').val();
-                    var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
-                    var id = element.find('input[name="id"]').val();
+                    var Yuncang = element.find('input[name="Yuncang[]"]').val();
+                    var Selecttype = element.find('input[name="Selecttype[]"]').val();
+                    var Commonfield = element.find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = element.find('input[name="GoodsNo[]"]').val();
+                    var rule_type = element.find('select[name="rule_type[]"]').val();
+                    var remain_store = element.find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = element.find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd[]"]').val();
+                    var id = element.find('input[name="id[]"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
@@ -744,7 +787,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.del_nanchang_goods_config').on('click', function(){
                 var _this = $(this);
                 layer.confirm('是否删除',{},function () {
-                        var id = element.find('input[name="id"]').val();
+                        var id = element.find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -757,22 +800,29 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             ea.listen();
             });
 
+            //一键保存全部
+            $('.add_nanchang_goods_config_all').on('click', function(){
+                var _url = url.savePuhuoZdySetAll_url;
+                var all_data = $('form[id="app-form_nanchang_goods_config"]').serializeArray();
+                that.savePuhuoZdySetAll($('.nanchang_goods_config-select'), _url, all_data);
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.nanchang_goods_config-select'), function (key, element) {
 
                 //编辑 保存
                 $(element).find('.get_nanchang_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
-                    var id = $(element).find('input[name="id"]').val();
-                    var Yuncang = $(element).find('input[name="Yuncang"]').val();
-                    var Selecttype = $(element).find('input[name="Selecttype"]').val();
-                    var Commonfield = $(element).find('input[name="Commonfield"]').val();
-                    var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
-                    var rule_type = $(element).find('select[name="rule_type"]').val();
-                    var remain_store = $(element).find('select[name="remain_store"]').val();
-                    var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
+                    var id = $(element).find('input[name="id[]"]').val();
+                    var Yuncang = $(element).find('input[name="Yuncang[]"]').val();
+                    var Selecttype = $(element).find('input[name="Selecttype[]"]').val();
+                    var Commonfield = $(element).find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = $(element).find('input[name="GoodsNo[]"]').val();
+                    var rule_type = $(element).find('select[name="rule_type[]"]').val();
+                    var remain_store = $(element).find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = $(element).find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd[]"]').val();
 
                     var _data = {
                         id:id,
@@ -794,7 +844,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.del_nanchang_goods_config').on('click', function(){
                     var _this = $(this);
                     layer.confirm('是否删除',{},function () {
-                        var id = $(element).find('input[name="id"]').val();
+                        var id = $(element).find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -827,13 +877,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var mathod_list_hidden = changsha_select_list_hidden['mathod_list'];
 
             html += '<td class="changsha_goods">';
-            html += '<input type="text" style="width:438px;" name="GoodsNo" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
+            html += '<input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B52612002 B52503005 B52110135" value="" class="layui-input">';
             html += '</td>';
 
-            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="" class="layui-input"></td>';
+            html += '<td class="Commonfield"><input type="text" style="width:438px;" name="Commonfield[]" lay-verify="required" placeholder="请输入,多个店铺名用空格 隔开，如：株洲一店 邵阳二店 桑植三店" value="" class="layui-input"></td>';
 
             html += '<td class="rule_type">';
-            html += '<select name="rule_type">';
+            html += '<select name="rule_type[]">';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
             });	
@@ -841,7 +891,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             html += '</td>';
 
             html += '<td class="remain_store">';
-            html += '<select name="remain_store">';
+            html += '<select name="remain_store[]">';
             html += '<option value="2">不铺</option>';
             html += '<option value="1">铺</option>';
             html += '</select>';
@@ -849,7 +899,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="remain_rule_type">';
-            html += '<select name="remain_rule_type">';
+            html += '<select name="remain_rule_type[]">';
             html += '<option value="0">请选择</option>';
             $.each(rule_type_hidden, function (key, value) {
                 html += '<option value="'+key+'">'+value+'</option>';
@@ -859,14 +909,14 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
 
 
             html += '<td class="if_taozhuang">';
-            html += '<select name="if_taozhuang">';
+            html += '<select name="if_taozhuang[]">';
             html += '<option value="2">否</option>';
             html += '<option value="1">是</option>';
             html += '</select>';
             html += '</td>';
 
             html += '<td class="if_zdmd">';
-            html += '<select name="if_zdmd">';
+            html += '<select name="if_zdmd[]">';
             html += '<option value="1">是</option>';
             html += '<option value="2">否</option>';
             html += '</select>';
@@ -876,13 +926,13 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             $('.add_changsha_goods_config').on('click', function(){
 
             var element = $([
-                '<tr>',
+                '<tr class="changsha_goods_config-select">',
                     ,html,
                     '<td class="handler">',
-                        '<input type="text" name="id" class="layui-hide" value="">',
-                        '<input type="text" name="Yuncang" class="layui-hide" value="长沙云仓">',
-                        '<input type="text" name="Selecttype" class="layui-hide" value="2">',
-                        '<button type="button" class="layui-btn layui-btn-normal get_changsha_goods_config" id="">保存</button>',
+                        '<input type="text" name="id[]" class="layui-hide" value="">',
+                        '<input type="text" name="Yuncang[]" class="layui-hide" value="长沙云仓">',
+                        '<input type="text" name="Selecttype[]" class="layui-hide" value="2">',
+                        '<button type="button" class="layui-btn layui-btn-normal get_changsha_goods_config" id="save_button">保存</button>',
                         '<button type="button" class="layui-btn layui-btn-danger del_changsha_goods_config">删除</button>',
                     '</td>',
                 '</tr>',
@@ -892,16 +942,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.get_changsha_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
 
-                    var Yuncang = element.find('input[name="Yuncang"]').val();
-                    var Selecttype = element.find('input[name="Selecttype"]').val();
-                    var Commonfield = element.find('input[name="Commonfield"]').val();
-                    var GoodsNo = element.find('input[name="GoodsNo"]').val();
-                    var rule_type = element.find('select[name="rule_type"]').val();
-                    var remain_store = element.find('select[name="remain_store"]').val();
-                    var remain_rule_type = element.find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = element.find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = element.find('select[name="if_zdmd"]').val();
-                    var id = element.find('input[name="id"]').val();
+                    var Yuncang = element.find('input[name="Yuncang[]"]').val();
+                    var Selecttype = element.find('input[name="Selecttype[]"]').val();
+                    var Commonfield = element.find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = element.find('input[name="GoodsNo[]"]').val();
+                    var rule_type = element.find('select[name="rule_type[]"]').val();
+                    var remain_store = element.find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = element.find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = element.find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = element.find('select[name="if_zdmd[]"]').val();
+                    var id = element.find('input[name="id[]"]').val();
                     var _data = {
                         Yuncang:Yuncang,
                         Selecttype:Selecttype,
@@ -921,7 +971,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 element.find('.del_changsha_goods_config').on('click', function(){
                 var _this = $(this);
                 layer.confirm('是否删除',{},function () {
-                        var id = element.find('input[name="id"]').val();
+                        var id = element.find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
@@ -934,22 +984,29 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             ea.listen();
             });
 
+            //一键保存全部
+            $('.add_changsha_goods_config_all').on('click', function(){
+                var _url = url.savePuhuoZdySetAll_url;
+                var all_data = $('form[id="app-form_changsha_goods_config"]').serializeArray();
+                that.savePuhuoZdySetAll($('.changsha_goods_config-select'), _url, all_data);
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.changsha_goods_config-select'), function (key, element) {
 
                 //编辑 保存
                 $(element).find('.get_changsha_goods_config').on('click', function(){
                     var _url = url.savePuhuoZdySet_url;
-                    var id = $(element).find('input[name="id"]').val();
-                    var Yuncang = $(element).find('input[name="Yuncang"]').val();
-                    var Selecttype = $(element).find('input[name="Selecttype"]').val();
-                    var Commonfield = $(element).find('input[name="Commonfield"]').val();
-                    var GoodsNo = $(element).find('input[name="GoodsNo"]').val();
-                    var rule_type = $(element).find('select[name="rule_type"]').val();
-                    var remain_store = $(element).find('select[name="remain_store"]').val();
-                    var remain_rule_type = $(element).find('select[name="remain_rule_type"]').val();
-                    var if_taozhuang = $(element).find('select[name="if_taozhuang"]').val();
-                    var if_zdmd = $(element).find('select[name="if_zdmd"]').val();
+                    var id = $(element).find('input[name="id[]"]').val();
+                    var Yuncang = $(element).find('input[name="Yuncang[]"]').val();
+                    var Selecttype = $(element).find('input[name="Selecttype[]"]').val();
+                    var Commonfield = $(element).find('input[name="Commonfield[]"]').val();
+                    var GoodsNo = $(element).find('input[name="GoodsNo[]"]').val();
+                    var rule_type = $(element).find('select[name="rule_type[]"]').val();
+                    var remain_store = $(element).find('select[name="remain_store[]"]').val();
+                    var remain_rule_type = $(element).find('select[name="remain_rule_type[]"]').val();
+                    var if_taozhuang = $(element).find('select[name="if_taozhuang[]"]').val();
+                    var if_zdmd = $(element).find('select[name="if_zdmd[]"]').val();
 
                     var _data = {
                         id:id,
@@ -971,7 +1028,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.del_changsha_goods_config').on('click', function(){
                     var _this = $(this);
                     layer.confirm('是否删除',{},function () {
-                        var id = $(element).find('input[name="id"]').val();
+                        var id = $(element).find('input[name="id[]"]').val();
                         if (id != '') {
                             that.delConfig(_this, url.del_url, id)
                         }
