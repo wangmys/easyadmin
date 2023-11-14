@@ -44,7 +44,8 @@ class PuhuoService
         $CustomerName = $params['CustomerName'] ?? '';//店铺名称
         $is_puhuo = $params['is_puhuo'] ?? '';
         $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
-        $score_sort = $params['score_sort'] ?? '';//店铺排名
+        // $score_sort = $params['score_sort'] ?? '';//店铺排名
+        $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
 
         $where = $list = [];
         if ($WarehouseName) {
@@ -62,19 +63,24 @@ class PuhuoService
         if ($CustomItem17) {
             $where[] = ['CustomItem17', 'in', $CustomItem17];
         }
-        if ($score_sort) {
-            $where[] = ['score_sort', '<=', $score_sort];
-        }
+        // if ($score_sort) {
+        //     $where[] = ['score_sort', '<=', $score_sort];
+        // }
         if ($is_puhuo) {
             if ($is_puhuo == '可铺') {//可铺
 
-                $where[] = ['Stock_Quantity_puhuo', '>', 0];
+                if ($kepu_sort) {
+                    $where[] = ['kepu_sort', '<>', 0];
+                    $where[] = ['kepu_sort', '<=', $kepu_sort];
+                } else {
+                    $where[] = ['Stock_Quantity_puhuo', '>', 0];
+                }
                 $list = SpLypPuhuoEndDataModel::where($where)->field('*')
-                ->paginate([
-                    'list_rows'=> $pageLimit,
-                    'page' => $page,
-                ]);
-                $list = $list ? $list->toArray() : [];
+                    ->paginate([
+                        'list_rows'=> $pageLimit,
+                        'page' => $page,
+                    ]);
+                    $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 

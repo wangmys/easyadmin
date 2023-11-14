@@ -2603,6 +2603,7 @@ class Puhuo_start2_merge extends Command
                     'xiuxian_num' => 0,
                     'score_sort' => 0,
                     'is_total' => 1,
+                    'kepu_sort' => -2,
                     'Stock_00_puhuo' => $v_data['Stock_00'],
                     'Stock_29_puhuo' => $v_data['Stock_29'],
                     'Stock_30_puhuo' => $v_data['Stock_30'],
@@ -2647,6 +2648,7 @@ class Puhuo_start2_merge extends Command
                     'xiuxian_num' => 0,
                     'score_sort' => 0,
                     'is_total' => 1,
+                    'kepu_sort' => -1,
                     'Stock_00_puhuo' => $v_data['Stock_00_puhuo'],
                     'Stock_29_puhuo' => $v_data['Stock_29_puhuo'],
                     'Stock_30_puhuo' => $v_data['Stock_30_puhuo'],
@@ -2670,6 +2672,22 @@ class Puhuo_start2_merge extends Command
             //该云仓下 各个货品铺货情况获取
             $ware_goods = $this->db_easy->Query($this->get_ware_goods_sql($v_data['WarehouseName'], $v_data['GoodsNo']));
             if ($ware_goods) {
+
+                $tmp_arr = [];
+                $cur_sort = 0;
+                foreach ($ware_goods as $v_ware_goods) {
+                    if ($v_ware_goods['Stock_Quantity_puhuo'] > 0) {
+                        $cur_sort++;
+                        $tmp_arr[$v_ware_goods['uuid']] = $cur_sort;
+                    }
+                }   
+
+                foreach ($ware_goods as &$vv_ware_goods) {
+                    if (isset($tmp_arr[$vv_ware_goods['uuid']])) {
+                        $vv_ware_goods['kepu_sort'] = $tmp_arr[$vv_ware_goods['uuid']];
+                    }
+                }
+
                 $add_data = array_merge($add_data, $ware_goods);
             }
 
@@ -2705,6 +2723,7 @@ class Puhuo_start2_merge extends Command
         , lpcs.xiuxian_num 
         , lpcs.score_sort
         , 0 as is_total 
+        , 0 as kepu_sort 
         , lpcl.Stock_00_puhuo 
         , lpcl.Stock_29_puhuo 
         , lpcl.Stock_30_puhuo 
