@@ -1460,4 +1460,143 @@ class Shangguitips extends BaseController
             ]);
         }
     }
+
+    public function handle_7() {
+        $更新日期 = date('Y-m-d', time());
+        $sql_handle_push = "
+            SELECT 货号,克重,风格,一级分类,二级分类,分类,季节,年份,季节归集,'{$更新日期}' as 更新日期 FROM `cwl_shangguitips_handle`where 上柜提醒 in ('请上柜','重点上柜') GROUP BY 货号 
+        ";
+        $select = $this->db_easyA->query($sql_handle_push);
+
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push;');
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_handle_push')->strict(false)->insertAll($val);
+            }
+
+            $sql_更新1 = "
+                update cwl_shangguitips_handle_push as p
+                left join sp_ww_hpzl as h on p.货号 = h.货号
+                set
+                    p.颜色 = h.颜色,
+                    p.零售价 = h.零售价,
+                    p.货品名称 = h.货品名称
+            ";
+            $this->db_easyA->execute($sql_更新1);
+
+
+            $sql_货号 = "
+                SELECT
+                    货号 
+                FROM
+                    `cwl_shangguitips_handle_push` 
+                WHERE
+                    1
+            ";
+            $select_货号 = $this->db_easyA->query($sql_货号);
+            $goodsNos = '';
+            foreach ($select_货号 as $key => $val) {
+                if ($key + 1 < count($select_货号)) {
+                    $goodsNos .= "'".$val['货号']."',";
+                } else {
+                    $goodsNos .= "'".$val['货号']."'";
+                }
+            }
+            // echo $goodsNos;die;
+            $sql_图片 = "
+                SELECT
+                    EG.GoodsNo as 货号,
+                    EGI.Img 
+                FROM ErpGoods AS EG
+                LEFT JOIN ErpGoodsImg AS EGI ON EGI.GoodsId = EG.GoodsId
+                WHERE
+                    EG.GoodsNo IN ({$goodsNos})
+            ";
+            $select_图片 = $this->db_sqlsrv->query($sql_图片);
+    
+            foreach ($select_货号 as $k1 => $v1) {
+                foreach ($select_图片 as $k2 => $v2) {
+                    if ($v1['货号'] == $v2['货号']) {
+                            $this->db_easyA->table('cwl_shangguitips_handle_push')->where(['货号' => $v1['货号']])->update([
+                                '图片' => $v2['Img']
+                            ]);
+                        break;
+                    }
+                }
+            }
+
+            // 入库时间
+            $this->ruku($goodsNos);
+
+            
+        }
+    }
+
+    // 入库
+    public function ruku($goodsNos = "") {
+        if ($goodsNos) {
+            $sql_入库时间 = "
+                SELECT
+                        EG.GoodsName 货品名称,
+                        EG.GoodsNo 货号,
+                        EW.WarehouseName 云仓,
+                        CONVERT(varchar(10), ER.ReceiptDate, 120) AS 入库时间
+                FROM
+                        ErpReceipt AS ER
+                        LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
+                        LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
+                        LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                        LEFT JOIN erpGoodsColor AS EGC ON ERG.GoodsId = EGC.GoodsId
+                        LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
+                WHERE
+                        ER.CodingCodeText = '已审结' 
+                        AND ER.Type= 1 
+                        AND ES.SupplyName <> '南昌岳歌服饰' 
+                        AND EG.TimeCategoryName1 IN ( '2023','2024') 
+                        AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓') 
+                        AND EG.GoodsNo IN ({$goodsNos})
+                GROUP BY
+                        EG.GoodsNo
+                        ,EG.GoodsId
+                        ,EG.GoodsName 
+                        ,EW.WarehouseName
+                        ,CONVERT(varchar(10), ER.ReceiptDate, 120)
+            ";
+            $select_入库时间 = $this->db_sqlsrv->query($sql_入库时间);
+            if ($select_入库时间) {
+                $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
+                $chunk_list = array_chunk($select_入库时间, 500);
+
+                foreach($chunk_list as $key => $val) {
+                    $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val);
+                }
+            }   
+
+            // $this->db_easyA->table('cwl_shangguitips_pc')->field('云仓,货号')->where()->select();
+            $sql_最近日期 = "
+                SELECT
+                    货号,
+                    云仓,
+                    max(入库时间) as 入库时间
+                FROM
+                    `cwl_shangguitips_handle_push_ruku` 
+                WHERE 1
+                GROUP BY
+                    云仓,货号
+            ";
+            $select_最近日期 = $this->db_easyA->query($sql_最近日期);
+            if ($select_最近日期) {
+                $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
+                $chunk_list2 = array_chunk($select_最近日期, 500);
+
+                foreach($chunk_list2 as $key2 => $val2) {
+                    $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val2);
+                }
+            }
+        }
+
+
+    }
 }
