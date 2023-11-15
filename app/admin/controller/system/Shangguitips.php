@@ -394,32 +394,40 @@ class Shangguitips extends AdminController
             } else {
                 $map9 = "";
             }
+
+            if (!empty($input['分类'])) {
+                // echo $input['商品负责人'];
+                $map10Str = xmSelectInput($input['分类']);
+                $map10 = " AND p.分类 IN ({$map10Str})";
+            } else {
+                $map10 = "";
+            }
             // echo  $map8;die;
             $sql = "
                 select
                     p.*,
                     
-                    gzrk.入库时间 as `广州云仓_入库时间`,
+                    right(gzrk.入库时间, 5) as `广州云仓_入库时间`,
                     gz.`云仓_可用数量` as `广州云仓_可用数量`,
                     gz.`实际上柜_上柜家数` as `广州云仓_实际上柜_上柜家数`,
                     gz.上柜提醒 as `广州云仓_上柜提醒`,
                     
-                    ncrk.入库时间 as `南昌云仓_入库时间`,
+                    right(ncrk.入库时间, 5) as `南昌云仓_入库时间`,
                     nc.`云仓_可用数量` as `南昌云仓_可用数量`,
                     nc.`实际上柜_上柜家数` as `南昌云仓_实际上柜_上柜家数`,
                     nc.上柜提醒 as `南昌云仓_上柜提醒`,
                     
-                    gyrk.入库时间 as `贵阳云仓_入库时间`,
+                    right(gyrk.入库时间, 5) as `贵阳云仓_入库时间`,
                     gy.`云仓_可用数量` as `贵阳云仓_可用数量`,
                     gy.`实际上柜_上柜家数` as `贵阳云仓_实际上柜_上柜家数`,
                     gy.上柜提醒 as `贵阳云仓_上柜提醒`,
                     
-                    csrk.入库时间 as `长沙云仓_入库时间`,
+                    right(csrk.入库时间, 5) as `长沙云仓_入库时间`,
                     cs.`云仓_可用数量` as `长沙云仓_可用数量`,
                     cs.`实际上柜_上柜家数` as `长沙云仓_实际上柜_上柜家数`,
                     cs.上柜提醒 as `长沙云仓_上柜提醒`,
                     
-                    whrk.入库时间 as `武汉云仓_入库时间`,
+                    right(whrk.入库时间, 5) as `武汉云仓_入库时间`,
                     wh.`云仓_可用数量` as `武汉云仓_可用数量`,
                     wh.`实际上柜_上柜家数` as `武汉云仓_实际上柜_上柜家数`,
                     wh.上柜提醒 as `武汉云仓_上柜提醒`
@@ -445,6 +453,7 @@ class Shangguitips extends AdminController
                     {$map7}
                     {$map8}
                     {$map9}
+                    {$map10}
                 LIMIT {$pageParams1}, {$pageParams2}  
             "; 
 
@@ -475,6 +484,7 @@ class Shangguitips extends AdminController
                     {$map7}
                     {$map8}
                     {$map9}
+                    {$map10}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
@@ -523,6 +533,9 @@ class Shangguitips extends AdminController
         $ejfl = $this->db_easyA->query("
             SELECT 二级分类 as name, 二级分类 as value FROM cwl_shangguitips_handle_push WHERE 二级分类 IS NOT NULL GROUP BY 二级分类
         ");
+        $fl = $this->db_easyA->query("
+            SELECT 分类 as name, 分类 as value FROM cwl_shangguitips_handle_push WHERE 分类 IS NOT NULL GROUP BY 分类
+        ");
         $ssbd = $this->db_easyA->query("
             SELECT 上市波段 as name, 上市波段 as value FROM cwl_shangguitips_handle_push GROUP BY 上市波段
         ");
@@ -530,6 +543,6 @@ class Shangguitips extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'ssbd' => $ssbd]]);
+        return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'fl' => $fl, 'ssbd' => $ssbd]]);
     }
 }
