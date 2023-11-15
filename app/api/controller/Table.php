@@ -1210,7 +1210,8 @@ class Table extends BaseController
 
     // 下水道店数据源
     public function xiashui_data() {
-        $updateTime = date('Y-m-d', strtotime('+1 day', time()));
+        // $updateTime = date('Y-m-d', strtotime('+1 day', time()));
+        $updateTime = date('Y-m-d', strtotime('+0 day', time()));
         $sql = "
             SELECT
                 *
@@ -1290,7 +1291,7 @@ class Table extends BaseController
                     今日达成率 = 昨天销量 / 今日目标,
                     本月达成率 = 本月业绩 / 本月目标
                 where 
-                    更新时间 = '{$updateTime}'
+                    1
             ";
             $this->db_bi->execute($sql_更新_今日达成率_本月达成率);
 
