@@ -319,6 +319,7 @@ class Caigou extends BaseController
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo AS 货号,
                 EG.GoodsId,
+                EG.TimeCategoryName AS 上市波段,
                 -- SUM(ERG.Quantity) AS 采购入库量,
                 CONVERT(varchar(10),GETDATE(),120) AS 更新日期
             FROM
@@ -345,6 +346,7 @@ class Caigou extends BaseController
                 ,EG.GoodsName 
                 ,EG.TimeCategoryName1
                 ,EG.TimeCategoryName2
+                ,EG.TimeCategoryName
                 ,EG.CategoryName1
                 ,EG.CategoryName2
                 ,EG.CategoryName

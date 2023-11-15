@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>新品上柜提醒</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+        .cima {
+            height:18px; 
+            line-height:18px;
+        }
+        .weather_div {
+            height:28px;
+        }
+        .cima_1 {
+            height:5px; 
+            width:10px;
+        }
+        .cima_2 {
+            line-height:5px;
+        }
+        .cima_manzu {
+            /* height:5px; 
+            width:10px; */
+            line-height:5px
+        }
+        .autumn{
+            color: #afaf00;
+        }
+        .winter{
+            color: #24d3f2;
+        }
+        .hot {
+            color: red;
+        }
+        .cool {
+            color:#0879bb;
+        }
+        /* th[data-key="1-0-9"] {
+            background-color: #f885f8 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-3"] {
+            background-color: #f885f8 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-10"] {
+            background-color: #1e71c7 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-6"] {
+            background-color: #1e71c7 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-11"] {
+            background-color: #7cacf5 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-9"] {
+            background-color: #7cacf5 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-12"] {
+            background-color: #4cddaf !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-10"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-2"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        } */
+        /* th[data-key="1-1-11"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-5"] {
+            background-color: #6baa96 !important;
+            color:#ffffff;
+        } */
+        /* th[data-key="1-1-11"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-5"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-13"] {
+            background-color: #5a9afa !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-14"] {
+            background-color: #5a9afa !important;
+            color:#ffffff;
+        }
+        th[data-key="1-0-14"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-15"] {
+            background-color: #c4b360 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-8"] {
+            background-color: #c4b360 !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-16"] {
+            background-color: #d8c35d !important;
+            color:#ffffff;
+        }
+        th[data-key="1-2-11"] {
+            background-color: #d8c35d !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-17"] {
+            background-color: #f5d954 !important;
+            color:#b66b6b;
+        }
+        th[data-key="1-2-14"] {
+            background-color: #f5d954 !important;
+            color:#b66b6b;
+        }
+        th[data-key="1-1-18"] {
+            background-color: #deef21 !important;
+            /* color:#000; */
+        }
+        th[data-key="1-1-19"] {
+            background-color: #ff6b6b !important;
+            color:#ffffff;
+        }
+        th[data-key="1-1-20"] {
+            background-color: #e6f543 !important;
+            /* color:#363535; */
+        }
+        th[data-key="1-1-21"] {
+            background-color: #e4f80c !important;
+            color:#000;
+        }
+        th[data-key="1-0-15"] {
+            background-color: #fb4506 !important;
+            color:#ffffff;
+        } */
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yc" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">一级分类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yjfl" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">二级分类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-ejfl" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fg" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">二级风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-ejfg" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">货号</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-hh" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">主码可配</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-zmqk" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">年份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-nf" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 165px !important;">
+                                <div id="xm-jjgj" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">提醒</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-tips" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height:70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 5px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">新品上柜提醒 <a class="dateStr"></a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单店品类断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    var viewCustomers = function (yc, goodsno) {
+        window.localStorage.setItem('viewCustomer_yc', yc);
+        window.localStorage.setItem('viewCustomer_gdno', goodsno);
+    }
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , url1 = "{:url('admin/system.Shangguitips/handle_push')}" 
+            , url_download_history_area = "{:url('admin/system.Weathertips/excel_weathertips')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Shangguitips/getXmMapSelect')}"
+            , keshang_url = "{$keshang_url}"
+
+        initFn();
+        startTable();
+
+       // 选择云仓
+       xmSelect.render({
+            el: '#xm-yc', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "南昌云仓", value: "南昌云仓", selected: ""},
+                {name: "广州云仓", value: "广州云仓", selected: ""},
+                {name: "武汉云仓", value: "武汉云仓", selected: ""},
+                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+                {name: "长沙云仓", value: "长沙云仓", selected: ""},
+            ]
+        })
+        // 季节归集
+        xmSelect.render({
+            el: '#xm-jjgj', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '季节归集',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "春季", value: "春季", selected: ""},
+                {name: "夏季", value: "夏季", selected: ""},
+                {name: "秋季", value: "秋季", selected: true},
+                {name: "冬季", value: "冬季", selected: true},
+            ]
+        })
+        // 季节归集
+        xmSelect.render({
+            el: '#xm-nf', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '年份',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "2023", value: "2023", selected: true},
+            ]
+        })
+        // 一级分类
+        xmSelect.render({
+            el: '#xm-yjfl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '一级分类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+            ]
+        })
+        // 二级分类
+        xmSelect.render({
+            el: '#xm-ejfl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '二级分类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+            ]
+        })
+        // 二级风格
+        xmSelect.render({
+            el: '#xm-ejfl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '二级风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+            ]
+        })
+        // 
+        xmSelect.render({
+            el: '#xm-fg', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "基本款", value: "基本款", selected: ""},
+                {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-zmqk', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓_主码齐码情况',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "可配", value: "可配", selected: false},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-tips', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '上柜提醒',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "请上柜", value: "请上柜", selected: true},
+                {name: "重点上柜", value: "重点上柜", selected: true},
+            ]
+        })
+
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // 渲染所有省份
+                xmSelect.render({
+                    el: '#xm-hh', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'货号',
+                    data: res.data.goodsno
+                })
+                xmSelect.render({
+                    el: '#xm-yjfl', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '一级分类',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.yjfl
+                })
+                xmSelect.render({
+                    el: '#xm-ejfl', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '二级分类',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.ejfl
+                })
+                xmSelect.render({
+                    el: '#xm-ejfg', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '二级风格',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.ejfg
+                })
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+            return false; 
+        });
+
+        // 监听事件
+        $(document).on('click', '.viewBtn', function(data){
+            var yc = window.localStorage.getItem('viewCustomer_yc');
+            var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            layer.open({
+                title: '可上门店铺明细'
+                ,type: 2
+                ,area: ['100%', '100%'] // 100%全屏
+                ,content: keshang_url
+            });
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        function startTable() {
+            var mapHeight = $('#map').height();
+            // console.log(111);
+            var height = document.documentElement.clientHeight - mapHeight - 10;
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                // , toolbar: '#toolbar1'
+                , toolbar: false
+                , page: true
+                , limit: 1000
+                , limits: [500, 1000, 5000, 10000, 20000]
+                , height: height
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , where: {'季节归集': '秋季,冬季', '上柜提醒': '请上柜,重点上柜' }
+                , cols: [
+                    [
+                        { field: '货号', title: '货号', fixed: 'left' ,align: 'center' , width: 80, rowspan: 2}
+                        ,{ field: '克重', title: '克重', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ field: '颜色', title: '颜色', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ field: '风格', title: '风格', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">一级</div>
+                                    <div class="cima">分类</div>
+                                    </div>`, field: '一级分类',  fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">二级</div>
+                                    <div class="cima">分类</div>
+                                    </div>`, field: '二级分类', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">季节</div>
+                                    <div class="cima">归集</div>
+                                    </div>`, field: '季节归集', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ field: '季节', title: '季节', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        ,{ field: '货品名称', title: '货品名称', fixed: 'left' ,align: 'center' , width: 100, rowspan: 2}
+                        ,{ field: '零售价', title: '零售价', fixed: 'left' ,align: 'center' , width: 50, rowspan: 2}
+                        ,{ title: '广州云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                        ,{ title: '南昌云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                        ,{ title: '贵阳云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                        ,{ title: '长沙云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                        ,{ title: '武汉云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                    ],
+                    [
+                        // 广州
+                        { title: '入库时间', field: '广州云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
+                        ,{ title: `可用库存`, field: '广州云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
+                        ,{ title: `上架店数`, field: '广州云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '广州云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        // 南昌
+                        ,{ title: '入库时间', field: '南昌云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
+                        ,{ title: `可用库存`, field: '南昌云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
+                        ,{ title: `上架店数`, field: '南昌云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '南昌云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        // 贵阳
+                        ,{ title: '入库时间', field: '贵阳云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
+                        ,{ title: `可用库存`, field: '贵阳云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
+                        ,{ title: `上架店数`, field: '贵阳云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '贵阳云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        // 长沙
+                        ,{ title: '入库时间', field: '长沙云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
+                        ,{ title: `可用库存`, field: '长沙云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
+                        ,{ title: `上架店数`, field: '长沙云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '长沙云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        // 武汉
+                        ,{ title: '入库时间', field: '武汉云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
+                        ,{ title: `可用库存`, field: '武汉云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
+                        ,{ title: `上架店数`, field: '武汉云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '武汉云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                    ]
+                    
+                ]
+                ,done: function (res, curr, count) {
+                    $('.dateStr').text(res.create_time);
+                }
+            });
+        }
+    });
+
+</script>

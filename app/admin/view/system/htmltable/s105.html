@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>下水道店铺业绩情况</title>
+    <!-- <link rel="stylesheet" href="__STATIC__/admin/css/flex.css"> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        table {
+            text-align: center;
+        }
+        
+        table thead tr th {
+            padding: 5px 20px;
+            background-color: yellowgreen;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        table tbody tr td {
+            /* padding: 5px 20px; */
+            padding: 5px 20px;
+            width: 300px !important;
+            border-top: 1px solid yellowgreen;
+        }
+        
+        table tbody tr:nth-child(2n) td {
+            background-color: rgb(201, 236, 248);
+        }
+        
+        table tbody tr:last-child td {
+            border-bottom: 1px solid rgb(191, 241, 91);
+        }
+
+        .xiaoshou_left {
+            width:60%; text-align: left; padding-left: 5px;  float:left; 
+        } 
+        .xiaoshou_right {
+            width:30%; text-align: left; float:left;
+        }
+    </style>
+</head>
+<body>
+    <table border="1" cellspacing="0" cellpadding="0">
+        <caption>{$title}</caption>
+        <thead>
+            <tr>
+                <th rowspan="2" style="width:200px !important;">店铺<br>名称</th>
+                <th colspan="6">流水达成对比情况</th>
+                <th colspan="4">实际流水</th>
+            </tr>
+            <tr>
+                <th style="width:100px">今日达成率</th>
+                <th style="width:100px">本月达成率</th>
+                <th style="width:150px">22年日同比</th>
+                <th style="width:150px">21年日同比</th>
+                <th style="width:150px">22年月累同比</th>
+                <th style="width:150px">21年月累同比</th>
+                <th style="width:100px">今日流水</th>
+                <th style="width:100px">今日目标</th>
+                <th style="width:100px">本月流水</th>
+                <th style="width:100px">本月目标</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name="data" id="vo"}
+                {php}if($vo['店铺名称'] == '合计') { {/php}
+                    <tr style="background-color: yellow;">
+                {php} } else { {/php}
+                    <tr>
+                {php} } {/php}
+                    <td>{$vo['店铺名称']}</td>
+                    <td>{$vo['今日达成率']}</td>
+                    <td>{$vo['本月达成率']}</td>
+                    <td>{$vo['22年日同比']}</td>
+                    <td>{$vo['21年日同比']}</td>
+                    <td>{$vo['22年月累同比']}</td>
+                    <td>{$vo['21年月累同比']}</td>
+                    <td>{$vo['今日流水']}</td>
+                    <td>{$vo['今日目标']}</td>
+                    <td>{$vo['本月流水']}</td>
+                    <td>{$vo['本月目标']}</td>
+                </tr>
+            {/volist}
+        </tbody>
+    </table>
+</body>
+</html>
