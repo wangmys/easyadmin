@@ -306,7 +306,7 @@ class Shangguitips extends AdminController
 
     /**
      * @NodeAnotation(title="新品上柜提醒_钉钉推送") 
-     * 
+     *  辛斌旧版地址：https://bx.babiboy.com/bi/spnewproductlaunchwinterwarning
      */
     public function handle_push() {
         $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where('id=1')->find();
@@ -489,8 +489,18 @@ class Shangguitips extends AdminController
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
         } else {
+            $gzyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '广州云仓'])->find();
+            $ncyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '南昌云仓'])->find();
+            $gyyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '贵阳云仓'])->find();
+            $csyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '长沙云仓'])->find();
+            $whyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '武汉云仓'])->find();
             return View('handle_push', [
                 // 'config' => $find_config,
+                'gzyc' => $gzyc,
+                'ncyc' => $ncyc,
+                'gyyc' => $gyyc,
+                'csyc' => $csyc,
+                'whyc' => $whyc,
                 'keshang_url' => $keshang_url,
             ]);
         }
