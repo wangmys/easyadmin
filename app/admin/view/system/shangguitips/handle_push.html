@@ -134,103 +134,62 @@
         th[data-key="1-0-10"] {
             background-color: #1e71c7 !important;
             color:#ffffff;
-        }
-        th[data-key="1-1-6"] {
-            background-color: #1e71c7 !important;
-            color:#ffffff;
-        }
+        }  */
         th[data-key="1-0-11"] {
-            background-color: #7cacf5 !important;
+            background-color: #f75f23 !important;    
             color:#ffffff;
         }
-        th[data-key="1-1-9"] {
-            background-color: #7cacf5 !important;
+        th[data-key="1-1-4"] {
+            background-color: #f75f23 !important;    
             color:#ffffff;
         }
         th[data-key="1-0-12"] {
-            background-color: #4cddaf !important;
+            background-color: #0864ec !important;    
             color:#ffffff;
         }
-        th[data-key="1-1-10"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-2"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        } */
-        /* th[data-key="1-1-11"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-5"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        } */
-        /* th[data-key="1-1-11"] {
-            background-color: #2e9574 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-5"] {
-            background-color: #2e9574 !important;
+        th[data-key="1-1-9"] {
+            background-color: #0864ec !important;    
             color:#ffffff;
         }
         th[data-key="1-0-13"] {
-            background-color: #5a9afa !important;
+            background-color: #035e80 !important;
             color:#ffffff;
         }
         th[data-key="1-1-14"] {
-            background-color: #5a9afa !important;
+            background-color: #035e80 !important;
             color:#ffffff;
         }
         th[data-key="1-0-14"] {
-            background-color: #c5aa2a !important;
+            background-color: #3bac03 !important;
             color:#ffffff;
-        }
-        th[data-key="1-1-15"] {
-            background-color: #c4b360 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-8"] {
-            background-color: #c4b360 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-1-16"] {
-            background-color: #d8c35d !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-11"] {
-            background-color: #d8c35d !important;
-            color:#ffffff;
-        }
-        th[data-key="1-1-17"] {
-            background-color: #f5d954 !important;
-            color:#b66b6b;
-        }
-        th[data-key="1-2-14"] {
-            background-color: #f5d954 !important;
-            color:#b66b6b;
-        }
-        th[data-key="1-1-18"] {
-            background-color: #deef21 !important;
-            /* color:#000; */
         }
         th[data-key="1-1-19"] {
-            background-color: #ff6b6b !important;
+            background-color: #3bac03 !important;
             color:#ffffff;
-        }
-        th[data-key="1-1-20"] {
-            background-color: #e6f543 !important;
-            /* color:#363535; */
-        }
-        th[data-key="1-1-21"] {
-            background-color: #e4f80c !important;
-            color:#000;
         }
         th[data-key="1-0-15"] {
-            background-color: #fb4506 !important;
+            background-color: #9004bb !important;
             color:#ffffff;
-        } */
+        }
+        th[data-key="1-1-24"] {
+            background-color: #9004bb !important;
+            color:#ffffff;
+        }
+        #mask {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.7);
+            width: 100%;
+            height: 100%;
+            z-index: 10000 !important;
+            display: none;
+        }
+        #mask img {
+            position: absolute; 
+            left:50%; 
+            top:50%; 
+            transform: translate(-50%, -50%); 
+            width: 25%;
+        }
     </style>
 </head>
 
@@ -241,45 +200,40 @@
                 <div class="flex row end between">
                     <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">云仓</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-yc" class="xm-select-demo"></div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">货号</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-hh" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">一级分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <div class="layui-input-inline" style="width: 210px !important;">
                                 <div id="xm-yjfl" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">二级分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <div class="layui-input-inline" style="width: 210px !important;">
                                 <div id="xm-ejfl" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">风格</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <div class="layui-input-inline" style="width: 210px !important;">
                                 <div id="xm-fg" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">二级风格</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-ejfg" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">货号</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-hh" class="xm-select-demo"></div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">年份</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-nf" class="xm-select-demo"></div>
                             </div>
                         </div>
 
                         <div class="layui-form-item">
-
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">主码可配</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-zmqk" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">年份</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-nf" class="xm-select-demo"></div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">陈列款</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-clk" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">季节归集</label>
-                            <div class="layui-input-inline" style="width: 165px !important;">
+                            <div class="layui-input-inline" style="width: 210px !important;">
                                 <div id="xm-jjgj" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">上市波段</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-ssbd" class="xm-select-demo"></div>
                             </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">提醒</label>
                             <div class="layui-input-inline" style="width: 210px !important;">
@@ -306,6 +260,9 @@
         </table>
         <div id="page"></div>
     </div>
+    <div id="mask">
+        <img id="pic" src="" alt="">
+    </div>
 </body>
 
 </html>
@@ -324,6 +281,7 @@
         window.localStorage.setItem('viewCustomer_yc', yc);
         window.localStorage.setItem('viewCustomer_gdno', goodsno);
     }
+
     watermark({ "watermark_txt": '南昌索歌服饰' });
     layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
         let form = layui.form
@@ -334,30 +292,30 @@
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Shangguitips/handle_push')}" 
             , url_download_history_area = "{:url('admin/system.Weathertips/excel_weathertips')}" 
-            , url_getXmMapSelect = "{:url('admin/system.Shangguitips/getXmMapSelect')}"
+            , url_getXmMapSelect_push = "{:url('admin/system.Shangguitips/getXmMapSelect_push')}"
             , keshang_url = "{$keshang_url}"
 
         initFn();
         startTable();
 
        // 选择云仓
-       xmSelect.render({
-            el: '#xm-yc', 
-            filterable: true,
-            toolbar: {show: true},
-            name: '云仓',
-            // showCount: 1,
-            theme: {
-                color: '#1cbbb4',
-            },
-            data: [
-                {name: "南昌云仓", value: "南昌云仓", selected: ""},
-                {name: "广州云仓", value: "广州云仓", selected: ""},
-                {name: "武汉云仓", value: "武汉云仓", selected: ""},
-                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
-                {name: "长沙云仓", value: "长沙云仓", selected: ""},
-            ]
-        })
+    //    xmSelect.render({
+    //         el: '#xm-yc', 
+    //         filterable: true,
+    //         toolbar: {show: true},
+    //         name: '云仓',
+    //         // showCount: 1,
+    //         theme: {
+    //             color: '#1cbbb4',
+    //         },
+    //         data: [
+    //             {name: "南昌云仓", value: "南昌云仓", selected: ""},
+    //             {name: "广州云仓", value: "广州云仓", selected: ""},
+    //             {name: "武汉云仓", value: "武汉云仓", selected: ""},
+    //             {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+    //             {name: "长沙云仓", value: "长沙云仓", selected: ""},
+    //         ]
+    //     })
         // 季节归集
         xmSelect.render({
             el: '#xm-jjgj', 
@@ -415,12 +373,12 @@
             data: [
             ]
         })
-        // 二级风格
+        // 上市波段
         xmSelect.render({
-            el: '#xm-ejfl', 
+            el: '#xm-ssbd', 
             filterable: true,
             toolbar: {show: true},
-            name: '二级风格',
+            name: '上市波段',
             // showCount: 1,
             theme: {
                 color: '#1cbbb4',
@@ -444,19 +402,19 @@
             ]
         })
 
-        xmSelect.render({
-            el: '#xm-zmqk', 
-            filterable: true,
-            toolbar: {show: true},
-            name: '云仓_主码齐码情况',
-            // showCount: 1,
-            theme: {
-                color: '#e4362b',
-            },
-            data: [
-                {name: "可配", value: "可配", selected: false},
-            ]
-        })
+        // xmSelect.render({
+        //     el: '#xm-zmqk', 
+        //     filterable: true,
+        //     toolbar: {show: true},
+        //     name: '云仓_主码齐码情况',
+        //     // showCount: 1,
+        //     theme: {
+        //         color: '#e4362b',
+        //     },
+        //     data: [
+        //         {name: "可配", value: "可配", selected: false},
+        //     ]
+        // })
 
         xmSelect.render({
             el: '#xm-tips', 
@@ -473,9 +431,23 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-clk', 
+            filterable: true,
+            toolbar: {show: true},
+            name: 'CustomItem49',
+            // showCount: 1,
+            theme: {
+                color: '#e4362b',
+            },
+            data: [
+                {name: "是", value: "陈列款"},
+            ]
+        })
+
 
         function initFn() {
-            $.get(url_getXmMapSelect, {}, function(res) {
+            $.get(url_getXmMapSelect_push, {}, function(res) {
                 // 渲染所有省份
                 xmSelect.render({
                     el: '#xm-hh', 
@@ -511,15 +483,15 @@
                     data: res.data.ejfl
                 })
                 xmSelect.render({
-                    el: '#xm-ejfg', 
+                    el: '#xm-ssbd', 
                     filterable: true,
                     toolbar: {show: true},
-                    name: '二级风格',
+                    name: '上市波段',
                     // showCount: 1,
                     theme: {
                         color: '#1cbbb4',
                     },
-                    data: res.data.ejfg
+                    data: res.data.ssbd
                 })
             }, 'json')
         }
@@ -567,6 +539,16 @@
             });
         });
 
+        window.viewPic = function (url) {
+            $('#pic').attr('src', url); 
+            $('#mask').css('display', 'block'); 
+        }
+
+        // 监听事件
+        $(document).on('click', '#mask', function(data){
+            $('#mask').css('display', 'none');
+        });
+
         //触发事件
         table.on('toolbar(table)', function(obj) {
             var checkStatus = table.checkStatus(obj.config.id);
@@ -603,14 +585,23 @@
                 , where: {'季节归集': '秋季,冬季', '上柜提醒': '请上柜,重点上柜' }
                 , cols: [
                     [
-                        { field: '货号', title: '货号', fixed: 'left' ,align: 'center' , width: 80, rowspan: 2}
-                        ,{ field: '克重', title: '克重', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                        { field: '货号', title: '<a style="color:blue; font-weight:bold;">货号</a>', fixed: 'left' ,align: 'center' , width: 75, rowspan: 2, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['货号']) {
+                                str = `<a style="color:blue; font-weight:bold; cursor:pointer;" onClick="viewPic('${data['图片']}')">${data['货号']}</a>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                         ,{ field: '颜色', title: '颜色', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
                         ,{ field: '风格', title: '风格', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima">一级</div>
                                     <div class="cima">分类</div>
-                                    </div>`, field: '一级分类',  fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                                    </div>`, field: '一级分类',  fixed: 'left' ,align: 'center' , width: 40, rowspan: 2}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima">二级</div>
                                     <div class="cima">分类</div>
@@ -618,42 +609,248 @@
                         ,{ title: `<div class="flex col around">
                                     <div class="cima">季节</div>
                                     <div class="cima">归集</div>
-                                    </div>`, field: '季节归集', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
-                        ,{ field: '季节', title: '季节', fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
+                                    </div>`, field: '季节归集', fixed: 'left' ,align: 'center' , width: 40, rowspan: 2, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['季节归集'] == '春季') {
+                                str = `<span style="color:#09ca05; font-weight:bold;">春季</span>`;
+                            } else if (data['季节归集'] == '夏季') {
+                                str = `<span style="color:#f66711; font-weight:bold;">夏季</span>`;
+                            } else if (data['季节归集'] == '秋季') {
+                                str = `<span style="color:#eda200; font-weight:bold;">秋季</span>`;
+                            } else if (data['季节归集'] == '冬季') {
+                                str = `<span style="color:#107df9; font-weight:bold;">冬季</span>`;
+                            }  else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
+                        ,{ field: '季节', title: '季节', fixed: 'left' ,align: 'center' , width: 40, rowspan: 2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">上市</div>
+                                    <div class="cima">波段</div>
+                                    </div>`,  field: '上市波段',  fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
                         ,{ field: '货品名称', title: '货品名称', fixed: 'left' ,align: 'center' , width: 100, rowspan: 2}
                         ,{ field: '零售价', title: '零售价', fixed: 'left' ,align: 'center' , width: 50, rowspan: 2}
-                        ,{ title: '广州云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
-                        ,{ title: '南昌云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
-                        ,{ title: '贵阳云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
-                        ,{ title: '长沙云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
-                        ,{ title: '武汉云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 4}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">陈</div>
+                                    <div class="cima">裂</div>
+                                    <div class="cima">款</div>
+                                    </div>`, fixed: 'left' ,align: 'center' , width: 30, rowspan: 2, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['CustomItem49'] == '陈列款' && data['CustomItem52'] == '是') {
+                                str = `<span style="color:red; font-weight:bold;">是</span>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
+                        ,{ title: '广州云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 5}
+                        ,{ title: '南昌云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 5}
+                        ,{ title: '贵阳云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 5}
+                        ,{ title: '长沙云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 5}
+                        ,{ title: '武汉云仓 仓库总数：', align: 'center' , rowspan: 1, colspan: 5}
                     ],
                     [
                         // 广州
                         { title: '入库时间', field: '广州云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
-                        ,{ title: `可用库存`, field: '广州云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
-                        ,{ title: `上架店数`, field: '广州云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
-                        ,{ title: `上柜提醒`, field: '广州云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            // console.log(data)
+                            if (data['广州云仓_入库时间']) {
+                                return `
+                                    <button class="viewBtn layui-btn layui-btn-xs" style="background: #2894f8;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('广州', '${data['货号']}')">
+                                        查看
+                                    </button>
+                                `; 
+                            } else {
+                                return '';
+                            }
+                        }}
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">可用</div>
+                                <div class="cima">库存</div>
+                                </div>`, field: '广州云仓_可用数量', align: 'center', width: 35,  rowspan: 1} 
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">上架</div>
+                                <div class="cima">店数</div>
+                                </div>`, field: '广州云仓_实际上柜_上柜家数', align: 'center', width: 35, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '广州云仓_上柜提醒', align: 'center', width: 65,  rowspan: 1, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['广州云仓_上柜提醒'] == '请上柜') {
+                                str = `<div style="background:orange; color:white; font-weight:bold; padding:0; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                            } else if (data['广州云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                         // 南昌
                         ,{ title: '入库时间', field: '南昌云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
-                        ,{ title: `可用库存`, field: '南昌云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
-                        ,{ title: `上架店数`, field: '南昌云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
-                        ,{ title: `上柜提醒`, field: '南昌云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            if (data['南昌云仓_入库时间']) {
+                                return `
+                                    <button class="viewBtn layui-btn layui-btn-xs" style="background: #2894f8;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('南昌', '${data['货号']}')">
+                                        查看
+                                    </button>
+                                `; 
+                            } else {
+                                return '';
+                            }
+                        }}
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">可用</div>
+                                <div class="cima">库存</div>
+                                </div>`, field: '南昌云仓_可用数量', align: 'center', width: 35,  rowspan: 1} 
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">上架</div>
+                                <div class="cima">店数</div>
+                                </div>`, field: '南昌云仓_实际上柜_上柜家数', align: 'center', width: 35, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '南昌云仓_上柜提醒', align: 'center', width: 65,  rowspan: 1, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['广州云仓_上柜提醒'] == '请上柜') {
+                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                            } else if (data['广州云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                         // 贵阳
                         ,{ title: '入库时间', field: '贵阳云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
-                        ,{ title: `可用库存`, field: '贵阳云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
-                        ,{ title: `上架店数`, field: '贵阳云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
-                        ,{ title: `上柜提醒`, field: '贵阳云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            if (data['贵阳云仓_入库时间']) {
+                                return `
+                                    <button class="viewBtn layui-btn layui-btn-xs" style="background: #2894f8;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('贵阳', '${data['货号']}')">
+                                        查看
+                                    </button>
+                                `; 
+                            } else {
+                                return '';
+                            }
+                        }}
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">可用</div>
+                                <div class="cima">库存</div>
+                                </div>`, field: '贵阳云仓_可用数量', align: 'center', width: 35,  rowspan: 1} 
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">上架</div>
+                                <div class="cima">店数</div>
+                                </div>`, field: '贵阳云仓_实际上柜_上柜家数', align: 'center', width: 35, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '贵阳云仓_上柜提醒', align: 'center', width: 65,  rowspan: 1, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['贵阳云仓_上柜提醒'] == '请上柜') {
+                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['贵阳云仓_上柜提醒']}</div>`;
+                            } else if (data['贵阳云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['贵阳云仓_上柜提醒']}</div>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                         // 长沙
                         ,{ title: '入库时间', field: '长沙云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
-                        ,{ title: `可用库存`, field: '长沙云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
-                        ,{ title: `上架店数`, field: '长沙云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
-                        ,{ title: `上柜提醒`, field: '长沙云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            if (data['长沙云仓_入库时间']) {
+                                return `
+                                    <button class="viewBtn layui-btn layui-btn-xs" style="background: #2894f8;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('长沙', '${data['货号']}')">
+                                        查看
+                                    </button>
+                                `; 
+                            } else {
+                                return '';
+                            }
+                        }}
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">可用</div>
+                                <div class="cima">库存</div>
+                                </div>`, field: '长沙云仓_可用数量', align: 'center', width: 35,  rowspan: 1} 
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">上架</div>
+                                <div class="cima">店数</div>
+                                </div>`, field: '长沙云仓_实际上柜_上柜家数', align: 'center', width: 35, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '长沙云仓_上柜提醒', align: 'center', width: 65,  rowspan: 1, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['长沙云仓_上柜提醒'] == '请上柜') {
+                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['长沙云仓_上柜提醒']}</div>`;
+                            } else if (data['长沙云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['长沙云仓_上柜提醒']}</div>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                         // 武汉
                         ,{ title: '入库时间', field: '武汉云仓_入库时间', align: 'center', width: 70,  rowspan: 1} 
-                        ,{ title: `可用库存`, field: '武汉云仓_可用数量', align: 'center', width: 60,  rowspan: 1} 
-                        ,{ title: `上架店数`, field: '武汉云仓_实际上柜_上柜家数', align: 'center', width: 60, rowspan: 1} 
-                        ,{ title: `上柜提醒`, field: '武汉云仓_上柜提醒', align: 'center', width: 70,  rowspan: 1} 
+                        ,{title: `<div class="flex col around">
+                                <div class="cima">可上门</div>
+                                <div class="cima">店明细</div>
+                                </div>`, width:50, align: 'center' , rowspan: 2, templet:
+                        function (data) {
+                            if (data['武汉云仓_入库时间']) {
+                                return `
+                                    <button class="viewBtn layui-btn layui-btn-xs" style="background: #2894f8;
+                                    letter-spacing:1px;color: #ffffff; line-height: 25px; float:right;"  onClick="viewCustomers('武汉', '${data['货号']}')">
+                                        查看
+                                    </button>
+                                `; 
+                            } else {
+                                return '';
+                            }
+                        }}
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">可用</div>
+                                <div class="cima">库存</div>
+                                </div>`, field: '武汉云仓_可用数量', align: 'center', width: 35,  rowspan: 1} 
+                        ,{ title: `<div class="flex col around">
+                                <div class="cima">上架</div>
+                                <div class="cima">店数</div>
+                                </div>`, field: '武汉云仓_实际上柜_上柜家数', align: 'center', width: 35, rowspan: 1} 
+                        ,{ title: `上柜提醒`, field: '武汉云仓_上柜提醒', align: 'center', width: 65,  rowspan: 1, templet:
+                        function (data) {
+                            // console.log(data)
+                            var str = '';
+                            if (data['武汉云仓_上柜提醒'] == '请上柜') {
+                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['武汉云仓_上柜提醒']}</div>`;
+                            } else if (data['武汉云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['武汉云仓_上柜提醒']}</div>`;
+                            } else {
+                                str = '';
+                            }
+                            return str; 
+                        }}
                     ]
                     
                 ]

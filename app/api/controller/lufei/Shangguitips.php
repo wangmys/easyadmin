@@ -1381,7 +1381,7 @@ class Shangguitips extends BaseController
                     AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
                     AND
                         case
-                            when 一级分类 in ('内搭', '外套') then 仓库齐码个数 >= 4 
+                            when 一级分类 in ('内搭', '外套', '鞋履') then 仓库齐码个数 >= 4 
                             when 一级分类 in ('下装') and 二级分类 in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 5 
                             when 一级分类 in ('下装') and 二级分类 not in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 6 
                         end
@@ -1461,6 +1461,7 @@ class Shangguitips extends BaseController
         }
     }
 
+    // 钉钉推送
     public function handle_7() {
         $更新日期 = date('Y-m-d', time());
         $sql_handle_push = "
@@ -1505,22 +1506,28 @@ class Shangguitips extends BaseController
                 }
             }
             // echo $goodsNos;die;
-            $sql_图片 = "
+            $sql_图片_上市波段 = "
                 SELECT
                     EG.GoodsNo as 货号,
+                    EG.TimeCategoryName AS 上市波段,
+                    EG.CustomItem49,
+                    EG.CustomItem52,
                     EGI.Img 
                 FROM ErpGoods AS EG
                 LEFT JOIN ErpGoodsImg AS EGI ON EGI.GoodsId = EG.GoodsId
                 WHERE
                     EG.GoodsNo IN ({$goodsNos})
             ";
-            $select_图片 = $this->db_sqlsrv->query($sql_图片);
+            $select_图片_上市波段 = $this->db_sqlsrv->query($sql_图片_上市波段);
     
             foreach ($select_货号 as $k1 => $v1) {
-                foreach ($select_图片 as $k2 => $v2) {
+                foreach ($select_图片_上市波段 as $k2 => $v2) {
                     if ($v1['货号'] == $v2['货号']) {
                             $this->db_easyA->table('cwl_shangguitips_handle_push')->where(['货号' => $v1['货号']])->update([
-                                '图片' => $v2['Img']
+                                '图片' => $v2['Img'],
+                                '上市波段' => $v2['上市波段'],
+                                'CustomItem49' => $v2['CustomItem49'],
+                                'CustomItem52' => $v2['CustomItem52'],
                             ]);
                         break;
                     }
@@ -1528,9 +1535,7 @@ class Shangguitips extends BaseController
             }
 
             // 入库时间
-            $this->ruku($goodsNos);
-
-            
+            $this->ruku($goodsNos);            
         }
     }
 
@@ -1552,7 +1557,7 @@ class Shangguitips extends BaseController
                 WHERE
                         ER.CodingCodeText = '已审结' 
                         AND ER.Type= 1 
-                        AND ES.SupplyName <> '南昌岳歌服饰' 
+                        -- AND ES.SupplyName <> '南昌岳歌服饰' 
                         AND EG.TimeCategoryName1 IN ( '2023','2024') 
                         AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓') 
                         AND EG.GoodsNo IN ({$goodsNos})
