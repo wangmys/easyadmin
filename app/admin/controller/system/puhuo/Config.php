@@ -31,8 +31,10 @@ class Config extends AdminController
     public function index() {
 
         $puhuo_config = $this->service->get_puhuo_config();
+        $puhuo_config2 = $this->service->get_puhuo_config2();
         $this->assign([
             'puhuo_config' => $puhuo_config,
+            'puhuo_config2' => $puhuo_config2,
         ]);
 
         return $this->fetch();
@@ -47,6 +49,20 @@ class Config extends AdminController
         $puhuo_config = $this->service->get_puhuo_config();
         $this->assign([
             'puhuo_config' => $puhuo_config,
+        ]);
+
+        return $this->fetch();
+    }
+
+    /**
+     * 仓库预留参数配置2
+     * @return mixed
+     */
+    public function warehouse_config2() {
+
+        $puhuo_config2 = $this->service->get_puhuo_config2();
+        $this->assign([
+            'puhuo_config2' => $puhuo_config2,
         ]);
 
         return $this->fetch();
@@ -120,6 +136,18 @@ class Config extends AdminController
         $res_id = $this->service->save_warehouse_config($post);
 
         return $this->success('成功',['id' => $res_id, 'sign_id'=>$post['sign_id']]);
+
+    }
+
+    /**
+     * @NodeAnotation(title="保存仓库预留参数配置2")
+     */
+    public function saveWarehouseConfig2() {
+
+        $post = $this->request->post();
+        $res_id = $this->service->save_warehouse_config2($post);
+
+        return $this->success('成功',['id' => $res_id, 'config_str'=>$post['config_str']]);
 
     }
 

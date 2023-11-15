@@ -1,0 +1,101 @@
+<div class="layuimini-container">
+    <form class="layui-form layuimini-form" lay-filter="app-form">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">云仓：</label>
+            <div class="layui-input-block">
+                <select name="config_str" lay-verify="" lay-search="" lay-filter="config_str">
+                    {foreach $config_str_list as $vo}
+                    <option value="{$vo}" {if $info['config_str'] == $vo}selected=""{/if}>{$vo}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">货号:</label>
+            <div class="layui-input-block">
+                <input type="text" name="GoodsNo" placeholder="请输入留仓比例" class="layui-input" value="{$info['GoodsNo']}">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">28/37/44/S:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_28" placeholder="请输入留仓比例" class="layui-input" value="{$info['_28']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">29/38/46/M:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_29" placeholder="请输入留仓比例" class="layui-input" value="{$info['_29']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">30/39/48/L:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_30" placeholder="请输入留仓比例" class="layui-input" value="{$info['_30']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">31/40/50/XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_31" placeholder="请输入留仓比例" class="layui-input" value="{$info['_31']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">32/41/52/2XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_32" placeholder="请输入留仓比例" class="layui-input" value="{$info['_32']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">33/42/54/3XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_33" placeholder="请输入留仓比例" class="layui-input" value="{$info['_33']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">34/43/56/4XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_34" placeholder="请输入留仓比例" class="layui-input" value="{$info['_34']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">35/44/58/5XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_35" placeholder="请输入留仓比例" class="layui-input" value="{$info['_35']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">36/6XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_36" placeholder="请输入留仓比例" class="layui-input" value="{$info['_36']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">38/7XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_38" placeholder="请输入留仓比例" class="layui-input" value="{$info['_38']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">40/8XL:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_40" placeholder="请输入留仓比例" class="layui-input" value="{$info['_40']}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">42:</label>
+            <div class="layui-input-block">
+                <input type="text" name="_42" placeholder="请输入留仓比例" class="layui-input" value="{$info['_42']}">
+            </div>
+        </div>
+
+        <div class="layui-form-item text-center">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>
+        </div>
+
+    </form>
+</div>

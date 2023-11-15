@@ -1,0 +1,203 @@
+<style>
+    tr{
+        color: #0A0E11;
+        /*border: 5px solid whitesmoke;*/
+    }
+    .layuimini-main tr td{
+        margin: 0px;
+        padding: 0px 0;
+    }
+
+    .layui-table-cell {
+        font-size: 12px;
+        color: #606266;
+        padding: 0 0px;
+    }
+    .layuimini-main .table-search-fieldset {
+        padding: 2px 20px 0px 20px;
+    }
+    .layui-table-view .layui-table td {
+        padding: 0px 0;
+        border: 2px solid #b0b0b0;
+        border-right: 1px solid #b0b0b0;
+    }
+    .layui-table, .layui-table-view {
+        margin: 0px 0;
+    }
+    .layui-table-box .layui-table-header th {
+        border-right: 1px solid #b0b0b0;
+        border-left: 2px solid #b0b0b0;
+    }
+    .layui-table-box .layui-table-header th .layui-table-cell{
+        height: 55px;
+        word-break: break-all;
+        white-space: normal;
+    }
+    .form-search .layui-input-inline {
+        width: 130px;
+    }
+</style>
+<button id="import_dkdm" style="display:none;">【导入】单款单码</button>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <table id="currentTable"
+               data-auth-add="{:auth('system.puhuodkdm/add')}"
+               data-auth-delete="{:auth('system.puhuodkdm/delete')}"
+               lay-filter="currentTable">
+        </table>
+    </div>
+</div>
+
+<script>
+
+    layui.use(['form', 'jquery', 'layer', 'upload'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , upload = layui.upload
+            , url = "{:url('admin/system.puhuodkdm/index')}"
+            , url_import = "{:url('admin/system.puhuodkdm/import_dkdm')}"
+        ;
+
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#import_dkdm'
+            ,url: url_import //此处配置你自己的上传接口即可
+            ,accept: 'file' //普通文件
+            ,before: function (obj) {
+                // console.log(obj);
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
+            ,done: function(res) {
+                // console.log('res:....', res);
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    alert(res.msg);
+                    window.location.reload();//重新刷新页面
+                }
+            }
+        });
+
+        //导入操作
+        $('body').on('click', '[data-table-import]', function () {
+            $('#import_dkdm').click();
+        });
+
+        //监听温带下拉
+        // form.on('select(CustomItem30)', function (data) {
+
+        //     var wendai = data.value;
+        //     $.ajax({
+        //         type: "POST",
+        //         url: url1,
+        //         data: {'wendai':wendai},
+        //         dataType: 'json',
+        //         success: function (res) {
+
+        //             $('#c-CustomItem36').empty();
+        //             $('#c-CustomItem36').next().empty();
+
+        //             var append_str = '<option value="">- 全部 -</option>';
+        //             var dd_append_str = '<div class="layui-unselect layui-form-select">';
+        //             dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+        //             dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+        //             dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+        //             $.each(res.data, function(key, val){
+        //                 append_str += '<option value="'+val.CustomItem36+'">'+val.CustomItem36+'</option>';
+        //                 dd_append_str += '<dd lay-value="'+val.CustomItem36+'" class="">'+val.CustomItem36+'</dd>';
+        //             });
+        //             dd_append_str += '</dl></div>';
+        //             $('#c-CustomItem36').append(append_str);
+        //             $('#c-CustomItem36').next().append(dd_append_str);
+        //             form.render('select');
+
+        //         }
+        //     });
+
+        // });
+
+        //监听省份下拉
+        // form.on('select(State)', function (data) {
+
+        //     var province = data.value;
+        //     $.ajax({
+        //         type: "POST",
+        //         url: url2,
+        //         data: {'province':province},
+        //         dataType: 'json',
+        //         success: function (res) {
+        //             // console.log(res);
+
+        //             $('#c-CustomItem30').empty();
+        //             $('#c-CustomItem30').next().empty();
+
+        //             var append_str = '<option value="">- 全部 -</option>';
+        //             var dd_append_str = '<div class="layui-unselect layui-form-select">';
+        //             dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+        //             dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+        //             dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+        //             $.each(res.data, function(key, val){
+        //                 append_str += '<option value="'+val.CustomItem30+'">'+val.CustomItem30+'</option>';
+        //                 dd_append_str += '<dd lay-value="'+val.CustomItem30+'" class="">'+val.CustomItem30+'</dd>';
+        //             });
+        //             dd_append_str += '</dl></div>';
+        //             $('#c-CustomItem30').append(append_str);
+        //             $('#c-CustomItem30').next().append(dd_append_str);
+
+
+        //             //市联动处理
+        //             $('#c-City').empty();
+        //             $('#c-City').next().empty();
+
+        //             var append_str = '<option value="">- 全部 -</option>';
+        //             var dd_append_str = '<div class="layui-unselect layui-form-select">';
+        //             dd_append_str += '<div class="layui-select-title"><input type="text" placeholder="- 全部 -" value="" readOnly="" class="layui-input layui-unselect"><i class="layui-edge"></i></div>';
+        //             dd_append_str += '<dl class="layui-anim layui-anim-upbit" style="">';
+        //             dd_append_str += '<dd lay-value="" class="layui-select-tips">- 全部 -</dd>';
+
+        //             $.each(res.citys, function(key, val){
+        //                 append_str += '<option value="'+val+'">'+val+'</option>';
+        //                 dd_append_str += '<dd lay-value="'+val+'" class="">'+val+'</dd>';
+        //             });
+        //             dd_append_str += '</dl></div>';
+        //             $('#c-City').append(append_str);
+        //             $('#c-City').next().append(dd_append_str);
+
+        //             form.render('select');
+
+        //         }
+        //     });
+
+        // });
+
+
+    });
+
+</script>

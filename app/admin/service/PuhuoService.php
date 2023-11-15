@@ -19,6 +19,8 @@ use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
 use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
 use app\admin\model\bi\SpLypPuhuoRunModel;
 use app\admin\model\bi\SpLypPuhuoDdUserModel;
+use app\admin\model\bi\SpLypPuhuoWarehouseReserveConfigModel;
+use app\admin\model\bi\SpLypPuhuoWarehouseReserveGoodsModel;
 use app\admin\model\bi\DdUserModel;
 use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
@@ -191,6 +193,17 @@ class PuhuoService
     }
 
     /**
+     * 获取铺货配置2
+     */
+    public function get_puhuo_config2() {
+
+        $res = SpLypPuhuoWarehouseReserveConfigModel::select();
+        $res = $res ? $res->toArray() : [];
+        return $res;
+
+    }
+
+    /**
      * 保存仓库预留参数配置/保存门店上铺货连码标准配置/保存仓库齐码参数配置
      */
     public function save_warehouse_config($data) {
@@ -201,6 +214,19 @@ class PuhuoService
             unset($data['sign_id']);
             $id = SpLypPuhuoConfigModel::where([['config_str', '=', $sign_id]])->update($data);
             $id = $sign_id;
+        }
+        return $id;
+
+    }
+
+    /**
+     * 保存仓库预留参数配置/保存门店上铺货连码标准配置/保存仓库齐码参数配置2
+     */
+    public function save_warehouse_config2($data) {
+
+        $id = $data['id'] ?? 0;
+        if ($id) {
+            SpLypPuhuoWarehouseReserveConfigModel::where([['id', '=', $id]])->update($data);
         }
         return $id;
 
