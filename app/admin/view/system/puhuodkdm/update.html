@@ -99,3 +99,43 @@
 
     </form>
 </div>
+
+<script>
+
+    layui.use(['form', 'jquery', 'layer'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , url1 = "{:url('admin/system.Puhuodkdm/get_province_by_config_str')}"
+        ;
+
+        //监听下拉
+        form.on('select(config_str)', function (data) {
+
+            var config_str = data.value;
+            $.ajax({
+                type: "POST",
+                url: url1,
+                data: {'config_str':config_str},
+                dataType: 'json',
+                success: function (res) {
+                    $('input[name="_28"]').val(res.data._28);
+                    $('input[name="_29"]').val(res.data._29);
+                    $('input[name="_30"]').val(res.data._30);
+                    $('input[name="_31"]').val(res.data._31);
+                    $('input[name="_32"]').val(res.data._32);
+                    $('input[name="_33"]').val(res.data._33);
+                    $('input[name="_34"]').val(res.data._34);
+                    $('input[name="_35"]').val(res.data._35);
+                    $('input[name="_36"]').val(res.data._36);
+                    $('input[name="_38"]').val(res.data._38);
+                    $('input[name="_40"]').val(res.data._40);
+                    $('input[name="_42"]').val(res.data._42);
+                }
+            });
+
+        });
+
+    });
+
+</script>
