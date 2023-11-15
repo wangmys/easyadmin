@@ -454,6 +454,8 @@ class Shangguitips extends AdminController
                     {$map8}
                     {$map9}
                     {$map10}
+                ORDER BY
+                    季节归集 ASC,上市波段 ASC
                 LIMIT {$pageParams1}, {$pageParams2}  
             "; 
 
