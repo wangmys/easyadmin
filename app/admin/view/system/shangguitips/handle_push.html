@@ -144,36 +144,36 @@
         th[data-key="1-1-4"] {
             /* background-color: #00ff40 !important;     */
             /* color:#ffffff; */
-            background-color: red !important;
-            color:#ffffff;
+            /* background-color: red !important; */
+            color:red;
         }
         th[data-key="1-0-12"] {
-            background-color: #3c6ef7 !important;    
+            background-color: #0bb8e3 !important;    
             color:#ffffff;
         }
         th[data-key="1-1-9"] {
-            background-color: red !important;    
-            color:#ffffff;
+            /* background-color: red !important;     */
+            color:red;
         }
         th[data-key="1-0-13"] {
             background-color: #035e80 !important;
             color:#ffffff;
         }
         th[data-key="1-1-14"] {
-            background-color: red !important;
-            color:#ffffff;
+            /* background-color: red !important; */
+            color:red;
         }
         th[data-key="1-0-14"] {
             /* background-color: #fff34b !important; */
             /* color:#ffffff; */
-            background-color: #3c6ef7 !important;    
+            background-color: #0bb8e3 !important;    
             color:#ffffff;
         }
         th[data-key="1-1-19"] {
             /* background-color: #fff34b !important; */
             /* color:#ffffff; */
-            background-color: red !important;    
-            color:#ffffff;
+            /* background-color: red !important;     */
+            color:red;
         }
         th[data-key="1-0-15"] {
             /* background-color: #9004bb !important; */
@@ -182,8 +182,8 @@
         }
         th[data-key="1-1-24"] {
             /* background-color: #9004bb !important; */
-            background-color: red !important;
-            color:#ffffff;
+            /* background-color: red !important; */
+            color:red;
         }
         #mask {
             position: fixed;
@@ -644,7 +644,7 @@
                                     <div class="cima">二级</div>
                                     <div class="cima">分类</div>
                                     </div>`, field: '二级分类', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
-                        ,{ field: '分类', title: '分类', fixed: 'left' ,align: 'center' , width: 90, rowspan: 2}
+                        ,{ field: '分类', title: '分类', fixed: 'left' ,align: 'center' , width: 100, rowspan: 2}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima">季节</div>
                                     <div class="cima">归集</div>
@@ -670,7 +670,11 @@
                                     <div class="cima">上市</div>
                                     <div class="cima">波段</div>
                                     </div>`,  field: '上市波段',  fixed: 'left' ,align: 'center' , width: 45, rowspan: 2}
-                        ,{ field: '零售价', title: '零售价', fixed: 'left' ,align: 'center' , width: 50, rowspan: 2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">零</div>
+                                    <div class="cima">售</div>
+                                    <div class="cima">价</div>
+                                    </div>`, field: '零售价', fixed: 'left' ,align: 'center' , width: 40, rowspan: 2}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima">陈</div>
                                     <div class="cima">裂</div>
@@ -695,7 +699,7 @@
                     [
                         // 广州
                         { title: `<div class="flex col around">
-                                <div class="cima">最近入库</div>
+                                <div class="cima">最晚入库</div>
                                 <div class="cima">时间</div>
                                 </div>`, field: '广州云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
                         ,{title: `<div class="flex col around">
@@ -728,7 +732,7 @@
                             // console.log(data)
                             var str = '';
                             if (data['广州云仓_上柜提醒'] == '请上柜') {
-                                str = `<div style="background:orange; color:white; font-weight:bold; padding:0; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                                str = `<a style="color:red; font-weight:bold;">${data['广州云仓_上柜提醒']}</a>`;
                             } else if (data['广州云仓_上柜提醒'] == '重点上柜') {
                                 str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
                             } else {
@@ -738,7 +742,7 @@
                         }}
                         // 南昌
                         ,{ title: `<div class="flex col around">
-                                <div class="cima">最近入库</div>
+                                <div class="cima">最晚入库</div>
                                 <div class="cima">时间</div>
                                 </div>`, field: '南昌云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
                         ,{title: `<div class="flex col around">
@@ -769,10 +773,10 @@
                         function (data) {
                             // console.log(data)
                             var str = '';
-                            if (data['广州云仓_上柜提醒'] == '请上柜') {
-                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
-                            } else if (data['广州云仓_上柜提醒'] == '重点上柜') {
-                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['广州云仓_上柜提醒']}</div>`;
+                            if (data['南昌云仓_上柜提醒'] == '请上柜') {
+                                str = `<a style="color:red; font-weight:bold;">${data['南昌云仓_上柜提醒']}</a>`;
+                            } else if (data['南昌云仓_上柜提醒'] == '重点上柜') {
+                                str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['南昌云仓_上柜提醒']}</div>`;
                             } else {
                                 str = '';
                             }
@@ -780,7 +784,7 @@
                         }}
                         // 贵阳
                         ,{ title: `<div class="flex col around">
-                                <div class="cima">最近入库</div>
+                                <div class="cima">最晚入库</div>
                                 <div class="cima">时间</div>
                                 </div>`, field: '贵阳云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
                         ,{title: `<div class="flex col around">
@@ -812,7 +816,7 @@
                             // console.log(data)
                             var str = '';
                             if (data['贵阳云仓_上柜提醒'] == '请上柜') {
-                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['贵阳云仓_上柜提醒']}</div>`;
+                                str = `<a style="color:red; font-weight:bold;">${data['贵阳云仓_上柜提醒']}</a>`;
                             } else if (data['贵阳云仓_上柜提醒'] == '重点上柜') {
                                 str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['贵阳云仓_上柜提醒']}</div>`;
                             } else {
@@ -822,7 +826,7 @@
                         }}
                         // 长沙
                         ,{ title: `<div class="flex col around">
-                                <div class="cima">最近入库</div>
+                                <div class="cima">最晚入库</div>
                                 <div class="cima">时间</div>
                                 </div>`, field: '长沙云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
                         ,{title: `<div class="flex col around">
@@ -854,7 +858,8 @@
                             // console.log(data)
                             var str = '';
                             if (data['长沙云仓_上柜提醒'] == '请上柜') {
-                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['长沙云仓_上柜提醒']}</div>`;
+                                // str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['长沙云仓_上柜提醒']}</div>`;
+                                str = `<a style="color:red; font-weight:bold;">${data['长沙云仓_上柜提醒']}</a>`;
                             } else if (data['长沙云仓_上柜提醒'] == '重点上柜') {
                                 str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['长沙云仓_上柜提醒']}</div>`;
                             } else {
@@ -864,7 +869,7 @@
                         }}
                         // 武汉
                         ,{ title: `<div class="flex col around">
-                                <div class="cima">最近入库</div>
+                                <div class="cima">最晚入库</div>
                                 <div class="cima">时间</div>
                                 </div>`, field: '武汉云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
                         ,{title: `<div class="flex col around">
@@ -896,7 +901,8 @@
                             // console.log(data)
                             var str = '';
                             if (data['武汉云仓_上柜提醒'] == '请上柜') {
-                                str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['武汉云仓_上柜提醒']}</div>`;
+                                // str = `<div style="background:orange; color:white; font-weight:bold; border-radius: 5px;">${data['武汉云仓_上柜提醒']}</div>`;
+                                str = `<a style="color:red; font-weight:bold;">${data['武汉云仓_上柜提醒']}</a>`;
                             } else if (data['武汉云仓_上柜提醒'] == '重点上柜') {
                                 str = `<div style="background:red; color:white; font-weight:bold; border-radius: 5px;">${data['武汉云仓_上柜提醒']}</div>`;
                             } else {
