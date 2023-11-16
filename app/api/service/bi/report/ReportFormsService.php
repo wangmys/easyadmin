@@ -3974,6 +3974,7 @@ class ReportFormsService
                 LEFT JOIN cwl_ldkdjd_handle_zy as 同比累计 ON 同比累计.类型='同比累计' AND  直营天.销售日期 = 同比累计.销售日期
                 WHERE 
                     直营天.类型 = '直营天'
+                ORDER BY 日期 ASC
             ";
             $title = '直营连带、客单、件单及同比表';
         } elseif ($type == 'B') {
@@ -4005,6 +4006,7 @@ class ReportFormsService
                 LEFT JOIN cwl_ldkdjd_handle_jm as 同比累计 ON 同比累计.类型='同比累计' AND  加盟天.销售日期 = 同比累计.销售日期
                 WHERE 
                     加盟天.类型 = '加盟天'
+                ORDER BY 日期 ASC
             ";
             $title = '加盟连带、客单、件单及同比表';
         } elseif ($type == 'C') {
@@ -4036,6 +4038,7 @@ class ReportFormsService
                 LEFT JOIN cwl_ldkdjd_handle as 同比累计 ON 同比累计.类型='同比累计' AND  总计天.销售日期 = 同比累计.销售日期
                 WHERE 
                     总计天.类型 = '总计天'
+                ORDER BY 日期 ASC
             ";
             $title = '总体连带、客单、件单及同比表';
         } else {
