@@ -46,6 +46,8 @@ class Index extends AdminController
          // 商品负责人列表
         $manager = $this->errorLogModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
         $month = $this->errorLogModel->group('month')->order('month','desc')->column('month','month');
+
+        // dump($manager);die;
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {

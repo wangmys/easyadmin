@@ -69,6 +69,24 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
+    public function autoUpdate() {
+        $this->biaozhun();
+        $this->biaozhun_pro();
+        $this->sk_1();
+        $this->sk_2();
+        $this->retail();
+        $this->cangku();
+        $this->cangku_2();
+        $this->handle_1();
+        $this->handle_2();
+        $this->handle_3();
+        $this->handle_5();
+        $this->handle_6();
+        $this->handle_7();
+        // 可上店铺最后
+        $this->handle_4();
+    }
+
     // 标准1  标准文件上传到 cwl_shangguitips_biaozhun_no 通过该方法更新到 cwl_shangguitips_biaozhun
     public function biaozhun() {
         // 去掉未开业，闭店
@@ -1324,7 +1342,7 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_仓库可配中类SKC数);
     }
 
-    // 可上店铺
+    // 可上店铺 这个最后跑
     public function handle_4() {
         // $select = $this->db_easyA->table('cwl_shangguitips_handle')->where([
         //     ['季节归集', '=', '秋季'],
