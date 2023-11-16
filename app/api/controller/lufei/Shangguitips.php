@@ -85,6 +85,8 @@ class Shangguitips extends BaseController
         $this->handle_7();
         // 可上店铺最后
         $this->handle_4();
+
+        echo date('Y-m-d H:i:s');
     }
 
     // 标准1  标准文件上传到 cwl_shangguitips_biaozhun_no 通过该方法更新到 cwl_shangguitips_biaozhun
