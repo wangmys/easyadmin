@@ -571,11 +571,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            // [
-            //     'name' => '王威',
-            //     'tel' => '15880012590',
-            //     'userid' => '0812473564939990'
-            // ],
+            [
+                'name' => '程帅杰',
+                'tel' => '13583209142',
+                'userid' => '15853812794255837'
+            ],
             // [
             //     'name' => '俞有岳',
             //     'tel' => '13757775761',
@@ -609,8 +609,8 @@ class Push extends BaseController
             }
         } 
 
-        // $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_针织衫.jpg?v=" . time();
-        $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
+        $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_针织衫.jpg?v=" . time();
+        // $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
 
         $更新日期 = date('Y-m-d', time());
         $headers = get_headers($jpg_url);
