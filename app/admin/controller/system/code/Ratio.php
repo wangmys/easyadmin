@@ -20,6 +20,7 @@ use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
 use app\admin\model\code\SizeAllRatio;
 use app\admin\model\code\SizeWarehouseRatio;
+// use think\db\Raw;
 
 /**
  * Class Ratio
@@ -405,13 +406,32 @@ class Ratio extends AdminController
             $list = new SizeRanking;
             $model = new SizeRanking;
             if(isset($filters['风格']) && !empty($filters['风格'])){
-                $list = $list->where(['s.风格' => $filters['风格']]);
-                $model = $model->where(['s.风格' => $filters['风格']]);
+                // 梦园写的
+                // $list = $list->where(['s.风格' => $filters['风格']]);
+                // $model = $model->where(['s.风格' => $filters['风格']]);
+                // 可接收多选
+                $list = $list->whereIn('s.风格',$filters['风格']);
+                $model = $model->whereIn('s.风格',$filters['风格']);
+                // $list = $list->whereIn('s.风格',['基本款', '引流款']);
+                // $model = $model->whereIn('s.风格',['基本款', '引流款']);
+                // 失败
+                // $list = $list->where([
+                //     ['s.风格', 'exp', new Raw("IN ('基本款')")]
+                // ]);
+                // $model = $list->where([
+                //     ['s.风格', 'exp', new Raw("IN ('基本款')")]
+                // ]);
             }
+
+            
+            // print_r($list);
+            // print_r($model); 
+
 
             if(isset($filters['cate']) && !empty($filters['cate'])){
                 $list = $list->where(['s.一级分类' => $filters['cate']]);
                 $model = $model->where(['s.一级分类' => $filters['cate']]);
+                
             }
 
             if(isset($filters['cate2']) && !empty($filters['cate2'])){
@@ -439,12 +459,24 @@ class Ratio extends AdminController
                 $goodsnoList = SizeAllRatio::where(['合计'=>'偏码','Date' => date('Y-m-d')])->where(function ($q){
                     $q->where(['字段' => '当前库存尺码比'])->whereOr(['字段' => '总库存尺码比']);
                 })->group('GoodsNo')->column('GoodsNo');
+
+                // print_r($goodsnoList);
                 $list = $list->whereIn('s.货号',$goodsnoList);
                 $model = $model->whereIn('s.货号',$goodsnoList);
             }
 
             // 查询货号列表排名
-            $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where(['s.Date' => date('Y-m-d')])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
+            $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
+                ['s.Date' , '=', date('Y-m-d')]
+            ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
+
+            // echo $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
+            //     ['s.Date' , '=', date('Y-m-d')]
+            // ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->fetchSql()->select();
+            // echo $list::fetchSql(); 
+            // echo $list->fetchSql(); 
+            // die;
+         
             // 分组后的数量
             $count = $model->alias('s')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where(['s.Date' => date('Y-m-d')])->group('s.货号')->count();
 
