@@ -2587,6 +2587,7 @@ class Puhuo_start2_merge extends Command
                 [
                     'uuid' => '',
                     'WarehouseName' => $v_data['WarehouseName'],
+                    'WarehouseCode' => '',
                     'TimeCategoryName1' => $v_data['TimeCategoryName1'],
                     'TimeCategoryName2' => $v_data['TimeCategoryName2'],
                     'CategoryName1' => $v_data['CategoryName1'],
@@ -2601,11 +2602,13 @@ class Puhuo_start2_merge extends Command
                     'Lingxing' => $v_data['Lingxing'],
                     'UnitPrice' => $v_data['UnitPrice'],
                     'ColorDesc' => $v_data['ColorDesc'],
+                    'ColorCode' => '',
                     'CustomItem17' => '',
                     'State' => '',
                     'CustomerName' => $v_data['WarehouseName'],
                     'CustomerId' => '',
                     'CustomerGrade' => '',
+                    'CustomerCode' => '',
                     'Mathod' => $v_data['WarehouseName'],
                     
                     'StoreArea' => 0,
@@ -2632,6 +2635,7 @@ class Puhuo_start2_merge extends Command
                 [
                     'uuid' => '',
                     'WarehouseName' => $v_data['WarehouseName'],
+                    'WarehouseCode' => '',
                     'TimeCategoryName1' => $v_data['TimeCategoryName1'],
                     'TimeCategoryName2' => $v_data['TimeCategoryName2'],
                     'CategoryName1' => $v_data['CategoryName1'],
@@ -2646,11 +2650,13 @@ class Puhuo_start2_merge extends Command
                     'Lingxing' => $v_data['Lingxing'],
                     'UnitPrice' => $v_data['UnitPrice'],
                     'ColorDesc' => $v_data['ColorDesc'],
+                    'ColorCode' => '',
                     'CustomItem17' => '',
                     'State' => '',
                     'CustomerName' => '余量',
                     'CustomerId' => '',
                     'CustomerGrade' => '',
+                    'CustomerCode' => '',
                     'Mathod' => '余量',
                     
                     'StoreArea' => 0,
@@ -2709,6 +2715,11 @@ class Puhuo_start2_merge extends Command
 
         return "select lpcl.uuid
         , lpcs.Yuncang as WarehouseName
+        ,CASE WHEN lpcs.Yuncang='长沙云仓' THEN 'CK006' 
+			WHEN lpcs.Yuncang='武汉云仓' THEN 'CK003' 
+			WHEN lpcs.Yuncang='南昌云仓' THEN 'CK002' 
+			WHEN lpcs.Yuncang='广州云仓' THEN 'CK004' 
+			WHEN lpcs.Yuncang='贵阳云仓' THEN 'CK005' ELSE '' END AS WarehouseCode
         , lpwg.TimeCategoryName1  
         , lpwg.TimeCategoryName2 
         , lpwg.CategoryName1 
@@ -2722,11 +2733,13 @@ class Puhuo_start2_merge extends Command
         , lpwg.Lingxing 
         , lpwg.UnitPrice 
         , lpwg.ColorDesc 
+        , lpwg.ColorCode 
         , c.CustomItem17 
         , left(lpcs.State, 2) as State
         , lpcs.CustomerName
         , lpcs.CustomerId 
         , lpcs.CustomerGrade
+        , c.CustomerCode
         , lpcs.Mathod
         , lpcs.StoreArea
         , lpcs.xiuxian_num 
@@ -2901,7 +2914,55 @@ class Puhuo_start2_merge extends Command
 
             $res_data = [];
 
+            //对新数组真实尺码进行处理
+            $tmp_res_data = $new_res_data = [];
             foreach ($data as $v_data) {
+                $tmp_res_data[$v_data['WarehouseName'].$v_data['GoodsNo']][] = $v_data;
+            }
+
+            foreach ($tmp_res_data as $v_tmp_res_data) {
+
+                if (!$v_tmp_res_data) {
+                    continue;
+                }
+                $Stock_00 = $Stock_29 = $Stock_30 = $Stock_31 = $Stock_32 = $Stock_33 = $Stock_34 = $Stock_35 = $Stock_36 = $Stock_38 = $Stock_40 = $Stock_42 = $Stock_Quantity = 0;
+
+                $ViewOrder_arr = [];
+                foreach ($v_tmp_res_data as $vv_tmp_res_data) {
+                    $Stock_00 += $vv_tmp_res_data['Stock_00'];
+                    $Stock_29 += $vv_tmp_res_data['Stock_29'];
+                    $Stock_30 += $vv_tmp_res_data['Stock_30'];
+                    $Stock_31 += $vv_tmp_res_data['Stock_31'];
+                    $Stock_32 += $vv_tmp_res_data['Stock_32'];
+                    $Stock_33 += $vv_tmp_res_data['Stock_33'];
+                    $Stock_34 += $vv_tmp_res_data['Stock_34'];
+                    $Stock_35 += $vv_tmp_res_data['Stock_35'];
+                    $Stock_36 += $vv_tmp_res_data['Stock_36'];
+                    $Stock_38 += $vv_tmp_res_data['Stock_38'];
+                    $Stock_40 += $vv_tmp_res_data['Stock_40'];
+                    $Stock_42 += $vv_tmp_res_data['Stock_42'];
+                    $Stock_Quantity += $vv_tmp_res_data['Stock_Quantity'];
+                    $ViewOrder_arr[$vv_tmp_res_data['ViewOrder']] = $vv_tmp_res_data['Size'];
+                }
+                // print_r([$v_tmp_res_data,  $ViewOrder_arr]);die;
+
+                $arr = [1=>$Stock_00, 2=>$Stock_29, 3=>$Stock_30, 4=>$Stock_31, 5=>$Stock_32, 6=>$Stock_33, 7=>$Stock_34, 8=>$Stock_35, 9=>$Stock_36, 10=>$Stock_38
+                , 11=>$Stock_29, 12=>$Stock_42
+                ];
+                $arr2 = []; 
+                foreach ($arr as $k_arr=>$v_arr) {
+                    if ($v_arr > 0) $arr2[] = $k_arr;
+                }
+                //连码计算
+                $seri_arr = getSeriesNum($arr2);
+                $lianma_arr = [];
+                if ($seri_arr) {
+                    foreach ($seri_arr as $v_seri) {
+                        $lianma_arr[] = count($v_seri);
+                    }
+                }
+
+                $v_data = $v_tmp_res_data[0];
 
                 $tmp_data = [
                     'WarehouseName' => $v_data['WarehouseName'],
@@ -2918,64 +2979,77 @@ class Puhuo_start2_merge extends Command
                     'Lingxing' => $v_data['CategoryName'] ? mb_substr($v_data['CategoryName'], 0, 2) : '',
                     'UnitPrice' => $v_data['UnitPrice'],
                     'ColorDesc' => $v_data['ColorDesc'],
+                    'ColorCode' => $v_data['ColorCode'],
                     
-                    'Stock_00' => $v_data['Stock_00'],
+                    'Stock_00' => $Stock_00,
                     'Stock_00_yuliu' => 0,
                     'Stock_00_puhuo' => 0,
+                    'Stock_00_size' => $ViewOrder_arr[1] ?? '',//($v_data['ViewOrder']==1) ? $v_data['Size'] : '',
 
-                    'Stock_29' => $v_data['Stock_29'],
+                    'Stock_29' => $Stock_29,
                     'Stock_29_yuliu' => 0,
                     'Stock_29_puhuo' => 0,
+                    'Stock_29_size' => $ViewOrder_arr[2] ?? '',
 
-                    'Stock_30' => $v_data['Stock_30'],
+                    'Stock_30' => $Stock_30,
                     'Stock_30_yuliu' => 0,
                     'Stock_30_puhuo' => 0,
+                    'Stock_30_size' => $ViewOrder_arr[3] ?? '',
 
-                    'Stock_31' => $v_data['Stock_31'],
+                    'Stock_31' => $Stock_31,
                     'Stock_31_yuliu' => 0,
                     'Stock_31_puhuo' => 0,
+                    'Stock_31_size' => $ViewOrder_arr[4] ?? '',
 
-                    'Stock_32' => $v_data['Stock_32'],
+                    'Stock_32' => $Stock_32,
                     'Stock_32_yuliu' => 0,
                     'Stock_32_puhuo' => 0,
+                    'Stock_32_size' => $ViewOrder_arr[5] ?? '',
 
-                    'Stock_33' => $v_data['Stock_33'],
+                    'Stock_33' => $Stock_33,
                     'Stock_33_yuliu' => 0,
                     'Stock_33_puhuo' => 0,
+                    'Stock_33_size' => $ViewOrder_arr[6] ?? '',
 
-                    'Stock_34' => $v_data['Stock_34'],
+                    'Stock_34' => $Stock_34,
                     'Stock_34_yuliu' => 0,
                     'Stock_34_puhuo' => 0,
+                    'Stock_34_size' => $ViewOrder_arr[7] ?? '',
 
-                    'Stock_35' => $v_data['Stock_35'],
+                    'Stock_35' => $Stock_35,
                     'Stock_35_yuliu' => 0,
                     'Stock_35_puhuo' => 0,
+                    'Stock_35_size' => $ViewOrder_arr[8] ?? '',
 
-                    'Stock_36' => $v_data['Stock_36'],
+                    'Stock_36' => $Stock_36,
                     'Stock_36_yuliu' => 0,
                     'Stock_36_puhuo' => 0,
+                    'Stock_36_size' => $ViewOrder_arr[9] ?? '',
 
-                    'Stock_38' => $v_data['Stock_38'],
+                    'Stock_38' => $Stock_38,
                     'Stock_38_yuliu' => 0,
                     'Stock_38_puhuo' => 0,
+                    'Stock_38_size' => $ViewOrder_arr[10] ?? '',
 
-                    'Stock_40' => $v_data['Stock_40'],
+                    'Stock_40' => $Stock_40,
                     'Stock_40_yuliu' => 0,
                     'Stock_40_puhuo' => 0,
+                    'Stock_40_size' => $ViewOrder_arr[11] ?? '',
 
-                    'Stock_42' => $v_data['Stock_42'],
+                    'Stock_42' => $Stock_42,
                     'Stock_42_yuliu' => 0,
                     'Stock_42_puhuo' => 0,
+                    'Stock_42_size' => $ViewOrder_arr[12] ?? '',
 
-                    'Stock_Quantity' => $v_data['Stock_Quantity'],
+                    'Stock_Quantity' => $Stock_Quantity,
                     'Stock_Quantity_yuliu' => 0,
                     'Stock_Quantity_puhuo' => 0,
                     
-                    'qima' => $v_data['qima'],
+                    'qima' => $lianma_arr ? max($lianma_arr) : 1,
                 ];
                 
                 // $v_data['Lingxing'] = $v_data['CategoryName'] ? mb_substr($v_data['CategoryName'], 0, 2) : '';
-                if ($v_data['Stock_Quantity'] >= $puhuo_config['yuliu_num']) {//大于200件的才作预留
+                if ($tmp_data['Stock_Quantity'] >= $puhuo_config['yuliu_num']) {//大于200件的才作预留
 
                     $each_goods_config = isset($warehouse_reserve_goods[$v_data['WarehouseName'].$v_data['GoodsNo']]) ? $warehouse_reserve_goods[$v_data['WarehouseName'].$v_data['GoodsNo']] : (isset($warehouse_reserve_config[$v_data['WarehouseName']]) ? $warehouse_reserve_config[$v_data['WarehouseName']] : []);
 
@@ -2997,86 +3071,89 @@ class Puhuo_start2_merge extends Command
                     if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
 
                         //小码
-                        $tmp_data['Stock_00_yuliu'] = $each_goods_config ? round($each_goods_config['_28']*$v_data['Stock_00'], 0) : 0;
-                        $tmp_data['Stock_00_puhuo'] = $v_data['Stock_00']-$tmp_data['Stock_00_yuliu'];
-                        $tmp_data['Stock_29_yuliu'] = $each_goods_config ? round($each_goods_config['_29']*$v_data['Stock_29'], 0) : 0;
-                        $tmp_data['Stock_29_puhuo'] = $v_data['Stock_29']-$tmp_data['Stock_29_yuliu'];
+                        $tmp_data['Stock_00_yuliu'] = $each_goods_config ? round($each_goods_config['_28']*$tmp_data['Stock_00'], 0) : 0;
+                        $tmp_data['Stock_00_puhuo'] = $tmp_data['Stock_00']-$tmp_data['Stock_00_yuliu'];
+                        $tmp_data['Stock_29_yuliu'] = $each_goods_config ? round($each_goods_config['_29']*$tmp_data['Stock_29'], 0) : 0;
+                        $tmp_data['Stock_29_puhuo'] = $tmp_data['Stock_29']-$tmp_data['Stock_29_yuliu'];
 
                         //主码
-                        $tmp_data['Stock_30_yuliu'] = $each_goods_config ? round($each_goods_config['_30']*$v_data['Stock_30'], 0) : 0;
-                        $tmp_data['Stock_30_puhuo'] = $v_data['Stock_30']-$tmp_data['Stock_30_yuliu'];
-                        $tmp_data['Stock_31_yuliu'] = $each_goods_config ? round($each_goods_config['_31']*$v_data['Stock_31'], 0) : 0;
-                        $tmp_data['Stock_31_puhuo'] = $v_data['Stock_31']-$tmp_data['Stock_31_yuliu'];
-                        $tmp_data['Stock_32_yuliu'] = $each_goods_config ? round($each_goods_config['_32']*$v_data['Stock_32'], 0) : 0;
-                        $tmp_data['Stock_32_puhuo'] = $v_data['Stock_32']-$tmp_data['Stock_32_yuliu'];
-                        $tmp_data['Stock_33_yuliu'] = $each_goods_config ? round($each_goods_config['_33']*$v_data['Stock_33'], 0) : 0;
-                        $tmp_data['Stock_33_puhuo'] = $v_data['Stock_33']-$tmp_data['Stock_33_yuliu'];
+                        $tmp_data['Stock_30_yuliu'] = $each_goods_config ? round($each_goods_config['_30']*$tmp_data['Stock_30'], 0) : 0;
+                        $tmp_data['Stock_30_puhuo'] = $tmp_data['Stock_30']-$tmp_data['Stock_30_yuliu'];
+                        $tmp_data['Stock_31_yuliu'] = $each_goods_config ? round($each_goods_config['_31']*$tmp_data['Stock_31'], 0) : 0;
+                        $tmp_data['Stock_31_puhuo'] = $tmp_data['Stock_31']-$tmp_data['Stock_31_yuliu'];
+                        $tmp_data['Stock_32_yuliu'] = $each_goods_config ? round($each_goods_config['_32']*$tmp_data['Stock_32'], 0) : 0;
+                        $tmp_data['Stock_32_puhuo'] = $tmp_data['Stock_32']-$tmp_data['Stock_32_yuliu'];
+                        $tmp_data['Stock_33_yuliu'] = $each_goods_config ? round($each_goods_config['_33']*$tmp_data['Stock_33'], 0) : 0;
+                        $tmp_data['Stock_33_puhuo'] = $tmp_data['Stock_33']-$tmp_data['Stock_33_yuliu'];
 
                         //大码
-                        $tmp_data['Stock_34_yuliu'] = $each_goods_config ? round($each_goods_config['_34']*$v_data['Stock_34'], 0) : 0;
-                        $tmp_data['Stock_34_puhuo'] = $v_data['Stock_34']-$tmp_data['Stock_34_yuliu'];
-                        $tmp_data['Stock_35_yuliu'] = $each_goods_config ? round($each_goods_config['_35']*$v_data['Stock_35'], 0) : 0;
-                        $tmp_data['Stock_35_puhuo'] = $v_data['Stock_35']-$tmp_data['Stock_35_yuliu'];
+                        $tmp_data['Stock_34_yuliu'] = $each_goods_config ? round($each_goods_config['_34']*$tmp_data['Stock_34'], 0) : 0;
+                        $tmp_data['Stock_34_puhuo'] = $tmp_data['Stock_34']-$tmp_data['Stock_34_yuliu'];
+                        $tmp_data['Stock_35_yuliu'] = $each_goods_config ? round($each_goods_config['_35']*$tmp_data['Stock_35'], 0) : 0;
+                        $tmp_data['Stock_35_puhuo'] = $tmp_data['Stock_35']-$tmp_data['Stock_35_yuliu'];
 
                         $tmp_data['Stock_Quantity_yuliu'] = $tmp_data['Stock_00_yuliu'] + $tmp_data['Stock_29_yuliu'] + $tmp_data['Stock_30_yuliu'] + $tmp_data['Stock_31_yuliu'] + $tmp_data['Stock_32_yuliu'] + $tmp_data['Stock_33_yuliu'] + $tmp_data['Stock_34_yuliu'] + $tmp_data['Stock_35_yuliu'];
 
                     } else {
 
                         //小码
-                        $tmp_data['Stock_00_yuliu'] = $each_goods_config ? round($each_goods_config['_28']*$v_data['Stock_00'], 0) : 0;
-                        $tmp_data['Stock_00_puhuo'] = $v_data['Stock_00']-$tmp_data['Stock_00_yuliu'];
+                        $tmp_data['Stock_00_yuliu'] = $each_goods_config ? round($each_goods_config['_28']*$tmp_data['Stock_00'], 0) : 0;
+                        $tmp_data['Stock_00_puhuo'] = $tmp_data['Stock_00']-$tmp_data['Stock_00_yuliu'];
                         
                         //主码
-                        $tmp_data['Stock_29_yuliu'] = $each_goods_config ? round($each_goods_config['_29']*$v_data['Stock_29'], 0) : 0;
-                        $tmp_data['Stock_29_puhuo'] = $v_data['Stock_29']-$tmp_data['Stock_29_yuliu'];
-                        $tmp_data['Stock_30_yuliu'] = $each_goods_config ? round($each_goods_config['_30']*$v_data['Stock_30'], 0) : 0;
-                        $tmp_data['Stock_30_puhuo'] = $v_data['Stock_30']-$tmp_data['Stock_30_yuliu'];
-                        $tmp_data['Stock_31_yuliu'] = $each_goods_config ? round($each_goods_config['_31']*$v_data['Stock_31'], 0) : 0;
-                        $tmp_data['Stock_31_puhuo'] = $v_data['Stock_31']-$tmp_data['Stock_31_yuliu'];
-                        $tmp_data['Stock_32_yuliu'] = $each_goods_config ? round($each_goods_config['_32']*$v_data['Stock_32'], 0) : 0;
-                        $tmp_data['Stock_32_puhuo'] = $v_data['Stock_32']-$tmp_data['Stock_32_yuliu'];
-                        $tmp_data['Stock_33_yuliu'] = $each_goods_config ? round($each_goods_config['_33']*$v_data['Stock_33'], 0) : 0;
-                        $tmp_data['Stock_33_puhuo'] = $v_data['Stock_33']-$tmp_data['Stock_33_yuliu'];
-                        $tmp_data['Stock_34_yuliu'] = $each_goods_config ? round($each_goods_config['_34']*$v_data['Stock_34'], 0) : 0;
-                        $tmp_data['Stock_34_puhuo'] = $v_data['Stock_34']-$tmp_data['Stock_34_yuliu'];
+                        $tmp_data['Stock_29_yuliu'] = $each_goods_config ? round($each_goods_config['_29']*$tmp_data['Stock_29'], 0) : 0;
+                        $tmp_data['Stock_29_puhuo'] = $tmp_data['Stock_29']-$tmp_data['Stock_29_yuliu'];
+                        $tmp_data['Stock_30_yuliu'] = $each_goods_config ? round($each_goods_config['_30']*$tmp_data['Stock_30'], 0) : 0;
+                        $tmp_data['Stock_30_puhuo'] = $tmp_data['Stock_30']-$tmp_data['Stock_30_yuliu'];
+                        $tmp_data['Stock_31_yuliu'] = $each_goods_config ? round($each_goods_config['_31']*$tmp_data['Stock_31'], 0) : 0;
+                        $tmp_data['Stock_31_puhuo'] = $tmp_data['Stock_31']-$tmp_data['Stock_31_yuliu'];
+                        $tmp_data['Stock_32_yuliu'] = $each_goods_config ? round($each_goods_config['_32']*$tmp_data['Stock_32'], 0) : 0;
+                        $tmp_data['Stock_32_puhuo'] = $tmp_data['Stock_32']-$tmp_data['Stock_32_yuliu'];
+                        $tmp_data['Stock_33_yuliu'] = $each_goods_config ? round($each_goods_config['_33']*$tmp_data['Stock_33'], 0) : 0;
+                        $tmp_data['Stock_33_puhuo'] = $tmp_data['Stock_33']-$tmp_data['Stock_33_yuliu'];
+                        $tmp_data['Stock_34_yuliu'] = $each_goods_config ? round($each_goods_config['_34']*$tmp_data['Stock_34'], 0) : 0;
+                        $tmp_data['Stock_34_puhuo'] = $tmp_data['Stock_34']-$tmp_data['Stock_34_yuliu'];
 
                         //大码
-                        $tmp_data['Stock_35_yuliu'] = $each_goods_config ? round($each_goods_config['_35']*$v_data['Stock_35'], 0) : 0;
-                        $tmp_data['Stock_35_puhuo'] = $v_data['Stock_35']-$tmp_data['Stock_35_yuliu'];
-                        $tmp_data['Stock_36_yuliu'] = $each_goods_config ? round($each_goods_config['_36']*$v_data['Stock_36'], 0) : 0;
-                        $tmp_data['Stock_36_puhuo'] = $v_data['Stock_36']-$tmp_data['Stock_36_yuliu'];
-                        $tmp_data['Stock_38_yuliu'] = $each_goods_config ? round($each_goods_config['_38']*$v_data['Stock_38'], 0) : 0;
-                        $tmp_data['Stock_38_puhuo'] = $v_data['Stock_38']-$tmp_data['Stock_38_yuliu'];
-                        $tmp_data['Stock_40_yuliu'] = $each_goods_config ? round($each_goods_config['_40']*$v_data['Stock_40'], 0) : 0;
-                        $tmp_data['Stock_40_puhuo'] = $v_data['Stock_40']-$tmp_data['Stock_40_yuliu'];
-                        $tmp_data['Stock_42_yuliu'] = $each_goods_config ? round($each_goods_config['_42']*$v_data['Stock_42'], 0) : 0;
-                        $tmp_data['Stock_42_puhuo'] = $v_data['Stock_42']-$tmp_data['Stock_42_yuliu'];
+                        $tmp_data['Stock_35_yuliu'] = $each_goods_config ? round($each_goods_config['_35']*$tmp_data['Stock_35'], 0) : 0;
+                        $tmp_data['Stock_35_puhuo'] = $tmp_data['Stock_35']-$tmp_data['Stock_35_yuliu'];
+                        $tmp_data['Stock_36_yuliu'] = $each_goods_config ? round($each_goods_config['_36']*$tmp_data['Stock_36'], 0) : 0;
+                        $tmp_data['Stock_36_puhuo'] = $tmp_data['Stock_36']-$tmp_data['Stock_36_yuliu'];
+                        $tmp_data['Stock_38_yuliu'] = $each_goods_config ? round($each_goods_config['_38']*$tmp_data['Stock_38'], 0) : 0;
+                        $tmp_data['Stock_38_puhuo'] = $tmp_data['Stock_38']-$tmp_data['Stock_38_yuliu'];
+                        $tmp_data['Stock_40_yuliu'] = $each_goods_config ? round($each_goods_config['_40']*$tmp_data['Stock_40'], 0) : 0;
+                        $tmp_data['Stock_40_puhuo'] = $tmp_data['Stock_40']-$tmp_data['Stock_40_yuliu'];
+                        $tmp_data['Stock_42_yuliu'] = $each_goods_config ? round($each_goods_config['_42']*$tmp_data['Stock_42'], 0) : 0;
+                        $tmp_data['Stock_42_puhuo'] = $tmp_data['Stock_42']-$tmp_data['Stock_42_yuliu'];
                         
                         $tmp_data['Stock_Quantity_yuliu'] = $tmp_data['Stock_00_yuliu'] + $tmp_data['Stock_29_yuliu'] + $tmp_data['Stock_30_yuliu'] + $tmp_data['Stock_31_yuliu'] + $tmp_data['Stock_32_yuliu'] + $tmp_data['Stock_33_yuliu'] + $tmp_data['Stock_34_yuliu'] + $tmp_data['Stock_35_yuliu'] + $tmp_data['Stock_36_yuliu'] + $tmp_data['Stock_38_yuliu'] + $tmp_data['Stock_40_yuliu'] + $tmp_data['Stock_42_yuliu'];
                     }
 
-                    $tmp_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity']-$tmp_data['Stock_Quantity_yuliu'];
+                    $tmp_data['Stock_Quantity_puhuo'] = $tmp_data['Stock_Quantity']-$tmp_data['Stock_Quantity_yuliu'];
 
                 } else {//小于200件的，全铺
-                    $tmp_data['Stock_00_puhuo'] = $v_data['Stock_00'];
-                    $tmp_data['Stock_29_puhuo'] = $v_data['Stock_29'];
-                    $tmp_data['Stock_30_puhuo'] = $v_data['Stock_30'];
-                    $tmp_data['Stock_31_puhuo'] = $v_data['Stock_31'];
-                    $tmp_data['Stock_32_puhuo'] = $v_data['Stock_32'];
-                    $tmp_data['Stock_33_puhuo'] = $v_data['Stock_33'];
-                    $tmp_data['Stock_34_puhuo'] = $v_data['Stock_34'];
-                    $tmp_data['Stock_35_puhuo'] = $v_data['Stock_35'];
-                    $tmp_data['Stock_36_puhuo'] = $v_data['Stock_36'];
-                    $tmp_data['Stock_38_puhuo'] = $v_data['Stock_38'];
-                    $tmp_data['Stock_40_puhuo'] = $v_data['Stock_40'];
-                    $tmp_data['Stock_42_puhuo'] = $v_data['Stock_42'];
-                    $tmp_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity'];
+                    $tmp_data['Stock_00_puhuo'] = $tmp_data['Stock_00'];
+                    $tmp_data['Stock_29_puhuo'] = $tmp_data['Stock_29'];
+                    $tmp_data['Stock_30_puhuo'] = $tmp_data['Stock_30'];
+                    $tmp_data['Stock_31_puhuo'] = $tmp_data['Stock_31'];
+                    $tmp_data['Stock_32_puhuo'] = $tmp_data['Stock_32'];
+                    $tmp_data['Stock_33_puhuo'] = $tmp_data['Stock_33'];
+                    $tmp_data['Stock_34_puhuo'] = $tmp_data['Stock_34'];
+                    $tmp_data['Stock_35_puhuo'] = $tmp_data['Stock_35'];
+                    $tmp_data['Stock_36_puhuo'] = $tmp_data['Stock_36'];
+                    $tmp_data['Stock_38_puhuo'] = $tmp_data['Stock_38'];
+                    $tmp_data['Stock_40_puhuo'] = $tmp_data['Stock_40'];
+                    $tmp_data['Stock_42_puhuo'] = $tmp_data['Stock_42'];
+                    $tmp_data['Stock_Quantity_puhuo'] = $tmp_data['Stock_Quantity'];
                 }
-                // print_r($v_data);die;
-                // SpLypPuhuoYuncangkeyongModel::create($v_data);
+                // print_r($tmp_data);die;
+                // SpLypPuhuoYuncangkeyongModel::create($tmp_data);
 
                 $res_data[] = $tmp_data;
+
             }
+            // print_r($res_data);die;
+
             //批量入库
             $chunk_list = $data ? array_chunk($res_data, 500) : [];
             if ($chunk_list) {
@@ -3137,9 +3214,15 @@ class Puhuo_start2_merge extends Command
         
             EG.StyleCategoryName2,
             
+						EGPT.UnitPrice,
+						
             EGC.ColorDesc,
             
-            EGPT.UnitPrice,
+            EGC.ColorCode,
+						
+						EBGS.ViewOrder,
+						
+						EBGS.Size,
         
             SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE 0 END) AS [Stock_00],
         
@@ -3769,6 +3852,14 @@ class Puhuo_start2_merge extends Command
             EG.StyleCategoryName2,
             
             EGC.ColorDesc,
+						
+						EBGS.ViewOrder,
+						
+						EBGS.SizeId,
+						
+						EBGS.Size,
+						
+						EGC.ColorCode,
             
             EGPT.UnitPrice 
         HAVING  SUM(T.Quantity) >0
@@ -3878,7 +3969,7 @@ class Puhuo_start2_merge extends Command
 
         }
 
-        $sql = "select WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
+        $sql = "select WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, ColorCode, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_00_size, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_29_size, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_30_size, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_31_size, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_32_size, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_33_size, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_34_size, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_35_size, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_36_size, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_38_size, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_40_size, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_42_size, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
         (CategoryName1 in ('内搭', '外套', '鞋履') and qima>=$warehouse_qima_nd) 
         or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and qima>=$warehouse_qima_nd) 
         or (CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and qima>=$warehouse_qima_xz)  
