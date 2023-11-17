@@ -612,22 +612,22 @@
 
                         // 进度落后情况
                         ,{ field: '100%进度落后', title: '<a style="color:#861322;">100%</a>' ,align: 'center' ,  rowspan: 1, templet: function (data) {
-                            if (data['100%进度落后'] < 5) {
+                            if (data['100%进度落后'] >= -5 && data['100%进度落后'] <= 0) {
                                 return `<div style="background:red; color:yellow">${data['100%进度落后']}%</div>`;
-                            } else if (data['100%进度落后'] >= 5 && data['100%进度落后'] < 15) {
+                            } else if (data['100%进度落后'] >= -15 && data['100%进度落后'] < -5) {
                                 return `<div style="background:#92d050; color:red;">${data['100%进度落后']}%</div>`;
-                            } else if (data['100%进度落后'] >= 15) {
+                            } else if (data['100%进度落后'] >= -25 && data['100%进度落后'] < -15) {
                                 return `<div style="background:#d9d9d9; color:red;">${data['100%进度落后']}%</div>`;
                             } else {
                                 return `${data['100%进度落后']}%`;
                             }
                         }} 
                         ,{ field: '85%进度落后', title: '<a style="color:#1e366a;">85%</a>' ,align: 'center' , rowspan: 1, templet: function (data) {
-                            if (data['85%进度落后'] < 5) {
+                            if (data['85%进度落后'] >= -5 && data['85%进度落后'] <= 0) {
                                 return `<div style="background:red; color:yellow">${data['85%进度落后']}%</div>`;
-                            } else if (data['85%进度落后'] >= 5 && data['85%进度落后'] < 15) {
+                            } else if (data['85%进度落后'] >= -15 && data['85%进度落后'] < -5) {
                                 return `<div style="background:#92d050; color:red;">${data['85%进度落后']}%</div>`;
-                            } else if (data['85%进度落后'] >= 15) {
+                            } else if (data['85%进度落后'] >= -25 && data['85%进度落后'] < -15) {
                                 return `<div style="background:#d9d9d9; color:red;">${data['85%进度落后']}%</div>`;
                             } else {
                                 return `${data['85%进度落后']}%`;
