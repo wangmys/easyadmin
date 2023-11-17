@@ -289,6 +289,265 @@ class Customeryeji extends BaseController
     }
 
     // 单店整理
+    // public function getCustomer_old_bak() {
+    //     $date = input('date') ? input('date') : date('Y-m-d');
+    //     $select_customer = $this->db_easyA->table('dd_customer_yeji')->field('店铺名称,温区')->where([
+    //         ['销售日期', '=', $date],
+    //         // ['店铺名称', '=', '南宁二店'],
+    //     ])->group('店铺名称')->select()->toArray();
+
+    //     // dump($select_customer);die;
+
+    //     foreach ($select_customer as $k => $v) {
+    //         $sql = "
+    //             SELECT
+    //                 avg.品类,
+    //                 c.店铺名称,c.温区,c.数量,
+    //                 avg.季节修正,  
+    //                 avg.数量 as 平均数
+    //             FROM
+    //                 dd_customer_yeji_avg AS avg
+    //             LEFT JOIN 
+    //                 dd_customer_yeji AS c ON  avg.销售日期 = c.销售日期 AND  avg.温区 = c.温区 AND avg.季节修正 = c.季节修正 AND avg.品类 = c.品类 
+    //                 AND c.店铺名称 = '{$v["店铺名称"]}'
+    //             WHERE 1
+    //                 AND avg.店铺名称 = '同区平均'
+    //                 AND avg.温区 = '{$v["温区"]}'
+    //                 AND avg.销售日期 = '{$date}'
+    //             ORDER BY 
+    //                 avg.季节修正,avg.一级分类,avg.二级分类修正           
+    //         ";
+    //         $select = $this->db_easyA->query($sql);
+            
+    //         $业绩_春秋季 =$this->db_easyA->table('dd_customer_yeji_data')->field('店铺名称,温区')->where([
+    //             ['销售日期', '=', $date],
+    //             ['店铺名称', '=', $v['店铺名称']],
+    //             ['季节修正', '=', '春/秋季'],
+    //         ])->sum('销售金额');
+
+    //         $业绩_夏季 =$this->db_easyA->table('dd_customer_yeji_data')->field('店铺名称,温区')->where([
+    //             ['销售日期', '=', $date],
+    //             ['店铺名称', '=', $v['店铺名称']],
+    //             ['季节修正', '=', '夏季'],
+    //         ])->sum('销售金额');
+
+    //         $业绩_冬季 =$this->db_easyA->table('dd_customer_yeji_data')->field('店铺名称,温区')->where([
+    //             ['销售日期', '=', $date],
+    //             ['店铺名称', '=', $v['店铺名称']],
+    //             ['季节修正', '=', '冬季'],
+    //         ])->sum('销售金额');
+
+    //         $data = [
+    //             [
+    //                 '品类' => '上装总计',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '内搭/T恤',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '内搭/衬衫',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '内搭/卫衣',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '内搭/毛衣',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '外套/夹克',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '外套/皮衣',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '外套/羽绒服',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '下装/短裤',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '下装/牛仔',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '下装/松紧',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '下装/休闲',
+    //                 PHP_EOL.'春/秋季' => '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季' => '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '店铺业绩',
+    //                 PHP_EOL.'春/秋季' => $业绩_春秋季 ? '￥' . $业绩_春秋季 : '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => $业绩_夏季 ? '￥' . $业绩_夏季 : '',
+    //                 PHP_EOL.'冬季' => $业绩_冬季 ? '￥' . $业绩_冬季 : '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '业绩不含鞋子跟配件',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ],
+    //             [
+    //                 '品类' => '业绩占比',
+    //                 PHP_EOL.'春/秋季' => $业绩_春秋季 ? round($业绩_春秋季 / ($业绩_春秋季 + $业绩_夏季 + $业绩_冬季), 3) * 100 . '%'  : '',
+    //                 '本店卖的数量'.PHP_EOL.'夏季' => $业绩_夏季 ? round($业绩_夏季 / ($业绩_春秋季 + $业绩_夏季 + $业绩_冬季), 3) * 100 . '%' : '',
+    //                 PHP_EOL.'冬季' => $业绩_冬季 ? round($业绩_冬季 / ($业绩_春秋季 + $业绩_夏季 + $业绩_冬季), 3) * 100 . '%'  : '',
+    //                 PHP_EOL.'春/秋季.' => '',
+    //                 '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+    //                 PHP_EOL.'冬季.' => '',
+    //             ]
+    //         ];
+            
+    //         // dump($业绩_春秋季); $ 500 $
+    //         // dump($业绩_夏季);
+    //         // dump($业绩_冬季);
+    //         foreach ($select as $key => $val) {
+    //             foreach ($data as $key2 => $val2) {
+    //                 if ($val['品类'] == $val2['品类']) {
+    //                     if (!empty($val['数量'])) {
+    //                         if ($val['季节修正'] == '夏季') {
+    //                             $data[$key2]['本店卖的数量'.PHP_EOL."{$val['季节修正']}"] = $val['数量'];
+    //                         } else {
+    //                             $data[$key2][PHP_EOL."{$val['季节修正']}"] = $val['数量'];
+    //                         }                            
+    //                     }
+    //                     if (!empty($val['平均数'])) {
+    //                         if ($val['季节修正'] == '夏季') {
+    //                             $data[$key2]['同区平均卖的数量'.PHP_EOL."{$val['季节修正']}"] = $val['平均数'];
+    //                         } else {
+    //                             $data[$key2][PHP_EOL."{$val['季节修正']}."] = $val['平均数'];
+    //                         }  
+    //                     }
+    //                     // break;
+    //                 }
+    //             }
+    //         }
+
+    //         // echo '<pre>';
+    //         // print_r($data); die;
+    //         // dump($data);
+    //         // echo $v['店铺名称'];die;
+
+    //         // echo $data[0]['春/秋季'.PHP_EOL.'本店卖的数量'];
+
+    //         // dump($data);die;
+
+    //         if ($data) {
+    //             $table_header = ['ID'];
+    //             $table_header = array_merge($table_header, array_keys($data[0]));
+    //             foreach ($table_header as $kk => $vv) {
+    //                 $field_width[$kk] = 130;
+    //             }
+    
+    //             $field_width[0] = 35;
+    //             $field_width[1] = 100;
+    //             $field_width[2] = 90;
+    //             $field_width[3] = 150;
+    //             $field_width[4] = 90;
+    //             $field_width[5] = 90;
+    //             $field_width[6] = 150;
+    //             $field_width[7] = 90;
+     
+    //             $table_explain = [
+    //                 // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+    //                 0 => " ",
+    //             ];
+    //             //参数 $save_path = app()->getRootPath() . 'public/upload/dd_img/' . date('Ymd',time()).'/';   //文件保存路径
+    //             $params = [
+    //                 'row' => count($data),          //数据的行数
+    //                 'file_name' => $v['店铺名称'] . '.jpg',      //保存的文件名
+    //                 'title' => $v['店铺名称'] .'今日销售情况 [' . $date . ']',
+    //                 'table_time' => date("Y-m-d H:i:s"),
+    //                 'data' => $data,
+    //                 'table_explain' => $table_explain,
+    //                 'table_header' => $table_header,
+    //                 'field_width' => $field_width,
+    //                 'banben' => '',
+    //                 'file_path' => app()->getRootPath() . 'public/upload/dd_customer_yeji/' . date('Ymd', time()) . '/'  //文件保存路径
+    //             ];
+    
+    //             // 生成图片
+    //             $this->create_image_bgcolor($params,
+    //                 [
+    //                     // '最低温~最高温' => 3,
+    //                     // '去年日增长' => 4,
+    //                     // '前年月增长' => 5,
+    //                     // '去年月增长' => 6,
+    //                 ]
+    //             );
+    //         }
+    //     }
+    // }
+
+    // 单店整理
     public function getCustomer() {
         $date = input('date') ? input('date') : date('Y-m-d');
         $select_customer = $this->db_easyA->table('dd_customer_yeji')->field('店铺名称,温区')->where([
@@ -402,6 +661,15 @@ class Customeryeji extends BaseController
                     PHP_EOL.'冬季.' => '',
                 ],
                 [
+                    '品类' => '外套/羽绒服',
+                    PHP_EOL.'春/秋季' => '',
+                    '本店卖的数量'.PHP_EOL.'夏季' => '',
+                    PHP_EOL.'冬季' => '',
+                    PHP_EOL.'春/秋季.' => '',
+                    '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+                    PHP_EOL.'冬季.' => '',
+                ],
+                [
                     '品类' => '下装/短裤',
                     PHP_EOL.'春/秋季' => '',
                     '本店卖的数量'.PHP_EOL.'夏季' => '',
@@ -457,6 +725,7 @@ class Customeryeji extends BaseController
                 ]
             ];
             
+            // dump($data);die;
             // dump($业绩_春秋季); $ 500 $
             // dump($业绩_夏季);
             // dump($业绩_冬季);
@@ -477,14 +746,22 @@ class Customeryeji extends BaseController
                                 $data[$key2][PHP_EOL."{$val['季节修正']}."] = $val['平均数'];
                             }  
                         }
-                        // break;
+                        break;
                     }
+                }
+            }
+
+            // 处理bug专用
+            foreach ($data as $key3 => $val3) {
+                // echo $val;
+                if (!empty($val3[PHP_EOL.'.'])) {
+                    unset($data[$key3][PHP_EOL.'.']);
                 }
             }
 
             // echo '<pre>';
             // print_r($data); die;
-            // dump($data);
+            // dump($data);die; 
             // echo $v['店铺名称'];die;
 
             // echo $data[0]['春/秋季'.PHP_EOL.'本店卖的数量'];
