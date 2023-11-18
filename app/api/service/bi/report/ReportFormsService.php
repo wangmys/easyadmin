@@ -1727,7 +1727,7 @@ class ReportFormsService
                 (EC.MathodId,
                 EC.State)
         ";
-        $sql = "
+        $sql_old2 = "
             select 
             t.*
             from
@@ -1759,6 +1759,41 @@ class ReportFormsService
             (EC.MathodId,
             EC.State)
                 ) as t
+        ";
+
+        $sql = "
+            select 
+            t.*
+            from
+                (SELECT
+            CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
+            ISNULL(EC.State,'合计') AS 省份,
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年春],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年夏],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年秋],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end  AS [2023年冬],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年春],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年夏],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年秋],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2022 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [2022年冬],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品春],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品夏],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品秋],
+            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2022 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) AS [旧品冬]
+            FROM ErpCustomer EC
+            LEFT JOIN ErpRetail ER ON ER.CustomerId=EC.CustomerId
+            LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+            LEFT JOIN ErpGoods EG ON EG.GoodsId=ERG.GoodsId
+            WHERE EC.MathodId IN (4,7)
+            AND EG.CategoryName1 IN ('内搭','下装','外套','鞋履')
+            AND EG.TimeCategoryName2 IN ('夏季','初夏','盛夏','春季','初春','正春','秋季','初秋','深秋','冬季','初冬','深冬')
+            AND CONVERT(VARCHAR,ER.RetailDate,23)=CONVERT(VARCHAR,GETDATE()-1,23)
+            AND ER.CodingCodeText='已审结'
+            GROUP BY ROLLUP
+            (EC.MathodId,
+            EC.State)
+                ) as t
+
         ";
         $data = Db::connect("sqlsrv")->query($sql);
         $new_data = [];
@@ -1833,10 +1868,10 @@ class ReportFormsService
         SELECT
             CASE WHEN EC.MathodId=4 THEN '直营' WHEN EC.MathodId=7 THEN '加盟' ELSE '总计' END AS 经营,
             ISNULL(EC.State,'合计') AS 省份,
-            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年春],
-            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年夏],
-            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年秋],
-            CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [2023年冬],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年春],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年夏],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年秋],
+            case when SUM(ERG.Quantity*ERG.DiscountPrice)=0 then '0' else CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1=2023 AND EG.TimeCategoryName2 LIKE '%冬%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' end AS [2023年冬],
             CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2023 AND EG.TimeCategoryName2 LIKE '%春%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [旧品春],
             CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2023 AND EG.TimeCategoryName2 LIKE '%夏%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [旧品夏],
             CAST(CONVERT(DECIMAL(10,2),SUM(CASE WHEN EG.TimeCategoryName1<2023 AND EG.TimeCategoryName2 LIKE '%秋%' THEN ERG.Quantity*ERG.DiscountPrice ELSE NULL END)/SUM(ERG.Quantity*ERG.DiscountPrice)*100) as varchar) + '%' AS [旧品秋],
