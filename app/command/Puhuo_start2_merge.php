@@ -39,6 +39,7 @@ use app\admin\model\bi\SpLypPuhuoZdkphmdModel;
 use app\admin\model\bi\SpLypPuhuoDdUserModel;
 use app\admin\model\bi\SpLypPuhuoWarehouseReserveConfigModel;
 use app\admin\model\bi\SpLypPuhuoWarehouseReserveGoodsModel;
+use app\admin\model\bi\SpLypPuhuoYujiStockModel;
 use app\admin\model\bi\CwlDaxiaoHandleModel;
 use app\admin\model\bi\SpWwChunxiaStockModel;
 use app\api\service\dingding\Sample;
@@ -72,6 +73,7 @@ class Puhuo_start2_merge extends Command
     protected $puhuo_zdy_yuncang_goods_model;
     protected $puhuo_zdy_yuncang_goods2_model;
     protected $puhuo_onegoods_rule_model;
+    protected $puhuo_yuji_stock_model;
     protected $cwl_daxiao_handle_model;
 
     protected function configure()
@@ -103,6 +105,7 @@ class Puhuo_start2_merge extends Command
         $this->puhuo_onegoods_rule_model = new SpLypPuhuoOnegoodsRuleModel();
         $this->cwl_daxiao_handle_model = new CwlDaxiaoHandleModel();
         $this->puhuo_rule_b_model = new SpLypPuhuoRuleBModel();
+        $this->puhuo_yuji_stock_model = new SpLypPuhuoYujiStockModel();
     }
 
     protected function execute(Input $input, Output $output) {
@@ -120,6 +123,9 @@ class Puhuo_start2_merge extends Command
         if ($if_deal_yuncangkeyong) {
             $this->puhuo_yuncangkeyong2();
         }
+
+        //店铺预计库存实时更新
+        $this->puhuo_customer_yuji_stock();
 
         //铺货规则获取
         $puhuo_config = SpLypPuhuoConfigModel::where([['config_str', '=', 'puhuo_config']])->find();
@@ -485,7 +491,7 @@ class Puhuo_start2_merge extends Command
 
                                 //该店该款 库存数
                                 // print_r([['省份', '=', $v_customer['State']], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $v_data['CategoryName1']], ['二级分类', '=', $v_data['CategoryName2']], ['分类', '=', $v_data['CategoryName']], ['货号', '=', $GoodsNo]]);die;
-                                $goods_yuji_stock = $this->sp_ww_chunxia_stock_model::where([['省份', '=', $v_customer['State']], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $v_data['CategoryName1']], ['二级分类', '=', $v_data['CategoryName2']], ['分类', '=', $v_data['CategoryName']], ['货号', '=', $GoodsNo]])->field('预计库存')->find();
+                                $goods_yuji_stock = $this->puhuo_yuji_stock_model::where([['省份', '=', $v_customer['State']], ['店铺名称', '=', $v_customer['CustomerName']], ['一级分类', '=', $v_data['CategoryName1']], ['二级分类', '=', $v_data['CategoryName2']], ['分类', '=', $v_data['CategoryName']], ['货号', '=', $GoodsNo]])->field('预计库存')->find();
                                 $goods_yuji_stock = $goods_yuji_stock ? $goods_yuji_stock['预计库存'] : 0;
                                 // print_r($goods_yuji_stock);die;
                                 //近14天有无上柜过
@@ -3986,5 +3992,267 @@ class Puhuo_start2_merge extends Command
     }
 
     ###########################合并 puhuo_yuncangkeyong 代码进来 end###############################
+
+
+    #########################店铺预计库存实时更新start#############################
+
+    public function puhuo_customer_yuji_stock() {
+
+        $goodsno = $this->puhuo_zdy_yuncang_goods2_model::where([])->distinct(true)->column('GoodsNo');
+        
+        $goodsno = get_goods_str($goodsno);
+        // print_r($goodsno);die;
+        
+        $sql = "SELECT 
+        T.CustomItem15 云仓,
+        T.State 省份,
+        T.CustomItem17 商品负责人,
+        T.CustomerName 店铺名称,
+        CASE WHEN T.MathodId=7 THEN '加盟' WHEN T.MathodId=4 THEN '直营' END AS 经营模式,
+        EG.TimeCategoryName1 一级时间分类,
+        EG.TimeCategoryName2 二级时间分类,
+        EG.StyleCategoryName1 一级风格,
+        EG.StyleCategoryName2 二级风格,
+        EG.CategoryName1 一级分类,
+        EG.CategoryName2 二级分类,
+        EG.CategoryName 分类,
+        EG.StyleCategoryName 风格,
+        EG.GoodsNo 货号,
+        -- EGPT.UnitPrice 零售价,
+        -- ISNULL(TT.Price,EGPT.UnitPrice) 当前零售价,
+        SUM(店铺库存) 店铺库存,
+    -- 	SUM(在途库存) 在途库存,
+    -- 	SUM(已配未发数量) 已配未发数量,
+    -- 	SUM(在途量合计) 在途量合计,
+        SUM(预计库存) 预计库存,
+    -- 	CASE WHEN SUM(预计库存)<2 THEN '无效' END AS 无效识别,
+    -- 	CASE WHEN ISNULL(SUM(店铺库存),0)=0 AND SUM(在途量合计)>2 THEN 1 END AS 新增SKC识别,
+    -- 	CASE WHEN SUM(店库存加在途)>2 THEN 1 END AS 库存SKC数,
+        CASE WHEN EG.TimeCategoryName2 LIKE '%秋%' THEN '秋季' 
+                 WHEN EG.TimeCategoryName2 LIKE '%冬%' THEN '冬季'
+                 WHEN EG.TimeCategoryName2 LIKE '%秋%' THEN '秋季'
+                 WHEN EG.TimeCategoryName2 LIKE '%冬%' THEN '冬季'
+                    END AS 季节归集,
+        T.CustomerGrade AS 店铺等级,
+        CASE WHEN EG.CategoryName2='短T' AND EG.CategoryName LIKE '%翻领%' THEN '翻领' 
+                 WHEN EG.CategoryName2='短T' AND EG.CategoryName LIKE '%圆领%' THEN '圆领' 
+                 WHEN EG.CategoryName2='短T' THEN '其他'
+                 ELSE EG.CategoryName2 END AS 领型
+    -- 			 ,
+    -- 	GETDATE() 更新时间
+    FROM 
+    (
+    -- 店铺库存
+    SELECT 
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo,
+        SUM(ECS.Quantity) 店铺库存,
+    -- 	NULL 在途库存,
+    -- 	NULL 已配未发数量,
+    -- 	NULL 在途量合计,
+        SUM(ECS.Quantity) 预计库存,
+        SUM(ECS.Quantity) 店库存加在途
+    FROM ErpCustomer EC 
+    LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
+    LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+    WHERE EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+    -- 	AND EG.TimeCategoryName1=2023
+    -- 	AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%')
+        AND EC.ShutOut=0 
+        AND EC.MathodId IN (4,7)
+        AND EC.RegionId!=55
+        --AND EC.CustomItem15='南昌云仓'
+        AND EG.GoodsNo in 
+        ($goodsno)
+    GROUP BY
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo
+    HAVING SUM(ECS.Quantity)!=0
+    UNION ALL 
+    -- 仓库发货在途
+    SELECT 
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo,
+        NULL AS 店铺库存,
+    -- 	SUM(EDG.Quantity) AS 在途库存,
+    -- 	NULL 已配未发数量,
+    -- 	SUM(EDG.Quantity) 在途量合计,
+        SUM(EDG.Quantity) 预计库存,
+        SUM(EDG.Quantity) 店库存加在途
+    FROM ErpDelivery ED 
+    LEFT JOIN ErpDeliveryGoods EDG ON ED.DeliveryID=EDG.DeliveryID
+    LEFT JOIN ErpCustomer EC ON ED.CustomerId=EC.CustomerId
+    LEFT JOIN ErpGoods EG ON EDG.GoodsId=EG.GoodsId
+    WHERE ED.CodingCode='EndNode2'
+        AND ED.IsCompleted=0
+        --AND ED.IsReceipt IS NULL
+        AND ED.DeliveryID NOT IN (SELECT ERG.DeliveryId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.DeliveryId IS NOT NULL AND ERG.DeliveryId!='' GROUP BY ERG.DeliveryId)
+        AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+    -- 	AND EG.TimeCategoryName1=2023
+    -- 	AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%')
+        AND EC.ShutOut=0 
+        AND EC.MathodId IN (4,7)
+        AND EC.RegionId!=55
+        -- AND EC.CustomItem15='南昌云仓'
+        AND EG.GoodsNo in 
+        ($goodsno)
+    GROUP BY
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo
+    UNION ALL
+    --店店调拨在途
+    SELECT
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo,
+        NULL AS 店铺库存,
+    -- 	SUM(EIG.Quantity) AS 在途库存,
+    -- 	NULL 已配未发数量,
+    -- 	SUM(EIG.Quantity) 在途量合计,
+        SUM(EIG.Quantity) 预计库存,
+        SUM(EIG.Quantity) 店库存加在途
+    FROM ErpCustOutbound EI 
+    LEFT JOIN ErpCustOutboundGoods EIG ON EI.CustOutboundId=EIG.CustOutboundId
+    LEFT JOIN ErpCustomer EC ON EI.InCustomerId=EC.CustomerId
+    LEFT JOIN ErpGoods EG ON EIG.GoodsId=EG.GoodsId
+    WHERE EI.CodingCodeText='已审结'
+        AND EI.IsCompleted=0
+        AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
+        AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+    -- 	AND EG.TimeCategoryName1=2023
+    -- 	AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%')
+        AND EC.ShutOut=0 
+        AND EC.MathodId IN (4,7)
+        AND EC.RegionId!=55
+    -- 	AND EC.CustomItem15='南昌云仓'
+        AND EG.GoodsNo in 
+        ($goodsno)
+    GROUP BY 
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo
+    UNION ALL 
+    --店铺已配未发
+    SELECT 
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo,
+        NULL AS 店铺库存,
+    -- 	NULL AS 在途库存,
+    -- 	SUM(ESG.Quantity) 已配未发数量,
+    -- 	SUM(ESG.Quantity) 在途量合计,
+        SUM(ESG.Quantity) 预计库存,
+        NULL 店库存加在途
+    FROM ErpCustomer EC
+    LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+    LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+    LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+    WHERE EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+    -- 	AND EG.TimeCategoryName1=2023
+    -- 	AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%')
+        AND EC.ShutOut=0 
+        AND EC.MathodId IN (4,7)
+        AND ES.IsCompleted=0
+        AND EC.RegionId!=55
+    -- 	AND EC.CustomItem15='南昌云仓'
+        AND EG.GoodsNo in 
+        ($goodsno)
+    GROUP BY 
+        EC.CustomItem15,
+        EC.State,
+        EC.CustomItem17,
+        EC.CustomerId,
+        EC.CustomerName,
+        EC.MathodId,
+        EC.CustomerGrade,
+        EG.GoodsNo
+    ) T 
+    LEFT JOIN ErpGoods EG ON T.GoodsNo=EG.GoodsNo
+    -- LEFT JOIN ErpGoodsPriceType EGPT ON EG.GoodsId=EGPT.GoodsId
+    -- WHERE EGPT.PriceId=1
+    GROUP BY
+        T.CustomItem15,
+        T.CustomItem15,
+        T.State,
+        T.CustomItem17,
+        T.CustomerId,
+        T.CustomerName,
+        T.MathodId,
+        EG.TimeCategoryName1,
+        EG.TimeCategoryName2,
+        EG.StyleCategoryName1,
+        EG.StyleCategoryName2,
+        EG.CategoryName1,
+        EG.CategoryName2,
+        EG.CategoryName,
+        EG.StyleCategoryName,
+        EG.GoodsNo,
+        -- EGPT.UnitPrice,
+        -- TT.Price,
+        T.CustomerGrade;
+        ";
+
+        $res = Db::connect("sqlsrv")->Query($sql);
+
+        $chunk_list = $res ? array_chunk($res, 500) : [];
+        if ($chunk_list) {
+            foreach($chunk_list as $key => $val) {
+                $insert = $this->db_easy->table('sp_lyp_puhuo_yuji_stock')->strict(false)->insertAll($val);
+            }
+        }
+
+    }
+
+
+    #########################店铺预计库存实时更新end#############################
+
+
+
+
+
+
+
+
+
+
 
 }
