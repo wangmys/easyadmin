@@ -190,6 +190,9 @@
             , url_user = ""
             , url_DingUsers = ""
             , sendDingImgHandle = ""
+            , add_zero = '{$add_zero}'
+            , add_one = '{$add_one}'
+            , del_one = '{$del_one}'
             , recallImgHandle = "{:url('admin/system.dingding.Baobiao/recallImgHandle')}"
             , updateStatusHandle = "{:url('admin/system.dingding.Baobiao/updateStatusHandle')}"
             , url1 = "{:url('admin/system.dingding.Baobiao/list')}"; 
@@ -397,10 +400,18 @@
             })
         });
 
-        window.viewPic = function (url,name) {
-            var datetime = '{$datetime}/';
-            var urlpath = url + datetime + name;
-            console.log(urlpath)
+        window.viewPic = function (path, path2, name) {
+            var path2val = ''
+            if (path2 == 'add_zero') {
+                path2val = add_zero + '/';
+            } else if (path2 == 'add_one') {
+                path2val = add_one + '/';
+            } else if (path2 == 'del_one') {
+                path2val = del_one + '/';
+            }
+            var urlpath = path + path2val + name;
+            // console.log(path2)
+            // console.log(path2val)
             $('#pic').attr('src', urlpath); 
             $('#mask').css('display', 'block'); 
         }
@@ -455,7 +466,10 @@
                         // } else {
                         //     str = '';
                         // }
-                        return `<a style="color:blue; font-weight:bold; cursor:pointer;" onClick="viewPic('${data['path']}', '${data['图片名']}')">查看</a>`; 
+                        // console.log(data['path']);
+                        // console.log(data['path2']);
+                        // console.log(data['图片名']);
+                        return `<a style="color:blue; font-weight:bold; cursor:pointer;" onClick="viewPic('${data['path']}', '${data['path2']}', '${data['图片名']}')">查看</a>`; 
                     }}
                     , { field: '数据库', title: '数据库', align:'center' } 
                     , { field: '跑数表', title: '表名', align:'center' } 

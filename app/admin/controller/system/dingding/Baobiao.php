@@ -92,9 +92,15 @@ class Baobiao extends BaseController
             //     // echo '显示今天';
             //     $today = date('Y-m-d');
             // }
+            $add_zero = date('Ymd', strtotime('+0 day', time()));
+            $add_one = date('Ymd', strtotime('+1 day', time()));
+            $del_one = date('Ymd', strtotime('-1 day', time()));
+
             return View('list', [
                 // 'today' => $today,
-                'datetime' => date('Ymd')
+                'add_zero' => $add_zero,
+                'add_one' => $add_one,
+                'del_one' => $del_one,
             ]);
         }        
     }
