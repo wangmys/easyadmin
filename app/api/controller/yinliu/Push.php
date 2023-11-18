@@ -614,11 +614,11 @@ class Push extends BaseController
                 'tel' => '13066166636',
                 'userid' => '350364576037719254'
             ],
-            // [
-            //     'name' => '王慧淼',
-            //     'tel' => '15868571991',
-            //     'userid' => '033834553729226560'
-            // ],
+            [
+                'name' => '王慧淼',
+                'tel' => '15868571991',
+                'userid' => '033834553729226560'
+            ],
         ];
 
         $reportFormsService = new ReportFormsService();
@@ -632,8 +632,8 @@ class Push extends BaseController
             }
         } 
 
-        // echo $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_鞋履.jpg?v=" . time();
-        $jpg_url = $this->request->domain()."/img/20231117/cgzdt_鞋履.jpg?v=" . time();
+        $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_鞋履.jpg?v=" . time();
+        // $jpg_url = $this->request->domain()."/img/20231117/cgzdt_鞋履.jpg?v=" . time();
 
         // die;
         // $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
