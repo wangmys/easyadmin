@@ -174,6 +174,7 @@ class Customeryeji extends BaseController
                             when 二级分类 in ('松紧长裤') then '松紧'
                             when 二级分类 in ('休闲长裤') then '休闲'
                             when 二级分类 in ('羽绒服') then '羽绒服'
+                            when 二级分类 in ('大衣') then '大衣'
                         end
                     WHERE 1
                         AND 销售日期 = '{$date}'
@@ -662,6 +663,15 @@ class Customeryeji extends BaseController
                 ],
                 [
                     '品类' => '外套/羽绒服',
+                    PHP_EOL.'春/秋季' => '',
+                    '本店卖的数量'.PHP_EOL.'夏季' => '',
+                    PHP_EOL.'冬季' => '',
+                    PHP_EOL.'春/秋季.' => '',
+                    '同区平均卖的数量'.PHP_EOL.'夏季' => '',
+                    PHP_EOL.'冬季.' => '',
+                ],
+                [
+                    '品类' => '外套/大衣',
                     PHP_EOL.'春/秋季' => '',
                     '本店卖的数量'.PHP_EOL.'夏季' => '',
                     PHP_EOL.'冬季' => '',
