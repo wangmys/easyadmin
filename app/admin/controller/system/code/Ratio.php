@@ -33,10 +33,16 @@ class Ratio extends AdminController
         'sort' => 'desc',
         'id'   => 'desc',
     ];
+    
+    // 数据库
+    protected $db_easyA = '';
+    protected $db_bi = '';
 
     public function __construct(App $app)
     {
         parent::__construct($app);
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
     }
 
 
@@ -900,5 +906,29 @@ class Ratio extends AdminController
             '二级分类' => $cate2
         ])->column('领型','领型');
         return $this->success('成功',$collar);
+    }
+
+    public function getFieldCwl() {
+        // 商品负责人
+        $goodsNo = $this->db_easyA->query("
+            SELECT 货号 as 货号 FROM ea_size_ranking WHERE 1 GROUP BY 货号
+        ");
+        // $yjfl = $this->db_easyA->query("
+        //     SELECT 一级分类 as name, 一级分类 as value FROM cwl_shangguitips_handle WHERE 一级分类 IS NOT NULL GROUP BY 一级分类
+        // ");
+        // $ejfl = $this->db_easyA->query("
+        //     SELECT 二级分类 as name, 二级分类 as value FROM cwl_shangguitips_handle WHERE 二级分类 IS NOT NULL GROUP BY 二级分类
+        // ");
+        // $ejfg = $this->db_easyA->query("
+        //     SELECT 二级风格 as name, 二级风格 as value FROM cwl_shangguitips_handle WHERE 二级风格 IS NOT NULL GROUP BY 二级风格
+        // ");
+        // $customer = $this->db_easyA->query("
+        //     SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_shangguitips_sk GROUP BY 店铺名称
+        // ");
+        
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['goodsNo' => $goodsNo]]);
     }
 }

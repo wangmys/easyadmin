@@ -125,13 +125,32 @@ define(["jquery", "easy-admin"], function ($, ea) {
             ea.listen();
         },
         alllist: function () {
+            // url = ea.url('/system.code.Ratio/getFieldCwl');
+            // ea.request.get({
+            //     url: url,
+            //     data: {}
+            // }, function (res) {
+            //     // console.log(res);
+            //     // 省列表
+            //     goodsNo = res.data.goodsNo;
+            //     // console.log(res)
 
+            // }, function (res) {
+  
+            // })
+            // var goodsNoList = [];
+            // $.post('/admin/system.code.Ratio/getFieldCwl', {} ,function(data) {
+                
+            //     goodsNoList = data.data.goodsNo
+            //     console.log(goodsNoList)
+            // }, 'json')
             // 自定义模块
             layui.config({
                 base: '/static/ok/layuiadmin/modules/'
             }).extend({
                 tableMerge: 'tableMerge'
             });
+
 
             layui.use(['form', 'table','tableMerge'], function () {
                 tableMerge = layui.tableMerge;
@@ -142,65 +161,72 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var Collar = JSON.parse($("#Collar").val());
                 console.log(Collar)
 
-                ea.table.render({
-                    init:{
-                       table_elem: '#currentTable',
-                       table_render_id: 'currentTableRenderId',
-                       index_url: 'system.code.ratio/alllist',
-                       export_url: 'system.code.index/index_export'
-                    },
-                    where:{filter:[]},
-                    height: 760,
-                    toolbar:[],
-                    limit:40,
-                    size:'sm',
-                    limits:[40,50,100,200,1000],
-                    cols: [
-                        [
-                        {field: '全国排名', width: 60, title: '排名',search:false,fixed:'left'},
-                        {field: '货号', width: 90, title: '货号',search:true,fixed:'left'},
-                        {field: '风格', width: 60, title: '风格',search: 'xmSelect',selectList:Style,fixed:'left'},
-                        {field: '一级分类', width: 60, title: '大类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
-                        {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left',hide:true},
-                        {field: '领型', width: 70, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},
-                        {field: '近三天折率', width: 60, title: '折率',search:false},
-                        {field: '货品等级', width: 60, title: '等级',search:false},
-                        {field: '上柜家数', width: 60, title: '上柜数',search:false},
-                        {field: '总库存', title: '总库存 >=',search:true,hide: true},
-                        {field: 'showType', title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'},searchValue:'1'},
-                        {field: 'isDanger', title: '是否偏码', search: 'select',hide: true,selectList:{1: '展示偏码'}},
-                        // {field: '上市天数', width: 80, title: '上市天数',search:false},
-                        // {field: '日均销', width: 80, title: '日均销',search:false},
-                        {field: '图片', width: 110, title: '图片', search: false, templet: ea.table.image,imageHeight:30,merge: true},
-                        {field: '字段', width: 95, title: '字段', search: false},
-                        {field: '合计', width: 60, title: '合计', search: false},
-                        {field: '库存_00/28/37/44/90/160/S', width: 70, title: '28/37/44/S', search: false},
-                        {field: '库存_29/38/46/105/165/M', width: 70, title: '29/38/46/M', search: false},
-                        {field: '库存_30/39/48/110/170/L', width: 70, title: '30/39/48/L', search: false},
-                        {field: '库存_31/40/50/115/175/XL', width: 80, title: '31/40/50/XL', search: false},
-                        {field: '库存_32/41/52/120/180/2XL', width: 80, title: '32/41/52/2XL', search: false},
-                        {field: '库存_33/42/54/125/185/3XL', width: 80, title: '33/42/54/3XL', search: false},
-                        {field: '库存_34/43/56/190/4XL', width: 80, title: '34/43/56/4XL', search: false},
-                        {field: '库存_35/44/58/195/5XL', width: 80, title: '35/44/58/5XL', search: false},
-                        {field: '库存_36/6XL', width: 60, title: '36/6XL', search: false},
-                        {field: '库存_38/7XL', width: 60, title: '38/7XL', search: false},
-                        {field: '库存_40/8XL', width: 60, title: '40/8XL', search: false}
-                    ]
-                    ],done: function(res){
-                        tableMerge.render(this);
-                        if(res.showType==2){
-                            $('.layui-table tr:nth-child(8n) td').css({
-                                'border-bottom':'1px solid red',
-                                'box-sizing':'border-box',
-                            })
-                        }else{
-                            $('.layui-table tr:nth-child(14n) td').css({
-                                'border-bottom':'1px solid red',
-                                'box-sizing':'border-box',
-                            })
+
+                $.post('/admin/system.code.Ratio/getFieldCwl', {} ,function(res) {
+                    // console.log(data.data.goodsNo)
+                    // var goodsNoList = ;
+                    var goodsNoList = res.data.goodsNo;
+                    console.log(goodsNoList)
+                    ea.table.render({
+                        init:{
+                           table_elem: '#currentTable',
+                           table_render_id: 'currentTableRenderId',
+                           index_url: 'system.code.ratio/alllist',
+                           export_url: 'system.code.index/index_export'
+                        },
+                        where:{filter:[]},
+                        height: 760,
+                        toolbar:[],
+                        limit:40,
+                        size:'sm',
+                        limits:[40,50,100,200,1000],
+                        cols: [
+                            [
+                            {field: '全国排名', width: 60, title: '排名',search:false,fixed:'left'},
+                            {field: '货号', width: 90, title: '货号',search:true},
+                            {field: '风格', width: 60, title: '风格',search: 'xmSelect',selectList:Style,fixed:'left'},
+                            {field: '一级分类', width: 60, title: '大类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
+                            {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left',hide:true},
+                            {field: '领型', width: 70, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},
+                            {field: '近三天折率', width: 60, title: '折率',search:false},
+                            {field: '货品等级', width: 60, title: '等级',search:false},
+                            {field: '上柜家数', width: 60, title: '上柜数',search:false},
+                            {field: '总库存', title: '总库存 >=',search:true,hide: true},
+                            {field: 'showType', title: '展示方式',search:'select',hide: true,selectList:{1: '全部展示',2: '部分展示'},searchValue:'1'},
+                            {field: 'isDanger', title: '是否偏码', search: 'select',hide: true,selectList:{1: '展示偏码'}},
+                            // {field: '上市天数', width: 80, title: '上市天数',search:false},
+                            // {field: '日均销', width: 80, title: '日均销',search:false},
+                            {field: '图片', width: 110, title: '图片', search: false, templet: ea.table.image,imageHeight:30,merge: true},
+                            {field: '字段', width: 95, title: '字段', search: false},
+                            {field: '合计', width: 60, title: '合计', search: false},
+                            {field: '库存_00/28/37/44/90/160/S', width: 70, title: '28/37/44/S', search: false},
+                            {field: '库存_29/38/46/105/165/M', width: 70, title: '29/38/46/M', search: false},
+                            {field: '库存_30/39/48/110/170/L', width: 70, title: '30/39/48/L', search: false},
+                            {field: '库存_31/40/50/115/175/XL', width: 80, title: '31/40/50/XL', search: false},
+                            {field: '库存_32/41/52/120/180/2XL', width: 80, title: '32/41/52/2XL', search: false},
+                            {field: '库存_33/42/54/125/185/3XL', width: 80, title: '33/42/54/3XL', search: false},
+                            {field: '库存_34/43/56/190/4XL', width: 80, title: '34/43/56/4XL', search: false},
+                            {field: '库存_35/44/58/195/5XL', width: 80, title: '35/44/58/5XL', search: false},
+                            {field: '库存_36/6XL', width: 60, title: '36/6XL', search: false},
+                            {field: '库存_38/7XL', width: 60, title: '38/7XL', search: false},
+                            {field: '库存_40/8XL', width: 60, title: '40/8XL', search: false}
+                        ]
+                        ],done: function(res){
+                            tableMerge.render(this);
+                            if(res.showType==2){
+                                $('.layui-table tr:nth-child(8n) td').css({
+                                    'border-bottom':'1px solid red',
+                                    'box-sizing':'border-box',
+                                })
+                            }else{
+                                $('.layui-table tr:nth-child(14n) td').css({
+                                    'border-bottom':'1px solid red',
+                                    'box-sizing':'border-box',
+                                })
+                            }
                         }
-                    }
-                });
+                    });
+                }, 'json')
             });
 
             ea.listen();
