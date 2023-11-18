@@ -606,7 +606,7 @@ class Push extends BaseController
      */
     public function cgdt_s119_xielv()
     {
-        $date = input('date') ? input('date') : date('Y-m-d');
+        // $date = input('date') ? input('date') : date('Y-m-d');
         $model = new Sample;
         $parms = [
             [
@@ -632,7 +632,10 @@ class Push extends BaseController
             }
         } 
 
-        $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_鞋履.jpg?v=" . time();
+        // echo $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_鞋履.jpg?v=" . time();
+        $jpg_url = $this->request->domain()."/img/20231117/cgzdt_鞋履.jpg?v=" . time();
+
+        // die;
         // $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
 
         $更新日期 = date('Y-m-d', time());
