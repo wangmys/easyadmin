@@ -130,6 +130,120 @@ class PuhuoService
 
     }
 
+    public function puhuo_daodan($params) {
+
+        $pageLimit = $params['limit'] ?? 15;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $WarehouseName = $params['WarehouseName'] ?? '';
+        $CategoryName1 = $params['CategoryName1'] ?? '';
+        $GoodsNo = $params['GoodsNo'] ?? '';//货号
+        $CustomerName = $params['CustomerName'] ?? '';//店铺名称
+        $is_puhuo = $params['is_puhuo'] ?? '';
+        $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
+        // $score_sort = $params['score_sort'] ?? '';//店铺排名
+        $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
+
+        $where = $list = [];
+        if ($WarehouseName) {
+            $where[] = ['lped.WarehouseName', 'in', $WarehouseName];
+        }
+        if ($CategoryName1) {
+            $where[] = ['lped.CategoryName1', 'in', $CategoryName1];
+        }
+        if ($GoodsNo) {
+            $where[] = ['lped.GoodsNo', 'in', $GoodsNo];
+        }
+        if ($CustomerName) {
+            $where[] = ['lped.CustomerName', 'in', $CustomerName];
+        }
+        if ($CustomItem17) {
+            $where[] = ['lped.CustomItem17', 'in', $CustomItem17];
+        }
+        // if ($score_sort) {
+        //     $where[] = ['score_sort', '<=', $score_sort];
+        // }
+        if ($is_puhuo) {
+            if ($is_puhuo == '可铺') {//可铺
+
+                if ($kepu_sort) {
+                    $where[] = ['lped.kepu_sort', '<>', 0];
+                    $where[] = ['lped.kepu_sort', '<=', $kepu_sort];
+                } else {
+                    $where[] = ['lped.Stock_Quantity_puhuo', '>', 0];
+                }
+                $list = SpLypPuhuoEndDataModel::where($where)
+                ->alias('lped')
+                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lped.GoodsNo=lpwg.GoodsNo and lped.WarehouseName=lpwg.WarehouseName', 'left')
+                ->field('lped.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
+                ->paginate([
+                        'list_rows'=> $pageLimit,
+                        'page' => $page,
+                    ]);
+                    $list = $list ? $list->toArray() : [];
+
+            } else {//不可铺
+
+                // $where[] = ['is_total', '>', 0];
+                // $list = SpLypPuhuoEndDataModel::where($where)->whereOr(function ($q) use ($WarehouseName, $CategoryName1, $GoodsNo, $CustomerName) {
+                //     $where = [['is_total', '=', 0], ['Stock_Quantity_puhuo', '=', 0]];
+                //     if ($WarehouseName) {
+                //         $where[] = ['WarehouseName', 'in', $WarehouseName];
+                //     }
+                //     if ($CategoryName1) {
+                //         $where[] = ['CategoryName1', 'in', $CategoryName1];
+                //     }
+                //     if ($GoodsNo) {
+                //         $where[] = ['GoodsNo', 'in', $GoodsNo];
+                //     }
+                //     if ($CustomerName) {
+                //         $where[] = ['CustomerName', 'in', $CustomerName];
+                //     }
+                //     $q->where($where);
+                // })->field('*')
+                // ->paginate([
+                //     'list_rows'=> $pageLimit,
+                //     'page' => $page,
+                // ]);
+                // $list = $list ? $list->toArray() : [];
+
+            }
+        } else {
+
+            $list = SpLypPuhuoEndDataModel::where($where)
+                ->alias('lped')
+                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lped.GoodsNo=lpwg.GoodsNo and lped.WarehouseName=lpwg.WarehouseName', 'left')
+                ->field('lped.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
+                // ->field('*')
+                ->paginate([
+                    'list_rows'=> $pageLimit,
+                    'page' => $page,
+                ]);
+                $list = $list ? $list->toArray() : [];
+
+        }
+        
+        $data = [
+            'count' => $list ? $list['total'] : 0,
+            'data'  => $list ? $list['data'] : 0,
+        ];
+        return $data;
+
+    }
+
+    public function add_puhuo_daodan($res_data) {
+
+        if ($res_data) {
+            $this->easy_db->query("truncate table sp_lyp_puhuo_daodan;");
+            $chunk_list = array_chunk($res_data, 1000);
+            foreach($chunk_list as $key => $val) {
+                $insert = $this->easy_db->table('sp_lyp_puhuo_daodan')->strict(false)->insertAll($val);
+            }
+        }
+
+    }
+
     public function getXmMapSelect() {
 
         $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");

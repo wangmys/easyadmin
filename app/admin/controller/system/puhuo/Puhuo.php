@@ -70,6 +70,118 @@ class Puhuo extends AdminController
 
     }
 
+    /**
+     * @NodeAnotation(title="导单转换")
+     */
+    public function puhuo_daodan() {
+
+        $params = $this->request->param();
+
+        if (request()->isAjax()) {
+
+            $params['is_puhuo'] = '可铺';
+            $params['page'] = 1;
+            $params['limit'] = 1000000;
+
+            $code = rand_code(6);
+            cache($code, json_encode($params), 36000);	
+
+            $res = $this->service->puhuo_daodan($params);
+            // print_r($res);die;
+
+            if ($res && $res['data']) {
+                return json([
+                    'status' => 1,
+                    'code' => $code,
+                ]);
+            } else {
+                return json([
+                    'status' => 400,
+                    'msg' => '无数据',
+                ]);
+            }
+
+        } else {
+
+            $code = input('code');
+            $params = cache($code);
+            $params = $params ? json_decode($params, true) : [];
+            
+            $res = $this->service->puhuo_daodan($params);
+            // print_r($res);die;
+
+            if ($res && $res['data']) {
+
+                $excel_output_data = [];
+                foreach ($res['data'] as $k_res=>$v_res) {
+
+                    if ($v_res['is_total']) continue;
+
+                    $order_no = uuid('SX');//date('Ymd').(++$k_res);
+
+                    $tmp_arr = [
+                        'order_no' => $order_no,
+                        'WarehouseCode' => $v_res['WarehouseCode'],
+                        'CustomerCode' => $v_res['CustomerCode'],
+                        'send_out' => 'Y',
+                        're_confirm' => 'Y',
+                        'GoodsNo' => $v_res['GoodsNo'],
+                        'Size' => '',//
+                        'ColorCode' => $v_res['ColorCode'],
+                        'puhuo_num' => 0,//
+                        'status' => 2,
+                        'remark' => $v_res['CategoryName1'],
+                    ];
+
+                    $size_arr = [
+                        ['puhuo_num'=>$v_res['Stock_00_puhuo'], 'Size'=>$v_res['Stock_00_size']],
+                        ['puhuo_num'=>$v_res['Stock_29_puhuo'], 'Size'=>$v_res['Stock_29_size']],
+                        ['puhuo_num'=>$v_res['Stock_30_puhuo'], 'Size'=>$v_res['Stock_30_size']],
+                        ['puhuo_num'=>$v_res['Stock_31_puhuo'], 'Size'=>$v_res['Stock_31_size']],
+                        ['puhuo_num'=>$v_res['Stock_32_puhuo'], 'Size'=>$v_res['Stock_32_size']],
+                        ['puhuo_num'=>$v_res['Stock_33_puhuo'], 'Size'=>$v_res['Stock_33_size']],
+                        ['puhuo_num'=>$v_res['Stock_34_puhuo'], 'Size'=>$v_res['Stock_34_size']],
+                        ['puhuo_num'=>$v_res['Stock_35_puhuo'], 'Size'=>$v_res['Stock_35_size']],
+                        ['puhuo_num'=>$v_res['Stock_36_puhuo'], 'Size'=>$v_res['Stock_36_size']],
+                        ['puhuo_num'=>$v_res['Stock_38_puhuo'], 'Size'=>$v_res['Stock_38_size']],
+                        ['puhuo_num'=>$v_res['Stock_40_puhuo'], 'Size'=>$v_res['Stock_40_size']],
+                        ['puhuo_num'=>$v_res['Stock_42_puhuo'], 'Size'=>$v_res['Stock_42_size']],
+                    ];
+                    foreach ($size_arr as $k_size_arr=>&$v_size_arr) {
+                        if ($v_size_arr['puhuo_num']) {
+                            $tmp_arr['Size'] = $v_size_arr['Size'];
+                            $tmp_arr['puhuo_num'] = $v_size_arr['puhuo_num'];
+                            $excel_output_data[] = $tmp_arr;
+                        }
+                    }
+
+                }
+
+                $this->service->add_puhuo_daodan($excel_output_data);
+                // $this->success('该云仓下，以下货号已存在，请剔除6666:', $excel_output_data);
+
+                $header = [
+                    ['*订单号', 'order_no'],
+                    ['*仓库编号', 'WarehouseCode'],
+                    ['*店铺编号', 'CustomerCode'],
+                    ['*打包后立即发出', 'send_out'],
+                    ['*差异出货需二次确认', 're_confirm'],
+                    ['*货号', 'GoodsNo'],
+                    ['*尺码', 'Size'],
+                    ['*颜色编码', 'ColorCode'],
+                    ['*铺货数', 'puhuo_num'],
+                    ['*状态/1草稿,2预发布,3确定发布', 'status'],
+                    ['备注', 'remark'],
+                ];
+    
+                return Excel::exportData($excel_output_data, $header, 'puhuo_daodan_' .count($excel_output_data) , 'xlsx');
+
+            }
+
+        }        
+
+    }
+
     // 获取筛选栏多选参数
     public function getXmMapSelect() {
 
