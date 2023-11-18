@@ -984,7 +984,7 @@ class Tableupdate extends BaseController
     public function update_customer() {
         // 查询bi
         $select = $this->db_bi->table('customer')->where([
-            ['Mathod', 'exp',  new ("IN ('直营', '加盟')")],
+            ['Mathod', 'exp',  new Raw("IN ('直营', '加盟')")],
             ['Region', '<>', '闭店区']
         ])->select()->toArray();
         if (!$select) {
@@ -2511,6 +2511,9 @@ class Tableupdate extends BaseController
                 数据库 = '康雷'    
         ";
         $this->db_easyA->execute($sql_康雷表);
+
+
     }
+
 
 }

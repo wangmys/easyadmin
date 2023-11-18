@@ -100,6 +100,24 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        #mask {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.6);
+            width: 100%;
+            height: 100%;
+            z-index: 10000 !important;
+            display: none;
+            overflow: scroll;
+        }
+        #mask img {
+            position: absolute; 
+            /* left:50%;  */
+            top:0; 
+            /* transform: translate(-50%, -0%);  */
+            /* width: 100%; */
+            /* height: 100%; */
+        }
     </style>
 </head>
 
@@ -138,6 +156,10 @@
                 钉群报表推送列表
              </div>
         </table>
+    </div>
+
+    <div id="mask">
+        <img id="pic" src="" alt="">
     </div>
 </body>
 
@@ -375,6 +397,18 @@
             })
         });
 
+        window.viewPic = function (url,name) {
+            var datetime = '{$datetime}/';
+            var urlpath = url + datetime + name;
+            console.log(urlpath)
+            $('#pic').attr('src', urlpath); 
+            $('#mask').css('display', 'block'); 
+        }
+
+        // 监听事件
+        $(document).on('click', '#mask', function(data){
+            $('#mask').css('display', 'none');
+        });
 
         // 单店不动销数据统计 
         function startTable() {
@@ -411,16 +445,17 @@
                         }
                         return str; 
                     }}
-                    , { field: '钉群地址', title: '钉群地址', align:'center' } 
-                    , { title: '报表样图', align:'center', templet:
+                    // , { field: '钉群地址', title: '钉群地址', align:'center' } 
+                    , { title: '昨天数据报表', align:'center', templet:
                     function (data) {
-                        // console.log(data.title)
-                        return `
-                            <span style="cursor:pointer;" onClick="previewImg('${data['path']}')">
-                                查看
-                            </span>
-                            
-                        `; 
+                        // console.log(data)
+                        // var str = '';
+                        // if (data['货号']) {
+                        //     str = `<a style="color:blue; font-weight:bold; cursor:pointer;" onClick="viewPic('${data['图片']}')">${data['货号']}</a>`;
+                        // } else {
+                        //     str = '';
+                        // }
+                        return `<a style="color:blue; font-weight:bold; cursor:pointer;" onClick="viewPic('${data['path']}', '${data['图片名']}')">查看</a>`; 
                     }}
                     , { field: '数据库', title: '数据库', align:'center' } 
                     , { field: '跑数表', title: '表名', align:'center' } 

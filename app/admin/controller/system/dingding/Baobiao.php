@@ -94,6 +94,7 @@ class Baobiao extends BaseController
             // }
             return View('list', [
                 // 'today' => $today,
+                'datetime' => date('Ymd')
             ]);
         }        
     }
