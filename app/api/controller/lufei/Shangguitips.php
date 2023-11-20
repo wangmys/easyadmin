@@ -1398,7 +1398,7 @@ class Shangguitips extends BaseController
                     AND 季节归集 in ('秋季', '冬季')
                     AND `云仓_主码齐码情况` = '可配'
                     AND (`货品等级上柜率_合计` <= 0.85 OR 货品等级上柜率_合计 is null)
-                    AND (`铺货率_合计` <= 0.75 OR 上柜率_合计 is null)
+                    AND (`铺货率_合计` <= 0.65 OR 上柜率_合计 is null)
                     AND
                         case
                             when 一级分类 in ('内搭', '外套', '鞋履') then 仓库齐码个数 >= 4 
