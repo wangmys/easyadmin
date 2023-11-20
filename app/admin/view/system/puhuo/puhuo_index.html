@@ -392,6 +392,7 @@
                     // console.log(res);
                     if (res.status == 1) {
                         location.href = url2 + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
                     } else {
                         alert(res.msg);
                     }
