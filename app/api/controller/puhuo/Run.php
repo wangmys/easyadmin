@@ -23,6 +23,7 @@ class Run extends BaseController
       $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_start2_merge");
 
     }
+    var_dump($res);die;
 
   }
 
