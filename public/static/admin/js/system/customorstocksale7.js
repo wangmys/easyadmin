@@ -38,6 +38,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 var style_list = res.style_list;
                 // 季节
                 var season_list = res.season_list;
+
+                console.log(province_list)
                 var cols = [
                     { field: '云仓', width: 100, title: '云仓', fixed: 'left', search: false, selectList: {}, laySearch: true },
                     { field: '商品负责人', width: 100, title: '商品负责人', fixed: 'left', search: false, selectList: {}, laySearch: true },

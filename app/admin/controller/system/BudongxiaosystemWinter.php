@@ -59,7 +59,7 @@ class BudongxiaosystemWinter extends AdminController
         ]);
 
         // 
-        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=2')->find();
         
         // dump($select_config );die;
 
@@ -160,7 +160,7 @@ class BudongxiaosystemWinter extends AdminController
             $input = input();
              
             $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
-            $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+            $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=2')->find();
             $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
             $params = array_merge($select_config, $static_qima);
             // dump($select_config);
@@ -309,7 +309,7 @@ class BudongxiaosystemWinter extends AdminController
      */
     public function excel_history_detail_area() {
         $select_map = $this->db_easyA->table('cwl_budongxiao_history_map_sys_winter')->where(1)->order('id desc')->find();
-        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_budongxiao_config')->where('id=2')->find();
         $static_qima = $this->getTypeQiMa('not in ("下装","内搭","外套","鞋履")');
         $params = array_merge($select_config, $static_qima);
         // dump($select_config);
@@ -1053,7 +1053,7 @@ class BudongxiaosystemWinter extends AdminController
         if (request()->isAjax() && checkAdmin()) {
             $params = input();
 
-            $update_config = $this->db_easyA->table('cwl_budongxiao_config')->where(['id' => 1])->update([
+            $update_config = $this->db_easyA->table('cwl_budongxiao_config')->where(['id' => 2])->update([
                 '上柜率' => $params['上柜率'],
                 '省份售罄' => $params['省份售罄'],
                 '排名率' => $params['排名率'],

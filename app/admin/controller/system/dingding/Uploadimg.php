@@ -487,7 +487,7 @@ class Uploadimg extends AdminController
                 left join customer_pro as c on p.店铺名称 = c.CustomerName
                 where 1 
                     AND name not in ('陈威良', '王威')
-                    {$map}
+  
             ";
 
             $sql_total = "
@@ -497,7 +497,7 @@ class Uploadimg extends AdminController
                 left join customer_pro as c on p.店铺名称 = c.CustomerName
                 where 1 
                     AND name not in ('陈威良', '王威')
-                    {$map}
+  
             ";
             $select = $this->db_easyA->query($sql_select);
             $total = $this->db_easyA->query($sql_total);
@@ -1000,7 +1000,6 @@ class Uploadimg extends AdminController
             left join customer_pro as c on p.店铺名称 = c.CustomerName
             where 1 
                 AND name not in ('陈威良', '王威')
-                {$map}
             ORDER BY 省份
         ";
         

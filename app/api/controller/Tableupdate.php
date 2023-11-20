@@ -2511,6 +2511,9 @@ class Tableupdate extends BaseController
                 数据库 = '康雷'    
         ";
         $this->db_easyA->execute($sql_康雷表);
+
+
     }
+
 
 }

@@ -69,6 +69,26 @@ class Shangguitips extends BaseController
         return json($data);
     }
 
+    public function autoUpdate() {
+        $this->biaozhun();
+        $this->biaozhun_pro();
+        $this->sk_1();
+        $this->sk_2();
+        $this->retail();
+        $this->cangku();
+        $this->cangku_2();
+        $this->handle_1();
+        $this->handle_2();
+        $this->handle_3();
+        $this->handle_5();
+        $this->handle_6();
+        $this->handle_7();
+        // 可上店铺最后
+        $this->handle_4();
+
+        echo date('Y-m-d H:i:s');
+    }
+
     // 标准1  标准文件上传到 cwl_shangguitips_biaozhun_no 通过该方法更新到 cwl_shangguitips_biaozhun
     public function biaozhun() {
         // 去掉未开业，闭店
@@ -1324,7 +1344,7 @@ class Shangguitips extends BaseController
         $this->db_easyA->execute($sql_仓库可配中类SKC数);
     }
 
-    // 可上店铺
+    // 可上店铺 这个最后跑
     public function handle_4() {
         // $select = $this->db_easyA->table('cwl_shangguitips_handle')->where([
         //     ['季节归集', '=', '秋季'],
@@ -1377,11 +1397,11 @@ class Shangguitips extends BaseController
                 WHERE 1
                     AND 季节归集 in ('秋季', '冬季')
                     AND `云仓_主码齐码情况` = '可配'
-                    AND (`货品等级上柜率_合计` <= 0.95 OR 货品等级上柜率_合计 is null)
-                    AND (`铺货率_合计` <= 0.85 OR 上柜率_合计 is null)
+                    AND (`货品等级上柜率_合计` <= 0.85 OR 货品等级上柜率_合计 is null)
+                    AND (`铺货率_合计` <= 0.75 OR 上柜率_合计 is null)
                     AND
                         case
-                            when 一级分类 in ('内搭', '外套') then 仓库齐码个数 >= 4 
+                            when 一级分类 in ('内搭', '外套', '鞋履') then 仓库齐码个数 >= 4 
                             when 一级分类 in ('下装') and 二级分类 in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 5 
                             when 一级分类 in ('下装') and 二级分类 not in ('松紧长裤', '松紧短裤') then 仓库齐码个数 >= 6 
                         end
@@ -1461,6 +1481,7 @@ class Shangguitips extends BaseController
         }
     }
 
+    // 钉钉推送
     public function handle_7() {
         $更新日期 = date('Y-m-d', time());
         $sql_handle_push = "
@@ -1505,22 +1526,28 @@ class Shangguitips extends BaseController
                 }
             }
             // echo $goodsNos;die;
-            $sql_图片 = "
+            $sql_图片_上市波段 = "
                 SELECT
                     EG.GoodsNo as 货号,
+                    EG.TimeCategoryName AS 上市波段,
+                    EG.CustomItem49,
+                    EG.CustomItem52,
                     EGI.Img 
                 FROM ErpGoods AS EG
                 LEFT JOIN ErpGoodsImg AS EGI ON EGI.GoodsId = EG.GoodsId
                 WHERE
                     EG.GoodsNo IN ({$goodsNos})
             ";
-            $select_图片 = $this->db_sqlsrv->query($sql_图片);
+            $select_图片_上市波段 = $this->db_sqlsrv->query($sql_图片_上市波段);
     
             foreach ($select_货号 as $k1 => $v1) {
-                foreach ($select_图片 as $k2 => $v2) {
+                foreach ($select_图片_上市波段 as $k2 => $v2) {
                     if ($v1['货号'] == $v2['货号']) {
                             $this->db_easyA->table('cwl_shangguitips_handle_push')->where(['货号' => $v1['货号']])->update([
-                                '图片' => $v2['Img']
+                                '图片' => $v2['Img'],
+                                '上市波段' => $v2['上市波段'],
+                                'CustomItem49' => $v2['CustomItem49'],
+                                'CustomItem52' => $v2['CustomItem52'],
                             ]);
                         break;
                     }
@@ -1528,9 +1555,7 @@ class Shangguitips extends BaseController
             }
 
             // 入库时间
-            $this->ruku($goodsNos);
-
-            
+            $this->ruku($goodsNos);            
         }
     }
 
@@ -1552,7 +1577,7 @@ class Shangguitips extends BaseController
                 WHERE
                         ER.CodingCodeText = '已审结' 
                         AND ER.Type= 1 
-                        AND ES.SupplyName <> '南昌岳歌服饰' 
+                        -- AND ES.SupplyName <> '南昌岳歌服饰' 
                         AND EG.TimeCategoryName1 IN ( '2023','2024') 
                         AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓') 
                         AND EG.GoodsNo IN ({$goodsNos})

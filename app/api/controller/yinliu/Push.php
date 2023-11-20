@@ -508,6 +508,11 @@ class Push extends BaseController
                 'tel' => '13757775761',
                 'userid' => '051218272920490024'
             ],
+            [
+                'name' => '杨剑',
+                'tel' => '15200838578',
+                'userid' => '1369166106841705'
+            ],
             // [
             //     'name' => '李雅婷',
             //     'tel' => '15298454189',
@@ -548,6 +553,95 @@ class Push extends BaseController
                     $model->sendMarkdownImg($userids, $val['值'] . " 基本款 " . $更新日期 . " 表：S119 " , $jpg_url);
                 }
             }
+        }
+    }
+
+    /**
+     * 采购定推 针织衫单独推送
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function cgdt_s119_zhenzhishan()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            [
+                'name' => '程帅杰',
+                'tel' => '13583209142',
+                'userid' => '15853812794255837'
+            ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        $userids = "";
+        foreach ($parms as $key => $val) {
+            if (count($parms) == $key + 1 ) {
+                $userids .= $val['userid'];
+            } else {
+                $userids .= $val['userid'] . ',';
+            }
+        } 
+
+        $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_针织衫.jpg?v=" . time();
+        // $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
+
+        $更新日期 = date('Y-m-d', time());
+        $headers = get_headers($jpg_url);
+        if (substr($headers[0], 9, 3) == 200) {
+            $model->sendMarkdownImg($userids, "针织衫 基本款 " . $更新日期 . " 表：S119 " , $jpg_url);
+        }
+    }
+
+    /**
+     * 采购定推 鞋履单独推送
+     * 131255621326201188
+     * https://bx.babiboy.com/dingding/get?code=15880012590
+     */
+    public function cgdt_s119_xielv()
+    {
+        // $date = input('date') ? input('date') : date('Y-m-d');
+        $model = new Sample;
+        $parms = [
+            [
+                'name' => '陈威良',
+                'tel' => '13066166636',
+                'userid' => '350364576037719254'
+            ],
+            [
+                'name' => '王慧淼',
+                'tel' => '15868571991',
+                'userid' => '033834553729226560'
+            ],
+        ];
+
+        $reportFormsService = new ReportFormsService();
+        
+        $userids = "";
+        foreach ($parms as $key => $val) {
+            if (count($parms) == $key + 1 ) {
+                $userids .= $val['userid'];
+            } else {
+                $userids .= $val['userid'] . ',';
+            }
+        } 
+
+        $jpg_url = $this->request->domain()."/img/".date('Ymd') . "/cgzdt_鞋履.jpg?v=" . time();
+        // $jpg_url = $this->request->domain()."/img/20231117/cgzdt_鞋履.jpg?v=" . time();
+
+        // die;
+        // $jpg_url = $this->request->domain()."/img/20231115/cgzdt_针织衫.jpg?v=" . time();
+
+        $更新日期 = date('Y-m-d', time());
+        $headers = get_headers($jpg_url);
+        if (substr($headers[0], 9, 3) == 200) {
+            $model->sendMarkdownImg($userids, "鞋履 基本款 " . $更新日期 . " 表：S119 " , $jpg_url);
         }
     }
 

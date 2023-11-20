@@ -306,7 +306,7 @@ class Shangguitips extends AdminController
 
     /**
      * @NodeAnotation(title="新品上柜提醒_钉钉推送") 
-     * 
+     *  辛斌旧版地址：https://bx.babiboy.com/bi/spnewproductlaunchwinterwarning
      */
     public function handle_push() {
         $find_config = $this->db_easyA->table('cwl_shangguitips_config')->where('id=1')->find();
@@ -335,14 +335,14 @@ class Shangguitips extends AdminController
             if (!empty($input['风格'])) {
                 // echo $input['商品负责人'];
                 $map2Str = xmSelectInput($input['风格']);
-                $map2 = " AND 风格 IN ({$map2Str})";
+                $map2 = " AND p.风格 IN ({$map2Str})";
             } else {
                 $map2 = "";
             }   
             if (!empty($input['货号'])) {
                 // echo $input['商品负责人'];
                 $map3Str = xmSelectInput($input['货号']);
-                $map3 = " AND 货号 IN ({$map3Str})";
+                $map3 = " AND p.货号 IN ({$map3Str})";
             } else {
                 $map3 = "";
             }
@@ -350,7 +350,7 @@ class Shangguitips extends AdminController
             if (!empty($input['上柜提醒'])) {
                 // echo $input['商品负责人'];
                 $map4Str = xmSelectInput($input['上柜提醒']);
-                $map4 = " AND 上柜提醒 IN ({$map4Str})";
+                $map4 = " AND (gz.上柜提醒 IN ({$map4Str}) OR  nc.上柜提醒 IN ({$map4Str}) OR  gy.上柜提醒 IN ({$map4Str}) OR  cs.上柜提醒 IN ({$map4Str}) OR  wh.上柜提醒 IN ({$map4Str}))";
             } else {
                 $map4 = "";
             }
@@ -358,7 +358,7 @@ class Shangguitips extends AdminController
             if (!empty($input['季节归集'])) {
                 // echo $input['商品负责人'];
                 $map5Str = xmSelectInput($input['季节归集']);
-                $map5 = " AND 季节归集 IN ({$map5Str})";
+                $map5 = " AND p.季节归集 IN ({$map5Str})";
             } else {
                 $map5 = "";
             }
@@ -366,7 +366,7 @@ class Shangguitips extends AdminController
             if (!empty($input['一级分类'])) {
                 // echo $input['商品负责人'];
                 $map6Str = xmSelectInput($input['一级分类']);
-                $map6 = " AND 一级分类 IN ({$map6Str})";
+                $map6 = " AND p.一级分类 IN ({$map6Str})";
             } else {
                 $map6 = "";
             }
@@ -374,52 +374,60 @@ class Shangguitips extends AdminController
             if (!empty($input['二级分类'])) {
                 // echo $input['商品负责人'];
                 $map7Str = xmSelectInput($input['二级分类']);
-                $map7 = " AND 二级分类 IN ({$map7Str})";
+                $map7 = " AND p.二级分类 IN ({$map7Str})";
             } else {
                 $map7 = "";
             }
 
-            if (!empty($input['二级风格'])) {
+            if (!empty($input['上市波段'])) {
                 // echo $input['商品负责人'];
-                $map8Str = xmSelectInput($input['二级风格']);
-                $map8 = " AND 二级风格 IN ({$map8Str})";
+                $map8Str = xmSelectInput($input['上市波段']);
+                $map8 = " AND p.上市波段 IN ({$map8Str})";
             } else {
                 $map8 = "";
             }
 
-            if (!empty($input['云仓_主码齐码情况'])) {
+            if (!empty($input['CustomItem49'])) {
                 // echo $input['商品负责人'];
-                $map9Str = xmSelectInput($input['云仓_主码齐码情况']);
-                $map9 = " AND 云仓_主码齐码情况 IN ({$map9Str})";
+                $map9Str = xmSelectInput($input['CustomItem49']);
+                $map9 = " AND p.CustomItem49 IN ({$map9Str})";
             } else {
                 $map9 = "";
             }
 
+            if (!empty($input['分类'])) {
+                // echo $input['商品负责人'];
+                $map10Str = xmSelectInput($input['分类']);
+                $map10 = " AND p.分类 IN ({$map10Str})";
+            } else {
+                $map10 = "";
+            }
+            // echo  $map8;die;
             $sql = "
                 select
                     p.*,
                     
-                    gzrk.入库时间 as `广州云仓_入库时间`,
+                    right(gzrk.入库时间, 5) as `广州云仓_入库时间`,
                     gz.`云仓_可用数量` as `广州云仓_可用数量`,
                     gz.`实际上柜_上柜家数` as `广州云仓_实际上柜_上柜家数`,
                     gz.上柜提醒 as `广州云仓_上柜提醒`,
                     
-                    ncrk.入库时间 as `南昌云仓_入库时间`,
+                    right(ncrk.入库时间, 5) as `南昌云仓_入库时间`,
                     nc.`云仓_可用数量` as `南昌云仓_可用数量`,
                     nc.`实际上柜_上柜家数` as `南昌云仓_实际上柜_上柜家数`,
                     nc.上柜提醒 as `南昌云仓_上柜提醒`,
                     
-                    gyrk.入库时间 as `贵阳云仓_入库时间`,
+                    right(gyrk.入库时间, 5) as `贵阳云仓_入库时间`,
                     gy.`云仓_可用数量` as `贵阳云仓_可用数量`,
                     gy.`实际上柜_上柜家数` as `贵阳云仓_实际上柜_上柜家数`,
                     gy.上柜提醒 as `贵阳云仓_上柜提醒`,
                     
-                    csrk.入库时间 as `长沙云仓_入库时间`,
+                    right(csrk.入库时间, 5) as `长沙云仓_入库时间`,
                     cs.`云仓_可用数量` as `长沙云仓_可用数量`,
                     cs.`实际上柜_上柜家数` as `长沙云仓_实际上柜_上柜家数`,
                     cs.上柜提醒 as `长沙云仓_上柜提醒`,
                     
-                    whrk.入库时间 as `武汉云仓_入库时间`,
+                    right(whrk.入库时间, 5) as `武汉云仓_入库时间`,
                     wh.`云仓_可用数量` as `武汉云仓_可用数量`,
                     wh.`实际上柜_上柜家数` as `武汉云仓_实际上柜_上柜家数`,
                     wh.上柜提醒 as `武汉云仓_上柜提醒`
@@ -436,8 +444,20 @@ class Shangguitips extends AdminController
                 left join cwl_shangguitips_handle_push_ruku as csrk on csrk.云仓 = '长沙云仓' and p.货号=csrk.货号
                 left join cwl_shangguitips_handle_push_ruku as whrk on whrk.云仓 = '武汉云仓' and p.货号=whrk.货号
                 where 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
+                    {$map9}
+                    {$map10}
+                ORDER BY
+                    季节归集 ASC,上市波段 ASC
                 LIMIT {$pageParams1}, {$pageParams2}  
-            ";  
+            "; 
 
             $select = $this->db_easyA->query($sql);
 
@@ -457,12 +477,32 @@ class Shangguitips extends AdminController
                 left join cwl_shangguitips_handle_push_ruku as csrk on csrk.云仓 = '长沙云仓' and p.货号=csrk.货号
                 left join cwl_shangguitips_handle_push_ruku as whrk on whrk.云仓 = '武汉云仓' and p.货号=whrk.货号
                 where 1
+                    {$map1}
+                    {$map2}
+                    {$map3}
+                    {$map4}
+                    {$map5}
+                    {$map6}
+                    {$map7}
+                    {$map8}
+                    {$map9}
+                    {$map10}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
         } else {
+            $gzyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '广州云仓'])->find();
+            $ncyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '南昌云仓'])->find();
+            $gyyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '贵阳云仓'])->find();
+            $csyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '长沙云仓'])->find();
+            $whyc = $this->db_easyA->table('cwl_shangguitips_handle')->field('店铺个数_合计')->where(['云仓' => '武汉云仓'])->find();
             return View('handle_push', [
                 // 'config' => $find_config,
+                'gzyc' => $gzyc,
+                'ncyc' => $ncyc,
+                'gyyc' => $gyyc,
+                'csyc' => $csyc,
+                'whyc' => $whyc,
                 'keshang_url' => $keshang_url,
             ]);
         }
@@ -491,5 +531,30 @@ class Shangguitips extends AdminController
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
         return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'customer' => $customer, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'ejfg' => $ejfg]]);
+    }
+
+    // 获取筛选栏多选参数
+    public function getXmMapSelect_push() {
+        // 商品负责人
+        $goodsno = $this->db_easyA->query("
+            SELECT 货号 as name, 货号 as value FROM cwl_shangguitips_handle_push WHERE 货号 IS NOT NULL GROUP BY 货号
+        ");
+        $yjfl = $this->db_easyA->query("
+            SELECT 一级分类 as name, 一级分类 as value FROM cwl_shangguitips_handle_push WHERE 一级分类 IS NOT NULL GROUP BY 一级分类
+        ");
+        $ejfl = $this->db_easyA->query("
+            SELECT 二级分类 as name, 二级分类 as value FROM cwl_shangguitips_handle_push WHERE 二级分类 IS NOT NULL GROUP BY 二级分类
+        ");
+        $fl = $this->db_easyA->query("
+            SELECT 分类 as name, 分类 as value FROM cwl_shangguitips_handle_push WHERE 分类 IS NOT NULL GROUP BY 分类
+        ");
+        $ssbd = $this->db_easyA->query("
+            SELECT 上市波段 as name, 上市波段 as value FROM cwl_shangguitips_handle_push GROUP BY 上市波段
+        ");
+        
+        // 门店
+        // $storeAll = SpWwBudongxiaoDetail::getMapStore();
+
+        return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'fl' => $fl, 'ssbd' => $ssbd]]);
     }
 }
