@@ -158,9 +158,16 @@
 
                     </div>
 
-                    <div class="flex row between" style="width:20%; height: 40px;">
+                    <div class="flex row" style="width:20%; height: 40px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                        </button>
+
+                        <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="mapBtndd"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 46px;height: 30px;
+                        line-height: 30px;
+                        padding: 0 10px;
+                        font-size: 12px;">导单转换
                         </button>
                     </div>
                 </div>  
@@ -208,6 +215,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.puhuo.Puhuo/puhuo_index')}" 
+            , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan')}" 
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelect')}"
 
         initFn();
@@ -358,6 +366,42 @@
             return false; 
         });
 
+        //导单转换
+        form.on('submit(mapBtndd)', function (data) {
+
+            if (data.field.is_puhuo != '可铺') {
+                layer.confirm('只转换可铺数据，请确认',{},function () {
+
+                    layer.closeAll()
+
+                    $.post(url2, data.field, function(res) {
+                        // console.log(res);
+                        if (res.status == 1) {
+                            location.href = url2 + '?code=' + res.code
+                            alert('数据有点多，请耐心等待');
+                        } else {
+                            alert(res.msg);
+                        }
+                    })
+                    // return false; 
+    
+                })
+            } else {
+
+                $.post(url2, data.field, function(res) {
+                    // console.log(res);
+                    if (res.status == 1) {
+                        location.href = url2 + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert(res.msg);
+                    }
+                })
+
+            }
+            return false; 
+
+        });
 
         function startTable() {
             table.render({
