@@ -315,7 +315,7 @@ class Dress extends AdminController
                 $list = $this->logic->setStoreFilter($this->model);
                 // print_r($list);
                 // 查询数据
-                $list = $list->field($field)->where([
+                echo $list = $list->field($field)->where([
                     'Date' => $Date
                 ])->where(function ($q)use($vv,$filters,$where){
                     if(!empty($vv['省份'])){
@@ -342,8 +342,8 @@ class Dress extends AdminController
                             }
                         }
                     }
-                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
-                // })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->fetchSql()->select();
+                // })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->fetchSql()->select();
 
                 // echo $this->model->getLastSql();
                 // 根据筛选条件,设置颜色是否标红

@@ -12,14 +12,18 @@
         </thead>
         <tbody>
         {foreach $list3 as $key => $vo}
-        <tr class="province-select" lay-data="">
-            {foreach $vo as $vo2}
-            {if ($key=='省份')}
-            <td class="{$key}">
-                <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入标题" value="{$vo['店铺等级']}" class="layui-input">
-            </td>
-            {/foreach}
-        </tr>
+            <tr class="province-select" lay-data="">
+                <td class="{$key}">
+                    {$vo['店铺等级']}_周转
+                </td>
+                {foreach $vo as $key2 => $vo2}
+                    {php} if ($key2 != '店铺等级') { {/php}
+                        <td class="{$key}">
+                            <input type="text" name="{$key}[]" lay-verify="required" placeholder="请输入标题" value="{$vo2}" class="layui-input">
+                        </td>
+                    {php} } {/php}
+                {/foreach}
+            </tr>
         {/foreach}
         </tbody>
     </table>
