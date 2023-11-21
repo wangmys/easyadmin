@@ -36,6 +36,8 @@ class Sysconfig extends AdminController
     {
         // 查询所有的店铺等级
         $levelList = $this->logic->getLevel();
+        // echo $levelList = $this->logic->fetchSql()->getLevel();
+        // echo $this->logic->getLastSql();
         if ($this->request->isAjax()) {
             // 字段
             $field = $this->logic->getTableRow();
@@ -49,6 +51,8 @@ class Sysconfig extends AdminController
         $head = $this->logic->getSysHead();
         // 查询已保存数据
         $data = $this->logic->warStock->column('id,level,content','level');
+        // echo $data = $this->logic->warStock->fetchSql()->column('id,level,content','level');
+
         $d_field = [];
         foreach ($levelList as $kk => $vv){
             $_kk = $vv['name'];

@@ -255,11 +255,16 @@ class Dress extends AdminController
      */
     public function index()
     {
-        // 动态表头字段
+        // 动态表头字段 ea_yinliu_dress_head
         $head = $this->logic->dressHead->column('name,field,stock','id');
+        // echo $head = $this->logic->dressHead->fetchSql()->column('name,field,stock','id');
+
+        
+        // die;
+
         $Date = date('Y-m-d');
         // 定义固定字段
-        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式','冬季内搭周转'];
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
@@ -303,11 +308,14 @@ class Dress extends AdminController
                 }
                 $having = "(".trim($having,'or ').")";
 
+                // cwl
+                // $having .= " OR 冬季内搭周转 <= 8";
+
                 // 筛选门店
                 $list = $this->logic->setStoreFilter($this->model);
                 // print_r($list);
                 // 查询数据
-                $list = $list->field($field)->where([
+                echo $list = $list->field($field)->where([
                     'Date' => $Date
                 ])->where(function ($q)use($vv,$filters,$where){
                     if(!empty($vv['省份'])){
@@ -334,7 +342,8 @@ class Dress extends AdminController
                             }
                         }
                     }
-                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+                // })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
+                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->fetchSql()->select();
 
                 // echo $this->model->getLastSql();
                 // 根据筛选条件,设置颜色是否标红
@@ -670,4 +679,5 @@ class Dress extends AdminController
         }
         return $list;
     }
+
 }

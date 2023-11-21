@@ -23,6 +23,8 @@ use think\facade\Cache;
  */
 class Config extends AdminController
 {
+    protected $db_easyA = '';
+    protected $db_bi = '';
 
     protected $sort = [
         'sort' => 'desc',
@@ -35,6 +37,8 @@ class Config extends AdminController
         $this->model = new Accessories;
         // 实例化逻辑类
         $this->logic = new DressLogic;
+        $this->db_easyA = Db::connect('mysql');
+        $this->db_bi = Db::connect('mysql2');
     }
 
     /**
@@ -92,17 +96,25 @@ class Config extends AdminController
             $new_item['_province'] = $this->logic->setProvince($new_item['省份'],$province);
             $list[] = $new_item;
         }
-        // 传值
+
+        
+        // dump($head_field);die;
+        // 传值 1
         $this->assign([
             'head_field' => $head_field,
             'province' => $this->logic->getProvince(),
             'list' => $list
         ]);
-
+        // 传值 2
         $this->assign([
             'field' => $head,
             '_field' => array_column($head,'name'),
             'd_field' => $d_field2,
+        ]);
+        // 传值 3
+        $this->assign([
+            // 'field3' => [],
+            'list3' => $this->zhouzhuanField(),
         ]);
         return $this->fetch();
     }
@@ -265,5 +277,71 @@ class Config extends AdminController
         }
         Cache::clear();
         return $this->success('成功');
+    }
+
+
+    // cwl 新增周转默认值   ea_customer_yinliu_zzconfig
+    public function addZZdefault() {
+        // $name = "偏热地区下装（春和秋）";
+
+        $find_head = $this->db_easyA->table('ea_yinliu_dress_head')->where(['id' => input('id')])->find();
+
+        if ($find_head) {
+            $data = [
+                ['店铺等级' => 'SS', '字段名' => $find_head['name'], 'index' => 10],
+                ['店铺等级' => 'S', '字段名'  => $find_head['name'], 'index' => 9],
+                ['店铺等级' => 'A', '字段名'  => $find_head['name'], 'index' => 8],
+                ['店铺等级' => 'B', '字段名'  => $find_head['name'], 'index' => 7],
+                ['店铺等级' => 'C', '字段名'  => $find_head['name'], 'index' => 6],
+                ['店铺等级' => 'D', '字段名'  => $find_head['name'], 'index' => 5],
+            ];
+            foreach ($data as $key => $val) {
+                $data[$key]['季节集合'] = $find_head['field'];
+            }
+            // 删除周转config
+            $this->db_easyA->table('ea_customer_yinliu_zzconfig')->where(['字段名' => $find_head['name']])->delete();
+
+            $this->db_easyA->table('ea_customer_yinliu_zzconfig')->strict(false)->insertAll($data);
+        } else {
+            echo '没找到';
+        }
+    }
+
+    // 周转动态表头查询
+    public function zhouzhuanField() {
+        /*
+        select 
+            店铺等级
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='偏热地区下装（春和秋）' AND 店铺等级=m1.店铺等级) as `偏热地区下装（春和秋）`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='春秋内搭' AND 店铺等级=m1.店铺等级) as `春秋内搭`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='秋和冬内搭' AND 店铺等级=m1.店铺等级) as `秋和冬内搭`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='偏冷地区下装（秋和冬）' AND 店铺等级=m1.店铺等级) as `偏冷地区下装（秋和冬）`
+        from ea_customer_yinliu_zzconfig as m1
+        group by 店铺等级 
+        order by `index` DESC 
+        */
+        $select_head_field = $this->db_easyA->table('ea_yinliu_dress_head')->field('name')->where(1)->group('name')->order('id ASC')->select();
+        // dump($select_head_field);
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            $field .= " ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='{$val['name']}' AND 店铺等级=m1.店铺等级) as `{$val['name']}`";
+            // if ($key + 1 < count($select_head_field)) {
+            //     $field .= "`" . $val['name'] . "`,";   
+            // } else {
+            //     $field .= "`" . $val['name'] . "`";   
+            // }
+        }
+
+        $sql_动态表头 = "
+            select 
+                店铺等级
+                {$field}
+            from ea_customer_yinliu_zzconfig as m1
+            group by 店铺等级 
+            order by `index` DESC 
+        ";
+        $res = $this->db_easyA->query($sql_动态表头);
+        // dump($res);
+        return $res;
     }
 }
