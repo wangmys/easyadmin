@@ -32,8 +32,11 @@ class Stock_week_select extends Command
 		$CustomItem45 = $db->query("select 'CustomItem45' as param_name, CustomItem45 as name, CustomItem45 as value from sp_customer_stock_sale_threeyear2_week where CustomItem45<>'' group by CustomItem45;");
 		$CustomItem47 = $db->query("select 'CustomItem47' as param_name, CustomItem47 as name, CustomItem47 as value from sp_customer_stock_sale_threeyear2_week where CustomItem47<>'' group by CustomItem47;");
 		$CustomItem48 = $db->query("select 'CustomItem48' as param_name, CustomItem48 as name, CustomItem48 as value from sp_customer_stock_sale_threeyear2_week where CustomItem48<>'' group by CustomItem48;");
+		$CustomItem15 = $db->query("select 'CustomItem15' as param_name, CustomItem15 as name, CustomItem15 as value from sp_customer_stock_sale_threeyear2_week where CustomItem15<>'' group by CustomItem15;");
+		$CustomItem65 = $db->query("select 'CustomItem65' as param_name, CustomItem65 as name, CustomItem65 as value from sp_customer_stock_sale_threeyear2_week where CustomItem65<>'' group by CustomItem65;");
+		$CustomItem66 = $db->query("select 'CustomItem66' as param_name, CustomItem66 as name, CustomItem66 as value from sp_customer_stock_sale_threeyear2_week where CustomItem66<>'' group by CustomItem66;");
 
-		$merge = array_merge($TimeCategoryName2, $TimeCategoryName, $CustomItem17, $CustomItem1, $CustomItem45, $CustomItem47, $CustomItem48);
+		$merge = array_merge($TimeCategoryName2, $TimeCategoryName, $CustomItem17, $CustomItem1, $CustomItem45, $CustomItem47, $CustomItem48, $CustomItem15, $CustomItem65, $CustomItem66);
 		// print_r($merge);die;
 
 		$chunk_list = array_chunk($merge, 500);

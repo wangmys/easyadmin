@@ -61,6 +61,9 @@ class ThreeyearService
         $Year = $params['Year'] ?? '';
         $Month = $params['Month'] ?? '';
         $YunCang = $params['YunCang'] ?? '';
+        $CustomItem15 = $params['CustomItem15'] ?? '';
+        $CustomItem65 = $params['CustomItem65'] ?? '';
+        $CustomItem66 = $params['CustomItem66'] ?? '';
         $WenDai = $params['WenDai'] ?? '';
         $WenQu = $params['WenQu'] ?? '';
         $State = $params['State'] ?? '';
@@ -264,6 +267,61 @@ class ThreeyearService
                 $where_customer_num[] = ['YunCang', '=', $YunCang];
 
             }
+            //云仓
+            if ($CustomItem15) {
+
+                $where_yeji_2021[] = ['CustomItem15', 'in', $CustomItem15];
+                $where_yeji_2022[] = ['CustomItem15', 'in', $CustomItem15];
+                $where_yeji_2023[] = ['CustomItem15', 'in', $CustomItem15];
+
+                $where_weather_2021[] = ['b.yuncang', 'in', $CustomItem15];
+                $where_weather_2022[] = ['b.yuncang', 'in', $CustomItem15];
+                $where_weather_2023[] = ['b.yuncang', 'in', $CustomItem15];
+
+                $where_customer_2021[] = ['CustomItem15', 'in', $CustomItem15];
+                $where_customer_2022[] = ['CustomItem15', 'in', $CustomItem15];
+                $where_customer_2023[] = ['CustomItem15', 'in', $CustomItem15];
+
+                $where_customer_num[] = ['CustomItem15', 'in', $CustomItem15];
+
+            }
+            //秋冬云仓
+            if ($CustomItem65) {
+
+                $where_yeji_2021[] = ['CustomItem65', 'in', $CustomItem65];
+                $where_yeji_2022[] = ['CustomItem65', 'in', $CustomItem65];
+                $where_yeji_2023[] = ['CustomItem65', 'in', $CustomItem65];
+
+                $where_weather_2021[] = ['b.yuncang', 'in', $CustomItem65];
+                $where_weather_2022[] = ['b.yuncang', 'in', $CustomItem65];
+                $where_weather_2023[] = ['b.yuncang', 'in', $CustomItem65];
+
+                $where_customer_2021[] = ['CustomItem65', 'in', $CustomItem65];
+                $where_customer_2022[] = ['CustomItem65', 'in', $CustomItem65];
+                $where_customer_2023[] = ['CustomItem65', 'in', $CustomItem65];
+
+                $where_customer_num[] = ['CustomItem65', 'in', $CustomItem65];
+
+            }
+            //春夏云仓
+            if ($CustomItem66) {
+
+                $where_yeji_2021[] = ['CustomItem66', 'in', $CustomItem66];
+                $where_yeji_2022[] = ['CustomItem66', 'in', $CustomItem66];
+                $where_yeji_2023[] = ['CustomItem66', 'in', $CustomItem66];
+
+                $where_weather_2021[] = ['b.yuncang', 'in', $CustomItem66];
+                $where_weather_2022[] = ['b.yuncang', 'in', $CustomItem66];
+                $where_weather_2023[] = ['b.yuncang', 'in', $CustomItem66];
+
+                $where_customer_2021[] = ['CustomItem66', 'in', $CustomItem66];
+                $where_customer_2022[] = ['CustomItem66', 'in', $CustomItem66];
+                $where_customer_2023[] = ['CustomItem66', 'in', $CustomItem66];
+
+                $where_customer_num[] = ['CustomItem66', 'in', $CustomItem66];
+
+            }
+            
 
             //温带
             if ($WenDai) {
@@ -511,7 +569,7 @@ class ThreeyearService
 
 
             //店铺数获取处理(当有店铺属性筛选时有效)
-            $customer_num_list = $this->threeyear2_week_model::where($where_customer_num)->group('aa,year_week')->field("Year, Week, concat(YunCang, WenDai, WenQu, State, Mathod) as aa, max(NUM) as max_num, concat(Year, Week) as year_week")->select();
+            $customer_num_list = $this->threeyear2_week_model::where($where_customer_num)->group('aa,year_week')->field("Year, Week, concat(YunCang, CustomItem15, CustomItem65, CustomItem66, WenDai, WenQu, State, Mathod) as aa, max(NUM) as max_num, concat(Year, Week) as year_week")->select();
             $customer_num_list = $customer_num_list ? $customer_num_list->toArray() : [];
             $customer_num_list_new = [];
             if ($customer_num_list) {
@@ -1206,6 +1264,9 @@ class ThreeyearService
         $params_Year = ($params && $params['Year']) ? explode(',', $params['Year']) : [];
         $params_Month = ($params && $params['Month']) ? explode(',', $params['Month']) : [];
         $params_YunCang = ($params && $params['YunCang']) ? explode(',', $params['YunCang']) : [];
+        $params_CustomItem15 = ($params && isset($params['CustomItem15'])) ? explode(',', $params['CustomItem15']) : [];
+        $params_CustomItem65 = ($params && isset($params['CustomItem65'])) ? explode(',', $params['CustomItem65']) : [];
+        $params_CustomItem66 = ($params && isset($params['CustomItem66'])) ? explode(',', $params['CustomItem66']) : [];
         $params_WenDai = ($params && $params['WenDai']) ? explode(',', $params['WenDai']) : [];
         // print_r([$params_Year, $params_Month, $params_YunCang]);die;
         $params_WenQu = ($params && $params['WenQu']) ? explode(',', $params['WenQu']) : [];
@@ -1358,6 +1419,28 @@ class ThreeyearService
         }
 
 
+        if (isset($selects_arr['CustomItem15']) && $selects_arr['CustomItem15']) {
+            foreach ($selects_arr['CustomItem15'] as &$v_CustomItem15) {
+                if (in_array($v_CustomItem15['value'], $params_CustomItem15)) {
+                    $v_CustomItem15['selected'] = true;
+                }
+            }
+        }
+        if (isset($selects_arr['CustomItem65']) && $selects_arr['CustomItem65']) {
+            foreach ($selects_arr['CustomItem65'] as &$v_CustomItem65) {
+                if (in_array($v_CustomItem65['value'], $params_CustomItem65)) {
+                    $v_CustomItem65['selected'] = true;
+                }
+            }
+        }
+        if (isset($selects_arr['CustomItem66']) && $selects_arr['CustomItem66']) {
+            foreach ($selects_arr['CustomItem66'] as &$v_CustomItem66) {
+                if (in_array($v_CustomItem66['value'], $params_CustomItem66)) {
+                    $v_CustomItem66['selected'] = true;
+                }
+            }
+        }
+
         if ($selects_arr['TimeCategoryName2']) {
             foreach ($selects_arr['TimeCategoryName2'] as &$v_TimeCategoryName2) {
                 if (in_array($v_TimeCategoryName2['value'], $params_TimeCategoryName2)) {
@@ -1411,7 +1494,7 @@ class ThreeyearService
         return ['Year' => $Year, 'Month' => $Month, 'YunCang'=>$YunCang, 'WenDai'=>$WenDai, 'WenQu' => $WenQu, 
         'State' => $State, 'Mathod' => $Mathod, 'NewOld'=>$NewOld, 'Season'=>$Season, 'StyleCategoryName' => $StyleCategoryName, 
         'CategoryName1' => $CategoryName1, 'CategoryName2' => $CategoryName2, 'CategoryName'=>$CategoryName, 'CustomItem46'=>$CustomItem46,
-        'TimeCategoryName2' => $selects_arr['TimeCategoryName2'] ?? [], 'TimeCategoryName' => $selects_arr['TimeCategoryName'] ?? [], 'CustomItem17'=>$selects_arr['CustomItem17'] ?? [], 'CustomItem1'=>$selects_arr['CustomItem1'] ?? [], 'CustomItem45'=>$selects_arr['CustomItem45'] ?? [], 'CustomItem47'=>$selects_arr['CustomItem47'] ?? [], 'CustomItem48'=>$selects_arr['CustomItem48'] ?? [],
+        'TimeCategoryName2' => $selects_arr['TimeCategoryName2'] ?? [], 'TimeCategoryName' => $selects_arr['TimeCategoryName'] ?? [], 'CustomItem17'=>$selects_arr['CustomItem17'] ?? [], 'CustomItem1'=>$selects_arr['CustomItem1'] ?? [], 'CustomItem45'=>$selects_arr['CustomItem45'] ?? [], 'CustomItem47'=>$selects_arr['CustomItem47'] ?? [], 'CustomItem48'=>$selects_arr['CustomItem48'] ?? [], 'CustomItem15'=>$selects_arr['CustomItem15'] ?? [], 'CustomItem65'=>$selects_arr['CustomItem65'] ?? [], 'CustomItem66'=>$selects_arr['CustomItem66'] ?? [],
         ];
 
     }

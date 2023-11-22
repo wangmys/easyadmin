@@ -448,9 +448,9 @@ class Stock2 extends Command
 
 		FROM ErpCustomer EC 
 
-		LEFT JOIN ff21120220830.dbo.ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
+		LEFT JOIN ErpCustomerStock ECS ON EC.CustomerId = ECS.CustomerId
 
-		LEFT JOIN ff21120220830.dbo.ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
+		LEFT JOIN ErpCustomerStockDetail ECSD ON ECS.StockId=ECSD.StockId
 
 		LEFT JOIN ErpBaseGoodsSize EBGS ON ECSD.SizeId=EBGS.SizeId
 
