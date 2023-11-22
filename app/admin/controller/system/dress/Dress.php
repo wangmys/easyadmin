@@ -264,12 +264,13 @@ class Dress extends AdminController
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
+
+        // dump($_field );die;
          // 获取预警库存查询条件
         $warStockItem = $this->logic->warStockItem();
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {
-        // if (1) {
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
             // 固定字段
@@ -459,6 +460,8 @@ class Dress extends AdminController
             $standard[$key]['描述'] = '省份库存标准';
             $standard[$key] = array_merge($standard[$key],$v['_data']);
         }
+
+        dump($cols);
         return $this->fetch('',['cols' => $cols,'_field' => $standard,'where' => $where]);
     }
 

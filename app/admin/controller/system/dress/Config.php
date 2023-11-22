@@ -116,6 +116,8 @@ class Config extends AdminController
             // 'field3' => [],
             'list3' => $this->zhouzhuanField(),
         ]);
+        // echo '<pre>';
+        // print_r($this->zhouzhuanField());die;
         return $this->fetch();
     }
 
@@ -200,6 +202,31 @@ class Config extends AdminController
     }
 
     /**
+     * 保存库存预警配置
+     */
+    public function waring_zhouzhuan_save()
+    {
+        // $provinceAll = [];
+        $post = $this->request->post();
+        // echo '<pre>';
+        // print_r($post);
+
+
+        foreach ($post as $k1 => $v1) {
+            // print_r($k1);
+            foreach ($v1 as $k2 => $v2) {
+                // print_r($k2);
+                $this->db_bi->execute("
+                    update ea_customer_yinliu_zzconfig set 周转 = '{$v2}' where 标识='{$k1}_{$k2}';
+                ");
+            }
+            // die;
+        }
+
+        return $this->success('成功');
+    }
+
+    /**
      * 保存引流表头配置
      */
     public function saveConfig()
@@ -220,15 +247,24 @@ class Config extends AdminController
         }
         try {
             if(!empty($post['id'])){
+                // 修改
                 $model = $this->logic->dressHead->find($post['id']);
                 $model->save($post);
                 $res_id = $model->id;
-            }else{
+            }else{ 
+                // 插入
                 $res_id = $this->logic->saveHead($post);
             }
+            // 周转配置插入
+            $this->addZZdefault($res_id);
+            // 周转配置标识更新
+            $this->updateZhouzhuanBiaoshi();
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }
+
+        
+        // 配置3表 
         return $this->success('成功',['id' => $res_id]);
     }
 
@@ -242,7 +278,14 @@ class Config extends AdminController
         if(empty($id)){
             return $this->error('ID为空');
         }
+
          try {
+            // 删除周转config
+            $find_head = $this->db_easyA->table('ea_yinliu_dress_head')->where(['id' => $id])->find();
+            $this->db_bi->table('ea_customer_yinliu_zzconfig')->where(['字段名' => $find_head['name']])->delete();
+            // 周转配置标识更新
+            $this->updateZhouzhuanBiaoshi();
+            // 删除head字段
             $this->logic->dressHead->where('id',$id)->delete();
         }catch (\Exception $e){
             return $this->error($e->getMessage());
@@ -281,31 +324,35 @@ class Config extends AdminController
 
 
     // cwl 新增周转默认值   ea_customer_yinliu_zzconfig
-    public function addZZdefault() {
-        // $name = "偏热地区下装（春和秋）";
+    public function addZZdefault($id = '') {
+        $id = $id ? $id : input('id');
+        if (! empty('id')) {
+            // $name = "偏热地区下装（春和秋）";
 
-        $find_head = $this->db_easyA->table('ea_yinliu_dress_head')->where(['id' => input('id')])->find();
+            $find_head = $this->db_easyA->table('ea_yinliu_dress_head')->where(['id' => $id])->find();
 
-        if ($find_head) {
-            $data = [
-                ['店铺等级' => 'SS', '字段名' => $find_head['name'], 'index' => 10],
-                ['店铺等级' => 'S', '字段名'  => $find_head['name'], 'index' => 9],
-                ['店铺等级' => 'A', '字段名'  => $find_head['name'], 'index' => 8],
-                ['店铺等级' => 'B', '字段名'  => $find_head['name'], 'index' => 7],
-                ['店铺等级' => 'C', '字段名'  => $find_head['name'], 'index' => 6],
-                ['店铺等级' => 'D', '字段名'  => $find_head['name'], 'index' => 5],
-            ];
-            foreach ($data as $key => $val) {
-                $data[$key]['季节集合'] = $find_head['field'];
+            if ($find_head) {
+                $data = [
+                    ['店铺等级' => 'SS', '字段名' => $find_head['name'], 'index' => 10],
+                    ['店铺等级' => 'S', '字段名'  => $find_head['name'], 'index' => 9],
+                    ['店铺等级' => 'A', '字段名'  => $find_head['name'], 'index' => 8],
+                    ['店铺等级' => 'B', '字段名'  => $find_head['name'], 'index' => 7],
+                    ['店铺等级' => 'C', '字段名'  => $find_head['name'], 'index' => 6],
+                    ['店铺等级' => 'D', '字段名'  => $find_head['name'], 'index' => 5],
+                ];
+                foreach ($data as $key => $val) {
+                    $data[$key]['季节集合'] = $find_head['field'];
+                }
+                // 删除周转config
+                $this->db_bi->table('ea_customer_yinliu_zzconfig')->where(['字段名' => $find_head['name']])->delete();
+
+                $this->db_bi->table('ea_customer_yinliu_zzconfig')->strict(false)->insertAll($data);
+            } else {
+                echo '没找到';
             }
-            // 删除周转config
-            $this->db_easyA->table('ea_customer_yinliu_zzconfig')->where(['字段名' => $find_head['name']])->delete();
-
-            $this->db_easyA->table('ea_customer_yinliu_zzconfig')->strict(false)->insertAll($data);
-        } else {
-            echo '没找到';
         }
     }
+
 
     // 周转动态表头查询
     public function zhouzhuanField() {
@@ -340,8 +387,39 @@ class Config extends AdminController
             group by 店铺等级 
             order by `index` DESC 
         ";
-        $res = $this->db_easyA->query($sql_动态表头);
+        $res = $this->db_bi->query($sql_动态表头);
         // dump($res);
         return $res;
+    }
+
+    // 更新周转标识
+    public function updateZhouzhuanBiaoshi() {
+        $group_字段名 = $this->db_bi->query("
+            select 字段名 from ea_customer_yinliu_zzconfig group by 字段名
+        ");
+
+        // dump($group_字段名);
+
+        foreach ($group_字段名 as $key => $val) {
+            $sql_ss = "update ea_customer_yinliu_zzconfig set 标识 = '0_$key' where 字段名='{$val['字段名']}' and 店铺等级='SS'";
+            // echo '<br>';
+            $sql_s = "update ea_customer_yinliu_zzconfig set 标识 = '1_$key' where 字段名='{$val['字段名']}' and 店铺等级='S'";
+            // echo '<br>';
+            $sql_a = "update ea_customer_yinliu_zzconfig set 标识 = '2_$key' where 字段名='{$val['字段名']}' and 店铺等级='A'";
+            // echo '<br>';
+            $sql_b = "update ea_customer_yinliu_zzconfig set 标识 = '3_$key' where 字段名='{$val['字段名']}' and 店铺等级='B'";
+            // echo '<br>';
+            $sql_c = "update ea_customer_yinliu_zzconfig set 标识 = '4_$key' where 字段名='{$val['字段名']}' and 店铺等级='C'";
+            // echo '<br>';
+            $sql_d = "update ea_customer_yinliu_zzconfig set 标识 = '5_$key' where 字段名='{$val['字段名']}' and 店铺等级='D'";
+            // echo '<br>';
+            $this->db_bi->execute($sql_ss);
+            $this->db_bi->execute($sql_s);
+            $this->db_bi->execute($sql_a);
+            $this->db_bi->execute($sql_b);
+            $this->db_bi->execute($sql_c);
+            $this->db_bi->execute($sql_d);
+            
+        }
     }
 }
