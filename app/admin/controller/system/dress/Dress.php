@@ -243,10 +243,6 @@ class Dress extends AdminController
         return Excel::exportData($list_all, $header, $fileName, 'xlsx','',[],'dress');
     }
 
-    public static function test() {
-        echo 'test';
-    }
-
 
     /**
      * @NodeAnotation(title="店铺引流结果")
@@ -259,12 +255,12 @@ class Dress extends AdminController
         $head = $this->logic->dressHead->column('name,field,stock','id');
         // echo $head = $this->logic->dressHead->fetchSql()->column('name,field,stock','id');
 
-        
+        // dump($head);
         // die;
 
         $Date = date('Y-m-d');
         // 定义固定字段
-        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式','冬季内搭周转'];
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
         $dynamic_head = array_column($head,'name');
         // 合并字段成完整表头
         $_field = array_merge($defaultFields,$dynamic_head);
@@ -273,10 +269,13 @@ class Dress extends AdminController
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {
+        // if (1) {
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
             // 固定字段
             $field = implode(',',$defaultFields);
+
+            // 梦拿自己的动态头
             foreach ($head as $k=>$v){
                 // 计算字段合并,多字段相加
 //                $field_str = str_replace(',',' + ',$v['field']);
@@ -296,6 +295,15 @@ class Dress extends AdminController
             // 数据集
             $list_all = [];
             // 根据每个省份设置的筛选查询
+
+            // 周转配置
+            $zhouzhuanFieldSql_1 = $this->zhouzhuanFieldSql_1($head);
+            $zhouzhuanFieldSql_2 = $this->zhouzhuanFieldSql_2($head);
+            // 周转
+            $zhouzhuanFieldSql_3 = $this->zhouzhuanFieldSql_3($head);
+            $zhouzhuanFieldSql_4 = $this->zhouzhuanFieldSql_4($head);
+            $havingSql_1 = $this->havingSql_1($head);
+
             foreach($warStockItem as $kk => $vv){
                 // 查询条件
                 $having = '';
@@ -308,57 +316,108 @@ class Dress extends AdminController
                 }
                 $having = "(".trim($having,'or ').")";
 
-                // cwl
-                // $having .= " OR 冬季内搭周转 <= 8";
+                // 获取配饰门店排除列表 表：ea_system_config name = yinliu_store_list，过滤不要的门店
+                $storeList = xmSelectInput(sysconfig('site', 'yinliu_store_list'));
 
-                // 筛选门店
-                $list = $this->logic->setStoreFilter($this->model);
-                // print_r($list);
-                // 查询数据
-                echo $list = $list->field($field)->where([
-                    'Date' => $Date
-                ])->where(function ($q)use($vv,$filters,$where){
-                    if(!empty($vv['省份'])){
-                       $q->whereIn('省份',$vv['省份']);
-                    }
-                    if(!empty($filters['省份'])){
-                       $q->whereIn('省份',$filters['省份']);
-                    }
-                    if(!empty($filters['店铺名称'])){
-                        $q->whereIn('店铺名称',$filters['店铺名称']);
-                    }
-                    if(!empty($filters['经营模式'])){
-                        $q->whereIn('经营模式',$filters['经营模式']);
-                    }
-                    if(!empty($where['商品负责人'])){
-                       $q->whereIn('商品负责人',$where['商品负责人']);
-                    }else{
-                        $user = session('admin');
-                        if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
-                            $q->whereIn('商品负责人',$user['name']);
+
+                // die;
+                // dump($vv['省份']);
+                // echo arrToStr($vv['省份']);
+                // dump($filters['商品负责人']);die;
+                $map0 = " AND 店铺名称 <> '合计' AND 省份 <> '合计' AND 商品负责人 <> '合计'";
+                if (!empty($vv['省份'])) {
+                    $map1Str = arrToStr($vv['省份']);
+                    $map1 = " AND 省份 IN ({$map1Str})";
+                } else {
+                    $map1 = "";
+                }
+
+                if (!empty($filters['省份'])) {
+                // $q->whereIn('省份',$filters['省份']);
+                    $map2Str = arrToStr($filters['省份']);
+                    $map2 = " AND 省份 IN ({$map2Str})";
+                } else {
+                    $map2 = "";
+                }
+                if (!empty($filters['店铺名称'])) {
+                    // $q->whereIn('店铺名称',$filters['店铺名称']);
+                    $map3Str = arrToStr($filters['店铺名称']);
+                    $map3 = " AND 店铺名称 IN ({$map3Str})";
+                } else {
+                    $map3 = "";
+                }
+                if (!empty($filters['经营模式'])) {
+                    // $q->whereIn('经营模式',$filters['经营模式']);
+                    $map4Str = arrToStr($filters['经营模式']);
+                    $map4 = " AND 经营模式 IN ({$map4Str})";
+                } else {
+                    $map4 = "";
+                }
+                if (!empty($where['商品负责人'])) {
+                    // $q->whereIn('商品负责人',$where['商品负责人']);
+                    $map5Str = arrToStr($where['商品负责人']);
+                    $map5 = " AND 商品负责人 IN ({$map5Str})";
+                } else {
+                    $user = session('admin');
+                    if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
+                        // $q->whereIn('商品负责人',$user['name']);
+                        $map5Str = arrToStr($user['name']);
+                        $map5 = " AND 商品负责人 IN ({$map5Str})";
+                    } else {
+                        if(!empty($filters['商品负责人'])){
+                            $q->whereIn('商品负责人',$filters['商品负责人']);
+                            $map5Str = arrToStr($filters['商品负责人']);
+                            $map5 = " AND 商品负责人 IN ({$map5Str})";
                         } else {
-                            if(!empty($filters['商品负责人'])){
-                                $q->whereIn('商品负责人',$filters['商品负责人']);
-                            }
+                            $map5 = "";
                         }
                     }
-                // })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->select()->toArray();
-                })->whereNotIn('店铺名称&省份&商品负责人','合计')->having($having)->order('省份,店铺名称,商品负责人')->fetchSql()->select();
+                }
 
+                $sql_主体 = "
+                    select
+                        y.省份,y.店铺名称,y.店铺等级,y.商品负责人,y.经营模式
+                        {$zhouzhuanFieldSql_1}
+                        {$zhouzhuanFieldSql_2}
+                        {$zhouzhuanFieldSql_3}
+                    from sp_customer_yinliu as y
+                    left join (
+                        {$zhouzhuanFieldSql_4}
+                    ) as c on y.店铺等级 = c.店铺等级
+                    where 1
+                        and `Date` = '{$Date}'
+                        and y.店铺名称 not in ($storeList)
+                        {$map1}
+                        {$map2}
+                        {$map3}
+                        {$map4}
+                        {$map5}
+                    group by 
+                        y.店铺名称,y.店铺等级
+                    HAVING
+                        {$having}
+                        {$havingSql_1}
+                ";
+
+                // echo '<br>------<br>';
+                $list = $this->db_bi->query($sql_主体);
                 // echo $this->model->getLastSql();
                 // 根据筛选条件,设置颜色是否标红
-                $this->setStyle($list,$vv['_data']);
+                // $this->setStyle($list,$vv['_data']);
                 $list_all = array_merge($list_all,$list);
             }
+
             // 返回数据
             $data = [
-                    'code'  => 0,
-                    'msg'   => '',
-                    'count' => count($list_all),
-                    'data'  => $list_all
-                ];
+                'code'  => 0,
+                'msg'   => '',
+                'count' => count($list_all),
+                'data'  => $list_all
+            ];
             return json($data);
-        }
+        }    
+
+
         // 获取搜索条件列表(省列表,店铺列表,商品负责人列表)
         $getSelectList = $this->getSelectList();
         // 前端表格数据
@@ -678,6 +737,318 @@ class Dress extends AdminController
             }
         }
         return $list;
+    }
+
+
+    public function test() {
+        $Date = date('Y-m-d');
+        $head = $this->logic->dressHead->column('name,field,stock','id');
+        // 定义固定字段
+        $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
+        $dynamic_head = array_column($head,'name');
+        // 合并字段成完整表头
+        $_field = array_merge($defaultFields,$dynamic_head);
+         // 获取预警库存查询条件
+        $warStockItem = $this->logic->warStockItem();
+        // dump($warStockItem);die;
+        // 获取参数
+        $where = $this->request->get();
+        if (1) {
+            // 筛选
+            $filters = json_decode($this->request->get('filter', '{}',null), true);
+            // 固定字段
+            $field = implode(',',$defaultFields);
+
+            // 梦拿自己的动态头
+            foreach ($head as $k=>$v){
+                // 计算字段合并,多字段相加
+//                $field_str = str_replace(',',' + ',$v['field']);
+                // 计算字段合并,多字段相加
+                $field_arr = explode(',',$v['field']);
+                $field_str = '';
+                foreach ($field_arr as $fk =>$fv){
+                    $field_str .= " IFNULL($fv,0) +";
+                }
+                // 清空多余字符串
+                $field_str = trim($field_str,'+');
+                // 拼接查询字段
+                $field .= ",( $field_str ) as {$v['name']}";
+            }
+            // 清空多余字符串
+            $field = trim($field,',');
+            // 数据集
+            $list_all = [];
+            // 根据每个省份设置的筛选查询
+
+            // 周转配置
+            $zhouzhuanFieldSql_1 = $this->zhouzhuanFieldSql_1($head);
+            $zhouzhuanFieldSql_2 = $this->zhouzhuanFieldSql_2($head);
+            // 周转
+            $zhouzhuanFieldSql_3 = $this->zhouzhuanFieldSql_3($head);
+            $zhouzhuanFieldSql_4 = $this->zhouzhuanFieldSql_4($head);
+            $havingSql_1 = $this->havingSql_1($head);
+
+            foreach($warStockItem as $kk => $vv){
+                // 查询条件
+                $having = '';
+                foreach ($vv['_data'] as $k=>$v){
+                    // 表头有的字段才能筛选
+                    if(in_array($k,$dynamic_head)){
+                        // 拼接过滤条件
+                        $having .= " ({$k} < {$v} or $k is null) or ";
+                    }
+                }
+                $having = "(".trim($having,'or ').")";
+
+                // 获取配饰门店排除列表 表：ea_system_config name = yinliu_store_list，过滤不要的门店
+                $storeList = xmSelectInput(sysconfig('site', 'yinliu_store_list'));
+
+
+                // die;
+                // dump($vv['省份']);
+                // echo arrToStr($vv['省份']);
+                // dump($filters['商品负责人']);die;
+                $map0 = " AND 店铺名称 <> '合计' AND 省份 <> '合计' AND 商品负责人 <> '合计'";
+                if (!empty($vv['省份'])) {
+                    $map1Str = arrToStr($vv['省份']);
+                    $map1 = " AND 省份 IN ({$map1Str})";
+                } else {
+                    $map1 = "";
+                }
+
+                if (!empty($filters['省份'])) {
+                // $q->whereIn('省份',$filters['省份']);
+                    $map2Str = arrToStr($filters['省份']);
+                    $map2 = " AND 省份 IN ({$map2Str})";
+                } else {
+                    $map2 = "";
+                }
+                if (!empty($filters['店铺名称'])) {
+                    // $q->whereIn('店铺名称',$filters['店铺名称']);
+                    $map3Str = arrToStr($filters['店铺名称']);
+                    $map3 = " AND 店铺名称 IN ({$map3Str})";
+                } else {
+                    $map3 = "";
+                }
+                if (!empty($filters['经营模式'])) {
+                    // $q->whereIn('经营模式',$filters['经营模式']);
+                    $map4Str = arrToStr($filters['经营模式']);
+                    $map4 = " AND 经营模式 IN ({$map4Str})";
+                } else {
+                    $map4 = "";
+                }
+                if (!empty($where['商品负责人'])) {
+                    // $q->whereIn('商品负责人',$where['商品负责人']);
+                    $map5Str = arrToStr($where['商品负责人']);
+                    $map5 = " AND 商品负责人 IN ({$map5Str})";
+                } else {
+                    $user = session('admin');
+                    if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
+                        // $q->whereIn('商品负责人',$user['name']);
+                        $map5Str = arrToStr($user['name']);
+                        $map5 = " AND 商品负责人 IN ({$map5Str})";
+                    } else {
+                        if(!empty($filters['商品负责人'])){
+                            $q->whereIn('商品负责人',$filters['商品负责人']);
+                            $map5Str = arrToStr($filters['商品负责人']);
+                            $map5 = " AND 商品负责人 IN ({$map5Str})";
+                        } else {
+                            $map5 = "";
+                        }
+                    }
+                }
+
+                $sql_主体 = "
+                    select
+                        y.店铺名称,y.店铺等级,y.店铺名称,y.店铺等级,y.商品负责人,y.经营模式
+                        {$zhouzhuanFieldSql_1}
+                        {$zhouzhuanFieldSql_2}
+                        {$zhouzhuanFieldSql_3}
+                    from sp_customer_yinliu as y
+                    left join (
+                        {$zhouzhuanFieldSql_4}
+                    ) as c on y.店铺等级 = c.店铺等级
+                    where 1
+                        and `Date` = '{$Date}'
+                        and y.店铺名称 not in ($storeList)
+                        {$map1}
+                        {$map2}
+                        {$map3}
+                        {$map4}
+                        {$map5}
+                    group by 
+                        y.店铺名称,y.店铺等级
+                    HAVING
+                        {$having}
+                        {$havingSql_1}
+                ";
+
+                echo '<br>------<br>';
+                // $list = $this->db_bi->query($sql_梦园的转sql字符串);
+                // echo $this->model->getLastSql();
+                // 根据筛选条件,设置颜色是否标红
+                // $this->setStyle($list,$vv['_data']);
+                // $list_all = array_merge($list_all,$list);
+            }
+        }
+    }
+
+    public function test2() {
+        // 动态表头字段
+        $head = $this->logic->dressHead->column('name,field,stock','id');
+        $Date = date('Y-m-d');
+        echo '<pre>';
+        // print_r($head);
+        // 周转配置
+        $zhouzhuanFieldSql_1 = $this->zhouzhuanFieldSql_1($head);
+
+        $zhouzhuanFieldSql_2 = $this->zhouzhuanFieldSql_2($head);
+
+        // 周转
+        $zhouzhuanFieldSql_3 = $this->zhouzhuanFieldSql_3($head);
+
+        $zhouzhuanFieldSql_4 = $this->zhouzhuanFieldSql_4($head);
+
+        $havingSql_1 = $this->havingSql_1($head);
+        echo $sql_主体 = "
+            select
+                y.店铺名称,y.店铺等级,y.店铺名称,y.店铺等级,y.商品负责人,y.经营模式
+                {$zhouzhuanFieldSql_1}
+
+                {$zhouzhuanFieldSql_2}
+                    
+                {$zhouzhuanFieldSql_3}
+            from sp_customer_yinliu as y
+            left join (
+                {$zhouzhuanFieldSql_4}
+            ) as c on y.店铺等级 = c.店铺等级
+            where 1
+                and y.店铺名称 in ('海口一店','三亚一店')
+                and `Date` = '2023-11-22'
+            group by y.店铺名称,y.店铺等级
+
+            HAVING
+                ((偏热地区下装（春和秋） < 150 
+                        OR 偏热地区下装（春和秋） IS NULL 
+                        ) 
+                    OR (春秋内搭 < 100 OR 春秋内搭 IS NULL ) 
+                    OR (秋和冬内搭 < - 10 OR 秋和冬内搭 IS NULL ) 
+                OR (偏冷地区下装（秋和冬） < - 10 OR 偏冷地区下装（秋和冬） IS NULL )) 
+
+                {$havingSql_1}
+        ";
+        // $select = $this->db_bi->query($sql);
+        // dump($select);
+    }
+
+    // 周转配置拼接
+    private function zhouzhuanFieldSql_1($select_head_field = []) {
+        // 重置数组下标
+        // $select_head_field = array_merge($select_head_field);
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            $field .= ",c.`{$val['name']}` as `周转配置{$val['name']}`";
+        }
+        return $field;
+    }
+
+    // IFNULL拼接
+    private function zhouzhuanFieldSql_2($select_head_field = []) {
+        // 重置数组下标
+        // $select_head_field = array_merge($select_head_field);
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            $res = explode(',', $val['field']);
+
+            $str1 = "";
+            $str2 =  $val['name'];
+            foreach ($res as $k2 => $v2) {
+                if ($k2 + 1 < count($res)) {
+                    $str1 .= "IFNULL(`{$v2}`, 0 )+";
+                } else {
+                    $str1 .= "IFNULL(`{$v2}`, 0 )";
+                }
+            }
+            // $field .= " ,( IFNULL(春季下装, 0 )+ IFNULL(秋季下装, 0 )) AS 偏热地区下装（春和秋）";
+            $field .= " ,( $str1 ) AS `$str2`";
+
+        }
+        return $field;
+    }
+
+    // 周转拼接
+    private function zhouzhuanFieldSql_3($select_head_field = []) {
+        // 重置数组下标
+        // $select_head_field = array_merge($select_head_field);
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            $res = explode(',', $val['field']);
+
+            $str1 = "";
+            $str2 = "";
+            $str3 = '周转' . $val['name'];
+            foreach ($res as $k2 => $v2) {
+                if ($k2 + 1 < count($res)) {
+                    $str1 .= '`' . $v2 . '` + ';
+                    $str2 .= '`' . $v2 . '周销` + ';
+                } else {
+                    $str1 .= '`' . $v2 . '`';
+                    $str2 .= '`' . $v2 . '周销`';
+                }
+            }
+            $field .= " ,ROUND(({$str1}) / ({$str2}), 0) as `{$str3}`";
+        }
+        return $field;
+    }
+
+    // 配置附表拼接
+    private function zhouzhuanFieldSql_4($select_head_field = []) {
+        /*
+        select 
+            店铺等级
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='偏热地区下装（春和秋）' AND 店铺等级=m1.店铺等级) as `偏热地区下装（春和秋）`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='春秋内搭' AND 店铺等级=m1.店铺等级) as `春秋内搭`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='秋和冬内搭' AND 店铺等级=m1.店铺等级) as `秋和冬内搭`
+            ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='偏冷地区下装（秋和冬）' AND 店铺等级=m1.店铺等级) as `偏冷地区下装（秋和冬）`
+        from ea_customer_yinliu_zzconfig as m1
+        group by 店铺等级 
+        order by `index` DESC 
+        */
+        // $select_head_field = $this->db_easyA->table('ea_yinliu_dress_head')->field('name')->where(1)->group('name')->order('id ASC')->select();
+        // dump($select_head_field);
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            $field .= " ,(select 周转 from ea_customer_yinliu_zzconfig where 字段名='{$val['name']}' AND 店铺等级=m1.店铺等级) as `{$val['name']}`";
+        }
+
+        $sql_动态表头 = "
+            select 
+                店铺等级
+                {$field}
+            from ea_customer_yinliu_zzconfig as m1
+            group by 店铺等级 
+            order by `index` DESC 
+        ";
+        // $res = $this->db_easyA->query($sql_动态表头);
+        // dump($res);
+        return $sql_动态表头;
+    }
+
+    // having拼接
+    private function havingSql_1($select_head_field = []) {
+        // 重置数组下标
+        // $select_head_field = array_merge($select_head_field);
+        // dump($select_head_field);die;
+        $field = '';
+        foreach ($select_head_field as $key => $val) {
+            // echo $key;
+            // echo '<br>';
+            $field .= " OR `周转{$val['name']}` < `周转配置{$val['name']}` ";
+        }
+
+
+        // die;
+        return $field;
     }
 
 }
