@@ -160,7 +160,7 @@ class Table extends BaseController
                 EC.State 省份,
                 SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) ) 店铺名称,
                 CASE WHEN EC.CustomerCode='M0453' THEN 'Y1092' ELSE EC.CustomerCode END 店铺编号,
-                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '徐科' ELSE ISNULL(EC.CustomItem18,0) END 督导,
+                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '刘龙英' ELSE ISNULL(EC.CustomItem18,0) END 督导,
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)=CONVERT(VARCHAR(10),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 今天流水,
                 SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) 本月流水,
                 SUM(CASE WHEN CONVERT(VARCHAR(10),ER.RetailDate,23)>= CONVERT(VARCHAR(10),GETDATE()-6,23) THEN ERG.Quantity*ERG.DiscountPrice END) AS 近七天流水,
@@ -182,7 +182,7 @@ class Table extends BaseController
                 EC.State,
                 SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) ),
                 CASE WHEN EC.CustomerCode='M0453' THEN 'Y1092' ELSE EC.CustomerCode END,
-                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '徐科' ELSE ISNULL(EC.CustomItem18,0) END
+                CASE WHEN SUBSTRING(EC.CustomerName, 1, charindex('店',EC.CustomerName) )='绥阳一店' AND EC.MathodId=7 THEN '刘龙英' ELSE ISNULL(EC.CustomItem18,0) END
             HAVING SUM(CASE WHEN CONVERT(VARCHAR(7),ER.RetailDate,23)=CONVERT(VARCHAR(7),GETDATE(),23) THEN ERG.Quantity*ERG.DiscountPrice END) IS NOT NULL
         ";
         // 查康雷
