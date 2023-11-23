@@ -262,7 +262,8 @@ class Dress extends AdminController
         // 定义固定字段
         $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
         $dynamic_head = array_column($head,'name');
-
+        // dump($dynamic_head);
+        // die;
         // 周转字段
         $zhouzhuan_head = [];
         foreach($dynamic_head as $k => $v) {
@@ -421,6 +422,10 @@ class Dress extends AdminController
                 // print_r($vv['_data']);
                 // 根据筛选条件,设置颜色是否标红
                 $this->setStyle($list,$vv['_data']);
+                $this->setStyleCwl($list, $dynamic_head);
+
+                // die;
+                // print_r($list);
                 $list_all = array_merge($list_all,$list);
             }
 
@@ -765,20 +770,50 @@ class Dress extends AdminController
      */
     public function setStyleCwl(&$list,$config)
     {
-        $d_field = sysconfig('site','dress_field');
-        $d_field = json_decode($d_field,true);
+        // echo '<pre>';
+        // print_r($list);
+
+        // $new_config = [];
+        // foreach ($config as $key => $val) {
+        //     $config[$key] = '周转配置' . 
+        // }
+        // print_r($config); 
+        // $d_field = sysconfig('site','dress_field');
+        // $d_field = json_decode($d_field,true);
+        // if(empty($list)) return $list;
+        // foreach ($list as $k => $v){
+        //     foreach ($v as $kk => $vv){
+        //         $config = $d_field[$v['省份']];
+        //         if(isset($config[$kk]) && !empty($config[$kk])){
+        //             $vv = intval($vv);
+        //             if($vv < $config[$kk]){
+        //                 $list[$k]["_{$kk}"] = true;
+        //             }
+        //         }
+        //     }
+        // }
+
         if(empty($list)) return $list;
-        foreach ($list as $k => $v){
-            foreach ($v as $kk => $vv){
-                $config = $d_field[$v['省份']];
-                if(isset($config[$kk]) && !empty($config[$kk])){
-                    $vv = intval($vv);
-                    if($vv < $config[$kk]){
-                        $list[$k]["_{$kk}"] = true;
-                    }
+
+        foreach ($list as $key => $val) {
+            /*
+                ^ array:6 [▼
+                    0 => "偏热地区下装（春和秋）"
+                    1 => "春秋内搭"
+                    2 => "秋和冬内搭"
+                    3 => "偏冷地区下装（秋和冬）"
+                    4 => "test2"
+                    5 => "test3"
+                ]
+            */
+            foreach ($config as $key2 => $val2) {
+                if ($val['周转' . $val2] < $val['周转配置' . $val2]) {
+                    $list[$key]["_周转" . $val2] = true;
                 }
             }
+            
         }
+        // print_r($list);die;
         return $list;
     }
 
