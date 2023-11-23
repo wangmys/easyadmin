@@ -102,6 +102,11 @@ class Customeryejijiameng extends BaseController
         }        
     }
 
+    public function autoUpdate() {
+        $this->getData();
+        $this->getCustomer();
+    }
+
     // 更新店铺cid
     public function getData() {
         $date = input('date') ? input('date') : date('Y-m-d');
