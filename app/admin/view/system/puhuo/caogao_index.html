@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>最终铺货数据</title>
+    <title>铺货草稿数据</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -118,7 +118,7 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:80%; height: 36px;">
+                    <div class="flex col between al-start" style="width:80%; height: 60px;">
                         
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">云仓</label>
@@ -153,6 +153,26 @@
                             <div class="layui-input-inline" style="width: 100px !important;">
                                 <input type="number" name='kepu_sort' autocomplete="off" value="" maxlength="10" placeholder="0"
                                     class="layui-input" lay-verify="">
+                            </div>
+
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">是否已导单</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <select name="is_delete" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value="1">已导</option>
+                                    <option value="2">未导</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$setTime1}" placeholder="yyyy-MM-dd">
+                            </div>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">结束日期</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$setTime2}" placeholder="yyyy-MM-dd">
                             </div>
                         </div>
 
@@ -191,19 +211,7 @@
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
       <input type="text" id="hid_count" class="layui-hide" value="">
 
-      <span class="layui-badge layui-bg-gray">可铺SKC:</span>
-      <span class="layui-badge layui-bg-green">内搭：<b id="nd_id">{$nd}</b></span>
-      <span class="layui-badge layui-bg-cyan">外套：<b id="wt_id">{$wt}</b></span>
-      <span class="layui-badge layui-bg-blue">下装：<b id="xz_id">{$xz}</b></span>
-      <span class="layui-badge layui-bg-orange">鞋履：<b id="xl_id">{$xl}</b></span>
-      <span class="layui-badge">店铺数：<b id="store_num">{$store_num}</b></span>
-
-      <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao" style="margin: 0px 0px 0px 100px;" lay-event="save_caogao"><b style="color:red;">保存草稿</b></button>
-
-      <!-- <button class="layui-btn layui-btn-sm zhouxiao" lay-event="delete">周销</button>
-      <button class="layui-btn layui-btn-sm yujiskc" lay-event="update">预计在途skc</button>
-      <button class="layui-btn layui-btn-sm yujiwin" lay-event="update">预计窗数</button>
-      <button class="layui-btn layui-btn-sm overflow" lay-event="update">溢出提醒</button> -->
+      <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:red;">导单转换</b></button>
 
     </div>
 </script>
@@ -217,10 +225,10 @@
             , table = layui.table
             , laydate = layui.laydate
             , laypage = layui.laypage
-            , url1 = "{:url('admin/system.puhuo.Puhuo/puhuo_index')}" 
-            , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan')}" 
-            , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelect')}"
-            , url_save_caogao = "{:url('admin/system.puhuo.Puhuo/save_caogao')}"
+            , url1 = "{:url('admin/system.puhuo.Puhuo/caogao_index')}" 
+            , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan_caogao')}" 
+            , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelectCaogao')}"
+            // , url_save_caogao_daodan = "{:url('admin/system.puhuo.Puhuo/save_caogao_daodan')}"
 
         initFn();
         startTable();
@@ -274,6 +282,15 @@
             name: 'CustomItem17',
             data: []
         })
+
+        // 日期选择器
+        laydate.render({
+            elem: '#setTime1'
+        });
+
+        laydate.render({
+            elem: '#setTime2'
+        });
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
@@ -353,6 +370,17 @@
                     data: res.data.CustomItem17
                 })
 
+
+                // 日期选择器
+                laydate.render({
+                    name:'setTime1',
+                    elem: '#setTime1'
+                });
+                laydate.render({
+                    name:'setTime2',
+                    elem: '#setTime2'
+                });
+
             }, 'json')
         }
 
@@ -373,36 +401,21 @@
         //导单转换
         form.on('submit(mapBtndd)', function (data) {
 
-            if (data.field.is_puhuo != '可铺') {
-                layer.confirm('只转换可铺数据，请确认',{},function () {
+            //test...
+            // var checkStatus = table.checkStatus('table');
+            // data = checkStatus.data;
+            // console.log(data);return false;
 
-                    layer.closeAll()
-
-                    $.post(url2, data.field, function(res) {
-                        // console.log(res);
-                        if (res.status == 1) {
-                            location.href = url2 + '?code=' + res.code
-                            alert('数据有点多，请耐心等待');
-                        } else {
-                            alert(res.msg);
-                        }
-                    })
-                    // return false; 
-    
-                })
-            } else {
-
-                $.post(url2, data.field, function(res) {
-                    // console.log(res);
-                    if (res.status == 1) {
-                        location.href = url2 + '?code=' + res.code
-                        alert('数据有点多，请耐心等待');
-                    } else {
-                        alert(res.msg);
-                    }
-                })
-
-            }
+            $.post(url2, data.field, function(res) {
+                console.log(res);//return false;
+                if (res.status == 1) {
+                    location.href = url2 + '?code=' + res.code
+                    alert('数据有点多，请耐心等待');
+                    window.location.reload();
+                } else {
+                    alert(res.msg);
+                }
+            })
             return false; 
 
         });
@@ -457,6 +470,8 @@
                      , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30}
                      , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30}
                      , { field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40}
+                     , { field: 'is_delete_str', title: '是否已导单', align: 'center', width: 40}
+                     , { field: 'create_time', title: '保存时间', align: 'center', width: 68}
                     ],
 
                 ]
@@ -464,6 +479,7 @@
                     $('#hid_count').val(res.count);
 
                     var data = res.data;
+                    console.log(data);
                     $.each(data, function(index, value){
                         if (value.is_total == 1) {
 
@@ -478,6 +494,12 @@
                             }
 
                         }
+
+                        if (value.is_delete_str == '已导') {
+                            $('tr[data-index="'+index+'"]').css({
+                                'background-color': '#eb5525', 'color': '#000', 'font-weight':'bold'
+                            });
+                        }
                     });
 
                     $('#nd_id').text(res.nd);
@@ -487,14 +509,15 @@
                     $('#store_num').text(res.store_num);
 
 
-                    //保存草稿
-                    $('.save_caogao').click(function() {
+                    //勾选导单转换
+                    $('.save_caogao_daodan').click(function() {
 
                         var checkStatus = table.checkStatus('table');
 		                data = checkStatus.data;
+                        // console.log(data);//return false;
                         
                         if (!data.length) {
-                            alert('请勾选需要保存为草稿的数据');return false;
+                            alert('请勾选需要导单转换的数据');return false;
                         }
                         var caogao_arr = [];
                         $.each(data, function(index, value){
@@ -502,12 +525,14 @@
                         });
 
                         var post_data = {
-                            'caogao_arr' : caogao_arr
+                            'caogao_uuid' : caogao_arr
                         };
-                        $.post(url_save_caogao, post_data, function(res) {
-                            //console.log(res);
-                            if (res.code == 200) {
-                                alert('保存成功');
+                        $.post(url2, post_data, function(res) {
+                            // console.log(res);
+                            if (res.status == 1) {
+                                // alert('保存成功');
+                                location.href = url2 + '?code=' + res.code
+                                alert('数据有点多，请耐心等待');
                                 window.location.reload();
                             } else {
                                 alert(res.msg);
@@ -516,8 +541,6 @@
                         return false; 
 
                     });
-
-
 
                 }
             });
