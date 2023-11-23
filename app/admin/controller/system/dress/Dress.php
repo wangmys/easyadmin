@@ -262,8 +262,18 @@ class Dress extends AdminController
         // 定义固定字段
         $defaultFields  = ['省份','店铺名称','商品负责人','经营模式'];
         $dynamic_head = array_column($head,'name');
+
+        // 周转字段
+        $zhouzhuan_head = [];
+        foreach($dynamic_head as $k => $v) {
+            $zhouzhuan_head[$k] = '周转' . $v;
+        }
+        // dump($dynamic_head);
+        // dump($zhouzhuan_head);
+        // die;
         // 合并字段成完整表头
-        $_field = array_merge($defaultFields,$dynamic_head);
+        // $_field = array_merge($defaultFields, $dynamic_head);
+        $_field = array_merge($defaultFields, $dynamic_head, $zhouzhuan_head);
 
         // dump($_field );die;
          // 获取预警库存查询条件
@@ -271,6 +281,7 @@ class Dress extends AdminController
         // 获取参数
         $where = $this->request->get();
         if ($this->request->isAjax()) {
+            
             // 筛选
             $filters = json_decode($this->request->get('filter', '{}',null), true);
             // 固定字段
@@ -304,7 +315,7 @@ class Dress extends AdminController
             $zhouzhuanFieldSql_3 = $this->zhouzhuanFieldSql_3($head);
             $zhouzhuanFieldSql_4 = $this->zhouzhuanFieldSql_4($head);
             $havingSql_1 = $this->havingSql_1($head);
-
+            
             foreach($warStockItem as $kk => $vv){
                 // 查询条件
                 $having = '';
@@ -326,6 +337,8 @@ class Dress extends AdminController
                 // echo arrToStr($vv['省份']);
                 // dump($filters['商品负责人']);die;
                 $map0 = " AND 店铺名称 <> '合计' AND 省份 <> '合计' AND 商品负责人 <> '合计'";
+                
+                // 系统配置的省份
                 if (!empty($vv['省份'])) {
                     $map1Str = arrToStr($vv['省份']);
                     $map1 = " AND 省份 IN ({$map1Str})";
@@ -333,48 +346,49 @@ class Dress extends AdminController
                     $map1 = "";
                 }
 
+    
+                // echo $filters;die;
                 if (!empty($filters['省份'])) {
+                    // echo 1222222;die;
                 // $q->whereIn('省份',$filters['省份']);
-                    $map2Str = arrToStr($filters['省份']);
+                    $map2Str = xmSelectInput($filters['省份']);
                     $map2 = " AND 省份 IN ({$map2Str})";
                 } else {
                     $map2 = "";
                 }
+
+                // dump($map2);
+                // die;
                 if (!empty($filters['店铺名称'])) {
-                    // $q->whereIn('店铺名称',$filters['店铺名称']);
-                    $map3Str = arrToStr($filters['店铺名称']);
+                    $map3Str = xmSelectInput($filters['店铺名称']);
                     $map3 = " AND 店铺名称 IN ({$map3Str})";
                 } else {
                     $map3 = "";
                 }
                 if (!empty($filters['经营模式'])) {
-                    // $q->whereIn('经营模式',$filters['经营模式']);
-                    $map4Str = arrToStr($filters['经营模式']);
+                    $map4Str = xmSelectInput($filters['经营模式']);
                     $map4 = " AND 经营模式 IN ({$map4Str})";
                 } else {
                     $map4 = "";
                 }
                 if (!empty($where['商品负责人'])) {
-                    // $q->whereIn('商品负责人',$where['商品负责人']);
-                    $map5Str = arrToStr($where['商品负责人']);
+                    $map5Str = xmSelectInput($where['商品负责人']);
                     $map5 = " AND 商品负责人 IN ({$map5Str})";
                 } else {
                     $user = session('admin');
                     if($user['id'] != AdminConstant::SUPER_ADMIN_ID) {
-                        // $q->whereIn('商品负责人',$user['name']);
-                        $map5Str = arrToStr($user['name']);
+                        $map5Str = xmSelectInput($user['name']);
                         $map5 = " AND 商品负责人 IN ({$map5Str})";
                     } else {
                         if(!empty($filters['商品负责人'])){
-                            $q->whereIn('商品负责人',$filters['商品负责人']);
-                            $map5Str = arrToStr($filters['商品负责人']);
+                            $map5Str = xmSelectInput($filters['商品负责人']);
                             $map5 = " AND 商品负责人 IN ({$map5Str})";
                         } else {
                             $map5 = "";
                         }
                     }
                 }
-
+                
                 $sql_主体 = "
                     select
                         y.省份,y.店铺名称,y.店铺等级,y.商品负责人,y.经营模式
@@ -400,11 +414,13 @@ class Dress extends AdminController
                         {$havingSql_1}
                 ";
 
-                // echo '<br>------<br>';
                 $list = $this->db_bi->query($sql_主体);
-                // echo $this->model->getLastSql();
+
+                // echo '<pre>';        
+                // $vv['_data']['周转test2'] = 5;
+                // print_r($vv['_data']);
                 // 根据筛选条件,设置颜色是否标红
-                // $this->setStyle($list,$vv['_data']);
+                $this->setStyle($list,$vv['_data']);
                 $list_all = array_merge($list_all,$list);
             }
 
@@ -423,6 +439,7 @@ class Dress extends AdminController
         $getSelectList = $this->getSelectList();
         // 前端表格数据
         $cols = [];
+        // dump($_field);die;
         // 根据数据,渲染前端表格表头
         foreach ($_field as $k=>$v){
             $length = substr_count($v,'_');
@@ -446,6 +463,7 @@ class Dress extends AdminController
             };
             $cols[] = $item;
         }
+        // dump($cols);die;
         // 标准
         $standard = [];
         foreach ($warStockItem as $key => $v){
@@ -461,7 +479,7 @@ class Dress extends AdminController
             $standard[$key] = array_merge($standard[$key],$v['_data']);
         }
 
-        dump($cols);
+        // dump($cols);
         return $this->fetch('',['cols' => $cols,'_field' => $standard,'where' => $where]);
     }
 
@@ -742,6 +760,27 @@ class Dress extends AdminController
         return $list;
     }
 
+    /**
+     * 根据引流配置,判断库存是否标红 cwl
+     */
+    public function setStyleCwl(&$list,$config)
+    {
+        $d_field = sysconfig('site','dress_field');
+        $d_field = json_decode($d_field,true);
+        if(empty($list)) return $list;
+        foreach ($list as $k => $v){
+            foreach ($v as $kk => $vv){
+                $config = $d_field[$v['省份']];
+                if(isset($config[$kk]) && !empty($config[$kk])){
+                    $vv = intval($vv);
+                    if($vv < $config[$kk]){
+                        $list[$k]["_{$kk}"] = true;
+                    }
+                }
+            }
+        }
+        return $list;
+    }
 
     public function test() {
         $Date = date('Y-m-d');
