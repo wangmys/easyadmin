@@ -6,6 +6,7 @@ use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
 use app\admin\service\PuhuoService;
 use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
+use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
 use app\admin\model\CustomerModel;
 use jianyan\excel\Excel;
 use think\Request;
@@ -119,7 +120,7 @@ class Puhuo extends AdminController
 
                     if ($v_res['is_total']) continue;
 
-                    $order_no = uuid('SX');//date('Ymd').(++$k_res);
+                    $order_no = 'SX'.date('Ymd').sprintf("%03d", ++$k_res);//uuid('SX');//date('Ymd').(++$k_res);
 
                     $tmp_arr = [
                         'order_no' => $order_no,
@@ -231,7 +232,7 @@ class Puhuo extends AdminController
 
                     if ($v_res['is_total']) continue;
 
-                    $order_no = uuid('SX');//date('Ymd').(++$k_res);
+                    $order_no = 'SX'.date('Ymd').sprintf("%03d", ++$k_res);//(++$k_res);
 
                     $tmp_arr = [
                         'order_no' => $order_no,
@@ -442,7 +443,7 @@ class Puhuo extends AdminController
                     // $order_no = uuid('SX');//date('Ymd').(++$k_res);
 
                     //查询云仓-货号 对应数据
-                    $wait_goods_info = SpLypPuhuoWaitGoodsModel::where([['WarehouseName', '=', $v_res['云仓']], ['GoodsNo', '=', $v_res['货号']]])->find();
+                    $wait_goods_info = SpLypPuhuoYuncangkeyongModel::where([['WarehouseName', '=', $v_res['云仓']], ['GoodsNo', '=', $v_res['货号']]])->find();
                     $wait_goods_info = $wait_goods_info ? $wait_goods_info->toArray() : [];
 
                     $customer_code = CustomerModel::where([['CustomerName', '=', $v_res['店铺']]])->field('CustomerCode')->find();
@@ -464,21 +465,22 @@ class Puhuo extends AdminController
                     ];
 
                     $size_arr = [
-                        ['puhuo_num'=>$v_res['44/28/'], 'Size'=>$wait_goods_info['Stock_00_size']],
-                        ['puhuo_num'=>$v_res['46/29/165/38/M/105'], 'Size'=>$wait_goods_info['Stock_29_size']],
-                        ['puhuo_num'=>$v_res['48/30/170/39/L/110'], 'Size'=>$wait_goods_info['Stock_30_size']],
-                        ['puhuo_num'=>$v_res['50/31/175/40/XL/115'], 'Size'=>$wait_goods_info['Stock_31_size']],
-                        ['puhuo_num'=>$v_res['52/32/180/41/2XL/120'], 'Size'=>$wait_goods_info['Stock_32_size']],
-                        ['puhuo_num'=>$v_res['54/33/185/42/3XL/125'], 'Size'=>$wait_goods_info['Stock_33_size']],
-                        ['puhuo_num'=>$v_res['56/34/190/43/4XL/130'], 'Size'=>$wait_goods_info['Stock_34_size']],
-                        ['puhuo_num'=>$v_res['58/35/195/44/5XL/'], 'Size'=>$wait_goods_info['Stock_35_size']],
-                        ['puhuo_num'=>$v_res['60/36/6XL/'], 'Size'=>$wait_goods_info['Stock_36_size']],
-                        ['puhuo_num'=>$v_res['38/7XL'], 'Size'=>$wait_goods_info['Stock_38_size']],
-                        ['puhuo_num'=>$v_res['40'], 'Size'=>$wait_goods_info['Stock_40_size']],
-                        ['puhuo_num'=>$v_res['42'], 'Size'=>$wait_goods_info['Stock_42_size']],
+                        ['puhuo_num'=>$v_res['44/28/'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_00_size'] : ''],
+                        ['puhuo_num'=>$v_res['46/29/165/38/M/105'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_29_size'] : ''],
+                        ['puhuo_num'=>$v_res['48/30/170/39/L/110'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_30_size'] : ''],
+                        ['puhuo_num'=>$v_res['50/31/175/40/XL/115'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_31_size'] : ''],
+                        ['puhuo_num'=>$v_res['52/32/180/41/2XL/120'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_32_size'] : ''],
+                        ['puhuo_num'=>$v_res['54/33/185/42/3XL/125'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_33_size'] : ''],
+                        ['puhuo_num'=>$v_res['56/34/190/43/4XL/130'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_34_size'] : ''],
+                        ['puhuo_num'=>$v_res['58/35/195/44/5XL/'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_35_size'] : ''],
+                        ['puhuo_num'=>$v_res['60/36/6XL/'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_36_size'] : ''],
+                        ['puhuo_num'=>$v_res['38/7XL'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_38_size'] : ''],
+                        ['puhuo_num'=>$v_res['40'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_40_size'] : ''],
+                        ['puhuo_num'=>$v_res['42'], 'Size'=>$wait_goods_info ? $wait_goods_info['Stock_42_size'] : ''],
                     ];
-                    foreach ($size_arr as $k_size_arr=>&$v_size_arr) {
-                        if ($v_size_arr['puhuo_num']) {
+                    // print_r([$size_arr,   $wait_goods_info]);die;
+                    foreach ($size_arr as $k_size_arr=>$v_size_arr) {
+                        if ($v_size_arr['puhuo_num'] && $v_size_arr['Size']) {
                             $tmp_arr['Size'] = $v_size_arr['Size'];
                             $tmp_arr['puhuo_num'] = $v_size_arr['puhuo_num'];
                             $excel_output_data[] = $tmp_arr;
