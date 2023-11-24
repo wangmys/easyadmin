@@ -246,7 +246,7 @@
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">数据导出
                         </button>
                     </div>
                 </div>  
@@ -287,6 +287,7 @@
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.Daxiaoma/handle')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
+            , download_excel = "{:url('admin/system.Daxiaoma/excel_handle')}"
             , url_getXmMapSelect = "{:url('admin/system.Daxiaoma/getXmMapSelect')}"
 
         initFn();
@@ -448,18 +449,9 @@
         });
 
         form.on('submit(downloadBtn)', function (data) {
-            $.post(url_download_history_area, data.field, function(res) {
-                // table.exportFile('#table', res, 'xls');
-                // console.log(223) 
-                if (res.status == 1) {
-                    if (res.count <= 100000) {
-                        location.href = url_download_history_area + '?code=' + res.code
-                        alert('数据有点多，请耐心等待');
-                    } else {
-                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
-                    }
-                }
-
+            $.post(download_excel + '?类型=鞋履', data.field, function(res) {
+                location.href = download_excel + '?code=' + res.code  + '&类型=鞋履'
+                alert('数据有点多，请耐心等待');
             })
             return false; 
         });
