@@ -32,15 +32,15 @@ class Stock_week extends Command
 
 	protected function execute(Input $input, Output $output)
     {
-		// ini_set('memory_limit','1024M');
+		ini_set('memory_limit','1024M');
 
-		//生成上周数据入week表
-		// $this->add_every_week();
+		// 生成上周数据入week表
+		$this->add_every_week();
 
-		// //重新生成三年趋势首页缓存数据
-		// $this->generate_index_data();
+		//重新生成三年趋势首页缓存数据
+		$this->generate_index_data();
 
-		// echo 'okk';die;
+		echo 'okk';die;
 
 
 
@@ -53,17 +53,17 @@ class Stock_week extends Command
 		// print_r($weather_data);die;
 
 		//跑三年数据使用：
-		ini_set('memory_limit','2048M');
-		$week_date = $this->get_week_date();
-		$year_start_time = array_column($week_date, 'year_start_time');
-		$week_date = array_combine($year_start_time, $week_date);
-		// print_r($week_date);die;
-		// $this->deal_week_data_2021($week_date);
-		// $this->deal_week_data_2022($week_date);
-		$this->deal_week_data_2023($week_date);
+		// ini_set('memory_limit','2048M');
+		// $week_date = $this->get_week_date();
+		// $year_start_time = array_column($week_date, 'year_start_time');
+		// $week_date = array_combine($year_start_time, $week_date);
+		// // print_r($week_date);die;
+		// // $this->deal_week_data_2021($week_date);
+		// // $this->deal_week_data_2022($week_date);
+		// $this->deal_week_data_2023($week_date);
 
-		//重新生成三年趋势首页缓存数据
-		$this->generate_index_data();
+		// //重新生成三年趋势首页缓存数据
+		// $this->generate_index_data();
 
     }
 
