@@ -220,7 +220,7 @@ class Shangguitips extends BaseController
             FROM
                 sp_sk 
             WHERE 1
-                AND 季节 IN ( '初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
+                AND 季节 IN ( '初秋', '深秋', '秋季', '初冬', '深冬', '冬季', '通季')
                 AND 店铺名称 IN (
                     SELECT CustomerName FROM customer_pro GROUP BY CustomerName
                 )
@@ -306,6 +306,7 @@ class Shangguitips extends BaseController
                                 WHEN '冬季' THEN '冬季'
                                 WHEN '初冬' THEN '冬季'
                                 WHEN '深冬' THEN '冬季'
+                                WHEN '通季' THEN '通季'
                         END AS 季节归集,
                         EG.CategoryName1 AS 一级分类,
                         EG.CategoryName2 AS 二级分类,
@@ -420,6 +421,7 @@ class Shangguitips extends BaseController
                         WHEN '冬季' THEN '冬季'
                         WHEN '初冬' THEN '冬季'
                         WHEN '深冬' THEN '冬季'
+                        WHEN '通季' THEN '通季'
                 END AS 季节归集,
                 yc.一级分类,yc.二级分类,yc.分类,
                 yc.货号,
@@ -515,7 +517,7 @@ class Shangguitips extends BaseController
                     GROUP BY t.云仓
             ) AS dpgsjm ON yc.仓库名称 = dpgsjm.云仓
             WHERE 1 
-                AND yc.二级时间分类 IN ('初秋', '深秋', '秋季', '初冬', '深冬', '冬季')
+                AND yc.二级时间分类 IN ('初秋', '深秋', '秋季', '初冬', '深冬', '冬季', '通季')
         ";
 		
         $select = $this->db_easyA->query($sql);
@@ -979,6 +981,7 @@ class Shangguitips extends BaseController
                     WHEN '冬季' THEN '冬季'
                     WHEN '初冬' THEN '冬季'
                     WHEN '深冬' THEN '冬季'
+                    WHEN '通季' THEN '通季'
                 END AS 季节归集,
                 一级分类,二级分类,分类,风格,一级风格,二级风格,货号,
                 可用数量 as 云仓_可用数量,

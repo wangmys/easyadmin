@@ -103,7 +103,7 @@ class BudongxiaosystemWinter extends AdminController
             } else {
                 $success_percent = "";
             }
-            $total_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.Budongxiaosystem/open_dandian_total');
+            $total_url = $_SERVER['REQUEST_SCHEME'] . '://'. $_SERVER['HTTP_HOST'] . url('admin/system.BudongxiaosystemWinter/open_dandian_total');
             return View('system/budongxiao_winter/sys_result', [
                 // 'config' => $select_config,
                 // 'typeQima' => $typeQima,

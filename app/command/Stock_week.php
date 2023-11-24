@@ -58,8 +58,8 @@ class Stock_week extends Command
 		$year_start_time = array_column($week_date, 'year_start_time');
 		$week_date = array_combine($year_start_time, $week_date);
 		// print_r($week_date);die;
-		$this->deal_week_data_2021($week_date);
-		$this->deal_week_data_2022($week_date);
+		// $this->deal_week_data_2021($week_date);
+		// $this->deal_week_data_2022($week_date);
 		$this->deal_week_data_2023($week_date);
 
 		//重新生成三年趋势首页缓存数据
@@ -119,20 +119,21 @@ class Stock_week extends Command
 	protected function deal_week_data_2023($week_date) {
 
 		$date_arr = [
-			['start_time' => '2023-01-02', 'end_time' => '2023-02-05'],
+			// ['start_time' => '2023-01-02', 'end_time' => '2023-02-05'],
 
-			['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
-			['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
-			['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
-			['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
-			['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
+			// ['start_time' => '2023-02-06', 'end_time' => '2023-03-05'],
+			// ['start_time' => '2023-03-06', 'end_time' => '2023-04-02'],
+			// ['start_time' => '2023-04-03', 'end_time' => '2023-04-30'],
+			// ['start_time' => '2023-05-01', 'end_time' => '2023-05-14'],
+			// ['start_time' => '2023-05-15', 'end_time' => '2023-06-04'],
 
-			['start_time' => '2023-06-05', 'end_time' => '2023-06-18'],
-			['start_time' => '2023-06-19', 'end_time' => '2023-07-02'],
-			['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
+			// ['start_time' => '2023-06-05', 'end_time' => '2023-06-18'],
+			// ['start_time' => '2023-06-19', 'end_time' => '2023-07-02'],
+			// ['start_time' => '2023-07-03', 'end_time' => '2023-07-30'],
 
-			['start_time' => '2023-07-31', 'end_time' => '2023-08-13'],
-			['start_time' => '2023-08-14', 'end_time' => '2023-09-03'],
+			// ['start_time' => '2023-07-31', 'end_time' => '2023-08-13'],
+			// ['start_time' => '2023-08-14', 'end_time' => '2023-08-27'],
+			['start_time' => '2023-08-28', 'end_time' => '2023-09-03'],
 			['start_time' => '2023-09-04', 'end_time' => '2023-09-17'],
 			['start_time' => '2023-09-18', 'end_time' => '2023-10-01'],
 			['start_time' => '2023-10-02', 'end_time' => '2023-10-15'],

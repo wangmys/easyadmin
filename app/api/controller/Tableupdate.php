@@ -2516,4 +2516,13 @@ class Tableupdate extends BaseController
     }
 
 
+    // 引流店铺等级更新
+    public function yinliuGrade() {
+        $sql = "
+            update `sp_customer_yinliu` as y
+            left join customer as c on y.店铺名称 = c.CustomerName and c.Region <> '闭店区'
+            set y.店铺等级 = c.CustomerGrade
+        ";
+        $this->db_bi->execute($sql);
+    }
 }
