@@ -21,6 +21,7 @@ use app\admin\model\bi\SpLypPuhuoRunModel;
 use app\admin\model\bi\SpLypPuhuoDdUserModel;
 use app\admin\model\bi\SpLypPuhuoWarehouseReserveConfigModel;
 use app\admin\model\bi\SpLypPuhuoWarehouseReserveGoodsModel;
+use app\admin\model\bi\SpLypPuhuoCaogaoModel;
 use app\admin\model\bi\DdUserModel;
 use app\admin\model\CustomerModel;
 use app\common\traits\Singleton;
@@ -50,6 +51,7 @@ class PuhuoService
         $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
 
         $where = $list = [];
+        $where[] = ['is_delete', '=', 2];
         if ($WarehouseName) {
             $where[] = ['WarehouseName', 'in', $WarehouseName];
         }
@@ -113,6 +115,111 @@ class PuhuoService
         } else {
 
             $list = SpLypPuhuoEndDataModel::where($where)->field('*')
+                ->paginate([
+                    'list_rows'=> $pageLimit,
+                    'page' => $page,
+                ]);
+                $list = $list ? $list->toArray() : [];
+
+        }
+        // print_r([$pageLimit, $page]);die;
+        
+        $data = [
+            'count' => $list ? $list['total'] : 0,
+            'data'  => $list ? $list['data'] : 0,
+        ];
+        return $data;
+
+    }
+
+    public function caogao_index($params) {
+
+        $pageLimit = $params['limit'] ?? 15;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $WarehouseName = $params['WarehouseName'] ?? '';
+        $CategoryName1 = $params['CategoryName1'] ?? '';
+        $GoodsNo = $params['GoodsNo'] ?? '';//货号
+        $CustomerName = $params['CustomerName'] ?? '';//店铺名称
+        $is_puhuo = $params['is_puhuo'] ?? '';
+        $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
+        // $score_sort = $params['score_sort'] ?? '';//店铺排名
+        $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
+        $is_delete = $params['is_delete'] ?? 0;//是否导出
+        $setTime1 = $params['setTime1'] ?? '';//开始日期
+        $setTime2 = $params['setTime2'] ?? '';//结束日期
+
+        $where = $list = [];
+        // $where[] = ['is_delete', '=', 2];
+        if ($WarehouseName) {
+            $where[] = ['WarehouseName', 'in', $WarehouseName];
+        }
+        if ($CategoryName1) {
+            $where[] = ['CategoryName1', 'in', $CategoryName1];
+        }
+        if ($GoodsNo) {
+            $where[] = ['GoodsNo', 'in', $GoodsNo];
+        }
+        if ($CustomerName) {
+            $where[] = ['CustomerName', 'in', $CustomerName];
+        }
+        if ($CustomItem17) {
+            $where[] = ['CustomItem17', 'in', $CustomItem17];
+        }
+        if ($is_delete) {
+            $where[] = ['is_delete', '=', $is_delete];
+        }
+        if ($setTime1 && $setTime2) {
+            $setTime2 = $setTime2.' 23:59:59';
+            $where[] = ['create_time', 'between', [$setTime1, $setTime2]];
+        }
+        // if ($score_sort) {
+        //     $where[] = ['score_sort', '<=', $score_sort];
+        // }
+        if ($is_puhuo) {
+            if ($is_puhuo == '可铺') {//可铺
+
+                if ($kepu_sort) {
+                    $where[] = ['kepu_sort', '<>', 0];
+                    $where[] = ['kepu_sort', '<=', $kepu_sort];
+                } else {
+                    $where[] = ['Stock_Quantity_puhuo', '>', 0];
+                }
+                $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
+                    ->paginate([
+                        'list_rows'=> $pageLimit,
+                        'page' => $page,
+                    ]);
+                    $list = $list ? $list->toArray() : [];
+
+            } else {//不可铺
+
+                $where[] = ['is_total', '>', 0];
+                $list = SpLypPuhuoCaogaoModel::where($where)->whereOr(function ($q) use ($WarehouseName, $CategoryName1, $GoodsNo, $CustomerName) {
+                    $where = [['is_total', '=', 0], ['Stock_Quantity_puhuo', '=', 0]];
+                    if ($WarehouseName) {
+                        $where[] = ['WarehouseName', 'in', $WarehouseName];
+                    }
+                    if ($CategoryName1) {
+                        $where[] = ['CategoryName1', 'in', $CategoryName1];
+                    }
+                    if ($GoodsNo) {
+                        $where[] = ['GoodsNo', 'in', $GoodsNo];
+                    }
+                    if ($CustomerName) {
+                        $where[] = ['CustomerName', 'in', $CustomerName];
+                    }
+                    $q->where($where);
+                })->field('*')
+                ->paginate([
+                    'list_rows'=> $pageLimit,
+                    'page' => $page,
+                ]);
+                $list = $list ? $list->toArray() : [];
+
+            }
+        } else {
+
+            $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
                 ->paginate([
                     'list_rows'=> $pageLimit,
                     'page' => $page,
@@ -232,10 +339,142 @@ class PuhuoService
 
     }
 
+    public function puhuo_daodan_caogao($params) {
+
+        $pageLimit = $params['limit'] ?? 15;//每页条数
+        $page = $params['page'] ?? 1;//当前页
+        $WarehouseName = $params['WarehouseName'] ?? '';
+        $CategoryName1 = $params['CategoryName1'] ?? '';
+        $GoodsNo = $params['GoodsNo'] ?? '';//货号
+        $CustomerName = $params['CustomerName'] ?? '';//店铺名称
+        $is_puhuo = $params['is_puhuo'] ?? '';
+        $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
+        // $score_sort = $params['score_sort'] ?? '';//店铺排名
+        $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
+        $is_delete = $params['is_delete'] ?? 0;//是否导出
+        $setTime1 = $params['setTime1'] ?? '';//开始日期
+        $setTime2 = $params['setTime2'] ?? '';//结束日期
+        $caogao_uuid = $params['caogao_uuid'] ?? '';//草稿uuid
+
+        $where = $list = [];
+        if ($WarehouseName) {
+            $where[] = ['lpc.WarehouseName', 'in', $WarehouseName];
+        }
+        if ($CategoryName1) {
+            $where[] = ['lpc.CategoryName1', 'in', $CategoryName1];
+        }
+        if ($GoodsNo) {
+            $where[] = ['lpc.GoodsNo', 'in', $GoodsNo];
+        }
+        if ($CustomerName) {
+            $where[] = ['lpc.CustomerName', 'in', $CustomerName];
+        }
+        if ($CustomItem17) {
+            $where[] = ['lpc.CustomItem17', 'in', $CustomItem17];
+        }
+        // if ($score_sort) {
+        //     $where[] = ['score_sort', '<=', $score_sort];
+        // }
+        if ($is_delete) {
+            $where[] = ['lpc.is_delete', '=', $is_delete];
+        }
+        if ($setTime1 && $setTime2) {
+            $setTime2 = $setTime2.' 23:59:59';
+            $where[] = ['lpc.create_time', 'between', [$setTime1, $setTime2]];
+        }
+
+        if ($caogao_uuid) {
+            $where[] = ['lpc.uuid', 'in', $caogao_uuid];
+        }
+
+        if ($is_puhuo) {
+            if ($is_puhuo == '可铺') {//可铺
+
+                if ($kepu_sort) {
+                    $where[] = ['lpc.kepu_sort', '<>', 0];
+                    $where[] = ['lpc.kepu_sort', '<=', $kepu_sort];
+                } else {
+                    $where[] = ['lpc.Stock_Quantity_puhuo', '>', 0];
+                }
+                $list = SpLypPuhuoCaogaoModel::where($where)
+                ->alias('lpc')
+                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpc.GoodsNo=lpwg.GoodsNo and lpc.WarehouseName=lpwg.WarehouseName', 'left')
+                ->field('lpc.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
+                ->paginate([
+                        'list_rows'=> $pageLimit,
+                        'page' => $page,
+                    ]);
+                    $list = $list ? $list->toArray() : [];
+
+            } else {//不可铺
+
+                // $where[] = ['is_total', '>', 0];
+                // $list = SpLypPuhuoEndDataModel::where($where)->whereOr(function ($q) use ($WarehouseName, $CategoryName1, $GoodsNo, $CustomerName) {
+                //     $where = [['is_total', '=', 0], ['Stock_Quantity_puhuo', '=', 0]];
+                //     if ($WarehouseName) {
+                //         $where[] = ['WarehouseName', 'in', $WarehouseName];
+                //     }
+                //     if ($CategoryName1) {
+                //         $where[] = ['CategoryName1', 'in', $CategoryName1];
+                //     }
+                //     if ($GoodsNo) {
+                //         $where[] = ['GoodsNo', 'in', $GoodsNo];
+                //     }
+                //     if ($CustomerName) {
+                //         $where[] = ['CustomerName', 'in', $CustomerName];
+                //     }
+                //     $q->where($where);
+                // })->field('*')
+                // ->paginate([
+                //     'list_rows'=> $pageLimit,
+                //     'page' => $page,
+                // ]);
+                // $list = $list ? $list->toArray() : [];
+
+            }
+        } else {
+
+            $list = SpLypPuhuoCaogaoModel::where($where)
+                ->alias('lpc')
+                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpc.GoodsNo=lpwg.GoodsNo and lpc.WarehouseName=lpwg.WarehouseName', 'left')
+                ->field('lpc.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
+                // ->field('*')
+                ->paginate([
+                    'list_rows'=> $pageLimit,
+                    'page' => $page,
+                ]);
+                $list = $list ? $list->toArray() : [];
+
+        }
+        
+        $data = [
+            'count' => $list ? $list['total'] : 0,
+            'data'  => $list ? $list['data'] : 0,
+        ];
+        return $data;
+
+    }
+
+    public function change_caogao_status($res_data) { 
+
+        if ($res_data) {
+            $chunk_list = array_chunk($res_data, 500);
+            foreach($chunk_list as $key => $val) {
+                $uuid_arr = $val ? array_column($val, 'uuid') : [];
+                if ($uuid_arr) {
+                    SpLypPuhuoCaogaoModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete' => 1]);
+                }
+            }
+        }
+
+    }
+
     public function add_puhuo_daodan($res_data) {
 
         if ($res_data) {
-            $this->easy_db->query("truncate table sp_lyp_puhuo_daodan;");
+            // $this->easy_db->query("truncate table sp_lyp_puhuo_daodan;");
             $chunk_list = array_chunk($res_data, 1000);
             foreach($chunk_list as $key => $val) {
                 $insert = $this->easy_db->table('sp_lyp_puhuo_daodan')->strict(false)->insertAll($val);
@@ -244,13 +483,21 @@ class PuhuoService
 
     }
 
-    public function getXmMapSelect() {
+    public function getXmMapSelect($sign = 1) {
 
-        $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");
-        $CategoryName1 = $this->easy_db->query("select CategoryName1 as name, CategoryName1 as value from sp_lyp_puhuo_wait_goods where CategoryName1!='' and (TimeCategoryName2 like '%秋%' or TimeCategoryName2 like '%冬%') group by CategoryName1;");
-        $GoodsNo = $this->easy_db->query("select GoodsNo as name, GoodsNo as value from sp_lyp_puhuo_end_data  group by GoodsNo;");
-        $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data where CustomerName!='余量' and CustomerName not like '%云仓%' group by CustomerName;");
-        $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_end_data where CustomItem17!='' group by CustomItem17;");
+        if ($sign == 1) {
+            $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");
+            $CategoryName1 = $this->easy_db->query("select CategoryName1 as name, CategoryName1 as value from sp_lyp_puhuo_wait_goods where CategoryName1!='' and (TimeCategoryName2 like '%秋%' or TimeCategoryName2 like '%冬%') group by CategoryName1;");
+            $GoodsNo = $this->easy_db->query("select GoodsNo as name, GoodsNo as value from sp_lyp_puhuo_end_data  group by GoodsNo;");
+            $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_end_data where CustomerName!='余量' and CustomerName not like '%云仓%' group by CustomerName;");
+            $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_end_data where CustomItem17!='' group by CustomItem17;");
+        } else {
+            $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_caogao  group by WarehouseName;");
+            $CategoryName1 = $this->easy_db->query("select CategoryName1 as name, CategoryName1 as value from sp_lyp_puhuo_caogao where CategoryName1!='' and (TimeCategoryName2 like '%秋%' or TimeCategoryName2 like '%冬%') group by CategoryName1;");
+            $GoodsNo = $this->easy_db->query("select GoodsNo as name, GoodsNo as value from sp_lyp_puhuo_caogao  group by GoodsNo;");
+            $CustomerName = $this->easy_db->query("select CustomerName as name, CustomerName as value from sp_lyp_puhuo_caogao where CustomerName!='余量' and CustomerName not like '%云仓%' group by CustomerName;");
+            $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_caogao where CustomItem17!='' group by CustomItem17;");
+        }
 
         return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'CustomItem17'=>$CustomItem17, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
 
@@ -1183,6 +1430,41 @@ class PuhuoService
                 SpLypPuhuoDdUserModel::create($v_sel);
             }
         }
+
+    }
+
+    /**
+     * 处理草稿数据
+     */
+    public function deal_caogao($params) {
+
+        $caogao_arr = $params['caogao_arr'] ?? [];
+
+        $count = SpLypPuhuoEndDataModel::where([])->count();
+        if (count($caogao_arr) != $count) {
+            $res_end_data = SpLypPuhuoEndDataModel::where([['uuid', 'in', $caogao_arr], ['Stock_Quantity_puhuo', '>', 0]])->select();
+        } else {
+            $res_end_data = SpLypPuhuoEndDataModel::where([['is_total', '<>', 1], ['Stock_Quantity_puhuo', '>', 0]])->select();
+        }
+        //草稿入库
+        $res_end_data = $res_end_data ? $res_end_data->toArray() : [];
+        if (!$res_end_data) {
+            return json(["code" => "400", "msg" => "请选择可铺数据保存", "data" => []]);
+        } 
+        if ($res_end_data) {
+            foreach ($res_end_data as &$v_end_data) {
+                unset($v_end_data['create_time']);
+            }
+        }
+        
+        $chunk_list = array_chunk($res_end_data, 500);
+        foreach($chunk_list as $key => $val) {
+            $uuid_arr = array_column($val, 'uuid');
+            SpLypPuhuoEndDataModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete'=>1]);
+            $insert = $this->easy_db->table('sp_lyp_puhuo_caogao')->strict(false)->insertAll($val);
+        }
+
+        return json(["code" => "200", "msg" => "保存成功", "data" => []]);
 
     }
 

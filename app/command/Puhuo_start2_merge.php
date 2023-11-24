@@ -3622,11 +3622,7 @@ class Puhuo_start2_merge extends Command
         
         LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
         
-        WHERE	 (ES.CodingCode= 'StartNode1'
-        
-                            OR (ES.CodingCode= 'EndNode2' AND ES.IsCompleted= 0 )
-        
-                        ) 
+        WHERE	 ES.IsCompleted= 0   
         
             AND EG.TimeCategoryName1>2022
         
