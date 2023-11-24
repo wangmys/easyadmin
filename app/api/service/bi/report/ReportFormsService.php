@@ -1254,6 +1254,9 @@ class ReportFormsService
             性质,
             一级分类 as 大类,
             二级分类 as 中类,
+            _2024春 as `2024春`,
+            _2024夏 as `2024夏`,
+            _2024汇总 as `2024汇总`,
             _2023春 as `2023春`,
             _2023夏 as `2023夏`,
             _2023汇总 as `2023汇总`,
@@ -1272,9 +1275,6 @@ class ReportFormsService
             _2018春 as `2018春`,
             _2018夏 as `2018夏`,
             _2018汇总 as `2018汇总`,
-            _2017春 as `2017春`,
-            _2017夏 as `2017夏`,
-            _2017汇总 as `2017汇总`,
             合计库存数
         from sp_zy_spring_and_summer_stock where 更新日期 = '$date'";
         $data = $this->db_bi->query($sql);
@@ -1416,6 +1416,9 @@ class ReportFormsService
             性质,
             一级分类 as 大类,
             二级分类 as 中类,
+            _2024春 as `2024春`,
+            _2024夏 as `2024夏`,
+            _2024汇总 as `2024汇总`,
             _2023春 as `2023春`,
             _2023夏 as `2023夏`,
             _2023汇总 as `2023汇总`,
@@ -1434,9 +1437,6 @@ class ReportFormsService
             _2018春 as `2018春`,
             _2018夏 as `2018夏`,
             _2018汇总 as `2018汇总`,
-            _2017春 as `2017春`,
-            _2017夏 as `2017夏`,
-            _2017汇总 as `2017汇总`,
             合计库存数
         from sp_jm_spring_and_summer_stock where 更新日期 = '$date'";
         $data = $this->db_bi->Query($sql);
