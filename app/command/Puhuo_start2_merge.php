@@ -1335,13 +1335,41 @@ class Puhuo_start2_merge extends Command
             }
             // print_r($res_yuncang);die;
 
+            $where=[
+                [['TimeCategoryName2','like','%秋%']],
+                [['TimeCategoryName2','like','%冬%']],
+                [
+                    ['TimeCategoryName2','like','%春%'],
+                    ['TimeCategoryName1','=','2024'],
+                ],
+                [
+                    ['TimeCategoryName2','like','%夏%'],
+                    ['TimeCategoryName1','=','2024'],
+                ],
+                [
+                    ['TimeCategoryName2','=','通季'],
+                    ['GoodsName','=','正统长衬'],
+                ],
+                [
+                    ['TimeCategoryName2','=','通季'],
+                    ['CategoryName2','=','正统长衬'],
+                ],
+                [
+                    ['TimeCategoryName2','=','通季'],
+                    ['CategoryName1','=','正统长衬'],
+                ],
+            ];
+
             foreach ($res_yuncang as $k_yuncang=>$v_yuncang) {
                 $arr_goods = array_column($v_yuncang, 'GoodsNo');
-
-                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $k_yuncang)->where([['GoodsNo', 'in', $arr_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
-                    'list_rows'=> $list_rows,//每页条数
-                    'page' => $this->page,//当前页
-                ]);
+                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $k_yuncang)->where([['GoodsNo', 'in', $arr_goods]])
+                    ->where(function ($query) use ($where) {
+                       $query ->whereOr($where);
+                    })
+                    ->paginate([
+                        'list_rows' => $list_rows,//每页条数
+                        'page' => $this->page,//当前页
+                    ]);
                 $res = $res ? $res->toArray() : [];
                 $res = $res ? $res['data'] : [];
                 if ($res) {
