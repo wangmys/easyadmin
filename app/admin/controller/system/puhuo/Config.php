@@ -169,6 +169,7 @@ class Config extends AdminController
 
     }
 
+
     /**
      * @NodeAnotation(title="保存仓库齐码参数配置")
      */
