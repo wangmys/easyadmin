@@ -134,7 +134,7 @@
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">数据导出
                         </button>
                     </div>
                 </div>  
@@ -167,6 +167,7 @@
             , url1 = "{:url('admin/system.Shangguitips/keshang_customer')}" 
             , url2 = "{:url('admin/system.Budongxiaosystem/single_statistics')}" 
             , url_download_history = "{:url('admin/system.Budongxiaosystem/excel_history_detail')}" 
+            , download_excel = "{:url('admin/system.Shangguitips/excel_keshang')}" 
             , url_getXmMapSelect = "{:url('admin/system.Shangguitips/getXmMapSelect')}"
 
 
@@ -238,6 +239,14 @@
             data: [
             ]
         })
+
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(download_excel, data.field, function(res) {
+                location.href = download_excel + '?code=' + res.code
+                alert('数据有点多，请耐心等待');
+            })
+            return false; 
+        });
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
