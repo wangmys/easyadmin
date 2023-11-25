@@ -30,11 +30,20 @@ class Summary extends BaseController
     // 创建时间
     protected $create_time = '';
 
+    protected $目标月份 = "";
+
     public function __construct()
     {
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+
+        $目标月份 = date('Y-m');
+
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
+        $this->目标月份 = $目标月份;
     }
 
     public function seasionHandle($seasion = "夏季,秋季") {
@@ -111,6 +120,8 @@ class Summary extends BaseController
             left join customer_pro as p on s.店铺名称=p.CustomerName
             set
                 s.首单日期=p.首单日期
+            where
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_首单日期);
 
@@ -126,6 +137,8 @@ class Summary extends BaseController
                 s.目标达成率 = y.目标达成率,
                 s.日均流水 = y.实际累计流水 / {$到结束剩余天数},
                 s.剩余日均流水 = y.`100%缺口_日均额`
+            where
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_更新若干);
 
@@ -136,6 +149,7 @@ class Summary extends BaseController
                 s.环比=h.今日环比
             where 
                 h.更新日期='{$昨天}'
+                AND s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_环比);
 
@@ -271,7 +285,7 @@ class Summary extends BaseController
                 s.下装占比 = r.下装占比,
                 s.鞋履占比 = r.下装占比
             where
-                1
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_更新销售占比);
 
@@ -317,8 +331,9 @@ class Summary extends BaseController
 
         // 更新上新提醒
         foreach ($select_天气上新提醒 as $key2 => $val2) {
-            if ($val2['提醒']) {
-                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val2['店铺名称']])->update(['上新提醒' => $val2['提醒']]);
+            if ($val2['提醒']) {            
+                // $目标月份 = $this->目标月份;
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val2['店铺名称'], '目标月份' => $this->目标月份])->update(['上新提醒' => $val2['提醒']]);
             } 
         }
 
@@ -351,6 +366,8 @@ class Summary extends BaseController
             ) as m on s.店铺名称 = m.店铺名称
             set
                 s.大小码缺少提醒 = case when m.缺码>0 then '缺' end
+            WHERE 
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_大小码缺码提醒);
 
@@ -367,7 +384,7 @@ class Summary extends BaseController
         $select_售空SKC数 = $this->db_easyA->query($slq_售空SKC数);
         if ($select_售空SKC数) {
             foreach($select_售空SKC数 as $key3 => $val3) {
-                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val3['店铺名称']])->update(['售空SKC数' => $val3['数量']]); 
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val3['店铺名称'], '目标月份' => $this->目标月份])->update(['售空SKC数' => $val3['数量']]); 
             }
         }
 
@@ -384,7 +401,7 @@ class Summary extends BaseController
         $select_即将售空SKC数 = $this->db_easyA->query($slq_即将售空SKC数);
         if ($select_即将售空SKC数) {
             foreach($select_即将售空SKC数 as $key4 => $val4) {
-                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val4['店铺名称']])->update(['即将售空SKC数' => $val4['数量']]); 
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val4['店铺名称'], '目标月份' => $this->目标月份])->update(['即将售空SKC数' => $val4['数量']]); 
             }
         }
 
@@ -407,7 +424,7 @@ class Summary extends BaseController
         if ($select_不动销) {
             foreach ($select_不动销 as $key5 => $val5) {
                 // $val5[$val5['考核标准']]
-                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val5['店铺名称']])->update(['不动销占比' => $val5['考核标准占比'], '不动销SKC数' => $val5['需要调整SKC数']]); 
+                $this->db_easyA->table('cwl_summary')->where(['店铺名称' => $val5['店铺名称'], '目标月份' => $this->目标月份])->update(['不动销占比' => $val5['考核标准占比'], '不动销SKC数' => $val5['需要调整SKC数']]); 
             }
         }
 
@@ -418,6 +435,8 @@ class Summary extends BaseController
             SET
                 s.`断码率整体齐码率`=t.`齐码率-整体`,
                 s.`断码率TOP考核齐码率`=t.`齐码率-TOP考核`
+            WHERE
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_断码率);
 
@@ -435,6 +454,8 @@ class Summary extends BaseController
             ) as t on s.店铺名称=t.店铺名称
             SET
                 s.`单款超量SKC数`=t.数量
+            WHERE
+                s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_单款超量SKC数);
     }
@@ -443,6 +464,188 @@ class Summary extends BaseController
     public function getDaysDiff($beginDate, $endDate) {
         $days = round( ($endDate - $beginDate) / 3600 / 24);
         return $days;
+    }
+
+    // 新品大类监控情况
+    public function getData4() {    
+        $date = date('Y-m-d', strtotime('-1day', time()));
+        $dataEnd = input('date') ? input('date') : date('Y-m-d');
+        // 1.销售占比
+        $sql_销售占比数据源 = "
+            SELECT
+                ER.CustomerName AS 店铺名称,
+                EBC.Mathod AS 经营模式,
+                EC.CustomItem36 AS 温区,
+                SUM ( ERG.Quantity ) AS 数量,
+                SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
+                    CASE
+                        WHEN EG.TimeCategoryName2 IN ( '初春', '正春', '春季' ) THEN
+                        '春季' 
+                        WHEN EG.TimeCategoryName2 IN ( '初夏', '盛夏', '夏季' ) THEN
+                        '夏季' 
+                        WHEN EG.TimeCategoryName2 IN ( '初秋', '深秋', '秋季' ) THEN
+                        '秋季' 
+                        WHEN EG.TimeCategoryName2 IN ( '初冬', '深冬', '冬季' ) THEN
+                        '冬季' 
+                    END AS 季节归集,
+                    EG.TimeCategoryName2 AS 季节,
+                    EG.CategoryName1 AS 一级分类,
+                    EG.StyleCategoryName AS 风格,
+                    FORMAT ( ER.RetailDate, 'yyyy-MM-dd' ) AS 销售日期 
+                FROM
+                    ErpRetail AS ER
+                    LEFT JOIN erpRetailGoods AS ERG ON ER.RetailID = ERG.RetailID
+                    LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+                    LEFT JOIN ErpCustomer AS EC ON ER.CustomerId = EC.CustomerId
+                    LEFT JOIN ErpBaseCustomerMathod AS EBC ON EC.MathodId = EBC.MathodId 
+                WHERE
+                    ER.CodingCodeText = '已审结' 
+                    AND EG.CategoryName1 IN ( '内搭', '外套', '下装', '鞋履' ) 
+                    AND EBC.Mathod IN ( '直营', '加盟' ) 
+                    AND ER.RetailDate BETWEEN '{$date}' AND '{$dataEnd}' 
+                    AND EG.TimeCategoryName1 IN ('2023', '2024', '2025')
+                GROUP BY
+                    ER.CustomerName,
+                    EBC.Mathod,
+                    EC.CustomItem36,
+                    EG.CategoryName1,
+                    EG.StyleCategoryName,
+                    EG.TimeCategoryName2,
+                    FORMAT ( ER.RetailDate, 'yyyy-MM-dd' ) 
+                ORDER BY
+            ER.CustomerName
+        ";
+        $select_销售占比数据源 = $this->db_sqlsrv->query($sql_销售占比数据源);
+        if ($select_销售占比数据源) {
+            $this->db_easyA->execute('TRUNCATE cwl_summary_retail_pro;');
+            $chunk_list = array_chunk($select_销售占比数据源, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_summary_retail_pro')->strict(false)->insertAll($val);
+            }
+        }
+
+        // 2.
+        $sql_销售占比外套 = "
+            update cwl_summary as s
+            left join (
+                select 
+                    m1.店铺名称,
+                    sum(m1.数量) as 数量,
+                    sum(m1.销售金额) as 销售金额,
+                    m1.一级分类,
+                    m2.总销售金额
+                from cwl_summary_retail_pro  as m1
+                left join (
+                    select 
+                        店铺名称, sum(数量) as 总数量, sum(销售金额) as 总销售金额
+                    from cwl_summary_retail_pro 
+                    where 1
+                    group by
+                        店铺名称
+                ) as m2 on m1.店铺名称 = m2.店铺名称
+                where 1
+                    and m1.一级分类 = '外套'
+                group by
+                    m1.店铺名称,m1.一级分类
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.销售贡献比_外套 = t.销售金额 / t.总销售金额
+            where
+                s.目标月份 = '{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_销售占比外套);
+
+        $sql_销售占比内搭 = "
+            update cwl_summary as s
+            left join (
+                select 
+                    m1.店铺名称,
+                    sum(m1.数量) as 数量,
+                    sum(m1.销售金额) as 销售金额,
+                    m1.一级分类,
+                    m2.总销售金额
+                from cwl_summary_retail_pro  as m1
+                left join (
+                    select 
+                        店铺名称, sum(数量) as 总数量, sum(销售金额) as 总销售金额
+                    from cwl_summary_retail_pro 
+                    where 1
+                    group by
+                        店铺名称
+                ) as m2 on m1.店铺名称 = m2.店铺名称
+                where 1
+                    and m1.一级分类 = '内搭'
+                group by
+                    m1.店铺名称,m1.一级分类
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.销售贡献比_内搭 = t.销售金额 / t.总销售金额
+            where
+                s.目标月份 = '{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_销售占比内搭);
+
+        $sql_销售占比下装 = "
+            update cwl_summary as s
+            left join (
+                select 
+                    m1.店铺名称,
+                    sum(m1.数量) as 数量,
+                    sum(m1.销售金额) as 销售金额,
+                    m1.一级分类,
+                    m2.总销售金额
+                from cwl_summary_retail_pro  as m1
+                left join (
+                    select 
+                        店铺名称, sum(数量) as 总数量, sum(销售金额) as 总销售金额
+                    from cwl_summary_retail_pro 
+                    where 1
+                    group by
+                        店铺名称
+                ) as m2 on m1.店铺名称 = m2.店铺名称
+                where 1
+                    and m1.一级分类 = '下装'
+                group by
+                    m1.店铺名称,m1.一级分类
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.销售贡献比_下装 = t.销售金额 / t.总销售金额
+            where
+                s.目标月份 = '{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_销售占比下装);
+
+        $sql_销售占比鞋履 = "
+            update cwl_summary as s
+            left join (
+                select 
+                    m1.店铺名称,
+                    sum(m1.数量) as 数量,
+                    sum(m1.销售金额) as 销售金额,
+                    m1.一级分类,
+                    m2.总销售金额
+                from cwl_summary_retail_pro  as m1
+                left join (
+                    select 
+                        店铺名称, sum(数量) as 总数量, sum(销售金额) as 总销售金额
+                    from cwl_summary_retail_pro 
+                    where 1
+                    group by
+                        店铺名称
+                ) as m2 on m1.店铺名称 = m2.店铺名称
+                where 1
+                    and m1.一级分类 = '鞋履'
+                group by
+                    m1.店铺名称,m1.一级分类
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.销售贡献比_鞋履 = t.销售金额 / t.总销售金额
+            where
+                s.目标月份 = '{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_销售占比鞋履);
     }
 
 
