@@ -461,7 +461,7 @@ class Puhuo extends AdminController
                         'ColorCode' => $wait_goods_info ? $wait_goods_info['ColorCode'] : '',
                         'puhuo_num' => 0,//
                         'status' => 2,
-                        'remark' => $wait_goods_info ? $wait_goods_info['CategoryName1'] : '',
+                        'remark' => $wait_goods_info ? mb_substr($wait_goods_info['CategoryName1'], 0, 1) : '',
                     ];
 
                     $size_arr = [
@@ -489,6 +489,24 @@ class Puhuo extends AdminController
 
                 }
 
+                //相同单号，备注处理
+                $excel_output_data2 = [];
+                $end_output_data = [];
+                if ($excel_output_data) {
+                    foreach ($excel_output_data as $v_output_data) {
+                        $excel_output_data2[$v_output_data['order_no']][] = $v_output_data;
+                    }
+                    foreach ($excel_output_data2 as $vv_output_data) {
+                        $remarks = array_unique(array_column($vv_output_data, 'remark'));
+                        $remarks = $remarks ? implode('/', $remarks) : '';
+                        foreach ($vv_output_data as $vvv_output_data) {
+                            $vvv_output_data['remark'] = $remarks;
+                            $end_output_data[] = $vvv_output_data;
+                        }
+                    }
+                }
+                // print_r($end_output_data);die;
+
                 $header = [
                     ['*订单号', 'order_no'],
                     ['*仓库编号', 'WarehouseCode'],
@@ -503,7 +521,7 @@ class Puhuo extends AdminController
                     ['备注', 'remark'],
                 ];
     
-                return Excel::exportData($excel_output_data, $header, 'import_excel_zhuanhuan' .count($excel_output_data) , 'xlsx');
+                return Excel::exportData($end_output_data, $header, 'import_excel_zhuanhuan' .count($end_output_data) , 'xlsx');
 
             }
 
