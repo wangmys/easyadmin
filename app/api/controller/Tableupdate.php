@@ -2532,7 +2532,8 @@ class Tableupdate extends BaseController
             update sjp_liangzhou as l
             left join sp_ww_hpzl as h on l.货号 = h.货号
             set 
-                l.年份 = h.年份
+                l.年份 = h.年份,
+                l.一级分类 = h.一级分类
         ";
         $this->db_easyA->execute($sql);
     }

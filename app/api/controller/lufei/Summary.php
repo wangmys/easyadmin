@@ -667,6 +667,57 @@ class Summary extends BaseController
                 AND 目标月份='{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_特价占比);
+
+        $sql_周转 = "
+            update cwl_summary as s 
+                left join (
+                    SELECT
+                        m.店铺名称,
+                        (SELECT sum(周转合计) as 周转合计 FROM cwl_chaoliang_sk WHERE 店铺名称 = m.店铺名称 and 一级分类 = '外套') AS `周转_外套`,
+                        (SELECT sum(周转合计) as 周转合计 FROM cwl_chaoliang_sk WHERE 店铺名称 = m.店铺名称 and 一级分类 = '内搭') AS `周转_内搭`,
+                        (SELECT sum(周转合计) as 周转合计 FROM cwl_chaoliang_sk WHERE 店铺名称 = m.店铺名称 and 一级分类 = '下装') AS `周转_下装`,
+                        (SELECT sum(周转合计) as 周转合计 FROM cwl_chaoliang_sk WHERE 店铺名称 = m.店铺名称 and 一级分类 = '鞋履') AS `周转_鞋履`
+                    FROM
+                        `cwl_chaoliang_sk` as m
+                    WHERE 1
+                    GROUP BY
+                        m.店铺名称
+                ) as t on s.店铺名称 = t.店铺名称
+                set
+                    s.`周转_外套` = t.`周转_外套`,
+                    s.`周转_内搭` = t.`周转_内搭`,
+                    s.`周转_下装` = t.`周转_下装`,
+                    s.`周转_鞋履` = t.`周转_鞋履`
+                where 1
+                    AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_周转);
+
+        $sql_售空 = "
+            update cwl_summary as s 
+            left join (
+                    SELECT
+                        m.店铺名称,
+                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '外套') AS `售空_外套`,
+                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '内搭') AS `售空_内搭`,
+                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '下装') AS `售空_下装`,
+                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '鞋履') AS `售空_鞋履`
+                    FROM
+                        `cwl_chaoliang_sk` as m
+                    WHERE
+                        1
+                    GROUP BY
+                            m.店铺名称
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                    s.`售空_外套` = t.`售空_外套`,
+                    s.`售空_内搭` = t.`售空_内搭`,
+                    s.`售空_下装` = t.`售空_下装`,
+                    s.`售空_鞋履` = t.`售空_鞋履`
+            where 1
+                    AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_售空);
     }
 
 
