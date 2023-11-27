@@ -196,23 +196,23 @@
             background-color: #599afb !important;
             color:#ffffff;
         } */
-        th[data-key="1-0-4"] {
+        th[data-key="1-0-5"] {
             background-color: #ffff00 !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-5"] {
+        th[data-key="1-0-6"] {
             background-color: #add88d !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-6"] {
+        th[data-key="1-0-7"] {
             background-color: #f4b382 !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-7"] {
+        th[data-key="1-0-8"] {
             background-color: #fee796 !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-8"] {
+        th[data-key="1-0-9"] {
             background-color: #d6dce4 !important;
             color:#785e01;
         }
@@ -229,7 +229,7 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center;">考核月份</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
@@ -259,14 +259,22 @@
                                 <div id="xm-dpmc" class="xm-select-demo"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex col between" style="width:5%; height:35px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺等级</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-grade" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="flex col between" style="width:5%; height:70px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
                         </button>
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:block;">数据导出
                         </button>
                     </div>
                 </div>  
@@ -309,6 +317,7 @@
             , spzy = "{$mubiaoMonth}"
             , url1 = "{:url('admin/system.Customitem17/yeji')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
+            , download_excel = "{:url('admin/system.Customitem17/excel_yeji')}" 
             , url_getXmMapSelect = "{:url('admin/system.Customitem17/getXmMapSelect')}"
 
         initFn();
@@ -380,6 +389,19 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-grade', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '店铺等级',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+            ]
+        })
+
         // xmSelect.render({
         //     el: '#xm-tips', 
         //     filterable: true,
@@ -436,6 +458,18 @@
                     data: res.data.customer
                 })
 
+                xmSelect.render({
+                    el: '#xm-grade', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺等级',
+                    data: res.data.grade
+                })
+
             }, 'json')
         }
 
@@ -454,18 +488,9 @@
         });
 
         form.on('submit(downloadBtn)', function (data) {
-            $.post(url_download_history_area, data.field, function(res) {
-                // table.exportFile('#table', res, 'xls');
-                // console.log(223) 
-                if (res.status == 1) {
-                    if (res.count <= 100000) {
-                        location.href = url_download_history_area + '?code=' + res.code
-                        alert('数据有点多，请耐心等待');
-                    } else {
-                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
-                    }
-                }
-
+            $.post(download_excel, data.field, function(res) {
+                location.href = download_excel + '?code=' + res.code
+                alert('数据有点多，请耐心等待');
             })
             return false; 
         });
@@ -533,7 +558,12 @@
                                     <div class="cima"></div>
                                     </div>`, field: `经营模式`,  fixed: 'left' ,align: 'center' ,  rowspan: 2}
                         ,{ title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , rowspan: 2}
-                       
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima"></div>
+                                    <div class="cima">店铺</div>
+                                    <div class="cima">等级</div>
+                                    <div class="cima"></div>
+                                    </div>`, field: '店铺等级', fixed: 'left' ,align: 'center' , rowspan: 2}
 
                         ,{ title: `挑战目标完成情况`, align: 'center', colspan: 4}
                         ,{ title: `缺口情况`, align: 'center', colspan: 4}

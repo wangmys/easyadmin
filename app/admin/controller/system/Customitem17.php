@@ -102,12 +102,19 @@ class Customitem17 extends AdminController
             } else {
                 $map4 = "";
             }
+            if (!empty($input['店铺等级'])) {
+                // echo $input['商品负责人'];
+                $map5Str = xmSelectInput($input['店铺等级']);
+                $map5 = " AND 店铺等级 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
 
             $sql = "
                 SELECT
                     商品专员,
                     left(省份, 2) as 省份,
-                    经营模式,店铺名称,本月目标,实际累计流水,累计流水截止日期,
+                    经营模式,店铺名称,店铺等级,本月目标,实际累计流水,累计流水截止日期,
                     round(目标达成率 * 100, 1) as 目标达成率,
                     `100%缺口额`,`100%缺口_日均额`,`85%缺口额`,`85%缺口_日均额`,近七天日均销,
                     round(`100%进度落后` * 100, 1) as `100%进度落后`,
@@ -121,6 +128,7 @@ class Customitem17 extends AdminController
                     {$map2}
                     {$map3}
                     {$map4}
+                    {$map5}
                 ORDER BY 商品专员, 本月目标 DESC
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
@@ -137,6 +145,7 @@ class Customitem17 extends AdminController
                     {$map2}
                     {$map3}
                     {$map4}
+                    {$map5}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => date('Y-m-d')]);
@@ -234,6 +243,9 @@ class Customitem17 extends AdminController
         $customer = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_customitem17_yeji GROUP BY 店铺名称
         ");
+        $grade = $this->db_easyA->query("
+            SELECT 店铺等级 as name, 店铺等级 as value FROM cwl_customitem17_yeji WHERE 店铺等级 is not null GROUP BY 店铺等级 order by 店铺等级 DESC
+        ");
        
         if (!checkAdmin()) {
             foreach ($customer17 as $key => $val) {
@@ -245,53 +257,97 @@ class Customitem17 extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
         
-        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer17' => $customer17, 'province' => $province, 'customer' => $customer, 'grade' => $grade]]);
     }
 
-    public function test() {
-        $sql = "
-            SELECT
-                商品专员,
-                目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
-                累计流水截止日期,
-                concat(round(达成率_直营 * 100, 1), '%') as 达成率_直营,
-                concat(round(达成率_加盟 * 100, 1), '%') as 达成率_加盟,
-                concat(round(达成率_合计 * 100, 1), '%') as 达成率_合计,
-                `100%日均需销额_直营`,`100%日均需销额_加盟`,`100%日均需销额_合计`,`85%日均需销额_直营`,`85%日均需销额_加盟`,`85%日均需销额_合计`,
-                `近七天日均销额_直营`,`近七天日均销额_加盟`,`近七天日均销额_合计`
-            FROM
-            cwl_customitem17_zhuanyuan 
-            WHERE 1	
-                and 目标月份='2023-10'
-        ";
+    // 下载业绩
+    public function excel_yeji() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
 
-        $select = $this->db_easyA->query($sql);  
-        $合计 = [
-            '目标_直营' => 0,
-            '目标_加盟' => 0,
-            '目标_合计' => 0,
-            '累计流水_直营' => 0,
-            '累计流水_加盟' => 0,
-            '累计流水_合计' => 0,
+            if (!empty($input['目标月份'])) {
+                $map0 = " AND 目标月份 = '{$input['目标月份']}'";
+            } else {
+                $目标月份 = date('Y-m');
+                $map0 = " AND 目标月份 = '{$目标月份}'";;
+            }
 
-        ];
-        foreach ($select as $key => $val) {
-            $合计['目标_直营'] += $val['目标_直营'];
-            $合计['目标_加盟'] += $val['目标_加盟'];
-            $合计['目标_合计'] += $val['目标_合计'];
-            $合计['累计流水_直营'] += $val['累计流水_直营'];
-            $合计['累计流水_加盟'] += $val['累计流水_加盟'];
-            $合计['累计流水_合计'] += $val['累计流水_合计'];
+            if (!empty($input['商品专员'])) {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['商品专员']);
+                $map1 = " AND 商品专员 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }  
+            
+
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map2Str = xmSelectInput($input['省份']);
+                $map2 = " AND 省份 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }   
+            if (!empty($input['经营模式'])) {
+                // echo $input['商品负责人'];
+                $map3Str = xmSelectInput($input['经营模式']);
+                $map3 = " AND 经营模式 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }
+            if (!empty($input['店铺名称'])) {
+                // echo $input['商品负责人'];
+                $map4Str = xmSelectInput($input['店铺名称']);
+                $map4 = " AND 店铺名称 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+            if (!empty($input['店铺等级'])) {
+                // echo $input['商品负责人'];
+                $map5Str = xmSelectInput($input['店铺等级']);
+                $map5 = " AND 店铺等级 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+            $map = "{$map0}{$map1}{$map2}{$map3}{$map4}{$map5}";
+            $code = rand_code(6);
+            cache($code, $map, 3600);
+            return json([
+                'status' => 1,
+                'code' => $code,
+            ]); 
+
+        } else {
+            $code = input('code');
+            $map = cache($code);
+            if (empty($map)) {
+                $map = '';
+            }
+            $sql = "
+                SELECT
+                    商品专员,
+                    left(省份, 2) as 省份,
+                    经营模式,店铺名称,店铺等级,本月目标,实际累计流水,累计流水截止日期,
+                    round(目标达成率 * 100, 1) as 目标达成率,
+                    `100%缺口额`,`100%缺口_日均额`,`85%缺口额`,`85%缺口_日均额`,近七天日均销,
+                    round(`100%进度落后` * 100, 1) as `100%进度落后`,
+                    round(`85%进度落后` * 100, 1) as `85%进度落后`,
+                    concat(round(老店业绩同比, 1), '%') as 老店业绩同比
+                FROM
+                    cwl_customitem17_yeji 
+                WHERE 1	
+                    {$map}
+                ORDER BY 商品专员, 本月目标 DESC
+            ";  
+
+            $select = $this->db_easyA->query($sql);
+            $header = [];
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+            return Excel::exportData($select, $header, '门店业绩达成跟进表_' . date('Ymd') . '_' . time() , 'xlsx');
         }
-        $合计['达成率_直营'] = $合计['累计流水_直营'] / $合计['目标_直营'];
-        $合计['达成率_加盟'] = $合计['累计流水_加盟'] / $合计['目标_加盟'];
-        $合计['达成率_合计'] = $合计['累计流水_合计'] / $合计['目标_合计'];
-        $合计['累计流水截止日期'] = $select[0]['累计流水截止日期'];
-
-        // `100%日均需销额_直营` = (`目标_直营` - `累计流水_直营`) / {$到结束剩余天数},
-        // `100%日均需销额_加盟` = (`目标_加盟` - `累计流水_加盟`) / {$到结束剩余天数},
-        // `100%日均需销额_合计` = (`目标_合计` - `累计流水_合计`) / {$到结束剩余天数}
-        dump($合计);
-    }
+    } 
 
 }

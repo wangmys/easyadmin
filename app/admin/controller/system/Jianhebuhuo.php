@@ -1127,7 +1127,7 @@ class Jianhebuhuo extends AdminController
     // 补货测试
     public function redExcel_test_buhuo_new() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
-        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货.xlsx';   //文件保存路径
+        $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/1127店铺配货单导入模板 - 返修鞋子发回.xlsx';   //文件保存路径
         $read_column = [
             'A' => '原单编号',
             'B' => '仓库编号',
@@ -1178,16 +1178,16 @@ class Jianhebuhuo extends AdminController
         }
 
         // $this->db_easyA->startTrans();
-        $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_test')->where([
+        $del1 = $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
             ['aid', '=', $this->authInfo['id']]
         ])->delete();
-        $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_test')->where([
+        $del2 = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->where([
             ['aid', '=', $this->authInfo['id']]
         ])->delete();  
 
         
         // 同步康雷最新在途
-        echo $sql = "
+        $sql = "
             SELECT
                 TOP 20000
                 EC.CustomItem17,
@@ -1214,7 +1214,7 @@ class Jianhebuhuo extends AdminController
                 EIA.InstructionApplyId
         ";
         $select_zaitu = $this->db_sqlsrv->query($sql);
-        die;    
+          
 
         // 先别删
         // $del3 = $this->db_easyA->table('cwl_chuhuozhilingdan_zaitu')->where([
@@ -1226,7 +1226,7 @@ class Jianhebuhuo extends AdminController
         // 批量切割插入
         $chunk_list = array_chunk($data, 1000);
         foreach($chunk_list as $key => $val) {
-            $this->db_easyA->table('cwl_chuhuozhilingdan_test')->insertAll($val);
+            $this->db_easyA->table('cwl_chuhuozhilingdan_3')->insertAll($val);
         }
 
         // 7天清空库存数据 
@@ -1244,10 +1244,10 @@ class Jianhebuhuo extends AdminController
         $fuzheren_str = mb_substr($fuzheren_str, 0, -1, "UTF-8");
         $day7 = $this->day7($fuzheren_str);
 
-        $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_test')->insertAll($day7);
+        $insertAll_7dayclean = $this->db_easyA->table('cwl_chuhuozhilingdan_7dayclean_3')->insertAll($day7);
         $update_chuhuozhilingdan_join_7dayclean = $this->db_easyA->execute("
-            UPDATE cwl_chuhuozhilingdan_7dayclean_test AS a
-            LEFT JOIN cwl_chuhuozhilingdan_test AS b ON a.店铺名称 = b.店铺名称 
+            UPDATE cwl_chuhuozhilingdan_7dayclean_3 AS a
+            LEFT JOIN cwl_chuhuozhilingdan_3 AS b ON a.店铺名称 = b.店铺名称 
             AND a.货号 = b.货号 
             AND b.aid = '{$this->authInfo["id"]}'
             SET b.清空时间 = a.清空时间,
@@ -1273,7 +1273,7 @@ class Jianhebuhuo extends AdminController
                 a.货号,
                 zt.*
             FROM
-                `cwl_chuhuozhilingdan_test` as a right join cwl_chuhuozhilingdan_zaitu as zt
+                `cwl_chuhuozhilingdan_3` as a right join cwl_chuhuozhilingdan_zaitu as zt
                 on a.店铺名称=zt.CustomerName and a.`商品负责人`= zt.CustomItem17 and a.货号=zt.GoodsNo and a.aid = zt.aid
             WHERE
                 a.`aid` = '{$this->authInfo['id']}' 
@@ -1307,7 +1307,7 @@ class Jianhebuhuo extends AdminController
                 if ($kucun[0]['actual_quantity'] - $val['调拨未完成数'] <= 0) {
                     $data['调拨未完成数'] = $val['调拨未完成数'];
                     $data['库存数量'] = $kucun[0]['actual_quantity']; 
-                    $this->db_easyA->table('cwl_chuhuozhilingdan_test')->where([
+                    $this->db_easyA->table('cwl_chuhuozhilingdan_3')->where([
                         ['商品负责人', '=', $val['商品负责人']],
                         ['店铺名称', '=', $val['店铺名称']],
                         ['货号', '=', $val['货号']],

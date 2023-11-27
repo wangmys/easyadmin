@@ -646,6 +646,27 @@ class Summary extends BaseController
                 s.目标月份 = '{$this->目标月份}'
         ";
         $this->db_easyA->execute($sql_销售占比鞋履);
+
+        $sql_特价占比 = "
+            update cwl_summary as s 
+            left join (
+                SELECT
+                    店铺名称,
+                    (select sum(销售金额) from cwl_summary_retail_pro where 店铺名称=m.店铺名称 and 风格='引流款' and 销售日期=m.销售日期) / 
+                    (select sum(销售金额) from cwl_summary_retail_pro where 店铺名称=m.店铺名称 and 销售日期=m.销售日期) as 特价占比   
+                FROM
+                    `cwl_summary_retail_pro` as m
+                WHERE
+                    `销售日期` = '{$date}' 
+                GROUP BY
+                    店铺名称
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.特价占比 = t.特价占比
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_特价占比);
     }
 
 

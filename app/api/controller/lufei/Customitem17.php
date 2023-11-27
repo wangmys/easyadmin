@@ -142,6 +142,15 @@ class Customitem17 extends BaseController
                 ]);
             }
         }
+
+        $sql_店铺等级 = "
+            update cwl_customitem17_yeji as y
+            left join customer as c on y.店铺名称 = c.CustomerName
+            set
+                y.店铺等级 = c.CustomerGrade
+            where 1
+        ";
+        $this->db_easyA->execute($sql_店铺等级);
     }
 
     // 传入开始结束时间戳
