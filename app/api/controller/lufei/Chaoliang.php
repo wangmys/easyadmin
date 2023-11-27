@@ -203,7 +203,7 @@ class Chaoliang extends BaseController
                     AND c.Region <> '闭店区' 
                     AND sk.店铺名称 NOT IN ( '' ) --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
                     
-                    AND sk.年份 = 2023 
+                    AND sk.年份 >= 2023 
                     AND sk.一级分类 IN ('内搭', '外套', '下装', '鞋履')
                 GROUP BY
                     sk.店铺名称,

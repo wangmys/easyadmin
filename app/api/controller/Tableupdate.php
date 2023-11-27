@@ -2525,4 +2525,15 @@ class Tableupdate extends BaseController
         ";
         $this->db_bi->execute($sql);
     }
+
+    // 更新周转表的年份字段
+    public function zhouzhuanyear() {
+        $sql = "
+            update sjp_liangzhou as l
+            left join sp_ww_hpzl as h on l.货号 = h.货号
+            set 
+                l.年份 = h.年份
+        ";
+        $this->db_easyA->execute($sql);
+    }
 }
