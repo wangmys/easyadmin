@@ -2537,4 +2537,17 @@ class Tableupdate extends BaseController
         ";
         $this->db_easyA->execute($sql);
     }
+
+    // 尺码比季节
+    public function chimabiJijie() {
+        $sql = "
+            update `ea_size_ranking` as r
+            left join sp_ww_hpzl as h on r.一级分类=h.一级分类 and r.二级分类=h.二级分类 and r.货号=h.货号
+            set
+                r.季节 = h.季节
+            where
+                r.季节 is null
+        ";
+        $this->db_easyA->execute($sql);
+    }
 }
