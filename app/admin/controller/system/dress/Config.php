@@ -394,10 +394,27 @@ class Config extends AdminController
 
     // 更新周转标识
     public function updateZhouzhuanBiaoshi() {
+        
+        // 查询表头
+        $head = $this->logic->getHead();
+        // dump($head); die;
+        // 查询出实际的自定义标题
+        $head_field = "";
+        foreach ($head as $k => $v) {
+            if ($k + 1 < count($head)) {
+                $head_field .= "'{$v['name']}',";
+            } else {
+                $head_field .= "'{$v['name']}'";
+            }
+        }
+        $sql_del = "delete from ea_customer_yinliu_zzconfig where 字段名 not in ({$head_field})";
+        $this->db_bi->execute($sql_del);
+        // echo $head_field; 
+
         $group_字段名 = $this->db_bi->query("
             select 字段名 from ea_customer_yinliu_zzconfig group by 字段名
         ");
-
+        // echo 11;
         // dump($group_字段名);
 
         foreach ($group_字段名 as $key => $val) {
