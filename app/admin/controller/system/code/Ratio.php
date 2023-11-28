@@ -394,6 +394,8 @@ class Ratio extends AdminController
 
     /**
      * @NodeAnotation(title="展示所有货号整体偏码")
+     * 
+     * ea_size_ranking
      */
     public function alllist()
     {
@@ -473,16 +475,16 @@ class Ratio extends AdminController
             }
 
             // 查询货号列表排名
-            // $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
-            //     ['s.Date' , '=', date('Y-m-d')]
-            // ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
-
-            echo $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
+            $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
                 ['s.Date' , '=', date('Y-m-d')]
-            ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->fetchSql()->select();
-            // echo $list::fetchSql(); 
-            // echo $list->fetchSql(); 
-            die;
+            ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
+
+            // echo $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
+            //     ['s.Date' , '=', date('Y-m-d')]
+            // ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->fetchSql()->select();
+            // // echo $list::fetchSql(); 
+            // // echo $list->fetchSql(); 
+            // die;
          
             // 分组后的数量
             $count = $model->alias('s')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where(['s.Date' => date('Y-m-d')])->group('s.货号')->count();
