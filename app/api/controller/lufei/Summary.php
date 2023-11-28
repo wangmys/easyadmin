@@ -76,6 +76,14 @@ class Summary extends BaseController
         return $seasionStr;
     }
 
+    public function autoUpdate() {
+        $this->getData0();
+        $this->getData1();
+        $this->getData2();
+        $this->getData3();
+        $this->getData4();
+    }
+
     // 几秒
     public function getData0() {
         $目标月份 = date('Y-m');
@@ -142,11 +150,13 @@ class Summary extends BaseController
         ";
         $this->db_easyA->execute($sql_更新若干);
 
+        //   concat(  round(  (SUM(今日流水)   / SUM( `环比流水` )   - 1) * 100 , 2),    '%') AS 今日环比,
+        //   concat(  round(  (SUM( `本月累计流水` ) / SUM( `环比累计流水`) - 1 ) * 100 , 2),  '%') AS 月度环比,
         $sql_环比 = "
             update cwl_summary as s
             left join cwl_dianpuyejihuanbi_handle as h on s.店铺名称=h.店铺名称
             set
-                s.环比=h.今日环比
+                s.环比=  concat(   round( (h.今日流水 / 环比流水 -1) * 100 , 1),    '%')
             where 
                 h.更新日期='{$昨天}'
                 AND s.目标月份 = '{$this->目标月份}'
@@ -719,46 +729,29 @@ class Summary extends BaseController
         ";
         $this->db_easyA->execute($sql_售空);
 
-        $sql_不动销需调整skc = "
+        $sql_不动销需调整skc_秋 = "
             update cwl_summary as s 
             right join (
                 SELECT 店铺简称 AS 店铺名称,需要调整SKC数 FROM `cwl_budongxiao_result_sys` where 考核结果 = '不合格'
             ) as t_autumn on s.店铺名称 = t_autumn.店铺名称
+            set
+                s.`不动销需调整SKC_秋` = t_autumn.`需要调整SKC数`
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_不动销需调整skc_秋); 
+
+        $sql_不动销需调整skc_冬 = "
+            update cwl_summary as s 
             right join (
                 SELECT 店铺简称 AS 店铺名称,需要调整SKC数 FROM `cwl_budongxiao_result_sys_winter` where 考核结果 = '不合格'
             ) as t_winter on s.店铺名称 = t_winter.店铺名称
             set
-                s.`不动销需调整SKC_秋` = t_autumn.`需要调整SKC数`,
                 s.`不动销需调整SKC_冬` = t_winter.`需要调整SKC数`
             where 1
                 AND 目标月份='{$this->目标月份}'
         ";
-        $this->db_easyA->execute($sql_不动销需调整skc);
-        
-        $sql_断码率情况_秋 = "
-            update cwl_summary as s 
-            left join (
-                SELECT
-                    m.店铺名称,
-                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '外套' HAVING 领型断码数 > 0) AS `断码率情况_秋_外套`,
-                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '内搭' HAVING 领型断码数 > 0) AS `断码率情况_秋_内搭`,
-                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '下装' HAVING 领型断码数 > 0) AS `断码率情况_秋_下装`,
-                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '鞋履' HAVING 领型断码数 > 0) AS `断码率情况_秋_鞋履`
-                FROM
-                    `cwl_duanmalv_table6` as m
-                WHERE 1
-                GROUP BY
-                    m.店铺名称
-            ) as t on s.店铺名称 = t.店铺名称
-            set
-                s.`断码率情况_秋_外套` = t.`断码率情况_秋_外套`,
-                s.`断码率情况_秋_内搭` = t.`断码率情况_秋_内搭`,
-                s.`断码率情况_秋_下装` = t.`断码率情况_秋_下装`,
-                s.`断码率情况_秋_鞋履` = t.`断码率情况_秋_鞋履`
-            where 1
-                AND 目标月份='{$this->目标月份}'
-        ";
-        $this->db_easyA->execute($sql_断码率情况_秋);
+        $this->db_easyA->execute($sql_不动销需调整skc_冬); 
 
         $sql_断码率情况_秋 = "
             update cwl_summary as s 
