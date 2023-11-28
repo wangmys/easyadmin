@@ -32,10 +32,6 @@ class Summary extends AdminController
         $this->create_time = date('Y-m-d H:i:s', time());
     }
 
-    public function test2() {
-        echo 'test2';
-    }
-
     /**
      * @NodeAnotation(title="") 
      * 
@@ -157,7 +153,8 @@ class Summary extends AdminController
 
             $sql = "
                 SELECT
-                    商品专员,省份,经营模式,店铺名称,首单日期,本月目标,当前流水,目标达成率,
+                    商品专员,经营模式,店铺名称,首单日期,本月目标,当前流水,目标达成率,
+                    left(省份, 2) as 省份,
                     round(日均流水, 2) as 日均流水,
                     剩余日均流水,环比,同比,
                     concat(round(上装春占比 * 100, 1), '%') as 上装春占比,
@@ -170,8 +167,8 @@ class Summary extends AdminController
                     concat(`不动销占比`, '%') as 不动销占比,
                     concat(round(断码率整体齐码率 * 100, 1), '%') as 断码率整体齐码率,
                     concat(round(断码率TOP考核齐码率 * 100, 1), '%') as 断码率TOP考核齐码率,
-                    `单款超量SKC数`
-                    
+                    `单款超量SKC数`,
+                    销售贡献比_外套,销售贡献比_内搭,销售贡献比_下装,销售贡献比_鞋履,特价占比,周转_外套
                 FROM
                     cwl_summary 
                 WHERE 1	

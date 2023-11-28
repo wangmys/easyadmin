@@ -183,8 +183,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         cols: [
                             [
                             {field: '全国排名', width: 60, title: '排名',search:false,fixed:'left'},
-                            {field: '货号', width: 90, title: '货号',search:true},
-                            {field: '风格', width: 60, title: '风格',search: 'xmSelect',selectList:Style,fixed:'left'},
+                            {field: '货号', width: 90, title: '货号',search:true,fixed:'left'},
+                            {field: '风格', width: 60, title: '风格',search: 'xmSelect',selectList:Style,fixed:'left',fixed:'left'},
                             {field: '一级分类', width: 60, title: '大类',fieldAlias:'cate',search:'select',selectList:CategoryName1,fixed:'left',hide:true},
                             {field: '二级分类', width: 80, title: '中类',fieldAlias:'cate2',search:'select',selectList:CategoryName2,fixed:'left',hide:true},
                             {field: '领型', width: 70, title: '领型',fieldAlias:'collar',search:'select',selectList:Collar,fixed:'left'},

@@ -696,28 +696,119 @@ class Summary extends BaseController
         $sql_售空 = "
             update cwl_summary as s 
             left join (
-                    SELECT
-                        m.店铺名称,
-                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '外套') AS `售空_外套`,
-                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '内搭') AS `售空_内搭`,
-                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '下装') AS `售空_下装`,
-                        (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '鞋履') AS `售空_鞋履`
-                    FROM
-                        `cwl_chaoliang_sk` as m
-                    WHERE
-                        1
-                    GROUP BY
-                            m.店铺名称
+                SELECT
+                    m.店铺名称,
+                    (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '外套') AS `售空_外套`,
+                    (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '内搭') AS `售空_内搭`,
+                    (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '下装') AS `售空_下装`,
+                    (SELECT count(*) FROM cwl_skauto_res WHERE 售空提醒 is not null and 店铺名称 = m.店铺名称 and 一级分类 = '鞋履') AS `售空_鞋履`
+                FROM
+                    `cwl_chaoliang_sk` as m
+                WHERE
+                    1
+                GROUP BY
+                    m.店铺名称
             ) as t on s.店铺名称 = t.店铺名称
             set
-                    s.`售空_外套` = t.`售空_外套`,
-                    s.`售空_内搭` = t.`售空_内搭`,
-                    s.`售空_下装` = t.`售空_下装`,
-                    s.`售空_鞋履` = t.`售空_鞋履`
+                s.`售空_外套` = case when t.`售空_外套` > 0 then t.`售空_外套` else null end,
+                s.`售空_内搭` = case when t.`售空_内搭` > 0 then t.`售空_内搭` else null end,
+                s.`售空_下装` = case when t.`售空_下装` > 0 then t.`售空_下装` else null end,
+                s.`售空_鞋履` = case when t.`售空_鞋履` > 0 then t.`售空_鞋履` else null end
             where 1
-                    AND 目标月份='{$this->目标月份}'
+                AND 目标月份='2023-11'
         ";
         $this->db_easyA->execute($sql_售空);
+
+        $sql_不动销需调整skc = "
+            update cwl_summary as s 
+            right join (
+                SELECT 店铺简称 AS 店铺名称,需要调整SKC数 FROM `cwl_budongxiao_result_sys` where 考核结果 = '不合格'
+            ) as t_autumn on s.店铺名称 = t_autumn.店铺名称
+            right join (
+                SELECT 店铺简称 AS 店铺名称,需要调整SKC数 FROM `cwl_budongxiao_result_sys_winter` where 考核结果 = '不合格'
+            ) as t_winter on s.店铺名称 = t_winter.店铺名称
+            set
+                s.`不动销需调整SKC_秋` = t_autumn.`需要调整SKC数`,
+                s.`不动销需调整SKC_冬` = t_winter.`需要调整SKC数`
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_不动销需调整skc);
+        
+        $sql_断码率情况_秋 = "
+            update cwl_summary as s 
+            left join (
+                SELECT
+                    m.店铺名称,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '外套' HAVING 领型断码数 > 0) AS `断码率情况_秋_外套`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '内搭' HAVING 领型断码数 > 0) AS `断码率情况_秋_内搭`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '下装' HAVING 领型断码数 > 0) AS `断码率情况_秋_下装`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '鞋履' HAVING 领型断码数 > 0) AS `断码率情况_秋_鞋履`
+                FROM
+                    `cwl_duanmalv_table6` as m
+                WHERE 1
+                GROUP BY
+                    m.店铺名称
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.`断码率情况_秋_外套` = t.`断码率情况_秋_外套`,
+                s.`断码率情况_秋_内搭` = t.`断码率情况_秋_内搭`,
+                s.`断码率情况_秋_下装` = t.`断码率情况_秋_下装`,
+                s.`断码率情况_秋_鞋履` = t.`断码率情况_秋_鞋履`
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_断码率情况_秋);
+
+        $sql_断码率情况_秋 = "
+            update cwl_summary as s 
+            left join (
+                SELECT
+                    m.店铺名称,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '外套' HAVING 领型断码数 > 0) AS `断码率情况_秋_外套`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '内搭' HAVING 领型断码数 > 0) AS `断码率情况_秋_内搭`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '下装' HAVING 领型断码数 > 0) AS `断码率情况_秋_下装`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6 WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '鞋履' HAVING 领型断码数 > 0) AS `断码率情况_秋_鞋履`
+                FROM
+                    `cwl_duanmalv_table6` as m
+                WHERE 1
+                GROUP BY
+                    m.店铺名称
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.`断码率情况_秋_外套` = t.`断码率情况_秋_外套`,
+                s.`断码率情况_秋_内搭` = t.`断码率情况_秋_内搭`,
+                s.`断码率情况_秋_下装` = t.`断码率情况_秋_下装`,
+                s.`断码率情况_秋_鞋履` = t.`断码率情况_秋_鞋履`
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_断码率情况_秋);
+
+        $sql_断码率情况_冬 = "
+            update cwl_summary as s 
+            left join (
+                SELECT
+                    m.店铺名称,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6_winter WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '外套' HAVING 领型断码数 > 0) AS `断码率情况_冬_外套`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6_winter WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '内搭' HAVING 领型断码数 > 0) AS `断码率情况_冬_内搭`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6_winter WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '下装' HAVING 领型断码数 > 0) AS `断码率情况_冬_下装`,
+                    (SELECT sum(领型断码数) as 领型断码数 FROM cwl_duanmalv_table6_winter WHERE 1 AND 店铺名称 = m.店铺名称 AND 一级分类 = '鞋履' HAVING 领型断码数 > 0) AS `断码率情况_冬_鞋履`
+                FROM
+                    `cwl_duanmalv_table6_winter` as m
+                WHERE 1
+                GROUP BY
+                    m.店铺名称
+            ) as t on s.店铺名称 = t.店铺名称
+            set
+                s.`断码率情况_冬_外套` = t.`断码率情况_冬_外套`,
+                s.`断码率情况_冬_内搭` = t.`断码率情况_冬_内搭`,
+                s.`断码率情况_冬_下装` = t.`断码率情况_冬_下装`,
+                s.`断码率情况_冬_鞋履` = t.`断码率情况_冬_鞋履`
+            where 1
+                AND 目标月份='{$this->目标月份}'
+        ";
+        $this->db_easyA->execute($sql_断码率情况_冬);
     }
 
 

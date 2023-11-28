@@ -83,6 +83,8 @@ class Index extends AdminController
 
     /**
      * @NodeAnotation(title="错误调拨统计")
+     * 
+     * 表：ea_command_error_total
      */
     public function total()
     {
@@ -102,6 +104,12 @@ class Index extends AdminController
                 }
             })->order('商品负责人,year desc,month asc')->select();
 
+            // echo $list = $this->totalModel->where(function ($q)use($filters,$manager){
+            //     if(!empty($filters['商品负责人'])){
+            //          $q->whereIn('商品负责人',$filters['商品负责人']);
+            //     }
+            // })->order('商品负责人,year desc,month asc')->fetchSql(true)->select();
+            // die;
             // 数据集重组
             $new = [];
             foreach ($list as $k => $v){

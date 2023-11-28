@@ -407,6 +407,7 @@ class Config extends AdminController
                 $head_field .= "'{$v['name']}'";
             }
         }
+        // 删除bug造成没删除成功的
         $sql_del = "delete from ea_customer_yinliu_zzconfig where 字段名 not in ({$head_field})";
         $this->db_bi->execute($sql_del);
         // echo $head_field; 
