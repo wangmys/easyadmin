@@ -42,4 +42,8 @@ class Pull extends BaseController
             'msg' => $model->getError($code)
         ]);
     }
+
+    public function test () {
+        echo 111;
+    }
 }

@@ -9,4 +9,5 @@ class CommandErrorLog extends TimeModel
 {
     // 表名
     protected $name = 'command_error_log';
+    // protected $name = 'command_error_log_2';
 }

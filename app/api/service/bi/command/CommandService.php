@@ -85,6 +85,8 @@ class CommandService
             $log[$k]['is_error']??$log[$k]['is_error'] = 0;
         }
         $result_process = $this->processData($result);
+
+        // dump($result_log);die;
         // 提交事务
         Db::startTrans();
         try{

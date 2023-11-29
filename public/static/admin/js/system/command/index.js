@@ -35,6 +35,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     // {type: "checkbox"},
                     // {field: 'id', minWith: '10%', title: 'ID',search:false},
                     {field: '商品负责人', minWith: '10%', title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)},
+                    {field: '创建人', minWith: 134, title: '创建人',search:false},
                     {field: '店铺名称', minWith: 134, title: '店铺名称',search:false},
                     {field: '货号', minWith: 134, title: '货号',search:false},
                     {field: '单据类型', minWith: 134, title: '单据类型',search:false},
