@@ -486,7 +486,7 @@ class Puhuoruleb extends AdminController
                         ];
                         $ruleB = $db->table('sp_lyp_puhuo_rule_b')->where($where)->find();
                         if ($ruleB) {
-                            $a = $db->table('sp_lyp_puhuo_rule_b')->where(['id' => $ruleB['id']])->update($update_data);
+                            $a = $db->table('sp_lyp_puhuo_rule_b')->where($where)->update($update_data);
                         } else {
                             $add_data[] = [
                                 'Yuncang' => $v_data['云仓'],
