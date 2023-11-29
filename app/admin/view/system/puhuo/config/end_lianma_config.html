@@ -6,7 +6,9 @@
                 <tr>
                     <th style="width: 120px;">内/外/鞋履</th>
                     <th style="width: 120px;">松紧短裤/松紧长裤</th>
+                    <th style="width: 120px;">羊毛库</th>
                     <th style="width: 120px;">其余下装</th>
+                    <th style="width: 120px;">套西</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -18,10 +20,15 @@
                     <td class="end_puhuo_lianma_sjdk">
                         <input type="text" name="end_puhuo_lianma_sjdk" lay-verify="required" placeholder="请输入" value="{$puhuo_config['end_puhuo_lianma_sjdk']}" class="layui-input">
                     </td>
+                    <td class="end_puhuo_lianma_ymk">
+                        <input type="text" name="end_puhuo_lianma_ymk" lay-verify="required" placeholder="请输入" value="{$puhuo_config['end_puhuo_lianma_ymk']}" class="layui-input">
+                    </td>
                     <td class="end_puhuo_lianma_xz">
                         <input type="text" name="end_puhuo_lianma_xz" lay-verify="required" placeholder="请输入" value="{$puhuo_config['end_puhuo_lianma_xz']}" class="layui-input">
                     </td>
-    
+                    <td class="end_puhuo_lianma_tx">
+                        <input type="text" name="end_puhuo_lianma_tx" lay-verify="required" placeholder="请输入" value="{$puhuo_config['end_puhuo_lianma_tx']}" class="layui-input">
+                    </td>
                     <td class="handler">
                         <input type="text" name="sign_id" class="layui-hide" value="{$puhuo_config['config_str']}">
                         <button type="button" class="layui-btn layui-btn-normal get_end_lianma_config">保存</button>

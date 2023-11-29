@@ -822,34 +822,104 @@ class Puhuo_yuncangkeyong extends Command
         $puhuo_config = SpLypPuhuoConfigModel::where([['config_str', '=', 'puhuo_config']])->find();
         $warehouse_qima_nd = $puhuo_config ? $puhuo_config['warehouse_qima_nd'] : 0;
         $warehouse_qima_xz = $puhuo_config ? $puhuo_config['warehouse_qima_xz'] : 0;
+        $warehouse_qima_ymk = $puhuo_config ? $puhuo_config['warehouse_qima_ymk'] : 0;
+        $warehouse_qima_tx = $puhuo_config ? $puhuo_config['warehouse_qima_tx'] : 0;
         $store_puhuo_lianma_nd = $puhuo_config ? $puhuo_config['store_puhuo_lianma_nd'] : 0;//中间码连码个数 （有可能为：2，3，4）
         $store_puhuo_lianma_xz = $puhuo_config ? $puhuo_config['store_puhuo_lianma_xz'] : 0;//中间码连码个数（有可能为：2，3，4，5，6）
+        //羊毛裤
+        $store_puhuo_lianma_ymk = $puhuo_config ? $puhuo_config['store_puhuo_lianma_ymk'] : 0;
+        //套西
+        $store_puhuo_lianma_tx = $puhuo_config ? $puhuo_config['store_puhuo_lianma_tx'] : 0;
 
-        $sql_store_puhuo_lianma_nd = $sql_store_puhuo_lianma_xz = '';
         //内搭、外套、鞋履、松紧裤
         if ($store_puhuo_lianma_nd == 2) {//中间码，2连码
 
             $sql_store_puhuo_lianma_nd = " 
-            or (CategoryName1 in ('内搭', '外套', '鞋履') and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0) or  (Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
+            or (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0) or  (Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
             or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0) or  (Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
 
         } elseif ($store_puhuo_lianma_nd == 3) {
 
             $sql_store_puhuo_lianma_nd = " 
-            or (CategoryName1 in ('内搭', '外套', '鞋履') and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
+            or (CategoryName1 in ('内搭', '外套', '鞋履')  and CategoryName2 not like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
             or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
 
         } elseif ($store_puhuo_lianma_nd == 4) {
 
             $sql_store_puhuo_lianma_nd = " 
-            or (CategoryName1 in ('内搭', '外套', '鞋履') and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0)  )) 
+            or (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0)  )) 
             or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) ) ";
 
         } else {//其他默认使用3 
 
             $sql_store_puhuo_lianma_nd = " 
-            or (CategoryName1 in ('内搭', '外套', '鞋履') and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
+            or (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) 
             or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
+
+        }
+        //套西
+        if ($store_puhuo_lianma_tx == 2) {
+            $sql_tx=" or (CategoryName2  like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0) or  (Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
+        }else if($store_puhuo_lianma_tx == 3){
+            $sql_tx=" or (CategoryName2  like '%套西%'  and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
+        }else if($store_puhuo_lianma_tx == 4){
+            $sql_tx=" or (CategoryName2  like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0)  )) ";
+        }else{//其他默认使用3
+            $sql_tx=" or (CategoryName2  like '%套西%'  and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
+        }
+
+
+        //羊毛裤
+        if ($store_puhuo_lianma_ymk == 2) {
+
+            $sql_ymk = " or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and 
+                ( 
+                (Stock_29_puhuo >0 and Stock_30_puhuo >0) or 
+                (Stock_30_puhuo >0 and Stock_31_puhuo >0) or 
+                (Stock_31_puhuo >0 and Stock_32_puhuo >0) or 
+                (Stock_32_puhuo >0 and Stock_33_puhuo >0) or   
+                (Stock_33_puhuo >0 and Stock_34_puhuo >0)   
+                )
+                )  ";;
+
+        } else if ($store_puhuo_lianma_ymk == 3) {
+            $sql_ymk = " or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and 
+                ( 
+                (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0) or 
+                (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0) or 
+                (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
+                (Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0)  
+                )
+                )  ";
+        } else if ($store_puhuo_lianma_ymk == 4) {
+
+            $sql_ymk = " or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and                 
+                ( 
+                (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0) or 
+                (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
+                (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0)  
+                )
+                )  ";
+        } else if ($store_puhuo_lianma_ymk == 5) {
+            $sql_ymk = " or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and                                 
+                ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
+                (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
+                ) ";
+        } else if ($store_puhuo_lianma_ymk == 6) {
+            $sql_ymk = "or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and                                 
+                 ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
+                )";
+        } else { //其他默认使用5
+            $sql_ymk = " or (
+                CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and                                                 
+                ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
+                (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
+                )  ";
 
         }
 
@@ -857,7 +927,7 @@ class Puhuo_yuncangkeyong extends Command
         if ($store_puhuo_lianma_xz == 2) {
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( 
                 (Stock_29_puhuo >0 and Stock_30_puhuo >0) or 
                 (Stock_30_puhuo >0 and Stock_31_puhuo >0) or 
@@ -870,7 +940,7 @@ class Puhuo_yuncangkeyong extends Command
         } elseif ($store_puhuo_lianma_xz == 3) {
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( 
                 (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0) or 
                 (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0) or 
@@ -882,7 +952,7 @@ class Puhuo_yuncangkeyong extends Command
         } elseif ($store_puhuo_lianma_xz == 4) {
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( 
                 (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0) or 
                 (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
@@ -893,7 +963,7 @@ class Puhuo_yuncangkeyong extends Command
         } elseif ($store_puhuo_lianma_xz == 5) {
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
                 (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
                 )  ";
@@ -901,14 +971,14 @@ class Puhuo_yuncangkeyong extends Command
         } elseif ($store_puhuo_lianma_xz == 6) {
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
                 )  ";
 
         } else {//其他默认使用5
 
             $sql_store_puhuo_lianma_xz = " or (
-                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and 
+                CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and CategoryName2 not like '%羊毛裤%' and
                 ( (Stock_29_puhuo >0 and Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) or 
                 (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0 and Stock_34_puhuo >0) )
                 )  ";
@@ -916,12 +986,15 @@ class Puhuo_yuncangkeyong extends Command
         }
 
         $sql = "select WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
-        (CategoryName1 in ('内搭', '外套', '鞋履') and qima>=$warehouse_qima_nd) 
+        (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and qima>=$warehouse_qima_nd) 
+        or ( CategoryName2 like '%套西%' and qima>=$warehouse_qima_tx) 
         or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and qima>=$warehouse_qima_nd) 
-        or (CategoryName1 = '下装' and CategoryName2 not like '%松紧%' and qima>=$warehouse_qima_xz)  
+        or (CategoryName1 = '下装' and CategoryName2  like '%羊毛裤%' and qima>=$warehouse_qima_ymk)  
+        or (CategoryName1 = '下装' and CategoryName2 not like '%松紧%'  and CategoryName2 not like '%羊毛裤%' and qima>=$warehouse_qima_xz)  
 
+        $sql_tx
         $sql_store_puhuo_lianma_nd 
-
+        $sql_ymk
         $sql_store_puhuo_lianma_xz 
 
         then 1 else 0 end) as can_puhuo from sp_lyp_puhuo_yuncangkeyong where 1 having  can_puhuo=1;";

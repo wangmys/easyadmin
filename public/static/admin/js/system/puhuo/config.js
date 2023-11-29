@@ -169,12 +169,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 $(element).find('.get_lianma_config').on('click', function(){
                     var _url = url.save_lianma_config_url;
                     var store_puhuo_lianma_nd = $(element).find('input[name="store_puhuo_lianma_nd"]').val();
+                    var store_puhuo_lianma_ymk = $(element).find('input[name="store_puhuo_lianma_ymk"]').val();
+                    var store_puhuo_lianma_tx = $(element).find('input[name="store_puhuo_lianma_tx"]').val();
                     var store_puhuo_lianma_xz = $(element).find('input[name="store_puhuo_lianma_xz"]').val();
                     var sign_id = $(element).find('input[name="sign_id"]').val();
     
                     var _data = {
                         store_puhuo_lianma_nd:store_puhuo_lianma_nd,
                         store_puhuo_lianma_xz:store_puhuo_lianma_xz,
+                        store_puhuo_lianma_tx:store_puhuo_lianma_tx,
+                        store_puhuo_lianma_ymk:store_puhuo_lianma_ymk,
                         sign_id:sign_id,
                     }
                     // console.log(_data);
@@ -200,11 +204,15 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var _url = url.save_warehouse_qima_config_url;
                     var warehouse_qima_nd = $(element).find('input[name="warehouse_qima_nd"]').val();
                     var warehouse_qima_xz = $(element).find('input[name="warehouse_qima_xz"]').val();
+                    var warehouse_qima_ymk = $(element).find('input[name="warehouse_qima_ymk"]').val();
+                    var warehouse_qima_tx = $(element).find('input[name="warehouse_qima_tx"]').val();
                     var sign_id = $(element).find('input[name="sign_id"]').val();
     
                     var _data = {
                         warehouse_qima_nd:warehouse_qima_nd,
                         warehouse_qima_xz:warehouse_qima_xz,
+                        warehouse_qima_ymk:warehouse_qima_ymk,
+                        warehouse_qima_tx:warehouse_qima_tx,
                         sign_id:sign_id,
                     }
                     // console.log(_data);
@@ -259,13 +267,17 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var _url = url.save_end_lianma_config_url;
                     var end_puhuo_lianma_nd = $(element).find('input[name="end_puhuo_lianma_nd"]').val();
                     var end_puhuo_lianma_sjdk = $(element).find('input[name="end_puhuo_lianma_sjdk"]').val();
+                    var end_puhuo_lianma_ymk = $(element).find('input[name="end_puhuo_lianma_ymk"]').val();
                     var end_puhuo_lianma_xz = $(element).find('input[name="end_puhuo_lianma_xz"]').val();
+                    var end_puhuo_lianma_tx = $(element).find('input[name="end_puhuo_lianma_tx"]').val();
                     var sign_id = $(element).find('input[name="sign_id"]').val();
     
                     var _data = {
                         end_puhuo_lianma_nd:end_puhuo_lianma_nd,
                         end_puhuo_lianma_sjdk:end_puhuo_lianma_sjdk,
+                        end_puhuo_lianma_ymk:end_puhuo_lianma_ymk,
                         end_puhuo_lianma_xz:end_puhuo_lianma_xz,
+                        end_puhuo_lianma_tx:end_puhuo_lianma_tx,
                         sign_id:sign_id,
                     }
                     // console.log(_data);

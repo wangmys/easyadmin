@@ -416,7 +416,7 @@ class Puhuo_start2_merge extends Command
                         $v_add_all_arr['score_sort'] = ++$k_add_all_arr;
                     }
                     // print_r($daxiaoma_customer_sort);die;
-                    
+
                     if ($add_all_arr) {
                         $chunk_list = array_chunk($add_all_arr, 500);
                         foreach($chunk_list as $key => $val) {
@@ -1067,6 +1067,8 @@ class Puhuo_start2_merge extends Command
                                         ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
                                         
                                         $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
+
+//                                        dd($add_puhuo_log);
                                         $res_taozhuang[] = $add_puhuo_log;
                                         //要查询最新的库存数据出来
                                         $cur_goods = $this->puhuo_wait_goods_model::where([['id', '=', $v_data['id']]])->find();
@@ -1901,6 +1903,8 @@ class Puhuo_start2_merge extends Command
             $lianma_num = 0;
             if ($v_data['CategoryName1'] == '内搭') {
                 $lianma_num = $puhuo_config['end_puhuo_lianma_nd'];
+            } elseif ( strpos($v_data['CategoryName2'],'套西')) {
+                $lianma_num = $puhuo_config['end_puhuo_lianma_tx'];
             } elseif ($v_data['CategoryName1'] == '外套') {
                 $lianma_num = $puhuo_config['end_puhuo_lianma_wt'];
             } elseif ($v_data['CategoryName1'] == '鞋履') {
@@ -1909,7 +1913,9 @@ class Puhuo_start2_merge extends Command
                 $lianma_num = $puhuo_config['end_puhuo_lianma_sjdk'];
             } elseif ($v_data['CategoryName2'] == '松紧长裤') {
                 $lianma_num = $puhuo_config['end_puhuo_lianma_sjck'];
-            } else {
+            } elseif ($v_data['CategoryName2'] == '羊毛裤') {
+                $lianma_num = $puhuo_config['end_puhuo_lianma_ymk'];
+            }  else {
                 $lianma_num = $puhuo_config['end_puhuo_lianma_xz'];//其他下装
             }
 
@@ -1983,7 +1989,7 @@ class Puhuo_start2_merge extends Command
 
 
 
-            if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
+            if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && (strstr($v_data['CategoryName2'], '松紧') || strstr($v_data['CategoryName2'], '羊毛裤') ))) {
                 
                 //铺29码
                 if ($v_data['Stock_29'] > 0) {
@@ -2075,7 +2081,7 @@ class Puhuo_start2_merge extends Command
                     if (!$is_lianma) {//没有连码 ，不可铺
 
                         //不可铺，wait_goods（主码）各个尺码库存恢复
-                        if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
+                        if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && (strstr($v_data['CategoryName2'], '松紧') || strstr($v_data['CategoryName2'], '羊毛裤') ))) {
                 
                             $init_puhuo_stock['Stock_30_puhuo'] = ($v_data['Stock_30_puhuo']>=0) ? ($init_puhuo_stock['Stock_30_puhuo']+$v_last_daxiaoma_puhuo_log['Stock_30_puhuo']) : $v_data['Stock_30_puhuo'];
                             $init_puhuo_stock['Stock_31_puhuo'] = ($v_data['Stock_31_puhuo']>=0) ? ($init_puhuo_stock['Stock_31_puhuo']+$v_last_daxiaoma_puhuo_log['Stock_31_puhuo']) : $v_data['Stock_31_puhuo'];
@@ -2131,7 +2137,7 @@ class Puhuo_start2_merge extends Command
                     } else {//有满足连码
 
                         //最终满足连码的情况， wait_goods 要把各个大小码的库存减去
-                        if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
+                        if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && (strstr($v_data['CategoryName2'], '松紧') || strstr($v_data['CategoryName2'], '羊毛裤') ))) {
                 
                             $init_puhuo_stock['Stock_00_puhuo'] = ($v_data['Stock_00_puhuo']>=0) ? ($init_puhuo_stock['Stock_00_puhuo'] - $v_last_daxiaoma_puhuo_log['Stock_00_puhuo']) : $v_data['Stock_00_puhuo'];
                             $init_puhuo_stock['Stock_29_puhuo'] = ($v_data['Stock_29_puhuo']>=0) ? ($init_puhuo_stock['Stock_29_puhuo'] - $v_last_daxiaoma_puhuo_log['Stock_29_puhuo']) : $v_data['Stock_29_puhuo'];
@@ -3212,6 +3218,7 @@ class Puhuo_start2_merge extends Command
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();
+                    dd($e->getMessage());
                 }
             }
 
