@@ -16,7 +16,7 @@ class Run extends BaseController
 
     if (env('ENV_SIGN') == 'local') {
 
-      $res = exec("cd D:/wwwroot/suoge/sg_easyadmin/easyadmin && php think puhuo_start2_merge");
+      $res = exec("cd E:/phpstudy_pro/WWW/easyadmin && php think puhuo_start2_merge");
       
     } elseif (env('ENV_SIGN') == 'product') {
 
