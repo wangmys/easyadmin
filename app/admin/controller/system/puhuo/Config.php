@@ -169,6 +169,7 @@ class Config extends AdminController
 
     }
 
+
     /**
      * @NodeAnotation(title="保存仓库齐码参数配置")
      */
@@ -208,15 +209,12 @@ class Config extends AdminController
     public function saveEndLianmaConfig() {
 
         $post = $this->request->post();
-        if (!$post['end_puhuo_lianma_nd'] || !$post['end_puhuo_lianma_sjdk'] || !$post['end_puhuo_lianma_xz']) {
+        if (!$post['end_puhuo_lianma_nd'] || !$post['end_puhuo_lianma_sjdk'] || !$post['end_puhuo_lianma_xz'] || !$post['end_puhuo_lianma_tx'] || !$post['end_puhuo_lianma_ymk']) {
             return $this->error('存在值为空的情况，请检查');
         }
-        $post['end_puhuo_lianma_nd'] = $post['end_puhuo_lianma_nd'];
         $post['end_puhuo_lianma_wt'] = $post['end_puhuo_lianma_nd'];
         $post['end_puhuo_lianma_xl'] = $post['end_puhuo_lianma_nd'];
-        $post['end_puhuo_lianma_sjdk'] = $post['end_puhuo_lianma_sjdk'];
         $post['end_puhuo_lianma_sjck'] = $post['end_puhuo_lianma_sjdk'];
-        $post['end_puhuo_lianma_xz'] = $post['end_puhuo_lianma_xz'];
         $res_id = $this->service->save_warehouse_config($post);
 
         return $this->success('成功',['id' => $res_id, 'sign_id'=>$post['sign_id']]);
