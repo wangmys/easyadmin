@@ -460,7 +460,6 @@ class Puhuoruleb extends AdminController
                     $add_data = [];
                     foreach ($data as $v_data) {
                         $update_data = [
-                            'CustomerGrade' => $v_data['等级'],
                             'Stock_00' => $v_data['44/28/'],
                             'Stock_29' => $v_data['46/29/165/38/M/105'],
                             'Stock_30' => $v_data['48/30/170/39/L/110'],
