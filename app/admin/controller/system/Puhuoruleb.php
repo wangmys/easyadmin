@@ -483,6 +483,7 @@ class Puhuoruleb extends AdminController
                             'CategoryName1' => $v_data['一级分类'],
                             'CategoryName2' => $v_data['二级分类'],
                             'CategoryName' => $v_data['分类'],
+                            'CustomerGrade' => $v_data['等级'],
                         ];
                         $ruleB = $db->table('sp_lyp_puhuo_rule_b')->where($where)->find();
                         if ($ruleB) {
