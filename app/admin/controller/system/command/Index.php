@@ -45,7 +45,7 @@ class Index extends AdminController
         $filters = json_decode($this->request->get('filter', '{}',null), true);
          // 商品负责人列表
         $manager = $this->errorLogModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
-        $month = $this->errorLogModel->group('month')->order('month','desc')->column('month','month');
+        $month = $this->errorLogModel->group('month')->order('month ','desc')->column('month','month');
 
         // dump($manager);die;
         // 获取参数
