@@ -3,17 +3,22 @@
 
 namespace app\admin\controller\system;
 
+use AlibabaCloud\SDK\Dingtalk\Vedu_1_0\Models\DeactivateDeviceHeaders;
 use app\admin\model\bi\SpLypPuhuoRuleBModel;
 use app\admin\model\CustomerModel;
 use app\admin\model\SjpGoodsModel;
 use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
+
 // use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
+use think\Exception;
+use think\exception\ValidateException;
 use think\facade\Db;
+
 // use voku\helper\HtmlDomParser;
 // use think\cache\driver\Redis;
 // use app\admin\model\weather\Region;
@@ -27,7 +32,7 @@ class Puhuoruleb extends AdminController
 {
     protected $sort = [
         'sort' => 'desc',
-        'id'   => 'desc',
+        'id' => 'desc',
     ];
     const ProductMemberAuth = 7;
 
@@ -40,7 +45,8 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="铺货规则参数B列表")
      */
-    public function index() {
+    public function index()
+    {
 
         if ($this->request->isAjax()) {
             if (input('selectFields')) {
@@ -49,18 +55,18 @@ class Puhuoruleb extends AdminController
             list($page, $limit, $params) = $this->buildTableParames();
             $where = $this->getParms();
             $list = $this->model->where(function ($query) use ($where) {
-                                if (!empty($where['Yuncang'])) $query->where('Yuncang', $where['Yuncang']);
-                                if (!empty($where['State'])) $query->where('State', $where['State']);
-                                if (!empty($where['StyleCategoryName'])) $query->where('StyleCategoryName', $where['StyleCategoryName']);
-                                if (!empty($where['CategoryName1'])) $query->where('CategoryName1', 'in', $where['CategoryName1']);
-                                if (!empty($where['CategoryName2'])) $query->where('CategoryName2', 'in', $where['CategoryName2']);
-                                if (!empty($where['CustomerGrade'])) $query->whereIn('CustomerGrade', $where['CustomerGrade']);
-                                $query->where(1);
-                            })
-                            ->paginate([
-                                'list_rows'=> $limit,
-                                'page' => $page,
-                            ]);
+                if (!empty($where['Yuncang'])) $query->where('Yuncang', $where['Yuncang']);
+                if (!empty($where['State'])) $query->where('State', $where['State']);
+                if (!empty($where['StyleCategoryName'])) $query->where('StyleCategoryName', $where['StyleCategoryName']);
+                if (!empty($where['CategoryName1'])) $query->where('CategoryName1', 'in', $where['CategoryName1']);
+                if (!empty($where['CategoryName2'])) $query->where('CategoryName2', 'in', $where['CategoryName2']);
+                if (!empty($where['CustomerGrade'])) $query->whereIn('CustomerGrade', $where['CustomerGrade']);
+                $query->where(1);
+            })
+                ->paginate([
+                    'list_rows' => $limit,
+                    'page' => $page,
+                ]);
             $list = $list ? $list->toArray() : [];
             // print_r($list);die;
 
@@ -83,11 +89,11 @@ class Puhuoruleb extends AdminController
             }
 
             $data = [
-                'code'  => 0,
-                'msg'   => '',
-                'today_date'   => date('m-d'),
+                'code' => 0,
+                'msg' => '',
+                'today_date' => date('m-d'),
                 'count' => $list ? $list['total'] : 0,
-                'data'  => $list ? $list['data'] : 0,
+                'data' => $list ? $list['data'] : 0,
             ];
             return json($data);
         }
@@ -97,44 +103,45 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="获取下拉字段列")
      */
-    public function getWeatherField() {
+    public function getWeatherField()
+    {
 
         $cus_info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
         $info_list = SpLypPuhuoWaitGoodsModel::column('StyleCategoryName,CategoryName1,CategoryName2,CategoryName');
         $Yuncang_list = $State_list = $StyleCategoryName_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = [];
-        if(!empty($info_list)){
-            $Yuncang_list = array_unique(array_column($cus_info_list,'Yuncang'));
-            $Yuncang_list = array_combine($Yuncang_list,$Yuncang_list);
+        if (!empty($info_list)) {
+            $Yuncang_list = array_unique(array_column($cus_info_list, 'Yuncang'));
+            $Yuncang_list = array_combine($Yuncang_list, $Yuncang_list);
 
-            $State_list = array_unique(array_column($cus_info_list,'State'));
-            $State_list = array_combine($State_list,$State_list);
+            $State_list = array_unique(array_column($cus_info_list, 'State'));
+            $State_list = array_combine($State_list, $State_list);
 
-            $CustomerGrade_list = array_unique(array_column($cus_info_list,'CustomerGrade'));
+            $CustomerGrade_list = array_unique(array_column($cus_info_list, 'CustomerGrade'));
             $CustomerGrade_list = array_filter($CustomerGrade_list);
-            $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
+            $CustomerGrade_list = array_combine($CustomerGrade_list, $CustomerGrade_list);
 
-            $StyleCategoryName_list = array_unique(array_column($info_list,'StyleCategoryName'));
-            $StyleCategoryName_list = array_combine($StyleCategoryName_list,$StyleCategoryName_list);
+            $StyleCategoryName_list = array_unique(array_column($info_list, 'StyleCategoryName'));
+            $StyleCategoryName_list = array_combine($StyleCategoryName_list, $StyleCategoryName_list);
 
-            $CategoryName1_list = array_unique(array_column($info_list,'CategoryName1'));
-            $CategoryName1_list = array_combine($CategoryName1_list,$CategoryName1_list);
+            $CategoryName1_list = array_unique(array_column($info_list, 'CategoryName1'));
+            $CategoryName1_list = array_combine($CategoryName1_list, $CategoryName1_list);
 
-            $CategoryName2_list = array_unique(array_column($info_list,'CategoryName2'));
-            $CategoryName2_list = array_combine($CategoryName2_list,$CategoryName2_list);
+            $CategoryName2_list = array_unique(array_column($info_list, 'CategoryName2'));
+            $CategoryName2_list = array_combine($CategoryName2_list, $CategoryName2_list);
 
-            $CategoryName_list = array_unique(array_column($info_list,'CategoryName'));
-            $CategoryName_list = array_combine($CategoryName_list,$CategoryName_list);
+            $CategoryName_list = array_unique(array_column($info_list, 'CategoryName'));
+            $CategoryName_list = array_combine($CategoryName_list, $CategoryName_list);
         }
         $data = [
-            'code'  => 1,
-            'msg'   => '',
-            'Yuncang_list'  => $Yuncang_list,
-            'State_list'  => $State_list,
-            'CustomerGrade_list'  => $CustomerGrade_list,
-            'StyleCategoryName_list'  => $StyleCategoryName_list,
-            'CategoryName1_list'  => $CategoryName1_list,
-            'CategoryName2_list'  => $CategoryName2_list,
-            'CategoryName_list'  => $CategoryName_list,
+            'code' => 1,
+            'msg' => '',
+            'Yuncang_list' => $Yuncang_list,
+            'State_list' => $State_list,
+            'CustomerGrade_list' => $CustomerGrade_list,
+            'StyleCategoryName_list' => $StyleCategoryName_list,
+            'CategoryName1_list' => $CategoryName1_list,
+            'CategoryName2_list' => $CategoryName2_list,
+            'CategoryName_list' => $CategoryName_list,
         ];
         return json($data);
 
@@ -144,10 +151,11 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="编辑")
      */
-    public function update() {
+    public function update()
+    {
         // 获取店铺ID
         $id = $this->request->get('id');
-        
+
         if ($this->request->isAjax()) {
             $post = $this->request->post();
             $rule = [
@@ -186,8 +194,8 @@ class Puhuoruleb extends AdminController
 
 
             $post = $this->request->post();
-            $post['total'] = $post['Stock_00']+$post['Stock_29']+$post['Stock_30']+$post['Stock_31']+$post['Stock_32']+$post['Stock_33']+$post['Stock_34']+$post['Stock_35']+
-            $post['Stock_36']+$post['Stock_38']+$post['Stock_40']+$post['Stock_42'];
+            $post['total'] = $post['Stock_00'] + $post['Stock_29'] + $post['Stock_30'] + $post['Stock_31'] + $post['Stock_32'] + $post['Stock_33'] + $post['Stock_34'] + $post['Stock_35'] +
+                $post['Stock_36'] + $post['Stock_38'] + $post['Stock_40'] + $post['Stock_42'];
             $this->model->where([['id', '=', $id]])->update($post);
             $this->success('更新成功');
 
@@ -195,34 +203,34 @@ class Puhuoruleb extends AdminController
 
         $info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
         $goods_info_list = SpLypPuhuoWaitGoodsModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');//column('风格 as StyleCategoryName,一级风格 as StyleCategoryName1,一级分类 as CategoryName1,二级分类 as CategoryName2');
-        
+
         $Yuncang_list = $State_list = $StyleCategoryName_list = $StyleCategoryName1_list = $CategoryName1_list = $CategoryName2_list = $CustomerGrade_list = [];
-        
-        if(!empty($info_list)){
-            $Yuncang_list = array_unique(array_column($info_list,'Yuncang'));
-            $Yuncang_list = array_combine($Yuncang_list,$Yuncang_list);
 
-            $State_list = array_unique(array_column($info_list,'State'));
-            $State_list = array_combine($State_list,$State_list);
+        if (!empty($info_list)) {
+            $Yuncang_list = array_unique(array_column($info_list, 'Yuncang'));
+            $Yuncang_list = array_combine($Yuncang_list, $Yuncang_list);
 
-            $StyleCategoryName_list = array_unique(array_column($goods_info_list,'StyleCategoryName'));
-            $StyleCategoryName_list = array_combine($StyleCategoryName_list,$StyleCategoryName_list);
+            $State_list = array_unique(array_column($info_list, 'State'));
+            $State_list = array_combine($State_list, $State_list);
 
-            $StyleCategoryName1_list = array_unique(array_column($goods_info_list,'StyleCategoryName1'));
-            $StyleCategoryName1_list = array_combine($StyleCategoryName1_list,$StyleCategoryName1_list);
+            $StyleCategoryName_list = array_unique(array_column($goods_info_list, 'StyleCategoryName'));
+            $StyleCategoryName_list = array_combine($StyleCategoryName_list, $StyleCategoryName_list);
 
-            $CategoryName1_list = array_unique(array_column($goods_info_list,'CategoryName1'));
-            $CategoryName1_list = array_combine($CategoryName1_list,$CategoryName1_list);
+            $StyleCategoryName1_list = array_unique(array_column($goods_info_list, 'StyleCategoryName1'));
+            $StyleCategoryName1_list = array_combine($StyleCategoryName1_list, $StyleCategoryName1_list);
 
-            $CategoryName2_list = array_unique(array_column($goods_info_list,'CategoryName2'));
-            $CategoryName2_list = array_combine($CategoryName2_list,$CategoryName2_list);
+            $CategoryName1_list = array_unique(array_column($goods_info_list, 'CategoryName1'));
+            $CategoryName1_list = array_combine($CategoryName1_list, $CategoryName1_list);
 
-            $CategoryName_list = array_unique(array_column($goods_info_list,'CategoryName'));
-            $CategoryName_list = array_combine($CategoryName_list,$CategoryName_list);
+            $CategoryName2_list = array_unique(array_column($goods_info_list, 'CategoryName2'));
+            $CategoryName2_list = array_combine($CategoryName2_list, $CategoryName2_list);
+
+            $CategoryName_list = array_unique(array_column($goods_info_list, 'CategoryName'));
+            $CategoryName_list = array_combine($CategoryName_list, $CategoryName_list);
             $CategoryName_list = array_merge(['其它' => '其它'], $CategoryName_list);
 
-            $CustomerGrade_list = array_unique(array_column($info_list,'CustomerGrade'));
-            $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
+            $CustomerGrade_list = array_unique(array_column($info_list, 'CustomerGrade'));
+            $CustomerGrade_list = array_combine($CustomerGrade_list, $CustomerGrade_list);
         }
         $rulea_info = $this->model->where([['id', '=', $id]])->find();
         $rulea_info = $rulea_info ? $rulea_info->toArray() : [];
@@ -246,7 +254,8 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="添加")
      */
-    public function add() {
+    public function add()
+    {
 
         if ($this->request->isAjax()) {
             $post = $this->request->post();
@@ -283,14 +292,14 @@ class Puhuoruleb extends AdminController
                 // 'total.require' => '合计尺码铺货数不能为空',
             ];
             $this->validate($post, $rule, $message);
-            $post['total'] = $post['Stock_00']+$post['Stock_29']+$post['Stock_30']+$post['Stock_31']+$post['Stock_32']+$post['Stock_33']+$post['Stock_34']+$post['Stock_35']+
-            $post['Stock_36']+$post['Stock_38']+$post['Stock_40']+$post['Stock_42'];
+            $post['total'] = $post['Stock_00'] + $post['Stock_29'] + $post['Stock_30'] + $post['Stock_31'] + $post['Stock_32'] + $post['Stock_33'] + $post['Stock_34'] + $post['Stock_35'] +
+                $post['Stock_36'] + $post['Stock_38'] + $post['Stock_40'] + $post['Stock_42'];
 
             // echo json_encode([$post['Yuncang']]);die; 
             if ($post['State'] == '全部') {
 
                 $cus_info_list = CustomerModel::where([['ShutOut', '=', 0], ['CustomItem15', '=', $post['Yuncang']]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
-                $State_list = array_unique(array_column($cus_info_list,'State'));
+                $State_list = array_unique(array_column($cus_info_list, 'State'));
                 if ($State_list) {
 
                     $add_data = [];
@@ -322,37 +331,37 @@ class Puhuoruleb extends AdminController
 
         $info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
         $goods_info_list = SpLypPuhuoWaitGoodsModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');//column('风格 as StyleCategoryName,一级风格 as StyleCategoryName1,一级分类 as CategoryName1,二级分类 as CategoryName2');
-        
+
         $Yuncang_list = $State_list = $StyleCategoryName_list = $StyleCategoryName1_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = $CustomerGrade_list = [];
-        
-        if(!empty($info_list)){
-            $Yuncang_list = array_unique(array_column($info_list,'Yuncang'));
-            $Yuncang_list = array_combine($Yuncang_list,$Yuncang_list);
 
-            $State_list = array_unique(array_column($info_list,'State'));
-            $State_list = array_combine($State_list,$State_list);
+        if (!empty($info_list)) {
+            $Yuncang_list = array_unique(array_column($info_list, 'Yuncang'));
+            $Yuncang_list = array_combine($Yuncang_list, $Yuncang_list);
 
-            $StyleCategoryName_list = array_unique(array_column($goods_info_list,'StyleCategoryName'));
-            $StyleCategoryName_list = array_combine($StyleCategoryName_list,$StyleCategoryName_list);
+            $State_list = array_unique(array_column($info_list, 'State'));
+            $State_list = array_combine($State_list, $State_list);
 
-            $StyleCategoryName1_list = array_unique(array_column($goods_info_list,'StyleCategoryName1'));
-            $StyleCategoryName1_list = array_combine($StyleCategoryName1_list,$StyleCategoryName1_list);
+            $StyleCategoryName_list = array_unique(array_column($goods_info_list, 'StyleCategoryName'));
+            $StyleCategoryName_list = array_combine($StyleCategoryName_list, $StyleCategoryName_list);
 
-            $CategoryName1_list = array_unique(array_column($goods_info_list,'CategoryName1'));
-            $CategoryName1_list = array_combine($CategoryName1_list,$CategoryName1_list);
+            $StyleCategoryName1_list = array_unique(array_column($goods_info_list, 'StyleCategoryName1'));
+            $StyleCategoryName1_list = array_combine($StyleCategoryName1_list, $StyleCategoryName1_list);
 
-            $CategoryName2_list = array_unique(array_column($goods_info_list,'CategoryName2'));
-            $CategoryName2_list = array_combine($CategoryName2_list,$CategoryName2_list);
+            $CategoryName1_list = array_unique(array_column($goods_info_list, 'CategoryName1'));
+            $CategoryName1_list = array_combine($CategoryName1_list, $CategoryName1_list);
 
-            $CategoryName_list = array_unique(array_column($goods_info_list,'CategoryName'));
-            $CategoryName_list = array_combine($CategoryName_list,$CategoryName_list);
+            $CategoryName2_list = array_unique(array_column($goods_info_list, 'CategoryName2'));
+            $CategoryName2_list = array_combine($CategoryName2_list, $CategoryName2_list);
+
+            $CategoryName_list = array_unique(array_column($goods_info_list, 'CategoryName'));
+            $CategoryName_list = array_combine($CategoryName_list, $CategoryName_list);
             $CategoryName_list = array_merge(['其它' => '其它'], $CategoryName_list);
 
-            $CustomerGrade_list = array_unique(array_column($info_list,'CustomerGrade'));
-            $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
+            $CustomerGrade_list = array_unique(array_column($info_list, 'CustomerGrade'));
+            $CustomerGrade_list = array_combine($CustomerGrade_list, $CustomerGrade_list);
         }
         // print_r($Yuncang_list);die;
-        
+
         $this->assign([
             'Yuncang_list' => $Yuncang_list,
             'State_list' => $State_list,
@@ -371,7 +380,8 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="删除")
      */
-    public function delete() {
+    public function delete()
+    {
 
         $this->checkPostRequest();
         $post = $this->request->post();
@@ -388,12 +398,13 @@ class Puhuoruleb extends AdminController
     /**
      * 获取云仓对应省份
      */
-    public function get_province_by_yuncang() {
+    public function get_province_by_yuncang()
+    {
 
         $post = $this->request->post();
         $cus_info_list = CustomerModel::where([['ShutOut', '=', 0], ['CustomItem15', '=', $post['Yuncang']]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
-        $State_list = array_unique(array_column($cus_info_list,'State'));
-        $State_list = array_combine($State_list,$State_list);
+        $State_list = array_unique(array_column($cus_info_list, 'State'));
+        $State_list = array_combine($State_list, $State_list);
         return json(['data' => $State_list]);
 
     }
@@ -401,12 +412,13 @@ class Puhuoruleb extends AdminController
     /**
      * @NodeAnotation(title="导入铺货规则")
      */
-    public function import_rule() {
+    public function import_rule()
+    {
 
         if (request()->isAjax()) {
             $file = request()->file('file');
             $new_name = "铺货规则" . '_' . uuid('puhuo') . '.' . $file->getOriginalExtension();
-            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $save_path = app()->getRootPath() . 'runtime/uploads/' . date('Ymd', time()) . '/';   //文件保存路径
             $info = $file->move($save_path, $new_name);
 
             if ($info) {
@@ -415,77 +427,109 @@ class Puhuoruleb extends AdminController
 
                     'A' => '云仓',
                     'B' => '省份',
-                    'D' => '风格',
-                    'E' => '一级分类',
-                    'F' => '二级分类',
-                    'G' => '分类',
-                    'H' => '等级',
-                    'I' => '44/28/',
-                    'J' => '46/29/165/38/M/105',
-                    'K' => '48/30/170/39/L/110',
-                    'L' => '50/31/175/40/XL/115',
-                    'M' => '52/32/180/41/2XL/120',
-                    'N' => '54/33/185/42/3XL/125',
-                    'O' => '56/34/190/43/4XL/130',
-                    'P' => '58/35/195/44/5XL/',
-                    'Q' => '60/36/6XL/',
-                    'R' => '38/7XL',
-                    'S' => '40',
-                    'T' => '42',
-                    'U' => '合计',
+                    'C' => '风格',
+                    'D' => '一级分类',
+                    'E' => '二级分类',
+                    'F' => '分类',
+                    'G' => '等级',
+                    'H' => '44/28/',
+                    'I' => '46/29/165/38/M/105',
+                    'J' => '48/30/170/39/L/110',
+                    'K' => '50/31/175/40/XL/115',
+                    'L' => '52/32/180/41/2XL/120',
+                    'M' => '54/33/185/42/3XL/125',
+                    'N' => '56/34/190/43/4XL/130',
+                    'O' => '58/35/195/44/5XL/',
+                    'P' => '60/36/6XL/',
+                    'Q' => '38/7XL',
+                    'R' => '40',
+                    'S' => '42',
+                    'T' => '合计',
 
                 ];
 
                 $data = importExcel($info, $read_column);
                 if (!$data) {
-                    return json(['code' => 500, 'msg'=>'error,读取不到数据']);
-                }
-                //入库
-                $add_data = [];
-                foreach ($data as $v_data) {
-                    $add_data[] = [
-
-                        'Yuncang' => $v_data['云仓'],
-                        'State' => $v_data['省份'],
-                        'StyleCategoryName' => $v_data['风格'],
-                        // 'StyleCategoryName1' => $v_data['一级分类'],
-                        'CategoryName1' => $v_data['一级分类'],
-                        'CategoryName2' => $v_data['二级分类'],
-                        'CategoryName' => $v_data['分类'],
-                        'CustomerGrade' => $v_data['等级'],
-
-                        'Stock_00' => $v_data['44/28/'],
-                        'Stock_29' => $v_data['46/29/165/38/M/105'],
-                        'Stock_30' => $v_data['48/30/170/39/L/110'],
-                        'Stock_31' => $v_data['50/31/175/40/XL/115'],
-                        'Stock_32' => $v_data['52/32/180/41/2XL/120'],
-                        'Stock_33' => $v_data['54/33/185/42/3XL/125'],
-                        'Stock_34' => $v_data['56/34/190/43/4XL/130'],
-                        'Stock_35' => $v_data['58/35/195/44/5XL/'],
-                        'Stock_36' => $v_data['60/36/6XL/'],
-                        'Stock_38' => $v_data['38/7XL'],
-                        'Stock_40' => $v_data['40'],
-                        'Stock_42' => $v_data['42'],
-                        'total' => $v_data['合计'],
-
-                    ];
-
+                    return json(['code' => 500, 'msg' => 'error,读取不到数据']);
                 }
 
-                //清空表
-                $db = Db::connect("mysql");
-                $db->Query("truncate table sp_lyp_puhuo_rule_b;");
+                try {
 
-                $chunk_list = array_chunk($add_data, 1000);
-                foreach($chunk_list as $key => $val) {
-                    $db->table('sp_lyp_puhuo_rule_b')->insertAll($val);
+                    $db = Db::connect("mysql");
+                    //入库
+                    $add_data = [];
+                    foreach ($data as $v_data) {
+                        $update_data = [
+                            'CustomerGrade' => $v_data['等级'],
+                            'Stock_00' => $v_data['44/28/'],
+                            'Stock_29' => $v_data['46/29/165/38/M/105'],
+                            'Stock_30' => $v_data['48/30/170/39/L/110'],
+                            'Stock_31' => $v_data['50/31/175/40/XL/115'],
+                            'Stock_32' => $v_data['52/32/180/41/2XL/120'],
+                            'Stock_33' => $v_data['54/33/185/42/3XL/125'],
+                            'Stock_34' => $v_data['56/34/190/43/4XL/130'],
+                            'Stock_35' => $v_data['58/35/195/44/5XL/'],
+                            'Stock_36' => $v_data['60/36/6XL/'],
+                            'Stock_38' => $v_data['38/7XL'],
+                            'Stock_40' => $v_data['40'],
+                            'Stock_42' => $v_data['42'],
+                            'total' => $v_data['合计'],
+
+                        ];
+                        $where = [
+                            'Yuncang' => $v_data['云仓'],
+                            'State' => $v_data['省份'],
+                            'StyleCategoryName' => $v_data['风格'],
+                            'CategoryName1' => $v_data['一级分类'],
+                            'CategoryName2' => $v_data['二级分类'],
+                            'CategoryName' => $v_data['分类'],
+                        ];
+                        $ruleB = $db->table('sp_lyp_puhuo_rule_b')->where($where)->find();
+                        if ($ruleB) {
+                            $a = $db->table('sp_lyp_puhuo_rule_b')->where(['id' => $ruleB['id']])->update($update_data);
+                        } else {
+                            $add_data[] = [
+                                'Yuncang' => $v_data['云仓'],
+                                'State' => $v_data['省份'],
+                                'StyleCategoryName' => $v_data['风格'],
+                                'CategoryName1' => $v_data['一级分类'],
+                                'CategoryName2' => $v_data['二级分类'],
+                                'CategoryName' => $v_data['分类'],
+                                'CustomerGrade' => $v_data['等级'],
+                                'Stock_00' => $v_data['44/28/'],
+                                'Stock_29' => $v_data['46/29/165/38/M/105'],
+                                'Stock_30' => $v_data['48/30/170/39/L/110'],
+                                'Stock_31' => $v_data['50/31/175/40/XL/115'],
+                                'Stock_32' => $v_data['52/32/180/41/2XL/120'],
+                                'Stock_33' => $v_data['54/33/185/42/3XL/125'],
+                                'Stock_34' => $v_data['56/34/190/43/4XL/130'],
+                                'Stock_35' => $v_data['58/35/195/44/5XL/'],
+                                'Stock_36' => $v_data['60/36/6XL/'],
+                                'Stock_38' => $v_data['38/7XL'],
+                                'Stock_40' => $v_data['40'],
+                                'Stock_42' => $v_data['42'],
+                                'total' => $v_data['合计'],
+
+                            ];
+                        }
+
+                    }
+                    $chunk_list = array_chunk($add_data, 1000);
+                    foreach ($chunk_list as $key => $val) {
+                        $db->table('sp_lyp_puhuo_rule_b')->insertAll($val);
+                    }
+                } catch (Exception $e) {
+
+                    dd($e->getMessage());
+                    return json(['code' => 1, 'msg' => $e->getMessage(), 'data' => []]);
                 }
 
-                return json(['code' => 0, 'msg'=>'导入成功', 'data'=>$add_data]);
+
+                return json(['code' => 0, 'msg' => '导入成功', 'data' => $add_data]);
 
             } else {
 
-                return json(['code' => 500, 'msg'=>'error,请联系系统管理员']);
+                return json(['code' => 500, 'msg' => 'error,请联系系统管理员']);
 
             }
 
