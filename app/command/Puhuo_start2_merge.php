@@ -1745,6 +1745,7 @@ class Puhuo_start2_merge extends Command
 
         }
 
+
         return ['Stock_00_skcnum'=>$Stock_00_skcnum, 'Stock_29_skcnum'=>$Stock_29_skcnum, 'Stock_34_skcnum'=>$Stock_34_skcnum, 'Stock_35_skcnum'=>$Stock_35_skcnum, 
         'Stock_36_skcnum'=>$Stock_36_skcnum, 'Stock_38_skcnum'=>$Stock_38_skcnum, 'Stock_40_skcnum'=>$Stock_40_skcnum, 'Stock_42_skcnum'=>$Stock_42_skcnum
         ];
