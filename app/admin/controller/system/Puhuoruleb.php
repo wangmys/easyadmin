@@ -520,7 +520,6 @@ class Puhuoruleb extends AdminController
                     }
                 } catch (Exception $e) {
 
-                    dd($e->getMessage());
                     return json(['code' => 1, 'msg' => $e->getMessage(), 'data' => []]);
                 }
 
