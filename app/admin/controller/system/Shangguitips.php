@@ -136,6 +136,18 @@ class Shangguitips extends AdminController
                 $map9 = "";
             }
 
+            if (!empty($input['云仓_可用数量'])) {
+                $map10 = " AND 云仓_可用数量 >= '{$input['云仓_可用数量']}'";
+            } else {
+                $map10 = "";
+            }
+
+            if (!empty($input['预计最大可加铺店数'])) {
+                $map11 = " AND 预计最大可加铺店数 >= '{$input['预计最大可加铺店数']}'";
+            } else {
+                $map11 = "";
+            }
+
             $sql = "
                 SELECT
                     left(云仓, 2) as 云仓,
@@ -171,6 +183,8 @@ class Shangguitips extends AdminController
                     {$map7} 
                     {$map8} 
                     {$map9} 
+                    {$map10} 
+                    {$map11} 
                 ORDER BY 
                     云仓,季节归集 DESC,风格
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -192,6 +206,8 @@ class Shangguitips extends AdminController
                     {$map7} 
                     {$map8} 
                     {$map9} 
+                    {$map10} 
+                    {$map11}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
@@ -286,7 +302,19 @@ class Shangguitips extends AdminController
             } else {
                 $map9 = "";
             }
-            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}";
+
+            if (!empty($input['云仓_可用数量'])) {
+                $map10 = " AND 云仓_可用数量 >= '{$input['云仓_可用数量']}'";
+            } else {
+                $map10 = "";
+            }
+
+            if (!empty($input['预计最大可加铺店数'])) {
+                $map11 = " AND 预计最大可加铺店数 >= '{$input['预计最大可加铺店数']}'";
+            } else {
+                $map11 = "";
+            }
+            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}";
             $code = rand_code(6);
             cache($code, $map, 3600);
             return json([
