@@ -32,7 +32,6 @@ class Zdconfig2 extends AdminController
      * @NodeAnotation(title="指定铺货货品配置")
      */
     public function index() {
-        // echo 8899;die;
 
         $res_guiyang = $this->service->get_zdy_goods2('贵阳云仓');
         $res_wuhan = $this->service->get_zdy_goods2('武汉云仓');
@@ -309,6 +308,28 @@ class Zdconfig2 extends AdminController
         }
 
     }
+
+
+    /**
+     * @return null
+     * @NodeAnotation(title="一键删除全部",auth=false)
+     */
+    public function delPuhuoZdySetAll(){
+
+        $post = $this->request->post();
+        try {
+            $db=Db::connect('mysql');
+            $resID=$db->table('sp_lyp_puhuo_zdy_set2')->where(['Yuncang'=>$post['Yuncang'],'Selecttype'=>$post['Selecttype']])->column('id');
+            $db->table('sp_lyp_puhuo_zdy_set2')->whereIn('id',$resID)->delete();
+            $db->table('sp_lyp_puhuo_zdy_yuncang_goods2')->whereIn('set_id',$resID)->delete();
+            $this->service->delPuhuoZdySet2($post);
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
+        return $this->success('删除成功');
+
+    }
+
 
     /**
      * @NodeAnotation(title="删除铺货配置(多店/多省/商品专员/经营模式)")

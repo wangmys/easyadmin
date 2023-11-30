@@ -5,6 +5,7 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
     url = {
         savePuhuoZdySet_url:ea.url('system.puhuo.Zdconfig2/savePuhuoZdySet'),
         savePuhuoZdySetAll_url:ea.url('system.puhuo.Zdconfig2/savePuhuoZdySetAll'),
+        delPuhuoZdySetAll_url:ea.url('system.puhuo.Zdconfig2/delPuhuoZdySetAll'),
         del_url:ea.url('/system.puhuo.Zdconfig2/delPuhuoZdySet')
     }
 
@@ -51,6 +52,20 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 });
                 ea.msg.success(res.msg);
              });
+        },
+
+        //一键删除
+        delPuhuoZdySetAll:function (_this,_url,_data) {
+            ea.request.post({
+                url:_url,
+                data:_data
+            },function (res) {
+                if(res.code == 1){
+                    _this.remove();
+                    layer.closeAll()
+                }
+                ea.msg.success(res.msg);
+            });
         },
 
         // 删除配置
@@ -208,6 +223,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var _url = url.savePuhuoZdySetAll_url;
                 var all_data = $('form[id="app-form_guiyang_goods_config"]').serializeArray();
                 that.savePuhuoZdySetAll($('.guiyang_goods_config-select'), _url, all_data);
+            });
+            //一键删除全部
+            $('.del_guiyang_goods_config_all').on('click', function () {
+                var _this = $(this);
+                var _url = url.delPuhuoZdySetAll_url;
+                    layer.confirm('是否删除全部',{},function () {
+                        that.delPuhuoZdySetAll($('.guiyang_goods_config-select'), _url, {Yuncang: '贵阳云仓', Selecttype: 2});
+                        layer.closeAll()
+                    })
+
             });
 
             // 获取渲染后端渲染的数据,重新绑定事件
@@ -438,6 +463,16 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var all_data = $('form[id="app-form_wuhan_goods_config"]').serializeArray();
                 that.savePuhuoZdySetAll($('.wuhan_goods_config-select'), _url, all_data);
             });
+            //一键删除全部
+            $('.del_wuhan_goods_config_all').on('click', function () {
+                var _this = $(this);
+                var _url = url.delPuhuoZdySetAll_url;
+                layer.confirm('是否删除全部',{},function () {
+                    that.delPuhuoZdySetAll($('.wuhan_goods_config-select'), _url, {Yuncang: '武汉云仓', Selecttype: 2});
+                    layer.closeAll()
+                })
+
+            });
 
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.wuhan_goods_config-select'), function (key, element) {
@@ -622,6 +657,17 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var all_data = $('form[id="app-form_guangzhou_goods_config"]').serializeArray();
                 that.savePuhuoZdySetAll($('.guangzhou_goods_config-select'), _url, all_data);
             });
+            //一键删除全部
+            $('.del_guangzhou_goods_config_all').on('click', function () {
+                var _this = $(this);
+                var _url = url.delPuhuoZdySetAll_url;
+                layer.confirm('是否删除全部',{},function () {
+                    that.delPuhuoZdySetAll($('.guangzhou_goods_config-select'), _url, {Yuncang: '广州云仓', Selecttype: 2});
+                    layer.closeAll()
+                })
+
+            });
+
 
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.guangzhou_goods_config-select'), function (key, element) {
@@ -807,6 +853,17 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 that.savePuhuoZdySetAll($('.nanchang_goods_config-select'), _url, all_data);
             });
 
+            //一键删除全部
+            $('.del_nanchang_goods_config_all').on('click', function () {
+                var _this = $(this);
+                var _url = url.delPuhuoZdySetAll_url;
+                layer.confirm('是否删除全部',{},function () {
+                    that.delPuhuoZdySetAll($('.nanchang_goods_config-select'), _url, {Yuncang: '南昌云仓', Selecttype: 2});
+                    layer.closeAll()
+                })
+
+            });
+
             // 获取渲染后端渲染的数据,重新绑定事件
             $.each($('.nanchang_goods_config-select'), function (key, element) {
 
@@ -989,6 +1046,17 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var _url = url.savePuhuoZdySetAll_url;
                 var all_data = $('form[id="app-form_changsha_goods_config"]').serializeArray();
                 that.savePuhuoZdySetAll($('.changsha_goods_config-select'), _url, all_data);
+            });
+
+            //一键删除全部
+            $('.del_changsha_goods_config_all').on('click', function () {
+                var _this = $(this);
+                var _url = url.delPuhuoZdySetAll_url;
+                layer.confirm('是否删除全部',{},function () {
+                    that.delPuhuoZdySetAll($('.changsha_goods_config-select'), _url, {Yuncang: '长沙云仓', Selecttype: 2});
+                    layer.closeAll()
+                })
+
             });
 
             // 获取渲染后端渲染的数据,重新绑定事件

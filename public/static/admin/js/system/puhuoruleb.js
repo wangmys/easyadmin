@@ -100,6 +100,29 @@ define(["jquery", "easy-admin2"], function ($, ea) {
             ea.listen();
         },
         add: function () {
+
+            $.get('xm_son', {}, function (data) {
+                xmSelect.render({
+                    el: '#xm-select',
+                    icon: 'show',
+                    tips: '请选择',
+                    name: 'CustomerGrade',
+                    toolbar: {
+                        show: false,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    data: data.CustomerGrade_list
+                });
+
+                layui.form.render("select");
+            });
             ea.listen();
         }
     };
