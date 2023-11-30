@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>检核-SKC</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
+    <style>
+        body {
+            overflow: hidden;
+        }        
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+        
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+        .cima {
+            height:16px; 
+            line-height:16px;
+        }
+        .weather_div {
+            height:28px;
+        }
+        .cima_1 {
+            height:5px; 
+            width:10px;
+        }
+        .cima_2 {
+            line-height:5px;
+        }
+        .cima_manzu {
+            /* height:5px; 
+            width:10px; */
+            line-height:5px
+        }
+        .autumn{
+            color: #afaf00;
+        }
+        .winter{
+            color: #24d3f2;
+        }
+        .hot {
+            color: red;
+        }
+        .cool {
+            color:#0879bb;
+        }
+        /* th[data-field="7"][data-key="1-0-7"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="温度"][data-key="1-1-11"] {
+            background-color: #2e9574 !important;
+            color:#ffffff;
+        }
+        th[data-field="8"][data-key="1-0-8"] {
+            background-color: #b9b9b9 !important;
+            color:#ffffff;
+        }
+        th[data-field="9"][data-key="1-0-9"] {
+            background-color: #dedede !important;
+        }
+        th[data-field="季节"][data-key="1-1-23"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="识别规则"][data-key="1-1-24"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="识别天数"][data-key="1-1-25"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="季节SKC数"][data-key="1-1-26"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+
+        th[data-field="提醒"][data-key="1-1-27"] {
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+        th[data-field="10"][data-key="1-0-10"],
+        th[data-field="春季SKC基本_内搭"][data-key="1-1-29"],
+        th[data-field="春季SKC基本_外套"][data-key="1-1-30"] {
+            background-color: #5a9afa !important;
+            color:#ffffff;
+        }
+        
+        th[data-field="11"][data-key="1-0-11"],
+        th[data-field="提醒"][data-key="1-1-20"]{
+            background-color: #ff3c00 !important;
+            color:#ffffff;
+        }
+        th[data-field="12"][data-key="1-0-12"] {
+            background-color: #c5aa2a !important;
+            color:#ffffff;
+        }
+        th[data-field="17"][data-key="1-1-17"],
+        th[data-field="0"][data-key="1-2-0"],
+        th[data-field="1"][data-key="1-2-1"],
+        th[data-field="2"][data-key="1-2-2"] {
+            background-color: #90bcff !important;
+            color:#ffffff;
+        }
+        th[data-field="18"][data-key="1-1-18"],
+        th[data-field="3"][data-key="1-2-3"],
+        th[data-field="4"][data-key="1-2-4"],
+        th[data-field="5"][data-key="1-2-5"] {
+            background-color: #7db0fc !important;
+            color:#ffffff;
+        }
+        th[data-field="19"][data-key="1-1-19"],
+        th[data-field="6"][data-key="1-2-6"],
+        th[data-field="7"][data-key="1-2-7"],
+        th[data-field="8"][data-key="1-2-8"] {
+            background-color: #599afb !important;
+            color:#ffffff;
+        } */
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+    <div class="layui-tab-item layui-show">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+            <form class="layui-form layui-form-pane ok-form layui-col-space8">
+                <div class="flex row end between">
+                    <div class="flex col between al-start" style="width:95%; height: 70px;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-spzy" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-sf" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-dpmc" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-fg" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-season" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">温区</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-wq" class="xm-select-demo"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex col between" style="width:5%; height:70px;">
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="updateBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">实时更新
+                        </button>
+                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                        </button>
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+        <table class="layui-hide" id="table" lay-filter="table">
+            <div style="text-align: center; color:#0051ff;">店铺检核表 <a class="dateStr" style="color:red;">预计库存skc</a></div>
+        </table>
+        <div id="page"></div>
+    </div>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<!-- 单店不动销 -->
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+      <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单店品类断码情况</button>
+      <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+      <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
+    </div>
+</script>
+<script>
+    var viewCustomers = function (yc, goodsno) {
+        window.localStorage.setItem('viewCustomer_yc', yc);
+        window.localStorage.setItem('viewCustomer_gdno', goodsno);
+    }
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , getHeader = "{:url('admin/system.Jianheskcpro/getHeader')}" 
+            , url1 = "{:url('admin/system.Jianheskcpro/handle')}" 
+            , url_download_history_area = "{:url('admin/system.Jianheskcpro/excel_weathertips')}" 
+            , url_getXmMapSelect = "{:url('admin/system.Jianheskcpro/getXmMapSelect')}"
+            , url_updateDdata = "{:url('admin/system.Jianheskcpro/updateDdata')}"
+
+
+        $("#checkType").val("店铺库存");
+        // $("#checkType").val("店铺库存skc");
+        form.render();
+
+        initFn();
+        startTable();
+
+        xmSelect.render({
+            el: '#xm-spzy', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '商品专员',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-sf', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '省份',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-wq', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '温区',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-fg', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '调整风格',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "基本款", value: "基本款", selected: ""},
+                {name: "引流款", value: "引流款", selected: ""},
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-season', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '修订季节',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "春季", value: "春", selected: ""},
+                {name: "夏季", value: "夏", selected: ""},
+                {name: "秋季", value: "秋", selected: ""},
+                {name: "冬季", value: "冬", selected: ""},
+            ]
+        })
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+                // 商品专员
+                xmSelect.render({
+                    el: '#xm-spzy', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'商品负责人',
+                    data: res.data.customer17
+                })
+                // 温区
+                xmSelect.render({
+                    el: '#xm-wq', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'温区',
+                    data: res.data.customer36
+                })
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-dpmc', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'店铺名称',
+                    data: res.data.customer
+                })
+                xmSelect.render({
+                    el: '#xm-sf', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'省份',
+                    data: res.data.province
+                })
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false; 
+        });
+
+        //监听保存
+        form.on('submit(updateBtn)', function (data) {
+            layui.use('layer', function () {
+                layui.layer.load();
+                //console.log(Lodingindex) opacity
+                $(".layui-layer-shade").css('background', '#000000')
+                $(".layui-layer-shade").css('opacity', '0.2')
+                $(".layui-layer-shade").click(function (event) {
+                    event.stopPropagation();
+                })
+            })
+            $.post(url_updateDdata, {}, function(res) {
+                if (res.status == 1) {
+                    table.reload('table', {
+                        where: data.field
+                        , method: 'post'
+                        , url: url1
+                        , loading: true
+                        , page: true
+                        , limit: data.field.limit
+                    })
+                } else {
+                    alert(res.msg);
+                }
+
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 0);
+                });
+            })
+
+
+            return false; 
+        });
+
+        form.on('submit(downloadBtn)', function (data) {
+            $.post(url_download_history_area, data.field, function(res) {
+                // table.exportFile('#table', res, 'xls');
+                // console.log(223) 
+                if (res.status == 1) {
+                    if (res.count <= 100000) {
+                        location.href = url_download_history_area + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
+                    }
+                }
+
+            })
+            return false; 
+        });
+
+        // 监听事件
+        $(document).on('click', '.viewBtn', function(data){
+            var yc = window.localStorage.getItem('viewCustomer_yc');
+            var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            layer.open({
+                title: '可上门店铺明细'
+                ,type: 2
+                ,area: ['100%', '100%'] // 100%全屏
+                ,content: keshang_url
+            });
+        });
+
+        //触发事件
+        table.on('toolbar(table)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'download':
+                    location.href = url_download_history_area
+                    alert('数据有点多，请耐心等待');
+                break;
+                case 'delete':
+                layer.msg('删除');
+                break;
+                case 'update':
+                layer.msg('编辑');
+                break;
+            };
+        });
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            console.log(data.field)
+            var colsData =  
+                [
+                    { title: `<div class="flex col around">
+                                <div class="cima"></div>
+                                <div class="cima">大</div>
+                                <div class="cima">类</div>
+                                <div class="cima"></div>
+                            </div>`, field: '一级分类', fixed: 'left' ,align: 'center' , width: 60}
+                    ,{ field: '二级分类', title: '中类', fixed: 'left' ,align: 'center' , width: 60}
+                    ,{ field: '修订分类', title: '小类', fixed: 'left' ,align: 'center' , width: 60}
+
+                ];
+            $.post(getHeader, data.field, function(dataRes) {
+                console.log(dataRes)
+                // var res = data.data
+                for (let key in dataRes.data) {
+                    // console.log(key, dataRes)
+                    // console.log(key)
+                    if (key != '一级分类' && key != '二级分类'  && key != '修订分类') {
+                        colsData.push({title:
+                                        `<div class="flex col around">
+                                            <div class="cima" style="background:yellow;">${key}</div>
+                                            <div class="cima" style="color:red;">窗数：${dataRes.data[key]['窗数']}</div>
+                                            <div class="cima" style="color:orange;">裤台：${dataRes.data[key]['裤台']}</div>
+                                            <div class="cima" style="color:blue;">${dataRes.data[key]['温区']}</div>
+                                        </div>`, field: key, align: 'center', width: 60})
+                    }
+                }
+
+                try {
+                    var mapHeight = $('#map').height();
+                    var height = document.documentElement.clientHeight - mapHeight - 10;
+                    table.render({
+                        elem: '#table'
+                        ,url: url1
+                        , loading: true
+                        , method: 'post'
+                        // , toolbar: '#toolbar1'
+                        , toolbar: false
+                        , page: true
+                        , limit: 1000
+                        , limits: [500, 1000, 5000, 10000, 20000]
+                        , height:height
+                        , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                        , where: data.field
+                        , cols: [
+                            colsData
+                        
+                        ]
+                        ,done: function (res, curr, count) {
+                            var val = $('#checkType').val();
+                            // $('.dateStr').text(val);
+                        }
+                    });
+                } catch (error) {
+                    console.log(error)
+                }
+            }, 'json');
+
+            return false; 
+        });
+
+        function startTable() {
+            var mapHeight = $('#map').height();
+            // console.log(111);
+            var height = document.documentElement.clientHeight - mapHeight - 10;
+            var colsData =  
+                [
+                    { title: `<div class="flex col around">
+                                <div class="cima"></div>
+                                <div class="cima">大</div>
+                                <div class="cima">类</div>
+                                <div class="cima"></div>
+                            </div>`, field: '一级分类', fixed: 'left' ,align: 'center' , width: 60}
+                    ,{ field: '二级分类', title: '中类', fixed: 'left' ,align: 'center' , width: 60}
+                    ,{ field: '修订分类', title: '小类', fixed: 'left' ,align: 'center' , width: 60}
+
+                ];
+            $.post(getHeader, {"检核类型": "店铺库存", '商品负责人': '{$customer17}'}, function(dataRes) {
+                // console.log(dataRes.data)
+                // var res = data.data
+                for (let key in dataRes.data) {
+                    // console.log(key, dataRes.data[key])
+                    // console.log(key)
+                    if (key != '一级分类' && key != '二级分类'  && key != '修订分类') {
+                        colsData.push({title:
+                                        `<div class="flex col around">
+                                            <div class="cima" style="background:yellow;">${key}</div>
+                                            <div class="cima" style="color:red;">窗数：${dataRes.data[key]['窗数']}</div>
+                                            <div class="cima" style="color:orange;">裤台：${dataRes.data[key]['裤台']}</div>
+                                            <div class="cima" style="color:blue;">${dataRes.data[key]['温区']}</div>
+                                        </div>`, field: key, align: 'center', width: 60})
+                    }
+                }
+
+                table.render({
+                    elem: '#table'
+                    ,url: url1
+                    , loading: true
+                    , method: 'post'
+                    // , toolbar: '#toolbar1'
+                    , toolbar: false
+                    , page: true
+                    , limit: 1000
+                    , limits: [500, 1000, 5000, 10000, 20000]
+                    , height: height
+                    , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                    , where: {"检核类型": "预计库存skc", '商品负责人': '{$customer17}'}
+                    , cols: [
+                        colsData,
+                    
+                    ]
+                    ,done: function (res, curr, count) {
+                        var val = $('#checkType').val();
+                        // $('.dateStr').text(val);
+                    }
+                });
+            }, 'json');
+        }
+    });
+
+</script>
