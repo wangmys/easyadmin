@@ -211,7 +211,9 @@
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
       <input type="text" id="hid_count" class="layui-hide" value="">
 
-      <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:red;">导单转换</b></button>
+      <button class="layui-btn layui-btn-sm layui-bg-orange del" style="margin: 0px 0px 0px 10px;" lay-event="del"><b style="color:#e040fb;">勾选删除</b></button>
+      <button class="layui-btn layui-btn-sm layui-bg-orange del_all" style="margin: 0px 0px 0px 10px;" lay-event="del_all"><b style="color:#e040fb;">一键全删</b></button>
+        <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:red;">导单转换</b></button>
 
     </div>
 </script>
@@ -228,6 +230,7 @@
             , url1 = "{:url('admin/system.puhuo.Puhuo/caogao_index')}" 
             , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan_caogao')}" 
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelectCaogao')}"
+            , url_del = "{:url('admin/system.puhuo.Puhuo/delete')}"
             // , url_save_caogao_daodan = "{:url('admin/system.puhuo.Puhuo/save_caogao_daodan')}"
 
         initFn();
@@ -508,6 +511,48 @@
                     $('#xl_id').text(res.xl);
                     $('#store_num').text(res.store_num);
 
+                    //勾选删除
+                    $('.del').click(function() {
+
+                        var checkStatus = table.checkStatus('table');
+                        data = checkStatus.data;
+                        // console.log(data);//return false;
+
+                        if (!data.length) {
+                            alert('请勾选需要删除的数据');return false;
+                        }
+                        var arr = [];
+                        $.each(data, function(index, value){
+                            arr.push(data[index].uuid);
+                        });
+
+                        var post_data = {
+                            'uuid' : arr
+                        };
+                        $.post(url_del+'?all=0', post_data, function(res) {
+                            // console.log(res);
+                            window.location.reload();
+
+                        })
+                        return false;
+
+                    });
+                    //删除全部
+                    $('.del_all').click(function() {
+
+                        layer.confirm('是否全部删除？',{},function () {
+                            $.post(url_del+'?all=1', {}, function(res) {
+                                // console.log(res);
+                                window.location.reload();
+
+                            })
+                            layer.closeAll()
+                        })
+
+
+                        return false;
+
+                    });
 
                     //勾选导单转换
                     $('.save_caogao_daodan').click(function() {

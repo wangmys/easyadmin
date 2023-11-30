@@ -9,6 +9,7 @@ use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
 use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
 use app\admin\model\CustomerModel;
 use jianyan\excel\Excel;
+use think\facade\Db;
 use think\Request;
 
 /**
@@ -539,6 +540,23 @@ class Puhuo extends AdminController
             '贵阳云仓' => 'CK005',
         ];
         return $arr[$yuncang] ?? '';
+
+    }
+
+    public function delete(){
+
+        $param=$this->request->param();
+
+        $db=Db::connect('mysql');
+
+        if($param['all'] ==1){
+            $res=$db->table('sp_lyp_puhuo_caogao')->whereNotNull('uuid')->update(['is_delete'=>1]);
+        }else{
+            $res=$db->table('sp_lyp_puhuo_caogao')->whereIn('uuid',$param['uuid'])->update(['is_delete'=>1]);
+        }
+
+        return $this->success('ok',$param);
+
 
     }
 
