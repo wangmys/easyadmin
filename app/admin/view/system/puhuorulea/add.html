@@ -74,11 +74,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label required">店铺等级:</label>
             <div class="layui-input-block">
-                <select name="CustomerGrade" lay-verify="" lay-search="">
-                    {foreach $CustomerGrade_list as $vo}
-                    <option value="{$vo}">{$vo}</option>
-                    {/foreach}
-                </select>
+                <div id="xm-select" class="xm-select"></div>
             </div>
         </div>
 

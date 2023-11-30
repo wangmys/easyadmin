@@ -140,6 +140,35 @@ class Puhuorulea extends AdminController
 
     }
 
+    /**
+     * @return \think\response\Json
+     * @NodeAnotation(title="下拉",auth=false)
+     */
+    public function xm_son(){
+
+
+        $cus_info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
+        $info_list = SpLypPuhuoWaitGoodsModel::column('StyleCategoryName,CategoryName1,CategoryName2,CategoryName');
+        if(!empty($info_list)){
+            $CustomerGrade_list = array_unique(array_column($cus_info_list,'CustomerGrade'));
+            $CustomerGrade_list = array_filter($CustomerGrade_list);
+            $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
+
+        }
+        $CustomerGrade_arr=[];
+        foreach ($CustomerGrade_list as $value){
+            $CustomerGrade_arr[]=['name'=>$value,'value'=>$value,'selected'=>false];
+
+        }
+        $data = [
+            'code'  => 1,
+            'msg'   => '',
+            'CustomerGrade_list'  => $CustomerGrade_arr,
+
+        ];
+        return json($data);
+    }
+
 
     /**
      * @NodeAnotation(title="编辑")
@@ -295,10 +324,16 @@ class Puhuorulea extends AdminController
 
                     $add_data = [];
                     $post_new = $post;
+                    $CustomerGrade=explode(',',$post_new['CustomerGrade']);
+                    unset($post_new['CustomerGrade']);
                     unset($post_new['State']);
                     foreach ($State_list as $v_state) {
                         $post_new['State'] = $v_state;
-                        $add_data[] = $post_new;
+                        foreach ($CustomerGrade as $v_g) {
+                            $post_new['CustomerGrade'] = $v_g;
+                            $add_data[] = $post_new;
+
+                        }
                     }
                     $save = $this->model->saveAll($add_data);
                     $save ? $this->success('保存成功') : $this->error('保存失败');
@@ -308,9 +343,15 @@ class Puhuorulea extends AdminController
                 }
 
             } else {
+                $CustomerGrade = explode(',', $post['CustomerGrade']);
+                $add_data = [];
+                foreach ($CustomerGrade as $v_g) {
+                    $post['CustomerGrade'] = $v_g;
+                    $add_data[] = $post;
 
+                }
                 try {
-                    $save = $this->model->save($post);
+                    $save = $this->model->saveAll($add_data);
                 } catch (\Exception $e) {
                     $this->error('保存失败');
                 }
@@ -322,7 +363,7 @@ class Puhuorulea extends AdminController
         $info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
         $goods_info_list = SpLypPuhuoWaitGoodsModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');
         $Yuncang_list = $State_list = $StyleCategoryName_list = $StyleCategoryName1_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = $CustomerGrade_list = [];
-        
+
         if(!empty($info_list)){
             $Yuncang_list = array_unique(array_column($info_list,'Yuncang'));
             $Yuncang_list = array_combine($Yuncang_list,$Yuncang_list);
@@ -350,7 +391,7 @@ class Puhuorulea extends AdminController
             $CustomerGrade_list = array_combine($CustomerGrade_list,$CustomerGrade_list);
         }
         // print_r($Yuncang_list);die;
-        
+
         $this->assign([
             'Yuncang_list' => $Yuncang_list,
             'State_list' => $State_list,
