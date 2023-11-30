@@ -20,17 +20,15 @@
                         <!-- <span>添加操作</span> -->
                     </td>
                     <td colspan="1">
-                        <div class="layui-btn-group">
-                            <button type="button" class="layui-btn add_guiyang_goods_config">增加</button>
-                        </div>
-                        <div class="layui-btn-group">
-                            <button type="button" class="layui-btn add_guiyang_goods_config_all">一键保存全部</button>
-                        </div>
+                        <button type="button" class="layui-btn layui-btn-sm  add_guiyang_goods_config" style="margin-bottom: 5px">增加</button>
+                        <button type="button" class="layui-btn layui-btn-sm  add_guiyang_goods_config_all" style="margin-bottom: 5px">一键保存全部</button>
+                        <button type="button" class="layui-btn layui-btn-sm  layui-btn-danger del_guiyang_goods_config_all" style="margin-bottom: 5px">一键删除全部</button>
+
                     </td>
                 </tr>
 
                 {foreach $guiyang_goods_config as $vo}
-                <tr class="guiyang_goods_config-select" lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
+                <tr class="guiyang_goods_config-select"  lay-data="{:htmlspecialchars(json_encode($vo['Commonfield_select']))}">
                     <td class="guiyang_goods">
                         <input type="text" style="width:438px;" name="GoodsNo[]" lay-verify="required" placeholder="请输入,多个货号用空格 隔开，如：B72109013 B62109211 B62105155" value="{$vo['GoodsNo']}" class="layui-input">
                     </td>
