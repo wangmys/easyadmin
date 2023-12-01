@@ -499,7 +499,7 @@ class Puhuo_start2_merge extends Command
                                 // print_r($current_14days);die;
 
                                 //满足条件的才铺货
-                                $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, 0, $current_14days);
+                                $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, $goods_yuji_stock, $current_14days);
 //                                 print_r($can_puhuo);die;
                                 $uuid = uuid();
                                 if ($can_puhuo['if_can_puhuo']) {
