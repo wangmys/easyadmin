@@ -108,7 +108,7 @@ class Puhuoruleb extends AdminController
     {
 
         $cus_info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
-        $info_list = SpLypPuhuoWaitGoodsModel::column('StyleCategoryName,CategoryName1,CategoryName2,CategoryName');
+        $info_list = SpLypPuhuoYuncangkeyongModel::column('StyleCategoryName,CategoryName1,CategoryName2,CategoryName');
         $Yuncang_list = $State_list = $StyleCategoryName_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = [];
         if (!empty($info_list)) {
             $Yuncang_list = array_unique(array_column($cus_info_list, 'Yuncang'));
