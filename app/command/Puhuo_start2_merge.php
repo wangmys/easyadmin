@@ -4198,7 +4198,7 @@ class Puhuo_start2_merge extends Command
         EC.CustomerGrade,
         EG.GoodsNo
     UNION ALL 
-    --店铺已配未发
+    -- 店铺已配未发
     SELECT 
         EC.CustomItem15,
         EC.State,
