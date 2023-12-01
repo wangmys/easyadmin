@@ -204,8 +204,8 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 70px;">
-                        <div class="layui-form-item">
+                    <div class="flex col between al-start" style="width:95%; height: 35px;">
+                        <!-- <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-spzy" class="xm-select-demo"></div>
@@ -232,18 +232,14 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-wq" class="xm-select-demo"></div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
-                    <div class="flex col between" style="width:5%; height:70px;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">条件查询
-                        </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="updateBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">实时更新
-                        </button>
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="downloadBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffffff,rgb(7, 199, 183));letter-spacing:1px;color: #0879bb; line-height: 25px; float:right; display:none;">导出全部
+                    <div class="flex row between" style="width:100px; height:35px;">
+
+                        <button type="button" id="uploadBtn" class="layui-btn layui-btn-xs uploadBtn">1.导入</button>
+                        <button lay-submit class="layui-btn layui-btn-xs" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">2.查询
                         </button>
                     </div>
                 </div>  
@@ -252,7 +248,7 @@
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;">店铺检核表 <a class="dateStr" style="color:red;">预计库存skc</a></div>
+            <div style="text-align: center; color:#0051ff;">店铺检核表 <a class="dateStr" style="color:red;">预计库存skc</a> <a style="color:#666">上传时间：<a class="lasttime"></a> </a> </div>
         </table>
         <div id="page"></div>
     </div>
@@ -275,15 +271,17 @@
         window.localStorage.setItem('viewCustomer_gdno', goodsno);
     }
     watermark({ "watermark_txt": '南昌索歌服饰' });
-    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
+    layui.use(['form', 'upload', 'jquery', 'layer', 'table', 'laydate', 'laypage'], function () {
         let form = layui.form
             , $ = layui.$
             , layer = layui.layer
             , table = layui.table
+            , upload = layui.upload
             , laydate = layui.laydate
             , laypage = layui.laypage
             , getHeader = "{:url('admin/system.Jianheskcpro/getHeader')}" 
             , url1 = "{:url('admin/system.Jianheskcpro/handle')}" 
+            , upload_excel = "{:url('admin/system.Jianheskcpro/upload_excel')}"
             , url_download_history_area = "{:url('admin/system.Jianheskcpro/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Jianheskcpro/getXmMapSelect')}"
             , url_updateDdata = "{:url('admin/system.Jianheskcpro/updateDdata')}"
@@ -424,17 +422,71 @@
         }
 
         //监听保存
-        form.on('submit(mapBtn)', function (data) {
-            table.reload('table', {
-                where: data.field
-                , method: 'post'
-                , url: url1
-                , loading: true
-                , page: true
-                , limit: data.field.limit
-            })
+        // form.on('submit(mapBtn)', function (data) {
+        //     table.reload('table', {
+        //         where: data.field
+        //         , method: 'post'
+        //         , url: url1
+        //         , loading: true
+        //         , page: true
+        //         , limit: data.field.limit
+        //     })
 
-            return false; 
+        //     return false; 
+        // });
+
+        upload.render({
+            elem: '#uploadBtn'
+            ,url: upload_excel //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            ,accept: 'file'
+            ,exts: 'xlsx'
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                } else {
+                    // 方案
+                    // table.reload('table2', {
+                    //       method: 'post'
+                    //     , url: url1
+                    //     , loading: true
+                    // })
+
+                    // table.reload('table', {
+                    //     where: data.field
+                    //     , method: 'post'
+                    //     , url: url1
+                    //     , loading: true
+                    //     , page: true
+                    //     , limit: data.field.limit
+                    // })
+
+
+                    layui.use('layer', function () {
+                        setTimeout(function () {
+                            layui.layer.closeAll();
+                            // stop = false
+                            return layer.msg('上传成功');
+                        }, 0);
+                    });
+                    
+                }
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+            }
         });
 
         //监听保存
@@ -458,6 +510,8 @@
                         , page: true
                         , limit: data.field.limit
                     })
+
+                    alert('!!');
                 } else {
                     alert(res.msg);
                 }
@@ -572,8 +626,9 @@
                         
                         ]
                         ,done: function (res, curr, count) {
-                            var val = $('#checkType').val();
-                            // $('.dateStr').text(val);
+                            // var val = $('#checkType').val();
+                            $('.lasttime').text(res.lasttime);
+                            // console.log(111);
                         }
                     });
                 } catch (error) {
@@ -606,6 +661,7 @@
                 for (let key in dataRes.data) {
                     // console.log(key, dataRes.data[key])
                     // console.log(key)
+                    
                     if (key != '一级分类' && key != '二级分类'  && key != '修订分类') {
                         colsData.push({title:
                                         `<div class="flex col around">
@@ -636,7 +692,7 @@
                     ]
                     ,done: function (res, curr, count) {
                         var val = $('#checkType').val();
-                        // $('.dateStr').text(val);
+                         $('.lasttime').text(res.lasttime);
                     }
                 });
             }, 'json');
