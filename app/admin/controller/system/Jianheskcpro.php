@@ -241,17 +241,26 @@ class Jianheskcpro extends AdminController
 
             $select_店铺名称 = $this->db_easyA->table('cwl_jianhe_stock_skc_upload')->field('店铺名称')->where([
                 'aid' => $this->authInfo['id']
-            ])->group('店铺名称')->select();
-            
+            ])->group('店铺名称')->select()->toArray();
+
+            // echo '<pre>';
+            // print_r($select_店铺名称);
+            // die;
             $map_店铺名称 = "";
-            foreach ($select_店铺名称 as $k1 => $v1) {
-                if ($k1 + 1 < count($select_店铺名称)) {
-                    $map_店铺名称 .= "'{$v1['店铺名称']}',";
-                } else {
-                    $map_店铺名称 .= "'{$v1['店铺名称']}'";
-                }
+            if ($select_店铺名称) {
+                foreach ($select_店铺名称 as $k1 => $v1) {
+                    if ($k1 + 1 < count($select_店铺名称)) {
+                        $map_店铺名称 .= "'{$v1['店铺名称']}',";
+                    } else {
+                        $map_店铺名称 .= "'{$v1['店铺名称']}'";
+                    }
+                }   
+                $map1 = " AND m.店铺名称 IN ({$map_店铺名称})";
+            } else {
+                $map1 = " AND m.店铺名称 IN ('')";
             }
-            $map1 = " AND m.店铺名称 IN ({$map_店铺名称})";
+
+            // $map1 = " AND m.店铺名称 IN ({$map_店铺名称})";
             // echo $map_店铺名称;die;
 
             $sql0 = "
@@ -267,15 +276,15 @@ class Jianheskcpro extends AdminController
                 -- LIMIT 10
             ";  
       
-            $select_店铺名称 = $this->db_easyA->query($sql0);
-
+            $select_店铺名称2 = $this->db_easyA->query($sql0);
             
-            if ($select_店铺名称) {
+
+            if ($select_店铺名称2) {
                 // print_r($select_店铺名称);die;
                 $field = "";
                 $customerName = "";
-                $len = count($select_店铺名称);
-                foreach ($select_店铺名称 as $key => $val) {
+                $len = count($select_店铺名称2);
+                foreach ($select_店铺名称2 as $key => $val) {
                     $field .= 
                     ",sum(
                         case 
@@ -422,17 +431,21 @@ class Jianheskcpro extends AdminController
 
             $select_店铺名称 = $this->db_easyA->table('cwl_jianhe_stock_skc_upload')->field('店铺名称')->where([
                 'aid' => $this->authInfo['id']
-            ])->group('店铺名称')->select();
+            ])->group('店铺名称')->select()->toArray();
 
             $map_店铺名称 = "";
-            foreach ($select_店铺名称 as $k1 => $v1) {
-                if ($k1 + 1 < count($select_店铺名称)) {
-                    $map_店铺名称 .= "'{$v1['店铺名称']}',";
-                } else {
-                    $map_店铺名称 .= "'{$v1['店铺名称']}'";
-                }
+            if ($select_店铺名称) {
+                foreach ($select_店铺名称 as $k1 => $v1) {
+                    if ($k1 + 1 < count($select_店铺名称)) {
+                        $map_店铺名称 .= "'{$v1['店铺名称']}',";
+                    } else {
+                        $map_店铺名称 .= "'{$v1['店铺名称']}'";
+                    }
+                }   
+                $map1 = " AND m.店铺名称 IN ({$map_店铺名称})";
+            } else {
+                $map1 = " AND m.店铺名称 IN ('')";
             }
-            $map1 = " AND m.店铺名称 IN ({$map_店铺名称})";
 
             $sql0 = "
                 SELECT
@@ -446,13 +459,13 @@ class Jianheskcpro extends AdminController
                     店铺名称
                 -- LIMIT 100
             ";  
-            $select_店铺名称 = $this->db_easyA->query($sql0);
+            $select_店铺名称2 = $this->db_easyA->query($sql0);
 
-            if ($select_店铺名称) {
+            if ($select_店铺名称2) {
                 $field = "";
                 $customerName = "";
-                $len = count($select_店铺名称);
-                foreach ($select_店铺名称 as $key => $val) {
+                $len = count($select_店铺名称2);
+                foreach ($select_店铺名称2 as $key => $val) {
                     $field .= 
                     ",sum(
                         case 
@@ -502,24 +515,35 @@ class Jianheskcpro extends AdminController
                 ";
                 $select_上传skc = $this->db_easyA->query($sql_上传skc);
                 
-                // 重要
-                foreach ($select as $key1 => $val1) {
-                    foreach ($select_上传skc as $key2 => $val2) {
-                        if ( $val1['一级分类'] ==  $val2['一级分类'] && $val1['二级分类'] ==  $val2['二级分类']  && $val1['修订分类'] ==  $val2['修订分类']) {
-                            $select[$key1][$val2['店铺名称']] += 1;
-                            // break;
-                        }
+                if ($select_上传skc) {
+                    // 重要
+                    foreach ($select as $key1 => $val1) {
+                        foreach ($select_上传skc as $key2 => $val2) {
+                            if ( $val1['一级分类'] ==  $val2['一级分类'] && $val1['二级分类'] ==  $val2['二级分类']  && $val1['修订分类'] ==  $val2['修订分类']) {
+                                $select[$key1][$val2['店铺名称']] += 1;
+                                // break;
+                            }
 
-                        if ($val1['一级分类'] ==  $val2['一级分类'] && $val1['二级分类'] ==  $val2['二级分类'] && $val1['修订分类'] ==  '合计') {
-                            $select[$key1][$val2['店铺名称']] += 1;
+                            if ($val1['一级分类'] ==  $val2['一级分类'] && $val1['二级分类'] ==  $val2['二级分类'] && $val1['修订分类'] ==  '合计') {
+                                $select[$key1][$val2['店铺名称']] += 1;
+                            }
                         }
                     }
+                    $lasttime = $select_上传skc[0]['更新时间'];
+                } else {
+                    $sql_上传skc = "
+                        select * from cwl_jianhe_stock_skc_upload
+                        WHERE 1
+                            AND 店铺名称 in ({$customerName})
+                            AND aid = '{$this->authInfo['id']}'
+                    ";
+                     $select_上传skc = $this->db_easyA->query($sql_上传skc);
+                     $lasttime = $select_上传skc[0]['更新时间'];
                 }
 
-
-                return json(["code" => "0", "msg" => "", "count" => $count, "data" => $select]);
+                return json(["code" => "0", "msg" => "", "count" => $count, "data" => $select, 'lasttime' => $lasttime]);
             } else {
-                return json(["code" => "0", "msg" => "", "count" => 0, "data" => []]);
+                return json(["code" => "0", "msg" => "", "count" => 0, "data" => [], 'lasttime' => '暂无上传记录，请上传后再进行查询操作']);
             }
 
 
@@ -678,6 +702,129 @@ class Jianheskcpro extends AdminController
         return $data;
     }
 
+    // 上传excel 店铺补货
+    public function upload_excel() {
+        if (request()->isAjax()) {
+        // if (1) {    
+            $file = request()->file('file');  //这里‘file’是你提交时的name
+            $new_name = "检核预计SKC_". $this->authInfo['name'] . '_' . rand(100, 999) . time() . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+
+            // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/检核预计SKC_超级管理员_1681701397511.xlsx';   //文件保存路径
+            // $info = 1;
+
+            // $info = $file->move($save_path, $new_name);
+            // echo 11;
+            // die;
+            // dump($info);die;
+            if($info) {
+                //成功上传后 获取上传的数据
+                $read_column = [
+                    // 'A' => '原单编号',
+                    'B' => '仓库编号',
+                    'C' => '店铺编号',
+                    'F' => '货号',
+                    // 'G' => '尺码',
+                    'I' => '铺货数',
+                    // 'K' => '备注',
+                ];
+
+                // $data = $this->readExcel($save_path, $read_column); // 直接读本地测试
+                $data = $this->readExcel($info, $read_column); // 上传
+                // print_r($data);
+                // die;
+                if ($data) {
+                    // $this->authInfo
+                    foreach ($data as $kk => $vv) {
+                        $data[$kk]['aid'] = $this->authInfo['id'];
+                        $data[$kk]['aname'] = $this->authInfo['name'];
+                        $data[$kk]['更新时间'] = date('Y-m-d H:i:s', time());
+                    }
+        
+                    // 删除历史
+                    $this->db_easyA->table('cwl_jianhe_stock_skc_upload')->where([
+                        ['aid', '=', $this->authInfo['id']]
+                    ])->delete();
+        
+                    // 插入
+                    $chunk_list = array_chunk($data, 500);
+                    foreach($chunk_list as $key => $val) {
+                        // 基础结果 
+                        $this->db_easyA->table('cwl_jianhe_stock_skc_upload')->strict(false)->insertAll($val);
+                    }
+        
+                    // 分组处理
+                    $this->groupHandle();
+        
+                    // die;
+        
+                    $sql_店铺 = "
+                        update `cwl_jianhe_stock_skc_upload` as u
+                        left join customer as c on u.店铺编号 = c.CustomerCode
+                        set
+                            u.店铺名称 = c.CustomerName
+                        where
+                            u.aid = '{$this->authInfo['id']}'
+                    ";
+                    $this->db_easyA->execute($sql_店铺);
+        
+                    $sql_分类 = "
+                        update `cwl_jianhe_stock_skc_upload` as u
+                        left join sp_ww_hpzl as h on u.货号 = h.货号
+                        set
+                            u.一级分类 = h.一级分类,
+                            u.二级分类 = h.二级分类,
+                            u.分类 = h.分类,
+                            u.季节 = h.季节
+                        where
+                        u.aid = '{$this->authInfo['id']}'
+                    ";
+                    $this->db_easyA->execute($sql_分类);
+        
+                    $sql_修订分类 = "
+                        update cwl_jianhe_stock_skc_upload as sk
+                        LEFT JOIN (
+                            SELECT
+                                分类,修订分类
+                            FROM	cwl_jianhe_skc_biaozhun_1 where 分类 is not null group by 分类
+                        ) as b ON sk.分类 = b.分类
+                        set 
+                            sk.修订分类 = b.修订分类
+                        where 
+                            sk.修订分类 is null
+                            AND sk.aid = '{$this->authInfo['id']}'
+                    ";
+                    $this->db_easyA->execute($sql_修订分类);
+        
+                    $sql_预计库存数量 = "
+                        update `cwl_jianhe_stock_skc_upload` as u
+                        left join sp_sk as sk on u.店铺名称 = sk.店铺名称 and u.一级分类 = sk.一级分类 and u.二级分类 = sk.二级分类 and u.货号 = sk.货号
+                        set
+                            u.店铺预计库存数量 = sk.预计库存数量
+                        where
+                        aid = '{$this->authInfo['id']}'
+                    ";
+                    $this->db_easyA->execute($sql_预计库存数量);
+        
+                    $sql_预计skc需合计数 = "
+                        update `cwl_jianhe_stock_skc_upload` 
+                        set
+                            预计skc需合计数 = case
+                                when 店铺预计库存数量 is null OR 店铺预计库存数量 <= 0 then 1 else 0
+                            end
+                        where
+                        aid = '{$this->authInfo['id']}'
+                    ";
+                    $this->db_easyA->execute($sql_预计skc需合计数);
+                    return json(['code' => 0, 'status' => 1,'msg' => '上传成功']);
+                }
+                
+
+            }
+        }
+    }
+
     // 上次excel测试
     public function readExcel_test() {
         // $save_path = app()->getRootPath() . 'runtime/uploads/'.date('Ymd',time()).'/补货申请_黎亿炎_ccccccccccccc.xlsx';   //文件保存路径
@@ -706,7 +853,7 @@ class Jianheskcpro extends AdminController
             foreach ($data as $kk => $vv) {
                 $data[$kk]['aid'] = $this->authInfo['id'];
                 $data[$kk]['aname'] = $this->authInfo['name'];
-                $data[$kk]['更新时间'] = date('Y-m-d', time());
+                $data[$kk]['更新时间'] = date('Y-m-d H:i:s', time());
             }
 
             // 删除历史
