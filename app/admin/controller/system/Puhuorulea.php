@@ -4,6 +4,7 @@
 namespace app\admin\controller\system;
 
 use app\admin\model\bi\SpLypPuhuoRuleAModel;
+use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
 use app\admin\model\CustomerModel;
 use app\admin\model\SjpGoodsModel;
 use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
@@ -224,7 +225,7 @@ class Puhuorulea extends AdminController
         }
 
         $info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
-        $goods_info_list = SpLypPuhuoWaitGoodsModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');
+        $goods_info_list = SpLypPuhuoYuncangkeyongModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');
         $Yuncang_list = $State_list = $StyleCategoryName_list = $StyleCategoryName1_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = $CustomerGrade_list = [];
         
         if(!empty($info_list)){
@@ -361,7 +362,7 @@ class Puhuorulea extends AdminController
         }
 
         $info_list = CustomerModel::where([['ShutOut', '=', 0]])->column('CustomItem15 as Yuncang,State,CustomerGrade');
-        $goods_info_list = SpLypPuhuoWaitGoodsModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');
+        $goods_info_list = SpLypPuhuoYuncangkeyongModel::where([])->column('StyleCategoryName,StyleCategoryName1,CategoryName1,CategoryName2,CategoryName');
         $Yuncang_list = $State_list = $StyleCategoryName_list = $StyleCategoryName1_list = $CategoryName1_list = $CategoryName2_list = $CategoryName_list = $CustomerGrade_list = [];
 
         if(!empty($info_list)){
