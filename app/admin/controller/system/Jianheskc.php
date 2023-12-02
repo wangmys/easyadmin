@@ -494,6 +494,197 @@ class Jianheskc extends AdminController
 
     }
 
+    public function excel_handle() {
+        if (request()->isAjax()) {
+            $input = input();
+            @$pageParams1 = ($input['page'] - 1) * $input['limit'];
+            @$pageParams2 = input('limit');
+
+            if (!empty($input['检核类型'])) {
+                // echo $input['商品负责人'];
+                // $map0Str = xmSelectInput($input['检核类型']);
+                $map0 = "m.{$input['检核类型']}";
+            } else {
+                $map0 = "m.店铺库存";
+            }
+            if (!empty($input['店铺名称'])) {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['店铺名称']);
+                $map1 = " AND m.店铺名称 IN ({$map1Str})";
+            } else {
+                $map1 = "";
+            }
+
+            if (!empty($input['调整风格'])) {
+                // echo $input['商品负责人'];
+                $map2Str = xmSelectInput($input['调整风格']);
+                $map2 = " AND m.调整风格 IN ({$map2Str})";
+            } else {
+                $map2 = "";
+            }
+
+            if (!empty($input['修订季节'])) {
+                // echo $input['商品负责人'];
+                $map3Str = xmSelectInput($input['修订季节']);
+                $map3 = " AND m.修订季节 IN ({$map3Str})";
+            } else {
+                $map3 = "";
+            }
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map4Str = xmSelectInput($input['商品负责人']);
+                $map4 = " AND m.商品负责人 IN ({$map4Str})";
+            } else {
+                $map4 = "";
+            }
+
+            if (!empty($input['温区'])) {
+                // echo $input['商品负责人'];
+                $map5Str = xmSelectInput($input['温区']);
+                $map5 = " AND m.温区 IN ({$map5Str})";
+            } else {
+                $map5 = "";
+            }
+
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $map6Str = xmSelectInput($input['省份']);
+                $map6 = " AND m.省份 IN ({$map6Str})";
+            } else {
+                $map6 = "";
+            }
+
+            
+            if (!empty($input['一级分类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['一级分类']);
+                $map7 = " AND m.一级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+     
+            if (!empty($input['二级分类'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['二级分类']);
+                $map8 = " AND m.二级分类 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+
+            if (!empty($input['修订分类'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['修订分类']);
+                $map9 = " AND m.修订分类 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+
+            // $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}";
+            $map = [
+                'map0' => $map0,
+                'map1' => $map1,
+                'map2' => $map2,
+                'map3' => $map3,
+                'map4' => $map4,
+                'map5' => $map5,
+                'map6' => $map6,
+                'map7' => $map7,
+                'map8' => $map8,
+                'map9' => $map9,
+            ];
+            
+            $code = rand_code(6);
+            cache($code, $map, 3600);
+            return json([
+                'status' => 1,
+                'code' => $code,
+            ]); 
+
+        } else {
+            $code = input('code');
+            $map = cache($code);
+            if (empty($map)) {
+                $map = '';
+            }
+            // print_r($map); die;
+            $sql0 = "
+                SELECT
+                    店铺名称
+                FROM
+                    cwl_jianhe_stock_skc as m
+                WHERE 
+                    1
+                    {$map['map1']}
+                    {$map['map4']}
+                    {$map['map5']}
+                    {$map['map6']}
+
+                    
+                GROUP BY
+                    店铺名称
+                -- LIMIT 100
+            ";  
+            $select_店铺名称 = $this->db_easyA->query($sql0);
+
+           
+            if ($select_店铺名称) {
+                $field = "";
+                $customerName = "";
+                $len = count($select_店铺名称);
+                foreach ($select_店铺名称 as $key => $val) {
+                    $field .= 
+                    ",sum(
+                        case 
+                            when m.店铺名称 = '{$val['店铺名称']}' then {$map['map0']} else null
+                        end
+                    ) AS {$val['店铺名称']}";
+                    
+                    if ($key < $len -1 ) {
+                        $customerName .= "'{$val['店铺名称']}'" . ",";
+                    } else {
+                        $customerName .= "'{$val['店铺名称']}'";
+                    }
+                }
+    
+                // echo $customerName;die;
+                // -- 	m.店铺名称 in ('南宁一店','南宁二店')
+                $sql = "
+                    SELECT
+                        IFNULL(m.一级分类,'合计') AS 一级分类,
+                        IFNULL(m.二级分类,'合计') AS 二级分类, 
+                        IFNULL(m.修订分类,'合计') AS 修订分类 
+                        {$field}
+                    FROM
+                        cwl_jianhe_stock_skc as m
+                    WHERE 1
+                        AND m.店铺名称 in ({$customerName})
+                        {$map['map2']}
+                        {$map['map3']}
+                        {$map['map4']}
+                        {$map['map5']}
+                        {$map['map6']}
+                        {$map['map7']}
+                        {$map['map8']}
+                        {$map['map9']}
+
+                        
+                    GROUP BY
+                        m.一级分类,m.二级分类,m.修订分类
+                        WITH ROLLUP
+
+                ";  
+    
+                // die;
+                $select = $this->db_easyA->query($sql);
+            }
+            $header = [];
+            foreach($select[0] as $key => $val) {
+                $header[] = [$key, $key];
+            }
+            return Excel::exportData($select, $header, '检核_' . input('name') . date('Ymd') . '_' . time() , 'xlsx');
+        }
+    } 
+
     public function testRedis()
     {
         // $redis = new Redis;
