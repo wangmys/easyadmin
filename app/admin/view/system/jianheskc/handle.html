@@ -698,7 +698,13 @@
                                 <div class="cima"></div>
                             </div>`, field: '一级分类', fixed: 'left' ,align: 'center' , width: 60}
                     ,{ field: '二级分类', title: '中类', fixed: 'left' ,align: 'center' , width: 60}
-                    ,{ field: '修订分类', title: '小类', fixed: 'left' ,align: 'center' , width: 60}
+                    ,{ field: '修订分类', title: '小类', fixed: 'left' ,align: 'center' , width: 60, templet: function (data) {
+                        if (data['修订分类'] && data['修订分类'] == '合计') {
+                            return `<a style="color:red;font-weight:bold;">${data['修订分类']}</a>`;
+                        } else {
+                            return `${data['修订分类']}`;
+                        }
+                    }}
 
                 ];
             $.post(getHeader, {"检核类型": "店铺库存", '商品负责人': '{$customer17}'}, function(dataRes) {
