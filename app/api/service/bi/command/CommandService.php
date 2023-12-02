@@ -40,6 +40,7 @@ class CommandService
         $this->db_easyA = Db::connect('mysql');
     }
 
+
     /**
      * 拉取指令日志
      */
