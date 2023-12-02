@@ -639,6 +639,16 @@
             return false; 
         });
 
+        // 设置颜色 背景色
+        function setColor(color = '#dedede'){
+            $('.layui-table').find('tr').each(function(){
+                if($(this).find('td[data-field="修订分类"] div').html() == '合计'){   //给状态为2的数据行设置背景色
+                    $(this).attr('style',`background:${color};color:#000`);
+                }
+
+            })
+        }
+
         function startTable() {
             var mapHeight = $('#map').height();
             // console.log(111);
@@ -692,7 +702,9 @@
                     ]
                     ,done: function (res, curr, count) {
                         var val = $('#checkType').val();
-                         $('.lasttime').text(res.lasttime);
+                        $('.lasttime').text(res.lasttime);
+                        // 设置背景色
+                        setColor('#feff9a')
                     }
                 });
             }, 'json');
