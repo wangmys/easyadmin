@@ -68,8 +68,15 @@ class CommandService
                 $item = $log[$k+1]??[];
                 if(!empty($item) && $item['货号']==$v['货号'] && $item['店铺名称']==$v['店铺名称']  && $item['单据类型']=='店铺收货单' && $item['变动数量'] > 0 && $item['库存数量'] > 0 ){
 
-                    $pos = strstr($item['创建人'], "商品~");
-                    $name = mb_substr($item['创建人'], 3);
+                    $time = strtotime($v['变动时间']);
+                    $time2 = strtotime($item['变动时间']);
+                    if ($time > $time2) {
+                        $pos = strstr($v['创建人'], "商品~");
+                        $name = mb_substr($v['创建人'], 3);
+                    } else {
+                        $pos = strstr($item['创建人'], "商品~");
+                        $name = mb_substr($item['创建人'], 3);
+                    }
                     if ($pos === false) {
                         $v['创建人'] = $item['创建人'];
                         $v['商品负责人'] = $item['创建人'];
