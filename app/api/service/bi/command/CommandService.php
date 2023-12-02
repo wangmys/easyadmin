@@ -51,19 +51,35 @@ class CommandService
         // $log = Db::connect("sqlsrv")->query($getSql);
         //换为从邝的表里直接查
         $log = Db::connect("mysql")->query("select * from ea_command_error_log_2;");
+
+
         // print_r($log);die;
         // 定义错误指令统计结果集
         $result = [];
         // 定义错误指令记录结果集
         $result_log = [];
         // 循环判断
-        foreach ($log as $k => $v){
+        foreach ($log as $k => &$v){
             $log[$k]['is_error']??$log[$k]['is_error'] = 0;
             // 是否符合异常指令判断第一层
             if($v['单据类型'] == '店铺调出单' && $v['清空操作']=='调出清空'){
                 // 异常指令判断第二层(下一条指令是否为[店铺收货单],且库存数量大于0)
                 $item = $log[$k+1]??[];
-                if(!empty($item) && $item['单据类型']=='店铺收货单' && $item['库存数量'] > 0 ){
+                if(!empty($item) && $item['货号']==$v['货号'] && $item['店铺名称']==$v['店铺名称']  && $item['单据类型']=='店铺收货单' && $item['变动数量'] > 0 && $item['库存数量'] > 0 ){
+
+                    $pos = strstr($item['创建人'], "商品~");
+                    $name = mb_substr($item['创建人'], 3);
+                    if ($pos === false) {
+                        $v['创建人'] = $item['创建人'];
+                        $v['商品负责人'] = $item['创建人'];
+                        $item['创建人'] = $item['创建人'];
+                        $item['商品负责人'] = $item['创建人'];
+                    } else {
+                        $v['创建人'] = $name;
+                        $v['商品负责人'] = $name;
+                        $item['创建人'] = $name;
+                        $item['商品负责人'] = $name;
+                    }
                     // 月份
                     $month = date('Y-m',strtotime($v['变动时间']));
                     // 年份
@@ -116,8 +132,8 @@ class CommandService
             return ApiConstant::ERROR_CODE;
         }
 
-        $this->totalResultHandle_1();
-        $this->totalResultHandle_2();
+//        $this->totalResultHandle_1();
+//        $this->totalResultHandle_2();
         return ApiConstant::SUCCESS_CODE;
     }
 
