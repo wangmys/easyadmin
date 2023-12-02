@@ -301,7 +301,7 @@ class Push extends BaseController
     public function pushLiandai()
     {
         $time = time();
-        if ($time >= strtotime(date('Y-m-d 23:30:00')) && $time <= strtotime(date('Y-m-d 23:40:00'))) {
+        if ($time >= strtotime(date('Y-m-d 23:25:00')) && $time <= strtotime(date('Y-m-d 23:40:00'))) {
         } else {
             // echo '时间范围外';
             die;

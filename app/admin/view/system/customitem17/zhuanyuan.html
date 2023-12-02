@@ -380,6 +380,15 @@
             };
         });
 
+        // 设置颜色 背景色
+        function setColor(color = '#dedede'){
+            $('.layui-table').find('tr').each(function(){
+                if($(this).find('td[data-field="商品专员"] div').html() == '合计'){   //给状态为2的数据行设置背景色
+                    $(this).attr('style',`background:${color};`);
+                }
+            })
+        }
+
         function startTable() {
             var mapHeight = $('#map').height();
             // console.log(111);
@@ -406,7 +415,7 @@
                                     <div class="cima"></div>
                                     </div>`, field: '商品专员',  fixed: 'left' ,align: 'center' , rowspan: 2, templet: function (data) {
                             if (data['商品专员'] == '合计') {
-                                return `<div style="background:#6b3dff;color:#fff;">${data['商品专员']}%</div>`;
+                                return `${data['商品专员']}`;
                             } else {
                                 return data['商品专员'];
                             }
@@ -492,6 +501,8 @@
                 ]
                 ,done: function (res, curr, count) {
                     $('.dateStr').text(res.create_time);
+                    // 设置背景色
+                    setColor('#feff9a');
                 }
             });
         }

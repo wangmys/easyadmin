@@ -84,7 +84,7 @@ class Table extends BaseController
             date_format(DATE_ADD(now(),INTERVAL 1 DAY),  '%Y-%m-%d') AS 更新日期
             from wechat.shopdaytasknewtz R
             left join wechat.shopstask N on R.pid=N.id
-            WHERE (concat(N.start , '-01') = DATE_ADD(DATE_ADD(curdate(), interval -1 DAY),interval -day(DATE_ADD(curdate(), interval -1 DAY))+1 day)
+            WHERE (concat(N.start , '-01') = DATE_ADD(curdate(),interval -day(curdate())+1 day)
                 -- OR concat(N.start , '-01') = date_add(curdate()-1-day(curdate()-1)+1,interval -1 month)
             )
                 AND R.name IS NOT NULL

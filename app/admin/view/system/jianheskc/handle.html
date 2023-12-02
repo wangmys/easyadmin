@@ -245,6 +245,18 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-wq" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">大类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yj" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">中类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-ej" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">小类</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-xl" class="xm-select-demo"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -383,6 +395,48 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-yj', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '大类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-ej', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '中类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-xl', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '修订分类',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
                 // 商品专员
@@ -432,7 +486,41 @@
                     name:'省份',
                     data: res.data.province
                 })
+                xmSelect.render({
+                    el: '#xm-yj', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '一级分类',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.yj
+                })
 
+                xmSelect.render({
+                    el: '#xm-ej', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '二级分类',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.ej
+                })
+
+                xmSelect.render({
+                    el: '#xm-xl', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    name: '修订分类',
+                    // showCount: 1,
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    data: res.data.xl
+                })
             }, 'json')
         }
 
@@ -587,6 +675,8 @@
                         ,done: function (res, curr, count) {
                             var val = $('#checkType').val();
                             $('.dateStr').text(val);
+                            // 设置背景色
+                            setColor('#feff9a');
                         }
                     });
                 } catch (error) {
@@ -596,6 +686,17 @@
 
             return false; 
         });
+
+        // 设置颜色 背景色
+        function setColor(color = '#dedede'){
+            $('.layui-table').find('tr').each(function(){
+                if($(this).find('td[data-field="修订分类"] div').html() == '合计'){   //给状态为2的数据行设置背景色
+                    $(this).attr('style',`background:${color};color:#000`);
+                }
+
+            })
+        }
+
 
         function startTable() {
             var mapHeight = $('#map').height();
@@ -650,6 +751,8 @@
                     ,done: function (res, curr, count) {
                         var val = $('#checkType').val();
                         $('.dateStr').text(val);
+                        // 设置背景色
+                        setColor('#feff9a');
                     }
                 });
             }, 'json');

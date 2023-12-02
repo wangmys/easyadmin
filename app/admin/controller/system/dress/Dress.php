@@ -1073,7 +1073,7 @@ class Dress extends AdminController
                     $str2 .= '`' . $v2 . '周销`';
                 }
             }
-            $field .= " ,ROUND(({$str1}) / ({$str2}), 0) as `{$str3}`";
+            $field .= " ,ROUND(({$str1}) / ({$str2}), 1) as `{$str3}`";
         }
         return $field;
     }

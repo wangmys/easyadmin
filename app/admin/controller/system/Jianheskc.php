@@ -294,6 +294,31 @@ class Jianheskc extends AdminController
                 $map6 = "";
             }
 
+            
+            if (!empty($input['一级分类'])) {
+                // echo $input['商品负责人'];
+                $map7Str = xmSelectInput($input['一级分类']);
+                $map7 = " AND m.一级分类 IN ({$map7Str})";
+            } else {
+                $map7 = "";
+            }
+     
+            if (!empty($input['二级分类'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['二级分类']);
+                $map8 = " AND m.二级分类 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+
+            if (!empty($input['修订分类'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['修订分类']);
+                $map9 = " AND m.修订分类 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+
             $sql0 = "
                 SELECT
                     店铺名称
@@ -305,6 +330,8 @@ class Jianheskc extends AdminController
                     {$map4}
                     {$map5}
                     {$map6}
+
+                    
                 GROUP BY
                     店铺名称
                 -- LIMIT 100
@@ -348,6 +375,11 @@ class Jianheskc extends AdminController
                         {$map4}
                         {$map5}
                         {$map6}
+                        {$map7}
+                        {$map8}
+                        {$map9}
+
+                        
                     GROUP BY
                         m.一级分类,m.二级分类,m.修订分类
                         WITH ROLLUP
@@ -407,7 +439,15 @@ class Jianheskc extends AdminController
         $customer = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_jianhe_stock_skc GROUP BY 店铺名称
         ");
-
+        $yj = $this->db_easyA->query("
+            SELECT 一级分类 as name, 一级分类 as value FROM cwl_jianhe_stock_skc WHERE 一级分类 IS NOT NULL AND 一级分类 !='0' GROUP BY 一级分类
+        ");
+        $ej = $this->db_easyA->query("
+            SELECT 二级分类 as name, 二级分类 as value FROM cwl_jianhe_stock_skc WHERE 二级分类 IS NOT NULL AND 二级分类 !='0' GROUP BY 二级分类
+        ");
+        $xl = $this->db_easyA->query("
+            SELECT 修订分类 as name, 修订分类 as value FROM cwl_jianhe_stock_skc WHERE 修订分类 IS NOT NULL AND 修订分类 !='0' GROUP BY 修订分类
+        ");
         $find_name = false;
         foreach ($customer17 as $key => $val) {
             if (checkAdmin()) {
@@ -437,7 +477,8 @@ class Jianheskc extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36, 'province' => $province]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer, 'customer17' => $customer17, 'customer36' => $customer36, 'province' => $province,
+        'yj' => $yj, 'ej' => $ej, 'xl' => $xl]]);
     }
 
     // 实时数据更新
