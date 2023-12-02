@@ -39,7 +39,7 @@ class Puhuo_yuncangkeyong extends Command
                     $warehouse_reserve_smallsize = $puhuo_config['warehouse_reserve_smallsize']/100;
                     $warehouse_reserve_mainsize = $puhuo_config['warehouse_reserve_mainsize']/100;
                     $warehouse_reserve_bigsize = $puhuo_config['warehouse_reserve_bigsize']/100;
-                    if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
+                    if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && (strstr($v_data['CategoryName2'], '松紧') || strstr($v_data['CategoryName2'], '羊毛裤')) )) {
 
                         //小码
                         $v_data['Stock_00_yuliu'] = round($warehouse_reserve_smallsize*$v_data['Stock_00'], 0);
