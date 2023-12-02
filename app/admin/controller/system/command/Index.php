@@ -118,7 +118,7 @@ class Index extends AdminController
             $new = [];
             foreach ($list as $k => $v){
                 $new[$v['商品负责人']]['商品负责人'] = $v['商品负责人'];
-                $new[$v['商品负责人']][$v['date_str']] = $v['result_num'];
+                $new[$v['商品负责人']][$v['date_str']] = $v['num'];
             }
             // 返回数据
             $data = [

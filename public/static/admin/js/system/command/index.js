@@ -34,7 +34,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 cols: [[
                     // {type: "checkbox"},
                     // {field: 'id', minWith: '10%', title: 'ID',search:false},
-                    {field: '商品负责人', minWith: '10%', title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)},
+                    {field: '商品负责人', minWith: '10%',hide:true, title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)},
                     {field: '创建人', minWith: 134, title: '创建人',search:false},
                     {field: '店铺名称', minWith: 134, title: '店铺名称',search:false},
                     {field: '货号', minWith: 134, title: '货号',search:false},
@@ -59,7 +59,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
            var $get = $("#where").val();
            var $manager = $("#manager").val();
            var field = JSON.parse($("#field").val());
-           var cols = [{field: '商品负责人', minWith: '10%', title: '商品负责人',search:'xmSelect',selectList:JSON.parse($manager)}];
+           var cols = [{field: '商品负责人', minWith: '10%', title: '创建人',search:'xmSelect',selectList:JSON.parse($manager)}];
            // 完善动态字段列表
            for (index in field) {
                 var val = field[index];
