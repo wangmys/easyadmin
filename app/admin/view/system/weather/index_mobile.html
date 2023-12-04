@@ -105,7 +105,7 @@
 </head>
 
 <body class="" style="background-color: #ffffff;">
-    <div class="layui-tab-item layui-show">
+    <!-- <div class="layui-tab-item layui-show" style="">
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
@@ -131,12 +131,12 @@
                 </div>  
             </form>
         </div>
-    </div>
+    </div> -->
 
-    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px; display:block;">
+    <div style="border: 0px solid red; float: left; width: 100%; margin-top: 0px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
             <div class="title_text2" style="text-align: center; color:#0051ff;">
-            店铺未来天气推送列表（<span style="color:red;">未读：<a class="noReadsNum" style="color:red;"></a></span>&nbsp;&nbsp;<span style="color:rgb(10, 112, 32);">已读：<a class="readsNum" style="color:rgb(10, 112, 32);"></a></span>）
+                天气早知道（<span style="color:red;">最后更新时间：<a class="lasttime" style="color:red;"></a></span>）
              </div>
         </table>
     </div>
@@ -182,6 +182,8 @@
             , wendai_list = ""
             , store_list = ""
             , if_can_see = ""
+            , last_update_time = ""
+            , CustomerGrade = ""
             , data = ""
             , downloadUrl = "{:url('admin/system.dingding.Weather/download_noreads')}"
             , recallImgHandle = "{:url('admin/system.dingding.Weather/recallImgHandle')}"
@@ -219,6 +221,8 @@
                     v = res.store_list;
                     //绑定城市 字段权限
                     if_can_see = res.if_can_see;
+                    CustomerGrade = res.CustomerGrade;
+                    last_update_time = res.last_update_time;
                     data = res.data;
 
                     // 表1初始化
@@ -538,7 +542,7 @@
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");
                     // console.log(res);
-                    // $('.readsNum').text(res.readsData.reads);
+                    $('.lasttime').text(last_update_time);
                     // $('.noReadsNum').text(res.readsData.noReads);
                 }
             });
