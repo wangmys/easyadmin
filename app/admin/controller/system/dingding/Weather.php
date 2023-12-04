@@ -111,9 +111,11 @@ class Weather extends BaseController
         // dump($selet_weather_customer);
         if ($selet_weather_customer) {
             $this->db_easyA->execute('TRUNCATE dd_weather_customer;');
+            $this->db_bi->execute('TRUNCATE dd_weather_customer;');
             $chunk_list = array_chunk($selet_weather_customer, 500);
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('dd_weather_customer')->strict(false)->insertAll($val);
+                $this->db_bi->table('dd_weather_customer')->strict(false)->insertAll($val);
             }
         }
     }
@@ -173,11 +175,13 @@ class Weather extends BaseController
             // 删除历史数据
             // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
             $this->db_easyA->execute('TRUNCATE dd_weather;');
+            $this->db_bi->execute('TRUNCATE dd_weather;');
             $chunk_list = array_chunk($select, 500);
             // $this->db_easyA->startTrans();
 
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('dd_weather')->strict(false)->insertAll($val);
+                $this->db_bi->table('dd_weather')->strict(false)->insertAll($val);
             }
 
             // 更新 day_index
@@ -191,6 +195,7 @@ class Weather extends BaseController
                 day_index is null
             ";
             $this->db_easyA->execute($sql2);
+            $this->db_bi->execute($sql2);
 
             // 更新天气值和颜色
             $sql_天气值 = "
@@ -222,6 +227,9 @@ class Weather extends BaseController
             ";
             $this->db_easyA->execute($sql_天气值);
             $this->db_easyA->execute($sql_颜色);
+
+            $this->db_bi->execute($sql_天气值);
+            $this->db_bi->execute($sql_颜色);
 
             return json([
                 'status' => 1,
@@ -333,6 +341,7 @@ class Weather extends BaseController
         ";
         // die;
         $update = $this->db_easyA->execute($sql);
+        $update = $this->db_bi->execute($sql);
     }   
 
     // 天气颜色统计
@@ -361,6 +370,7 @@ class Weather extends BaseController
         $select = $this->db_easyA->query($sql);
 
         $this->db_easyA->execute('TRUNCATE dd_weather_color;');
+        $this->db_bi->execute('TRUNCATE dd_weather_color;');
         $insertData = [];
         foreach ($select as $key => $val) {
             $前三天颜色1 = 0;
@@ -535,6 +545,7 @@ class Weather extends BaseController
         }
 
         $this->db_easyA->table('dd_weather_color')->insertAll($insertData);
+        $this->db_bi->table('dd_weather_color')->insertAll($insertData);
 
         $sql_省份汇总 = "
             SELECT
@@ -561,6 +572,7 @@ class Weather extends BaseController
         ";
         $select_汇总 = $this->db_easyA->query($sql_省份汇总);
         $this->db_easyA->table('dd_weather_color')->insertAll($select_汇总);
+        $this->db_bi->table('dd_weather_color')->insertAll($select_汇总);
     }
 
 
@@ -839,7 +851,7 @@ class Weather extends BaseController
                 FROM
                     `dd_weather_color`
                 WHERE 1
-             		AND 省份 in ('重庆')
+             		-- AND 省份 in ('重庆')
                     AND 店铺名称 = '汇总'
                     AND 更新日期 = '{$date}'
                 GROUP BY 省份
@@ -852,6 +864,7 @@ class Weather extends BaseController
 
         // dump($data);
         foreach($select as $key => $val) {
+            echo  $key; 
             $data = [
                 [
                     '家数' => $val['七天颜色1'],
@@ -887,8 +900,9 @@ class Weather extends BaseController
                 ],
             ];
         }
-        echo '<pre>';
+        // echo '<pre>';
         dump($data);
+        
 
     }
 
