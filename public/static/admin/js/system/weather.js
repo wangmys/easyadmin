@@ -74,6 +74,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                         })
                     }
                 })
+                // console.log(cols);
 
                 cols.push({
                     width: 120,

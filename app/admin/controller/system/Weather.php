@@ -210,7 +210,12 @@ class Weather extends AdminController
             ];
             return json($data);
         }
-        return $this->fetch();
+        if (isMobile()) {
+            return $this->fetch('index_mobile');
+        } else {
+            return $this->fetch();
+        }
+        
     }
 
     /**
