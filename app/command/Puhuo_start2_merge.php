@@ -157,7 +157,8 @@ class Puhuo_start2_merge extends Command
         //云仓归类、按省份归类店铺
         $all_customer_arr = $all_customer_arr_state = [];
         if ($all_customers) {
-            foreach ($all_customers as $v_customer) {
+            foreach ($all_customers as &$v_customer) {
+                $v_customer['StoreArea'] = $v_customer['CustomItem27'] ?: $v_customer['StoreArea'];
                 $all_customer_arr[$v_customer['CustomItem15']][] = $v_customer;
                 $all_customer_arr_state[$v_customer['State']][] = $v_customer;
             }
