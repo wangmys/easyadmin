@@ -120,19 +120,115 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         // , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
                         //  , { field: 'StyleCategoryName1', title: '一级风格', align: 'center', width: 55}
                         , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
-                        , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50}
-                        , { field: 'Stock_29_puhuo', title: '29/46/38/M', align: 'center', width: 50}
-                        , { field: 'Stock_30_puhuo', title: '30/48/39/L', align: 'center', width: 50}
-                        , { field: 'Stock_31_puhuo', title: '31/50/40/XL', align: 'center', width: 50}
-                        , { field: 'Stock_32_puhuo', title: '32/52/41/2XL', align: 'center', width: 50}
-                        , { field: 'Stock_33_puhuo', title: '33/54/42/3XL', align: 'center', width: 50}
-                        , { field: 'Stock_34_puhuo', title: '34/56/43/4XL', align: 'center', width: 50}
-                        , { field: 'Stock_35_puhuo', title: '35/58/44/5XL', align: 'center', width: 50}
-                        , { field: 'Stock_36_puhuo', title: '36/6XL', align: 'center', width: 35}
-                        , { field: 'Stock_38_puhuo', title: '38/7XL', align: 'center', width: 35}
-                        , { field: 'Stock_40_puhuo', title: '40/8XL', align: 'center', width: 35}
-                        , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30}
-                        , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30}
+                        , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_00'] == 1) {
+                                str = `<span >${d.Stock_00_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_00_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_29_puhuo', title: '29/46/38/M', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_29'] == 1) {
+                                str = `<span >${d.Stock_29_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_29_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_30_puhuo', title: '30/48/39/L', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_30'] == 1) {
+                                str = `<span >${d.Stock_30_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_30_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_31_puhuo', title: '31/50/40/XL', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_31'] == 1) {
+                                str = `<span >${d.Stock_31_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_31_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_32_puhuo', title: '32/52/41/2XL', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_32'] == 1) {
+                                str = `<span >${d.Stock_32_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_32_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_33_puhuo', title: '33/54/42/3XL', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_33'] == 1) {
+                                str = `<span >${d.Stock_33_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_33_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_34_puhuo', title: '34/56/43/4XL', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_34'] == 1) {
+                                str = `<span >${d.Stock_34_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_34_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_35_puhuo', title: '35/58/44/5XL', align: 'center', width: 50,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_35'] == 1) {
+                                str = `<span >${d.Stock_35_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_35_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_36_puhuo', title: '36/6XL', align: 'center', width: 35,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_36'] == 1) {
+                                str = `<span >${d.Stock_36_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_36_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_38_puhuo', title: '38/7XL', align: 'center', width: 35,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_38'] == 1) {
+                                str = `<span >${d.Stock_38_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_38_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_40_puhuo', title: '40/8XL', align: 'center', width: 35,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_40'] == 1) {
+                                str = `<span >${d.Stock_40_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_40_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30,templet: function (d) {
+                            var str = "";
+                            if (d['Stock_42'] == 1) {
+                                str = `<span >${d.Stock_42_puhuo}</span>`
+                            } else {
+                                str = `<span style="color:red">${d['Stock_42_puhuo']}</span>`
+                            }
+                            return str;
+                        }}
+                        , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30,}
                         , { field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40}
                     ],
 
