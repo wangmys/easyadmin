@@ -1,0 +1,140 @@
+<style>
+    body {
+        overflow: hidden;
+    }
+    .layui-table-cell {
+        font-size: 12px;
+        padding: 0 5px;
+        height: auto;
+        /*text-align: left;*/
+    }
+
+    .ok-form {
+        margin-top: 5px;
+    }
+
+    .layui-btn+.layui-btn {
+        margin-left: 3px;
+    }
+
+    .layui-form-item {
+        margin-bottom: 0px;
+        height: 30px;
+    }
+
+    .layui-input,
+    .layui-select,
+    .layui-textarea {
+        height: 32px;
+    }
+
+    .layui-form-pane .layui-form-label {
+        height: 32px;
+        line-height: 15px;
+    }
+
+    .layui-form-select dl dd,
+    .layui-form-select dl dt {
+        line-height: 32px;
+    }
+
+    .layui-form-select dl {
+        padding: 0px 0;
+    }
+
+    .layui-table th {
+        font-weight: bolder;
+    }
+
+    .layui-form-pane .layui-form-label {
+        text-align: right;
+    }
+
+    .layui-laypage .layui-laypage-curr .layui-laypage-em {
+        background-color: #ffcc00;
+        color: #666
+    }
+
+    .layui-colorpicker {
+        width: 30px;
+        height: 10px;
+        line-height: 30px;
+        padding: 0px;
+    }
+
+
+    .layui-table-cell{
+        height:auto;
+        overflow:visible;
+        text-overflow:inherit;
+    }
+    /* .layui-unselect .layui-form-select {
+        width: 80px !important;
+    }  */
+    .layui-col-md1 {
+        width: 11.333% !important;
+    }
+    .layui-form-label {
+        width: 130px !important;
+    }
+
+    .layui-input-inline {
+        width: 40px;
+    }
+
+
+    .layui-table-box .layui-table-header th {
+        height: 39px;
+        line-height: 12px;
+    }
+    .layui-table-box .layui-table-header th .layui-table-cell{
+        height: 32px;
+        line-height: 12px;
+        word-break: break-all;
+        white-space: normal;
+    }
+    .layui-table-view .layui-table td, .layui-table-view .layui-table th{
+        padding: 2px 0;
+        border-top: none;
+        border-left: none;
+    }
+
+</style>
+
+<div class="layuimini-container">
+    <div class="layuimini-main" >
+        <fieldset id="searchFieldset_CustomerId" class="table-search-fieldset">
+            <legend>条件搜索</legend>
+            <form class="layui-form layui-form-pane form-search" name="myform" lay-filter="myform">
+                <label class="layui-form-label" style="line-height: 2;width: 50px !important; text-align: center; overflow: visible;">云仓</label>
+                <div id="more" class="layui-input-inline" style="width: 120px">
+                    <div id="xm-select" class="xm-select"></div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">是否铺货</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <select class="layui-select" name="status">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item layui-inline">
+                    <div class="layui-btn layui-btn-normal" id="search">查询结果</div>
+                    <div class="layui-btn layui-btn-normal" id="upload_excel"> 导入excel</div>
+                    <div class="layui-btn layui-btn-normal" id="export_excel"> 导出可用库存</div>
+                    <div class="layui-btn layui-btn-normal" id="export_excel_all"> 导出全部</div>
+                </div>
+
+            </form>
+        </fieldset>
+        <table id="currentTable" class="layui-table layui-hide"
+               data-auth-add="{:auth('system.auth/add')}"
+               data-auth-edit="{:auth('system.auth/edit')}"
+               data-auth-delete="{:auth('system.auth/delete')}"
+               data-auth-authorize="{:auth('system.auth/authorize')}"
+               lay-filter="currentTable">
+        </table>
+    </div>
+</div>
