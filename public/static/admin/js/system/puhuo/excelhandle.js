@@ -117,7 +117,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         , { field: 'Mathod', title: '经营模式', align: 'center', width: 55}
                         , { field: 'CustomerGrade', title: '店铺等级', align: 'center', width: 55}
                         , { field: 'StoreArea', title: '店铺面积', align: 'center', width: 55}
-                        , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
+                        // , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
                         //  , { field: 'StyleCategoryName1', title: '一级风格', align: 'center', width: 55}
                         , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
                         , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50}
@@ -138,30 +138,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
                 ]
                 ,done: function (res, curr, count) {
-                    $('#hid_count').val(res.count);
-
-                    var data = res.data;
-                    $.each(data, function(index, value){
-                        if (value.is_total == 1) {
-
-                            if (value.CustomerName == '余量') {
-                                $('tr[data-index="'+index+'"]').css({
-                                    'background-color': 'rgb(225, 225, 0)', 'color': '#000', 'font-weight':'bold'
-                                });
-                            } else {
-                                $('tr[data-index="'+index+'"]').css({
-                                    'background-color': 'rgb(110, 170, 46)', 'color': '#000', 'font-weight':'bold'
-                                });
-                            }
-
-                        }
-                    });
-
-                    $('#nd_id').text(res.nd);
-                    $('#wt_id').text(res.wt);
-                    $('#xz_id').text(res.xz);
-                    $('#xl_id').text(res.xl);
-                    $('#store_num').text(res.store_num);
 
 
                 }

@@ -40,16 +40,35 @@ class Excelhandle extends AdminController
 
         if (request()->isAjax()) {
 
+//            $this->service->customer_sort();
+
             $get = $this->request->param();
 
             $where = [];
             $db = Db::connect('mysql');
             $query = $db->table('sp_lyp_puhuo_excel');
             $count = $query->where($where)->count();
-            $res = $query->where($where)->select();
+            $res = $query->where($where)->select()->toArray();
+            foreach ($res as &$item){
+                $item['Stock_00_puhuo'] =$item['Stock_00_puhuo'] !=0?$item['Stock_00_puhuo']:' ';
+                $item['Stock_29_puhuo'] =$item['Stock_29_puhuo'] !=0?$item['Stock_29_puhuo']:' ';
+                $item['Stock_30_puhuo'] =$item['Stock_30_puhuo'] !=0?$item['Stock_30_puhuo']:' ';
+                $item['Stock_31_puhuo'] =$item['Stock_31_puhuo'] !=0?$item['Stock_31_puhuo']:' ';
+                $item['Stock_32_puhuo'] =$item['Stock_32_puhuo'] !=0?$item['Stock_32_puhuo']:' ';
+                $item['Stock_33_puhuo'] =$item['Stock_33_puhuo'] !=0?$item['Stock_33_puhuo']:' ';
+                $item['Stock_34_puhuo'] =$item['Stock_34_puhuo'] !=0?$item['Stock_34_puhuo']:' ';
+                $item['Stock_35_puhuo'] =$item['Stock_35_puhuo'] !=0?$item['Stock_35_puhuo']:' ';
+                $item['Stock_36_puhuo'] =$item['Stock_36_puhuo'] !=0?$item['Stock_36_puhuo']:' ';
+                $item['Stock_38_puhuo'] =$item['Stock_38_puhuo'] !=0?$item['Stock_38_puhuo']:' ';
+                $item['Stock_40_puhuo'] =$item['Stock_40_puhuo'] !=0?$item['Stock_40_puhuo']:' ';
+                $item['Stock_42_puhuo'] =$item['Stock_42_puhuo'] !=0?$item['Stock_42_puhuo']:' ';
+                $item['Stock_44_puhuo'] =$item['Stock_44_puhuo'] !=0?$item['Stock_44_puhuo']:' ';
+//                dd($item['Stock_00_puhuo']);
+            }
             $data = [
-                "code" => "0", "msg" => "", "count" => $count, "data" => $res ?: []
+                "code" => "0", "msg" => "", "count" => $count, "data" => $res
             ];
+//            dd($res);
             return json($data);
         }
 
