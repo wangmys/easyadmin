@@ -36,113 +36,15 @@ use think\facade\Db;
 
 class ExcelhandleService
 {
-    protected $db_easy;
-    protected $list_rows=160;//每页条数
-    protected $page=1;//当前页
-    // protected $customer_model;
-    protected $sp_ww_chunxia_stock_model;
-    protected $puhuo_rule_model;
-    protected $puhuo_rule_b_model;
-    protected $puhuo_customer_sort_model;
-    protected $puhuo_log_model;
-    protected $puhuo_cur_log_model;
-    protected $puhuo_wait_goods_model;
-    protected $puhuo_shangshiday_model;
-    protected $puhuo_score_model;
-    protected $puhuo_daxiaoma_skcnum_model;
-    protected $puhuo_daxiaoma_customer_model;
-    protected $puhuo_daxiaoma_customer_sort_model;
-    protected $puhuo_ti_goods_model;
-    protected $puhuo_zhiding_goods_model;
-    protected $puhuo_zdy_set_model;
-    protected $puhuo_zdy_set2_model;
-    protected $puhuo_zdy_yuncang_goods_model;
-    protected $puhuo_zdy_yuncang_goods2_model;
-    protected $puhuo_onegoods_rule_model;
-    protected $cwl_daxiao_handle_model;
 
     public function __construct()
     {
-        $this->sp_ww_chunxia_stock_model = new SpWwChunxiaStockModel();
-        $this->puhuo_customer_sort_model = new SpLypPuhuoCustomerSortModel();
-        $this->puhuo_log_model = new SpLypPuhuoLogModel();
-        $this->puhuo_cur_log_model = new SpLypPuhuoCurLogModel();
-        $this->puhuo_wait_goods_model = new SpLypPuhuoWaitGoodsModel();
-        $this->puhuo_shangshiday_model = new SpLypPuhuoShangshidayModel();
-        $this->puhuo_score_model = new SpLypPuhuoScoreModel();
-        $this->puhuo_daxiaoma_skcnum_model = new SpLypPuhuoDaxiaomaSkcnumModel();
-        $this->puhuo_daxiaoma_customer_model = new SpLypPuhuoDaxiaomaCustomerModel();
-        $this->puhuo_daxiaoma_customer_sort_model = new SpLypPuhuoDaxiaomaCustomerSortModel();
-        $this->puhuo_ti_goods_model = new SpLypPuhuoTiGoodsModel();
-        $this->puhuo_zhiding_goods_model = new SpLypPuhuoZhidingGoodsModel();
-        $this->puhuo_zdy_set_model = new SpLypPuhuoZdySetModel();
-        $this->puhuo_zdy_set2_model = new SpLypPuhuoZdySet2Model();
-        $this->puhuo_zdy_yuncang_goods_model = new SpLypPuhuoZdyYuncangGoodsModel();
-        $this->puhuo_zdy_yuncang_goods2_model = new SpLypPuhuoZdyYuncangGoods2Model();
-        $this->puhuo_onegoods_rule_model = new SpLypPuhuoOnegoodsRuleModel();
-        $this->cwl_daxiao_handle_model = new CwlDaxiaoHandleModel();
-        $this->puhuo_rule_b_model = new SpLypPuhuoRuleBModel();
-    }
-
-
-    public function customer_sort(){
-        $db=Db::connect('mysql');
-        $customList=$db->table('sp_lyp_puhuo_excel')->group('CustomerName')->select()->toArray();
-
-
-        $customer_level = $this->puhuo_score_model::where([['config_str', '=', 'customer_level']])->column('*', 'key');
-        $fill_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'fill_rate']])->column('*', 'key_level');
-        $dongxiao_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'dongxiao_rate']])->column('*', 'key_level');
-
-        $ti_goods = $this->puhuo_ti_goods_model::where([])->column('GoodsNo');
-        $ti_goods = $this->get_goods_str($ti_goods);
-
-        foreach ($customList as $item){
-
-            //店铺等级评分
-            $CustomerGradeScore = isset($customer_level[$item['CustomerGrade']]) ? $customer_level[$item['CustomerGrade']]['score'] : 0;
-
-            //满足率计算
-            //满足率-单店skc
-            $dandian_skc = $this->db_easy->Query($this->get_dandian_skc(['一级时间分类' => $item['TimeCategoryName1'], '二级时间分类' => $item['TimeCategoryName2'], '一级分类' => $item['CategoryName1'], '二级分类' =>  $item['CategoryName2'], '风格' =>  $item['StyleCategoryName'], '店铺名称' => $item['CustomerName']], $ti_goods));
-            //查询该店已经铺的货
-            // $already_puhuo_goods = $this->puhuo_cur_log_model::where([['CustomerId', '=', $v_customer['CustomerId']], ['total', '>', 0]])->distinct(true)->column('GoodsNo');
-            $already_puhuo_goods = $this->return_already_puhuo_goods(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
-            if ($already_puhuo_goods) {
-                $dandian_skc_goods_str = $dandian_skc[0]['goods_str'] ?? 0;
-                $dandian_skc_goods_str = $dandian_skc_goods_str ? explode(',', $dandian_skc_goods_str) : [];
-                $merge_dandian_skc = array_unique(array_merge(array_column($already_puhuo_goods, 'GoodsNo'), $dandian_skc_goods_str));
-                $dandian_skc = count($merge_dandian_skc);
-            } else {
-                $dandian_skc = $dandian_skc[0]['store_skc_num'] ?? 0;
-            }
-            // print_r($dandian_skc);die;
-            //满足率-(云仓可用+云仓下门店预计库存的总skc数）
-            $yuncangkeyong_skc = $this->get_yuncangkeyong_skc(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '云仓' => $WarehouseName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
-            // print_r($yuncangkeyong_skc);die;
-            $fill_rate = $yuncangkeyong_skc ? round($dandian_skc/$yuncangkeyong_skc, 2) : 0;
-            $fill_rate_score = $this->get_fill_rate_score($fill_rate, $fill_rate_level);
-
-            dd($CustomerGradeScore);
-        }
-
-
-        dd([$customer_level,$fill_rate_level,$dongxiao_rate_level]);
-
-
 
     }
 
-    protected function get_goods_str($ti_goods=[]) {
-        $ti_goods_str = '';
-        if ($ti_goods) {
-            foreach ($ti_goods as $v_goods) {
-                $ti_goods_str .= "'".$v_goods."',";
-            }
-            $ti_goods_str = substr($ti_goods_str, 0, -1);
-        }
-        return $ti_goods_str;
-    }
+
+
+
 
 
 

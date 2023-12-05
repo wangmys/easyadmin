@@ -37,10 +37,7 @@ class Excelhandle extends AdminController
     public function index()
     {
 
-
         if (request()->isAjax()) {
-
-//            $this->service->customer_sort();
 
             $get = $this->request->param();
 
@@ -48,21 +45,37 @@ class Excelhandle extends AdminController
             $db = Db::connect('mysql');
             $query = $db->table('sp_lyp_puhuo_excel');
             $count = $query->where($where)->count();
-            $res = $query->where($where)->select()->toArray();
-            foreach ($res as &$item){
-                $item['Stock_00_puhuo'] =$item['Stock_00_puhuo'] !=0?$item['Stock_00_puhuo']:' ';
-                $item['Stock_29_puhuo'] =$item['Stock_29_puhuo'] !=0?$item['Stock_29_puhuo']:' ';
-                $item['Stock_30_puhuo'] =$item['Stock_30_puhuo'] !=0?$item['Stock_30_puhuo']:' ';
-                $item['Stock_31_puhuo'] =$item['Stock_31_puhuo'] !=0?$item['Stock_31_puhuo']:' ';
-                $item['Stock_32_puhuo'] =$item['Stock_32_puhuo'] !=0?$item['Stock_32_puhuo']:' ';
-                $item['Stock_33_puhuo'] =$item['Stock_33_puhuo'] !=0?$item['Stock_33_puhuo']:' ';
-                $item['Stock_34_puhuo'] =$item['Stock_34_puhuo'] !=0?$item['Stock_34_puhuo']:' ';
-                $item['Stock_35_puhuo'] =$item['Stock_35_puhuo'] !=0?$item['Stock_35_puhuo']:' ';
-                $item['Stock_36_puhuo'] =$item['Stock_36_puhuo'] !=0?$item['Stock_36_puhuo']:' ';
-                $item['Stock_38_puhuo'] =$item['Stock_38_puhuo'] !=0?$item['Stock_38_puhuo']:' ';
-                $item['Stock_40_puhuo'] =$item['Stock_40_puhuo'] !=0?$item['Stock_40_puhuo']:' ';
-                $item['Stock_42_puhuo'] =$item['Stock_42_puhuo'] !=0?$item['Stock_42_puhuo']:' ';
-                $item['Stock_44_puhuo'] =$item['Stock_44_puhuo'] !=0?$item['Stock_44_puhuo']:' ';
+            $res = $query->where($where)
+                ->where(function ($q) {
+                    $q->whereOr('Stock_00', '=', '0')
+                        ->whereOr('Stock_29', '=', '0')
+                        ->whereOr('Stock_30', '=', '0')
+                        ->whereOr('Stock_31', '=', '0')
+                        ->whereOr('Stock_32', '=', '0')
+                        ->whereOr('Stock_33', '=', '0')
+                        ->whereOr('Stock_34', '=', '0')
+                        ->whereOr('Stock_35', '=', '0')
+                        ->whereOr('Stock_36', '=', '0')
+                        ->whereOr('Stock_38', '=', '0')
+                        ->whereOr('Stock_40', '=', '0')
+                        ->whereOr('Stock_42', '=', '0');
+                })
+                ->select()->toArray();
+//                ->fetchSql(1)->select();
+            foreach ($res as &$item) {
+                $item['Stock_00_puhuo'] = $item['Stock_00_puhuo'] != 0 ? $item['Stock_00_puhuo'] : ' ';
+                $item['Stock_29_puhuo'] = $item['Stock_29_puhuo'] != 0 ? $item['Stock_29_puhuo'] : ' ';
+                $item['Stock_30_puhuo'] = $item['Stock_30_puhuo'] != 0 ? $item['Stock_30_puhuo'] : ' ';
+                $item['Stock_31_puhuo'] = $item['Stock_31_puhuo'] != 0 ? $item['Stock_31_puhuo'] : ' ';
+                $item['Stock_32_puhuo'] = $item['Stock_32_puhuo'] != 0 ? $item['Stock_32_puhuo'] : ' ';
+                $item['Stock_33_puhuo'] = $item['Stock_33_puhuo'] != 0 ? $item['Stock_33_puhuo'] : ' ';
+                $item['Stock_34_puhuo'] = $item['Stock_34_puhuo'] != 0 ? $item['Stock_34_puhuo'] : ' ';
+                $item['Stock_35_puhuo'] = $item['Stock_35_puhuo'] != 0 ? $item['Stock_35_puhuo'] : ' ';
+                $item['Stock_36_puhuo'] = $item['Stock_36_puhuo'] != 0 ? $item['Stock_36_puhuo'] : ' ';
+                $item['Stock_38_puhuo'] = $item['Stock_38_puhuo'] != 0 ? $item['Stock_38_puhuo'] : ' ';
+                $item['Stock_40_puhuo'] = $item['Stock_40_puhuo'] != 0 ? $item['Stock_40_puhuo'] : ' ';
+                $item['Stock_42_puhuo'] = $item['Stock_42_puhuo'] != 0 ? $item['Stock_42_puhuo'] : ' ';
+                $item['Stock_44_puhuo'] = $item['Stock_44_puhuo'] != 0 ? $item['Stock_44_puhuo'] : ' ';
 //                dd($item['Stock_00_puhuo']);
             }
             $data = [
@@ -90,18 +103,19 @@ class Excelhandle extends AdminController
      * @return void
      * @NodeAnotation(title="导出",auth=false)
      */
-    public function export_excel(){
+    public function export_excel()
+    {
 
         $res = $this->mysql->table('sp_lyp_puhuo_excel')->select();
 
 
         $excel_output_data = [];
-        foreach ($res as $k_res=>$v_res) {
+        foreach ($res as $k_res => $v_res) {
 
             $tmp_arr = [
                 'order_no' => $v_res['uuid'],
-                'WarehouseCode' =>$v_res['WarehouseCode'],
-                'CustomerCode' =>$v_res['WarehouseCode'],
+                'WarehouseCode' => $v_res['WarehouseCode'],
+                'CustomerCode' => $v_res['WarehouseCode'],
                 'send_out' => 'Y',
                 're_confirm' => 'Y',
                 'GoodsNo' => $v_res['GoodsNo'],
@@ -109,25 +123,25 @@ class Excelhandle extends AdminController
                 'ColorCode' => $v_res['ColorCode'],
                 'puhuo_num' => 0,//
                 'status' => 2,
-                'remark' => $v_res['CategoryName1']?mb_substr($v_res['CategoryName1'], 0, 1):'',
+                'remark' => $v_res['CategoryName1'] ? mb_substr($v_res['CategoryName1'], 0, 1) : '',
             ];
 
             $size_arr = [
-                ['puhuo_num'=>$v_res['Stock_00_puhuo'], 'Size'=>$v_res['Stock_00_size']],
-                ['puhuo_num'=>$v_res['Stock_29_puhuo'], 'Size'=>$v_res['Stock_29_size']],
-                ['puhuo_num'=>$v_res['Stock_30_puhuo'], 'Size'=>$v_res['Stock_30_size']],
-                ['puhuo_num'=>$v_res['Stock_31_puhuo'], 'Size'=>$v_res['Stock_31_size']],
-                ['puhuo_num'=>$v_res['Stock_32_puhuo'], 'Size'=>$v_res['Stock_32_size']],
-                ['puhuo_num'=>$v_res['Stock_33_puhuo'], 'Size'=>$v_res['Stock_33_size']],
-                ['puhuo_num'=>$v_res['Stock_34_puhuo'], 'Size'=>$v_res['Stock_34_size']],
-                ['puhuo_num'=>$v_res['Stock_35_puhuo'], 'Size'=>$v_res['Stock_35_size']],
-                ['puhuo_num'=>$v_res['Stock_36_puhuo'], 'Size'=>$v_res['Stock_36_size']],
-                ['puhuo_num'=>$v_res['Stock_38_puhuo'], 'Size'=>$v_res['Stock_38_size']],
-                ['puhuo_num'=>$v_res['Stock_40_puhuo'], 'Size'=>$v_res['Stock_40_size']],
-                ['puhuo_num'=>$v_res['Stock_42_puhuo'], 'Size'=>$v_res['Stock_42_size']],
+                ['puhuo_num' => $v_res['Stock_00_puhuo'], 'Size' => $v_res['Stock_00_size']],
+                ['puhuo_num' => $v_res['Stock_29_puhuo'], 'Size' => $v_res['Stock_29_size']],
+                ['puhuo_num' => $v_res['Stock_30_puhuo'], 'Size' => $v_res['Stock_30_size']],
+                ['puhuo_num' => $v_res['Stock_31_puhuo'], 'Size' => $v_res['Stock_31_size']],
+                ['puhuo_num' => $v_res['Stock_32_puhuo'], 'Size' => $v_res['Stock_32_size']],
+                ['puhuo_num' => $v_res['Stock_33_puhuo'], 'Size' => $v_res['Stock_33_size']],
+                ['puhuo_num' => $v_res['Stock_34_puhuo'], 'Size' => $v_res['Stock_34_size']],
+                ['puhuo_num' => $v_res['Stock_35_puhuo'], 'Size' => $v_res['Stock_35_size']],
+                ['puhuo_num' => $v_res['Stock_36_puhuo'], 'Size' => $v_res['Stock_36_size']],
+                ['puhuo_num' => $v_res['Stock_38_puhuo'], 'Size' => $v_res['Stock_38_size']],
+                ['puhuo_num' => $v_res['Stock_40_puhuo'], 'Size' => $v_res['Stock_40_size']],
+                ['puhuo_num' => $v_res['Stock_42_puhuo'], 'Size' => $v_res['Stock_42_size']],
             ];
             // print_r([$size_arr,   $wait_goods_info]);die;
-            foreach ($size_arr as $k_size_arr=>$v_size_arr) {
+            foreach ($size_arr as $k_size_arr => $v_size_arr) {
                 if ($v_size_arr['puhuo_num'] && $v_size_arr['Size']) {
                     $tmp_arr['Size'] = $v_size_arr['Size'];
                     $tmp_arr['puhuo_num'] = $v_size_arr['puhuo_num'];
@@ -169,7 +183,7 @@ class Excelhandle extends AdminController
             ['备注', 'remark'],
         ];
 
-        return Excel::exportData($end_output_data, $header, 'import_excel_zhuanhuan' .count($end_output_data) , 'xlsx');
+        return Excel::exportData($end_output_data, $header, 'import_excel_zhuanhuan' . count($end_output_data), 'xlsx');
 
 
     }
@@ -179,7 +193,7 @@ class Excelhandle extends AdminController
      */
     public function import_excel()
     {
-
+        set_time_limit(0);
         if (request()->isAjax()) {
             $file = request()->file('file');
             $new_name = "import_excel" . '_' . uuid('zhuanhuan') . '.' . $file->getOriginalExtension();
@@ -206,14 +220,16 @@ class Excelhandle extends AdminController
                 'Q' => '合计',
             ];
             try {
-                $yc_data=$this->service->get_yunchang_goods_data();
-                $ycRes=[];
-                foreach ($yc_data as $yc_v){
-                    $ycRes[$yc_v['WarehouseName'].$yc_v['GoodsNo']]=$yc_v;
+                $yc_data = $this->service->get_yunchang_goods_data();
+                $ycRes = [];
+                foreach ($yc_data as $yc_v) {
+                    $ycRes[$yc_v['WarehouseName'] . $yc_v['GoodsNo']] = $yc_v;
                 }
 
                 $res = importExcel($save_path . $new_name, $read_column);
                 $arr = [];
+                $yunArr = [];
+                $y = [];
                 foreach ($res as $key => &$item) {
                     $erp = $this->erp->table('ErpGoods')->alias('a')->where('a.GoodsNo', $item['货号'])
                         ->leftjoin('ErpGoodsColor c', 'c.GoodsId=a.GoodsId')
@@ -232,15 +248,138 @@ WHERE
 ORDER BY
     bgs.ViewOrder ASC";
 
-                    $erpSize=$this->erp->query($sql);
-                    $erpSize=array_column($erpSize,'Size');
+                    $erpSize = $this->erp->query($sql);
+                    $erpSize = array_column($erpSize, 'Size');
 
                     $where = [
                         ['CustomerName', '=', $item['店铺']],
                         ['RegionId', '<>', 55]
                     ];
                     $erpCustomer = $this->erp->table('ErpCustomer')->where($where)->find();
-                    $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName',$item['云仓'])->find();
+                    $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName', $item['云仓'])->find();
+
+                    $Stock_00 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_00'];
+                    $Stock_29 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_29'];
+                    $Stock_30 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_30'];
+                    $Stock_31 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_31'];
+                    $Stock_32 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_32'];
+                    $Stock_33 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_33'];
+                    $Stock_34 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_34'];
+                    $Stock_35 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_35'];
+                    $Stock_36 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_36'];
+                    $Stock_38 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_38'];
+                    $Stock_40 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_40'];
+                    $Stock_42 = (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_42'];
+
+                    $Stock_00_puhuo = (int)$item['44/28/'] ?? 0;
+                    $Stock_29_puhuo = (int)$item['46/29/165/38/M/105'] ?? 0;
+                    $Stock_30_puhuo = (int)$item['48/30/170/39/L/110'] ?? 0;
+                    $Stock_31_puhuo = (int)$item['50/31/175/40/XL/115'] ?? 0;
+                    $Stock_32_puhuo = (int)$item['52/32/180/41/2XL/120'] ?? 0;
+                    $Stock_33_puhuo = (int)$item['54/33/185/42/3XL/125'] ?? 0;
+                    $Stock_34_puhuo = (int)$item['56/34/190/43/4XL/130'] ?? 0;
+                    $Stock_35_puhuo = (int)$item['58/35/195/44/5XL/'] ?? 0;
+                    $Stock_36_puhuo = (int)$item['60/36/6XL/'] ?? 0;
+                    $Stock_38_puhuo = (int)$item['38/7XL'] ?? 0;
+                    $Stock_40_puhuo = (int)$item['40'] ?? 0;
+                    $Stock_42_puhuo = (int)$item['42'] ?? 0;
+
+                    $Stock_00_sub = $Stock_00 - $Stock_00_puhuo;
+                    if ($Stock_00_sub >= 0) {
+                        $Stock_00_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] = $Stock_00_sub;
+                    } else {
+                        $Stock_00_m = 0;
+                    }
+                    $Stock_29_sub = $Stock_29 - $Stock_29_puhuo;
+                    if ($Stock_29_sub >= 0) {
+                        $Stock_29_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] = $Stock_29_sub;
+                    } else {
+                        $Stock_29_m = 0;
+                    }
+
+                    $Stock_30_sub = $Stock_30 - $Stock_30_puhuo;
+
+                    if ($Stock_30_sub >= 0) {
+                        $Stock_30_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] = $Stock_30_sub;
+                    } else {
+                        $Stock_30_m = 0;
+                    }
+
+                    $Stock_31_sub = $Stock_31 - $Stock_31_puhuo;
+                    if ($Stock_31_sub >= 0) {
+                        $Stock_31_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] = $Stock_31_sub;
+                    } else {
+                        $Stock_31_m = 0;
+                    }
+
+                    $Stock_32_sub = $Stock_32 - $Stock_32_puhuo;
+                    if ($Stock_32_sub >= 0) {
+                        $Stock_32_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] = $Stock_32_sub;
+                    } else {
+                        $Stock_32_m = 0;
+                    }
+
+                    $Stock_33_sub = $Stock_33 - $Stock_33_puhuo;
+                    if ($Stock_33_sub >= 0) {
+                        $Stock_33_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] = $Stock_33_sub;
+                    } else {
+                        $Stock_33_m = 0;
+                    }
+
+                    $Stock_34_sub = $Stock_34 - $Stock_34_puhuo;
+                    if ($Stock_34_sub >= 0) {
+                        $Stock_34_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] = $Stock_34_sub;
+                    } else {
+                        $Stock_34_m = 0;
+                    }
+
+                    $Stock_35_sub = $Stock_35 - $Stock_35_puhuo;
+                    if ($Stock_35_sub >= 0) {
+                        $Stock_35_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] = $Stock_35_sub;
+                    } else {
+                        $Stock_35_m = 0;
+                    }
+
+                    $Stock_36_sub = $Stock_36 - $Stock_36_puhuo;
+                    if ($Stock_36_sub >= 0) {
+                        $Stock_36_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] = $Stock_36_sub;
+                    } else {
+                        $Stock_36_m = 0;
+                    }
+
+                    $Stock_38_sub = $Stock_38 - $Stock_38_puhuo;
+                    if ($Stock_38_sub >= 0) {
+                        $Stock_38_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] = $Stock_38_sub;
+                    } else {
+                        $Stock_38_m = 0;
+                    }
+
+                    $Stock_40_sub = $Stock_40 - $Stock_40_puhuo;
+                    if ($Stock_40_sub >= 0) {
+                        $Stock_40_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] = $Stock_40_sub;
+                    } else {
+                        $Stock_40_m = 0;
+                    }
+
+                    $Stock_42_sub = $Stock_42 - $Stock_42_puhuo;
+                    if ($Stock_42_sub >= 0) {
+                        $Stock_42_m = 1;
+                        $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] = $Stock_42_sub;
+                    } else {
+                        $Stock_42_m = 0;
+                    }
+
 
                     $arr[] = [
                         'uuid' => $item['单号'] ?? '',
@@ -248,45 +387,43 @@ ORDER BY
                         'GoodsNo' => $item['货号'] ?? '',
                         'CustomerName' => $item['店铺'] ?? '',
 //                    '' => $item['合计'],
-                        'Stock_00_puhuo' => $item['44/28/'] ?? '',
-                        'Stock_29_puhuo' => $item['46/29/165/38/M/105'] ?? '',
-                        'Stock_30_puhuo' => $item['48/30/170/39/L/110'] ?? '',
-                        'Stock_31_puhuo' => $item['50/31/175/40/XL/115'] ?? '',
-                        'Stock_32_puhuo' => $item['52/32/180/41/2XL/120'] ?? '',
-                        'Stock_33_puhuo' => $item['54/33/185/42/3XL/125'] ?? '',
-                        'Stock_34_puhuo' => $item['34/43/56/190/4XL/'] ?? '',
-                        'Stock_35_puhuo' => $item['58/35/195/44/5XL/'] ?? '',
-                        'Stock_36_puhuo' => $item['60/36/6XL/'] ?? '',
-                        'Stock_38_puhuo' => $item['38/7XL'] ?? '',
-                        'Stock_40_puhuo' => $item['40'] ?? '',
-                        'Stock_42_puhuo' => $item['42'] ?? '',
-                        'Stock_44_puhuo' => $item['44'] ?? '',
-                        'Stock_00_size' =>$erpSize[0] ??'',
-                        'Stock_29_size' =>$erpSize[1]??'',
-                        'Stock_30_size' =>$erpSize[2]??'',
-                        'Stock_31_size' =>$erpSize[3]??'',
-                        'Stock_32_size' =>$erpSize[4]??'',
-                        'Stock_33_size' =>$erpSize[5]??'',
-                        'Stock_34_size' =>$erpSize[6]??'',
-                        'Stock_35_size' =>$erpSize[7]??'',
-                        'Stock_36_size' =>$erpSize[8]??'',
-                        'Stock_38_size' =>$erpSize[9]??'',
-                        'Stock_40_size' =>$erpSize[10]??'',
-                        'Stock_42_size' =>$erpSize[11]??'',
-                        'Stock_44_size' =>$erpSize[12]??'',
-                        'Stock_00' => $ycRes[$item['云仓'].$item['货号']]['Stock_00'] ?? '',
-                        'Stock_29' => $ycRes[$item['云仓'].$item['货号']]['Stock_29'] ?? '',
-                        'Stock_30' => $ycRes[$item['云仓'].$item['货号']]['Stock_30'] ?? '',
-                        'Stock_31' => $ycRes[$item['云仓'].$item['货号']]['Stock_31'] ?? '',
-                        'Stock_32' => $ycRes[$item['云仓'].$item['货号']]['Stock_32'] ?? '',
-                        'Stock_33' => $ycRes[$item['云仓'].$item['货号']]['Stock_33'] ?? '',
-                        'Stock_34' => $ycRes[$item['云仓'].$item['货号']]['Stock_34'] ?? '',
-                        'Stock_35' => $ycRes[$item['云仓'].$item['货号']]['Stock_35'] ?? '',
-                        'Stock_36' => $ycRes[$item['云仓'].$item['货号']]['Stock_36'] ?? '',
-                        'Stock_38' => $ycRes[$item['云仓'].$item['货号']]['Stock_38'] ?? '',
-                        'Stock_40' => $ycRes[$item['云仓'].$item['货号']]['Stock_40'] ?? '',
-                        'Stock_42' => $ycRes[$item['云仓'].$item['货号']]['Stock_42'] ?? '',
-                        'Stock_44' => $ycRes[$item['云仓'].$item['货号']]['Stock_44'] ?? '',
+                        'Stock_00_puhuo' => $Stock_00_puhuo,
+                        'Stock_29_puhuo' => $Stock_29_puhuo,
+                        'Stock_30_puhuo' => $Stock_30_puhuo,
+                        'Stock_31_puhuo' => $Stock_31_puhuo,
+                        'Stock_32_puhuo' => $Stock_32_puhuo,
+                        'Stock_33_puhuo' => $Stock_33_puhuo,
+                        'Stock_34_puhuo' => $Stock_34_puhuo,
+                        'Stock_35_puhuo' => $Stock_35_puhuo,
+                        'Stock_36_puhuo' => $Stock_36_puhuo,
+                        'Stock_38_puhuo' => $Stock_38_puhuo,
+                        'Stock_40_puhuo' => $Stock_40_puhuo,
+                        'Stock_42_puhuo' => $Stock_42_puhuo,
+
+                        'Stock_00_size' => $erpSize[0] ?? '',
+                        'Stock_29_size' => $erpSize[1] ?? '',
+                        'Stock_30_size' => $erpSize[2] ?? '',
+                        'Stock_31_size' => $erpSize[3] ?? '',
+                        'Stock_32_size' => $erpSize[4] ?? '',
+                        'Stock_33_size' => $erpSize[5] ?? '',
+                        'Stock_34_size' => $erpSize[6] ?? '',
+                        'Stock_35_size' => $erpSize[7] ?? '',
+                        'Stock_36_size' => $erpSize[8] ?? '',
+                        'Stock_38_size' => $erpSize[9] ?? '',
+                        'Stock_40_size' => $erpSize[10] ?? '',
+                        'Stock_42_size' => $erpSize[11] ?? '',
+                        'Stock_00' => $Stock_00_m,
+                        'Stock_29' => $Stock_29_m,
+                        'Stock_30' => $Stock_30_m,
+                        'Stock_31' => $Stock_31_m,
+                        'Stock_32' => $Stock_32_m,
+                        'Stock_33' => $Stock_33_m,
+                        'Stock_34' => $Stock_34_m,
+                        'Stock_35' => $Stock_35_m,
+                        'Stock_36' => $Stock_36_m,
+                        'Stock_38' => $Stock_38_m,
+                        'Stock_40' => $Stock_40_m,
+                        'Stock_42' => $Stock_42_m,
 
                         'WarehouseCode' => $ErpWarehouse['WarehouseCode'] ?? '',
 
@@ -307,7 +444,9 @@ ORDER BY
                         'CustomerGrade' => $erpCustomer['CustomerGrade'],
                         'StoreArea' => $erpCustomer['CustomItem27'] ?: $erpCustomer['StoreArea'],
                     ];
+
                 }
+
 
                 try {
                     $this->mysql->Query("truncate table sp_lyp_puhuo_excel;");
@@ -335,7 +474,6 @@ ORDER BY
         }
 
     }
-
 
 
 }
