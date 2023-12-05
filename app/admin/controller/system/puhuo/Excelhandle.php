@@ -217,6 +217,13 @@ ORDER BY
                     ];
                     $erpCustomer = $this->erp->table('ErpCustomer')->where($where)->find();
                     $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName',$item['云仓'])->find();
+
+                    $yc_data=$this->service->get_yunchang_goods_data();
+                    $ycRes=[];
+                    foreach ($yc_data as $yc_v){
+                        $ycRes[$yc_v['WarehouseName'].$yc_v['GoodsNo']]=$yc_v;
+                    }
+
                     $arr[] = [
                         'uuid' => $item['单号'] ?? '',
                         'WarehouseName' => $item['云仓'] ?? '',
@@ -249,6 +256,19 @@ ORDER BY
                         'Stock_40_size' =>$erpSize[10]??'',
                         'Stock_42_size' =>$erpSize[11]??'',
                         'Stock_44_size' =>$erpSize[12]??'',
+                        'Stock_00' => $ycRes[$item['云仓'].$item['货号']]['Stock_00'] ?? '',
+                        'Stock_29' => $ycRes[$item['云仓'].$item['货号']]['Stock_29'] ?? '',
+                        'Stock_30' => $ycRes[$item['云仓'].$item['货号']]['Stock_30'] ?? '',
+                        'Stock_31' => $ycRes[$item['云仓'].$item['货号']]['Stock_31'] ?? '',
+                        'Stock_32' => $ycRes[$item['云仓'].$item['货号']]['Stock_32'] ?? '',
+                        'Stock_33' => $ycRes[$item['云仓'].$item['货号']]['Stock_33'] ?? '',
+                        'Stock_34' => $ycRes[$item['云仓'].$item['货号']]['Stock_34'] ?? '',
+                        'Stock_35' => $ycRes[$item['云仓'].$item['货号']]['Stock_35'] ?? '',
+                        'Stock_36' => $ycRes[$item['云仓'].$item['货号']]['Stock_36'] ?? '',
+                        'Stock_38' => $ycRes[$item['云仓'].$item['货号']]['Stock_38'] ?? '',
+                        'Stock_40' => $ycRes[$item['云仓'].$item['货号']]['Stock_40'] ?? '',
+                        'Stock_42' => $ycRes[$item['云仓'].$item['货号']]['Stock_42'] ?? '',
+                        'Stock_44' => $ycRes[$item['云仓'].$item['货号']]['Stock_44'] ?? '',
 
                         'WarehouseCode' => $ErpWarehouse['WarehouseCode'] ?? '',
 
@@ -269,7 +289,6 @@ ORDER BY
                         'CustomerGrade' => $erpCustomer['CustomerGrade'],
                         'StoreArea' => $erpCustomer['CustomItem27'] ?: $erpCustomer['StoreArea'],
                     ];
-
                 }
 
                 try {
