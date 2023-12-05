@@ -23,7 +23,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 ,url: init.url_import //此处配置你自己的上传接口即可
                 ,accept: 'file' //普通文件
                 ,before: function (obj) {
-                    // console.log(obj);
+                    layer.load();
                 }
                 ,error: function() {
                     //上传成功结束加载效果
@@ -32,17 +32,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         }, 2000);
                 }
                 ,done: function(res) {
+                    layer.closeAll('loading');
                     console.log('res:....', res);
-                    //上传成功结束加载效果
-                        setTimeout(function () {
-                            layui.layer.closeAll();
-                        }, 2000);
                     if (res.code != 0) {
-                        alert('上传失败！' + res.msg);
+                        layer.msg('上传失败！' + res.msg)
                     } else {
-                        // location.href = url_import + '?excel_url=' + res.data;
-                        // alert('数据有点多，请耐心等待');
-                        // window.location.reload();//重新刷新页面
+                        layer.msg('上传成功，请刷新页面', {time: 2000, icon:1});
                     }
                 }
             });
