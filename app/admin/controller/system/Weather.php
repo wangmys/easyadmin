@@ -223,7 +223,9 @@ class Weather extends AdminController
             return json($data);
         }
         if (isMobile()) {
-            return $this->fetch('system/shangguitips/weather_mobile');
+            // system.Shangguitips/weather_mobile
+            $this->redirect(url('admin/system.Shangguitips/weather_mobile'));
+            // return $this->fetch('system/shangguitips/weather_mobile');
         } else {
             return $this->fetch();
             // return $this->fetch('index_mobile2');
