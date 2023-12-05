@@ -177,6 +177,11 @@
             <form class="flex col between layui-form layui-form-pane ok-form layui-col-space8" style="width:100%; height: 100%; overflow: hidden;">
                 <!-- <div class="layui-form-item" style="width:95%;"> -->
                 <div class="flex col al-start" style="width:100%;">
+                    <div style="margin-left: 20px;">店铺名称：</div>
+                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
+                        <div id="xm-customerName" class="xm-select-demo"></div>
+                    </div>
+                    <div>&nbsp;</div>
                     <div style="margin-left: 20px;">省份：</div>
                     <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
                         <div id="xm-state" class="xm-select-demo"></div>
@@ -185,11 +190,6 @@
                     <div style="margin-left: 20px;">温区：</div>
                     <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
                         <div id="xm-wq" class="xm-select-demo"></div>
-                    </div>
-                    <div>&nbsp;</div>
-                    <div style="margin-left: 20px;">店铺名称：</div>
-                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
-                        <div id="xm-customerName" class="xm-select-demo"></div>
                     </div>
                     <div>&nbsp;</div>
                     <div style="margin-left: 20px;">专员：</div>
@@ -427,7 +427,7 @@
 
             xmSelect.render({
                 el: '#xm-wq', 
-                filterable: true,
+                filterable: false,
                 toolbar: {show: true},
                 name: '温区',
                 // showCount: 1,
@@ -449,7 +449,7 @@
 
             xmSelect.render({
                 el: '#xm-state', 
-                filterable: true,
+                filterable: false,
                 toolbar: {show: true},
                 name: '省份',
                 // showCount: 1,
@@ -493,7 +493,7 @@
 
             xmSelect.render({
                 el: '#xm-customItem17', 
-                filterable: true,
+                filterable: false,
                 toolbar: {show: true},
                 name: '商品专员',
                 // showCount: 1,
