@@ -962,4 +962,11 @@ class Shangguitips extends AdminController
 
         return json(["code" => "0", "msg" => "", "data" => ['goodsno' => $goodsno, 'yjfl' => $yjfl, 'ejfl' => $ejfl, 'fl' => $fl, 'ssbd' => $ssbd]]);
     }
+
+    // 获取筛选栏多选参数
+    public function weather_mobile() {
+        return View('weather_mobile', [
+            // 'config' => ,
+        ]);
+    }
 }

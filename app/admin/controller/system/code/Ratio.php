@@ -415,6 +415,8 @@ class Ratio extends AdminController
             $list = new SizeRanking;
             $model = new SizeRanking;
             if(isset($filters['风格']) && !empty($filters['风格'])){
+
+                // print_r($filters['风格']);
                 // 梦园写的
                 // $list = $list->where(['s.风格' => $filters['风格']]);
                 // $model = $model->where(['s.风格' => $filters['风格']]);

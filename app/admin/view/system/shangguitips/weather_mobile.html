@@ -109,15 +109,15 @@
             height: 100%;
             z-index: 10000 !important;
             top:0;
-            display: block;
+            display: none;
         }
         #mask #content {
             position: absolute; 
             left:50%; 
             top:50%; 
             transform: translate(-50%, -50%); 
-            width: 80%;
-            height: 80%;
+            width: 90%;
+            height: 70%;
             background-color: #ffffff;
         }
     </style>
@@ -130,7 +130,15 @@
                 <div class="flex row end between">
                     <div class="flex col between al-start" style="width:95%; height: 70px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">货号</label>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-state" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">店铺名称</label>
+                            <div class="layui-input-inline" style="width: 210px !important;">
+                                <div id="xm-customerName" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">专员</label>
                             <div class="layui-input-inline" style="width: 210px !important;">
                                 <div id="xm-customItem17" class="xm-select-demo"></div>
                             </div>
@@ -154,30 +162,67 @@
 
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 3px; display:block;">
         <table class="layui-hide" id="table2" lay-filter="table">
-            <div class="title_text2" style="text-align: center; color:#0051ff;">
-                天气早知道（<span style="color:red;">最后更新时间：<a class="lasttime" style="color:red;"></a></span>）
+            <div class="title_text2" style="text-align: center; color:#0051ff;margin-bottom: 5px;">
+                天气（<span style="color:red;">更新时间：<a class="lasttime" style="color:red;"></a></span>）
+                <button lay-submit class="showBtn layui-btn layui-btn-normal layui-btn-xs"
+                style="display:inline-block;">筛选
+                </button>
+                <!-- 筛选 -->
              </div>
         </table>
     </div>
 
     <div id="mask">
-        <!-- <img id="pic" src="" alt=""> -->
-        <div id="content" class="test">
-            <form class="flex col between" style="width:100%; height: 100%; overflow: hidden;">
-                <!-- <div class="layui-form-item test2" style="width:100%;"> -->
-                <!-- <form> -->
-                    <div class="flex row between test" style="width:90%;">
-                        <!-- <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">专员</label> -->
-                        <a style="width: 10%;">专员</a>
-                        <div class="layui-input-inline" style="width: 90% !important;">
-                            <div id="xm-customItem17" class="xm-select-demo"></div>
-                        </div>
+        <div id="content" class="">
+            <form class="flex col between layui-form layui-form-pane ok-form layui-col-space8" style="width:100%; height: 100%; overflow: hidden;">
+                <!-- <div class="layui-form-item" style="width:95%;"> -->
+                <div class="flex col al-start" style="width:100%;">
+                    <div style="margin-left: 20px;">省份：</div>
+                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
+                        <div id="xm-state" class="xm-select-demo"></div>
                     </div>
-                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="searchBtn2"
-                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询2x
+                    <div>&nbsp;</div>
+                    <div style="margin-left: 20px;">温区：</div>
+                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
+                        <div id="xm-wq" class="xm-select-demo"></div>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div style="margin-left: 20px;">店铺名称：</div>
+                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
+                        <div id="xm-customerName" class="xm-select-demo"></div>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div style="margin-left: 20px;">专员：</div>
+                    <div class="layui-input-inline" style="margin-left: 20px; width: 90% !important;">
+                        <div id="xm-customItem17" class="xm-select-demo"></div>
+                    </div>
+                </div>
+
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div class="flex row">
+                    <button  class="closeBtn layui-btn layui-btn-sm"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">关闭
                     </button>
-                <!-- </form> -->
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询
+                    </button>
+                </div>
+
+                <div>&nbsp;</div>
             </form>
+
         </div>
     </div>
 </body>
@@ -216,8 +261,10 @@
             , sendDingImgHandle = ""
             , customerName = ""
             , province_list = ""
+
             , area_list = ""
             , liable_list = ""
+
             , city_list = ""
             , wenqu_list = ""
             , wendai_list = ""
@@ -273,6 +320,44 @@
                 }
             }, 'json')   
         }
+        // 省份
+        xmSelect.render({
+            el: '#xm-state', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '省份',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
+
+        // 温区
+        xmSelect.render({
+            el: '#xm-wq', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '温区',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
+
+        // 专员
+        xmSelect.render({
+            el: '#xm-customerName', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '店铺名称',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: []
+        })
 
         // 专员
         xmSelect.render({
@@ -326,20 +411,89 @@
             //     },
             //     data: [liable_list]
             // })
-            var customItem17List = [];
 
+            // console.log(customerName);
+
+
+            var wenqulist = [];
+            for (item in wenqu_list) {
+                // console.log(item)
+                // customItem17List
+                wenqulist.push({
+                    name: item , value:item
+                })
+            }
+            // console.log(customerNameList);
+
+            xmSelect.render({
+                el: '#xm-wq', 
+                filterable: true,
+                toolbar: {show: true},
+                name: '温区',
+                // showCount: 1,
+                theme: {
+                    color: '#1cbbb4',
+                },
+                data: wenqulist
+            })
+
+            var provinceList = [];
+            for (item in province_list) {
+                // console.log(item)
+                // customItem17List
+                provinceList.push({
+                    name: item , value:item
+                })
+            }
+            // console.log(customerNameList);
+
+            xmSelect.render({
+                el: '#xm-state', 
+                filterable: true,
+                toolbar: {show: true},
+                name: '省份',
+                // showCount: 1,
+                theme: {
+                    color: '#1cbbb4',
+                },
+                data: provinceList
+            })
+
+            var customerNameList = [];
+            for (item in customerName) {
+                // console.log(item)
+                // customItem17List
+                customerNameList.push({
+                    name: item , value:item
+                })
+            }
+            // console.log(customerNameList);
+
+            xmSelect.render({
+                el: '#xm-customerName', 
+                filterable: true,
+                toolbar: {show: true},
+                name: '店铺名称',
+                // showCount: 1,
+                theme: {
+                    color: '#1cbbb4',
+                },
+                data: customerNameList
+            })
+
+            var customItem17List = [];
             for (item in liable_list) {
-                console.log(item)
+                // console.log(item)
                 // customItem17List
                 customItem17List.push({
                     name: item , value:item
                 })
             }
-            console.log(customItem17List);
+            // console.log(customItem17List);
 
             xmSelect.render({
                 el: '#xm-customItem17', 
-                // filterable: true,
+                filterable: true,
                 toolbar: {show: true},
                 name: '商品专员',
                 // showCount: 1,
@@ -396,11 +550,22 @@
             return false; 
         });
 
-        //监听保存
-        form.on('submit(searchBtn)', function (data) {
-            console.log(data);
+        $('.closeBtn').click(function() {
+            $('#mask').css('display','none');
             return false; 
-            var datetime = data.field['更新日期'];
+        });
+        
+        $('.showBtn').click(function() {
+            $('#mask').css('display','block');
+            return false; 
+        });
+
+        //监听保存 
+        form.on('submit(mapBtn)', function (data) {
+            $('#mask').css('display','none');
+            // console.log(data);
+            // return false; 
+            // var datetime = data.field['更新日期'];
             table.reload('table2', {
                     where: data.field
                     , method: 'get'
@@ -409,7 +574,7 @@
                     , page: true
                     , limit: data.field.limit
                     ,done: function(res){
-                        today = datetime;
+                        // today = datetime;
                         // $('.readsNum').text(res.readsData.reads);
                         // $('.noReadsNum').text(res.readsData.noReads);
                     }
@@ -418,21 +583,22 @@
         });
 
         //监听保存
-        form.on('submit(searchBtn2)', function (data) {
-            var datetime = data.field['更新日期'];
-            table.reload('table2', {
-                    where: data.field
-                    , method: 'post'
-                    , url: url1
-                    , loading: true
-                    , page: true
-                    , limit: data.field.limit
-                    ,done: function(res){
-                        today = datetime;
-                        // $('.readsNum').text(res.readsData.reads);
-                        // $('.noReadsNum').text(res.readsData.noReads);
-                    }
-                })
+        form.on('submit(mapBtn2)', function (data) {
+            console.log(data);
+            // var datetime = data.field['更新日期'];
+            // table.reload('table2', {
+            //     where: data.field
+            //     , method: 'get'
+            //     , url: url1
+            //     , loading: true
+            //     , page: true
+            //     , limit: data.field.limit
+            //     ,done: function(res){
+            //         // today = datetime;
+            //         // $('.readsNum').text(res.readsData.reads);
+            //         // $('.noReadsNum').text(res.readsData.noReads);
+            //     }
+            // })
             return false; 
         });
 

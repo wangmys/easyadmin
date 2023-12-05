@@ -46,11 +46,14 @@ class Weather extends AdminController
     public function index()
     {
         if ($this->request->isAjax()) {
+
             if (input('selectFields')) {
                 return $this->selectList();
             }
             list($page, $limit, $params) = $this->buildTableParames();
             $where = $this->getParms();
+            
+            // print_r(input()); die;
             $count = $this->customers
             ->alias('c')
             ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
@@ -62,6 +65,11 @@ class Weather extends AdminController
                 if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->where('c.City', $where['City']);
+                if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
+                if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
+                if (!empty(input('店铺名称'))) $query->whereIn('c.CustomerName', input('店铺名称'));
+                if (!empty(input('温区'))) $query->whereIn('c.CustomItem36', input('温区'));
+                if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
                 if (!empty($where['url_2345_cid'])) {
@@ -90,6 +98,10 @@ class Weather extends AdminController
                 if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
                 if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
                 if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
+                if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
+                if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
+                if (!empty(input('店铺名称'))) $query->whereIn('c.CustomerName', input('店铺名称'));
+                if (!empty(input('温区'))) $query->whereIn('c.CustomItem36', input('温区'));
                 if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
                 if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
                 if (!empty($where['url_2345_cid'])) {
@@ -211,9 +223,10 @@ class Weather extends AdminController
             return json($data);
         }
         if (isMobile()) {
-            return $this->fetch('index_mobile');
+            return $this->fetch('system/shangguitips/weather_mobile');
         } else {
             return $this->fetch();
+            // return $this->fetch('index_mobile2');
         }
         
     }
