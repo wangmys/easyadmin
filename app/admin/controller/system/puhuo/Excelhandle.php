@@ -290,8 +290,6 @@ ORDER BY
                     ];
                 }
 
-                dd($arr);
-
                 try {
                     $this->mysql->Query("truncate table sp_lyp_puhuo_excel;");
                     //铺货日志批量入库
