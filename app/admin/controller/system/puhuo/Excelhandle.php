@@ -187,8 +187,13 @@ class Excelhandle extends AdminController
                 'Q' => '合计',
             ];
             try {
-                $res = importExcel($save_path . $new_name, $read_column);
+                $yc_data=$this->service->get_yunchang_goods_data();
+                $ycRes=[];
+                foreach ($yc_data as $yc_v){
+                    $ycRes[$yc_v['WarehouseName'].$yc_v['GoodsNo']]=$yc_v;
+                }
 
+                $res = importExcel($save_path . $new_name, $read_column);
                 $arr = [];
                 foreach ($res as $key => &$item) {
                     $erp = $this->erp->table('ErpGoods')->alias('a')->where('a.GoodsNo', $item['货号'])
@@ -217,12 +222,6 @@ ORDER BY
                     ];
                     $erpCustomer = $this->erp->table('ErpCustomer')->where($where)->find();
                     $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName',$item['云仓'])->find();
-
-                    $yc_data=$this->service->get_yunchang_goods_data();
-                    $ycRes=[];
-                    foreach ($yc_data as $yc_v){
-                        $ycRes[$yc_v['WarehouseName'].$yc_v['GoodsNo']]=$yc_v;
-                    }
 
                     $arr[] = [
                         'uuid' => $item['单号'] ?? '',
@@ -290,6 +289,8 @@ ORDER BY
                         'StoreArea' => $erpCustomer['CustomItem27'] ?: $erpCustomer['StoreArea'],
                     ];
                 }
+
+                dd($arr);
 
                 try {
                     $this->mysql->Query("truncate table sp_lyp_puhuo_excel;");
