@@ -176,7 +176,7 @@ class Excelhandle extends AdminController
             $tmp_arr = [
                 'order_no' => $v_res['uuid'],
                 'WarehouseCode' => $v_res['WarehouseCode'],
-                'CustomerCode' => $v_res['WarehouseCode'],
+                'CustomerCode' => $v_res['CustomerCode'],
                 'send_out' => 'Y',
                 're_confirm' => 'Y',
                 'GoodsNo' => $v_res['GoodsNo'],
