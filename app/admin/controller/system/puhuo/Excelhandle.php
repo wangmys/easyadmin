@@ -110,11 +110,29 @@ class Excelhandle extends AdminController
      * @return void
      * @NodeAnotation(title="导出",auth=false)
      */
-    public function export_excel()
+    public function export_excel($all = '')
     {
 
-        $res = $this->mysql->table('sp_lyp_puhuo_excel')->select();
+        $where = [];
+        if (!$all) {
+            $where = [
+                ['Stock_00', '=', '1'],
+                ['Stock_29', '=', '1'],
+                ['Stock_30', '=', '1'],
+                ['Stock_31', '=', '1'],
+                ['Stock_32', '=', '1'],
+                ['Stock_33', '=', '1'],
+                ['Stock_34', '=', '1'],
+                ['Stock_35', '=', '1'],
+                ['Stock_36', '=', '1'],
+                ['Stock_38', '=', '1'],
+                ['Stock_40', '=', '1'],
+                ['Stock_42', '=', '1'],
+            ];
 
+        }
+
+        $res = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select();
 
         $excel_output_data = [];
         foreach ($res as $k_res => $v_res) {

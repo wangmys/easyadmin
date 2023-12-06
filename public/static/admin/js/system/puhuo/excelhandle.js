@@ -57,11 +57,14 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
             $('body').on('click', '#export_excel', function (obj) {
 
-                console.log('123')
                 location.href = init.url_export;
-                // return false;
+
             })
 
+            $('body').on('click', '#export_excel_all', function (obj) {
+
+                location.href = init.url_export + '?all=1';
+            })
 
             $.get('xm_select', {}, function (data) {
                 xmSelect.render({
