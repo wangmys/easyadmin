@@ -12,26 +12,6 @@
 
 namespace app\admin\service;
 
-use app\admin\model\bi\CwlDaxiaoHandleModel;
-use app\admin\model\bi\SpLypPuhuoCurLogModel;
-use app\admin\model\bi\SpLypPuhuoCustomerSortModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaSkcnumModel;
-use app\admin\model\bi\SpLypPuhuoLogModel;
-use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
-use app\admin\model\bi\SpLypPuhuoRuleBModel;
-use app\admin\model\bi\SpLypPuhuoScoreModel;
-use app\admin\model\bi\SpLypPuhuoShangshidayModel;
-use app\admin\model\bi\SpLypPuhuoTiGoodsModel;
-use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
-use app\admin\model\bi\SpLypPuhuoZdySet2Model;
-use app\admin\model\bi\SpLypPuhuoZdySetModel;
-use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
-use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
-use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
-use app\admin\model\bi\SpWwChunxiaStockModel;
-use think\facade\Cache;
 use think\facade\Db;
 
 class ExcelhandleService

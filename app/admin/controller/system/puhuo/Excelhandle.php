@@ -5,6 +5,7 @@ namespace app\admin\controller\system\puhuo;
 use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
 use app\admin\model\CustomerModel;
 use app\admin\service\ExcelhandleService;
+use app\common\logic\execl\PHPExecl;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
@@ -228,8 +229,6 @@ class Excelhandle extends AdminController
                 }
             }
         }
-        // print_r($end_output_data);die;
-
         $header = [
             ['*订单号', 'order_no'],
             ['*仓库编号', 'WarehouseCode'],
@@ -244,7 +243,8 @@ class Excelhandle extends AdminController
             ['备注', 'remark'],
         ];
 
-        return Excel::exportData($end_output_data, $header, 'import_excel_zhuanhuan' . count($end_output_data), 'xlsx');
+
+        return Excel::exportData($end_output_data, $header, date('Ymd').'_CTY_1', 'xlsx');
 
 
     }
