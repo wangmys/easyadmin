@@ -68,10 +68,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
             $.get('xm_select', {}, function (data) {
                 xmSelect.render({
-                    el: '#xm-select',
+                    el: '#xm-WarehouseName',
                     icon: 'show',
                     tips: '请选择',
-                    name: 'val',
+                    name: 'WarehouseName',
                     toolbar: {
                         show: false,
                         list: ['ALL', 'CLEAR', 'REVERSE']
@@ -83,7 +83,62 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     theme: {
                         color: '#0081ff',
                     },
-                    data: data.customer
+                    data: data.WarehouseName
+                });
+                xmSelect.render({
+                    el: '#xm-CategoryName1',
+                    icon: 'show',
+                    tips: '请选择',
+                    name: 'CategoryName1',
+                    toolbar: {
+                        show: false,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    data: data.CategoryName1
+                });
+
+                xmSelect.render({
+                    el: '#xm-CustomerName',
+                    icon: 'show',
+                    tips: '请选择',
+                    name: 'CustomerName',
+                    toolbar: {
+                        show: false,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    data: data.CustomerName
+                });
+                xmSelect.render({
+                    el: '#xm-GoodsNo',
+                    icon: 'show',
+                    tips: '请选择',
+                    name: 'GoodsNo',
+                    toolbar: {
+                        show: false,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    data: data.GoodsNo
                 });
 
                 layui.form.render("select");

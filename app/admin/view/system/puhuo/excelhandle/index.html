@@ -106,17 +106,36 @@
         <fieldset id="searchFieldset_CustomerId" class="table-search-fieldset">
             <legend>条件搜索</legend>
             <form class="layui-form layui-form-pane form-search" name="myform" lay-filter="myform">
-                <label class="layui-form-label" style="line-height: 2;width: 50px !important; text-align: center; overflow: visible;">云仓</label>
-                <div id="more" class="layui-input-inline" style="width: 120px">
-                    <div id="xm-select" class="xm-select"></div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">云仓</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-WarehouseName" class="xm-select"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="layui-form-item layui-inline">
-                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">是否铺货</label>
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">大类选择</label>
                     <div class="layui-input-inline" style="width: 120px">
-                        <select class="layui-select" name="status">
-                            <option value="1">是</option>
-                            <option value="0">否</option>
-                        </select>
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-CategoryName1" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">店铺</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-CustomerName" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">货号</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-GoodsNo" class="xm-select"></div>
+                        </div>
                     </div>
                 </div>
 

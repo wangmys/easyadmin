@@ -39,9 +39,22 @@ class Excelhandle extends AdminController
 
         if (request()->isAjax()) {
 
-            $get = $this->request->param();
-
+            $param = $this->request->param();
             $where = [];
+
+            if (isset($param['WarehouseName']) && $param['WarehouseName']) {
+                $where[] = ['WarehouseName', 'IN', explode(',',$param['WarehouseName'])];
+            }
+            if (isset($param['CategoryName1']) && $param['CategoryName1']) {
+                $where[] = ['CategoryName1', 'IN',  explode(',',$param['CategoryName1'])];
+            }
+            if (isset($param['CustomerName']) && $param['CustomerName']) {
+                $where[] = ['CustomerName', 'IN',  explode(',',$param['CustomerName'])];
+            }
+            if (isset($param['GoodsNo']) && $param['GoodsNo']) {
+                $where[] = ['GoodsNo', 'IN', explode(',',$param['GoodsNo'])];
+            }
+
             $db = Db::connect('mysql');
             $query = $db->table('sp_lyp_puhuo_excel');
             $count = $query->where($where)->count();
@@ -98,11 +111,33 @@ class Excelhandle extends AdminController
 
     public function xm_select()
     {
+        $res = $this->mysql->table('sp_lyp_puhuo_excel')->where(function ($q) {
+            $q->whereOr('Stock_00', '=', '0')
+                ->whereOr('Stock_29', '=', '0')
+                ->whereOr('Stock_30', '=', '0')
+                ->whereOr('Stock_31', '=', '0')
+                ->whereOr('Stock_32', '=', '0')
+                ->whereOr('Stock_33', '=', '0')
+                ->whereOr('Stock_34', '=', '0')
+                ->whereOr('Stock_35', '=', '0')
+                ->whereOr('Stock_36', '=', '0')
+                ->whereOr('Stock_38', '=', '0')
+                ->whereOr('Stock_40', '=', '0')
+                ->whereOr('Stock_42', '=', '0');
+        })->select()->toArray();
 
-        $data = [
-            'customer' => [['name' => '132', 'value' => '885']]
-        ];
-        return json($data);
+        $CustomerName = array_unique(array_column($res, 'CustomerName'));
+        $CustomerName = $this->service->xm_select($CustomerName);
+        $CategoryName1 = array_unique(array_column($res, 'CategoryName1'));
+        $CategoryName1 = $this->service->xm_select($CategoryName1);
+
+        $GoodsNo = array_unique(array_column($res, 'GoodsNo'));
+        $GoodsNo = $this->service->xm_select($GoodsNo);
+
+        $WarehouseName = array_unique(array_column($res, 'WarehouseName'));
+        $WarehouseName = $this->service->xm_select($WarehouseName);
+
+        return json(compact('WarehouseName', 'CustomerName', 'CategoryName1', 'GoodsNo'));
     }
 
 

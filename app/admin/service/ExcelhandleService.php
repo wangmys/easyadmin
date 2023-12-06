@@ -42,14 +42,18 @@ class ExcelhandleService
 
     }
 
+    public function xm_select($data)
+    {
+        $res = [];
+        foreach ($data as $item) {
+            $res[] = ['name' => $item, 'value' => $item];
+        }
+        return $res;
+    }
 
 
-
-
-
-
-
-    public function get_yunchang_goods_data() {
+    public function get_yunchang_goods_data()
+    {
 
         $sql = "SELECT 
 
