@@ -37,6 +37,7 @@ class Excelhandle extends AdminController
     public function index()
     {
 
+
         if (request()->isAjax()) {
 
             $param = $this->request->param();
