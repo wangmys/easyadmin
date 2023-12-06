@@ -177,7 +177,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         , { field: 'StoreArea', title: '店铺面积', align: 'center', width: 55}
                         // , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
                         //  , { field: 'StyleCategoryName1', title: '一级风格', align: 'center', width: 55}
-                        , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
+                        // , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
                         , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50,templet: function (d) {
                             var str = "";
                             if (d['Stock_00'] == 1) {
