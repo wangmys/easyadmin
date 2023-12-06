@@ -441,7 +441,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY  
     
@@ -487,7 +486,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -531,7 +529,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -572,8 +569,7 @@ class ExcelhandleService
         AND EG.TimeCategoryName1>2022
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
-    
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
+
     
     GROUP BY
     
@@ -615,7 +611,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -659,7 +654,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     

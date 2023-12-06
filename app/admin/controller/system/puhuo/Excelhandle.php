@@ -44,16 +44,16 @@ class Excelhandle extends AdminController
             $where = [];
 
             if (isset($param['WarehouseName']) && $param['WarehouseName']) {
-                $where[] = ['WarehouseName', 'IN', explode(',',$param['WarehouseName'])];
+                $where[] = ['WarehouseName', 'IN', explode(',', $param['WarehouseName'])];
             }
             if (isset($param['CategoryName1']) && $param['CategoryName1']) {
-                $where[] = ['CategoryName1', 'IN',  explode(',',$param['CategoryName1'])];
+                $where[] = ['CategoryName1', 'IN', explode(',', $param['CategoryName1'])];
             }
             if (isset($param['CustomerName']) && $param['CustomerName']) {
-                $where[] = ['CustomerName', 'IN',  explode(',',$param['CustomerName'])];
+                $where[] = ['CustomerName', 'IN', explode(',', $param['CustomerName'])];
             }
             if (isset($param['GoodsNo']) && $param['GoodsNo']) {
-                $where[] = ['GoodsNo', 'IN', explode(',',$param['GoodsNo'])];
+                $where[] = ['GoodsNo', 'IN', explode(',', $param['GoodsNo'])];
             }
 
             $db = Db::connect('mysql');
@@ -284,6 +284,19 @@ class Excelhandle extends AdminController
                 $yc_data = $this->service->get_yunchang_goods_data();
                 $ycRes = [];
                 foreach ($yc_data as $yc_v) {
+                    $yc_v['Stock_00'] = $yc_v['Stock_00'] > 0 ? $yc_v['Stock_00'] : 0;
+                    $yc_v['Stock_29'] = $yc_v['Stock_29'] > 0 ? $yc_v['Stock_29'] : 0;
+                    $yc_v['Stock_30'] = $yc_v['Stock_30'] > 0 ? $yc_v['Stock_30'] : 0;
+                    $yc_v['Stock_31'] = $yc_v['Stock_31'] > 0 ? $yc_v['Stock_31'] : 0;
+                    $yc_v['Stock_32'] = $yc_v['Stock_32'] > 0 ? $yc_v['Stock_32'] : 0;
+                    $yc_v['Stock_33'] = $yc_v['Stock_33'] > 0 ? $yc_v['Stock_33'] : 0;
+                    $yc_v['Stock_34'] = $yc_v['Stock_34'] > 0 ? $yc_v['Stock_34'] : 0;
+                    $yc_v['Stock_35'] = $yc_v['Stock_35'] > 0 ? $yc_v['Stock_35'] : 0;
+                    $yc_v['Stock_36'] = $yc_v['Stock_36'] > 0 ? $yc_v['Stock_36'] : 0;
+                    $yc_v['Stock_38'] = $yc_v['Stock_38'] > 0 ? $yc_v['Stock_38'] : 0;
+                    $yc_v['Stock_40'] = $yc_v['Stock_40'] > 0 ? $yc_v['Stock_40'] : 0;
+                    $yc_v['Stock_42'] = $yc_v['Stock_42'] > 0 ? $yc_v['Stock_42'] : 0;
+
                     $ycRes[$yc_v['WarehouseName'] . $yc_v['GoodsNo']] = $yc_v;
                 }
 
@@ -295,7 +308,9 @@ class Excelhandle extends AdminController
                         ->leftjoin('ErpGoodsColor c', 'c.GoodsId=a.GoodsId')
                         ->field('a.*,c.ColorDesc, c.ColorCode')
                         ->find();
-
+                    if (!$erp) {
+                        continue;
+                    }
                     $sql = "SELECT
     bgs.Size
 FROM
@@ -318,19 +333,6 @@ ORDER BY
                     $erpCustomer = $this->erp->table('ErpCustomer')->where($where)->find();
                     $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName', $item['云仓'])->find();
 
-                    $Stock_00 = $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] ?? 0;
-                    $Stock_29 = $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] ?? 0;
-                    $Stock_30 = $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] ?? 0;
-                    $Stock_31 = $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] ?? 0;
-                    $Stock_32 = $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] ?? 0;
-                    $Stock_33 = $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] ?? 0;
-                    $Stock_34 = $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] ?? 0;
-                    $Stock_35 = $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] ?? 0;
-                    $Stock_36 = $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] ?? 0;
-                    $Stock_38 = $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] ?? 0;
-                    $Stock_40 = $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] ?? 0;
-                    $Stock_42 = $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] ?? 0;
-
                     $Stock_00_puhuo = $item['44/28/'] ?? 0;
                     $Stock_29_puhuo = $item['46/29/165/38/M/105'] ?? 0;
                     $Stock_30_puhuo = $item['48/30/170/39/L/110'] ?? 0;
@@ -344,99 +346,128 @@ ORDER BY
                     $Stock_40_puhuo = $item['40'] ?? 0;
                     $Stock_42_puhuo = $item['42'] ?? 0;
 
-                    $Stock_00_sub = (int)abs($Stock_00) - (int)$Stock_00_puhuo;
-                    if ($Stock_00_sub >= 0) {
-                        $Stock_00_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] = $Stock_00_sub;
+                    if (isset($ycRes[$item['云仓'] . $item['货号']])) {  //云仓存在货号
+
+                        $Stock_00 = $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] ?? 0;
+                        $Stock_29 = $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] ?? 0;
+                        $Stock_30 = $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] ?? 0;
+                        $Stock_31 = $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] ?? 0;
+                        $Stock_32 = $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] ?? 0;
+                        $Stock_33 = $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] ?? 0;
+                        $Stock_34 = $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] ?? 0;
+                        $Stock_35 = $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] ?? 0;
+                        $Stock_36 = $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] ?? 0;
+                        $Stock_38 = $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] ?? 0;
+                        $Stock_40 = $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] ?? 0;
+                        $Stock_42 = $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] ?? 0;
+
+                        $Stock_00_sub = (int)abs($Stock_00) - (int)$Stock_00_puhuo;
+                        if ($Stock_00_sub >= 0) {
+                            $Stock_00_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] = $Stock_00_sub;
+                        } else {
+                            $Stock_00_m = 0;
+                        }
+                        $Stock_29_sub = (int)abs($Stock_29) - (int)$Stock_29_puhuo;
+                        if ($Stock_29_sub >= 0) {
+                            $Stock_29_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] = $Stock_29_sub;
+                        } else {
+                            $Stock_29_m = 0;
+                        }
+
+                        $Stock_30_sub = (int)abs($Stock_30) - (int)$Stock_30_puhuo;
+
+                        if ($Stock_30_sub >= 0) {
+                            $Stock_30_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] = $Stock_30_sub;
+                        } else {
+                            $Stock_30_m = 0;
+                        }
+
+                        $Stock_31_sub = (int)abs($Stock_31) - (int)$Stock_31_puhuo;
+                        if ($Stock_31_sub >= 0) {
+                            $Stock_31_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] = $Stock_31_sub;
+                        } else {
+                            $Stock_31_m = 0;
+                        }
+
+                        $Stock_32_sub = (int)abs($Stock_32) - (int)$Stock_32_puhuo;
+                        if ($Stock_32_sub >= 0) {
+                            $Stock_32_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] = $Stock_32_sub;
+                        } else {
+                            $Stock_32_m = 0;
+                        }
+
+                        $Stock_33_sub = (int)abs($Stock_33) - (int)$Stock_33_puhuo;
+                        if ($Stock_33_sub >= 0) {
+                            $Stock_33_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] = $Stock_33_sub;
+                        } else {
+                            $Stock_33_m = 0;
+                        }
+
+                        $Stock_34_sub = (int)abs($Stock_34) - (int)$Stock_34_puhuo;
+                        if ($Stock_34_sub >= 0) {
+                            $Stock_34_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] = $Stock_34_sub;
+                        } else {
+                            $Stock_34_m = 0;
+                        }
+
+                        $Stock_35_sub = (int)abs($Stock_35) - (int)$Stock_35_puhuo;
+                        if ($Stock_35_sub >= 0) {
+                            $Stock_35_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] = $Stock_35_sub;
+                        } else {
+                            $Stock_35_m = 0;
+                        }
+
+                        $Stock_36_sub = (int)abs($Stock_36) - (int)$Stock_36_puhuo;
+                        if ($Stock_36_sub >= 0) {
+                            $Stock_36_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] = $Stock_36_sub;
+                        } else {
+                            $Stock_36_m = 0;
+                        }
+
+                        $Stock_38_sub = (int)abs($Stock_38) - (int)$Stock_38_puhuo;
+                        if ($Stock_38_sub >= 0) {
+                            $Stock_38_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] = $Stock_38_sub;
+                        } else {
+                            $Stock_38_m = 0;
+                        }
+
+                        $Stock_40_sub = (int)abs($Stock_40) - (int)$Stock_40_puhuo;
+                        if ($Stock_40_sub >= 0) {
+                            $Stock_40_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] = $Stock_40_sub;
+                        } else {
+                            $Stock_40_m = 0;
+                        }
+
+                        $Stock_42_sub = (int)abs($Stock_42) - (int)$Stock_42_puhuo;
+                        if ($Stock_42_sub >= 0) {
+                            $Stock_42_m = 1;
+                            $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] = $Stock_42_sub;
+                        } else {
+                            $Stock_42_m = 0;
+                        }
                     } else {
                         $Stock_00_m = 0;
-                    }
-                    $Stock_29_sub = (int)abs($Stock_29) - (int)$Stock_29_puhuo;
-                    if ($Stock_29_sub >= 0) {
-                        $Stock_29_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] = $Stock_29_sub;
-                    } else {
                         $Stock_29_m = 0;
-                    }
-
-                    $Stock_30_sub = (int)abs($Stock_30) - (int)$Stock_30_puhuo;
-
-                    if ($Stock_30_sub >= 0) {
-                        $Stock_30_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] = $Stock_30_sub;
-                    } else {
                         $Stock_30_m = 0;
-                    }
-
-                    $Stock_31_sub = (int)abs($Stock_31) - (int)$Stock_31_puhuo;
-                    if ($Stock_31_sub >= 0) {
-                        $Stock_31_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] = $Stock_31_sub;
-                    } else {
                         $Stock_31_m = 0;
-                    }
-
-                    $Stock_32_sub = (int)abs($Stock_32) - (int)$Stock_32_puhuo;
-                    if ($Stock_32_sub >= 0) {
-                        $Stock_32_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] = $Stock_32_sub;
-                    } else {
                         $Stock_32_m = 0;
-                    }
-
-                    $Stock_33_sub = (int)abs($Stock_33) - (int)$Stock_33_puhuo;
-                    if ($Stock_33_sub >= 0) {
-                        $Stock_33_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] = $Stock_33_sub;
-                    } else {
                         $Stock_33_m = 0;
-                    }
-
-                    $Stock_34_sub = (int)abs($Stock_34) - (int)$Stock_34_puhuo;
-                    if ($Stock_34_sub >= 0) {
-                        $Stock_34_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] = $Stock_34_sub;
-                    } else {
                         $Stock_34_m = 0;
-                    }
-
-                    $Stock_35_sub = (int)abs($Stock_35) - (int)$Stock_35_puhuo;
-                    if ($Stock_35_sub >= 0) {
-                        $Stock_35_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] = $Stock_35_sub;
-                    } else {
                         $Stock_35_m = 0;
-                    }
-
-                    $Stock_36_sub = (int)abs($Stock_36) - (int)$Stock_36_puhuo;
-                    if ($Stock_36_sub >= 0) {
-                        $Stock_36_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] = $Stock_36_sub;
-                    } else {
                         $Stock_36_m = 0;
-                    }
-
-                    $Stock_38_sub = (int)abs($Stock_38) - (int)$Stock_38_puhuo;
-                    if ($Stock_38_sub >= 0) {
-                        $Stock_38_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] = $Stock_38_sub;
-                    } else {
                         $Stock_38_m = 0;
-                    }
-
-                    $Stock_40_sub = (int)abs($Stock_40) - (int)$Stock_40_puhuo;
-                    if ($Stock_40_sub >= 0) {
-                        $Stock_40_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] = $Stock_40_sub;
-                    } else {
                         $Stock_40_m = 0;
-                    }
-
-                    $Stock_42_sub = (int)abs($Stock_42) - (int)$Stock_42_puhuo;
-                    if ($Stock_42_sub >= 0) {
-                        $Stock_42_m = 1;
-                        $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] = $Stock_42_sub;
-                    } else {
                         $Stock_42_m = 0;
                     }
 
@@ -497,11 +528,11 @@ ORDER BY
                         'UnitPrice' => $erp['UnitPrice'],
                         'StyleCategoryName2' => $erp['StyleCategoryName2'],
                         'StyleCategoryName' => $erp['StyleCategoryName'],
-                        'CustomerCode' => $erpCustomer['CustomerCode'],
-                        'State' => $erpCustomer['State'],
-                        'CustomItem17' => $erpCustomer['CustomItem17'],
+                        'CustomerCode' => $erpCustomer['CustomerCode'] ?? '',
+                        'State' => $erpCustomer['State'] ?? '',
+                        'CustomItem17' => $erpCustomer['CustomItem17'] ?? '',
                         'Mathod' => $erpCustomer['MathodId'] == 4 ? '直营' : '加盟',
-                        'CustomerGrade' => $erpCustomer['CustomerGrade'],
+                        'CustomerGrade' => $erpCustomer['CustomerGrade'] ?? '',
                         'StoreArea' => $erpCustomer['CustomItem27'] ?: $erpCustomer['StoreArea'],
                     ];
 
