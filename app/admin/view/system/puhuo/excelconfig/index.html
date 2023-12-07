@@ -1,0 +1,133 @@
+<div class="layuimini-container" xmlns="http://www.w3.org/1999/html">
+    <div class="layuimini-main" id="app">
+
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">基本设置</li>
+                <li class="">商品负责人设置</li>
+                <li class="">特殊店铺设置</li>
+            </ul>
+            <div class="layui-tab-content">
+
+                <div class="layui-tab-item layui-show">
+                    <form id="form" class="layui-form layuimini-form">
+
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label">上新</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="SX" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$config['上新']}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label">补货</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="SH" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$config['补货']}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label">新补</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="XH" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$config['新补']}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">单包裹件数：</label>
+                            <label class="layui-form-label" style="width: 150px;padding-right: 2px">衣服+裤子 <=</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="YK" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$config['衣裤']}">
+                            </div>
+                            <label class="layui-form-label" style="padding-right: 2px">鞋子 >=</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="XZ" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$config['鞋子']}">
+                            </div>
+                        </div>
+
+                        <div class="hr-line"></div>
+                        <div class="layui-form-item text-center">
+                            <div  id="form-sub" class="layui-btn layui-btn-normal">保存</div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="layui-tab-item ">
+                    <form id="form2" class="layui-form layuimini-form">
+
+                        {volist name='CustomItem17' id='item'}
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label">{$item.name}</label>
+                            <div class="layui-input-inline">
+                                <input type="text"  name="json2[{$item.name}]" class="layui-input" lay-reqtext="请输入" placeholder="请输入" value="{$item.value}">
+                            </div>
+                        </div>
+                        {/volist}
+
+                        <div class="hr-line"></div>
+                        <div class="layui-form-item text-center">
+                            <div  id="form-sub2" class="layui-btn layui-btn-normal">保存</div>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="layui-tab-item">
+
+                    <input type="hidden"  name="Customer_hide" class="layui-input"  value="{$config['特殊店铺']}">
+
+                    <form id="form3" class="layui-form layuimini-form">
+
+                        <table id="form-customer-config" class="layui-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">店铺名称</th>
+                                <th style="width: 120px;">衣服+裤子 <=</th>
+                                <th style="width: 120px;">鞋子 >=</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="3">
+                                    <span></span>
+                                </td>
+                                <td colspan="1">
+                                    <div class="layui-btn-group">
+                                        <button type="button" class="layui-btn add_customer_level">增加</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="hr-line"></div>
+                        <div class="layui-form-item text-center">
+                            <div  id="form-sub3" class="layui-btn layui-btn-normal">保存</div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/html" id="addTpl">
+
+    <tr>
+        <td colspan="1">
+            <input type="text" name="CustomerName[]" class="layui-input" placeholder="请输入店铺名称" value="">
+        </td>
+        <td colspan="1">
+            <input type="number" name="YK[]" class="layui-input" placeholder="请输入数量" value="50">
+        </td>
+        <td colspan="1">
+            <input type="number" name="XZ[]" class="layui-input" placeholder="请输入数量" value="4">
+        </td>
+        <td colspan="1">
+            <button type="button" class="layui-btn  layui-btn-danger del">删除</button>
+
+        </td>
+    </tr>
+
+</script>

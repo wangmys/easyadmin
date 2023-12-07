@@ -12,142 +12,88 @@
 
 namespace app\admin\service;
 
-use app\admin\model\bi\CwlDaxiaoHandleModel;
-use app\admin\model\bi\SpLypPuhuoCurLogModel;
-use app\admin\model\bi\SpLypPuhuoCustomerSortModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaCustomerSortModel;
-use app\admin\model\bi\SpLypPuhuoDaxiaomaSkcnumModel;
-use app\admin\model\bi\SpLypPuhuoLogModel;
-use app\admin\model\bi\SpLypPuhuoOnegoodsRuleModel;
-use app\admin\model\bi\SpLypPuhuoRuleBModel;
-use app\admin\model\bi\SpLypPuhuoScoreModel;
-use app\admin\model\bi\SpLypPuhuoShangshidayModel;
-use app\admin\model\bi\SpLypPuhuoTiGoodsModel;
-use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
-use app\admin\model\bi\SpLypPuhuoZdySet2Model;
-use app\admin\model\bi\SpLypPuhuoZdySetModel;
-use app\admin\model\bi\SpLypPuhuoZdyYuncangGoods2Model;
-use app\admin\model\bi\SpLypPuhuoZdyYuncangGoodsModel;
-use app\admin\model\bi\SpLypPuhuoZhidingGoodsModel;
-use app\admin\model\bi\SpWwChunxiaStockModel;
-use think\facade\Cache;
 use think\facade\Db;
 
 class ExcelhandleService
 {
-    protected $db_easy;
-    protected $list_rows=160;//每页条数
-    protected $page=1;//当前页
-    // protected $customer_model;
-    protected $sp_ww_chunxia_stock_model;
-    protected $puhuo_rule_model;
-    protected $puhuo_rule_b_model;
-    protected $puhuo_customer_sort_model;
-    protected $puhuo_log_model;
-    protected $puhuo_cur_log_model;
-    protected $puhuo_wait_goods_model;
-    protected $puhuo_shangshiday_model;
-    protected $puhuo_score_model;
-    protected $puhuo_daxiaoma_skcnum_model;
-    protected $puhuo_daxiaoma_customer_model;
-    protected $puhuo_daxiaoma_customer_sort_model;
-    protected $puhuo_ti_goods_model;
-    protected $puhuo_zhiding_goods_model;
-    protected $puhuo_zdy_set_model;
-    protected $puhuo_zdy_set2_model;
-    protected $puhuo_zdy_yuncang_goods_model;
-    protected $puhuo_zdy_yuncang_goods2_model;
-    protected $puhuo_onegoods_rule_model;
-    protected $cwl_daxiao_handle_model;
+
+    protected $mysql;
 
     public function __construct()
     {
-        $this->sp_ww_chunxia_stock_model = new SpWwChunxiaStockModel();
-        $this->puhuo_customer_sort_model = new SpLypPuhuoCustomerSortModel();
-        $this->puhuo_log_model = new SpLypPuhuoLogModel();
-        $this->puhuo_cur_log_model = new SpLypPuhuoCurLogModel();
-        $this->puhuo_wait_goods_model = new SpLypPuhuoWaitGoodsModel();
-        $this->puhuo_shangshiday_model = new SpLypPuhuoShangshidayModel();
-        $this->puhuo_score_model = new SpLypPuhuoScoreModel();
-        $this->puhuo_daxiaoma_skcnum_model = new SpLypPuhuoDaxiaomaSkcnumModel();
-        $this->puhuo_daxiaoma_customer_model = new SpLypPuhuoDaxiaomaCustomerModel();
-        $this->puhuo_daxiaoma_customer_sort_model = new SpLypPuhuoDaxiaomaCustomerSortModel();
-        $this->puhuo_ti_goods_model = new SpLypPuhuoTiGoodsModel();
-        $this->puhuo_zhiding_goods_model = new SpLypPuhuoZhidingGoodsModel();
-        $this->puhuo_zdy_set_model = new SpLypPuhuoZdySetModel();
-        $this->puhuo_zdy_set2_model = new SpLypPuhuoZdySet2Model();
-        $this->puhuo_zdy_yuncang_goods_model = new SpLypPuhuoZdyYuncangGoodsModel();
-        $this->puhuo_zdy_yuncang_goods2_model = new SpLypPuhuoZdyYuncangGoods2Model();
-        $this->puhuo_onegoods_rule_model = new SpLypPuhuoOnegoodsRuleModel();
-        $this->cwl_daxiao_handle_model = new CwlDaxiaoHandleModel();
-        $this->puhuo_rule_b_model = new SpLypPuhuoRuleBModel();
+        $this->mysql = Db::connect('mysql');
+
     }
 
 
-    public function customer_sort(){
-        $db=Db::connect('mysql');
-        $customList=$db->table('sp_lyp_puhuo_excel')->group('CustomerName')->select()->toArray();
+    public function order_no()
+    {
 
+        $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['特殊店铺'] = array_column(json_decode($config['特殊店铺'], true), null, 'CustomerName');
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
-        $customer_level = $this->puhuo_score_model::where([['config_str', '=', 'customer_level']])->column('*', 'key');
-        $fill_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'fill_rate']])->column('*', 'key_level');
-        $dongxiao_rate_level = $this->puhuo_score_model::where([['config_str', '=', 'dongxiao_rate']])->column('*', 'key_level');
+        $data = [];
+        $clothes = [];//衣服
+        $pants = [];//裤子
+        $shoes = []; //鞋子
+        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->column('CustomerName');
 
-        $ti_goods = $this->puhuo_ti_goods_model::where([])->column('GoodsNo');
-        $ti_goods = $this->get_goods_str($ti_goods);
+        $order_no_num = 1;
+        foreach ($Customers as $key => $item) {
+            $cus_data = [];
+            $cus_num = 1; //店铺包数
 
-        foreach ($customList as $item){
+            $yk_con = isset($config['特殊店铺'][$item]['YK']) ? $config['特殊店铺'][$item]['YK'] : $config['衣裤'];
+            $xl_con = isset($config['特殊店铺'][$item]['XZ']) ? $config['特殊店铺'][$item]['XZ'] : $config['鞋子'];
+            //衣裤
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+                ->order('CategoryName1 ASC')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->where('CategoryName1', '鞋履')->select()->toArray();
+            $total = 0; //总件数
 
-            //店铺等级评分
-            $CustomerGradeScore = isset($customer_level[$item['CustomerGrade']]) ? $customer_level[$item['CustomerGrade']]['score'] : 0;
+            foreach ($clothesPants as $cp_v) {
 
-            //满足率计算
-            //满足率-单店skc
-            $dandian_skc = $this->db_easy->Query($this->get_dandian_skc(['一级时间分类' => $item['TimeCategoryName1'], '二级时间分类' => $item['TimeCategoryName2'], '一级分类' => $item['CategoryName1'], '二级分类' =>  $item['CategoryName2'], '风格' =>  $item['StyleCategoryName'], '店铺名称' => $item['CustomerName']], $ti_goods));
-            //查询该店已经铺的货
-            // $already_puhuo_goods = $this->puhuo_cur_log_model::where([['CustomerId', '=', $v_customer['CustomerId']], ['total', '>', 0]])->distinct(true)->column('GoodsNo');
-            $already_puhuo_goods = $this->return_already_puhuo_goods(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
-            if ($already_puhuo_goods) {
-                $dandian_skc_goods_str = $dandian_skc[0]['goods_str'] ?? 0;
-                $dandian_skc_goods_str = $dandian_skc_goods_str ? explode(',', $dandian_skc_goods_str) : [];
-                $merge_dandian_skc = array_unique(array_merge(array_column($already_puhuo_goods, 'GoodsNo'), $dandian_skc_goods_str));
-                $dandian_skc = count($merge_dandian_skc);
-            } else {
-                $dandian_skc = $dandian_skc[0]['store_skc_num'] ?? 0;
+                if ($cp_v['Stock_Quantity_puhuo'] > $yk_con) { //单货号大于配置
+                } else {
+                    $total2 = $total + $cp_v['Stock_Quantity_puhuo'];
+                    if ($total2 < $yk_con * $cus_num) {
+                        $data[] = [
+                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
+                        ];
+
+                    } else {
+                        $cus_num++;
+                        $order_no_num++;
+                        $data[] = [
+                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
+                        ];
+                    }
+
+                }
+
             }
-            // print_r($dandian_skc);die;
-            //满足率-(云仓可用+云仓下门店预计库存的总skc数）
-            $yuncangkeyong_skc = $this->get_yuncangkeyong_skc(['一级时间分类' => $TimeCategoryName1, '二级时间分类' => $TimeCategoryName2, '一级分类' => $CategoryName1, '二级分类' => $CategoryName2, '风格' => $StyleCategoryName, '云仓' => $WarehouseName, '店铺名称' => $v_customer['CustomerName']], $ti_goods);
-            // print_r($yuncangkeyong_skc);die;
-            $fill_rate = $yuncangkeyong_skc ? round($dandian_skc/$yuncangkeyong_skc, 2) : 0;
-            $fill_rate_score = $this->get_fill_rate_score($fill_rate, $fill_rate_level);
+            $order_no_num++;
 
-            dd($CustomerGradeScore);
         }
 
-
-        dd([$customer_level,$fill_rate_level,$dongxiao_rate_level]);
-
+        dd($data);
 
 
     }
 
-    protected function get_goods_str($ti_goods=[]) {
-        $ti_goods_str = '';
-        if ($ti_goods) {
-            foreach ($ti_goods as $v_goods) {
-                $ti_goods_str .= "'".$v_goods."',";
-            }
-            $ti_goods_str = substr($ti_goods_str, 0, -1);
+    public function xm_select($data)
+    {
+        $res = [];
+        foreach ($data as $item) {
+            $res[] = ['name' => $item, 'value' => $item];
         }
-        return $ti_goods_str;
+        return $res;
     }
 
 
-
-
-    public function get_yunchang_goods_data() {
+    public function get_yunchang_goods_data()
+    {
 
         $sql = "SELECT 
 
@@ -535,7 +481,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY  
     
@@ -581,7 +526,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -625,7 +569,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -666,8 +609,7 @@ class ExcelhandleService
         AND EG.TimeCategoryName1>2022
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
-    
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
+
     
     GROUP BY
     
@@ -709,7 +651,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     
@@ -753,7 +694,6 @@ class ExcelhandleService
     
         AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
-        AND EW.WarehouseName IN ('广州云仓','长沙云仓','南昌云仓','武汉云仓','贵阳云仓','广州过季仓')
     
     GROUP BY
     

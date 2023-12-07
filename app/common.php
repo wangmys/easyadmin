@@ -679,3 +679,45 @@ function importExcel($file_path = '/', $read_column = array(), $start_row = 2) {
 
 }
 
+function importExcel_m($file_path = '/', $read_column = array(), $start_row = 2) {
+
+    $reader = IOFactory::createReader('Xlsx');
+
+    $reader->setReadDataOnly(TRUE);
+
+    //载入excel表格
+    $spreadsheet = $reader->load($file_path);
+
+    // 读取第一個工作表
+    $sheet = $spreadsheet->getSheet(0);
+
+    // 取得总行数
+    $highest_row = $sheet->getHighestRow();
+
+    // 取得总列数
+    $highest_column = $sheet->getHighestColumn();
+
+    //读取内容
+    $data_origin = array();
+    $data = array();
+    for ($row = $start_row; $row <= $highest_row; $row++) { //行号从2开始
+        for ($column = 'A'; $column <= $highest_column; $column++) { //列数是以A列开始
+            $str = $sheet->getCell($column . $row)->getValue();
+            //保存该行的所有列
+            $data_origin[$column] = $str;
+        }
+
+        // 删除空行，好用的很
+        if(!implode('', $data_origin)){
+            //删除空行
+            continue;
+        }
+
+        //取出指定的数据
+        foreach ($read_column as $key => $val) {
+            $data[$row - $start_row][$val] = @$data_origin[$key] ? $data_origin[$key] : '';
+        }
+    }
+    return $data;
+
+}
