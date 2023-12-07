@@ -96,7 +96,12 @@ class ExcelhandleService
             }
         }
 
-        return $this->array_sort($return, 'uuid', 'asc');
+        $sort = array_column($return, 'sort');
+        array_multisort($sort, SORT_ASC, $return);
+
+        return $return;
+
+//        return $this->array_sort($return, 'uuid', 'asc');
 
     }
 
