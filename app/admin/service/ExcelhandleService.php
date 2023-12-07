@@ -17,8 +17,68 @@ use think\facade\Db;
 class ExcelhandleService
 {
 
+    protected $mysql;
+
     public function __construct()
     {
+        $this->mysql = Db::connect('mysql');
+
+    }
+
+
+    public function order_no()
+    {
+
+        $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['特殊店铺'] = array_column(json_decode($config['特殊店铺'], true), null, 'CustomerName');
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
+
+        $data = [];
+        $clothes = [];//衣服
+        $pants = [];//裤子
+        $shoes = []; //鞋子
+        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->column('CustomerName');
+
+        $order_no_num = 1;
+        foreach ($Customers as $key => $item) {
+            $cus_data = [];
+            $cus_num = 1; //店铺包数
+
+            $yk_con = isset($config['特殊店铺'][$item]['YK']) ? $config['特殊店铺'][$item]['YK'] : $config['衣裤'];
+            $xl_con = isset($config['特殊店铺'][$item]['XZ']) ? $config['特殊店铺'][$item]['XZ'] : $config['鞋子'];
+            //衣裤
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+                ->order('CategoryName1 ASC')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->where('CategoryName1', '鞋履')->select()->toArray();
+            $total = 0; //总件数
+
+            foreach ($clothesPants as $cp_v) {
+
+                if ($cp_v['Stock_Quantity_puhuo'] > $yk_con) { //单货号大于配置
+                } else {
+                    $total2 = $total + $cp_v['Stock_Quantity_puhuo'];
+                    if ($total2 < $yk_con * $cus_num) {
+                        $data[] = [
+                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
+                        ];
+
+                    } else {
+                        $cus_num++;
+                        $order_no_num++;
+                        $data[] = [
+                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
+                        ];
+                    }
+
+                }
+
+            }
+            $order_no_num++;
+
+        }
+
+        dd($data);
+
 
     }
 

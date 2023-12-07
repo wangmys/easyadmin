@@ -45,6 +45,10 @@ class Excelhandle extends AdminController
 
         if (request()->isAjax()) {
 
+//
+//            $service = $this->service->order_no();
+//
+//            dd($service);
             $param = $this->request->param();
             $where = [];
 
@@ -175,6 +179,7 @@ class Excelhandle extends AdminController
 
         $res = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select();
 
+        $service = $this->service->order_no($res);
         $excel_output_data = [];
         foreach ($res as $k_res => $v_res) {
 
@@ -258,7 +263,6 @@ class Excelhandle extends AdminController
      */
     public function import_excel()
     {
-        set_time_limit(0);
         if (request()->isAjax()) {
             $file = request()->file('file');
             $new_name = "import_excel" . '_' . uuid('zhuanhuan') . '.' . $file->getOriginalExtension();
@@ -337,35 +341,35 @@ ORDER BY
                     $erpCustomer = $this->erp->table('ErpCustomer')->where($where)->find();
                     $ErpWarehouse = $this->erp->table('ErpWarehouse')->where('WarehouseName', $item['云仓'])->find();
 
-                    $Stock_00_puhuo = $item['44/28/'] ?? 0;
-                    $Stock_29_puhuo = $item['46/29/165/38/M/105'] ?? 0;
-                    $Stock_30_puhuo = $item['48/30/170/39/L/110'] ?? 0;
-                    $Stock_31_puhuo = $item['50/31/175/40/XL/115'] ?? 0;
-                    $Stock_32_puhuo = $item['52/32/180/41/2XL/120'] ?? 0;
-                    $Stock_33_puhuo = $item['54/33/185/42/3XL/125'] ?? 0;
-                    $Stock_34_puhuo = $item['56/34/190/43/4XL/130'] ?? 0;
-                    $Stock_35_puhuo = $item['58/35/195/44/5XL/'] ?? 0;
-                    $Stock_36_puhuo = $item['60/36/6XL/'] ?? 0;
-                    $Stock_38_puhuo = $item['38/7XL'] ?? 0;
-                    $Stock_40_puhuo = $item['40'] ?? 0;
-                    $Stock_42_puhuo = $item['42'] ?? 0;
+                    $Stock_00_puhuo = $item['44/28/'] ?: 0;
+                    $Stock_29_puhuo = $item['46/29/165/38/M/105'] ?: 0;
+                    $Stock_30_puhuo = $item['48/30/170/39/L/110'] ?: 0;
+                    $Stock_31_puhuo = $item['50/31/175/40/XL/115'] ?: 0;
+                    $Stock_32_puhuo = $item['52/32/180/41/2XL/120'] ?: 0;
+                    $Stock_33_puhuo = $item['54/33/185/42/3XL/125'] ?: 0;
+                    $Stock_34_puhuo = $item['56/34/190/43/4XL/130'] ?: 0;
+                    $Stock_35_puhuo = $item['58/35/195/44/5XL/'] ?: 0;
+                    $Stock_36_puhuo = $item['60/36/6XL/'] ?: 0;
+                    $Stock_38_puhuo = $item['38/7XL'] ?: 0;
+                    $Stock_40_puhuo = $item['40'] ?: 0;
+                    $Stock_42_puhuo = $item['42'] ?: 0;
 
                     if (isset($ycRes[$item['云仓'] . $item['货号']])) {  //云仓存在货号
 
 
-                        $Stock_00 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_00']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] : 0;
-                        $Stock_29 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_29']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] : 0;
-                        $Stock_30 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_30']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] : 0;
-                        $Stock_31 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_31']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] : 0;
-                        $Stock_32 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_32']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] : 0;
-                        $Stock_33 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_33']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] : 0;
-                        $Stock_34 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_34']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] : 0;
-                        $Stock_35 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_35']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] : 0;
-                        $Stock_36 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_36']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] : 0;
-                        $Stock_38 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_38']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] : 0;
-                        $Stock_40 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_40']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] : 0;
-                        $Stock_42 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_42']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] > 0 ? $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] : 0;
-                        
+                        $Stock_00 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_00']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_00'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_00'] : 0;
+                        $Stock_29 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_29']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_29'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_29'] : 0;
+                        $Stock_30 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_30']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_30'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_30'] : 0;
+                        $Stock_31 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_31']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_31'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_31'] : 0;
+                        $Stock_32 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_32']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_32'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_32'] : 0;
+                        $Stock_33 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_33']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_33'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_33'] : 0;
+                        $Stock_34 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_34']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_34'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_34'] : 0;
+                        $Stock_35 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_35']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_35'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_35'] : 0;
+                        $Stock_36 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_36']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_36'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_36'] : 0;
+                        $Stock_38 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_38']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_38'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_38'] : 0;
+                        $Stock_40 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_40']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_40'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_40'] : 0;
+                        $Stock_42 = isset($ycRes[$item['云仓'] . $item['货号']]['Stock_42']) && $ycRes[$item['云仓'] . $item['货号']]['Stock_42'] > 0 ? (int)$ycRes[$item['云仓'] . $item['货号']]['Stock_42'] : 0;
+
 
                         $Stock_00_sub = $Stock_00 - (int)$Stock_00_puhuo;
                         if ($Stock_00_sub >= 0) {
@@ -484,7 +488,7 @@ ORDER BY
                         'GoodsNo' => $item['货号'] ?? '',
                         'CustomerName' => $item['店铺'] ?? '',
                         'xingzhi' => $item['性质'] ?? '',
-//                    '' => $item['合计'],
+                        'Stock_Quantity_puhuo' => $Stock_00_puhuo + $Stock_29_puhuo + $Stock_30_puhuo + $Stock_31_puhuo + $Stock_32_puhuo + $Stock_33_puhuo + $Stock_34_puhuo + $Stock_35_puhuo + $Stock_36_puhuo + $Stock_38_puhuo + $Stock_40_puhuo + $Stock_42_puhuo,
                         'Stock_00_puhuo' => $Stock_00_puhuo,
                         'Stock_29_puhuo' => $Stock_29_puhuo,
                         'Stock_30_puhuo' => $Stock_30_puhuo,
