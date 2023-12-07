@@ -51,10 +51,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
             });
         },
         show3:function (){
-
+            this.volist()
             $('.add_customer_level').on('click', function(){
                 var element = $("#addTpl").html()
-                $('#form-customer_level-config tbody').append(element);
+                $('#form-customer-config tbody').append(element);
             });
 
             $("body").on("click", ".del", function () {
@@ -68,8 +68,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 $('input[name^="CustomerName"]').each(function(index,element) {
                     data_arr[index] = $(this).val();
                 })
-
-
                 let param = {};
                 let form = $('#form3').serializeArray();
                 // console.log('form',form)
@@ -95,6 +93,19 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
             ea.listen();
         },
+        volist: function () {
+            var str = $("input[name='Customer_hide']").val()
+            var CustomerArr = JSON.parse(str)
+            $.each(CustomerArr,function (index,item) {
+                var html='<tr>' +
+                    '<td><input type="text" name="CustomerName[]" class="layui-input" placeholder="请输入店铺名称" value="'+item.CustomerName+'"></td>' +
+                    '<td><input type="number" name="YK[]" class="layui-input" placeholder="请输入数量" value="'+item.YK+'"></td>' +
+                    '<td><input type="number" name="XZ[]" class="layui-input" placeholder="请输入数量" value="'+item.XZ+'"></td>' +
+                    '<td><button type="button" class="layui-btn  layui-btn-danger del">删除</button></td>' +
+                    '</tr>'
+                $('#form-customer-config tbody').append(html);
+            })
+        }
 
     };
     return Controller;

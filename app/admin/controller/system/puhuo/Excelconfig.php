@@ -85,6 +85,9 @@ class Excelconfig extends AdminController
             $XZ = $param['XZ'] ?? [];
             $newData = [];
             foreach ($CustomerName as $key => $item) {
+                if(empty($item) ){
+                    continue;
+                }
                 $newData[] = [
                     'CustomerName' => trim($CustomerName[$key]),
                     'YK' => (int)($YK[$key] ?? 0),

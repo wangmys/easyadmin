@@ -44,7 +44,7 @@
 
                         <div class="hr-line"></div>
                         <div class="layui-form-item text-center">
-                            <div  id="form-sub" class="layui-btn layui-btn-normal layui-btn-sm">保存</div>
+                            <div  id="form-sub" class="layui-btn layui-btn-normal">保存</div>
                         </div>
 
                     </form>
@@ -65,7 +65,7 @@
 
                         <div class="hr-line"></div>
                         <div class="layui-form-item text-center">
-                            <div  id="form-sub2" class="layui-btn layui-btn-normal layui-btn-sm">保存</div>
+                            <div  id="form-sub2" class="layui-btn layui-btn-normal">保存</div>
                         </div>
                     </form>
 
@@ -73,9 +73,11 @@
 
                 <div class="layui-tab-item">
 
+                    <input type="hidden"  name="Customer_hide" class="layui-input"  value="{$config['特殊店铺']}">
+
                     <form id="form3" class="layui-form layuimini-form">
 
-                        <table id="form-customer_level-config" class="layui-table">
+                        <table id="form-customer-config" class="layui-table">
                             <thead>
                             <tr>
                                 <th style="width: 120px;">店铺名称</th>
@@ -87,7 +89,7 @@
                             <tbody>
                             <tr>
                                 <td colspan="3">
-                                    <span>添加操作</span>
+                                    <span></span>
                                 </td>
                                 <td colspan="1">
                                     <div class="layui-btn-group">
@@ -99,7 +101,7 @@
                         </table>
                         <div class="hr-line"></div>
                         <div class="layui-form-item text-center">
-                            <div  id="form-sub3" class="layui-btn layui-btn-normal layui-btn-sm">保存</div>
+                            <div  id="form-sub3" class="layui-btn layui-btn-normal">保存</div>
                         </div>
                     </form>
 
