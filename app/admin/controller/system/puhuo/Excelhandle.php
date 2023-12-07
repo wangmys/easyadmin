@@ -18,7 +18,7 @@ use think\facade\Db;
 /**
  * Class Excel
  * @package app\admin\controller\system\puhuo
- * @ControllerAnnotation(title="",auth=true)
+ * @ControllerAnnotation(title="铺货excel",auth=true)
  */
 class Excelhandle extends AdminController
 {
@@ -35,6 +35,10 @@ class Excelhandle extends AdminController
         $this->mysql = Db::connect('mysql');
     }
 
+    /**
+     * @return mixed|\think\response\Json
+     * @NodeAnotation(title="铺货excel列表",auth=true)
+     */
     public function index()
     {
 

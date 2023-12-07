@@ -19,7 +19,7 @@ use think\facade\Db;
 /**
  * Class Excel
  * @package app\admin\controller\system\puhuo
- * @ControllerAnnotation(title="铺货excel",auth=true)
+ * @ControllerAnnotation(title="铺货excel配置",auth=true)
  */
 class Excelconfig extends AdminController
 {
@@ -38,7 +38,7 @@ class Excelconfig extends AdminController
 
     /**
      * @return mixed
-     * @NodeAnotation(title="铺货excel列表",auth=true)
+     * @NodeAnotation(title="铺货excel配置",auth=true)
      */
     public function index()
     {
@@ -60,7 +60,7 @@ class Excelconfig extends AdminController
     /**
      * @param $op
      * @return void
-     * @NodeAnotation(title="铺货excel保存",auth=true)
+     * @NodeAnotation(title="铺货excel设置保存",auth=true)
      */
     public function save($op = 1)
     {
