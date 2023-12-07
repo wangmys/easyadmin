@@ -45,10 +45,6 @@ class Excelhandle extends AdminController
 
         if (request()->isAjax()) {
 
-//
-//            $service = $this->service->order_no();
-//
-//            dd($service);
             $param = $this->request->param();
             $where = [];
 
@@ -177,9 +173,8 @@ class Excelhandle extends AdminController
 
         }
 
-        $res = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select();
+        $res = $this->service->order_no($where);
 
-        $service = $this->service->order_no($res);
         $excel_output_data = [];
         foreach ($res as $k_res => $v_res) {
 
