@@ -240,7 +240,7 @@ class Skauto extends BaseController
             LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
             WHERE  EC.ShutOut=0
-                AND EG.TimeCategoryName1 in (2023)
+                AND EG.TimeCategoryName1 in (2023,2024)
                 AND EC.MathodId IN (4,7)
             GROUP BY 
                 EC.State,
@@ -267,7 +267,7 @@ class Skauto extends BaseController
             LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
             LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
                         WHERE  EC.ShutOut=0
-                                AND EG.TimeCategoryName1 in (2023)
+                                AND EG.TimeCategoryName1 in (2023,2024)
                                     AND EC.MathodId IN (4,7)
         -- 								AND EC.CustomerName IN ('宁德一店')
         -- 								AND EG.GoodsNo = 'B42503007'
@@ -324,7 +324,7 @@ class Skauto extends BaseController
             LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
             LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
             WHERE	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                AND eg.TimeCategoryName1 = '2023'
+                AND eg.TimeCategoryName1 in ('2023','2024')
             --    AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
                 AND EC.ShutOut=0 
                 AND EC.MathodId IN (4,7)
@@ -390,7 +390,7 @@ class Skauto extends BaseController
                 -- 排除店铺调入单 ErpCustReceipt
                  AND EI.CustOutboundId NOT IN (SELECT ERG.CustOutboundId FROM ErpCustReceipt ER LEFT JOIN ErpCustReceiptGoods ERG ON ER.ReceiptID=ERG.ReceiptID  WHERE ER.CodingCodeText='已审结' AND ERG.CustOutboundId IS NOT NULL AND ERG.CustOutboundId!='' GROUP BY ERG.CustOutboundId )
                 AND	EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
-                AND eg.TimeCategoryName1 = '2023'
+                AND eg.TimeCategoryName1 in ('2023', '2024')
             --    AND EG.TimeCategoryName2 IN ( {$this->seasionStr} ) 
                 AND EC.ShutOut=0 
                 AND EC.MathodId IN (4,7)
