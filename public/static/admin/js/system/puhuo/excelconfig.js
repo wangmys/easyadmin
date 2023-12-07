@@ -69,15 +69,24 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     data_arr[index] = $(this).val();
                 })
 
-               console.log('aa',data_arr)
 
                 let param = {};
                 let form = $('#form3').serializeArray();
-                console.log('form',form)
-                $.each(form, function (index, item) {
-                    param[item.name] = item.value;
-                });
-                $.post('save?op=3', param, function (res) {
+                // console.log('form',form)
+                // $.each(form, function (index, item) {
+                //     if(item.name.indexOf('[]') != -1){
+                //         var key=item.name.replace('[]','')
+                //         if(key  in param){
+                //         }else {
+                //             param[key]=[]
+                //         }
+                //         param[key].push(item.value)
+                //     }else {
+                //         param[item.name] = item.value;
+                //     }
+                // });
+                // console.log('param',param)
+                $.post('save?op=3', form, function (res) {
 
                     layer.msg(res.msg, {time: 2000, icon:1});
                 })

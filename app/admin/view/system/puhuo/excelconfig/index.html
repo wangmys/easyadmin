@@ -79,8 +79,8 @@
                             <thead>
                             <tr>
                                 <th style="width: 120px;">店铺名称</th>
-                                <th style="width: 120px;">衣服+裤子</th>
-                                <th style="width: 120px;">鞋子</th>
+                                <th style="width: 120px;">衣服+裤子 <=</th>
+                                <th style="width: 120px;">鞋子 >=</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -114,13 +114,13 @@
 
     <tr>
         <td colspan="1">
-            <input type="text" name="CustomerName[]" class="layui-input" value="">
+            <input type="text" name="CustomerName[]" class="layui-input" placeholder="请输入店铺名称" value="">
         </td>
         <td colspan="1">
-            <input type="text" name="YK[]" class="layui-input" value="">
+            <input type="number" name="YK[]" class="layui-input" placeholder="请输入数量" value="">
         </td>
         <td colspan="1">
-            <input type="text" name="XZ[]" class="layui-input" value="">
+            <input type="number" name="XZ[]" class="layui-input" placeholder="请输入数量" value="">
         </td>
         <td colspan="1">
             <button type="button" class="layui-btn  layui-btn-danger del">删除</button>

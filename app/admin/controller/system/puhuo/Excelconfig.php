@@ -19,7 +19,7 @@ use think\facade\Db;
 /**
  * Class Excel
  * @package app\admin\controller\system\puhuo
- * @ControllerAnnotation(title="",auth=true)
+ * @ControllerAnnotation(title="铺货excel",auth=true)
  */
 class Excelconfig extends AdminController
 {
@@ -36,11 +36,15 @@ class Excelconfig extends AdminController
         $this->mysql = Db::connect('mysql');
     }
 
+    /**
+     * @return mixed
+     * @NodeAnotation(title="铺货excel列表",auth=true)
+     */
     public function index()
     {
         $config = $this->mysql->table('sp_lyp_puhuo_excel_config')->select()->toArray();
         $config = $config[0];
-        $configCustomItem17=json_decode($config['商品负责人'],true);
+        $configCustomItem17 = json_decode($config['商品负责人'], true);
         $CustomItem17Arr = CustomerModel::where('CustomItem17', '<>', '')->distinct(true)->column('CustomItem17');
 
         $CustomItem17 = [];
@@ -53,6 +57,11 @@ class Excelconfig extends AdminController
         return $this->fetch();
     }
 
+    /**
+     * @param $op
+     * @return void
+     * @NodeAnotation(title="铺货excel保存",auth=true)
+     */
     public function save($op = 1)
     {
         $param = $this->request->param();
@@ -66,10 +75,27 @@ class Excelconfig extends AdminController
                 '衣裤' => $param['YK'],
                 '鞋子' => $param['XZ'],
             ];
-        }elseif($op ==2){
-            $data=[
-                '商品负责人'=>json_encode($param['json2'])
+        } elseif ($op == 2) {
+            $data = [
+                '商品负责人' => json_encode($param['json2'])
             ];
+        } elseif ($op == 3) {
+            $CustomerName = $param['CustomerName'] ?? [];
+            $YK = $param['YK'] ?? [];
+            $XZ = $param['XZ'] ?? [];
+            $newData = [];
+            foreach ($CustomerName as $key => $item) {
+                $newData[] = [
+                    'CustomerName' => trim($CustomerName[$key]),
+                    'YK' => (int)($YK[$key] ?? 0),
+                    'XZ' => (int)($XZ[$key] ?? 0),
+                ];
+
+            }
+            $data = [
+                '特殊店铺' => json_encode($newData)
+            ];
+
         }
 
         $this->mysql->table('sp_lyp_puhuo_excel_config')->where(1)->save($data);
