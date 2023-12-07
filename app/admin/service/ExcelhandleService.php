@@ -95,11 +95,27 @@ class ExcelhandleService
                 $return[] = $son;
             }
         }
-        $sort = array_column($return, 'uuid');
-        array_multisort($sort, SORT_ASC, $return);
 
-        return $return;
+        return $this->array_sort($return, 'uuid', 'asc');
 
+    }
+
+    public function array_sort($arr, $keys, $orderby = 'asc')
+    {
+        $keysvalue = $new_array = array();
+        foreach ($arr as $k => $v) {
+            $keysvalue[$k] = $v[$keys];
+        }
+        if ($orderby == 'asc') {
+            asort($keysvalue);
+        } else {
+            arsort($keysvalue);
+        }
+        reset($keysvalue);
+        foreach ($keysvalue as $k => $v) {
+            $new_array[] = $arr[$k];
+        }
+        return $new_array;
     }
 
     public function xm_select($data)
