@@ -81,7 +81,7 @@ class Chaoliang extends BaseController
                         + IFNULL(`单码量36/6XL`, 0) 
                         + IFNULL(`单码量38/7XL`, 0) 
                         + IFNULL(`单码量_40`, 0),
-                    `周转合计` = 8    
+                    `周转合计` = 6    
                 WHERE 1
         ";
         $this->db_easyA->execute($sql);
