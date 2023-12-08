@@ -476,12 +476,17 @@ class Ratio extends AdminController
                 $model = $model->whereIn('s.货号',$goodsnoList);
             }
 
+
+            /*
+                SELECT `s`.* FROM `ea_size_ranking` `s` LEFT JOIN `ea_size_all_ratio` `r` ON `s`.`货号`=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量" WHERE `s`.`Date` = '2023-12-08' GROUP BY `s`.`货号` ORDER BY `日均销` DESC LIMIT 0,40
+            */
+
             // 查询货号列表排名
             $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
                 ['s.Date' , '=', date('Y-m-d')]
             ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->select();
 
-            // echo $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
+            // $list = $list->alias('s')->field('s.*')->leftJoin('size_all_ratio r','s.货号=r.GoodsNo and s.Date=r.Date and r.字段="当前总库存量"')->where([
             //     ['s.Date' , '=', date('Y-m-d')]
             // ])->group('s.货号')->order('日均销','desc')->page($page, $limit)->fetchSql()->select();
             // // echo $list::fetchSql(); 
