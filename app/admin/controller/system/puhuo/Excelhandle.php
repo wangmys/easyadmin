@@ -174,12 +174,18 @@ class Excelhandle extends AdminController
         }
 
         $res = $this->service->order_no($where);
-
+        $date = date('Y-m-d');
+        $tag = date('YmdHis');
         $excel_output_data = [];
+        $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
         foreach ($res as $k_res => $v_res) {
-
             $tmp_arr = [
-                'order_no' => $v_res['uuid'],
+                'uuid' => $v_res['uuid'],
+                'date' => $date,
+                'sort' => $v_res['sort'],
+                'CustomItem17' => $config['商品负责人'][$v_res['CustomItem17']] ?? '',
+                'tag' => $tag,
                 'WarehouseCode' => $v_res['WarehouseCode'],
                 'CustomerCode' => $v_res['CustomerCode'],
                 'send_out' => 'Y',
@@ -222,7 +228,7 @@ class Excelhandle extends AdminController
         $end_output_data = [];
         if ($excel_output_data) {
             foreach ($excel_output_data as $v_output_data) {
-                $excel_output_data2[$v_output_data['order_no']][] = $v_output_data;
+                $excel_output_data2[$v_output_data['uuid']][] = $v_output_data;
             }
             foreach ($excel_output_data2 as $vv_output_data) {
                 $remarks = array_unique(array_column($vv_output_data, 'remark'));
@@ -233,8 +239,31 @@ class Excelhandle extends AdminController
                 }
             }
         }
+
+        try {
+            $chunk_list = array_chunk($end_output_data, 500);
+            if ($chunk_list) {
+                foreach ($chunk_list as $key => $val) {
+                    $this->mysql->table('sp_lyp_puhuo_excel_data')->strict(false)->insertAll($val);
+                }
+            }
+        } catch (Exception $e) {
+            dd($e->getMessage());
+        }
+        return $this->success('ok', compact('tag'));
+
+
+    }
+
+
+    public function export_excel_runing($tag)
+    {
+
+        $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
+
+
         $header = [
-            ['*订单号', 'order_no'],
+            ['*订单号', 'uuid'],
             ['*仓库编号', 'WarehouseCode'],
             ['*店铺编号', 'CustomerCode'],
             ['*打包后立即发出', 'send_out'],
@@ -246,10 +275,7 @@ class Excelhandle extends AdminController
             ['*状态/1草稿,2预发布,3确定发布', 'status'],
             ['备注', 'remark'],
         ];
-
-
-        return Excel::exportData($end_output_data, $header, date('Ymd') . '_CTY_1', 'xlsx');
-
+        return Excel::exportData($data, $header, date('Ymd') . '_CTY_1', 'xlsx');
 
     }
 
