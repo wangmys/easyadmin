@@ -83,6 +83,7 @@ class Excelhandle extends AdminController
                 ->select()->toArray();
 //                ->fetchSql(1)->select();
             foreach ($res as &$item) {
+                $item['State']=mb_substr($item['State'],0,2);
                 $item['Stock_Quantity_puhuo'] = $item['Stock_00_puhuo']
                     + $item['Stock_29_puhuo'] + $item['Stock_30_puhuo']
                     + $item['Stock_31_puhuo'] + $item['Stock_32_puhuo']

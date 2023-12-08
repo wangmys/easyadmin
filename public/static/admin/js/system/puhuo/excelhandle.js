@@ -166,12 +166,13 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar: ['refresh']
                 , limit: 30000
                 , limits: [200, 500, 1000, 5000, 10000, 20000]
-                , height: 780
+                , height: 650,
+                totalRow: true
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                        {type: "checkbox", fixed: 'left'},
-                        {field: 'TimeCategoryName2', title: '季节', align: 'center', fixed: 'left', width: 35}
+                        // {type: "checkbox", fixed: 'left'},
+                        {field: 'TimeCategoryName2', title: '季节', align: 'center', fixed: 'left', width: 35,totalRowText: '合计：'}
                         , {field: 'CategoryName1', title: '一级分类', align: 'center', fixed: 'left', width: 55}
                         , {field: 'CategoryName2', title: '二级分类', align: 'center', width: 55}
                         , {field: 'CategoryName', title: '分类', align: 'center', width: 75}
@@ -184,8 +185,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         //  ,{field: 'img', width: 80, title: '图片', search: false, templet: table.image,imageHeight:30,merge: true}
                         //  ,{field: 'img', width: 80, title: '图片', search: false, templet: '<div><img src="{}"/></div>',imageHeight:30,merge: true}
                         , {field: 'CustomItem17', title: '商品专员', align: 'center', width: 50}
-                        , {field: 'State', title: '省份', align: 'center', width: 35}
+                        , {field: 'State', title: '省份', align: 'center', width: 50}
                         , {field: 'CustomerName', title: '店铺名称', align: 'center', width: 70}
+                        , {field: 'CustomerCode', title: '店铺编号', align: 'center', width: 70}
                         , {field: 'Mathod', title: '经营模式', align: 'center', width: 55}
                         , {field: 'CustomerGrade', title: '店铺等级', align: 'center', width: 55}
                         , {field: 'StoreArea', title: '店铺面积', align: 'center', width: 55}
@@ -357,7 +359,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         }
                     }
                         , {field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30,}
-                        , {field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40}
+                        , {field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40,totalRow: true}
                     ],
 
                 ]
