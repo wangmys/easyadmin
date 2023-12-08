@@ -65,6 +65,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
             })
 
+            $('body').on('click', '#excel_tpl', function (obj) {
+                location.href = 'http://im.babiboy.com/static/m/images/puhuo_tpl.xlsx';
+
+            })
             $('body').on('click', '#export_excel_all', function (obj) {
 
                 layer.load('加载中');
