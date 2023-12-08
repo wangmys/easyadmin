@@ -219,7 +219,6 @@ class Chaoliang extends BaseController
                 ) AS t
         ";
 
-        die;
 		
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);
