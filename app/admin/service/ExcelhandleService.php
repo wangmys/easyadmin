@@ -26,7 +26,7 @@ class ExcelhandleService
     }
 
 
-    public function order_no()
+    public function order_no($where = [])
     {
 
         $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
@@ -34,16 +34,25 @@ class ExcelhandleService
         $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
         $data = [];
-        $clothes = [];//衣服
-        $pants = [];//裤子
-        $shoes = []; //鞋子
-        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->column('CustomerName');
-
+        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->group('CustomerName')->column('CustomerName');
+//        $Customers = ['安康一店', '阿拉尔一店'];
         $order_no_num = 1;
-        foreach ($Customers as $key => $item) {
-            $cus_data = [];
-            $cus_num = 1; //店铺包数
+        $gg = Db::connect('mysql')->table('sp_lyp_puhuo_excel')->where(1)->find();
 
+        if (!empty($gg)) {
+            $sortWhere = [
+                'CustomItem17' => $config['商品负责人'][$gg['CustomItem17']],
+                'date' => date('Y-m-d')
+            ];
+            $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
+            if ($sortDb) {
+                $order_no_num = (int)$sortDb + 1;
+            }
+        }
+
+        foreach ($Customers as $key => $item) {
+
+            $cus_num = 1; //店铺包数
             $yk_con = isset($config['特殊店铺'][$item]['YK']) ? $config['特殊店铺'][$item]['YK'] : $config['衣裤'];
             $xl_con = isset($config['特殊店铺'][$item]['XZ']) ? $config['特殊店铺'][$item]['XZ'] : $config['鞋子'];
             //衣裤
@@ -51,36 +60,62 @@ class ExcelhandleService
                 ->order('CategoryName1 ASC')->select()->toArray();
             $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->where('CategoryName1', '鞋履')->select()->toArray();
             $total = 0; //总件数
+            //处理衣裤
 
             foreach ($clothesPants as $cp_v) {
-
-                if ($cp_v['Stock_Quantity_puhuo'] > $yk_con) { //单货号大于配置
-                } else {
-                    $total2 = $total + $cp_v['Stock_Quantity_puhuo'];
-                    if ($total2 < $yk_con * $cus_num) {
-                        $data[] = [
-                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
-                        ];
-
+                $clothesPantsArr = $cp_v;
+                if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
+                    $total = $total + $cp_v['Stock_Quantity_puhuo'];
+                    if ($total <= $yk_con * $cus_num) {
+                        $clothesPantsArr['sort'] = $order_no_num;
+                        $clothesPantsArr['uuid'] = $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
+                        $data[$item][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
                         $order_no_num++;
-                        $data[] = [
-                            'uuid' => $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT)
-                        ];
+                        $clothesPantsArr['sort'] = $order_no_num;
+                        $clothesPantsArr['uuid'] = $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
+                        $data[$item][] = $clothesPantsArr;
                     }
+
+                }
+            }
+            //鞋子
+            foreach ($shoes as $s_k => $s_v) {
+                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$item][$s_k])) { //加到原来的
+                    $shoesArr = $s_v;
+                    $shoesArr['sort'] = $data[$item][$s_k]['sort'];
+                    $shoesArr['uuid'] = $data[$item][$s_k]['uuid'];
+                    $data[$item][$s_k][] = $shoesArr;
+                } else {
+                    $order_no_num++;
+                    $shoesArr = $s_v;
+                    $shoesArr['sort'] = $order_no_num;
+                    $shoesArr['uuid'] = $config['商品负责人'][$s_v['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
+                    $data[$item][$s_k][] = $shoesArr;
 
                 }
 
             }
+
+            //更换店铺 包数更换
             $order_no_num++;
 
         }
+        $return = [];
+        foreach ($data as $item) {
+            foreach ($item as $son) {
+                $return[] = $son;
+            }
+        }
 
-        dd($data);
+        $sort = array_column($return, 'sort');
+        array_multisort($sort, SORT_ASC, $return);
 
+        return $return;
 
     }
+
 
     public function xm_select($data)
     {

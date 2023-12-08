@@ -90,6 +90,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
             var data = JSON.parse(element.attr('lay-data'));
             var genderSelect = xmSelect.render({
                 el: gender,
+                toolbar: {
+                    show: true,
+                    list: ['ALL', 'CLEAR', 'REVERSE']
+                },
                 filterable: true,
                 name: 'Commonfield[]',
                 data: function(){
@@ -175,6 +179,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var genderSelect = xmSelect.render({
                     el: gender,
                     filterable: true,
+                    toolbar: {
+                        show: true,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
                     name: 'Commonfield[]',
                     data: function(){
                         return merge_list_hidden
@@ -407,6 +415,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     var gender = element.find('.Commonfield')[0];
                     var genderSelect = xmSelect.render({
                         el: gender,
+                        toolbar: {
+                            show: true,
+                            list: ['ALL', 'CLEAR', 'REVERSE']
+                        },
                         filterable: true,
                         name: 'Commonfield[]',
                         data: function(){
@@ -615,6 +627,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var gender = element.find('.Commonfield')[0];
                 var genderSelect = xmSelect.render({
                     el: gender,
+                    toolbar: {
+                        show: true,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
                     filterable: true,
                     name: 'Commonfield[]',
                     data: function(){
@@ -817,6 +833,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var gender = element.find('.Commonfield')[0];
                 var genderSelect = xmSelect.render({
                     el: gender,
+                    toolbar: {
+                        show: true,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
                     filterable: true,
                     name: 'Commonfield[]',
                     data: function(){
@@ -1018,6 +1038,10 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                 var gender = element.find('.Commonfield')[0];
                 var genderSelect = xmSelect.render({
                     el: gender,
+                    toolbar: {
+                        show: true,
+                        list: ['ALL', 'CLEAR', 'REVERSE']
+                    },
                     filterable: true,
                     name: 'Commonfield[]',
                     data: function(){

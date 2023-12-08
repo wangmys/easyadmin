@@ -45,10 +45,6 @@ class Excelhandle extends AdminController
 
         if (request()->isAjax()) {
 
-//
-//            $service = $this->service->order_no();
-//
-//            dd($service);
             $param = $this->request->param();
             $where = [];
 
@@ -177,14 +173,19 @@ class Excelhandle extends AdminController
 
         }
 
-        $res = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select();
-
-        $service = $this->service->order_no($res);
+        $res = $this->service->order_no($where);
+        $date = date('Y-m-d');
+        $tag = date('YmdHis');
         $excel_output_data = [];
+        $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
         foreach ($res as $k_res => $v_res) {
-
             $tmp_arr = [
-                'order_no' => $v_res['uuid'],
+                'uuid' => $v_res['uuid'],
+                'date' => $date,
+                'sort' => $v_res['sort'],
+                'CustomItem17' => $config['商品负责人'][$v_res['CustomItem17']] ?? '',
+                'tag' => $tag,
                 'WarehouseCode' => $v_res['WarehouseCode'],
                 'CustomerCode' => $v_res['CustomerCode'],
                 'send_out' => 'Y',
@@ -211,7 +212,6 @@ class Excelhandle extends AdminController
                 ['puhuo_num' => $v_res['Stock_40_puhuo'], 'Size' => $v_res['Stock_40_size']],
                 ['puhuo_num' => $v_res['Stock_42_puhuo'], 'Size' => $v_res['Stock_42_size']],
             ];
-            // print_r([$size_arr,   $wait_goods_info]);die;
             foreach ($size_arr as $k_size_arr => $v_size_arr) {
                 if ($v_size_arr['puhuo_num'] && $v_size_arr['Size']) {
                     $tmp_arr['Size'] = $v_size_arr['Size'];
@@ -221,39 +221,55 @@ class Excelhandle extends AdminController
             }
 
         }
-
-        //相同单号，备注处理
-        $excel_output_data2 = [];
-        $end_output_data = [];
-        if ($excel_output_data) {
-            foreach ($excel_output_data as $v_output_data) {
-                $excel_output_data2[$v_output_data['order_no']][] = $v_output_data;
-            }
-            foreach ($excel_output_data2 as $vv_output_data) {
-                $remarks = array_unique(array_column($vv_output_data, 'remark'));
-                $remarks = $remarks ? implode('/', $remarks) : '';
-                foreach ($vv_output_data as $vvv_output_data) {
-                    $vvv_output_data['remark'] = $remarks;
-                    $end_output_data[] = $vvv_output_data;
+        try {
+            $chunk_list = array_chunk($excel_output_data, 500);
+            if ($chunk_list) {
+                foreach ($chunk_list as $key => $val) {
+                    $this->mysql->table('sp_lyp_puhuo_excel_data')->strict(false)->insertAll($val);
                 }
             }
+        } catch (Exception $e) {
+            dd($e->getMessage());
         }
-        $header = [
-            ['*订单号', 'order_no'],
-            ['*仓库编号', 'WarehouseCode'],
-            ['*店铺编号', 'CustomerCode'],
-            ['*打包后立即发出', 'send_out'],
-            ['*差异出货需二次确认', 're_confirm'],
-            ['*货号', 'GoodsNo'],
-            ['*尺码', 'Size'],
-            ['*颜色编码', 'ColorCode'],
-            ['*铺货数', 'puhuo_num'],
-            ['*状态/1草稿,2预发布,3确定发布', 'status'],
-            ['备注', 'remark'],
+        return $this->success('ok', compact('tag'));
+
+
+    }
+
+
+    public function export_excel_runing($tag)
+    {
+
+        $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
+
+        $where = [
+            ['date', '=', date('Y-m-d')],
+            ['CustomItem17', '=', $data[0]['CustomItem17']],
         ];
+        $count = $this->mysql->table('sp_lyp_puhuo_excel_data')
+            ->where($where)
+            ->group('tag')
+            ->select()->toArray();
+        $count = count($count);
+        if ($data) {
+            $header = [
+                ['*订单号', 'uuid'],
+                ['*仓库编号', 'WarehouseCode'],
+                ['*店铺编号', 'CustomerCode'],
+                ['*打包后立即发出', 'send_out'],
+                ['*差异出货需二次确认', 're_confirm'],
+                ['*货号', 'GoodsNo'],
+                ['*尺码', 'Size'],
+                ['*颜色编码', 'ColorCode'],
+                ['*铺货数', 'puhuo_num'],
+                ['*状态/1草稿,2预发布,3确定发布', 'status'],
+                ['备注', 'remark'],
+            ];
+            return Excel::exportData($data, $header, date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count, 'xlsx');
+        }
 
 
-        return Excel::exportData($end_output_data, $header, date('Ymd') . '_CTY_1', 'xlsx');
+        return 'error';
 
 
     }
