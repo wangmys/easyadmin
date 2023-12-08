@@ -145,6 +145,11 @@
                     <div class="layui-btn layui-btn-normal" id="upload_excel"> 导入excel</div>
                     <div class="layui-btn layui-btn-normal" id="export_excel"> 导出可用库存</div>
                     <div class="layui-btn layui-btn-normal" id="export_excel_all"> 导出全部</div>
+                    {if condition="$runing eq 1"}
+                          <div class="layui-btn layui-btn-danger layui-btn-normal runing" data-status="0" style="margin-left: 10px"> 正在使用中</div>
+                    {else /}
+                          <div class="layui-btn layui-btn-warm runing" data-status="1" style="margin-left: 10px"> 可使用</div>
+                    {/if}
                 </div>
                 <div class="layui-form-item" style="display: flex;justify-content: center;margin-top: 5px">
                     <div id="msg" style="display: none;color: #3FDD86;font-size: 22px;font-weight: 700" >已成功导入,请刷新页面</div>

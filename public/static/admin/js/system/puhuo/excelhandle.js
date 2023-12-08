@@ -11,6 +11,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         url_import: 'import_excel',
         url_export: 'export_excel',
         url_export_runing: 'export_excel_runing',
+        url_runing: 'runing',
     };
 
     var Controller = {
@@ -34,16 +35,27 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 , done: function (res) {
                     layer.closeAll('loading');
                     if (res.code != 0) {
-                        $("#msg").css('color','red');
+                        $("#msg").css('color', 'red');
                         $("#msg").html('上传失败');
                         $("#msg").show();
-                        layer.msg('上传失败！' + res.msg)
+                        layer.msg(res.msg,{time: 2000, icon: 2})
                     } else {
                         $("#msg").show();
                         layer.msg('上传成功，请刷新页面', {time: 2000, icon: 1});
                     }
                 }
             });
+
+            $('body').on('click', '.runing', function (obj) {
+
+                var status = $(this).data('status');
+                $.get(init.url_runing + '?status=' + status, {}, function (res) {
+                    layer.msg('切换成功');
+                    location.reload()
+                })
+
+            })
+
 
             $('body').on('click', '#search', function (obj) {
                 let where = {};
@@ -172,7 +184,14 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 , cols: [
                     [
                         // {type: "checkbox", fixed: 'left'},
-                        {field: 'TimeCategoryName2', title: '季节', align: 'center', fixed: 'left', width: 35,totalRowText: '合计：'}
+                        {
+                            field: 'TimeCategoryName2',
+                            title: '季节',
+                            align: 'center',
+                            fixed: 'left',
+                            width: 35,
+                            totalRowText: '合计：'
+                        }
                         , {field: 'CategoryName1', title: '一级分类', align: 'center', fixed: 'left', width: 55}
                         , {field: 'CategoryName2', title: '二级分类', align: 'center', width: 55}
                         , {field: 'CategoryName', title: '分类', align: 'center', width: 75}
@@ -359,7 +378,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         }
                     }
                         , {field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30,}
-                        , {field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40,totalRow: true}
+                        , {field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40, totalRow: true}
                     ],
 
                 ]
