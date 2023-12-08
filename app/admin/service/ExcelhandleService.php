@@ -35,8 +35,8 @@ class ExcelhandleService
 
         $data = [];
 
-//        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->column('CustomerName');
-        $Customers = ['安康一店', '阿拉尔一店'];
+        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->column('CustomerName');
+//        $Customers = ['安康一店', '阿拉尔一店'];
         $order_no_num = 1;
         $gg = Db::connect('mysql')->table('sp_lyp_puhuo_excel')->where(1)->find();
 
