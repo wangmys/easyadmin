@@ -14,6 +14,7 @@ use think\App;
 use think\Exception;
 use think\facade\Cache;
 use think\facade\Db;
+use think\facade\Log;
 
 /**
  * Class Excel
@@ -172,8 +173,6 @@ class Excelhandle extends AdminController
             ];
 
         }
-
-
         $res = $this->service->order_no($where);
         $date = date('Y-m-d');
         $tag = date('YmdHis');
@@ -197,7 +196,7 @@ class Excelhandle extends AdminController
                 'uuid' => $v_res['uuid'],
                 'date' => $date,
                 'sort' => $v_res['sort'],
-                'CustomItem17' => $config['商品负责人'][$v_res['CustomItem17']] ?? '',
+                'CustomItem17' => $v_res['CustomItem17'],
                 'tag' => $tag,
                 'WarehouseCode' => $v_res['WarehouseCode'],
                 'CustomerCode' => $v_res['CustomerCode'],
