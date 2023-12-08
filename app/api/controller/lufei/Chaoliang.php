@@ -98,7 +98,7 @@ class Chaoliang extends BaseController
         } else {
             $天数 = 14;
         }
-        $sql = "
+        echo $sql = "
             SELECT
                 t.*,
                 round(t.`预计00/28/37/44/100/160/S` / t.`平均每日销量00/28/37/44/100/160/S`, 1) as `周转00/28/37/44/100/160/S`,
@@ -154,17 +154,20 @@ class Chaoliang extends BaseController
                     lz.`38/7XL` AS `两周销38/7XL`,
                     lz.`_40` AS `两周销_40`,
                     lz.`合计` AS 两周销合计,
+
                     CASE
                         WHEN lz.上市天数 >= {$天数} THEN lz.`00/28/37/44/100/160/S` / {$天数} * 7 
                         WHEN lz.上市天数 < {$天数} THEN lz.`00/28/37/44/100/160/S` / lz.上市天数 * 7 
                     END AS `平均每日销量00/28/37/44/100/160/S`, 
+
+
                     CASE
                         WHEN lz.上市天数 >= {$天数} THEN lz.`29/38/46/105/165/M` / {$天数} * 7 
                         WHEN lz.上市天数 < {$天数} THEN lz.`29/38/46/105/165/M` / lz.上市天数 * 7 
                     END AS `平均每日销量29/38/46/105/165/M`, 	
                     CASE
                         WHEN lz.上市天数 >= {$天数} THEN lz.`30/39/48/110/170/L` / {$天数} * 7 
-                        WHEN lz.上市天数 < {$天数} THEN lz.`30/39/48/110/170/L` / {$天数}.上市天数 * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`30/39/48/110/170/L` / lz.上市天数 * 7 
                     END AS `平均每日销量30/39/48/110/170/L`, 
                     CASE
                         WHEN lz.上市天数 >= {$天数} THEN lz.`31/40/50/115/175/XL` / {$天数} * 7 
@@ -207,7 +210,7 @@ class Chaoliang extends BaseController
                 WHERE
                     sk.季节 IN ( {$seasion} )
                     AND c.Region <> '闭店区' 
-                    AND sk.店铺名称 NOT IN ( '' ) --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
+                    AND sk.店铺名称 NOT IN ( '' )
                     
                     AND sk.年份 >= 2023 
                     AND sk.一级分类 IN ('内搭', '外套', '下装', '鞋履')
@@ -219,7 +222,7 @@ class Chaoliang extends BaseController
                 ) AS t
         ";
 
-		
+		die;
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);
 
