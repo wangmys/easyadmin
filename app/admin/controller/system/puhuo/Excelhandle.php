@@ -174,6 +174,8 @@ class Excelhandle extends AdminController
         }
 
         $res = $this->service->order_no($where);
+
+        dd($res);
         $date = date('Y-m-d');
         $tag = date('YmdHis');
         $excel_output_data = [];
@@ -212,7 +214,6 @@ class Excelhandle extends AdminController
                 ['puhuo_num' => $v_res['Stock_40_puhuo'], 'Size' => $v_res['Stock_40_size']],
                 ['puhuo_num' => $v_res['Stock_42_puhuo'], 'Size' => $v_res['Stock_42_size']],
             ];
-            // print_r([$size_arr,   $wait_goods_info]);die;
             foreach ($size_arr as $k_size_arr => $v_size_arr) {
                 if ($v_size_arr['puhuo_num'] && $v_size_arr['Size']) {
                     $tmp_arr['Size'] = $v_size_arr['Size'];
@@ -222,26 +223,8 @@ class Excelhandle extends AdminController
             }
 
         }
-
-        //相同单号，备注处理
-        $excel_output_data2 = [];
-        $end_output_data = [];
-        if ($excel_output_data) {
-            foreach ($excel_output_data as $v_output_data) {
-                $excel_output_data2[$v_output_data['uuid']][] = $v_output_data;
-            }
-            foreach ($excel_output_data2 as $vv_output_data) {
-                $remarks = array_unique(array_column($vv_output_data, 'remark'));
-                $remarks = $remarks ? implode('/', $remarks) : '';
-                foreach ($vv_output_data as $vvv_output_data) {
-                    $vvv_output_data['remark'] = $remarks;
-                    $end_output_data[] = $vvv_output_data;
-                }
-            }
-        }
-
         try {
-            $chunk_list = array_chunk($end_output_data, 500);
+            $chunk_list = array_chunk($excel_output_data, 500);
             if ($chunk_list) {
                 foreach ($chunk_list as $key => $val) {
                     $this->mysql->table('sp_lyp_puhuo_excel_data')->strict(false)->insertAll($val);

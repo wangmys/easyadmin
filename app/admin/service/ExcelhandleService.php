@@ -34,8 +34,7 @@ class ExcelhandleService
         $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
         $data = [];
-
-        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->column('CustomerName');
+        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->group('CustomerName')->column('CustomerName');
 //        $Customers = ['安康一店', '阿拉尔一店'];
         $order_no_num = 1;
         $gg = Db::connect('mysql')->table('sp_lyp_puhuo_excel')->where(1)->find();
@@ -50,6 +49,7 @@ class ExcelhandleService
                 $order_no_num = (int)$sortDb + 1;
             }
         }
+
         foreach ($Customers as $key => $item) {
 
             $cus_num = 1; //店铺包数
