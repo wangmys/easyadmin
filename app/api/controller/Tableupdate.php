@@ -2550,4 +2550,185 @@ class Tableupdate extends BaseController
         ";
         $this->db_easyA->execute($sql);
     }
+
+    // 一周销 sjp_yizhou
+    public function yizhouxiao() {
+        $sql = "
+                SELECT
+                -- CONVERT(VARCHAR(10),GETDATE()-7,23) as t1,
+                -- CONVERT(VARCHAR(10),GETDATE()-1,23) as t2,
+                    T1.CustomItem15 AS 云仓,
+                    T1.CustomerName AS 店铺名称,
+                    T1.[货号],
+                    T2.[00/28/37/44/100/160/S],
+                    T2.[29/38/46/105/165/M],
+                    T2.[30/39/48/110/170/L],
+                    T2.[31/40/50/115/175/XL],
+                    T2.[32/41/52/120/180/2XL],
+                    T2.[33/42/54/125/185/3XL],
+                    T2.[34/43/56/190/4XL],
+                    T2.[35/44/58/195/5XL],
+                    T2.[36/6XL],
+                    T2.[38/7XL],
+                    T2.[40] AS _40,
+                    T2.合计,
+                    T2.金额,
+                    T2.CustomerGrade AS 店铺等级,
+                    CONVERT(VARCHAR(10),T1.StockDate,23) AS 上市时间,
+                    DATEDIFF(day, T1.StockDate, GETDATE()) AS 上市天数
+                    
+                FROM
+                (
+                SELECT 
+                    T.CustomItem15,
+                    T.CustomerName,
+                    T.[货号],
+                    MIN(T.StockDate) AS StockDate
+                FROM 
+                (
+                SELECT 
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo AS 货号,
+                    MIN(ECS.StockDate) AS StockDate
+                FROM ErpCustomerStock ECS
+                LEFT JOIN ErpGoods EG ON ECS.GoodsId=EG.GoodsId
+                LEFT JOIN ErpCustomer EC ON ECS.CustomerId=EC.CustomerId
+                WHERE ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
+                                OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
+                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                    AND EC.ShutOut=0
+                    AND EC.MathodId IN (4,7)
+                GROUP BY 
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo
+                
+                UNION ALL
+                SELECT 
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    MIN(ES.CreateTime)
+                FROM ErpCustomer EC
+                LEFT JOIN ErpSorting ES ON EC.CustomerId=ES.CustomerId
+                LEFT JOIN ErpSortingGoods ESG ON ES.SortingID=ESG.SortingID
+                LEFT JOIN ErpGoods EG ON ESG.GoodsId=EG.GoodsId
+                WHERE EC.ShutOut=0
+                    AND EC.MathodId IN (4,7)
+                    AND ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
+                                OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ))
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                GROUP BY 
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo
+                    
+                UNION ALL 
+                SELECT
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    MIN(EI.CreateTime)
+                FROM ErpCustomer EC 
+                JOIN ErpInstruction EI ON EC.CustomerId= EI.InItemId
+                JOIN ErpInstructionGoods EIG ON EI.InstructionId= EIG.InstructionId
+                JOIN ErpGoods EG ON EIG.GoodsId= EG.GoodsId
+                WHERE EC.MathodId IN (4,7)
+                    AND EC.ShutOut=0
+                    AND ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
+                                OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
+                    AND EG.CategoryName1 IN ('内搭','外套','鞋履','下装')
+                    AND EI.Type=4
+                    AND EI.CodingCodeText='已审结'
+                    AND EI.OutBillId!=''
+                    AND EI.InBillId=''	
+                GROUP BY
+                    EC.CustomItem15,
+                    EC.CustomerName,
+                    EG.GoodsNo
+                ) T
+                GROUP BY 
+                    T.CustomItem15,
+                    T.CustomerName,
+                    T.[货号]
+                ) T1
+                LEFT JOIN 
+                (
+                SELECT 
+                    T.CustomItem15,
+                    T.CustomerName,
+                    T.GoodsNo,
+                    SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE NULL END ) AS  [00/28/37/44/100/160/S],
+                    SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE NULL END ) AS  [29/38/46/105/165/M],
+                    SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE NULL END ) AS  [30/39/48/110/170/L],
+                    SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE NULL END ) AS  [31/40/50/115/175/XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE NULL END ) AS  [32/41/52/120/180/2XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE NULL END ) AS  [33/42/54/125/185/3XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE NULL END ) AS  [34/43/56/190/4XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE NULL END ) AS  [35/44/58/195/5XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE NULL END ) AS  [36/6XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE NULL END ) AS  [38/7XL],
+                    SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE NULL END ) AS  [40],
+                    SUM(T.Quantity) AS 合计,
+                    SUM(T.[金额]) AS 金额,
+                    T.CustomerGrade
+                FROM
+                (
+                SELECT 
+                    EC.CustomItem15,
+                    EC.CustomerGrade,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    ERGD.SizeId,
+                    SUM(ERGD.Quantity) AS Quantity,
+                    SUM(ERGD.Quantity*ERG.DiscountPrice) AS 金额
+                FROM ErpCustomer EC 
+                LEFT JOIN ErpRetail ER ON EC.CustomerId=ER.CustomerId
+                LEFT JOIN ErpRetailGoods ERG ON ER.RetailID=ERG.RetailID
+                LEFT JOIN ErpRetailGoodsDetail ERGD ON ERG.RetailGoodsID=ERGD.RetailGoodsID
+                LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+                WHERE EC.ShutOut=0
+                    AND EC.MathodId IN (4,7)
+                    AND ER.CodingCodeText='已审结'
+                    AND ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
+                                OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
+                    AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
+                    AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR(10),GETDATE()-7,23)	AND CONVERT(VARCHAR(10),GETDATE()-1,23)
+                GROUP BY
+                    EC.CustomItem15,
+                    EC.CustomerGrade,
+                    EC.CustomerName,
+                    EG.GoodsNo,
+                    ERGD.SizeId
+                ) T
+                LEFT JOIN ErpBaseGoodsSize EBGS ON T.SizeId=EBGS.SizeId
+                WHERE EBGS.IsEnable=1
+                GROUP BY
+                    T.CustomItem15,
+                    T.CustomerName,
+                    T.GoodsNo,
+                    T.CustomerGrade
+                ) T2 ON T1.CustomerName=T2.CustomerName AND T1.[货号]=T2.GoodsNo
+                WHERE T2.[合计] <>0;
+        ";
+
+        $select = $this->db_sqlsrv->query($sql);
+        // dump($select);die;
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE sjp_yizhou;');
+
+            $select_chunk = array_chunk($select, 500);
+    
+            foreach($select_chunk as $key => $val) {
+                $status = $this->db_easyA->table('sjp_yizhou')->insertAll($val);
+            }
+            // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
+            return json([
+                'status' => 1,
+                'msg' => 'success',
+                'content' => 'sjp_yizhou 更新成功！'
+            ]);
+        }
+    }
 }

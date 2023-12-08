@@ -70,7 +70,7 @@ class Chaoliang extends BaseController
             UPDATE cwl_chaoliang_biaozhun
                 SET
                     `单码量合计` = 
-                        IFNULL(`单码量00/28/37/44/100/160/S`, 0)
+                        round((IFNULL(`单码量00/28/37/44/100/160/S`, 0)
                         + IFNULL(`单码量29/38/46/105/165/M`, 0) 
                         + IFNULL(`单码量30/39/48/110/170/L`, 0) 
                         + IFNULL(`单码量31/40/50/115/175/XL`, 0)
@@ -80,7 +80,7 @@ class Chaoliang extends BaseController
                         + IFNULL(`单码量35/44/58/195/5XL`, 0) 
                         + IFNULL(`单码量36/6XL`, 0) 
                         + IFNULL(`单码量38/7XL`, 0) 
-                        + IFNULL(`单码量_40`, 0),
+                        + IFNULL(`单码量_40`, 0) ) * 1.5, 0)  ,
                     `周转合计` = 6    
                 WHERE 1
         ";
@@ -92,6 +92,12 @@ class Chaoliang extends BaseController
         $select_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
         $seasion = $this->seasionHandle($select_config['季节归集']); 
 
+        // 一周销：sjp_yizhou  两周销：sjp_liangzhou
+        if ($select_config['周销'] == 'sjp_yizhou') {
+            $天数 = 7;
+        } else {
+            $天数 = 14;
+        }
         $sql = "
             SELECT
                 t.*,
@@ -149,53 +155,53 @@ class Chaoliang extends BaseController
                     lz.`_40` AS `两周销_40`,
                     lz.`合计` AS 两周销合计,
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`00/28/37/44/100/160/S` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`00/28/37/44/100/160/S` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`00/28/37/44/100/160/S` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`00/28/37/44/100/160/S` / lz.上市天数 * 7 
                     END AS `平均每日销量00/28/37/44/100/160/S`, 
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`29/38/46/105/165/M` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`29/38/46/105/165/M` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`29/38/46/105/165/M` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`29/38/46/105/165/M` / lz.上市天数 * 7 
                     END AS `平均每日销量29/38/46/105/165/M`, 	
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`30/39/48/110/170/L` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`30/39/48/110/170/L` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`30/39/48/110/170/L` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`30/39/48/110/170/L` / {$天数}.上市天数 * 7 
                     END AS `平均每日销量30/39/48/110/170/L`, 
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`31/40/50/115/175/XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`31/40/50/115/175/XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`31/40/50/115/175/XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`31/40/50/115/175/XL` / lz.上市天数 * 7 
                     END AS `平均每日销量31/40/50/115/175/XL`, 
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`32/41/52/120/180/2XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`32/41/52/120/180/2XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`32/41/52/120/180/2XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`32/41/52/120/180/2XL` / lz.上市天数 * 7 
                     END AS `平均每日销量32/41/52/120/180/2XL`, 
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`33/42/54/125/185/3XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`33/42/54/125/185/3XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`33/42/54/125/185/3XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`33/42/54/125/185/3XL` / lz.上市天数 * 7 
                     END AS `平均每日销量33/42/54/125/185/3XL`, 
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`34/43/56/190/4XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`34/43/56/190/4XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`34/43/56/190/4XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`34/43/56/190/4XL` / lz.上市天数 * 7 
                     END AS `平均每日销量34/43/56/190/4XL`, 	
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`35/44/58/195/5XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`35/44/58/195/5XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`35/44/58/195/5XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`35/44/58/195/5XL` / lz.上市天数 * 7 
                     END AS `平均每日销量35/44/58/195/5XL`, 	
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`36/6XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`36/6XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`36/6XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`36/6XL` / lz.上市天数 * 7 
                     END AS `平均每日销量36/6XL`, 	
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`38/7XL` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`38/7XL` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`38/7XL` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`38/7XL` / lz.上市天数 * 7 
                     END AS `平均每日销量38/7XL`, 	
                     CASE
-                        WHEN lz.上市天数 >= 14 THEN lz.`_40` / 14 * 7 
-                        WHEN lz.上市天数 < 14 THEN lz.`_40` / lz.上市天数 * 7 
+                        WHEN lz.上市天数 >= {$天数} THEN lz.`_40` / {$天数} * 7 
+                        WHEN lz.上市天数 < {$天数} THEN lz.`_40` / lz.上市天数 * 7 
                     END AS `平均每日销量_40`															
                 FROM
                     `sp_sk` AS sk
                     RIGHT JOIN customer AS c ON sk.店铺名称 = c.CustomerName
-                    LEFT JOIN sjp_liangzhou AS lz ON sk.云仓 = lz.云仓 
+                    LEFT JOIN {$select_config['周销']} AS lz ON sk.云仓 = lz.云仓 
                     AND sk.店铺名称 = lz.店铺名称 
                     AND sk.货号 = lz.货号 
                 WHERE
@@ -212,6 +218,7 @@ class Chaoliang extends BaseController
              	-- LIMIT 1000 
                 ) AS t
         ";
+
 		
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);

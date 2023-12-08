@@ -42,7 +42,8 @@ class Baokuan extends BaseController
                 1000000
                 EC.State as 省份,
                 EC.CustomItem36 as 温区,
-                EG.GoodsNo  AS 货号,
+                EG.GoodsNo AS 货号,
+                EG.GoodsId,
                 EG.GoodsName AS 货品名称,
                 EG.TimeCategoryName1 AS 年份,
                 CASE
@@ -100,6 +101,7 @@ class Baokuan extends BaseController
                 AND EG.StyleCategoryName in ( '基本款', '引流款')               
             GROUP BY
                 EG.GoodsNo
+                ,EG.GoodsId
                 ,EC.State
                 ,EG.GoodsName
                 ,EC.CustomItem36
@@ -366,17 +368,15 @@ class Baokuan extends BaseController
                 and m1.货号=m2.货号
         ";
         $this->db_easyA->execute($sql_分组排名);
+
+        $sql_排名展示 = "update cwl_baokuan_7day set use3 = '是' where 排名 <= 6";
+        $this->db_easyA->execute($sql_排名展示);
     }
 
     // 更新图片路径
-    public function handle_2() {
+    public function fifth() {
         $sql_TOP = "
-            SELECT
-                GoodsId 
-            FROM
-                `cwl_cgzdt_caigoushouhuo` 
-            WHERE
-                TOP = 'Y'
+            SELECT GoodsId FROM `cwl_baokuan_7day` where 排名 is not null group by 货号
         ";
         $select_TOP = $this->db_easyA->query($sql_TOP);
         $goodsId = '';
@@ -396,14 +396,17 @@ class Baokuan extends BaseController
             WHERE
                 GoodsId IN ( {$goodsId} )
         ";
-        $select_图片 = $this->db_sqlsrv->query($sql_图片);
-        $select_data = $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->field('GoodsId')->where(['TOP' => 'Y'])->select();
 
-        foreach ($select_data as $k1 => $v1) {
+        // die;
+        $select_图片 = $this->db_sqlsrv->query($sql_图片);
+        
+        // $select_data = $this->db_easyA->table('cwl_baokuan_7day')->field('GoodsId')->where(['TOP' => 'Y'])->select();
+
+        foreach ($select_TOP as $k1 => $v1) {
             foreach ($select_图片 as $k2 => $v2) {
                 if ($v1['GoodsId'] == $v2['GoodsId']) {
-                    $this->db_easyA->table('cwl_cgzdt_caigoushouhuo')->where(['GoodsId' => $v1['GoodsId']])->update([
-                        '图片路径' => $v2['Img']
+                    $this->db_easyA->table('cwl_baokuan_7day')->where(['GoodsId' => $v1['GoodsId']])->update([
+                        'path' => $v2['Img']
                     ]);
                     break;
                 }
