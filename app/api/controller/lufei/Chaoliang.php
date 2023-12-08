@@ -98,7 +98,7 @@ class Chaoliang extends BaseController
         } else {
             $天数 = 14;
         }
-        echo $sql = "
+        $sql = "
             SELECT
                 t.*,
                 round(t.`预计00/28/37/44/100/160/S` / t.`平均每日销量00/28/37/44/100/160/S`, 1) as `周转00/28/37/44/100/160/S`,
@@ -222,7 +222,7 @@ class Chaoliang extends BaseController
                 ) AS t
         ";
 
-		die;
+		// die;
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);
 
