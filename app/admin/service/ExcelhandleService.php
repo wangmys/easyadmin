@@ -46,16 +46,19 @@ class ExcelhandleService
 
         }
 
-        foreach ($CustomersKV as $cus => $item) {
-
+        foreach ($CustomItem17Arr as $item) {
             $sortWhere = [
-                'CustomItem17' => $item['CustomItem17'],
+                'CustomItem17' => $item,
                 'date' => date('Y-m-d')
             ];
             $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
             if ($sortDb) {
-                $numArr[$item['CustomItem17']] = (int)$sortDb + 1;
+                $numArr[$item] = (int)$sortDb + 1;
             }
+        }
+
+        foreach ($CustomersKV as $cus => $item) {
+
             $cus_num = 1; //店铺包数
             $yk_con = isset($config['特殊店铺'][$cus]['YK']) ? $config['特殊店铺'][$cus]['YK'] : $config['衣裤'];
             $xl_con = isset($config['特殊店铺'][$cus]['XZ']) ? $config['特殊店铺'][$cus]['XZ'] : $config['鞋子'];
