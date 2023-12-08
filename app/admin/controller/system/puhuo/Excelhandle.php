@@ -179,6 +179,18 @@ class Excelhandle extends AdminController
         $excel_output_data = [];
         $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
         $config['商品负责人'] = json_decode($config['商品负责人'], true);
+
+        $remarkArr = [];
+        foreach ($res as $item) {
+            $str = $item['CategoryName1'] ? mb_substr($item['CategoryName1'], 0, 1) : '';
+            if (!isset($remarkArr[$item['sort']])) {
+                $remarkArr[$item['sort']] = [];
+            }
+            if (!in_array($str, $remarkArr[$item['sort']])) {
+                $remarkArr[$item['sort']][] = $str;
+            }
+        }
+
         foreach ($res as $k_res => $v_res) {
             $tmp_arr = [
                 'uuid' => $v_res['uuid'],
@@ -191,11 +203,11 @@ class Excelhandle extends AdminController
                 'send_out' => 'Y',
                 're_confirm' => 'Y',
                 'GoodsNo' => $v_res['GoodsNo'],
-                'Size' => '',//
+                'Size' => '',
                 'ColorCode' => $v_res['ColorCode'],
-                'puhuo_num' => 0,//
+                'puhuo_num' => 0,
                 'status' => 2,
-                'remark' => $v_res['CategoryName1'] ? mb_substr($v_res['CategoryName1'], 0, 1) : '',
+                'remark' => implode('/', $remarkArr[$v_res['sort']]),
             ];
 
             $size_arr = [
