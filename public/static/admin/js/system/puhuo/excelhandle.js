@@ -16,7 +16,6 @@ define(["jquery", "easy-admin"], function ($, ea) {
     var Controller = {
 
         index: function () {
-
             //excel转换
             //指定允许上传的文件类型
             upload.render({
@@ -34,15 +33,17 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 }
                 , done: function (res) {
                     layer.closeAll('loading');
-                    console.log('res:....', res);
                     if (res.code != 0) {
+                        $("#msg").css('color','red');
+                        $("#msg").html('上传失败');
+                        $("#msg").show();
                         layer.msg('上传失败！' + res.msg)
                     } else {
+                        $("#msg").show();
                         layer.msg('上传成功，请刷新页面', {time: 2000, icon: 1});
                     }
                 }
             });
-
 
             $('body').on('click', '#search', function (obj) {
                 let where = {};
