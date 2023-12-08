@@ -37,9 +37,19 @@ class ExcelhandleService
 
 //        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->column('CustomerName');
         $Customers = ['安康一店', '阿拉尔一店'];
-
-        $date = date('Y-m-d');
         $order_no_num = 1;
+        $gg = Db::connect('mysql')->table('sp_lyp_puhuo_excel')->where(1)->find();
+
+        if (!empty($gg)) {
+            $sortWhere = [
+                'CustomItem17' => $config['商品负责人'][$gg['CustomItem17']],
+                'date' => date('Y-m-d')
+            ];
+            $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
+            if ($sortDb) {
+                $order_no_num = (int)$sortDb + 1;
+            }
+        }
         foreach ($Customers as $key => $item) {
 
             $cus_num = 1; //店铺包数
@@ -51,19 +61,6 @@ class ExcelhandleService
             $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->where('CategoryName1', '鞋履')->select()->toArray();
             $total = 0; //总件数
             //处理衣裤
-
-            $gg = $clothesPants ? $clothesPants : $shoes;
-            if ($gg) {
-                $sortWhere = [
-                    'CustomItem17' => $config['商品负责人'][$gg[0]['CustomItem17']],
-                    'date' => $date
-                ];
-                $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
-                if ($sortDb) {
-                    $order_no_num = (int)$sortDb + 1;
-                }
-            }
-
 
             foreach ($clothesPants as $cp_v) {
                 $clothesPantsArr = $cp_v;
