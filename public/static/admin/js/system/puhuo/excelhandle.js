@@ -67,7 +67,12 @@ define(["jquery", "easy-admin"], function ($, ea) {
 
             $('body').on('click', '#export_excel_all', function (obj) {
 
-                location.href = init.url_export + '?all=1';
+                layer.load('加载中');
+                $.get(init.url_export + '?all=1', {}, function (res) {
+                    location.href = init.url_export_runing + '?tag=' + res.data.tag;
+                    layer.closeAll('loading');
+                })
+
             })
 
             $.get('xm_select', {}, function (data) {
