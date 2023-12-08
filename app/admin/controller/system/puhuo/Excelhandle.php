@@ -261,21 +261,35 @@ class Excelhandle extends AdminController
 
         $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
 
-
-        $header = [
-            ['*订单号', 'uuid'],
-            ['*仓库编号', 'WarehouseCode'],
-            ['*店铺编号', 'CustomerCode'],
-            ['*打包后立即发出', 'send_out'],
-            ['*差异出货需二次确认', 're_confirm'],
-            ['*货号', 'GoodsNo'],
-            ['*尺码', 'Size'],
-            ['*颜色编码', 'ColorCode'],
-            ['*铺货数', 'puhuo_num'],
-            ['*状态/1草稿,2预发布,3确定发布', 'status'],
-            ['备注', 'remark'],
+        $where = [
+            ['date', '=', date('Y-m-d')],
+            ['CustomItem17', '=', $data[0]['CustomItem17']],
         ];
-        return Excel::exportData($data, $header, date('Ymd') . '_CTY_1', 'xlsx');
+        $count = $this->mysql->table('sp_lyp_puhuo_excel_data')
+            ->where($where)
+            ->group('tag')
+            ->select()->toArray();
+        $count = count($count);
+        if ($data) {
+            $header = [
+                ['*订单号', 'uuid'],
+                ['*仓库编号', 'WarehouseCode'],
+                ['*店铺编号', 'CustomerCode'],
+                ['*打包后立即发出', 'send_out'],
+                ['*差异出货需二次确认', 're_confirm'],
+                ['*货号', 'GoodsNo'],
+                ['*尺码', 'Size'],
+                ['*颜色编码', 'ColorCode'],
+                ['*铺货数', 'puhuo_num'],
+                ['*状态/1草稿,2预发布,3确定发布', 'status'],
+                ['备注', 'remark'],
+            ];
+            return Excel::exportData($data, $header, date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count, 'xlsx');
+        }
+
+
+        return 'error';
+
 
     }
 
