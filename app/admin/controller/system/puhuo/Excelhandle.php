@@ -174,8 +174,6 @@ class Excelhandle extends AdminController
         }
 
         $res = $this->service->order_no($where);
-
-        dd($res);
         $date = date('Y-m-d');
         $tag = date('YmdHis');
         $excel_output_data = [];
