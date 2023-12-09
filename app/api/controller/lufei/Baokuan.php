@@ -134,7 +134,8 @@ class Baokuan extends BaseController
             update cwl_baokuan_7day as m
             left join sp_ww_hpzl as h on m.大类 = h.一级分类 and m.中类=h.二级分类 and m.分类=h.分类 and m.货号=h.货号
             set
-                m.零售单价 = h.零售价
+                m.零售单价 = h.零售价,
+                m.颜色 = h.颜色
             where
                 m.零售单价 is null
         ";

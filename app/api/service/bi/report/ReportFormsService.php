@@ -2116,7 +2116,9 @@ class ReportFormsService
     public function create_table_s045(){
         // $arr = '广东省','广西壮族自治区','江西省','湖北省','湖南省','贵州省';
         $code ='S045';
-        $date_ = date('Y-m-d');
+        echo $date_ = date('Y-m-d');
+
+        die;
         $start = date("Y-m-d", strtotime( "$date_ -1 day"));
         $data_date = date("Y-m-d", strtotime( "-7 day"));
         $date_arr = getDateFromRange_m($data_date,$start);
