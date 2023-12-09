@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1">
+    <title>{$select[0]['省份']}-{$select[0]['温区']}-爆款</title>
+    <!-- head 中 -->
+    
+    <!--引入css样式文件-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.css"/>
+    <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.0/css/jquery-weui.min.css">     -->
+    <link rel="stylesheet" href="__STATIC__/admin/css/phone_common.css" />
+    <link rel="stylesheet" href="__STATIC__/admin/css/dd_baokuan.css" />
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css?v=1">
+    <link rel="stylesheet" href="__STATIC__/admin/css/honeySwitch.css?v=2">
+
+    <script>
+        setRem();
+        // 横屏竖屏适配
+        window.addEventListener('orientationchange', setRem);
+        window.addEventListener('resize', setRem);
+        function setRem() {
+            var html = document.querySelector('html');
+            var width = html.getBoundingClientRect().width;
+            html.style.fontSize = width / 16 + 'px';
+        }
+
+    </script>
+</head>
+<body >
+    <section class="wrap">
+        <!-- <div class="page">
+            <div class="page__hd">
+                <h1 class="page__title">Picker</h1>
+                <p class="page__desc">多列选择器，需要配合js实现</p>
+            </div>
+            <div class="page__bd page__bd_spacing">
+                <a href="javascript:" role="button" class="weui-btn weui-btn_default" id="showPicker">单列选择器</a>
+                <a href="javascript:" role="button" class="weui-btn weui-btn_default" id="showDatePicker">日期选择器</a>
+            </div>
+        </div>     -->
+        <div class="menu flex row around">
+            <button class="niceButton" id="jj">季节</button>
+            <button class="niceButton" id="yjfl">大类</button>
+            <button class="niceButton" id="ejfl">中类</button>
+            <button class="niceButton" id="hh">货号</button>
+            <button class="niceButton2" id="reset">重置筛选</button>
+        </div>
+        <div class="space"></div>
+        {php} if (! empty($select)) { {/php}
+
+
+            {volist name="select" id="vo"}
+                <div class="category flex row between" >
+                    <div></div>
+                    <div><a style="font-weight: bold; color: rgb(245, 0, 0);">No.{$vo['排名']}</a></div>
+                    <!-- <div></div> -->
+                </div>
+                <div class="content shadow flex col">
+                    <div class="head flex" style="background-color: rgb(30, 125, 250); font-weight: bold;">
+                        <a style="color:rgb(254, 252, 255); font-weight: bold;">&nbsp;{$vo['大类']} - {$vo['中类']}</a>
+                    </div>
+                    <div class="title flex row">    
+                        <div class="left flex row">
+                            <div class="left_1">
+                                <div class="item" style="background-color: yellow;"><a style="color:red; font-weight: bold;">爆款指数：</a></div>
+                                <div class="item">货品名称：</div>
+                                <div class="item">季节归集：</div>
+                                <div class="item">风格：</div>
+                                <div class="item" style="color:rgb(0, 4, 255); font-weight: bold;">货号：</div>
+                                <div class="item" style="color:red;background-color: yellow;font-weight: bold;">颜色：</div>
+                                <div class="item">零售价：</div>
+                                
+                            </div>
+                            <div class="left_2">
+                                <div class="item" style="background-color: yellow;"><a style="color:red; font-weight: bold; font-size: 16px;">
+                                {php} if ($vo['排名'] == 1) { {/php}
+                                    ★★★★★★
+                                {php} } elseif ($vo['排名'] == 2) { {/php}
+                                    ★★★★★
+                                {php} } elseif ($vo['排名'] == 3) { {/php}
+                                    ★★★★
+                                {php} } elseif ($vo['排名'] == 4) { {/php}
+                                    ★★★
+                                {php} } elseif ($vo['排名'] == 5) { {/php}
+                                    ★★
+                                {php} } elseif ($vo['排名'] == 6) { {/php}
+                                    ★
+                                {php} } {/php}
+                                </a></div>
+                                <div class="item">{$vo['货品名称']}</div>
+                                <div class="item">{$vo['季节归集']}</div>
+                                <div class="item">{$vo['风格']}</div>
+                                <div class="item" style="color:rgb(0, 4, 255); font-weight: bold;">{$vo['货号']}</div>
+                                <div class="item" style="color:red;background-color: yellow;font-weight: bold;">{$vo['颜色']}</div>
+                                <div class="item">{$vo['零售单价']}</div>
+                                
+                            </div>
+                        </div>
+                        <div class="right">
+                            <img src="{$vo['path']}" alt="" onclick="viewImg(this)">
+                        </div>
+                    </div>
+                </div>
+            {/volist}
+        {php} } else { {/php}
+            <div class="nodata flex">没有数据了，换个筛选条件试试 (>_<) </div>    
+        {php} } {/php}
+    </section>
+    <!--遮罩层-->
+    <!-- <div class="window" style="position: absolute; top: 0; left: 0; background-color:rgba(255,255,255,0.8); width: 100%; height: 100%; z-index: 90; display: block;"></div> -->
+    <div class="window" onclick="closeImg(this)">
+        <img src="https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71106001.jpg"  alt="" id="windowImg">
+    </div>
+    <div class="window2">
+       
+    </div>
+</body>
+</html>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script type="text/javascript" src="__STATIC__/admin/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="__STATIC__/admin/js/honeySwitch.js"></script>
+
+<!-- <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/jquery-weui.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/swiper.min.js"></script> -->
+
+<!-- <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script> -->
+<!-- <script src="https://cdn.bootcss.com/jquery-weui/1.2.0/js/city-picker.min.js"></script> -->
+
+
+<!--引入微信的两个js-->
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--weui.min.js有版本之分，在低版本的js中有些功能不完善，在高版本会支持-->
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+<!-- <script src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script> -->
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+</script>
+<script>
+
+
+$(function() {
+    var statusHandle = "{:url('admin/system.dingding.Baokuan/statusHandle')}";
+    var url_getXmMapSelect = "{:url('admin/system.dingding.Baokuan/getXmMapSelect_mobile')}";
+    var uid = '';
+    var customerName = '{$customerName}';
+    var yjfl_val = '大类';
+    var ejfl_val = '中类';
+    var hh_val = '货号';
+    var jj_val = '季节';
+    // var switch_status = null;
+    var yjfl = [
+        {
+            label: '全选',
+            value: '大类'
+        }, {
+            label: '内搭',
+            value: '内搭'
+        }, {
+            label: '外套',
+            value: '外套'
+        }, {
+            label: '下装',
+            value: '下装'
+        },{
+            label: '鞋履',
+            value: '鞋履'
+        }
+    ];
+    var ejfl = [
+    ];
+    var hh = [
+    ];
+    var jj = [
+        // {
+        //     label: '全选',
+        //     value: '季节'
+        // }, {
+        //     label: '春季',
+        //     value: '春季'
+        // }, {
+        //     label: '夏季',
+        //     value: '夏季'
+        // }, {
+        //     label: '秋季',
+        //     value: '秋季'
+        // },{
+        //     label: '冬季',
+        //     value: '冬季'
+        // }
+    ];
+    var url = "{$url}";
+    setMenuNameFn();
+    initFn();
+    
+
+    // 设置按钮名称
+    function setMenuNameFn() {
+        yjfl_val = getUrlParam('大类') ? getUrlParam('大类') : yjfl_val
+        ejfl_val = getUrlParam('中类') ? getUrlParam('中类') : ejfl_val
+        hh_val = getUrlParam('货号') ? getUrlParam('货号') : hh_val
+        jj_val = getUrlParam('季节归集') ? getUrlParam('季节归集') : jj_val
+        $('#yjfl').text(yjfl_val);
+        $('#ejfl').text(ejfl_val);
+        $('#hh').text(hh_val);
+        $('#jj').text(jj_val);
+        // console.log(jj_val);
+    }
+
+    function initFn() {
+        $.get(url_getXmMapSelect, {customerName: customerName, '季节归集': jj_val, '大类': yjfl_val, '中类': ejfl_val, '货号':hh_val}, function(res) {
+            yjfl = res.data.yjfl
+            ejfl = res.data.ejfl
+            hh = res.data.hh
+            jj = res.data.jjgj
+            yjfl.unshift({label: '全选', value: '大类'})
+            ejfl.unshift({label: '全选', value: '中类'})
+            hh.unshift({label: '全选', value: '货号'})
+            jj.unshift({label: '全选', value: '季节'})
+        }, 'json')
+    }
+
+    // 添加 或者 修改 url中参数的值
+    function UpdateUrlParam(name, val) {
+        // var thisURL = document.location.href;
+        var thisURL = decodeURI(document.location.href);
+        // console.log(thisURL);
+        // 如果 url中包含这个参数 则修改
+        if (thisURL.indexOf(name+'=') > 0) {
+            var v = getUrlParam(name);
+            console.log(v)
+            if (v != null) {
+                // 是否包含参数
+                thisURL = thisURL.replace(name + '=' + v, name + '=' + val);
+            } else {
+                thisURL = thisURL.replace(name + '=', name + '=' + val);
+            }
+            
+        } // 不包含这个参数 则添加
+        else {
+            if (thisURL.indexOf("?") > 0) {
+                thisURL = thisURL + "&" + name + "=" + val;
+            } else {
+                thisURL = thisURL + "?" + name + "=" + val;
+            }
+        }
+        // console.log(thisURL);
+        location.href = thisURL;
+    };
+
+
+    //封装方法 
+    function getUrlParam(name) {
+        // 新增转格式
+        name = encodeURI(name)
+
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象 
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数 
+        // console.log(r);
+
+        if (r != null) {
+            // 新增转格式
+            // console.log(unescape(decodeURI(r[2])));
+            // 新增转格式
+            return unescape(unescape(decodeURI(r[2]))); 
+        } else {
+            // console.log(null);
+            return null; //返回参数值 
+        }
+    } 
+
+
+    $('#yjfl').on('click', function () {
+        weui.picker(yjfl, {
+            onChange: function (result) {
+                // console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+                yjfl_val = result[0];
+                // setMenuNameFn();
+                UpdateUrlParam('大类', yjfl_val);
+            },
+            onCancel: function (result) {
+                console.log('取消');
+            },
+        });
+    });
+
+    $('#ejfl').on('click', function () {
+        weui.picker(ejfl, {
+            onChange: function (result) {
+                // console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+                ejfl_val = result[0];
+                // setMenuNameFn();
+                UpdateUrlParam('中类', ejfl_val);
+            },
+            onCancel: function (result) {
+                console.log('取消');
+            },
+        });
+    });
+
+    $('#hh').on('click', function () {
+        weui.picker(hh, {
+            onChange: function (result) {
+                // console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+                hh_val = result[0];
+                // setMenuNameFn();
+                UpdateUrlParam('货号', hh_val);
+            },
+            onCancel: function (result) {
+                console.log('取消');
+            },
+        });
+    });
+
+    $('#jj').on('click', function () {
+        weui.picker(jj, {
+            onChange: function (result) {
+                // console.log(result);
+            },
+            onConfirm: function (result) {
+                console.log(result);
+                jj_val = result[0];
+                // setMenuNameFn();
+                UpdateUrlParam('季节归集', jj_val);
+            },
+            onCancel: function (result) {
+                console.log('取消');
+            },
+        });
+    });
+
+    $('#reset').on('click', function () {
+        $('.window2').css('display', 'block');
+        // setTimeout(() => {
+        window.location.href = url + '?uid=' + uid + '&店铺名称=' + customerName;
+        // }, 1000);
+    });
+    
+    // $('#showDatePicker').on('click', function () {
+    //     weui.datePicker({
+    //         start: 1990,
+    //         end: new Date().getFullYear(),
+    //         onChange: function (result) {
+    //             console.log(result);
+    //         },
+    //         onConfirm: function (result) {
+    //             console.log(result);
+    //         },
+            
+    //     });
+    // });
+
+    // 监听swich切换事件
+    switchEvent("span[name=switch]",
+        function(){
+            console.log('开');
+            // switch_status = "N"
+
+        }
+        ,function(){
+            console.log('关');
+            // switch_status = "Y"
+        }
+    );
+
+
+    // // 从服务器获取状态
+    // // 在服务器返回status
+    // var status = 2;
+    // if(status == 1){
+    //     // 1开
+    //     honeySwitch.showOn("#switch");
+    //     // $('#status').text('开');
+    // }else{
+    //     // 2关
+    //     honeySwitch.showOff("#switch");
+    //     // $('#status').text('关');
+    // }
+
+    // 开关 
+    window.switchBtn = function(uid = '',customerName = '',goodsNo = '') {
+        // 监听swich切换事件
+        // console.log(uid,customerName,goodsNo);
+        // console.log(switch_status);
+
+        // if (switch_status == 'Y') {
+        //     switch_status = 'N';
+        // } else {
+        //     switch_status = 'Y';
+        // }
+
+        $.post(statusHandle, {uid: uid, customerName: customerName, goodsNo:goodsNo}, function(data) {
+                
+        }, 'json');
+
+    }
+
+    // 图片放大
+    window.viewImg = function (obj) {
+        console.log(obj.src)
+        $('.window').css('display', 'flex');
+        $('#windowImg').attr('src', obj.src);
+    }
+
+    // 图片关闭
+    window.closeImg = function (obj) {
+        $('.window').css('display', 'none');
+    }
+})
+</script>
+<!-- picker -->
+<script type="text/javascript">
+    // var yjfl = [
+    //     {
+    //         label: '全选',
+    //         value: ''
+    //     }, {
+    //         label: '内搭',
+    //         value: '内搭'
+    //     }, {
+    //         label: '外套',
+    //         value: '外套'
+    //     }, {
+    //         label: '下装',
+    //         value: '下装'
+    //     },{
+    //         label: '鞋履',
+    //         value: '鞋履'
+    //     }
+    // ]
+    // $('#yjfl').on('click', function () {
+    //     weui.picker(yjfl, {
+    //         onChange: function (result) {
+    //             // console.log(result);
+    //         },
+    //         onConfirm: function (result) {
+    //             console.log(result);
+    //         },
+    //         onCancel: function (result) {
+    //             console.log('取消');
+    //         },
+    //     });
+    // });
+    
+    // $('#showDatePicker').on('click', function () {
+    //     weui.datePicker({
+    //         start: 1990,
+    //         end: new Date().getFullYear(),
+    //         onChange: function (result) {
+    //             console.log(result);
+    //         },
+    //         onConfirm: function (result) {
+    //             console.log(result);
+    //         },
+            
+    //     });
+    // });
+</script>

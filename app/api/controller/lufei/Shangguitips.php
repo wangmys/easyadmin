@@ -83,6 +83,7 @@ class Shangguitips extends BaseController
         $this->handle_5();
         $this->handle_6();
         $this->handle_7();
+        $this->handle_8();
         // 可上店铺最后
         $this->handle_4();
 
@@ -1559,6 +1560,23 @@ class Shangguitips extends BaseController
 
             // 入库时间
             $this->ruku($goodsNos);            
+        }
+    }
+
+    // 拷贝结果到bi
+    public function handle_8() {
+        $sql = "
+            SELECT * FROM `cwl_shangguitips_handle` where 1 
+        ";
+        $select = $this->db_easyA->query($sql);
+
+        if ($select) {
+            $this->db_bi->execute('TRUNCATE ww_shangguitips;');
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_bi->table('ww_shangguitips')->strict(false)->insertAll($val);
+            }        
         }
     }
 

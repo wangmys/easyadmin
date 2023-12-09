@@ -93,7 +93,7 @@ class Baokuan extends BaseController
                 AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EG.GoodsNo NOT IN ('B72212008', 'B72212007','B72212004','B72212006','B72212005','B72212003')
-            --  AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
+                AND EG.TimeCategoryName2 IN ('初冬', '深冬', '冬季')
             --  AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('2023', '2024')
@@ -134,7 +134,8 @@ class Baokuan extends BaseController
             update cwl_baokuan_7day as m
             left join sp_ww_hpzl as h on m.大类 = h.一级分类 and m.中类=h.二级分类 and m.分类=h.分类 and m.货号=h.货号
             set
-                m.零售单价 = h.零售价
+                m.零售单价 = h.零售价,
+                m.颜色 = h.颜色
             where
                 m.零售单价 is null
         ";
@@ -331,8 +332,69 @@ class Baokuan extends BaseController
 
     }
 
+    // 店铺预计库存+云仓可用库存
+    public function fourth() {
+        // 更新日期 = date_format(now(),'%Y-%m-%d') 
+        $sql_use1_use2 = "
+            SELECT
+                货号
+            FROM
+                cwl_baokuan_7day 
+            WHERE
+                use1 = '是' 
+                AND use2 = '是'
+            GROUP BY 货号
+        ";
+        $select_use1_use2 = $this->db_easyA->query($sql_use1_use2);
+        // if ($select_use1_use2) {
+        //     $this->db_easyA->execute('TRUNCATE cwl_baokuan_stock_2;');
+        //     $chunk_list = array_chunk($select_use1_use2, 500);
+        //     // $this->db_easyA->startTrans();
+
+        //     foreach($chunk_list as $key => $val) {
+        //         // 基础结果 
+        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
+        //     }
+        // } else {
+        //     die;
+        // }
+
+        $货号str = "";
+        foreach($select_use1_use2 as $kk => $vv) {
+            if ($kk + 1 < count($select_use1_use2)) {
+                $货号str .= "'{$vv['货号']}',";
+            } else {
+                $货号str .= "'{$vv['货号']}'";
+            }
+        }
+
+        $sql_店铺预计库存 = "
+            update cwl_baokuan_stock_2 as m
+            left join (select 货号,sum(预计库存数量) as 店铺预计库存 from sp_sk where 货号 in ({$货号str}) group by 货号) as t on m.货号 = t.货号
+            set
+                m.店铺预计库存 = t.店铺预计库存
+            where
+                m.货号 = t.货号
+        ";
+        $this->db_easyA->execute($sql_店铺预计库存);
+        // $select_店铺预计库存 = $this->db_easyA->query($sql_店铺预计库存);
+        // if ($select_店铺预计库存) {
+
+        //     $chunk_list2 = array_chunk($select_店铺预计库存, 500);
+        //     // $this->db_easyA->startTrans();
+
+        //     foreach($chunk_list2 as $key => $val) {
+        //         // 基础结果 
+        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
+        //     }
+        // } else {
+        //     die;
+        // }
+
+    }
+
     // 分组排名
-    public function fourth()
+    public function fifth()
     {
         $sql_分组排名 = "
             update cwl_baokuan_7day as m1
@@ -357,6 +419,7 @@ class Baokuan extends BaseController
                 WHERE
                         a.use1 = '是' 
                         and a.use2 = '是'
+                        and a.use3 = '是'
                 ORDER BY
                         a.省份 ASC,a.温区 ASC, a.中类 ASC, a.销量 DESC
             ) as m2 on m1.省份=m2.省份 and m1.温区=m2.温区 and m1.货号=m2.货号
@@ -369,12 +432,12 @@ class Baokuan extends BaseController
         ";
         $this->db_easyA->execute($sql_分组排名);
 
-        $sql_排名展示 = "update cwl_baokuan_7day set use3 = '是' where 排名 <= 6";
+        $sql_排名展示 = "update cwl_baokuan_7day set use4 = '是' where 排名 <= 6";
         $this->db_easyA->execute($sql_排名展示);
     }
 
     // 更新图片路径
-    public function fifth() {
+    public function sixth() {
         $sql_TOP = "
             SELECT GoodsId FROM `cwl_baokuan_7day` where 排名 is not null group by 货号
         ";

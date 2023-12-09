@@ -1,0 +1,182 @@
+@rem:46.875rem;
+// .window{position: relative; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0); z-index: 9; display: block;}
+.window{position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 17, 17, 0.7); z-index: 9; display: none; align-items: center;justify-content: center;}
+.window2{position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 17, 17, 0.3); z-index: 200; display: none; align-items: center;justify-content: center;}
+
+
+
+.wrap { 
+    // position: relative; 
+    width: 100vh;
+    height: 100vh;
+    // // display: flex;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.menu {
+    position: fixed;
+    width: 744/@rem;
+    height: 85/@rem;
+    z-index: 100;
+    background-color: rgb(30, 125, 250);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5), -2px -2px 4px rgba(255,255,255,0.5);
+    // border: 0.8px solid #ccc;
+    border: 0.8px solid #ccc;
+}
+// 按钮
+.niceButton{
+    display: inline-block;
+    padding: 8/@rem 15/@rem;
+    font-size: 22/@rem;
+    font-weight: bold;
+    width: 18%;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color:rgb(30, 125, 250);
+    // background-color: rgb(16, 185, 214);
+    background-color: rgb(221, 253, 41);
+    border: none;
+    border-radius: 15/@rem;
+    box-shadow: 0 9/@rem #999;
+}
+.niceButton:hover{
+// background-color: #1795bb;
+background-color: #eeea0f;
+}
+.niceButton:active{
+    // background-color: #1795bb;
+    background-color: #eeea0f;
+    box-shadow: 0 5px #666;
+    transform:translateY(4px);
+}
+// 按钮2
+.niceButton2{
+    display: inline-block;
+    padding: 8/@rem 15/@rem;
+    font-size: 22/@rem;
+    font-weight: bold;
+    width: 18%;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    // background-color: rgb(16, 185, 214);
+    background-color: rgb(248, 82, 118);
+    border: none;
+    border-radius: 15/@rem;
+    box-shadow: 0 9/@rem #999;
+}
+.niceButton2:hover{
+// background-color: #1795bb;
+background-color: rgb(250, 9, 61);
+}
+.niceButton2:active{
+    // background-color: #1795bb;
+    background-color: rgb(250, 9, 61);
+    box-shadow: 0 5px #666;
+    transform:translateY(4px);
+}
+
+.space {
+    margin-top: 120/@rem;
+}
+.category {
+    width: 744/@rem;
+    // height: 50/@rem;
+    // line-height: 55/@rem;
+    font-weight: bold;
+    font-size: 30/@rem;
+    display: block;
+    text-align: center;
+}
+.category:nth-of-type(0) {
+    margin-top: 100px;
+}
+.content { 
+    // background-color: aqua;
+    width: 744/@rem;
+    height: auto;
+    margin-bottom: 25px;
+    border:1px solid #b3b3b3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.shadow{
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5), -2px -2px 4px rgba(255,255,255,0.5);
+    border: 1px solid #ccc;
+    }
+.head { 
+    width: 744/@rem;
+    height: 50/@rem;
+    line-height: 42/@rem;
+    height: auto;
+    font-size: 28/@rem;
+    font-weight: bold;
+    padding-top: 10/@rem;
+    padding-left: 10/@rem;
+    padding-bottom: 10/@rem;
+    background-color: rgb(242, 245, 255);
+}
+
+.title { 
+    // background-color: rgb(155, 145, 154);
+    width: 744/@rem;
+    height: auto;
+    
+}
+.left { 
+    width: 744/2/@rem;
+    height: auto;
+}
+.left_1 {
+    // background-color: rgb(212, 37, 195);
+    width:38%;
+}
+.left_1 .item {
+    // background-color: rgb(32, 114, 161);
+    height: 51.5/@rem;
+    line-height: 56/@rem;
+    // width:50%;
+    font-size: 24/@rem;
+    padding-left: 5/@rem;
+    border-top:1px solid #dedede;
+    // border-left:1px solid #dedede;
+    border-right:1px solid #dedede;
+    background-color: #fcfcfc;
+}
+.left_2 {
+    // background-color: rgb(212, 37, 195);
+    width:62%;
+}
+.left_2 .item {
+    // background-color: rgb(32, 114, 161);
+    height: 51.5/@rem;
+    line-height: 56/@rem;
+    // width:50%;
+    font-size: 24/@rem;
+    padding-left: 5/@rem;
+    border-top:1px solid #dedede;
+    // border-left:1px solid #dedede;
+    border-right:1px solid #dedede;
+    background-color: #fcfcfc;
+}
+.right { 
+    width: 744/2/@rem;
+    height: auto;
+}
+
+.nodata {
+    width: 744/@rem;
+    font-size: 24/@rem;
+    color: #666;
+}
+
+// .right img { 
+//     width: 746/2/@rem;
+//     height: auto;
+// }
+
