@@ -46,7 +46,6 @@ class Excelconfig extends AdminController
         $config = $config[0];
         $configCustomItem17 = json_decode($config['商品负责人'], true);
         $CustomItem17Arr = CustomerModel::where('CustomItem17', '<>', '')
-            ->where('RegionId','<>',55)
             ->where('ShutOut','<>',1)->distinct(true)->column('CustomItem17');
 
         $CustomItem17 = [];
