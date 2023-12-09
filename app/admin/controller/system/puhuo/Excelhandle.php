@@ -268,6 +268,9 @@ class Excelhandle extends AdminController
 
         $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
 
+        if (empty($data)) {
+            echo '数据为空,请核对';die;
+        }
         $where = [
             ['date', '=', date('Y-m-d')],
             ['CustomItem17', '=', $data[0]['CustomItem17']],
