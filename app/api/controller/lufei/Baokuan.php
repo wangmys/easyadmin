@@ -346,31 +346,50 @@ class Baokuan extends BaseController
             GROUP BY 货号
         ";
         $select_use1_use2 = $this->db_easyA->query($sql_use1_use2);
-        if ($select_use1_use2) {
-            // 删除历史数据
-            // $this->db_easyA->table('cwl_duanmalv_sk')->where(1)->delete();
-            $this->db_easyA->execute('TRUNCATE cwl_baokuan_stock_2;');
-            $chunk_list = array_chunk($select_use1_use2, 500);
-            // $this->db_easyA->startTrans();
+        // if ($select_use1_use2) {
+        //     $this->db_easyA->execute('TRUNCATE cwl_baokuan_stock_2;');
+        //     $chunk_list = array_chunk($select_use1_use2, 500);
+        //     // $this->db_easyA->startTrans();
 
-            foreach($chunk_list as $key => $val) {
-                // 基础结果 
-                $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
-            }
-        } else {
-            die;
-        }
+        //     foreach($chunk_list as $key => $val) {
+        //         // 基础结果 
+        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
+        //     }
+        // } else {
+        //     die;
+        // }
 
-        
+        $货号str = "";
         foreach($select_use1_use2 as $kk => $vv) {
-
+            if ($kk + 1 < count($select_use1_use2)) {
+                $货号str .= "'{$vv['货号']}',";
+            } else {
+                $货号str .= "'{$vv['货号']}'";
+            }
         }
-
 
         $sql_店铺预计库存 = "
-            select 货号,sum(预计库存数量) as 店铺估计库存 from sp_sk where 货号 in ('B71202447', 'B71202453', 'B71202497') group by 货号
+            update cwl_baokuan_stock_2 as m
+            left join (select 货号,sum(预计库存数量) as 店铺预计库存 from sp_sk where 货号 in ({$货号str}) group by 货号) as t on m.货号 = t.货号
+            set
+                m.店铺预计库存 = t.店铺预计库存
+            where
+                m.货号 = t.货号
         ";
+        $this->db_easyA->execute($sql_店铺预计库存);
+        // $select_店铺预计库存 = $this->db_easyA->query($sql_店铺预计库存);
+        // if ($select_店铺预计库存) {
 
+        //     $chunk_list2 = array_chunk($select_店铺预计库存, 500);
+        //     // $this->db_easyA->startTrans();
+
+        //     foreach($chunk_list2 as $key => $val) {
+        //         // 基础结果 
+        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
+        //     }
+        // } else {
+        //     die;
+        // }
 
     }
 
