@@ -1071,7 +1071,7 @@ class Baokuan extends BaseController
                 LEFT JOIN cwl_baokuan_7day as t on c.State = t.省份 and c.CustomItem36 = t.温区
                 WHERE
                     c.CustomerName in ('{$input['店铺名称']}')
-                    and t.use3 IS NOT NULL
+                    and t.use4 IS NOT NULL
                     {$map1}
                     {$map2}
                     {$map3}
@@ -1090,7 +1090,7 @@ class Baokuan extends BaseController
                 //     LEFT JOIN cwl_baokuan_7day as t on c.State = t.省份 and c.CustomItem36 = t.温区
                 //     WHERE
                 //         c.CustomerName in ('{$input['店铺名称']}')
-                //         and t.use3 IS NOT NULL
+                //         and t.use4 IS NOT NULL
                 //         {$map1}
                 //         {$map2}
                 //         {$map3}
@@ -1316,7 +1316,7 @@ class Baokuan extends BaseController
             FROM
                 cwl_baokuan_7day
             WHERE
-                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use3 is not null
+                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use4 is not null
     
                 {$map2}
                 {$map3}
@@ -1331,7 +1331,7 @@ class Baokuan extends BaseController
             FROM
                 cwl_baokuan_7day
             WHERE
-                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use3 is not null
+                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use4 is not null
                 {$map1}
 
                 {$map3}
@@ -1346,7 +1346,7 @@ class Baokuan extends BaseController
             FROM
                 cwl_baokuan_7day
             WHERE
-                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use3 is not null
+                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use4 is not null
                 {$map1}
                 {$map2}
 
@@ -1360,7 +1360,7 @@ class Baokuan extends BaseController
             FROM
                 cwl_baokuan_7day
             WHERE
-                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use3 is not null
+                省份 = '{$find_customer['省份']}' and 温区 = '{$find_customer['温区']}' and use4 is not null
                 {$map1}
                 {$map2}
                 {$map3}
