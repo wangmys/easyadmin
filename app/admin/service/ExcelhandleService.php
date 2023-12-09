@@ -34,72 +34,81 @@ class ExcelhandleService
         $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
         $data = [];
-        $Customers = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->group('CustomerName')->column('CustomerName');
+        $exDb = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select()->toArray();
+        $CustomersKV = array_column($exDb, null, 'CustomerName');
+//        $Customers = array_values(array_unique(array_column($exDb, 'CustomerName')));
 //        $Customers = ['安康一店', '阿拉尔一店'];
-        $order_no_num = 1;
-        $gg = Db::connect('mysql')->table('sp_lyp_puhuo_excel')->where(1)->find();
+        $CustomItem17Arr = array_values(array_unique(array_column($exDb, 'CustomItem17')));
 
-        if (!empty($gg)) {
+        $numArr = [];
+        foreach ($CustomItem17Arr as $item) {
+            $numArr[$item] = 1;
+
+        }
+
+        foreach ($CustomItem17Arr as $item) {
             $sortWhere = [
-                'CustomItem17' => $config['商品负责人'][$gg['CustomItem17']],
+                'CustomItem17' => $item,
                 'date' => date('Y-m-d')
             ];
             $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
             if ($sortDb) {
-                $order_no_num = (int)$sortDb + 1;
+                $numArr[$item] = (int)$sortDb + 1;
             }
         }
 
-        foreach ($Customers as $key => $item) {
+        foreach ($CustomersKV as $cus => $item) {
 
             $cus_num = 1; //店铺包数
-            $yk_con = isset($config['特殊店铺'][$item]['YK']) ? $config['特殊店铺'][$item]['YK'] : $config['衣裤'];
-            $xl_con = isset($config['特殊店铺'][$item]['XZ']) ? $config['特殊店铺'][$item]['XZ'] : $config['鞋子'];
+            $yk_con = isset($config['特殊店铺'][$cus]['YK']) ? $config['特殊店铺'][$cus]['YK'] : $config['衣裤'];
+            $xl_con = isset($config['特殊店铺'][$cus]['XZ']) ? $config['特殊店铺'][$cus]['XZ'] : $config['鞋子'];
             //衣裤
-            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('CustomerName', $cus)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
                 ->order('CategoryName1 ASC')->select()->toArray();
-            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where('CustomerName', $item)->where('CategoryName1', '鞋履')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('CustomerName', $cus)->where('CategoryName1', '鞋履')->select()->toArray();
             $total = 0; //总件数
             //处理衣裤
 
             foreach ($clothesPants as $cp_v) {
+
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
                     if ($total <= $yk_con * $cus_num) {
-                        $clothesPantsArr['sort'] = $order_no_num;
-                        $clothesPantsArr['uuid'] = $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
-                        $data[$item][] = $clothesPantsArr;
+
+                        $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
+                        $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$cus][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
-                        $order_no_num++;
-                        $clothesPantsArr['sort'] = $order_no_num;
-                        $clothesPantsArr['uuid'] = $config['商品负责人'][$cp_v['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
-                        $data[$item][] = $clothesPantsArr;
+                        $numArr[$item['CustomItem17']]++;
+                        $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
+                        $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$cus][] = $clothesPantsArr;
                     }
 
                 }
             }
+
             //鞋子
             foreach ($shoes as $s_k => $s_v) {
-                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$item][$s_k])) { //加到原来的
+                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$cus][$s_k])) { //加到原来的
                     $shoesArr = $s_v;
-                    $shoesArr['sort'] = $data[$item][$s_k]['sort'];
-                    $shoesArr['uuid'] = $data[$item][$s_k]['uuid'];
-                    $data[$item][$s_k][] = $shoesArr;
+                    $shoesArr['sort'] = $data[$cus][$s_k]['sort'];
+                    $shoesArr['uuid'] = $data[$cus][$s_k]['uuid'];
+                    $data[$cus][$s_k][] = $shoesArr;
                 } else {
-                    $order_no_num++;
+                    $numArr[$item['CustomItem17']]++;
                     $shoesArr = $s_v;
-                    $shoesArr['sort'] = $order_no_num;
-                    $shoesArr['uuid'] = $config['商品负责人'][$s_v['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($order_no_num, 3, '0', STR_PAD_LEFT);
-                    $data[$item][$s_k][] = $shoesArr;
+                    $shoesArr['sort'] = $numArr[$item['CustomItem17']];
+                    $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                    $data[$cus][$s_k][] = $shoesArr;
 
                 }
 
             }
-
             //更换店铺 包数更换
-            $order_no_num++;
+            $numArr[$item['CustomItem17']]++;
 
         }
         $return = [];
@@ -109,8 +118,9 @@ class ExcelhandleService
             }
         }
 
-        $sort = array_column($return, 'sort');
-        array_multisort($sort, SORT_ASC, $return);
+        $CustomItem17Sort = array_column($return, 'CustomItem17');
+        $sortArr = array_column($return, 'sort');
+        array_multisort($CustomItem17Sort, SORT_ASC, $sortArr, SORT_ASC, $return);
 
         return $return;
 

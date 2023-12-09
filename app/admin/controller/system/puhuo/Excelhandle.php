@@ -14,6 +14,7 @@ use think\App;
 use think\Exception;
 use think\facade\Cache;
 use think\facade\Db;
+use think\facade\Log;
 
 /**
  * Class Excel
@@ -82,6 +83,7 @@ class Excelhandle extends AdminController
                 ->select()->toArray();
 //                ->fetchSql(1)->select();
             foreach ($res as &$item) {
+                $item['State'] = mb_substr($item['State'], 0, 2);
                 $item['Stock_Quantity_puhuo'] = $item['Stock_00_puhuo']
                     + $item['Stock_29_puhuo'] + $item['Stock_30_puhuo']
                     + $item['Stock_31_puhuo'] + $item['Stock_32_puhuo']
@@ -102,17 +104,31 @@ class Excelhandle extends AdminController
                 $item['Stock_40_puhuo'] = $item['Stock_40_puhuo'] != 0 ? $item['Stock_40_puhuo'] : ' ';
                 $item['Stock_42_puhuo'] = $item['Stock_42_puhuo'] != 0 ? $item['Stock_42_puhuo'] : ' ';
                 $item['Stock_44_puhuo'] = $item['Stock_44_puhuo'] != 0 ? $item['Stock_44_puhuo'] : ' ';
-//                dd($item['Stock_00_puhuo']);
             }
             $data = [
                 "code" => "0", "msg" => "", "count" => $count, "data" => $res
             ];
-//            dd($res);
+
             return json($data);
         }
 
+        $runing = Cache::store('cache')->get('runing') ?: 0;
+        $this->assign(['runing' => $runing]);
+
         return $this->fetch();
 
+    }
+
+    public function runing($status = 1)
+    {
+
+        if ($status == 1) {
+            $runing = Cache::store('cache')->set('runing', '1', 3600);
+        } else {
+            $runing = Cache::store('cache')->set('runing', '0', 3600);
+        }
+
+        return 'ok';
     }
 
     public function xm_select()
@@ -172,8 +188,6 @@ class Excelhandle extends AdminController
             ];
 
         }
-
-
         $res = $this->service->order_no($where);
         $date = date('Y-m-d');
         $tag = date('YmdHis');
@@ -197,7 +211,7 @@ class Excelhandle extends AdminController
                 'uuid' => $v_res['uuid'],
                 'date' => $date,
                 'sort' => $v_res['sort'],
-                'CustomItem17' => $config['商品负责人'][$v_res['CustomItem17']] ?? '',
+                'CustomItem17' => $v_res['CustomItem17'],
                 'tag' => $tag,
                 'WarehouseCode' => $v_res['WarehouseCode'],
                 'CustomerCode' => $v_res['CustomerCode'],
@@ -246,7 +260,6 @@ class Excelhandle extends AdminController
         }
         return $this->success('ok', compact('tag'));
 
-
     }
 
 
@@ -293,6 +306,10 @@ class Excelhandle extends AdminController
     public function import_excel()
     {
         if (request()->isAjax()) {
+            $runing = Cache::store('cache')->get('runing') ?: 0;
+            if($runing ==1){
+                return json(['code' => 400, 'msg' => '使用中，请询问其它人是否还在使用']);
+            }
             $file = request()->file('file');
             $new_name = "import_excel" . '_' . uuid('zhuanhuan') . '.' . $file->getOriginalExtension();
             $save_path = app()->getRootPath() . 'runtime/uploads/' . date('Ymd', time()) . '/';   //文件保存路径

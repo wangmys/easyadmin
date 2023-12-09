@@ -45,7 +45,8 @@ class Excelconfig extends AdminController
         $config = $this->mysql->table('sp_lyp_puhuo_excel_config')->select()->toArray();
         $config = $config[0];
         $configCustomItem17 = json_decode($config['商品负责人'], true);
-        $CustomItem17Arr = CustomerModel::where('CustomItem17', '<>', '')->distinct(true)->column('CustomItem17');
+        $CustomItem17Arr = CustomerModel::where('CustomItem17', '<>', '')
+            ->where('ShutOut','<>',1)->distinct(true)->column('CustomItem17');
 
         $CustomItem17 = [];
         foreach ($CustomItem17Arr as $item) {
