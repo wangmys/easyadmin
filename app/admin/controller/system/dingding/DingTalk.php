@@ -434,6 +434,39 @@ class DingTalk extends BaseController
         return $textString;
     }
 
+    /**
+     * 获取链接消息的内容
+     * @param $data
+     * @return false|string
+     */
+    public function getContent_baokuan($data)
+    {
+        // $content = "你的订单" . 11 . " 的物流信息超过7天未更新，可能存在异常，单号：" . 22;//文本内容
+        // $title = "订单物流异常提醒";//标题
+        // $picUrl = 'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71202028.jpg';//图片链接
+        // $messageUrl = "http://im.babiboy.com/admin/system.dingding.Tiaojia/res?uid=24853080&%E5%BA%97%E9%93%BA%E5%90%8D%E7%A7%B0=%E5%AE%89%E9%A1%BA%E4%BA%8C%E5%BA%97";//跳转链接
+        $type = "link";
+        $textString = json_encode([
+            "agent_id" => $this->AgentId,
+            "msg" => [
+                "msgtype" => $type,
+                "link" => [
+                    "text" => date('Y-m-d H:i:s'),
+                    "title" => "【{$data['店铺名称']}】省份温区爆款推荐",
+                    // "picUrl" => 'https://ff211-1254425741.cos.ap-guangzhou.myqcloud.com/F71202028.jpg',//图片链接
+                    // "picUrl" => "{$data['path']}",//图片链接
+                    "picUrl" => "https://bx.babiboy.com/babiboylogo.jpg",//图片链接
+                    // "messageUrl" => 'http://im.babiboy.com/admin/system.dingding.Tiaojia/res?uid=24853080&%E5%BA%97%E9%93%BA%E5%90%8D%E7%A7%B0=%E5%AE%89%E9%A1%BA%E4%BA%8C%E5%BA%97',//跳转链接
+                    "messageUrl" => "{$data['url']}",//跳转链接
+                ]
+            ],
+            // "userid_list" => "350364576037719254,0812473564939990,284616312226634272,111131100920206916,01041546130633121381",//接受用户ID
+            "userid_list" => "{$data['userid']}",//接受用户ID
+        ]);
+
+        return $textString;
+    }
+
 
     /**
      * 撤回消息通知
@@ -535,6 +568,20 @@ class DingTalk extends BaseController
     {
         $webhook = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $this->getAccessToken_cwl();
         $SendToUser_data = $this->getContent($data);
+        $result = $this->PostCurlRequest($webhook, $SendToUser_data);
+        return $result;
+
+    }
+
+    /**
+     * 发送链接消息 爆款
+     * @param $data
+     * @return bool|string
+     */
+    public function sendLinkMsg_baokuan($data)
+    {
+        $webhook = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2?access_token=" . $this->getAccessToken_cwl();
+        $SendToUser_data = $this->getContent_baokuan($data);
         $result = $this->PostCurlRequest($webhook, $SendToUser_data);
         return $result;
 
