@@ -219,7 +219,6 @@ class Chaoliang extends BaseController
                     AND sk.年份 >= 2023 
                     AND sk.一级分类 IN ('内搭', '外套', '下装', '鞋履')
 
-                    AND sk.货号 in ('B82109012')
                 GROUP BY
                     sk.店铺名称,
                     sk.季节,
