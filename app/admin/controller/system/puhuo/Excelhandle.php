@@ -268,6 +268,9 @@ class Excelhandle extends AdminController
 
         $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
 
+        if (empty($data)) {
+            echo '数据为空,请核对';die;
+        }
         $where = [
             ['date', '=', date('Y-m-d')],
             ['CustomItem17', '=', $data[0]['CustomItem17']],
@@ -533,7 +536,7 @@ ORDER BY
                         'WarehouseName' => $item['云仓'] ?? '',
                         'GoodsNo' => $item['货号'] ?? '',
                         'CustomerName' => $item['店铺'] ?? '',
-                        'xingzhi' => $item['性质'] ?? '',
+                        'xingzhi' => $item['性质'] ?? '上新',
                         'Stock_Quantity_puhuo' => $Stock_00_puhuo + $Stock_29_puhuo + $Stock_30_puhuo + $Stock_31_puhuo + $Stock_32_puhuo + $Stock_33_puhuo + $Stock_34_puhuo + $Stock_35_puhuo + $Stock_36_puhuo + $Stock_38_puhuo + $Stock_40_puhuo + $Stock_42_puhuo,
                         'Stock_00_puhuo' => $Stock_00_puhuo,
                         'Stock_29_puhuo' => $Stock_29_puhuo,
