@@ -95,8 +95,12 @@ class Chaoliang extends BaseController
         // 一周销：sjp_yizhou  两周销：sjp_liangzhou
         if ($select_config['周销'] == 'sjp_yizhou') {
             $天数 = 7;
+
+            $周转合计 = "ROUND( 预计库存合计 / (两周销合计), 1)";
         } else {
             $天数 = 14;
+
+            $周转合计 = "ROUND( 预计库存合计 / (两周销合计 / 2), 1)";
         }
         $sql = "
             SELECT
@@ -215,7 +219,7 @@ class Chaoliang extends BaseController
                     AND sk.年份 >= 2023 
                     AND sk.一级分类 IN ('内搭', '外套', '下装', '鞋履')
 
-
+                    AND sk.货号 in ('B82109012')
                 GROUP BY
                     sk.店铺名称,
                     sk.季节,
@@ -265,7 +269,7 @@ class Chaoliang extends BaseController
                 UPDATE 
                     cwl_chaoliang_sk
                 SET 
-                    周转合计 = ROUND( 预计库存合计 / (两周销合计 / 2), 0)
+                    周转合计 = {$周转合计}
                 WHERE
                     周转合计 IS NULL
             ";
