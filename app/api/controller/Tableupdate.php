@@ -2695,6 +2695,7 @@ class Tableupdate extends BaseController
                                 OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
                     AND EG.CategoryName1 IN ('内搭','外套','下装','鞋履')
                     AND CONVERT(VARCHAR(10),ER.RetailDate,23) BETWEEN  CONVERT(VARCHAR(10),GETDATE()-7,23)	AND CONVERT(VARCHAR(10),GETDATE()-1,23)
+                    -- and DATEDIFF(d,RetailDate,GETDATE()) BETWEEN 1 AND 7
                 GROUP BY
                     EC.CustomItem15,
                     EC.CustomerGrade,

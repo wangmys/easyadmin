@@ -98,7 +98,7 @@ class Chaoliang extends BaseController
         } else {
             $天数 = 14;
         }
-        $sql = "
+        echo $sql = "
             SELECT
                 t.*,
                 round(t.`预计00/28/37/44/100/160/S` / t.`平均每日销量00/28/37/44/100/160/S`, 1) as `周转00/28/37/44/100/160/S`,
@@ -214,15 +214,17 @@ class Chaoliang extends BaseController
                     
                     AND sk.年份 >= 2023 
                     AND sk.一级分类 IN ('内搭', '外套', '下装', '鞋履')
+
+
                 GROUP BY
                     sk.店铺名称,
                     sk.季节,
                     sk.货号 
-             	-- LIMIT 1000 
+
                 ) AS t
         ";
 
-		// die;
+		die;
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);
 
