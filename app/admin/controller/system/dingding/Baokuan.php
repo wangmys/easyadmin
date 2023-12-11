@@ -13,7 +13,7 @@ use app\admin\controller\system\dingding\DingTalk;
 /**
  * Class Baokuan
  * @package app\admin\controller\system\dingding
- * @ControllerAnnotation(title="身份温区爆款推送")
+ * @ControllerAnnotation(title="省份温区爆款推送")
  */
 class Baokuan extends BaseController
 {
@@ -41,6 +41,9 @@ class Baokuan extends BaseController
         $this->authInfo = session('admin');
     }
 
+    /**
+     * @NodeAnotation(title="爆款推送列表")
+     */
     public function list() {
         if (request()->isAjax()) {
             // 筛选条件
