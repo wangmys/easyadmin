@@ -1283,7 +1283,7 @@ class Weather extends BaseController
                             if ($item3['最高温'] > 30 ) {
                                 // imagefilledrectangle($img, $val2['x0'], $y1 + 30 * ($key + 1), $val2['x1'], $y2 + 30 * ($key + 1), $orange);
                                 $colorVal = 38;
-                            } elseif ($item3['最高温'] - $item3['最低温'] <= 5) {
+                            } elseif ($item3['最高温'] - $item3['最低温'] <= 5 || $item3['最高温'] <= 18) {
                                 $colorVal = round(($item3['最高温'] + $item3['最低温']) / 2, 0);
                             } elseif ( ($item3['最高温'] - $item3['最低温']) > 5 && ($item3['最高温'] - $item3['最低温']) <= 10) {
                                 $colorVal = round(($item3['最高温'] + $item3['最低温']) / 2 + 2, 0);

@@ -346,18 +346,18 @@ class Baokuan extends BaseController
             GROUP BY 货号
         ";
         $select_use1_use2 = $this->db_easyA->query($sql_use1_use2);
-        // if ($select_use1_use2) {
-        //     $this->db_easyA->execute('TRUNCATE cwl_baokuan_stock_2;');
-        //     $chunk_list = array_chunk($select_use1_use2, 500);
-        //     // $this->db_easyA->startTrans();
+        if ($select_use1_use2) {
+            $this->db_easyA->execute('TRUNCATE cwl_baokuan_stock_2;');
+            $chunk_list = array_chunk($select_use1_use2, 500);
+            // $this->db_easyA->startTrans();
 
-        //     foreach($chunk_list as $key => $val) {
-        //         // 基础结果 
-        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
-        //     }
-        // } else {
-        //     die;
-        // }
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
+            }
+        } else {
+            die;
+        }
 
         $货号str = "";
         foreach($select_use1_use2 as $kk => $vv) {
@@ -368,6 +368,8 @@ class Baokuan extends BaseController
             }
         }
 
+        // echo $货号str;die;
+
         $sql_店铺预计库存 = "
             update cwl_baokuan_stock_2 as m
             left join (select 货号,sum(预计库存数量) as 店铺预计库存 from sp_sk where 货号 in ({$货号str}) group by 货号) as t on m.货号 = t.货号
@@ -377,19 +379,26 @@ class Baokuan extends BaseController
                 m.货号 = t.货号
         ";
         $this->db_easyA->execute($sql_店铺预计库存);
-        // $select_店铺预计库存 = $this->db_easyA->query($sql_店铺预计库存);
-        // if ($select_店铺预计库存) {
 
-        //     $chunk_list2 = array_chunk($select_店铺预计库存, 500);
-        //     // $this->db_easyA->startTrans();
+        $sql_云仓可用库存 = "
+            update cwl_baokuan_stock_2 as m
+            left join (select 货号,sum(云仓数量) as 云仓可用库存 from sp_sk where 货号 in ({$货号str}) group by 货号) as t on m.货号 = t.货号
+            set
+                m.云仓可用库存 = t.云仓可用库存
+            where
+                m.货号 = t.货号
+        ";
+        $this->db_easyA->execute($sql_云仓可用库存);
 
-        //     foreach($chunk_list2 as $key => $val) {
-        //         // 基础结果 
-        //         $insert = $this->db_easyA->table('cwl_baokuan_stock_2')->strict(false)->insertAll($val);
-        //     }
-        // } else {
-        //     die;
-        // }
+        $sql_合计库存 = "
+            update cwl_baokuan_stock_2 as m
+            set
+                合计库存 = 店铺预计库存 + 云仓可用库存,
+                更新日期 = date_format(now(),'%Y-%m-%d')
+            where
+                1
+        ";
+        $this->db_easyA->execute($sql_合计库存);
 
     }
 
