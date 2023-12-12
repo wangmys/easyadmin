@@ -2538,7 +2538,7 @@ class Tableupdate extends BaseController
         $this->db_easyA->execute($sql);
     }
 
-    // 尺码比季节
+    // 尺码比季节 波段
     public function chimabiJijie() {
         $sql = "
             update `ea_size_ranking` as r
@@ -2549,6 +2549,45 @@ class Tableupdate extends BaseController
                 r.季节 is null
         ";
         $this->db_easyA->execute($sql);
+
+        $date = date('Y-m-d');
+        $sql_货号 = "
+            select 货号 from ea_size_ranking where `Date` = '{$date}' group by 货号
+        ";
+        $select_货号 = $this->db_easyA->query($sql_货号);
+
+        $货号str = '';
+        foreach ($select_货号 as $key => $val) {
+            if ($key + 1 < count($select_货号)) {
+                $货号str .= "'{$val['货号']}',";
+            } else {
+                $货号str .= "'{$val['货号']}'";
+            }
+        }
+
+        // echo $货号str;die;
+        // echo $goodsNos;die;
+        $sql_上市波段 = "
+            SELECT
+                EG.GoodsNo as 货号,
+                EG.TimeCategoryName AS 上市波段
+            FROM ErpGoods AS EG
+            LEFT JOIN ErpGoodsImg AS EGI ON EGI.GoodsId = EG.GoodsId
+            WHERE
+                EG.GoodsNo IN ({$货号str})
+        ";
+        $select_上市波段 = $this->db_sqlsrv->query($sql_上市波段);
+
+        foreach ($select_货号 as $k1 => $v1) {
+            foreach ($select_上市波段 as $k2 => $v2) {
+                if ($v1['货号'] == $v2['货号']) {
+                        $this->db_easyA->table('ea_size_ranking')->where(['货号' => $v1['货号']])->update([
+                            '上市波段' => $v2['上市波段'],
+                        ]);
+                    break;
+                }
+            }
+        }
     }
 
     // 一周销 sjp_yizhou

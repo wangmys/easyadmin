@@ -20,7 +20,7 @@ use app\admin\model\code\SizeWarehouseTransitStock;
 use app\admin\model\code\SizeRanking;
 use app\admin\model\code\SizeAllRatio;
 use app\admin\model\code\SizeWarehouseRatio;
-// use think\db\Raw;
+use think\db\Raw;
 
 /**
  * Class Ratio
@@ -434,7 +434,15 @@ class Ratio extends AdminController
                 // ]);
             }
 
+            if(isset($filters['季节']) && !empty($filters['季节'])){
+                $list = $list->whereIn('s.季节',$filters['季节']);
+                $model = $model->whereIn('s.季节',$filters['季节']);
+            }  
             
+            if(isset($filters['上市波段']) && !empty($filters['上市波段'])){
+                $list = $list->whereIn('s.上市波段',$filters['上市波段']);
+                $model = $model->whereIn('s.上市波段',$filters['上市波段']);
+            }   
             // print_r($list);
             // print_r($model); 
 
@@ -919,13 +927,30 @@ class Ratio extends AdminController
     }
 
     public function getFieldCwl() {
+        $date = date('Y-m-d');
         // 商品负责人
         $goodsNo = $this->db_easyA->query("
-            SELECT 货号 as 货号 FROM ea_size_ranking WHERE 1 GROUP BY 货号
+            SELECT 货号 as 货号 FROM ea_size_ranking WHERE 1 and `Date` = '{$date}' GROUP BY 货号
         ");
-        // $yjfl = $this->db_easyA->query("
-        //     SELECT 一级分类 as name, 一级分类 as value FROM cwl_shangguitips_handle WHERE 一级分类 IS NOT NULL GROUP BY 一级分类
+        // $jj = $this->db_easyA->query("
+        //     SELECT 季节 as '季节' FROM ea_size_ranking WHERE 季节 IS NOT NULL and `Date` = '{$date}' GROUP BY 季节
         // ");
+        $res8 = $this->db_easyA->table('ea_size_ranking')->where([
+            ['上市波段', 'exp', new Raw('IS NOT NULL')],
+            ['Date', '=' , $date]
+        ])->field('上市波段')->group('上市波段')->column('上市波段');
+        
+        
+        $boduan_list = array_combine($res8, $res8);
+
+        $res9 = $this->db_easyA->table('ea_size_ranking')->where([
+            ['季节', 'exp', new Raw('IS NOT NULL')],
+            ['Date', '=' , $date]
+        ])->field('季节')->group('季节')->column('季节');
+        
+        
+        $season_list = array_combine($res9, $res9);
+        // print_r($season_list);die;
         // $ejfl = $this->db_easyA->query("
         //     SELECT 二级分类 as name, 二级分类 as value FROM cwl_shangguitips_handle WHERE 二级分类 IS NOT NULL GROUP BY 二级分类
         // ");
@@ -939,6 +964,6 @@ class Ratio extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['goodsNo' => $goodsNo]]);
+        return json(["code" => "0", "msg" => "", "data" => ['goodsNo' => $goodsNo, 'jj' => $season_list, 'bd' => $boduan_list]]);
     }
 }
