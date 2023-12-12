@@ -86,7 +86,7 @@
             width: 11.333% !important;
         }
         .layui-form-label {
-            width: 130px !important;
+            padding-left: 0 !important;
         }
 
         .layui-input-inline {
@@ -108,18 +108,28 @@
             border-top: none;
             border-left: none;
         }
+
+        .weather_div {
+            height:35px;
+        }
+        .cima_manzu {
+            height:5px; 
+            /* width:10px; */
+            line-height:5px;
+            font-size: 10px;
+        }
     </style>
 </head>
 
 <body class="" style="background-color: #ffffff;">
     <div class="layui-tab-item layui-show">
-        <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8" lay-filter='searchFormHead'>
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 113px;">
+                    <div class="flex col between al-start" style="width:95%; height: 105px;">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">销售年份</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <select id="xm-Year" name="Year" lay-verify="">
                                     <option value="">请选择</option>
                                     {foreach $Year as $k_year => $v_year}
@@ -127,12 +137,12 @@
                                     {/foreach}	
                                 </select>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">月</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center !important; overflow: visible;">月</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-Month" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">大区</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">大区</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <!-- <div id="xm-YunCang" class="xm-select-demo"></div> -->
                                 <select id="xm-YunCang" name="YunCang" lay-verify="">
                                     <option value="">请选择</option>
@@ -142,37 +152,37 @@
                                 </select>
                             </div>
 
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem15" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">秋冬云仓</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">秋冬云仓</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem65" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">春夏云仓</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">春夏云仓</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem66" class="xm-select-demo"></div>
                             </div>
 
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">温带</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">温带</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-WenDai" class="xm-select-demo"></div>
                             </div>
                             
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">温区</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-WenQu" class="xm-select-demo"></div>
+                            </div>
                         </div>
 
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">温区</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-WenQu" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">省份</label>
-                            <div class="layui-input-inline" style="width: 80px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-State" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">经营模式</label>
-                            <div class="layui-input-inline" style="width: 90px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">经营模式</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <!-- <div id="xm-Mathod" class="xm-select-demo"></div> -->
                                 <select id="xm-Mathod" name="Mathod" lay-verify="">
                                     <option value="">请选择</option>
@@ -182,8 +192,8 @@
                                 </select>
                             </div>
 
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">新旧品</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">新旧品</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <!-- <div id="xm-NewOld" class="xm-select-demo"></div> -->
                                 <select id="xm-NewOld" name="NewOld" lay-verify="">
                                     <option value="">请选择</option>
@@ -192,12 +202,12 @@
                                     {/foreach}	
                                 </select>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">季节</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-Season" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">风格</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <!-- <div id="xm-StyleCategoryName" class="xm-select-demo"></div> -->
                                 <select id="xm-StyleCategoryName" name="StyleCategoryName" lay-verify="">
                                     <option value="">请选择</option>
@@ -206,25 +216,28 @@
                                     {/foreach}	
                                 </select>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">一级分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">一级分类</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CategoryName1" class="xm-select-demo"></div>
                             </div>
                             
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">二级分类</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-CategoryName2" class="xm-select-demo"></div>
+                            </div>
+
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">分类</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-CategoryName" class="xm-select-demo"></div>
+                            </div>
                         </div>
 
 
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">二级分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-CategoryName2" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
-                                <div id="xm-CategoryName" class="xm-select-demo"></div>
-                            </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">深浅色</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+
+
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">深浅色</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <!-- <div id="xm-CustomItem46" class="xm-select-demo"></div> -->
                                 <select id="xm-CustomItem46" name="CustomItem46" lay-verify="">
                                     <option value="">请选择</option>
@@ -234,43 +247,39 @@
                                 </select>
                             </div>
 
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">二级时间分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-TimeCategoryName2" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">时间分类</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">时间分类</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-TimeCategoryName" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">厚度</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">厚度</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem17" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">适龄段</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">适龄段</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem1" class="xm-select-demo"></div>
                             </div>
                             
-                        </div>
-
-                        <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">时尚度</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">时尚度</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem45" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">色感</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">色感</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem47" class="xm-select-demo"></div>
                             </div>
-                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">色系</label>
-                            <div class="layui-input-inline" style="width: 130px !important;">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">色系</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-CustomItem48" class="xm-select-demo"></div>
                             </div>
                         </div>
 
-
                     </div>
-                    <div class="flex col between" style="width:5%; height: 70px;">
+                    <div class="flex col between" style="width:5%; height: 105px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
                         </button>
@@ -876,6 +885,10 @@
         // });
 
         function startTable() {
+            var mapHeight = $('#map').height();
+            // var yc = window.localStorage.getItem('viewCustomer_yc');
+            // var gdno = window.localStorage.getItem('viewCustomer_gdno');
+            var height = document.documentElement.clientHeight - mapHeight;
             table.render({
                 elem: '#table'
                 ,url: url1
@@ -887,12 +900,21 @@
                 , page: true
                 , limit: 1000
                 , limits: [1000, 5000, 10000, 20000]
-                , height: 730
+                , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                     { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left', width: 35}
-                    , { field: '周', title: '周', align: 'center', rowspan: 1, fixed:'left', width: 43}
-                    , { field: '月', title: '月', align: 'center', rowspan: 1, fixed:'left', width: 33}
+                    { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left'}
+                    //  { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left', templet: 
+                    // function (data) {
+                    //     return `<div class="weather_div flex col around">
+                    //         <div class="cima_manzu" style="color:#c89804;">${data['年']}</div>
+                    //         <div class="cima_manzu" style="color:#0429c8;">2022</div>
+                    //         <div class="cima_manzu" style="color:#0429c8;">2021</div>
+                    //     </div>`; 
+    
+                    // }}
+                    , { field: '周', title: '周', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: '月', title: '月', align: 'center', rowspan: 1, fixed:'left'}
                     , { field: '周期', title: '周期', align: 'center', rowspan: 1, width: 75, fixed:'left'}
                     , { field: '前年业绩占比', title: '前年业绩占比', align: 'center', rowspan: 1, width: 50} 
                     , { field: '前年库存占比', title: '前年库存占比', align: 'center', rowspan: 1, width: 50}
