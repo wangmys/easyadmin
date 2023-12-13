@@ -48,7 +48,7 @@ class Excelhandle extends AdminController
 
             $param = $this->request->param();
             $where = [];
-
+            $where[] = ['admin_id', '=', session('admin.id')];
             if (isset($param['WarehouseName']) && $param['WarehouseName']) {
                 $where[] = ['WarehouseName', 'IN', explode(',', $param['WarehouseName'])];
             }
@@ -223,6 +223,7 @@ class Excelhandle extends AdminController
                 'puhuo_num' => 0,
                 'status' => 2,
                 'remark' => implode('/', $remarkArr[$v_res['sort']]),
+                'admin_id' => session('admin.id')
             ];
 
             $size_arr = [
@@ -269,7 +270,8 @@ class Excelhandle extends AdminController
         $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
 
         if (empty($data)) {
-            echo '数据为空,请核对';die;
+            echo '数据为空,请核对';
+            die;
         }
         $where = [
             ['date', '=', date('Y-m-d')],
@@ -309,10 +311,7 @@ class Excelhandle extends AdminController
     public function import_excel()
     {
         if (request()->isAjax()) {
-            $runing = Cache::store('cache')->get('runing') ?: 0;
-            if($runing ==1){
-                return json(['code' => 400, 'msg' => '使用中，请询问其它人是否还在使用']);
-            }
+
             $file = request()->file('file');
             $new_name = "import_excel" . '_' . uuid('zhuanhuan') . '.' . $file->getOriginalExtension();
             $save_path = app()->getRootPath() . 'runtime/uploads/' . date('Ymd', time()) . '/';   //文件保存路径
@@ -537,6 +536,7 @@ ORDER BY
                         'GoodsNo' => $item['货号'] ?? '',
                         'CustomerName' => $item['店铺'] ?? '',
                         'xingzhi' => $item['性质'] ?? '上新',
+                        'admin_id' => session('admin.id'),
                         'Stock_Quantity_puhuo' => $Stock_00_puhuo + $Stock_29_puhuo + $Stock_30_puhuo + $Stock_31_puhuo + $Stock_32_puhuo + $Stock_33_puhuo + $Stock_34_puhuo + $Stock_35_puhuo + $Stock_36_puhuo + $Stock_38_puhuo + $Stock_40_puhuo + $Stock_42_puhuo,
                         'Stock_00_puhuo' => $Stock_00_puhuo,
                         'Stock_29_puhuo' => $Stock_29_puhuo,
@@ -599,7 +599,7 @@ ORDER BY
                 }
 
                 try {
-                    $this->mysql->Query("truncate table sp_lyp_puhuo_excel;");
+                    $this->mysql->table('sp_lyp_puhuo_excel')->where('admin_id', session('admin.id'))->delete();
                     //铺货日志批量入库
                     $chunk_list = $arr ? array_chunk($arr, 500) : [];
                     if ($chunk_list) {
