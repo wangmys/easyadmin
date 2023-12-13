@@ -90,6 +90,7 @@ class ExcelhandleService
                 }
             }
 
+
             //鞋子
             foreach ($shoes as $s_k => $s_v) {
                 if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$cus][$s_k])) { //加到原来的
