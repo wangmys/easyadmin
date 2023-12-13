@@ -179,11 +179,14 @@
                 , where: {yc: yc, gdno:gdno}
                 , cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '云仓', title: '云仓' }
-                    ,{ field: '货号', title: '货号' }
-                    , { field: '二级风格', title: '二级风格' }
-                    , { field: '店铺名称', title: '店铺名称' }
-                    , { field: '经营模式', title: '经营模式' }
+                    { field: '云仓', title: '云仓', align:'center' }
+                    ,{ field: '货号', title: '货号', align:'center' }
+                    , { field: '二级风格', title: '二级风格', align:'center' }
+                    , { field: '商品专员', title: '商品专员', align:'center' }
+                    , { field: '店铺名称', title: '店铺名称', align:'center' }
+                    , { field: '店铺等级', title: '店铺等级', align:'center' }
+                    , { field: '温区', title: '温区', align:'center' }
+                    , { field: '经营模式', title: '经营模式', align:'center' }
                 ]]
                 ,done: function (res, curr, count) {
                     // layer.alert("加载完成");

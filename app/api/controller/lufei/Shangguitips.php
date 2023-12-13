@@ -1387,6 +1387,16 @@ class Shangguitips extends BaseController
             // dump($select_可上);
             $this->db_easyA->table('cwl_shangguitips_keshang_customer')->strict(false)->insertAll($select_可上);            
         }
+
+        $sql_店铺等级_商品专员_温区 = "
+            update `cwl_shangguitips_keshang_customer` as m
+            left join customer as c on m.店铺名称 = c.CustomerName
+            set
+                m.店铺等级 = c.CustomerGrade,
+                m.商品专员 = c.CustomItem17,
+                m.温区 = c.CustomItem36
+        ";
+        $this->db_easyA->execute($sql_店铺等级_商品专员_温区);
     }
 
     // 请上柜
