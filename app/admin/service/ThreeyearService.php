@@ -95,6 +95,7 @@ class ThreeyearService
         sum(StockQuantity) as '店均库存量', '' as '店周转(天)'";
         $field_weather = "CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' ) as Start_time, max(d.weather_time) as End_time, b.customer_name,max(d.max_c) as max_c, min(d.min_c) as min_c, CONCAT(SUBSTRING(  CONCAT( FROM_DAYS(TO_DAYS(d.weather_time) - MOD(TO_DAYS(d.weather_time) -2, 7)), ' 00:00:00' )  , 6, 5), ' 到 ', SUBSTRING( max(d.weather_time) , 6, 5)) as '周期'";
 
+        // print_r($field_weather);die;
         //如果有保存筛选条件的，且当前筛选条件等于已保存的筛选条件，则优先查缓存
         $index_search_data = SpCustomerStockSaleThreeyear2WeekCacheModel::where([['index_str', '=', 'threeyear_search']])->field('cache_data,cache_search_param')->find();
         $search_param = $params;
@@ -103,6 +104,9 @@ class ThreeyearService
         if (isset($search_param['page'])) unset($search_param['page']);
         if ( (!$from_cache && !$search_param) || ($index_search_data && $index_search_data['cache_data'] && ($index_search_data['cache_search_param'] == json_encode($search_param))) ) {
             $cache = json_decode($index_search_data['cache_data'], true);
+
+            // echo '<pre>';
+            // print_r($cache);die;
             if ($cache) {
                 return $cache;
             }

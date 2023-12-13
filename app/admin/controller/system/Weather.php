@@ -145,7 +145,8 @@ class Weather extends AdminController
                                 $diff = $vv['max_c']-$vv['min_c'];
                                 if ($vv['max_c'] > 30) {
                                     $value_c = $vv['max_c'];
-                                } elseif ($diff <= 5) {
+                                // } elseif ($diff <= 5) {
+                                } elseif ($diff <= 5 || $vv['max_c'] <= 18) { // 新增的 $vv['max_c'] <= 18
                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 );
                                 } elseif ($diff > 5 && $diff <= 10) {
                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 2;
@@ -155,28 +156,7 @@ class Weather extends AdminController
                                 }
 
                             }
-                            // if ($value_c < 10) {
-                            //     $bgCol = 'rgb(47,117,181)';
-                            //     $fontCol = '#000000';
-                            // } else if ($value_c >= 10 && $value_c < 18) {
-                            //     $bgCol = 'rgb(163,200,232)';
-                            //     $fontCol = '#000000';
-                            // } else if ($value_c >= 18 && $value_c < 22) {
-                            //     $bgCol = 'rgb(254,250,186)';
-                            //     $fontCol = '#000000';  
-                            // } else if ($value_c >= 22 && $value_c  < 26) {
-                            //     $bgCol = 'rgb(252,216,84)';
-                            //     $fontCol = '#000000';  
-                            // } else if ($value_c >= 26 && $value_c  < 30) {
-                            //     $bgCol = 'rgb(251,184,5)';
-                            //     $fontCol = '#000000';
-                            // } else if ($value_c >= 30) {
-                            //     $bgCol = 'rgb(239,33,33)';
-                            //     $fontCol = '#000000';
-                            // } else{
-                            //     $bgCol = '#fecc51';
-                            //     $fontCol = '#000000';
-                            // }
+
 
                             if ($value_c <= 10) {
                                 $bgCol = 'rgb(47,117,181)';

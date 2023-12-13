@@ -231,9 +231,14 @@ class Organize extends BaseController
         
         if ($select) {
             $this->db_easyA->execute('TRUNCATE dd_customer_push;');
+
+            $this->db_easyA->table('dd_customer_push_baokuan')->where([
+                '更新日期' => date('Y-m-d')
+            ])->delete();
             $chunk_list = array_chunk($select, 500);
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($val);
+                $this->db_easyA->table('dd_customer_push_baokuan')->strict(false)->insertAll($val);
             }
 
             $date = date('Y-m-d');
@@ -242,12 +247,40 @@ class Organize extends BaseController
             )->select()->toArray();
             // dump($补丁);die;
             $this->db_easyA->table('dd_customer_push')->strict(false)->insertAll($补丁);
+            $this->db_easyA->table('dd_customer_push_baokuan')->strict(false)->insertAll($补丁);
+
+            $this->baokuan_handle();    
+
             return json([
                 'status' => 0,
                 'msg' => 'error',
                 'content' => "店铺推送表：dd_customer_push  更新成功！"
             ]);
         }
+    }
+
+    // 爆款名单逻辑处理
+    public function baokuan_handle() {
+        $sql_星期_推送时间_url = "
+            update
+                dd_customer_push_baokuan
+            set
+                星期 = WEEKDAY(更新日期) + 1,
+                推送星期 = 1,
+                path = 'http://im.babiboy.com/babiboylogo.jpg',
+                url = concat('http://im.babiboy.com/admin/system.dingding.Baokuan/res?店铺名称=', 店铺名称) 
+        ";
+        $this->db_easyA->execute($sql_星期_推送时间_url);
+
+        $date = date('Y-m-d');
+        $sql_删除非推送日的数据 = "
+            delete from
+                dd_customer_push_baokuan
+            where
+                更新日期 = '{$date}'
+                AND 星期 != 推送星期
+        ";
+        $this->db_easyA->execute($sql_删除非推送日的数据);
     }
 
     public function ddUser_weather() {

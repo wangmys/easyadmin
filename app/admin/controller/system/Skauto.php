@@ -208,7 +208,6 @@ class Skauto extends AdminController
                     省份 asc
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
-            // die;
 
             $select = $this->db_easyA->query($sql);
 
@@ -275,8 +274,10 @@ class Skauto extends AdminController
         if (request()->isAjax()) {
             $input = input();
             foreach ($input as $key => $val) {
-                if (empty($val)) {
-                    unset($input[$key]);
+                if ( $key != '在途库存') {
+                    if (empty($val)) {
+                        unset($input[$key]);
+                    }
                 }
             }
             if (checkAdmin()) {
@@ -361,9 +362,23 @@ class Skauto extends AdminController
             } else {
                 $map11 = "";
             }
+            if ($input['在途库存'] === '0') {
+                // echo $input['商品负责人'];
+                $map12Str = xmSelectInput($input['在途库存']);
+                $map12 = " AND 在途库存 + 已配未发 <= {$map12Str}";
+            } else {
+                $map12 = "";
+            }
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $map13Str = xmSelectInput($input['季节归集']);
+                $map13 = " AND 季节归集 IN ({$map13Str})";
+            } else {
+                $map13 = "";
+            }
 
 
-            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}";
+            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}{$map12}{$map13}";
             $code = rand_code(6);
             cache($code, $map, 3600);
 
@@ -404,6 +419,7 @@ class Skauto extends AdminController
                     {$map}
                 order by 省份 asc
             ";
+
             $select = $this->db_easyA->query($sql);
             $header = [];
             foreach($select[0] as $key => $val) {
