@@ -692,8 +692,15 @@
                         // 广州
                         { title: `<div class="flex col around">
                                 <div class="cima">最晚入库</div>
-                                <div class="cima">时间</div>
-                                </div>`, field: '广州云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
+                                <div class="cima">时间 / 量</div>
+                                </div>`, field: '广州云仓_入库时间', align: 'center', width: 60,  rowspan: 1, templet: 
+                        function (data) {
+                            return `<div class="weather_div flex col around">
+                                    <div class="cima_2" style="line-height:5px">${data['广州云仓_入库时间']?data['广州云仓_入库时间']:''}</div>
+                                    <div></div>
+                                    <div class="cima2_2 cool" style="line-height:5px">${data['广州云仓_入库量']?data['广州云仓_入库量']+ ' 件':''}</div>
+                                </div>`; 
+                        }}
                         ,{title: `<div class="flex col around">
                                 <div class="cima">未上柜</div>
                                 <div class="cima">明细</div>
@@ -735,8 +742,15 @@
                         // 南昌
                         ,{ title: `<div class="flex col around">
                                 <div class="cima">最晚入库</div>
-                                <div class="cima">时间</div>
-                                </div>`, field: '南昌云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
+                                <div class="cima">时间 / 量</div>
+                                </div>`, field: '南昌云仓_入库时间', align: 'center', width: 60,  rowspan: 1, templet: 
+                        function (data) {
+                            return `<div class="weather_div flex col around">
+                                    <div class="cima_2" style="line-height:5px">${data['南昌云仓_入库时间']?data['南昌云仓_入库时间']:''}</div>
+                                    <div></div>
+                                    <div class="cima2_2 cool" style="line-height:5px">${data['南昌云仓_入库量']?data['南昌云仓_入库量']+ ' 件':''}</div>
+                                </div>`; 
+                        }}
                         ,{title: `<div class="flex col around">
                                 <div class="cima">未上柜</div>
                                 <div class="cima">明细</div>
@@ -777,8 +791,15 @@
                         // 贵阳
                         ,{ title: `<div class="flex col around">
                                 <div class="cima">最晚入库</div>
-                                <div class="cima">时间</div>
-                                </div>`, field: '贵阳云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
+                                <div class="cima">时间 / 量</div>
+                                </div>`, field: '贵阳云仓_入库时间', align: 'center', width: 60,  rowspan: 1, templet: 
+                        function (data) {
+                            return `<div class="weather_div flex col around">
+                                    <div class="cima_2" style="line-height:5px">${data['贵阳云仓_入库时间']?data['贵阳云仓_入库时间']:''}</div>
+                                    <div></div>
+                                    <div class="cima2_2 cool" style="line-height:5px">${data['贵阳云仓_入库量']?data['贵阳云仓_入库量']+ ' 件':''}</div>
+                                </div>`; 
+                        }} 
                         ,{title: `<div class="flex col around">
                                 <div class="cima">未上柜</div>
                                 <div class="cima">明细</div>
@@ -819,8 +840,15 @@
                         // 长沙
                         ,{ title: `<div class="flex col around">
                                 <div class="cima">最晚入库</div>
-                                <div class="cima">时间</div>
-                                </div>`, field: '长沙云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
+                                <div class="cima">时间 / 量</div>
+                                </div>`, field: '长沙云仓_入库时间', align: 'center', width: 60,  rowspan: 1, templet: 
+                        function (data) {
+                            return `<div class="weather_div flex col around">
+                                    <div class="cima_2" style="line-height:5px">${data['长沙云仓_入库时间']?data['长沙云仓_入库时间']:''}</div>
+                                    <div></div>
+                                    <div class="cima2_2 cool" style="line-height:5px">${data['长沙云仓_入库量']?data['长沙云仓_入库量']+ ' 件':''}</div>
+                                </div>`; 
+                        }} 
                         ,{title: `<div class="flex col around">
                                 <div class="cima">未上柜</div>
                                 <div class="cima">明细</div>
@@ -862,8 +890,15 @@
                         // 武汉
                         ,{ title: `<div class="flex col around">
                                 <div class="cima">最晚入库</div>
-                                <div class="cima">时间</div>
-                                </div>`, field: '武汉云仓_入库时间', align: 'center', width: 60,  rowspan: 1} 
+                                <div class="cima">时间 / 量</div>
+                                </div>`, field: '武汉云仓_入库时间', align: 'center', width: 60,  rowspan: 1, templet: 
+                        function (data) {
+                            return `<div class="weather_div flex col around">
+                                    <div class="cima_2" style="line-height:5px">${data['武汉云仓_入库时间']?data['武汉云仓_入库时间']:''}</div>
+                                    <div></div>
+                                    <div class="cima2_2 cool" style="line-height:5px">${data['武汉云仓_入库量']?data['武汉云仓_入库量']+ ' 件':''}</div>
+                                </div>`; 
+                        }} 
                         ,{title: `<div class="flex col around">
                                 <div class="cima">未上柜</div>
                                 <div class="cima">明细</div>
