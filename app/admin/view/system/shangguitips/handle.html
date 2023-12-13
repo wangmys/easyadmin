@@ -127,7 +127,7 @@
             background-color: #f885f8 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-3"] {
+        th[data-key="1-1-5"] {
             background-color: #f885f8 !important;
             color:#ffffff;
         }
@@ -135,7 +135,7 @@
             background-color: #1e71c7 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-6"] {
+        th[data-key="1-1-8"] {
             background-color: #1e71c7 !important;
             color:#ffffff;
         }
@@ -143,7 +143,7 @@
             background-color: #7cacf5 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-9"] {
+        th[data-key="1-1-11"] {
             background-color: #7cacf5 !important;
             color:#ffffff;
         }
@@ -151,7 +151,7 @@
             background-color: #4cddaf !important;
             color:#ffffff;
         }
-        th[data-key="1-1-10"] {
+        th[data-key="1-1-12"] {
             background-color: #6baa96 !important;
             color:#ffffff;
         }
@@ -159,15 +159,8 @@
             background-color: #6baa96 !important;
             color:#ffffff;
         }
-        /* th[data-key="1-1-11"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        }
-        th[data-key="1-2-5"] {
-            background-color: #6baa96 !important;
-            color:#ffffff;
-        } */
-        th[data-key="1-1-11"] {
+
+        th[data-key="1-1-13"] {
             background-color: #2e9574 !important;
             color:#ffffff;
         }
@@ -179,51 +172,51 @@
             background-color: #5a9afa !important;
             color:#ffffff;
         }
-        th[data-key="1-1-14"] {
+        th[data-key="1-1-16"] {
             background-color: #5a9afa !important;
             color:#ffffff;
         }
-        th[data-key="1-0-14"] {
+        th[data-key="1-1-17"] {
             background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-key="1-1-15"] {
-            background-color: #c4b360 !important;
+        th[data-key="1-1-18"] {
+            background-color: #d8c35d !important;
             color:#ffffff;
         }
         th[data-key="1-2-8"] {
-            background-color: #c4b360 !important;
+            background-color: #c5aa2a !important;
             color:#ffffff;
         }
-        th[data-key="1-1-16"] {
+        th[data-key="1-0-14"] {
             background-color: #d8c35d !important;
             color:#ffffff;
         }
         th[data-key="1-2-11"] {
-            background-color: #d8c35d !important;
+            background-color: #c4b360 !important;
             color:#ffffff;
         }
-        th[data-key="1-1-17"] {
+        /* th[data-key="1-1-17"] {
+            background-color: #f5d954 !important;
+            color:#b66b6b;
+        } */
+        th[data-key="1-1-19"],th[data-key="1-2-14"] {
             background-color: #f5d954 !important;
             color:#b66b6b;
         }
-        th[data-key="1-2-14"] {
-            background-color: #f5d954 !important;
-            color:#b66b6b;
-        }
-        th[data-key="1-1-18"] {
+        /* th[data-key="1-1-18"] {
             background-color: #deef21 !important;
-            /* color:#000; */
-        }
-        th[data-key="1-1-19"] {
+
+        } */
+        th[data-key="1-1-21"] {
             background-color: #ff6b6b !important;
             color:#ffffff;
         }
-        th[data-key="1-1-20"] {
+        th[data-key="1-1-20"],th[data-key="1-1-22"] {
             background-color: #e6f543 !important;
             /* color:#363535; */
         }
-        th[data-key="1-1-21"] {
+        th[data-key="1-1-23"] {
             background-color: #e4f80c !important;
             color:#000;
         }
@@ -605,6 +598,7 @@
                     [
                         { field: '云仓', title: '云仓', fixed: 'left' ,align: 'center' , width: 32, rowspan: 3}
                         ,{ field: '季节归集', title: '季节', fixed: 'left' ,align: 'center' , width: 35, rowspan: 3}
+                        ,{ field: '上市波段', title: '波段', fixed: 'left' ,align: 'center' , width: 35, rowspan: 3}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima"></div>
                                     <div class="cima">一级</div>
@@ -617,7 +611,7 @@
                                     <div class="cima">分类</div>
                                     <div class="cima"></div>
                                     </div>`, field: '二级分类', fixed: 'left', width: 60, align: 'center', rowspan: 3}
-                        ,{ title: `分类`,field: '分类', fixed: 'left', align: 'center', width: 80,rowspan: 3}
+                        ,{ title: `分类`,field: '分类', fixed: 'left', align: 'center', width: 100,rowspan: 3}
                         ,{ title: `风格`, field: '风格', fixed: 'left', width: 50, align: 'center' ,rowspan: 3, hide: false}
                         ,{ title: `<div class="flex col around">
                                     <div class="cima"></div>
@@ -626,8 +620,8 @@
                                     <div class="cima"></div>
                                     </div>`, field: '二级风格', fixed: 'left', width: 40, align: 'center' ,rowspan: 3, hide: false}
                         ,{ title: `货号`, field: '货号', fixed: 'left', width: 75, align: 'center' ,rowspan: 3}
-                        ,{ title: `克重`, field: '克重', fixed: 'left', width: 40, align: 'center' ,rowspan: 3}
-                        ,{ title: `仓库情况`, align: 'center', colspan: 4}
+                        // ,{ title: `克重`, field: '克重', fixed: 'left', width: 40, align: 'center' ,rowspan: 3}
+                        ,{ title: `仓库情况`, align: 'center', colspan: 6}
                         ,{ title: `店铺个数`, align: 'center', colspan: 3}
                         
                         ,{ title: `实际上柜情况`, align: 'center', colspan: 3}
@@ -659,6 +653,16 @@
 
                         // 仓库情况
                         {title: `<div class="flex col around">
+                                    <div class="cima">最晚</div>
+                                    <div class="cima">入库</div>
+                                    <div class="cima">时间</div>
+                                    </div>`, field: '最晚入库时间', align: 'center' , width: 40, rowspan: 2}
+                        ,{title: `<div class="flex col around">
+                                    <div class="cima">最晚</div>
+                                    <div class="cima">入库</div>
+                                    <div class="cima">量</div>
+                                    </div>`, field: '最晚入库量', align: 'center' , width: 35, rowspan: 2}
+                        ,{title: `<div class="flex col around">
                                     <div class="cima"></div>
                                     <div class="cima">可用</div>
                                     <div class="cima">数量</div>

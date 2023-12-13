@@ -1483,6 +1483,8 @@ class Shangguitips extends BaseController
                 '主码最小值码数' => $主码最小值码数
             ]);
         }
+
+        $this->boduan();
     }
 
     // 钉钉推送
@@ -1559,7 +1561,10 @@ class Shangguitips extends BaseController
             }
 
             // 入库时间
-            $this->ruku($goodsNos);            
+            $this->ruku($goodsNos);      
+            
+            // 帮主表更新入库时间
+            $this->lasttime();
         }
     }
 
@@ -1687,5 +1692,61 @@ class Shangguitips extends BaseController
                 $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val);
             }
         }
+    }
+
+    // pc主表更新波段
+    public function boduan() {
+        $sql_货号 = "
+            SELECT
+                货号 
+            FROM
+                `cwl_shangguitips_handle` 
+            WHERE
+                1
+        ";
+        $select_货号 = $this->db_easyA->query($sql_货号);
+        $goodsNos = '';
+        foreach ($select_货号 as $key => $val) {
+            if ($key + 1 < count($select_货号)) {
+                $goodsNos .= "'".$val['货号']."',";
+            } else {
+                $goodsNos .= "'".$val['货号']."'";
+            }
+        }
+        // echo $goodsNos;die;
+        $sql_上市波段 = "
+            SELECT
+                EG.GoodsNo as 货号,
+                EG.TimeCategoryName AS 上市波段
+            FROM ErpGoods AS EG
+            LEFT JOIN ErpGoodsImg AS EGI ON EGI.GoodsId = EG.GoodsId
+            WHERE
+                EG.GoodsNo IN ({$goodsNos})
+        ";
+        $select_上市波段 = $this->db_sqlsrv->query($sql_上市波段);
+        if ($select_上市波段) {
+            foreach ($select_货号 as $k1 => $v1) {
+                foreach ($select_上市波段 as $k2 => $v2) {
+                    if ($v1['货号'] == $v2['货号']) {
+                        $this->db_easyA->table('cwl_shangguitips_handle')->where(['货号' => $v1['货号']])->update([
+                            '上市波段' => $v2['上市波段'],
+                        ]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // pc主表 最晚入库时间，量 等网页推送执行完再执行
+    public function lasttime() {
+        $sql = "
+            update `cwl_shangguitips_handle` as h
+            left join cwl_shangguitips_handle_push_ruku as r on h.云仓 = r.云仓 and h.货号 = r.货号
+            set
+                h.最晚入库时间 = r.最晚入库时间,
+                h.最晚入库量 = r.最晚入库量
+        ";
+        $this->db_easyA->execute($sql);
     }
 }
