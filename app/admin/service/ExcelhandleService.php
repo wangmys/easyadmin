@@ -34,7 +34,7 @@ class ExcelhandleService
         $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
         $data = [];
-        $exDb = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->select()->toArray();
+        $exDb = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->select()->toArray();
         $CustomersKV = array_column($exDb, null, 'CustomerName');
 //        $Customers = array_values(array_unique(array_column($exDb, 'CustomerName')));
 //        $Customers = ['安康一店', '阿拉尔一店'];
@@ -51,7 +51,7 @@ class ExcelhandleService
                 'CustomItem17' => $item,
                 'date' => date('Y-m-d')
             ];
-            $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->order('sort desc')->value('sort');
+            $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->where('admin_id', session('admin.id'))->order('sort desc')->value('sort');
             if ($sortDb) {
                 $numArr[$item] = (int)$sortDb + 1;
             }
@@ -63,9 +63,9 @@ class ExcelhandleService
             $yk_con = isset($config['特殊店铺'][$cus]['YK']) ? $config['特殊店铺'][$cus]['YK'] : $config['衣裤'];
             $xl_con = isset($config['特殊店铺'][$cus]['XZ']) ? $config['特殊店铺'][$cus]['XZ'] : $config['鞋子'];
             //衣裤
-            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('CustomerName', $cus)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->where('CustomerName', $cus)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
                 ->order('CategoryName1 ASC')->select()->toArray();
-            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('CustomerName', $cus)->where('CategoryName1', '鞋履')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->where('CustomerName', $cus)->where('CategoryName1', '鞋履')->select()->toArray();
             $total = 0; //总件数
             //处理衣裤
 
