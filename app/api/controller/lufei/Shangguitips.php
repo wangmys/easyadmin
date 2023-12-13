@@ -1582,13 +1582,78 @@ class Shangguitips extends BaseController
 
     // 入库
     public function ruku($goodsNos = "") {
-        if ($goodsNos) {
-            $sql_入库时间 = "
-                SELECT
+        // if ($goodsNos) {
+        //     $sql_入库时间 = "
+        //         SELECT
+        //                 EG.GoodsName 货品名称,
+        //                 EG.GoodsNo 货号,
+        //                 EW.WarehouseName 云仓,
+        //                 CONVERT(varchar(10), ER.ReceiptDate, 120) AS 入库时间
+        //         FROM
+        //                 ErpReceipt AS ER
+        //                 LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
+        //                 LEFT JOIN ErpReceiptGoods AS ERG ON ER.ReceiptId = ERG.ReceiptId
+        //                 LEFT JOIN erpGoods AS EG ON ERG.GoodsId = EG.GoodsId
+        //                 LEFT JOIN ErpSupply AS ES ON ER.SupplyId = ES.SupplyId 
+        //         WHERE
+        //                 ER.CodingCodeText = '已审结' 
+        //                 AND ER.Type= 1 
+        //                 -- AND ES.SupplyName <> '南昌岳歌服饰' 
+        //                 AND EG.TimeCategoryName1 IN ( '2023','2024') 
+        //                 AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓') 
+        //                 AND EG.GoodsNo IN ({$goodsNos})
+        //         GROUP BY
+        //                 EG.GoodsNo
+        //                 ,EG.GoodsId
+        //                 ,EG.GoodsName 
+        //                 ,EW.WarehouseName
+        //                 ,CONVERT(varchar(10), ER.ReceiptDate, 120)
+        //     ";
+        //     $select_入库时间 = $this->db_sqlsrv->query($sql_入库时间);
+        //     if ($select_入库时间) {
+        //         $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
+        //         $chunk_list = array_chunk($select_入库时间, 500);
+
+        //         foreach($chunk_list as $key => $val) {
+        //             $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val);
+        //         }
+        //     }   
+
+        //     // $this->db_easyA->table('cwl_shangguitips_pc')->field('云仓,货号')->where()->select();
+        //     $sql_最近日期 = "
+        //         SELECT
+        //             货号,
+        //             云仓,
+        //             max(入库时间) as 入库时间
+        //         FROM
+        //             `cwl_shangguitips_handle_push_ruku` 
+        //         WHERE 1
+        //         GROUP BY
+        //             云仓,货号
+        //     ";
+        //     $select_最近日期 = $this->db_easyA->query($sql_最近日期);
+        //     if ($select_最近日期) {
+        //         $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
+        //         $chunk_list2 = array_chunk($select_最近日期, 500);
+
+        //         foreach($chunk_list2 as $key2 => $val2) {
+        //             $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val2);
+        //         }
+        //     }
+        // }
+
+        $sql_最晚入库时间_量  = "
+            SELECT 
+                T.*,
+                SUM(EWS.Quantity) as 最晚入库量 
+            FROM (
+                SELECT 
                         EG.GoodsName 货品名称,
                         EG.GoodsNo 货号,
+                        EG.GoodsId,
                         EW.WarehouseName 云仓,
-                        CONVERT(varchar(10), ER.ReceiptDate, 120) AS 入库时间
+                        EW.WarehouseId,
+                        CONVERT(varchar(10), MAX(ER.ReceiptDate), 120) AS 最晚入库时间
                 FROM
                         ErpReceipt AS ER
                         LEFT JOIN ErpWarehouse AS EW ON ER.WarehouseId = EW.WarehouseId
@@ -1598,50 +1663,29 @@ class Shangguitips extends BaseController
                 WHERE
                         ER.CodingCodeText = '已审结' 
                         AND ER.Type= 1 
-                        -- AND ES.SupplyName <> '南昌岳歌服饰' 
+                        AND ES.SupplyName <> '南昌岳歌服饰' 
                         AND EG.TimeCategoryName1 IN ( '2023','2024') 
                         AND EW.WarehouseName IN ( '南昌云仓', '武汉云仓', '广州云仓', '贵阳云仓', '长沙云仓') 
-                        AND EG.GoodsNo IN ({$goodsNos})
+            -- 					AND EG.GoodsNo IN ('B72212371')
                 GROUP BY
                         EG.GoodsNo
                         ,EG.GoodsId
                         ,EG.GoodsName 
                         ,EW.WarehouseName
-                        ,CONVERT(varchar(10), ER.ReceiptDate, 120)
-            ";
-            $select_入库时间 = $this->db_sqlsrv->query($sql_入库时间);
-            if ($select_入库时间) {
-                $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
-                $chunk_list = array_chunk($select_入库时间, 500);
+                        ,EW.WarehouseId
+            ) AS T 
+            LEFT JOIN  ErpWarehouseStock AS EWS ON EWS.WarehouseId = T.WarehouseId AND EWS.goodsId = T.GoodsId AND EWS.Quantity > 0 AND EWS.BillType = 'ErpReceipt'
+                    AND EWS.StockDate = T.最晚入库时间
+            GROUP BY T.货品名称, T.货号,T.GoodsId,T.云仓,T.WarehouseId,T.最晚入库时间
+        ";
+        $select_最晚入库时间_量 = $this->db_sqlsrv->query($sql_最晚入库时间_量);
+        if ($select_最晚入库时间_量) {
+            $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
+            $chunk_list = array_chunk($select_最晚入库时间_量, 500);
 
-                foreach($chunk_list as $key => $val) {
-                    $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val);
-                }
-            }   
-
-            // $this->db_easyA->table('cwl_shangguitips_pc')->field('云仓,货号')->where()->select();
-            $sql_最近日期 = "
-                SELECT
-                    货号,
-                    云仓,
-                    max(入库时间) as 入库时间
-                FROM
-                    `cwl_shangguitips_handle_push_ruku` 
-                WHERE 1
-                GROUP BY
-                    云仓,货号
-            ";
-            $select_最近日期 = $this->db_easyA->query($sql_最近日期);
-            if ($select_最近日期) {
-                $this->db_easyA->execute('TRUNCATE cwl_shangguitips_handle_push_ruku;');
-                $chunk_list2 = array_chunk($select_最近日期, 500);
-
-                foreach($chunk_list2 as $key2 => $val2) {
-                    $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val2);
-                }
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_shangguitips_handle_push_ruku')->strict(false)->insertAll($val);
             }
         }
-
-
     }
 }
