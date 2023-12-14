@@ -237,6 +237,14 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <div id="xm-jjgj" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-yc" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">商品专员</label>
+                            <div class="layui-input-inline" style="width: 130px !important;">
+                                <div id="xm-zy" class="xm-select-demo"></div>
+                            </div>
                         </div>
                     </div>
                     
@@ -389,6 +397,34 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-zy', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '商品负责人',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
+        xmSelect.render({
+            el: '#xm-yc', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '云仓',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+
+            ]
+        })
+
         // xmSelect.render({
         //     el: '#xm-tips', 
         //     filterable: true,
@@ -431,7 +467,30 @@
                     name:'店铺名称',
                     data: res.data.customer
                 })
-
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-yc', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'云仓',
+                    data: res.data.yc
+                })
+                // // 渲染所有店铺
+                xmSelect.render({
+                    el: '#xm-zy', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'商品负责人',
+                    data: res.data.zy
+                })
             }, 'json')
         }
 
@@ -506,7 +565,9 @@
                 , where: {"类型": "内搭" , "风格" : '基本款', '季节归集':'冬季'}
                 , cols: [
                     [
-                        { title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
+                        { title: `云仓`, field: '云仓', fixed: 'left' ,align: 'center' , width: 35, rowspan: 2}
+                        ,{ title: `店铺名称`, field: '店铺名称', fixed: 'left' ,align: 'center' , width: 60, rowspan: 2}
+                        ,{ title: `专员`, field: '商品负责人', fixed: 'left' ,align: 'center' , width: 50, rowspan: 2}
                         ,{ field: '省份', title: '省份', fixed: 'left' ,align: 'center' , width: 35, rowspan: 2}
                         ,{ field: '季节归集', title: '季节', fixed: 'left' ,align: 'center' , width: 35, rowspan: 2}
                         ,{ title: `<div class="flex col around">
@@ -529,6 +590,7 @@
                                     <div class="cima"></div>
                                     </div>`, field: '一级风格', fixed: 'left', width: 35, align: 'center' ,rowspan: 3, hide: false}
 
+                        ,{ title: `云仓可用`, align: 'center', colspan: 3}
                         ,{ title: `预计库存SKC`, align: 'center', colspan: 3}
                         ,{ title: `预计库存件数`, align: 'center', colspan: 3}
                         ,{ title: `店铺累销尺码占比`, align: 'center', colspan: 7}
@@ -550,8 +612,33 @@
                     ],
 
                     [
+                        // 云仓可用
+                        { field: '云仓可用29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['云仓可用29/38/46/105/165/M'] && data['云仓可用29/38/46/105/165/M'] != 0) {
+                                return data['云仓可用29/38/46/105/165/M'];   
+                            } else {
+                                return '';
+                            }  
+                        }}
+                        ,{ field: '云仓可用34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['云仓可用34/43/56/190/4XL'] && data['云仓可用34/43/56/190/4XL'] != 0) {
+                                return data['云仓可用34/43/56/190/4XL'];   
+                            } else {
+                                return '';
+                            }  
+                        }}
+                        ,{ field: '云仓可用35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 1, templet:
+                        function (data) {
+                            if (data['云仓可用35/44/58/195/5XL'] && data['云仓可用35/44/58/195/5XL'] != 0) {
+                                return data['云仓可用35/44/58/195/5XL'];   
+                            } else {
+                                return '';
+                            }  
+                        }}
                         // 预计库存sck
-                        { field: '预计SKC_29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 1} 
+                        ,{ field: '预计SKC_29/38/46/105/165/M', title: '小码-46' ,align: 'center' , width: 50, rowspan: 1} 
                         ,{ field: '预计SKC_34/43/56/190/4XL', title: '大码-56' ,align: 'center' , width: 50, rowspan: 1} 
                         ,{ field: '预计SKC_35/44/58/195/5XL', title: '大码-58' ,align: 'center' , width: 50, rowspan: 1} 
 

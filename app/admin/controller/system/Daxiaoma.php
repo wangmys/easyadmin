@@ -171,13 +171,33 @@ class Daxiaoma extends AdminController
                 $map7 = "";
             }
 
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['云仓']);
+                $map8 = " AND 云仓 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+            
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['商品负责人']);
+                $map9 = " AND 商品负责人 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+
             $sql = "
                 SELECT 
+                    left(云仓, 2) as 云仓,商品负责人,
                     left(省份, 2) as 省份,
                     店铺名称,一级分类,二级分类,
                     left(风格, 2) as 风格,
                     left(一级风格, 2) as 一级风格,
-                    季节归集,`预计SKC_00/28/37/44/100/160/S`,`预计SKC_29/38/46/105/165/M`,`预计SKC_30/39/48/110/170/L`,`预计SKC_31/40/50/115/175/XL`,
+                    季节归集,
+                    `云仓可用00/28/37/44/100/160/S`,`云仓可用29/38/46/105/165/M`,`云仓可用30/39/48/110/170/L`,`云仓可用31/40/50/115/175/XL`,
+                    `云仓可用32/41/52/120/180/2XL`,`云仓可用33/42/54/125/185/3XL`,`云仓可用34/43/56/190/4XL`,`云仓可用35/44/58/195/5XL`,`云仓可用36/6XL`,`云仓可用38/7XL`,`云仓可用_40`,
+                    `预计SKC_00/28/37/44/100/160/S`,`预计SKC_29/38/46/105/165/M`,`预计SKC_30/39/48/110/170/L`,`预计SKC_31/40/50/115/175/XL`,
                     `预计SKC_32/41/52/120/180/2XL`,`预计SKC_33/42/54/125/185/3XL`,`预计SKC_34/43/56/190/4XL`,`预计SKC_35/44/58/195/5XL`,`预计SKC_36/6XL`,`预计SKC_38/7XL`,`预计SKC_40`,
                     `预计00/28/37/44/100/160/S`,`预计29/38/46/105/165/M`,`预计30/39/48/110/170/L`,`预计31/40/50/115/175/XL`,`预计32/41/52/120/180/2XL`,`预计33/42/54/125/185/3XL`,
                     `预计34/43/56/190/4XL`,`预计35/44/58/195/5XL`,`预计36/6XL`,`预计38/7XL`,`预计_40`,`预计库存数量`,`总入量00/28/37/44/100/160/S`,`总入量29/38/46/105/165/M`,
@@ -200,6 +220,10 @@ class Daxiaoma extends AdminController
                     {$map5}
                     {$map6}
                     {$map7}
+                    {$map8}
+                    {$map9}
+                ORDER BY
+                    云仓, 商品负责人  
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";  
 
@@ -219,6 +243,8 @@ class Daxiaoma extends AdminController
                     {$map5}
                     {$map6}
                     {$map7}
+                    {$map8}
+                    {$map9}
             ";
             $count = $this->db_easyA->query($sql2);
             $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
@@ -277,11 +303,17 @@ class Daxiaoma extends AdminController
         $customer = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM cwl_daxiao_handle GROUP BY 店铺名称
         ");
-        
+        $yc = $this->db_easyA->query("
+            SELECT 云仓 as name, 云仓 as value FROM cwl_daxiao_handle GROUP BY 云仓
+        ");
+        $zy = $this->db_easyA->query("
+            SELECT 商品负责人 as name, 商品负责人 as value FROM cwl_daxiao_handle GROUP BY 商品负责人
+        ");
+            
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['province' => $province, 'customer' => $customer]]);
+        return json(["code" => "0", "msg" => "", "data" => ['province' => $province, 'customer' => $customer, 'yc' => $yc, 'zy' => $zy]]);
     }
 
     public function excel_handle() {
@@ -389,7 +421,24 @@ class Daxiaoma extends AdminController
                 $map7 = "";
             }
 
-            $map = "{$map0}{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}";
+            
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $map8Str = xmSelectInput($input['云仓']);
+                $map8 = " AND 云仓 IN ({$map8Str})";
+            } else {
+                $map8 = "";
+            }
+            
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map9Str = xmSelectInput($input['商品负责人']);
+                $map9 = " AND 商品负责人 IN ({$map9Str})";
+            } else {
+                $map9 = "";
+            }
+
+            $map = "{$map0}{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}";
 
             $code = rand_code(6);
             cache($code, $map, 3600);
@@ -409,11 +458,15 @@ class Daxiaoma extends AdminController
             // die;
             $sql = "
                 SELECT 
+                    left(云仓, 2) as 云仓,商品负责人,
                     left(省份, 2) as 省份,
                     店铺名称,一级分类,二级分类,
                     left(风格, 2) as 风格,
                     left(一级风格, 2) as 一级风格,
-                    季节归集,`预计SKC_00/28/37/44/100/160/S`,`预计SKC_29/38/46/105/165/M`,`预计SKC_30/39/48/110/170/L`,`预计SKC_31/40/50/115/175/XL`,
+                    季节归集,
+                    `云仓可用00/28/37/44/100/160/S`,`云仓可用29/38/46/105/165/M`,`云仓可用30/39/48/110/170/L`,`云仓可用31/40/50/115/175/XL`,
+                    `云仓可用32/41/52/120/180/2XL`,`云仓可用33/42/54/125/185/3XL`,`云仓可用34/43/56/190/4XL`,`云仓可用35/44/58/195/5XL`,`云仓可用36/6XL`,`云仓可用38/7XL`,`云仓可用_40`,
+                    `预计SKC_00/28/37/44/100/160/S`,`预计SKC_29/38/46/105/165/M`,`预计SKC_30/39/48/110/170/L`,`预计SKC_31/40/50/115/175/XL`,
                     `预计SKC_32/41/52/120/180/2XL`,`预计SKC_33/42/54/125/185/3XL`,`预计SKC_34/43/56/190/4XL`,`预计SKC_35/44/58/195/5XL`,`预计SKC_36/6XL`,`预计SKC_38/7XL`,`预计SKC_40`,
                     `预计00/28/37/44/100/160/S`,`预计29/38/46/105/165/M`,`预计30/39/48/110/170/L`,`预计31/40/50/115/175/XL`,`预计32/41/52/120/180/2XL`,`预计33/42/54/125/185/3XL`,
                     `预计34/43/56/190/4XL`,`预计35/44/58/195/5XL`,`预计36/6XL`,`预计38/7XL`,`预计_40`,`预计库存数量`,`总入量00/28/37/44/100/160/S`,`总入量29/38/46/105/165/M`,
@@ -424,11 +477,13 @@ class Daxiaoma extends AdminController
                     `店销占比35/44/58/195/5XL`,`店销占比36/6XL`,`店销占比38/7XL`,`店销占比_40`,`省销占比00/28/37/44/100/160/S`,`省销占比29/38/46/105/165/M`,`省销占比30/39/48/110/170/L`,
                     `省销占比31/40/50/115/175/XL`,`省销占比32/41/52/120/180/2XL`,`省销占比33/42/54/125/185/3XL`,`省销占比34/43/56/190/4XL`,`省销占比35/44/58/195/5XL`,`省销占比36/6XL`,`省销占比38/7XL`,
                     `省销占比_40`,`店销占比排名1`,`店销占比排名2`,`店销占比排名3`,`店销占比排名4`,`店销占比排名5`,`店销占比排名6`,`未上柜提醒00/28/37/44/100/160/S`,`未上柜提醒29/38/46/105/165/M`,
-                    `未上柜提醒34/43/56/190/4XL`,`未上柜提醒35/44/58/195/5XL`,`未上柜提醒36/6XL`,`未上柜提醒38/7XL`,`未上柜提醒_40`,`大小码提醒`   
+                    `未上柜提醒34/43/56/190/4XL`,`未上柜提醒35/44/58/195/5XL`,`未上柜提醒36/6XL`,`未上柜提醒38/7XL`,`未上柜提醒_40`,`大小码提醒`    
                 FROM 
                     cwl_daxiao_handle
                 WHERE 1	
                     {$map}
+                ORDER BY
+                    云仓, 商品负责人  
             "; 
             $select = $this->db_easyA->query($sql);
             $header = [];
