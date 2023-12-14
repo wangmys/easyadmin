@@ -292,17 +292,17 @@ class Daxiaoma extends BaseController
         $sql = "
             SELECT
                 云仓,商品负责人,省份,店铺名称,一级分类,二级分类,风格,一级风格,季节归集,
-                sum(case when `预计00/28/37/44/100/160/S` then 1 else null end) as `预计SKC_00/28/37/44/100/160/S`,
-                sum(case when `预计29/38/46/105/165/M` then 1 else null end) as `预计SKC_29/38/46/105/165/M`,
-                sum(case when `预计30/39/48/110/170/L` then 1 else null end) as `预计SKC_30/39/48/110/170/L`,
-                sum(case when `预计31/40/50/115/175/XL` then 1 else null end) as `预计SKC_31/40/50/115/175/XL`,
-                sum(case when `预计32/41/52/120/180/2XL` then 1 else null end) as `预计SKC_32/41/52/120/180/2XL`,
-                sum(case when `预计33/42/54/125/185/3XL` then 1 else null end) as `预计SKC_33/42/54/125/185/3XL`,
-                sum(case when `预计34/43/56/190/4XL` then 1 else null end) as `预计SKC_34/43/56/190/4XL`,
-                sum(case when `预计35/44/58/195/5XL` then 1 else null end) as `预计SKC_35/44/58/195/5XL`,
-                sum(case when `预计36/6XL` then 1 else null end) as `预计SKC_36/6XL`,
-                sum(case when `预计38/7XL` then 1 else null end) as `预计SKC_38/7XL`,
-                sum(case when `预计_40` then 1 else null end) as `预计SKC_40`,
+                sum(case when `预计00/28/37/44/100/160/S`>0 then 1 else null end) as `预计SKC_00/28/37/44/100/160/S`,
+                sum(case when `预计29/38/46/105/165/M`>0  then 1 else null end) as `预计SKC_29/38/46/105/165/M`,
+                sum(case when `预计30/39/48/110/170/L`>0  then 1 else null end) as `预计SKC_30/39/48/110/170/L`,
+                sum(case when `预计31/40/50/115/175/XL`>0  then 1 else null end) as `预计SKC_31/40/50/115/175/XL`,
+                sum(case when `预计32/41/52/120/180/2XL`>0  then 1 else null end) as `预计SKC_32/41/52/120/180/2XL`,
+                sum(case when `预计33/42/54/125/185/3XL`>0  then 1 else null end) as `预计SKC_33/42/54/125/185/3XL`,
+                sum(case when `预计34/43/56/190/4XL`>0  then 1 else null end) as `预计SKC_34/43/56/190/4XL`,
+                sum(case when `预计35/44/58/195/5XL`>0  then 1 else null end) as `预计SKC_35/44/58/195/5XL`,
+                sum(case when `预计36/6XL`>0  then 1 else null end) as `预计SKC_36/6XL`,
+                sum(case when `预计38/7XL`>0  then 1 else null end) as `预计SKC_38/7XL`,
+                sum(case when `预计_40`>0  then 1 else null end) as `预计SKC_40`,
                 sum(`预计00/28/37/44/100/160/S`) as `预计00/28/37/44/100/160/S`,
                 sum(`预计29/38/46/105/165/M`) as `预计29/38/46/105/165/M`,
                 sum(`预计30/39/48/110/170/L`) as `预计30/39/48/110/170/L`,
@@ -315,18 +315,20 @@ class Daxiaoma extends BaseController
                 sum(`预计38/7XL`) as `预计38/7XL`,
                 sum(`预计_40`) as `预计_40`,
                 sum(`预计库存数量`) as `预计库存数量`,
-                sum(`总入量00/28/37/44/100/160/S`) as `总入量00/28/37/44/100/160/S`,
-                sum(`总入量29/38/46/105/165/M`) as `总入量29/38/46/105/165/M`,
-                sum(`总入量30/39/48/110/170/L`) as `总入量30/39/48/110/170/L`,
-                sum(`总入量31/40/50/115/175/XL`) as `总入量31/40/50/115/175/XL`,
-                sum(`总入量32/41/52/120/180/2XL`) as `总入量32/41/52/120/180/2XL`,
-                sum(`总入量33/42/54/125/185/3XL`) as `总入量33/42/54/125/185/3XL`,
-                sum(`总入量34/43/56/190/4XL`) as `总入量34/43/56/190/4XL`,
-                sum(`总入量35/44/58/195/5XL`) as `总入量35/44/58/195/5XL`,
-                sum(`总入量36/6XL`) as `总入量36/6XL`,
-                sum(`总入量38/7XL`) as `总入量38/7XL`,
-                sum(`总入量_40`) as `总入量_40`,
-                sum(`总入量数量`) as `总入量数量`,
+
+                -- sum(`总入量00/28/37/44/100/160/S`) as `总入量00/28/37/44/100/160/S`,
+                -- sum(`总入量29/38/46/105/165/M`) as `总入量29/38/46/105/165/M`,
+                -- sum(`总入量30/39/48/110/170/L`) as `总入量30/39/48/110/170/L`,
+                -- sum(`总入量31/40/50/115/175/XL`) as `总入量31/40/50/115/175/XL`,
+                -- sum(`总入量32/41/52/120/180/2XL`) as `总入量32/41/52/120/180/2XL`,
+                -- sum(`总入量33/42/54/125/185/3XL`) as `总入量33/42/54/125/185/3XL`,
+                -- sum(`总入量34/43/56/190/4XL`) as `总入量34/43/56/190/4XL`,
+                -- sum(`总入量35/44/58/195/5XL`) as `总入量35/44/58/195/5XL`,
+                -- sum(`总入量36/6XL`) as `总入量36/6XL`,
+                -- sum(`总入量38/7XL`) as `总入量38/7XL`,
+                -- sum(`总入量_40`) as `总入量_40`,
+                -- sum(`总入量数量`) as `总入量数量`,
+
                 sum(`累销00/28/37/44/100/160/S`) as `累销00/28/37/44/100/160/S`, 
                 sum(`累销29/38/46/105/165/M`) as `累销29/38/46/105/165/M`, 
                 sum(`累销30/39/48/110/170/L`) as `累销30/39/48/110/170/L`, 
@@ -355,6 +357,58 @@ class Daxiaoma extends BaseController
             // 基础结果 
             $this->db_easyA->table('cwl_daxiao_handle')->strict(false)->insertAll($val);
         }
+
+        $sql_总入量 = "
+            UPDATE cwl_daxiao_handle as h
+            SET   
+                `总入量00/28/37/44/100/160/S` =  case 
+                    when IFNULL(`预计00/28/37/44/100/160/S`, 0) + IFNULL(`累销00/28/37/44/100/160/S`, 0) > 0
+                    then IFNULL(`预计00/28/37/44/100/160/S`, 0) + IFNULL(`累销00/28/37/44/100/160/S`, 0)
+                end,
+                `总入量29/38/46/105/165/M` =  case 
+                    when IFNULL(`预计29/38/46/105/165/M`, 0) + IFNULL(`累销29/38/46/105/165/M`, 0) > 0
+                    then IFNULL(`预计29/38/46/105/165/M`, 0) + IFNULL(`累销29/38/46/105/165/M`, 0)
+                end,
+                `总入量30/39/48/110/170/L` = case 
+                    when IFNULL(`预计30/39/48/110/170/L`, 0) + IFNULL(`累销30/39/48/110/170/L`, 0) > 0
+                    then IFNULL(`预计30/39/48/110/170/L`, 0) + IFNULL(`累销30/39/48/110/170/L`, 0)
+                end,
+                `总入量31/40/50/115/175/XL` = case 
+                    when IFNULL(`预计31/40/50/115/175/XL`, 0) + IFNULL(`累销31/40/50/115/175/XL`, 0) > 0
+                    then IFNULL(`预计31/40/50/115/175/XL`, 0) + IFNULL(`累销31/40/50/115/175/XL`, 0)
+                end,
+                `总入量32/41/52/120/180/2XL` = case 
+                    when IFNULL(`预计32/41/52/120/180/2XL`, 0) + IFNULL(`累销32/41/52/120/180/2XL`, 0) > 0
+                    then IFNULL(`预计32/41/52/120/180/2XL`, 0) + IFNULL(`累销32/41/52/120/180/2XL`, 0)
+                end,
+                `总入量33/42/54/125/185/3XL` = case 
+                    when IFNULL(`预计33/42/54/125/185/3XL`, 0) + IFNULL(`累销33/42/54/125/185/3XL`, 0) > 0
+                    then IFNULL(`预计33/42/54/125/185/3XL`, 0) + IFNULL(`累销33/42/54/125/185/3XL`, 0)
+                end,
+                `总入量34/43/56/190/4XL` = case 
+                    when IFNULL(`预计34/43/56/190/4XL`, 0) + IFNULL(`累销34/43/56/190/4XL`, 0) > 0
+                    then IFNULL(`预计34/43/56/190/4XL`, 0) + IFNULL(`累销34/43/56/190/4XL`, 0)
+                end,
+                `总入量35/44/58/195/5XL` = case 
+                    when IFNULL(`预计35/44/58/195/5XL`, 0) + IFNULL(`累销35/44/58/195/5XL`, 0) > 0
+                    then IFNULL(`预计35/44/58/195/5XL`, 0) + IFNULL(`累销35/44/58/195/5XL`, 0)
+                end,
+                `总入量36/6XL` = case 
+                    when IFNULL(`预计36/6XL`, 0) + IFNULL(`累销36/6XL`, 0) > 0
+                    then IFNULL(`预计36/6XL`, 0) + IFNULL(`累销36/6XL`, 0)
+                end,
+                `总入量38/7XL` = case 
+                    when IFNULL(`预计38/7XL`, 0) + IFNULL(`累销38/7XL`, 0) > 0
+                    then IFNULL(`预计38/7XL`, 0) + IFNULL(`累销38/7XL`, 0)
+                end,
+                `总入量_40` = case 
+                    when IFNULL(`预计_40`, 0) + IFNULL(`累销_40`, 0) > 0
+                    then IFNULL(`预计_40`, 0) + IFNULL(`累销_40`, 0)
+                end
+            WHERE  
+                1  
+        ";
+        $this->db_easyA->execute($sql_总入量);
 
         $sql_更新店省占比 = "
             UPDATE cwl_daxiao_handle as sk 
