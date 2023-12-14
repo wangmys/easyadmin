@@ -90,19 +90,20 @@ class ExcelhandleService
                 }
             }
 
+
             //鞋子
             foreach ($shoes as $s_k => $s_v) {
                 if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$cus][$s_k])) { //加到原来的
                     $shoesArr = $s_v;
                     $shoesArr['sort'] = $data[$cus][$s_k]['sort'];
                     $shoesArr['uuid'] = $data[$cus][$s_k]['uuid'];
-                    $data[$cus][$s_k][] = $shoesArr;
+                    $data[$cus][] = $shoesArr;
                 } else {
                     $numArr[$item['CustomItem17']]++;
                     $shoesArr = $s_v;
                     $shoesArr['sort'] = $numArr[$item['CustomItem17']];
                     $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
-                    $data[$cus][$s_k][] = $shoesArr;
+                    $data[$cus][] = $shoesArr;
 
                 }
 
