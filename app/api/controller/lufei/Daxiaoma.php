@@ -291,7 +291,7 @@ class Daxiaoma extends BaseController
     public function handle_1() {
         $sql = "
             SELECT
-                省份,店铺名称,一级分类,二级分类,风格,一级风格,季节归集,
+                云仓,商品负责人,省份,店铺名称,一级分类,二级分类,风格,一级风格,季节归集,
                 sum(case when `预计00/28/37/44/100/160/S` then 1 else null end) as `预计SKC_00/28/37/44/100/160/S`,
                 sum(case when `预计29/38/46/105/165/M` then 1 else null end) as `预计SKC_29/38/46/105/165/M`,
                 sum(case when `预计30/39/48/110/170/L` then 1 else null end) as `预计SKC_30/39/48/110/170/L`,
