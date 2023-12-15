@@ -820,6 +820,18 @@ class Skauto extends BaseController
                 $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
             }
 
+            $sql_专员店铺预计库存 = "
+                UPDATE
+                    cwl_skauto_res as r
+                LEFT JOIN (
+                    select 商品负责人,货号,sum(预计库存数量) as 预计库存数量 from sp_sk group by 商品负责人,货号
+                ) as t on r.商品负责人 = t.商品负责人 and r.货号 = t.货号
+                SET
+                    r.专员店铺预计库存 = t.预计库存数量
+                WHERE 1
+            ";
+            $this->db_easyA->execute($sql_专员店铺预计库存);
+
             $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update([
                 'skauto_res_updatetime' => date('Y-m-d H:i:s')
             ]);  

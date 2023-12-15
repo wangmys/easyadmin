@@ -92,6 +92,11 @@
         .layui-input-inline {
             width: 40px;
         }
+
+        .cima {
+            height:13px; 
+            line-height:15px;
+        }
     </style>
 </head>
 
@@ -586,6 +591,10 @@
                     }}
                     , { field: '近一周销', title: '近一周销', align: 'center'}
                     , { field: '近两周销', title: '近两周销', align: 'center'}
+                    , {title:  `<div class="flex col">
+                                 <div class="cima">专员店铺</div>
+                                 <div class="cima">预计库存</div>
+                               </div>`, field: '专员店铺预计库存', align: 'center'}
                     , { field: '云仓可用', title: '云仓可用', align: 'center', templet: function (data) {
                         if (data['云仓可用']) {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
