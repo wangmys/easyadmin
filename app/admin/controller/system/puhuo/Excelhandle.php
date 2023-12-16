@@ -37,6 +37,8 @@ class Excelhandle extends AdminController
         $this->mysql = Db::connect('mysql');
     }
 
+
+
     /**
      * @return mixed|\think\response\Json
      * @NodeAnotation(title="铺货excel列表",auth=true)
