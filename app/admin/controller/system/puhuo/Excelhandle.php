@@ -38,26 +38,6 @@ class Excelhandle extends AdminController
     }
 
 
-    public function test()
-    {
-
-
-        $header = [
-            ['名称', 'name', 'text', '10'],
-            ['图片', 'pic', 'image', '10'],
-            ['性别', 'sex', 'text', '10'],
-        ];
-        $data = [
-            ['name' => '张三', 'pic' => 'https://sha.babiboy.com/m/images/dindin_template/test.jpg', 'sex' => '男'],
-            ['name' => '李四', 'pic' => 'static/dingding/s101.png', 'sex' => '女'],
-            ['name' => '王五', 'pic' => 'static/dingding/s114.png', 'sex' => '男'],
-        ];
-        ExcelService::export($data, $header);
-
-//        $res = ExcelService:: downloadFile($url, 'download/' . date('Ymd') . '/', '123.jpg');
-//        dd($res);
-
-    }
 
     /**
      * @return mixed|\think\response\Json
