@@ -690,6 +690,27 @@ class Customitem17 extends BaseController
 
         // 专员合计
         $this->updateZhuanyuan_total();
+
+        // 生成实时表 每天一次
+        $sql_生成实时表 = "
+            select 商品专员,目标月份,目标_直营,目标_加盟,目标_合计 from cwl_customitem17_zhuanyuan
+            where 目标月份 = '{$目标月份}' and 商品专员 <> '合计'
+        ";
+        $select_生成实时表 = $this->db_easyA->query($sql_生成实时表);
+        if ($select_生成实时表) {
+            // 删除历史数据
+            $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->where([
+                ['目标月份' , '=', $目标月份]
+            ])->delete();
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_yeji;');
+            $chunk_list8 = array_chunk($select_生成实时表, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list8 as $key8 => $val8) {
+                $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insertAll($val8);
+            }
+        }
+        
     }
 
     public function test() {
