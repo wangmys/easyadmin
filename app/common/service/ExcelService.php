@@ -23,11 +23,23 @@ class ExcelService
 
 
     /**
+     *
+     * $header = [
+     * ['名称', 'name', 'text', '10'],
+     * ['图片', 'pic', 'image', '15'],
+     * ];
+     * $data = [
+     * ['name' => '张三', 'pic' => 'img/20230720/S114.jpg'],
+     * ['name' => '李四', 'pic' => 'img/20230720/S112B.jpg'],
+     * ['name' => '王五', 'pic' => 'img/20230720/S015.jpg'],
+     * ];
+     *
      * @param $data
      * @param $data [0] 标题
      * @param $data [1] 字段名
      * @param $data [2] 类型：text、number、image
-     * @param $data [3] 字体大小
+     * @param $data [3] 行宽
+     * @param $data [3] image ['图片', 'pic', 'image','15']
      * @param $header   表头
      * @param $fileName 文件名
      * @return string|void
@@ -62,6 +74,8 @@ class ExcelService
                     //写入数据
                     $worksheet->setCellValueExplicit($xy, $s_v, $type);
                 } else if (isset($item[2]) && $item[2] == 'image') {
+                    //设置行高
+                    $worksheet->getRowDimension($s_k + 2)->setRowHeight(35);
                     // 从本地路径加载图像文件 img/20230720/S114.jpg
                     $imagePath = $s_v; // 替换成真正的图片路径
                     $drawing = new Drawing();
@@ -69,9 +83,11 @@ class ExcelService
                     $drawing->setDescription('Image inserted by PhpSpreadsheet');
                     $drawing->setPath($imagePath);
                     $drawing->setCoordinates($xy);
-                    $drawing->setOffsetX(0);
-                    $drawing->setOffsetY(5);
-                    $drawing->setWidthAndHeight(300, 200);
+                      //跨行
+//                    $drawing->setOffsetX(0);
+//                    $drawing->setOffsetY(5);
+                    //设置图片宽高
+                    $drawing->setWidthAndHeight(100, 100);
                     $drawing->setResizeProportional(true);
                     $drawing->setWorksheet($worksheet);
                 } else {
