@@ -820,11 +820,20 @@ class Skauto extends BaseController
                 $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
             }
 
+            // 需要匹配有业绩没闭店的店铺
             $sql_专员店铺预计库存 = "
                 UPDATE
                     cwl_skauto_res as r
                 LEFT JOIN (
-                    select 商品负责人,货号,sum(预计库存数量) as 预计库存数量 from sp_sk group by 商品负责人,货号
+                    SELECT
+                    s.商品负责人,s.货号,
+                        sum(预计库存数量) AS 预计库存数量 
+                    FROM sp_sk as s
+                    LEFT JOIN customer_pro as p ON s.店铺名称 = p.CustomerName
+                    WHERE 	
+                        s.店铺名称 = p.CustomerName
+                    GROUP BY
+                        s.商品负责人,s.货号
                 ) as t on r.商品负责人 = t.商品负责人 and r.货号 = t.货号
                 SET
                     r.专员店铺预计库存 = t.预计库存数量
@@ -832,6 +841,32 @@ class Skauto extends BaseController
             ";
             $this->db_easyA->execute($sql_专员店铺预计库存);
 
+            $sql_专员货号周销合计 = "
+                UPDATE
+                        cwl_skauto_res as r
+                LEFT JOIN (
+                    SELECT y.货号,p.CustomItem17 as 商品负责人, sum(合计) as 专员货号周销合计 FROM sjp_yizhou as y
+                    LEFT JOIN customer_pro as p ON y.店铺名称 = p.CustomerName
+                    WHERE 	
+                            y.店铺名称 = p.CustomerName
+                    GROUP BY
+                            p.CustomItem17,y.货号
+                ) as t on r.商品负责人 = t.商品负责人 and r.货号 = t.货号
+                SET
+                        r.专员货号周销合计 = t.专员货号周销合计
+                WHERE 1            
+            ";
+            $this->db_easyA->execute($sql_专员货号周销合计);
+
+            $sql_专员货号周转 = "
+                UPDATE
+                    cwl_skauto_res
+                SET
+                    专员货号周转 = ROUND(专员店铺预计库存 / 专员货号周销合计, 1)
+                WHERE 1            
+            ";
+            $this->db_easyA->execute($sql_专员货号周转);
+            
             $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update([
                 'skauto_res_updatetime' => date('Y-m-d H:i:s')
             ]);  
