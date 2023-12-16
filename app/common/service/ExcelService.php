@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 /**
  * 支持设置单元格文本格式
- * 支持图片的导入导出  图片是本地路径  是远程需要自行下载到本地
+ * 支持图片的导入导出
  * Class ExcelService
  * @package app\common\service
  * @ControllerAnnotation(title="EXCEL导入导出",auth=true)
