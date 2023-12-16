@@ -230,6 +230,84 @@ class Customitem17 extends AdminController
         }
     }
 
+    /**
+     * @NodeAnotation(title="专员实时业绩") 
+     * 
+     */
+    public function zhuanyuancurrent() {
+        if (request()->isAjax()) {
+            // 筛选条件
+            $input = input();
+            $pageParams1 = ($input['page'] - 1) * $input['limit'];
+            $pageParams2 = input('limit');
+
+
+            if (!empty($input['目标月份'])) {
+                $map0 = " AND 目标月份 = '{$input['目标月份']}'";
+            } else {
+                $目标月份 = date('Y-m');
+                $map0 = " AND 目标月份 = '{$目标月份}'";;
+            }
+
+
+            $sql = "
+                SELECT
+                    商品专员,
+                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
+                    累计流水截止日期,
+                    round(达成率_直营 * 100, 1) as 达成率_直营,
+                    round(达成率_加盟 * 100, 1) as 达成率_加盟,
+                    round(达成率_合计 * 100, 1) as 达成率_合计
+                FROM
+                    cwl_customitem17_zhuanyuan_current 
+                WHERE 1	
+                    AND 商品专员 <> '合计'
+                    {$map0}
+                ORDER BY
+                    达成率_合计 DESC
+            ";
+            $select = $this->db_easyA->query($sql);
+
+            $sql_合计 = "
+                SELECT
+                    商品专员,
+                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
+                    累计流水截止日期,
+                    round(达成率_直营 * 100, 1) as 达成率_直营,
+                    round(达成率_加盟 * 100, 1) as 达成率_加盟,
+                    round(达成率_合计 * 100, 1) as 达成率_合计
+                FROM
+                    cwl_customitem17_zhuanyuan_current 
+                WHERE 1	
+                    AND 商品专员 = '合计'
+                    {$map0}
+            ";
+            $select_合计 = $this->db_easyA->query($sql_合计);
+            $result = array_merge($select, $select_合计);
+
+            $sql2 = "
+                SELECT 
+                    count(*) as total
+                FROM cwl_customitem17_zhuanyuan_current
+                WHERE 1
+                    {$map0}
+            ";
+            $count = $this->db_easyA->query($sql2);
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $result, 'create_time' => date('Y-m-d')]);
+        } else {
+            $目标月份 = date('Y-m');
+            if (checkAdmin()) {
+                $isAdmin = true;
+            } else {
+                $isAdmin = false;
+            }
+            return View('zhuanyuancurrent', [
+                'mubiaoMonth'=> $目标月份,
+                'isAdmin' => $isAdmin,
+            ]);
+        }
+    }
+
     // 获取筛选栏多选参数
     public function getXmMapSelect() {
 
