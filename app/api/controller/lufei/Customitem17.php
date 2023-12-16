@@ -851,7 +851,7 @@ class Customitem17 extends BaseController
     public function zhuanyuan_yeji_new() {
         $开始= date('Y-m-01 00:00:00');
         $结束= date('Y-m-d 23:59:59');
-        $截止日期 = date('Y-m-d');
+        $截止日期 = date('Y-m-d H:i:s');
         $本月最后一天 = date('Y-m-t'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
 
@@ -878,11 +878,8 @@ class Customitem17 extends BaseController
         // print_r($select);die;
         if ($select) {
             // 删除历史数据
-            // $this->db_easyA->table('cwl_customitem17_retail')->where(1)->delete();
             $this->db_easyA->execute("delete from cwl_customitem17_retail_current where 日期>='{$开始}' and 日期<='{$结束}'");
-            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_retail;');
             $chunk_list = array_chunk($select, 500);
-            // $this->db_easyA->startTrans();
 
             foreach($chunk_list as $key => $val) {
                 $this->db_easyA->table('cwl_customitem17_retail_current')->strict(false)->insertAll($val);
@@ -895,7 +892,142 @@ class Customitem17 extends BaseController
                     r.商品专员 = c.CustomItem17
             ";
             $this->db_easyA->execute($sql_商品专员);
+
+            
+            $sql_实际累计流水 = "
+                update cwl_customitem17_zhuanyuan_current as c 
+                left join (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) AS 销售金额 
+                    FROM
+                        cwl_customitem17_retail_current 
+                    WHERE
+                        日期 >= '{$开始}' 
+                        AND 日期 <= '{$结束}' 
+                        AND 经营属性 = '直营'
+                    GROUP BY
+                        商品专员 
+                ) as r_zy on c.商品专员 = r_zy.商品专员
+                left join (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) AS 销售金额 
+                    FROM
+                        cwl_customitem17_retail_current 
+                    WHERE
+                        日期 >= '{$开始}' 
+                        AND 日期 <= '{$结束}' 
+                        AND 经营属性 = '加盟'
+                    GROUP BY
+                        商品专员 
+                ) as r_jm on c.商品专员 = r_jm.商品专员
+                left join (
+                    SELECT
+                        商品专员,
+                        sum(销售金额) AS 销售金额 
+                    FROM
+                        cwl_customitem17_retail_current 
+                    WHERE
+                        日期 >= '{$开始}' 
+                        AND 日期 <= '{$结束}' 
+                    GROUP BY
+                        商品专员 
+                ) as r_hj on c.商品专员 = r_hj.商品专员
+                set
+                    c.累计流水_直营 = r_zy.销售金额,
+                    c.累计流水_加盟 = r_jm.销售金额,
+                    c.累计流水_合计 = r_hj.销售金额,
+                    c.累计流水截止日期 = '{$截止日期}'
+                where  
+                    c.目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_实际累计流水);
+
+            
+            $sql_达成率 = "
+                update cwl_customitem17_zhuanyuan_current
+                set 
+                    `达成率_直营` = `累计流水_直营` / `目标_直营`,
+                    `达成率_加盟` = `累计流水_加盟` / `目标_加盟`,
+                    `达成率_合计` = `累计流水_合计` / `目标_合计`
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_达成率);
+
+            // 合计
+            $this->updateZhuanyuan_total_current();
         }
 
+    }
+
+    public function updateZhuanyuan_total_current() {
+        $目标月份 = date('Y-m');
+        $截止日期 = date('Y-m-d H:i:s');
+        $本月最后一天 = date('Y-m-t'); 
+        $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        $str_近七天日期 = '';
+        $getBefore7 = $this->getBefore7();
+        if($getBefore7) {
+            $str_近七天日期 = arrToStr($getBefore7);
+        }
+
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+        }
+
+        // 每月1号
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
+            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        }
+
+        $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->where([
+            ['目标月份', '=', $目标月份],
+            ['商品专员', '=', '合计'],
+        ])->delete();
+
+        $sql = "
+            SELECT
+                商品专员,
+                目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
+                累计流水截止日期,
+                concat(round(达成率_直营 * 100, 1), '%') as 达成率_直营,
+                concat(round(达成率_加盟 * 100, 1), '%') as 达成率_加盟,
+                concat(round(达成率_合计 * 100, 1), '%') as 达成率_合计
+            FROM
+                cwl_customitem17_zhuanyuan_current 
+            WHERE 1	
+                and 目标月份='{$目标月份}'
+        ";
+
+        $select = $this->db_easyA->query($sql);  
+        $合计 = [
+            '商品专员' => '合计',
+            '目标月份' => $目标月份,
+            '目标_直营' => 0,
+            '目标_加盟' => 0,
+            '目标_合计' => 0,
+            '累计流水_直营' => 0,
+            '累计流水_加盟' => 0,
+            '累计流水_合计' => 0,
+
+        ];
+        foreach ($select as $key => $val) {
+            $合计['目标_直营'] += $val['目标_直营'];
+            $合计['目标_加盟'] += $val['目标_加盟'];
+            $合计['目标_合计'] += $val['目标_合计'];
+            $合计['累计流水_直营'] += $val['累计流水_直营'];
+            $合计['累计流水_加盟'] += $val['累计流水_加盟'];
+            $合计['累计流水_合计'] += $val['累计流水_合计'];
+        }
+
+        $合计['达成率_直营'] = $合计['累计流水_直营'] / $合计['目标_直营'];
+        $合计['达成率_加盟'] = $合计['累计流水_加盟'] / $合计['目标_加盟'];
+        $合计['达成率_合计'] = $合计['累计流水_合计'] / $合计['目标_合计'];
+        $合计['累计流水截止日期'] = $select[0]['累计流水截止日期'];
+
+        $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insert($合计);
     }
 }
