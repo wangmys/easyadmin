@@ -690,36 +690,29 @@ class Customitem17 extends BaseController
 
         // 专员合计
         $this->updateZhuanyuan_total();
-    }
 
-    public function test() {
-        echo $截止日期 = date('Y-m-d', strtotime('-1 day'));
-        echo '<br>';
-        echo $本月最后一天 = date('Y-m-t'); 
-        echo '<br>';
-        echo $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
-
-
-        $str_近七天日期 = '';
-        $getBefore7 = $this->getBefore7();
-        if($getBefore7) {
-            $str_近七天日期 = arrToStr($getBefore7);
-        }
-        echo '<br>';
-        $str_近七天日期 = "'2023-09-26','2023-09-25','2023-09-24','2023-09-23','2023-09-22','2023-09-21','2023-09-20'";
-
-        echo $sql_近七天日均销 = " 
-            SELECT
-                店铺名称,
-                销售金额
-            FROM
-                cwl_customitem17_retail
-            WHERE 
-                日期 in ({$str_近七天日期})
-                AND 商品专员 = '刘琳娜'
-            GROUP BY 店铺名称
+        // 生成实时表 每天一次
+        $sql_生成实时表 = "
+            select 商品专员,目标月份,目标_直营,目标_加盟,目标_合计 from cwl_customitem17_zhuanyuan
+            where 目标月份 = '{$目标月份}' and 商品专员 <> '合计'
         ";
+        $select_生成实时表 = $this->db_easyA->query($sql_生成实时表);
+        if ($select_生成实时表) {
+            // 删除历史数据
+            $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->where([
+                ['目标月份' , '=', $目标月份]
+            ])->delete();
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_yeji;');
+            $chunk_list8 = array_chunk($select_生成实时表, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list8 as $key8 => $val8) {
+                $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insertAll($val8);
+            }
+        }
+        
     }
+
 
     public function updateZhuanyuan_total() {
         $目标月份 = date('Y-m');
@@ -852,8 +845,9 @@ class Customitem17 extends BaseController
         $开始= date('Y-m-01 00:00:00');
         $结束= date('Y-m-d 23:59:59');
         $截止日期 = date('Y-m-d H:i:s');
+        $截止日期2 = date('Y-m-d');
         $本月最后一天 = date('Y-m-t'); 
-        $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期2), strtotime($本月最后一天));
 
         $目标月份 = date('Y-m');
 
@@ -862,7 +856,7 @@ class Customitem17 extends BaseController
             $开始= date("Y-m-01", strtotime('-1month')); 
             $目标月份 = date('Y-m', strtotime('-1 month'));
             $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
-            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期2), strtotime($本月最后一天));
         }
 
         // die;
@@ -956,6 +950,28 @@ class Customitem17 extends BaseController
             ";
             $this->db_easyA->execute($sql_达成率);
 
+            $sql_100日均需销额 = "
+                update cwl_customitem17_zhuanyuan_current
+                set 
+                    `100%日均需销额_直营` = (`目标_直营` - `累计流水_直营`) / {$到结束剩余天数},
+                    `100%日均需销额_加盟` = (`目标_加盟` - `累计流水_加盟`) / {$到结束剩余天数},
+                    `100%日均需销额_合计` = (`目标_合计` - `累计流水_合计`) / {$到结束剩余天数}
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_100日均需销额);
+
+            $sql_85日均需销额 = "
+                update cwl_customitem17_zhuanyuan_current
+                set 
+                    `85%日均需销额_直营` = (`目标_直营` * 0.85  - `累计流水_直营`) / {$到结束剩余天数},
+                    `85%日均需销额_加盟` = (`目标_加盟` * 0.85 - `累计流水_加盟`)  / {$到结束剩余天数},
+                    `85%日均需销额_合计` = (`目标_合计` * 0.85 - `累计流水_合计`)  / {$到结束剩余天数}
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_85日均需销额);
+
             // 合计
             $this->updateZhuanyuan_total_current();
         }
@@ -1027,6 +1043,13 @@ class Customitem17 extends BaseController
         $合计['达成率_加盟'] = $合计['累计流水_加盟'] / $合计['目标_加盟'];
         $合计['达成率_合计'] = $合计['累计流水_合计'] / $合计['目标_合计'];
         $合计['累计流水截止日期'] = $select[0]['累计流水截止日期'];
+
+        $合计['100%日均需销额_直营'] = $到结束剩余天数 > 0 ? round(($合计['目标_直营'] - $合计['累计流水_直营']) / $到结束剩余天数, 2): null;
+        $合计['100%日均需销额_加盟'] = $到结束剩余天数 > 0 ? round(($合计['目标_加盟'] - $合计['累计流水_加盟']) / $到结束剩余天数, 2): null;
+        $合计['100%日均需销额_合计'] = $到结束剩余天数 > 0 ? round(($合计['目标_合计'] - $合计['累计流水_合计']) / $到结束剩余天数, 2): null;
+        $合计['85%日均需销额_直营'] = $到结束剩余天数 > 0 ? round(($合计['目标_直营'] * 0.85 - $合计['累计流水_直营']) / $到结束剩余天数, 2): null;
+        $合计['85%日均需销额_加盟'] = $到结束剩余天数 > 0 ? round(($合计['目标_加盟'] * 0.85 - $合计['累计流水_加盟']) / $到结束剩余天数, 2): null;
+        $合计['85%日均需销额_合计'] = $到结束剩余天数 > 0 ? round(($合计['目标_合计'] * 0.85 - $合计['累计流水_合计']) / $到结束剩余天数, 2): null;
 
         $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insert($合计);
     }

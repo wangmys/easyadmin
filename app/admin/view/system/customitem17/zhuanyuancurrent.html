@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>商品负责人业绩目标达成情况</title>
+    <title>专员实时业绩达成</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -278,7 +278,7 @@
     </div>
     <div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
         <table class="layui-hide" id="table" lay-filter="table">
-            <div style="text-align: center; color:#0051ff;"><a style="color:red">昨日</a> 商品负责人业绩目标达成情况 <a class="dateStr"></a></div>
+            <div style="text-align: center; color:#0051ff;"><a style="color:red">实时 每十分钟更新一遍</a> 商品负责人业绩目标达成情况 <a class="dateStr"></a></div>
         </table>
         <div id="page"></div>
     </div>
@@ -309,7 +309,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , mubiaoMonth = "{$mubiaoMonth}"
-            , url1 = "{:url('admin/system.Customitem17/zhuanyuan')}" 
+            , url1 = "{:url('admin/system.Customitem17/zhuanyuancurrent')}" 
             , url_download_history_area = "{:url('admin/system.Daxiaoma/excel_weathertips')}" 
             , url_getXmMapSelect = "{:url('admin/system.Customitem17/getXmMapSelect')}"
 
@@ -420,7 +420,7 @@
                                 return data['商品专员'];
                             }
                         }}
-                        ,{ field: '累计流水截止日期', title: `流水截止日期`, align: 'center', rowspan:2}
+                        ,{ field: '累计流水截止日期', title: `流水截止日期`, align: 'center', width: 120, rowspan:2}
                         ,{ title: `目标`, align: 'center', colspan: 3}
                         ,{ title: `累计流水`, align: 'center', colspan: 3}
                         ,{ title: `达成率`, align: 'center', colspan: 3}
