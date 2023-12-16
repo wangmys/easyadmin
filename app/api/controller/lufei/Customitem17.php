@@ -846,4 +846,56 @@ class Customitem17 extends BaseController
     
         $this->db_easyA->table('cwl_customitem17_zhuanyuan')->strict(false)->insert($合计);
     }
+
+    // 专员实时业绩
+    public function zhuanyuan_yeji_new() {
+        $开始= date('Y-m-01 00:00:00');
+        $结束= date('Y-m-d 23:59:59');
+        $截止日期 = date('Y-m-d');
+        $本月最后一天 = date('Y-m-t'); 
+        $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+
+        $目标月份 = date('Y-m');
+
+        // 每月1号
+        if (date('Y-m-d') == date('Y-m-01')) {
+            $开始= date("Y-m-01", strtotime('-1month')); 
+            $目标月份 = date('Y-m', strtotime('-1 month'));
+            $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
+            $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
+        }
+
+        // die;
+        $sql = "
+            select 
+                *
+            from ww_dianpuyejihuanbi_data
+            where 日期>='{$开始}' and 日期< '{$结束}'
+        ";
+		
+        $select = $this->db_binew->query($sql);
+        // echo '<pre>';
+        // print_r($select);die;
+        if ($select) {
+            // 删除历史数据
+            // $this->db_easyA->table('cwl_customitem17_retail')->where(1)->delete();
+            $this->db_easyA->execute("delete from cwl_customitem17_retail_current where 日期>='{$开始}' and 日期<='{$结束}'");
+            // $this->db_easyA->execute('TRUNCATE cwl_customitem17_retail;');
+            $chunk_list = array_chunk($select, 500);
+            // $this->db_easyA->startTrans();
+
+            foreach($chunk_list as $key => $val) {
+                $this->db_easyA->table('cwl_customitem17_retail_current')->strict(false)->insertAll($val);
+            }
+
+            $sql_商品专员 = "
+            update cwl_customitem17_retail_current as r
+                left join customer_pro as c on r.店铺名称 = c.CustomerName
+                set
+                    r.商品专员 = c.CustomItem17
+            ";
+            $this->db_easyA->execute($sql_商品专员);
+        }
+
+    }
 }

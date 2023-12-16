@@ -10,6 +10,7 @@ use think\db\Raw;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\BaseController;
+use app\api\controller\lufei\Customitem17;
 
 /**
  * @ControllerAnnotation(title="基础表更新")
@@ -108,7 +109,8 @@ class Tableupdate extends BaseController
             GROUP BY 
                 ER.CustomerName,
                 EC.State,
-                EBC.Mathod	
+                EBC.Mathod	   
+            HAVING SUM (ERG.Quantity* ERG.DiscountPrice) <> 0
             ORDER BY EC.State ASC
         ";
         // 查康雷
@@ -124,6 +126,14 @@ class Tableupdate extends BaseController
             $insertAll = $this->db_binew->table('ww_dianpuyejihuanbi_data')->strict(false)->insertAll($select_data);
             if ($insertAll) {
                 // $this->db_bi->commit();
+
+
+
+                // 更新专员实时业绩
+                $customitem17 = new Customitem17;
+                $customitem17->zhuanyuan_yeji_new(); 
+
+
                 return json([
                     'status' => 1,
                     'msg' => 'success',
