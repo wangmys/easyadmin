@@ -86,6 +86,7 @@
         }
         .layui-form-label {
             width: 130px !important;
+            padding-left: 0 !important;
         }
 
         .layui-input-inline {
@@ -120,32 +121,42 @@
     <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
         <form class="layui-form layui-form-pane ok-form layui-col-space8">
             <div class="flex row end between">
-                <div class="flex col between al-start " style="width:95%; height: 70px;">
+                <div class="flex col between al-start " style="width:95%; height: 105px;">
                     <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">折率</label>
-                            <div class="layui-input-inline" style="width: 100px !important;">
+                            <label class="layui-form-label" style="width: 40px !important; text-align: left; overflow: visible;">折率</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" placeholder="1"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">短T 零售></label>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: left; overflow: visible;">短T 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='短T' autocomplete="off" value="{$config['短T']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲短衬 零售></label>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">休闲短衬 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='休闲短衬' autocomplete="off" value="{$config['休闲短衬']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲短裤 零售></label>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">休闲短裤 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='休闲短裤' autocomplete="off" value="{$config['休闲短裤']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">松紧短裤 零售></label>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">松紧短裤 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='松紧短裤' autocomplete="off" value="{$config['松紧短裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">牛仔短裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='牛仔短裤' autocomplete="off" value="{$config['牛仔短裤']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">休闲长裤 零售></label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='休闲长裤' autocomplete="off" value="{$config['休闲长裤']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
                         </div>  
@@ -153,34 +164,64 @@
 
                     <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">牛仔短裤 零售></label>
-                            <div class="layui-input-inline" style="width: 80px !important;">
-                                <input type="number" name='牛仔短裤' autocomplete="off" value="{$config['牛仔短裤']}" maxlength="4" placeholder="0"
-                                    class="layui-input" lay-verify="required">
-                            </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">休闲长裤 零售></label>
-                            <div class="layui-input-inline" style="width: 80px !important;">
-                                <input type="number" name='休闲长裤' autocomplete="off" value="{$config['休闲长裤']}" maxlength="4" placeholder="0"
-                                    class="layui-input" lay-verify="required">
-                            </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">牛仔长裤 零售></label>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">牛仔长裤 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='牛仔长裤' autocomplete="off" value="{$config['牛仔长裤']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">松紧长裤 零售></label>
+
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">松紧长裤 零售></label>
                             <div class="layui-input-inline" style="width: 80px !important;">
                                 <input type="number" name='松紧长裤' autocomplete="off" value="{$config['松紧长裤']}" maxlength="4" placeholder="0"
                                     class="layui-input" lay-verify="required">
                             </div> 
-                            <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">季节归集</label>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: left; overflow: visible;">季节归集</label>
                             <div class="layui-input-inline" style="width: 250px !important;">
                                 <div id="xm-season" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">周转参数</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='周转参数' autocomplete="off" value="{$config['周转参数']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">倍率参数</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='倍率参数' autocomplete="off" value="{$config['倍率参数']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">季末周转</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='季末周转' autocomplete="off" value="{$config['季末周转']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+                        </div>  
+                    </div>
+
+                    <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">单码可用</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='单码可用' autocomplete="off" value="{$config['单码可用']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+
+                            <label class="layui-form-label" style="width: 100px !important; text-align: left; overflow: visible;">总码可用</label>
+                            <div class="layui-input-inline" style="width: 80px !important;">
+                                <input type="number" name='总码可用' autocomplete="off" value="{$config['总码可用']}" maxlength="4" placeholder="0"
+                                    class="layui-input" lay-verify="required">
+                            </div> 
+
+                            <label class="layui-form-label" style="width: 80px !important; text-align: left;">周销</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <select id="zhouxiao_id" name="周销" lay-verify="">
+                                    <option value="sjp_yizhou">一周销</option>
+                                    <option value="sjp_liangzhou">两周销</option>
+                                </select>
                             </div>
                         </div>  
                     </div>
                 </div>
-                <div class="flex col between al-end" style="width:18%; height:70px;">
+                <div class="flex col between al-end" style="width:18%; height:105px;">
                     <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
                     style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
                     </button>
@@ -345,6 +386,8 @@
                 })
             })
             $("#season_id").val("{$config['季节归集']}");
+            $("#zhouxiao_id").val("{$config['周销']}");
+            form.render();
             form.render();
         }
         function startTable() {
