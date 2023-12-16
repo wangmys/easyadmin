@@ -6,6 +6,7 @@ use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
 use app\admin\model\CustomerModel;
 use app\admin\service\ExcelhandleService;
 use app\common\logic\execl\PHPExecl;
+use app\common\service\ExcelService;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
@@ -284,19 +285,19 @@ class Excelhandle extends AdminController
         $count = count($count);
         if ($data) {
             $header = [
-                ['*订单号', 'uuid'],
-                ['*仓库编号', 'WarehouseCode'],
-                ['*店铺编号', 'CustomerCode'],
-                ['*打包后立即发出', 'send_out'],
-                ['*差异出货需二次确认', 're_confirm'],
-                ['*货号', 'GoodsNo'],
-                ['*尺码', 'Size'],
-                ['*颜色编码', 'ColorCode'],
-                ['*铺货数', 'puhuo_num'],
-                ['*状态/1草稿,2预发布,3确定发布', 'status'],
+                ['*订单号', 'uuid', 'text', 18],
+                ['*仓库编号', 'WarehouseCode', 'text'],
+                ['*店铺编号', 'CustomerCode', 'text'],
+                ['*打包后立即发出', 'send_out', 'text'],
+                ['*差异出货需二次确认', 're_confirm', 'text'],
+                ['*货号', 'GoodsNo', 'text', 12],
+                ['*尺码', 'Size', 'text'],
+                ['*颜色编码', 'ColorCode', 'text'],
+                ['*铺货数', 'puhuo_num', 'number'],
+                ['*状态/1草稿,2预发布,3确定发布', 'status', 'number'],
                 ['备注', 'remark'],
             ];
-            return Excel::exportData($data, $header, date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count, 'xlsx');
+            ExcelService::export($data, $header, date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count);
         }
 
 
