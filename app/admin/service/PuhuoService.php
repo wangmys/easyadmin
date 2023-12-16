@@ -1256,6 +1256,7 @@ class PuhuoService
             'if_taozhuang' => $if_taozhuang,
             'if_zdmd' => $if_zdmd,
             'zuhe_customer' => $CustomerNames,
+            'admin_id' =>session('admin.id')
         ];
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoods2Model();
@@ -1281,6 +1282,7 @@ class PuhuoService
                         'Yuncang' => $Yuncang,
                         'GoodsNo' => $v_goodsno,
                         'set_id' => $id,
+                        'admin_id' =>session('admin.id')
                     ];
                 }
             }
