@@ -257,7 +257,8 @@ class Customitem17 extends AdminController
                     累计流水截止日期,
                     round(达成率_直营 * 100, 1) as 达成率_直营,
                     round(达成率_加盟 * 100, 1) as 达成率_加盟,
-                    round(达成率_合计 * 100, 1) as 达成率_合计
+                    round(达成率_合计 * 100, 1) as 达成率_合计,
+                    `100%日均需销额_直营`,`100%日均需销额_加盟`,`100%日均需销额_合计`,`85%日均需销额_直营`,`85%日均需销额_加盟`,`85%日均需销额_合计`
                 FROM
                     cwl_customitem17_zhuanyuan_current 
                 WHERE 1	
@@ -275,7 +276,8 @@ class Customitem17 extends AdminController
                     累计流水截止日期,
                     round(达成率_直营 * 100, 1) as 达成率_直营,
                     round(达成率_加盟 * 100, 1) as 达成率_加盟,
-                    round(达成率_合计 * 100, 1) as 达成率_合计
+                    round(达成率_合计 * 100, 1) as 达成率_合计,
+                    `100%日均需销额_直营`,`100%日均需销额_加盟`,`100%日均需销额_合计`,`85%日均需销额_直营`,`85%日均需销额_加盟`,`85%日均需销额_合计`
                 FROM
                     cwl_customitem17_zhuanyuan_current 
                 WHERE 1	
