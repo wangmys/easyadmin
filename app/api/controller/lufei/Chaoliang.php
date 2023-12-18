@@ -66,6 +66,8 @@ class Chaoliang extends BaseController
 
     // 更新单码量合计
     public function biaozhun_total() {
+        $find_config = $this->db_easyA->table('cwl_chaoliang_config')->where('id=1')->find();
+
         $sql = "
             UPDATE cwl_chaoliang_biaozhun
                 SET
@@ -80,8 +82,8 @@ class Chaoliang extends BaseController
                         + IFNULL(`单码量35/44/58/195/5XL`, 0) 
                         + IFNULL(`单码量36/6XL`, 0) 
                         + IFNULL(`单码量38/7XL`, 0) 
-                        + IFNULL(`单码量_40`, 0) ) * 1.5, 0)  ,
-                    `周转合计` = 6    
+                        + IFNULL(`单码量_40`, 0) ) * {$config['总码超量倍率']}, 0)  ,
+                    `周转合计` = {$config['周转参数']}    
                 WHERE 1
         ";
         $this->db_easyA->execute($sql);
