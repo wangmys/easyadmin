@@ -12,15 +12,15 @@ use app\admin\model\wwdata\LypWwCussale14dayModel;
 class Run extends BaseController
 {
 
-  public function puhuo() {
+  public function puhuo($admin_id='1') {
 
     if (env('ENV_SIGN') == 'local') {
 
-      $res = exec("cd E:/phpstudy_pro/WWW/easyadmin && php think puhuo_start2_merge");
+      $res = exec("cd E:/phpstudy_pro/WWW/easyadmin && php think puhuo_start2_merge $admin_id");
       
     } elseif (env('ENV_SIGN') == 'product') {
 
-      $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_start2_merge");
+      $res = exec("cd /data/web/easyadmin2/easyadmin && php think puhuo_start2_merge $admin_id");
 
     }
     var_dump($res);die;

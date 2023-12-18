@@ -34,7 +34,10 @@ class Rundiy extends AdminController
 
         $res = $this->service->get_puhuo_run();
         $res_dingding_user = $this->service->get_dingding_user();
-        // print_r($res);die;
+
+        if(!$res){
+            $res['update_time']='';
+        }
 
         $this->assign(
         array_merge(
@@ -129,10 +132,11 @@ class Rundiy extends AdminController
      */
     public function savePuhuoRun() {
 
-        $url = env('APP.APP_DOMAIN').'/api/puhuo.run/puhuo';
+        $url = env('APP.APP_DOMAIN').'/api/puhuo.run/puhuo?admin_id='.session('admin.id');
 
         $res = curl_post_pro($url, json_encode([]), '', 1800);
 
+        dd($res);
         return $this->success('成功', ['msg' => 'okkk']);
 
     }    
