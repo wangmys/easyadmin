@@ -319,7 +319,7 @@ class Zdconfig2 extends AdminController
         $post = $this->request->post();
         try {
             $db=Db::connect('mysql');
-            $resID=$db->table('sp_lyp_puhuo_zdy_set2')->where(['Yuncang'=>$post['Yuncang'],'Selecttype'=>$post['Selecttype']])->column('id');
+            $resID=$db->table('sp_lyp_puhuo_zdy_set2')->where(['admin_id'=>session('admin.id'),'Yuncang'=>$post['Yuncang'],'Selecttype'=>$post['Selecttype']])->column('id');
             $db->table('sp_lyp_puhuo_zdy_set2')->whereIn('id',$resID)->delete();
             $db->table('sp_lyp_puhuo_zdy_yuncang_goods2')->whereIn('set_id',$resID)->delete();
             $this->service->delPuhuoZdySet2($post);

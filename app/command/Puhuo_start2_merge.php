@@ -8,6 +8,7 @@ use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
+use think\Exception;
 use think\facade\Db;
 use think\facade\Log;
 use app\admin\model\bi\SpLypPuhuoYuncangkeyongModel;
@@ -75,11 +76,13 @@ class Puhuo_start2_merge extends Command
     protected $puhuo_onegoods_rule_model;
     protected $puhuo_yuji_stock_model;
     protected $cwl_daxiao_handle_model;
+    protected $admin_id;
 
     protected function configure()
     {
         // 指令配置
         $this->setName('Puhuo_start2_merge')
+            ->addArgument('admin_id', Argument::REQUIRED)
             ->addArgument('if_deal_yuncangkeyong', Argument::OPTIONAL)//是否处理云仓可用
             ->addArgument('list_rows', Argument::OPTIONAL)//每页条数
             ->setDescription('the Puhuo_start2_merge command');
@@ -112,12 +115,13 @@ class Puhuo_start2_merge extends Command
         
         ini_set('memory_limit','1024M');
         $db = Db::connect("mysql");
-
+        $admin_id=$input->getArgument('admin_id') ?: 1;
+        $this->admin_id=$admin_id;
         $if_deal_yuncangkeyong    = $input->getArgument('if_deal_yuncangkeyong') ?? 1;//是否处理云仓可用
         $list_rows    = $input->getArgument('list_rows') ?: 1000;//每页条数
 
         //铺货开始 更新铺货状态
-        $puhuo_run_res = SpLypPuhuoRunModel::create(['puhuo_status' => SpLypPuhuoRunModel::PUHUO_STATUS['running']]);
+        $puhuo_run_res = SpLypPuhuoRunModel::create(['admin_id'=>$admin_id,'puhuo_status' => SpLypPuhuoRunModel::PUHUO_STATUS['running']]);
 
         //先处理 puhuo_yuncangkeyong 
         if ($if_deal_yuncangkeyong) {
@@ -138,13 +142,13 @@ class Puhuo_start2_merge extends Command
         
         $data = $this->get_wait_goods_data($list_rows);
         $data_taozhuang = $this->get_wait_goods_data_taozhuang($list_rows);//套装套西
-        // print_r([$data, $data_taozhuang]);die;
 
         //先清空旧数据再跑
-        $this->db_easy->Query("truncate table sp_lyp_puhuo_customer_sort;");
-        $this->db_easy->Query("truncate table sp_lyp_puhuo_daxiaoma_customer_sort;");
-        $this->db_easy->Query("truncate table sp_lyp_puhuo_cur_log;");
-        $this->db_easy->Query("truncate table sp_lyp_puhuo_log;");
+
+        $this->db_easy->table('sp_lyp_puhuo_customer_sort')->where(['admin_id'=>$admin_id])->delete();
+        $this->db_easy->table('sp_lyp_puhuo_daxiaoma_customer_sort')->where(['admin_id'=>$admin_id])->delete();
+        $this->db_easy->table('sp_lyp_puhuo_cur_log')->where(['admin_id'=>$admin_id])->delete();
+        $this->db_easy->table('sp_lyp_puhuo_log')->where(['admin_id'=>$admin_id])->delete();
 
         $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
         $new_customers = $this->db_easy->Query("select CustomerName from customer where Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 
@@ -271,7 +275,7 @@ class Puhuo_start2_merge extends Command
                 ['CategoryName1', '=', $CategoryName1], ['CategoryName2', '=', $CategoryName2], ['StyleCategoryName', '=', $StyleCategoryName]])->find();
 
                 //是否已存在 daxiaoma_customer_sort
-                $if_exist_daxiaoma_customer_sort = $this->puhuo_daxiaoma_customer_sort_model::where([['WarehouseName', '=', $WarehouseName], ['TimeCategoryName1', '=', $TimeCategoryName1], ['season', '=', $season], 
+                $if_exist_daxiaoma_customer_sort = $this->puhuo_daxiaoma_customer_sort_model::where([['admin_id','=',$admin_id],['WarehouseName', '=', $WarehouseName], ['TimeCategoryName1', '=', $TimeCategoryName1], ['season', '=', $season],
                 ['CategoryName1', '=', $CategoryName1], ['CategoryName2', '=', $CategoryName2], ['StyleCategoryName', '=', $StyleCategoryName]])->column('*', 'CustomerName');
 
                 //先查看单款是否已经指定了特定的铺货规则,优先选择已指定的特定铺货规则
@@ -341,6 +345,7 @@ class Puhuo_start2_merge extends Command
                         // echo $dongxiao_rate_score;die;
 
                         $add_data = [
+                            'admin_id' => $admin_id,
                             'Yuncang' => $WarehouseName,
                             'State' => $v_customer['State'] ?: '',
                             'GoodsNo' => $GoodsNo,
@@ -501,7 +506,6 @@ class Puhuo_start2_merge extends Command
 
                                 //满足条件的才铺货
                                 $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, $goods_yuji_stock, $current_14days);
-//                                 print_r($can_puhuo);die;
                                 $uuid = uuid();
                                 if ($can_puhuo['if_can_puhuo']) {
 
@@ -517,12 +521,13 @@ class Puhuo_start2_merge extends Command
                                         $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
                                         //sp_lyp_puhuo_wait_goods处理
                                         unset($v_data['create_time']);
-                                        // print_r($v_data);die;
-                                        $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+                                        unset($v_data['id']);
+//                                         print_r($v_data);die;
+                                        $this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
                                     }
-
                                     //sp_lyp_puhuo_log、sp_lyp_puhuo_cur_log处理
                                     $puhuo_log = [
+                                        'admin_id' => $admin_id,
                                         'uuid' => $uuid,
                                         'WarehouseName' => $WarehouseName,
                                         'GoodsNo' => $GoodsNo,
@@ -551,8 +556,8 @@ class Puhuo_start2_merge extends Command
                                     $daxiaoma_puhuo_log[] = $puhuo_log_tmp;
                                     
                                 } else {//不铺
-                                    
                                     $puhuo_log = [
+                                        'admin_id' => $admin_id,
                                         'uuid' => $uuid,
                                         'WarehouseName' => $WarehouseName,
                                         'GoodsNo' => $GoodsNo,
@@ -583,13 +588,13 @@ class Puhuo_start2_merge extends Command
                                 //记录铺货日志：
                                 Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
-                                $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
+                                $this->puhuo_customer_sort_model::where([['admin_id', '=', $admin_id],['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
 
                             }
                             // print_r([$add_puhuo_log, $v_data]);die;
 
                             ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
-                            
+
                             //echo json_encode(['daxiaoma_puhuo_log'=>$daxiaoma_puhuo_log, 'daxiaoma_skcnum_score_sort'=>$daxiaoma_skcnum_score_sort,  'add_puhuo_log'=>$add_puhuo_log,  'v_data'=>$v_data,  'puhuo_config'=>$puhuo_config]);die;
                             $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
                             
@@ -646,7 +651,7 @@ class Puhuo_start2_merge extends Command
 
         //铺货完成钉钉通知
         $sample = new Sample();
-        $users = SpLypPuhuoDdUserModel::where([])->select();
+        $users = SpLypPuhuoDdUserModel::where(['admin_id'=>$admin_id])->select();
         $users = $users ? $users->toArray() : [];
         if ($users) {
             foreach ($users as $val) {
@@ -1322,7 +1327,7 @@ class Puhuo_start2_merge extends Command
         // $zhiding_goods = array_combine($yuncang_goods, $zhiding_goods);
 
         //改为从新的 自定义铺货设置表 获取
-        $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['pzs.if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['not_taozhuang']]])->alias('pzs')
+        $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::alias('pzs')->where([['pzs.admin_id','=',$this->admin_id],['pzs.if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['not_taozhuang']]])
         ->join(['sp_lyp_puhuo_zdy_yuncang_goods2' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
         ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzs.zuhe_customer, pzs.if_zdmd, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
@@ -1365,7 +1370,7 @@ class Puhuo_start2_merge extends Command
 
             foreach ($res_yuncang as $k_yuncang=>$v_yuncang) {
                 $arr_goods = array_column($v_yuncang, 'GoodsNo');
-                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $k_yuncang)->where([['GoodsNo', 'in', $arr_goods]])
+                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $k_yuncang)->where([['admin_id','=',$this->admin_id],['GoodsNo', 'in', $arr_goods]])
                     ->where(function ($query) use ($where) {
                        $query ->whereOr($where);
                     })
@@ -1399,7 +1404,7 @@ class Puhuo_start2_merge extends Command
     //获取套装套西铺货配置
     protected function get_wait_goods_data_taozhuang($list_rows) {
 
-        $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['is_taozhuang']]])
+        $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::where([['admin_id','=',$this->admin_id],['if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['is_taozhuang']]])
         ->field('Yuncang, GoodsNo, Selecttype, Commonfield, rule_type, remain_store, remain_rule_type, if_taozhuang, zuhe_customer, if_zdmd')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         if ($zdy_yuncang_goods) {
@@ -1417,7 +1422,6 @@ class Puhuo_start2_merge extends Command
                 $v_yuncang_goods['goods'] = array_chunk($res, 2);
             }
         }
-        // print_r($zdy_yuncang_goods);die;
         return $zdy_yuncang_goods;
 
     }
@@ -2560,8 +2564,10 @@ class Puhuo_start2_merge extends Command
     protected function generate_end_data() {
 
         //先清空旧数据再跑
-        $this->db_easy->Query("truncate table sp_lyp_puhuo_end_data;");
-        $WarehouseName = $this->db_easy->Query("select distinct WarehouseName from sp_lyp_puhuo_cur_log;");
+        $this->db_easy->table('sp_lyp_puhuo_end_data')->where(['admin_id'=>$this->admin_id])->delete();
+
+        $WarehouseName = $this->db_easy->Query("select distinct WarehouseName from sp_lyp_puhuo_cur_log where admin_id ={$this->admin_id};");
+
         if ($WarehouseName) {
             foreach ($WarehouseName as $v_ware) {
                 $data = $this->get_data($v_ware['WarehouseName']);
@@ -2580,6 +2586,7 @@ class Puhuo_start2_merge extends Command
     protected function get_data($yuncang) {
 
         $sql = "select lpcs.Yuncang as WarehouseName
+        , lpcs.admin_id  
         , lpwg.TimeCategoryName1  
         , lpwg.TimeCategoryName2 
         , lpwg.CategoryName1 
@@ -2625,7 +2632,7 @@ class Puhuo_start2_merge extends Command
         from sp_lyp_puhuo_customer_sort lpcs 
         left join sp_lyp_puhuo_cur_log lpcl on lpcs.cur_log_uuid=lpcl.uuid 
         left join sp_lyp_puhuo_wait_goods lpwg on (lpcs.Yuncang=lpwg.WarehouseName and lpcs.GoodsNo=lpwg.GoodsNo)  
-        where 1 and lpwg.WarehouseName='{$yuncang}' group by ware_goods;";
+        where lpcs.admin_id={$this->admin_id} and lpcl.admin_id={$this->admin_id} and lpwg.admin_id={$this->admin_id} and lpwg.WarehouseName='{$yuncang}' group by ware_goods;";
         return $this->db_easy->Query($sql);
 
     }
@@ -2640,6 +2647,7 @@ class Puhuo_start2_merge extends Command
 
                 [
                     'uuid' => '',
+                    'admin_id' => $v_data['admin_id'],
                     'WarehouseName' => $v_data['WarehouseName'],
                     'WarehouseCode' => '',
                     'TimeCategoryName1' => $v_data['TimeCategoryName1'],
@@ -2688,6 +2696,7 @@ class Puhuo_start2_merge extends Command
     
                 [
                     'uuid' => '',
+                    'admin_id' => $v_data['admin_id'],
                     'WarehouseName' => $v_data['WarehouseName'],
                     'WarehouseCode' => '',
                     'TimeCategoryName1' => $v_data['TimeCategoryName1'],
@@ -2768,6 +2777,7 @@ class Puhuo_start2_merge extends Command
     protected function get_ware_goods_sql($WarehouseName, $GoodsNo) {
 
         return "select lpcl.uuid
+        , lpcs.admin_id as admin_id
         , lpcs.Yuncang as WarehouseName
         ,CASE WHEN lpcs.Yuncang='长沙云仓' THEN 'CK006' 
 			WHEN lpcs.Yuncang='武汉云仓' THEN 'CK003' 
@@ -2818,7 +2828,7 @@ class Puhuo_start2_merge extends Command
         left join sp_lyp_puhuo_cur_log lpcl on lpcs.cur_log_uuid=lpcl.uuid 
         left join sp_lyp_puhuo_wait_goods lpwg on (lpcs.Yuncang=lpwg.WarehouseName and lpcs.GoodsNo=lpwg.GoodsNo)  
         left join customer c on lpcs.CustomerId=c.CustomerId  
-        where 1 and lpwg.WarehouseName='{$WarehouseName}' and lpwg.GoodsNo='{$GoodsNo}'";
+        where lpcs.admin_id ={$this->admin_id} and lpcl.admin_id ={$this->admin_id} and lpwg.admin_id ={$this->admin_id} and lpwg.WarehouseName='{$WarehouseName}' and lpwg.GoodsNo='{$GoodsNo}'";
 
     }
 
@@ -2954,8 +2964,8 @@ class Puhuo_start2_merge extends Command
     protected function puhuo_yuncangkeyong2() {
 
         $db = Db::connect("mysql");
-        $db->Query("truncate table sp_lyp_puhuo_yuncangkeyong;");
-        
+        $db->table('sp_lyp_puhuo_yuncangkeyong')->where(['admin_id'=>$this->admin_id])->delete();
+
         $data = $this->get_kl_data();
         if ($data) {
 
@@ -3019,6 +3029,7 @@ class Puhuo_start2_merge extends Command
                 $v_data = $v_tmp_res_data[0];
 
                 $tmp_data = [
+                    'admin_id' => $this->admin_id,
                     'WarehouseName' => $v_data['WarehouseName'],
                     'TimeCategoryName1' => $v_data['TimeCategoryName1'],
                     'TimeCategoryName2' => $v_data['TimeCategoryName2'],
@@ -3225,7 +3236,7 @@ class Puhuo_start2_merge extends Command
                 Db::startTrans();
                 try {
                     //先清空旧数据再跑
-                    $db->Query("truncate table sp_lyp_puhuo_wait_goods;");
+                    $db->table('sp_lyp_puhuo_wait_goods')->where(['admin_id'=>$this->admin_id])->delete();
                     foreach($chunk_list as $key => $val) {
                         $insert = $db->table('sp_lyp_puhuo_wait_goods')->strict(false)->insertAll($val);
                     }
@@ -4090,7 +4101,7 @@ class Puhuo_start2_merge extends Command
 
         }
 
-        $sql = "select WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
+        $sql = "select '$this->admin_id' as admin_id , WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
         (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and qima>=$warehouse_qima_nd) 
         or ( CategoryName2 like '%套西%' and qima>=$warehouse_qima_tx) 
         or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and qima>=$warehouse_qima_nd) 
@@ -4117,11 +4128,10 @@ class Puhuo_start2_merge extends Command
 
     public function puhuo_customer_yuji_stock() {
 
-        $goodsno = $this->puhuo_zdy_yuncang_goods2_model::where([])->distinct(true)->column('GoodsNo');
+        $goodsno = $this->puhuo_zdy_yuncang_goods2_model::where(['admin_id'=>$this->admin_id])->distinct(true)->column('GoodsNo');
         
         $goodsno = get_goods_str($goodsno);
-        // print_r($goodsno);die;
-        
+
         $sql = "SELECT 
         T.CustomItem15 云仓,
         T.State 省份,

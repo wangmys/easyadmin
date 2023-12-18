@@ -52,6 +52,7 @@ class PuhuoService
 
         $where = $list = [];
         $where[] = ['is_delete', '=', 2];
+        $where[] = ['admin_id', '=', session('admin.id')];
         if ($WarehouseName) {
             $where[] = ['WarehouseName', 'in', $WarehouseName];
         }
@@ -251,6 +252,8 @@ class PuhuoService
         $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
 
         $where = $list = [];
+        $where[] = ['lped.admin_id', '=', session('admin.id')];
+
         if ($WarehouseName) {
             $where[] = ['lped.WarehouseName', 'in', $WarehouseName];
         }
@@ -357,6 +360,8 @@ class PuhuoService
         $caogao_uuid = $params['caogao_uuid'] ?? '';//草稿uuid
 
         $where = $list = [];
+        $where[] = ['lpc.admin_id', '=', session('admin.id')];
+
         if ($WarehouseName) {
             $where[] = ['lpc.WarehouseName', 'in', $WarehouseName];
         }
@@ -873,7 +878,7 @@ class PuhuoService
      */
     public function get_zdy_goods2($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -938,7 +943,7 @@ class PuhuoService
      */
     public function get_zdy_goods2zh($Yuncang) {
 
-        $res = SpLypPuhuoZdySet2Model::where([['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data2($Yuncang);
         // print_r($select_list);die;
@@ -1100,11 +1105,11 @@ class PuhuoService
 
         if ($post['id']) {
 
-            $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
+            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
             
         } else {
             
-            $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
+            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
 
         }
 
@@ -1388,7 +1393,7 @@ class PuhuoService
      */
     public function get_puhuo_run() {
 
-        $res = SpLypPuhuoRunModel::where([])->order('id desc')->find();
+        $res = SpLypPuhuoRunModel::where([['admin_id','=',session('admin.id')]])->order('id desc')->find();
         $res = $res ? $res->toArray() : [];
         return $res;
 
@@ -1399,7 +1404,7 @@ class PuhuoService
      */
     public function get_puhuo_goods_count() {
 
-        return SpLypPuhuoZdyYuncangGoods2Model::where([])->count();
+        return SpLypPuhuoZdyYuncangGoods2Model::where(['admin_id'=>session('admin.id')])->count();
 
     }
 
@@ -1424,11 +1429,13 @@ class PuhuoService
      */
     public function save_dingding_user($dingding) {
 
-        $this->easy_db->query("truncate table sp_lyp_puhuo_dd_user;");
+//        $this->easy_db->query("truncate table sp_lyp_puhuo_dd_user;");
+        $this->easy_db->table('sp_lyp_puhuo_dd_user')->where(['admin_id'=>session('admin.id')])->delete();
         $select_dd_user = DdUserModel::where([['userid', 'in', $dingding ? explode(',', $dingding) : []]])->field('userid,name')->select();
         $select_dd_user = $select_dd_user ? $select_dd_user->toArray() : [];
         if ($select_dd_user) {
-            foreach ($select_dd_user as $v_sel) {
+            foreach ($select_dd_user as &$v_sel) {
+                $v_sel['admin_id']=session('admin.id');
                 SpLypPuhuoDdUserModel::create($v_sel);
             }
         }
