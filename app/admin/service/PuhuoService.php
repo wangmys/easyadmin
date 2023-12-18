@@ -1414,7 +1414,7 @@ class PuhuoService
     public function get_dingding_user() {
 
         $dd_user = $this->easy_db->query("select name as name, userid as value from dd_user  group by userid;");
-        $sel_dd_user = SpLypPuhuoDdUserModel::where([])->column('userid');
+        $sel_dd_user = SpLypPuhuoDdUserModel::where(['admin_id'=>session('admin.id')])->column('userid');
         foreach ($dd_user as &$v_user) {
             if (in_array($v_user['value'], $sel_dd_user)) {
                 $v_user['selected'] = true;

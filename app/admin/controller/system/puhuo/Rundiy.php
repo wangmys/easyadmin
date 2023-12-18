@@ -34,7 +34,10 @@ class Rundiy extends AdminController
 
         $res = $this->service->get_puhuo_run();
         $res_dingding_user = $this->service->get_dingding_user();
-        // print_r($res);die;
+
+        if(!$res){
+            $res['update_time']='';
+        }
 
         $this->assign(
         array_merge(
