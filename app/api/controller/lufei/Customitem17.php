@@ -161,7 +161,7 @@ class Customitem17 extends BaseController
 
     // 近七天，哪7天
     public function getBefore7() {
-        // $今天 = date('Y-m-01');
+        // $今天 = date('2023-12-01');
         $今天 = date('Y-m-d');
         $本月 = strtotime(date('Y-m-01'));
         $day1 = date('Y-m-d', strtotime('-1 day', strtotime($今天)));
@@ -972,6 +972,95 @@ class Customitem17 extends BaseController
             ";
             $this->db_easyA->execute($sql_85日均需销额);
 
+            $str_近七天日期 = '';
+            $getBefore7 = $this->getBefore7();
+            if($getBefore7) {
+                $str_近七天日期 = arrToStr($getBefore7);
+            }
+            $sql_近七天日均销_直营 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+               
+                    select 
+                        m.商品专员, 
+                        m.销售金额 / 7 as 近七天日均销
+                    from (
+                        SELECT
+                            商品专员,
+                            sum(销售金额) as 销售金额  
+                        FROM
+                            cwl_customitem17_retail_current
+                        WHERE
+                            日期 IN ( {$str_近七天日期} ) 
+                            AND 经营属性 = '直营'
+                        GROUP BY
+                            商品专员
+                    ) as m
+    
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`近七天日均销额_直营` = t.近七天日均销
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            
+            $sql_近七天日均销_加盟 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+    
+                    select 
+                        m.商品专员, 
+                        m.销售金额 / 7 as 近七天日均销
+                    from (
+                        SELECT
+                            商品专员,
+                            sum(销售金额) as 销售金额  
+                        FROM
+                            cwl_customitem17_retail_current
+                        WHERE
+                            日期 IN ( {$str_近七天日期} ) 
+                            AND 经营属性 = '加盟'
+                        GROUP BY
+                            商品专员
+                    ) as m
+    
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`近七天日均销额_加盟` = t.近七天日均销
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            
+            $sql_近七天日均销_合计 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+    
+                    select 
+                        m.商品专员, 
+                        m.销售金额 / 7 as 近七天日均销
+                    from (
+                        SELECT
+                            商品专员,
+                            sum(销售金额) as 销售金额  
+                        FROM
+                            cwl_customitem17_retail_current
+                        WHERE
+                            日期 IN ( {$str_近七天日期} ) 
+                        GROUP BY
+                            商品专员
+                    ) as m
+    
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`近七天日均销额_合计` = t.近七天日均销
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+    
+            $this->db_easyA->execute($sql_近七天日均销_直营);
+            $this->db_easyA->execute($sql_近七天日均销_加盟);
+            $this->db_easyA->execute($sql_近七天日均销_合计);
+
             // 合计
             $this->updateZhuanyuan_total_current();
         }
@@ -1051,6 +1140,62 @@ class Customitem17 extends BaseController
         $合计['85%日均需销额_加盟'] = $到结束剩余天数 > 0 ? round(($合计['目标_加盟'] * 0.85 - $合计['累计流水_加盟']) / $到结束剩余天数, 2): null;
         $合计['85%日均需销额_合计'] = $到结束剩余天数 > 0 ? round(($合计['目标_合计'] * 0.85 - $合计['累计流水_合计']) / $到结束剩余天数, 2): null;
 
+        $sql_近七天日均销_直营 = "
+            select 
+                round(m.销售金额 / 7, 2) as 近七天日均销_直营
+            from (
+                SELECT
+                    sum(销售金额) as 销售金额  
+                FROM
+                    cwl_customitem17_retail_current
+                WHERE
+                    日期 IN ( {$str_近七天日期} ) 
+                    AND 经营属性 = '直营'
+            ) as m
+        ";
+        $sql_近七天日均销_加盟 = "
+            select 
+                round(m.销售金额 / 7, 2) as 近七天日均销_加盟
+            from (
+                SELECT
+                    sum(销售金额) as 销售金额  
+                FROM
+                    cwl_customitem17_retail_current
+                WHERE
+                    日期 IN ( {$str_近七天日期} ) 
+                    AND 经营属性 = '加盟'
+            ) as m
+        ";
+        $sql_近七天日均销_合计 = "
+            select 
+                round(m.销售金额 / 7, 2) as 近七天日均销_合计
+            from (
+                SELECT
+                    sum(销售金额) as 销售金额  
+                FROM
+                    cwl_customitem17_retail_current
+                WHERE
+                    日期 IN ( {$str_近七天日期} ) 
+            ) as m
+        ";
+        $合计_近七天日均销_直营 = $this->db_easyA->query($sql_近七天日均销_直营);
+        $合计_近七天日均销_加盟 = $this->db_easyA->query($sql_近七天日均销_加盟);
+        $合计_近七天日均销_合计 = $this->db_easyA->query($sql_近七天日均销_合计);
+
+
+        $合计['近七天日均销额_直营'] = $合计_近七天日均销_直营[0]['近七天日均销_直营'];
+        $合计['近七天日均销额_加盟'] = $合计_近七天日均销_加盟[0]['近七天日均销_加盟'];
+        $合计['近七天日均销额_合计'] = $合计_近七天日均销_合计[0]['近七天日均销_合计'];
+
         $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insert($合计);
+    }
+
+    public function test() {
+        $str_近七天日期 = '';
+        $getBefore7 = $this->getBefore7();
+        if($getBefore7) {
+            $str_近七天日期 = arrToStr($getBefore7);
+        }
+        echo $str_近七天日期;
     }
 }
