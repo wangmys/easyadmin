@@ -266,7 +266,7 @@ class Organize extends BaseController
                 dd_customer_push_baokuan
             set
                 星期 = WEEKDAY(更新日期) + 1,
-                推送星期 = 1,
+                推送星期 = 4,
                 path = 'http://im.babiboy.com/babiboylogo.jpg',
                 url = concat('http://im.babiboy.com/admin/system.dingding.Baokuan/res?店铺名称=', 店铺名称) 
         ";
