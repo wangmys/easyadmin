@@ -842,6 +842,7 @@ class Customitem17 extends BaseController
 
     // 专员实时业绩
     public function zhuanyuan_yeji_new() {
+        $今天 = date('Y-m-d');
         $开始= date('Y-m-01 00:00:00');
         $结束= date('Y-m-d 23:59:59');
         $截止日期 = date('Y-m-d H:i:s');
@@ -1061,6 +1062,72 @@ class Customitem17 extends BaseController
             $this->db_easyA->execute($sql_近七天日均销_加盟);
             $this->db_easyA->execute($sql_近七天日均销_合计);
 
+            // 今日流水
+            $sql_今日流水_直营 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail_current
+                    WHERE
+                        日期 IN ( '{$今天}' ) 
+                        AND 经营属性 = '直营'
+                        AND 商品专员 is not null
+                    GROUP BY
+                        商品专员
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`今日流水_直营` = t.销售金额
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_今日流水_直营);
+
+            $sql_今日流水_加盟 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail_current
+                    WHERE
+                        日期 IN ( '{$今天}' ) 
+                        AND 经营属性 = '加盟'
+                        AND 商品专员 is not null
+                    GROUP BY
+                        商品专员
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`今日流水_加盟` = t.销售金额
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_今日流水_加盟);
+
+            $sql_今日流水_合计 = "
+                update cwl_customitem17_zhuanyuan_current as z 
+                left join ( 
+                    SELECT
+                        商品专员,
+                        sum(销售金额) as 销售金额  
+                    FROM
+                        cwl_customitem17_retail_current
+                    WHERE
+                        日期 IN ( '{$今天}' ) 
+                        AND 商品专员 is not null
+                    GROUP BY
+                        商品专员
+                ) as t on z.商品专员=t.商品专员
+                set 
+                    z.`今日流水_合计` = t.销售金额
+                where
+                    目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_今日流水_合计);
+
             // 合计
             $this->updateZhuanyuan_total_current();
         }
@@ -1097,7 +1164,7 @@ class Customitem17 extends BaseController
             SELECT
                 商品专员,
                 目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
-                累计流水截止日期,
+                累计流水截止日期,今日流水_直营,今日流水_加盟,今日流水_合计,
                 concat(round(达成率_直营 * 100, 1), '%') as 达成率_直营,
                 concat(round(达成率_加盟 * 100, 1), '%') as 达成率_加盟,
                 concat(round(达成率_合计 * 100, 1), '%') as 达成率_合计
@@ -1117,6 +1184,9 @@ class Customitem17 extends BaseController
             '累计流水_直营' => 0,
             '累计流水_加盟' => 0,
             '累计流水_合计' => 0,
+            '今日流水_直营' => 0,
+            '今日流水_加盟' => 0,
+            '今日流水_合计' => 0,
 
         ];
         foreach ($select as $key => $val) {
@@ -1126,6 +1196,9 @@ class Customitem17 extends BaseController
             $合计['累计流水_直营'] += $val['累计流水_直营'];
             $合计['累计流水_加盟'] += $val['累计流水_加盟'];
             $合计['累计流水_合计'] += $val['累计流水_合计'];
+            $合计['今日流水_直营'] += $val['今日流水_直营'];
+            $合计['今日流水_加盟'] += $val['今日流水_加盟'];
+            $合计['今日流水_合计'] += $val['今日流水_合计'];
         }
 
         $合计['达成率_直营'] = $合计['累计流水_直营'] / $合计['目标_直营'];

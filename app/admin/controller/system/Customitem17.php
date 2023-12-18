@@ -253,8 +253,8 @@ class Customitem17 extends AdminController
             $sql = "
                 SELECT
                     商品专员,
-                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
-                    累计流水截止日期,
+                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,今日流水_直营,今日流水_加盟,今日流水_合计,
+                    left(累计流水截止日期, 10) as 累计流水截止日期,
                     round(达成率_直营 * 100, 1) as 达成率_直营,
                     round(达成率_加盟 * 100, 1) as 达成率_加盟,
                     round(达成率_合计 * 100, 1) as 达成率_合计,
@@ -273,8 +273,8 @@ class Customitem17 extends AdminController
             $sql_合计 = "
                 SELECT
                     商品专员,
-                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,
-                    累计流水截止日期,
+                    目标_直营,目标_加盟,目标_合计,累计流水_直营,累计流水_加盟,累计流水_合计,今日流水_直营,今日流水_加盟,今日流水_合计,
+                    left(累计流水截止日期, 10) as 累计流水截止日期,
                     round(达成率_直营 * 100, 1) as 达成率_直营,
                     round(达成率_加盟 * 100, 1) as 达成率_加盟,
                     round(达成率_合计 * 100, 1) as 达成率_合计,
@@ -297,7 +297,16 @@ class Customitem17 extends AdminController
                     {$map0}
             ";
             $count = $this->db_easyA->query($sql2);
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $result, 'create_time' => date('Y-m-d')]);
+
+            $find_time = $this->db_easyA->query("
+                SELECT 
+                    累计流水截止日期
+                FROM cwl_customitem17_zhuanyuan_current
+                WHERE 1
+                    {$map0}
+                LIMIT 1
+            ");
+            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $result, 'create_time' => $find_time[0]['累计流水截止日期']]);
         } else {
             $目标月份 = date('Y-m');
             if (checkAdmin()) {

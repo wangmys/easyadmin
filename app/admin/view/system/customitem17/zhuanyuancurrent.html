@@ -123,79 +123,6 @@
         .cool {
             color:#0879bb;
         }
-        /* th[data-field="7"][data-key="1-0-7"] {
-            background-color: #2e9574 !important;
-            color:#ffffff;
-        }
-        th[data-field="温度"][data-key="1-1-11"] {
-            background-color: #2e9574 !important;
-            color:#ffffff;
-        }
-        th[data-field="8"][data-key="1-0-8"] {
-            background-color: #b9b9b9 !important;
-            color:#ffffff;
-        }
-        th[data-field="9"][data-key="1-0-9"] {
-            background-color: #dedede !important;
-        }
-        th[data-field="季节"][data-key="1-1-23"] {
-            background-color: #c5aa2a !important;
-            color:#ffffff;
-        }
-        th[data-field="识别规则"][data-key="1-1-24"] {
-            background-color: #c5aa2a !important;
-            color:#ffffff;
-        }
-        th[data-field="识别天数"][data-key="1-1-25"] {
-            background-color: #c5aa2a !important;
-            color:#ffffff;
-        }
-        th[data-field="季节SKC数"][data-key="1-1-26"] {
-            background-color: #c5aa2a !important;
-            color:#ffffff;
-        }
-
-        th[data-field="提醒"][data-key="1-1-27"] {
-            background-color: #ff3c00 !important;
-            color:#ffffff;
-        }
-        th[data-field="10"][data-key="1-0-10"],
-        th[data-field="春季SKC基本_内搭"][data-key="1-1-29"],
-        th[data-field="春季SKC基本_外套"][data-key="1-1-30"] {
-            background-color: #5a9afa !important;
-            color:#ffffff;
-        }
-        
-        th[data-field="11"][data-key="1-0-11"],
-        th[data-field="提醒"][data-key="1-1-20"]{
-            background-color: #ff3c00 !important;
-            color:#ffffff;
-        }
-        th[data-field="12"][data-key="1-0-12"] {
-            background-color: #c5aa2a !important;
-            color:#ffffff;
-        }
-        th[data-field="17"][data-key="1-1-17"],
-        th[data-field="0"][data-key="1-2-0"],
-        th[data-field="1"][data-key="1-2-1"],
-        th[data-field="2"][data-key="1-2-2"] {
-            background-color: #90bcff !important;
-            color:#ffffff;
-        }
-        th[data-field="18"][data-key="1-1-18"],
-        th[data-field="3"][data-key="1-2-3"],
-        th[data-field="4"][data-key="1-2-4"],
-        th[data-field="5"][data-key="1-2-5"] {
-            background-color: #7db0fc !important;
-            color:#ffffff;
-        }
-        th[data-field="19"][data-key="1-1-19"],
-        th[data-field="6"][data-key="1-2-6"],
-        th[data-field="7"][data-key="1-2-7"],
-        th[data-field="8"][data-key="1-2-8"] {
-            background-color: #599afb !important;
-            color:#ffffff;
-        } */
         th[data-key="1-0-2"] {
             background-color: #ffff00 !important;
             /* color:#ffffff; */
@@ -205,14 +132,18 @@
             /* color:#ffffff; */
         }
         th[data-key="1-0-4"] {
+            background-color: #84d7fd !important;
+            /* color:#ffffff; */
+        }
+        th[data-key="1-0-5"] {
             background-color: #f4b382 !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-7"] {
+        th[data-key="1-0-8"] {
             background-color: #fee796 !important;
             /* color:#ffffff; */
         }
-        th[data-key="1-0-8"] {
+        th[data-key="1-0-9"] {
             background-color: #d6dce4 !important;
             color:#785e01;
         }
@@ -413,16 +344,20 @@
                                     <div class="cima">商品</div>
                                     <div class="cima">专员</div>
                                     <div class="cima"></div>
-                                    </div>`, field: '商品专员',  fixed: 'left' ,align: 'center' , rowspan: 2, templet: function (data) {
+                                    </div>`, field: '商品专员',  fixed: 'left' ,align: 'center' ,width:50, rowspan: 2, templet: function (data) {
                             if (data['商品专员'] == '合计') {
                                 return `${data['商品专员']}`;
                             } else {
                                 return data['商品专员'];
                             }
                         }}
-                        ,{ field: '累计流水截止日期', title: `流水截止日期`, align: 'center', width: 120, rowspan:2}
+                        ,{ title: `<div class="flex col around">
+                                    <div class="cima">流水截止</div>
+                                    <div class="cima">日期</div>
+                                    </div>`, field: '累计流水截止日期', align: 'center', width: 75, rowspan:2}
                         ,{ title: `目标`, align: 'center', colspan: 3}
                         ,{ title: `累计流水`, align: 'center', colspan: 3}
+                        ,{ title: `今日流水`, align: 'center', colspan: 3}
                         ,{ title: `达成率`, align: 'center', colspan: 3}
                         ,{ title: `<a style="color:#861322;">100%达成日均需销额</a>`, align: 'center', colspan: 3}
                         ,{ title: `<a style="color:#1e366a;">85%达成日均需销额</a>`, align: 'center', colspan: 3}
@@ -432,17 +367,22 @@
 
                     [
                         // 目标
-                        { field: '目标_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
-                        ,{ field: '目标_加盟', title: '加盟' ,align: 'center' ,  rowspan: 1} 
-                        ,{ field: '目标_合计', title: '合计' ,align: 'center' ,  rowspan: 1} 
+                        { field: '目标_直营', title: '直营' ,align: 'center' ,width: 70,  rowspan: 1} 
+                        ,{ field: '目标_加盟', title: '加盟' ,align: 'center' ,width: 70,  rowspan: 1} 
+                        ,{ field: '目标_合计', title: '合计' ,align: 'center' ,width: 70,  rowspan: 1} 
 
                         // 累计流水
-                        ,{ field: '累计流水_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
-                        ,{ field: '累计流水_加盟', title: '加盟' ,align: 'center' ,  rowspan: 1} 
-                        ,{ field: '累计流水_合计', title: '合计' ,align: 'center' , rowspan: 1} 
+                        ,{ field: '累计流水_直营', title: '直营' ,align: 'center' ,width: 80,  rowspan: 1} 
+                        ,{ field: '累计流水_加盟', title: '加盟' ,align: 'center' ,width: 80,  rowspan: 1} 
+                        ,{ field: '累计流水_合计', title: '合计' ,align: 'center' ,width: 80, rowspan: 1} 
+
+                        // 今日流水
+                        ,{ field: '今日流水_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
+                        ,{ field: '今日流水_加盟', title: '加盟' ,align: 'center' ,  rowspan: 1} 
+                        ,{ field: '今日流水_合计', title: '合计' ,align: 'center' , rowspan: 1} 
 
                         // 达成率
-                        ,{ field: '达成率_直营', title: '直营' ,align: 'center' ,  rowspan: 1, templet: function (data) {
+                        ,{ field: '达成率_直营', title: '直营' ,align: 'center' ,width: 70,  rowspan: 1, templet: function (data) {
                             if (data['达成率_直营'] && data['达成率_直营'] <= 60) {
                                 return `<a style="color:red;font-weight:bold;">${data['达成率_直营']}%</a>`;
                             } else if (data['达成率_直营'] > 60 && data['达成率_直营'] < 85) {
@@ -455,7 +395,7 @@
                                 return ``;
                             }
                         }}
-                        ,{ field: '达成率_加盟', title: '加盟' ,align: 'center' , rowspan: 1, templet: function (data) {
+                        ,{ field: '达成率_加盟', title: '加盟' ,align: 'center' ,width: 70, rowspan: 1, templet: function (data) {
                             if (data['达成率_加盟'] && data['达成率_加盟'] <= 60) {
                                 return `<a style="color:red;font-weight:bold;">${data['达成率_加盟']}%</a>`;
                             } else if (data['达成率_加盟'] > 60 && data['达成率_加盟'] < 85) {
@@ -468,7 +408,7 @@
                                 return ``;
                             }
                         }}
-                        ,{ field: '达成率_合计', title: '合计' ,align: 'center' , rowspan: 1, templet: function (data) {
+                        ,{ field: '达成率_合计', title: '合计' ,align: 'center' ,width: 70, rowspan: 1, templet: function (data) {
                             if (data['达成率_合计'] && data['达成率_合计'] <= 60) {
                                 return `<a style="color:red;font-weight:bold;">${data['达成率_合计']}%</a>`;
                             } else if (data['达成率_合计'] > 60 && data['达成率_合计'] < 85) {
@@ -485,12 +425,24 @@
                         // 100%达成日均需销额
                         ,{ field: '100%日均需销额_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
                         ,{ field: '100%日均需销额_加盟', title: '加盟' ,align: 'center' , rowspan: 1} 
-                        ,{ field: '100%日均需销额_合计', title: '合计' ,align: 'center' , rowspan: 1} 
+                        ,{ field: '100%日均需销额_合计', title: '合计' ,align: 'center' , rowspan: 1, templet: function (data) {
+                            if (data['近七天日均销额_合计'] - data['100%日均需销额_合计'] > 0) {
+                                return `<a style="color:green;font-weight:bold;">${data['近七天日均销额_合计']}</a>`;
+                            } else {
+                                return `${data['100%日均需销额_合计']}`;
+                            }
+                        }}
 
                         // 85%达成日均需销额
                         ,{ field: '85%日均需销额_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
                         ,{ field: '85%日均需销额_加盟', title: '加盟' ,align: 'center' , rowspan: 1} 
-                        ,{ field: '85%日均需销额_合计', title: '合计' ,align: 'center' , rowspan: 1} 
+                        ,{ field: '85%日均需销额_合计', title: '合计' ,align: 'center' , rowspan: 1, templet: function (data) {
+                            if (data['近七天日均销额_合计'] - data['85%日均需销额_合计'] > 0) {
+                                return `<a style="color:green;font-weight:bold;">${data['85%日均需销额_合计']}</a>`;
+                            } else {
+                                return `${data['85%日均需销额_合计']}`;
+                            }
+                        }}
 
                         // 近7天日均销额
                         ,{ field: '近七天日均销额_直营', title: '直营' ,align: 'center' ,  rowspan: 1} 
