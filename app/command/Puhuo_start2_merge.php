@@ -521,9 +521,9 @@ class Puhuo_start2_merge extends Command
                                         $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
                                         //sp_lyp_puhuo_wait_goods处理
                                         unset($v_data['create_time']);
-                                        unset($v_data['id']);
-//                                         print_r($v_data);die;
-                                        $this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+//                                        unset($v_data['id']);
+
+                                        $res=$this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
                                     }
                                     //sp_lyp_puhuo_log、sp_lyp_puhuo_cur_log处理
                                     $puhuo_log = [
