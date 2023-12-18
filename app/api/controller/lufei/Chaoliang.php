@@ -82,8 +82,8 @@ class Chaoliang extends BaseController
                         + IFNULL(`单码量35/44/58/195/5XL`, 0) 
                         + IFNULL(`单码量36/6XL`, 0) 
                         + IFNULL(`单码量38/7XL`, 0) 
-                        + IFNULL(`单码量_40`, 0) ) * {$config['总码超量倍率']}, 0)  ,
-                    `周转合计` = {$config['周转参数']}    
+                        + IFNULL(`单码量_40`, 0) ) * {$find_config['总码超量倍率']}, 0)  ,
+                    `周转合计` = {$find_config['周转参数']}    
                 WHERE 1
         ";
         $this->db_easyA->execute($sql);
