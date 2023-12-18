@@ -529,231 +529,231 @@ class Baokuan extends BaseController
         }       
     }
 
-    // 拉取 已读 未读 用户主动执行
-    public function getReadsHandle() {
-        $input = input();
-        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+    // // 拉取 已读 未读 用户主动执行
+    // public function getReadsHandle() {
+    //     $input = input();
+    //     // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
-        if (request()->isAjax() && $input['id'] && session('admin.name')) {
-        // if (1) {
-        // if (request()->isAjax()) {
-            $model = new DingTalk;
-            // echo $path = $this->request->domain() ;
+    //     if (request()->isAjax() && $input['id'] && session('admin.name')) {
+    //     // if (1) {
+    //     // if (request()->isAjax()) {
+    //         $model = new DingTalk;
+    //         // echo $path = $this->request->domain() ;
 
-            // $input['id'] = 163;
+    //         // $input['id'] = 163;
             
-            if (! checkAdmin()) {
-                $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
-                    ['id', '=', $input['id']],
-                    ['aid', '=', $this->authInfo['id']],
-                ])->find();
-            } else {
-                $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
-                    ['id', '=', $input['id']],
-                ])->find();    
-            }
+    //         if (! checkAdmin()) {
+    //             $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
+    //                 ['id', '=', $input['id']],
+    //                 ['aid', '=', $this->authInfo['id']],
+    //             ])->find();
+    //         } else {
+    //             $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
+    //                 ['id', '=', $input['id']],
+    //             ])->find();    
+    //         }
 
-            if ($find_list) {
-                $select_user = $this->db_easyA->table('dd_tiaojia_list_user')->where([
-                    ['uid', '=', $find_list['uid']]
-                ])->group('task_id')->select()->toArray();
+    //         if ($find_list) {
+    //             $select_user = $this->db_easyA->table('dd_tiaojia_list_user')->where([
+    //                 ['uid', '=', $find_list['uid']]
+    //             ])->group('task_id')->select()->toArray();
 
-                foreach($select_user as $key => $val) {
-                    $res = json_decode($model->getsendresult($val['task_id']), true);
+    //             foreach($select_user as $key => $val) {
+    //                 $res = json_decode($model->getsendresult($val['task_id']), true);
                     
-                    // print_r($res);
-                    try {
-                        if ($res['errmsg'] = 'ok' && $res['send_result']) {  
-                            if (count($res['send_result']['read_user_id_list']) > 0) {
-                                // 已读
-                                $reads = arrToStr($res['send_result']['read_user_id_list']);    
-                                $this->db_easyA->execute("
-                                    UPDATE 
-                                        dd_tiaojia_list_user 
-                                    SET 
-                                        已读 = 'Y'
-                                    WHERE 1
-                                        AND task_id = '{$val['task_id']}'
-                                        AND userid in ($reads)
-                                ");
-                            }
+    //                 // print_r($res);
+    //                 try {
+    //                     if ($res['errmsg'] = 'ok' && $res['send_result']) {  
+    //                         if (count($res['send_result']['read_user_id_list']) > 0) {
+    //                             // 已读
+    //                             $reads = arrToStr($res['send_result']['read_user_id_list']);    
+    //                             $this->db_easyA->execute("
+    //                                 UPDATE 
+    //                                     dd_tiaojia_list_user 
+    //                                 SET 
+    //                                     已读 = 'Y'
+    //                                 WHERE 1
+    //                                     AND task_id = '{$val['task_id']}'
+    //                                     AND userid in ($reads)
+    //                             ");
+    //                         }
     
-                            if (count($res['send_result']['unread_user_id_list']) > 0) {
-                                // 未读
-                                $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
-                                $this->db_easyA->execute("
-                                    UPDATE 
-                                        dd_tiaojia_list_user 
-                                    SET 
-                                        已读 = 'N'
-                                    WHERE 1
-                                        AND task_id = '{$val['task_id']}'
-                                        AND userid in ($unReads)
-                                ");
-                            }
+    //                         if (count($res['send_result']['unread_user_id_list']) > 0) {
+    //                             // 未读
+    //                             $unReads = arrToStr($res['send_result']['unread_user_id_list']);   
+    //                             $this->db_easyA->execute("
+    //                                 UPDATE 
+    //                                     dd_tiaojia_list_user 
+    //                                 SET 
+    //                                     已读 = 'N'
+    //                                 WHERE 1
+    //                                     AND task_id = '{$val['task_id']}'
+    //                                     AND userid in ($unReads)
+    //                             ");
+    //                         }
     
-                        } else {
-                            return json(['code' => 0, 'msg' => '数据异常']);
-                        }
-                    } catch (\Throwable $th) {
-                        //throw $th;
-                    }
-                }
-                // 统计list展示的已读未读数
-                $this->db_easyA->execute("
-                    UPDATE 
-                        dd_tiaojia_list as l
-                    SET 
-                        l.已读 = (select count(*) from dd_tiaojia_list_user where uid = '{$find_list['uid']}' and 已读='Y')
-                    WHERE 1
-                        AND l.id = {$find_list['id']}
-                ");
+    //                     } else {
+    //                         return json(['code' => 0, 'msg' => '数据异常']);
+    //                     }
+    //                 } catch (\Throwable $th) {
+    //                     //throw $th;
+    //                 }
+    //             }
+    //             // 统计list展示的已读未读数
+    //             $this->db_easyA->execute("
+    //                 UPDATE 
+    //                     dd_tiaojia_list as l
+    //                 SET 
+    //                     l.已读 = (select count(*) from dd_tiaojia_list_user where uid = '{$find_list['uid']}' and 已读='Y')
+    //                 WHERE 1
+    //                     AND l.id = {$find_list['id']}
+    //             ");
 
-                // 统计list展示的已读未读数
-                $this->db_easyA->execute("
-                    UPDATE 
-                        dd_tiaojia_list as l
-                    SET 
-                        l.未读 = 总数 - ifnull(已读, 0)
-                    WHERE 1
-                        AND l.id = {$find_list['id']}
-                ");
+    //             // 统计list展示的已读未读数
+    //             $this->db_easyA->execute("
+    //                 UPDATE 
+    //                     dd_tiaojia_list as l
+    //                 SET 
+    //                     l.未读 = 总数 - ifnull(已读, 0)
+    //                 WHERE 1
+    //                     AND l.id = {$find_list['id']}
+    //             ");
 
-                return json(['code' => 0, 'msg' => '执行成功']);
-            } else {
-                return json(['code' => 1, 'msg' => '权限不足，只能操作自己创建的记录']);
-            }
-        } else {
-            return json(['code' => 2, 'msg' => '请勿非法访问']);
-        }      
-    }
+    //             return json(['code' => 0, 'msg' => '执行成功']);
+    //         } else {
+    //             return json(['code' => 1, 'msg' => '权限不足，只能操作自己创建的记录']);
+    //         }
+    //     } else {
+    //         return json(['code' => 2, 'msg' => '请勿非法访问']);
+    //     }      
+    // }
 
-    // 撤回 全部消息
-    public function recallAllHandle() {
-        $input = input();
-        // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
+    // // 撤回 全部消息
+    // public function recallAllHandle() {
+    //     $input = input();
+    //     // upload/dd_img/20230817/28cefa547f573a951bcdbbeb1396b06f.jpg_614.jpg
 
-        if (request()->isAjax() && $input['id'] && session('admin.name')) {
-        // if (1) {
-            $model = new DingTalk;
-            // echo $path = $this->request->domain() ;
+    //     if (request()->isAjax() && $input['id'] && session('admin.name')) {
+    //     // if (1) {
+    //         $model = new DingTalk;
+    //         // echo $path = $this->request->domain() ;
             
-            // $input['id'] = 167;
+    //         // $input['id'] = 167;
             
-            if (! checkAdmin()) {
-                $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
-                    ['id', '=', $input['id']],
-                    ['aid', '=', $this->authInfo['id']],
-                ])->find();
-            } else {
-                $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
-                    ['id', '=', $input['id']],
-                ])->find();    
-            }
+    //         if (! checkAdmin()) {
+    //             $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
+    //                 ['id', '=', $input['id']],
+    //                 ['aid', '=', $this->authInfo['id']],
+    //             ])->find();
+    //         } else {
+    //             $find_list = $this->db_easyA->table('dd_tiaojia_list')->where([
+    //                 ['id', '=', $input['id']],
+    //             ])->find();    
+    //         }
 
 
-            if ($find_list) {
-                $select_user = $this->db_easyA->table('dd_tiaojia_list_user')->field('task_id')->where([
-                    ['uid', '=', $find_list['uid']]
-                ])->group('task_id')->select()->toArray();
-                // ])->select()->toArray();
+    //         if ($find_list) {
+    //             $select_user = $this->db_easyA->table('dd_tiaojia_list_user')->field('task_id')->where([
+    //                 ['uid', '=', $find_list['uid']]
+    //             ])->group('task_id')->select()->toArray();
+    //             // ])->select()->toArray();
 
-                // echo '<pre>';
-                // print_r($select_user);
-                $model = new DingTalk;
-                foreach($select_user as $key => $val) {
-                    // echo  $val['task_id'];
-                    // echo '<br>';
-                    $res = json_decode($model->recallMessage($val['task_id']), true);
-                    // print_r($res);
-                    $res1 = $this->db_easyA->table('dd_tiaojia_list_user')->where(['task_id' => $val['task_id']])->update([
-                        '撤回时间' => date('Y-m-d H:i:s'),
-                    ]);
-                    $res2 = $this->db_easyA->table('dd_tiaojia_list')->where(['id' => $input['id']])->update([
-                        '撤回时间' => date('Y-m-d H:i:s'),
-                        'sendtime' => null,
-                    ]);
-                }
+    //             // echo '<pre>';
+    //             // print_r($select_user);
+    //             $model = new DingTalk;
+    //             foreach($select_user as $key => $val) {
+    //                 // echo  $val['task_id'];
+    //                 // echo '<br>';
+    //                 $res = json_decode($model->recallMessage($val['task_id']), true);
+    //                 // print_r($res);
+    //                 $res1 = $this->db_easyA->table('dd_tiaojia_list_user')->where(['task_id' => $val['task_id']])->update([
+    //                     '撤回时间' => date('Y-m-d H:i:s'),
+    //                 ]);
+    //                 $res2 = $this->db_easyA->table('dd_tiaojia_list')->where(['id' => $input['id']])->update([
+    //                     '撤回时间' => date('Y-m-d H:i:s'),
+    //                     'sendtime' => null,
+    //                 ]);
+    //             }
 
-                return json(['code' => 0, 'msg' => '执行成功']);
-            } else {
-                return json(['code' => 1, 'msg' => '权限不足，只能操作自己创建的记录']);
-            }
-        } else {
-            return json(['code' => 2, 'msg' => '请勿非法请求']);
-        }       
-    }
+    //             return json(['code' => 0, 'msg' => '执行成功']);
+    //         } else {
+    //             return json(['code' => 1, 'msg' => '权限不足，只能操作自己创建的记录']);
+    //         }
+    //     } else {
+    //         return json(['code' => 2, 'msg' => '请勿非法请求']);
+    //     }       
+    // }
 
-    // 下载用户信息模板
-    public function download_excel_user_demo() {
-        // $sql = "
-        //     SELECT
-        //         店铺名称, 陈列方案, 备注
-        //     from dd_temp_excel_user_demo
-        //     where 1
-        //     limit 1
-        // ";
-        // $select = $this->db_easyA->query($sql);
-        $select[0]['货号'] = 'F82109030';
-        $select[0]['调价价格'] = 69;
-        $select[0]['调价时间范围'] = '调价相关时间说明文案';
-        $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
-        }
-        return Excel::exportData($select, $header, '货号匹配店铺调价模板_' . date('Ymd') . '_' . time() , 'xlsx');
-    }
+    // // 下载用户信息模板
+    // public function download_excel_user_demo() {
+    //     // $sql = "
+    //     //     SELECT
+    //     //         店铺名称, 陈列方案, 备注
+    //     //     from dd_temp_excel_user_demo
+    //     //     where 1
+    //     //     limit 1
+    //     // ";
+    //     // $select = $this->db_easyA->query($sql);
+    //     $select[0]['货号'] = 'F82109030';
+    //     $select[0]['调价价格'] = 69;
+    //     $select[0]['调价时间范围'] = '调价相关时间说明文案';
+    //     $header = [];
+    //     foreach($select[0] as $key => $val) {
+    //         $header[] = [$key, $key];
+    //     }
+    //     return Excel::exportData($select, $header, '货号匹配店铺调价模板_' . date('Ymd') . '_' . time() , 'xlsx');
+    // }
 
-    // 下载用户信息模板
-    public function download_excel_user_demo2() {
-        // $sql = "
-        //     SELECT
-        //         店铺名称, 陈列方案, 备注
-        //     from dd_temp_excel_user_demo
-        //     where 1
-        //     limit 1
-        // ";
-        // $select = $this->db_easyA->query($sql);
-        $select[0]['店铺名称'] = '万年一店';
-        $select[0]['货号'] = 'F82109030';
-        $select[0]['调价价格'] = 69;
-        $select[0]['调价时间范围'] = '调价相关时间说明文案';
-        $header = [];
-        foreach($select[0] as $key => $val) {
-            $header[] = [$key, $key];
-        }
-        return Excel::exportData($select, $header, '指定店铺货号调价模板_' . date('Ymd') . '_' . time() , 'xlsx');
-    }
+    // // 下载用户信息模板
+    // public function download_excel_user_demo2() {
+    //     // $sql = "
+    //     //     SELECT
+    //     //         店铺名称, 陈列方案, 备注
+    //     //     from dd_temp_excel_user_demo
+    //     //     where 1
+    //     //     limit 1
+    //     // ";
+    //     // $select = $this->db_easyA->query($sql);
+    //     $select[0]['店铺名称'] = '万年一店';
+    //     $select[0]['货号'] = 'F82109030';
+    //     $select[0]['调价价格'] = 69;
+    //     $select[0]['调价时间范围'] = '调价相关时间说明文案';
+    //     $header = [];
+    //     foreach($select[0] as $key => $val) {
+    //         $header[] = [$key, $key];
+    //     }
+    //     return Excel::exportData($select, $header, '指定店铺货号调价模板_' . date('Ymd') . '_' . time() , 'xlsx');
+    // }
 
-    // 下载 未读 
-    public function downloadListUser() {
-        $id = input('id');
-        $find_list = $this->db_easyA->table('dd_tiaojia_list')->field('uid')->where([
-            ['id', '=', $id],
-        ])->find();
+    // // 下载 未读 
+    // public function downloadListUser() {
+    //     $id = input('id');
+    //     $find_list = $this->db_easyA->table('dd_tiaojia_list')->field('uid')->where([
+    //         ['id', '=', $id],
+    //     ])->find();
 
-        $sql = "
-            SELECT 
-                店铺名称,name as 姓名,mobile as 手机,title as 职位, url as 推送链接,
-                '否' as 已读
-            FROM 
-                dd_tiaojia_list_user   
-            WHERE 1
-                AND uid = '{$find_list['uid']}'
-                AND 已读 = 'N'
-            ORDER BY
-                已读 ASC,店铺名称
-        ";
-        $select = $this->db_easyA->query($sql);
-        $header = [];
-        if ($select) {
-            foreach($select[0] as $key => $val) {
-                $header[] = [$key, $key];
-            }
-        }
+    //     $sql = "
+    //         SELECT 
+    //             店铺名称,name as 姓名,mobile as 手机,title as 职位, url as 推送链接,
+    //             '否' as 已读
+    //         FROM 
+    //             dd_tiaojia_list_user   
+    //         WHERE 1
+    //             AND uid = '{$find_list['uid']}'
+    //             AND 已读 = 'N'
+    //         ORDER BY
+    //             已读 ASC,店铺名称
+    //     ";
+    //     $select = $this->db_easyA->query($sql);
+    //     $header = [];
+    //     if ($select) {
+    //         foreach($select[0] as $key => $val) {
+    //             $header[] = [$key, $key];
+    //         }
+    //     }
 
-        return Excel::exportData($select, $header, '调价通知表未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
-    }
+    //     return Excel::exportData($select, $header, '调价通知表未读名单_' . session('admin.name') . '_' . date('Ymd') . '_' . time() , 'xlsx');
+    // }
 
     // 拉取 已读 未读  自动更新24小时之内的记录
     public function getReads_auto() {
