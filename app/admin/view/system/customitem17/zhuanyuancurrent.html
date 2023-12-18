@@ -427,7 +427,7 @@
                         ,{ field: '100%日均需销额_加盟', title: '加盟' ,align: 'center' , rowspan: 1} 
                         ,{ field: '100%日均需销额_合计', title: '合计' ,align: 'center' , rowspan: 1, templet: function (data) {
                             if (data['近七天日均销额_合计'] - data['100%日均需销额_合计'] > 0) {
-                                return `<a style="color:green;font-weight:bold;">${data['近七天日均销额_合计']}</a>`;
+                                return `<a style="color:green;font-weight:bold;">${data['100%日均需销额_合计']}</a>`;
                             } else {
                                 return `${data['100%日均需销额_合计']}`;
                             }
