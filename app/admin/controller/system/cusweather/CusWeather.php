@@ -82,6 +82,10 @@ class CusWeather extends AdminController
             //     $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, cwd.weather_time');
             // }
 
+
+            // echo $count;
+            // echo '<br>';
+            // echo config('weather.init_output_num');
             return json([
                 'app_domain' => env('app.APP_DOMAIN'),
                 'init_output_num' => config('weather.init_output_num'),
@@ -124,6 +128,39 @@ class CusWeather extends AdminController
             
         }
 
+    }
+
+    public function down_cwl() {
+        ini_set('memory_limit','2048M');
+
+        $code = input('code');
+        $code = 712464;
+        $params = cache($code);
+        $params = $params ? json_decode($params, true) : [];
+
+        $header = [
+            ['店铺名称', 'customer_name'],
+            ['省', 'province'],
+            ['市', 'city'],
+            ['区', 'area'],
+            ['经营模式', 'store_type'],
+            ['温带', 'wendai'],
+            ['温区', 'wenqu'],
+            ['商品负责人', 'goods_manager'],
+            ['云仓', 'yuncang'],
+            ['店铺等级', 'store_level'],
+            // ['南中北', 'nanzhongbei'],
+            ['最低温', 'min_c'],
+            ['最高温', 'max_c'],
+            ['日期', 'weather_time'],
+        ];
+
+        $params['limit'] = 100000000;
+        $select = $this->service->get_cus_weather_excel($code, $params, 'cwb.customer_name, cwb.province, cwb.city, cwb.area, cwb.store_type, cwb.wendai, cwb.wenqu, cwb.goods_manager, cwb.yuncang, cwb.store_level, cwb.nanzhongbei,  cwd.min_c, cwd.max_c, SUBSTRING(cwd.weather_time, 1, 10) as weather_time');
+        if ($select['sign'] == 'normal') {
+            return Excel::exportData($select['data'], $header, 'customer_weather_' .$select['count'] , 'xlsx');
+        } else {//其他方案导出
+        }
     }
 
     /**
