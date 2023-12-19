@@ -203,7 +203,6 @@ class Puhuo_start2_merge extends Command
 
             //开始尝试自动铺货模式
             foreach ($data as $v_data_each) {
-                // print_r($v_data_each);die;
                 $v_data = $v_data_each['goods'] ?? [];
                 $Selecttype = $v_data_each['Selecttype'] ?? 0;//0-该云仓所有店 1-多店 2-多省 3-商品专员 4-经营模式
                 $Commonfield = $v_data_each['Commonfield'] ?? '';
@@ -506,6 +505,7 @@ class Puhuo_start2_merge extends Command
 
                                 //满足条件的才铺货
                                 $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, $goods_yuji_stock, $current_14days);
+
                                 $uuid = uuid();
                                 if ($can_puhuo['if_can_puhuo']) {
 
@@ -522,8 +522,12 @@ class Puhuo_start2_merge extends Command
                                         //sp_lyp_puhuo_wait_goods处理
                                         unset($v_data['create_time']);
                                         unset($v_data['id']);
-//                                         print_r($v_data);die;
-                                        $this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+
+                                        try {
+                                            $res=$this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+                                        } catch (\exception $e) {
+                                            dd($e->getMessage());
+                                        }
                                     }
                                     //sp_lyp_puhuo_log、sp_lyp_puhuo_cur_log处理
                                     $puhuo_log = [
@@ -583,7 +587,6 @@ class Puhuo_start2_merge extends Command
                                 }
 
                                 $add_puhuo_log[] = $puhuo_log;
-                                // print_r($add_puhuo_log);die;
 
                                 //记录铺货日志：
                                 Log::channel('puhuo')->write('##############普通-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
@@ -636,8 +639,8 @@ class Puhuo_start2_merge extends Command
 
         ######################套装套西处理start##########################
         //铺 套装套西
-        $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
-    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd);
+//        $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
+//    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd);
         ######################套装套西处理end##########################
 
         //记录铺货日志：
@@ -1000,6 +1003,7 @@ class Puhuo_start2_merge extends Command
                                                     $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
                                                     //sp_lyp_puhuo_wait_goods处理
                                                     unset($v_data['create_time']);
+                                                    unset($v_data['id']);
                                                     // print_r($v_data);die;
                                                     $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
                                                 }
@@ -1216,10 +1220,10 @@ class Puhuo_start2_merge extends Command
                             Db::startTrans();
                             try {
                                 //删除旧数据 重新入库
-                                $this->puhuo_log_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
-                                $this->puhuo_cur_log_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
-                                $this->puhuo_log_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
-                                $this->puhuo_cur_log_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_log_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_cur_log_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_log_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
+                                $this->puhuo_cur_log_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->delete();
                                 
                                 //铺货日志重新批量入库
                                 $chunk_list = $shangyi ? array_chunk($shangyi, 500) : [];
@@ -1241,8 +1245,8 @@ class Puhuo_start2_merge extends Command
                                 //wait_goods表库存处理
                                 unset($shangyi_stock['create_time']);
 		                        unset($kuzi_stock['create_time']);
-                                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->update($shangyi_stock);
-                                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->update($kuzi_stock);
+                                $this->puhuo_wait_goods_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $shangyi[0]['WarehouseName']], ['GoodsNo', '=', $shangyi[0]['GoodsNo']]])->update($shangyi_stock);
+                                $this->puhuo_wait_goods_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $kuzi[0]['WarehouseName']], ['GoodsNo', '=', $kuzi[0]['GoodsNo']]])->update($kuzi_stock);
 
                                 Db::commit();
                             } catch (\Exception $e) {
@@ -1328,7 +1332,7 @@ class Puhuo_start2_merge extends Command
 
         //改为从新的 自定义铺货设置表 获取
         $zdy_yuncang_goods = $this->puhuo_zdy_set2_model::alias('pzs')->where([['pzs.admin_id','=',$this->admin_id],['pzs.if_taozhuang', '=', $this->puhuo_zdy_set2_model::IF_TAOZHUANG['not_taozhuang']]])
-        ->join(['sp_lyp_puhuo_zdy_yuncang_goods2' => 'pzyg'], 'pzs.id=pzyg.set_id', 'left')
+        ->join(['sp_lyp_puhuo_zdy_yuncang_goods2' => 'pzyg'], 'pzs.id=pzyg.set_id and pzs.admin_id=pzyg.admin_id', 'left')
         ->field('pzs.Yuncang, pzs.Selecttype, pzs.Commonfield, pzs.rule_type, pzs.remain_store, pzs.remain_rule_type, pzs.zuhe_customer, pzs.if_zdmd, pzyg.GoodsNo, pzyg.set_id, concat(pzs.Yuncang, pzyg.GoodsNo) as yuncang_goods')->select();
         $zdy_yuncang_goods = $zdy_yuncang_goods ? $zdy_yuncang_goods->toArray() : [];
         $yuncang_goods = $zdy_yuncang_goods ? array_column($zdy_yuncang_goods, 'yuncang_goods') : [];
@@ -1412,7 +1416,7 @@ class Puhuo_start2_merge extends Command
                 $v_yuncang_goods['goods'] = [];
                 $arr_goods = $v_yuncang_goods['GoodsNo'] ? explode(' ', $v_yuncang_goods['GoodsNo']) : [];
 
-                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang_goods['Yuncang'])->where([['GoodsNo', 'in', $arr_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
+                $res = $this->puhuo_wait_goods_model::where('WarehouseName', $v_yuncang_goods['Yuncang'])->where([['admin_id','=',$this->admin_id],['GoodsNo', 'in', $arr_goods]])->where('TimeCategoryName2', 'like', ['1'=>'%秋%', '2'=>'%冬%'], 'OR')->paginate([
                     'list_rows'=> $list_rows,//每页条数
                     'page' => $this->page,//当前页
                 ]);
@@ -1811,6 +1815,7 @@ class Puhuo_start2_merge extends Command
 
 
         $add_daxiaoma_customer_sort = [];
+        $add_daxiaoma_customer_sort['admin_id'] = $v_data['admin_id'];
         $add_daxiaoma_customer_sort['WarehouseName'] = $v_data['WarehouseName'];
         $add_daxiaoma_customer_sort['CustomerName'] = $v_customer['CustomerName'];
         $add_daxiaoma_customer_sort['TimeCategoryName1'] = $v_data['TimeCategoryName1'];
@@ -2234,7 +2239,7 @@ class Puhuo_start2_merge extends Command
                 Log::channel('puhuo')->write('##############普通(大小码)-云仓-货号:'.$v_data['WarehouseName'].$v_data['GoodsNo'].'##############'.json_encode(['init_puhuo_stock'=>$init_puhuo_stock]) );
 
                 //wait_goods 库存处理
-                $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock); 
+                $this->puhuo_wait_goods_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $v_data['WarehouseName']], ['GoodsNo', '=', $v_data['GoodsNo']]])->update($init_puhuo_stock);
 
                 //$daxiaoma_skcnum_score_sort 大小码铺货后 重新排序
                 //大小码店 排序入库
@@ -2266,6 +2271,7 @@ class Puhuo_start2_merge extends Command
                 $season = $this->get_season_str($v_data['TimeCategoryName2']);
                 $season = $season ? $season.'季' : '';
                 $if_exist = $this->puhuo_daxiaoma_customer_sort_model::where([
+                    ['admin_id', '=', $this->admin_id],
                     ['WarehouseName', '=', $v_data['WarehouseName']],
                     ['TimeCategoryName1', '=', $v_data['TimeCategoryName1']],
                     ['season', '=', $season],
@@ -2275,6 +2281,7 @@ class Puhuo_start2_merge extends Command
                 ])->find();
                 if ($if_exist) {//存在则删除，重新插入
                     $this->puhuo_daxiaoma_customer_sort_model::where([
+                        ['admin_id', '=', $this->admin_id],
                         ['WarehouseName', '=', $v_data['WarehouseName']],
                         ['TimeCategoryName1', '=', $v_data['TimeCategoryName1']],
                         ['season', '=', $season],
@@ -4101,7 +4108,7 @@ class Puhuo_start2_merge extends Command
 
         }
 
-        $sql = "select '$this->admin_id' as admin_id , WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
+        $sql = "select admin_id , WarehouseName,TimeCategoryName1,TimeCategoryName2,CategoryName1,CategoryName2, CategoryName, GoodsName, StyleCategoryName, GoodsNo, StyleCategoryName1, StyleCategoryName2, Lingxing, UnitPrice, ColorDesc, Stock_00_puhuo, Stock_00_puhuo as Stock_00, Stock_29_puhuo, Stock_29_puhuo as Stock_29, Stock_30_puhuo, Stock_30_puhuo as Stock_30, Stock_31_puhuo, Stock_31_puhuo as Stock_31, Stock_32_puhuo, Stock_32_puhuo as Stock_32, Stock_33_puhuo, Stock_33_puhuo as Stock_33, Stock_34_puhuo, Stock_34_puhuo as Stock_34, Stock_35_puhuo, Stock_35_puhuo as Stock_35, Stock_36_puhuo, Stock_36_puhuo as Stock_36, Stock_38_puhuo, Stock_38_puhuo as Stock_38, Stock_40_puhuo, Stock_40_puhuo as Stock_40, Stock_42_puhuo, Stock_42_puhuo as Stock_42, Stock_Quantity_puhuo, Stock_Quantity_puhuo as Stock_Quantity, qima, (case when 
         (CategoryName1 in ('内搭', '外套', '鞋履') and CategoryName2 not like '%套西%' and qima>=$warehouse_qima_nd) 
         or ( CategoryName2 like '%套西%' and qima>=$warehouse_qima_tx) 
         or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and qima>=$warehouse_qima_nd) 
@@ -4113,7 +4120,7 @@ class Puhuo_start2_merge extends Command
         $sql_ymk
         $sql_store_puhuo_lianma_xz 
 
-        then 1 else 0 end) as can_puhuo from sp_lyp_puhuo_yuncangkeyong where 1 having  can_puhuo=1;";
+        then 1 else 0 end) as can_puhuo from sp_lyp_puhuo_yuncangkeyong where admin_id={$this->admin_id} having  can_puhuo=1;";
         // echo $sql;die;
 
         return Db::connect("mysql")->Query($sql);
