@@ -2846,12 +2846,81 @@ class Tableupdate extends BaseController
             foreach($select_chunk as $key => $val) {
                 $status = $this->db_bi->table('sp_ww_zt')->insertAll($val);
             }
+        }
+
+        $sql_spring = "
+            SELECT 
+                T.WarehouseName AS 云仓,
+                T.GoodsNo AS 货号,
+                SUM(CASE WHEN EBGS.ViewOrder=1 THEN T.Quantity ELSE NULL END ) AS  [00/28/37/44/100/160/S],
+                SUM(CASE WHEN EBGS.ViewOrder=2 THEN T.Quantity ELSE NULL END ) AS  [29/38/46/105/165/M],
+                SUM(CASE WHEN EBGS.ViewOrder=3 THEN T.Quantity ELSE NULL END ) AS  [30/39/48/110/170/L],
+                SUM(CASE WHEN EBGS.ViewOrder=4 THEN T.Quantity ELSE NULL END ) AS  [31/40/50/115/175/XL],
+                SUM(CASE WHEN EBGS.ViewOrder=5 THEN T.Quantity ELSE NULL END ) AS  [32/41/52/120/180/2XL],
+                SUM(CASE WHEN EBGS.ViewOrder=6 THEN T.Quantity ELSE NULL END ) AS  [33/42/54/125/185/3XL],
+                SUM(CASE WHEN EBGS.ViewOrder=7 THEN T.Quantity ELSE NULL END ) AS  [34/43/56/190/4XL],
+                SUM(CASE WHEN EBGS.ViewOrder=8 THEN T.Quantity ELSE NULL END ) AS  [35/44/58/195/5XL],
+                SUM(CASE WHEN EBGS.ViewOrder=9 THEN T.Quantity ELSE NULL END ) AS  [36/6XL],
+                SUM(CASE WHEN EBGS.ViewOrder=10 THEN T.Quantity ELSE NULL END ) AS [38/7XL],
+                SUM(CASE WHEN EBGS.ViewOrder=11 THEN T.Quantity ELSE NULL END ) AS [_40],
+                SUM(T.Quantity) AS 合计,
+                T.TimeCategoryName1 AS 年份,
+                T.TimeCategoryName2 AS 季节
+            FROM
+            (
+            SELECT 
+                EW.WarehouseName,
+                EG.GoodsNo,
+                ERGD.SizeId,
+                EG.TimeCategoryName1,
+                EG.TimeCategoryName2,
+                SUM(ERGD.Quantity) AS Quantity 
+            FROM ErpReceiptNotice ER
+            LEFT JOIN ErpReceiptNoticeGoods ERG ON ER.ReceiptNoticeId=ERG.ReceiptNoticeId
+            LEFT JOIN ErpReceiptNoticeGoodsDetail ERGD ON ERG.ReceiptNoticeGoodsId=ERGD.ReceiptNoticeGoodsId
+            LEFT JOIN ErpGoods EG ON ERG.GoodsId=EG.GoodsId
+            LEFT JOIN ErpWarehouse EW ON ER.WarehouseId=EW.WarehouseId
+            WHERE ER.CodingCodeText='已审结'
+                AND (ER.IsCompleted IS NULL OR ER.IsCompleted=0)
+                AND EW.WarehouseName IN ('广州云仓','南昌云仓','贵阳云仓','武汉云仓','长沙云仓')
+                AND ER.ReceiptNoticeDate>='2022-05-01 00:00:00'
+                AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
+                AND EG.TimeCategoryName1=2023 
+                -- AND (EG.TimeCategoryName2 LIKE '%春%' OR EG.TimeCategoryName2 LIKE '%夏%')
+            GROUP BY
+                EW.WarehouseName,
+                EG.GoodsNo,
+                ERGD.SizeId,
+                EG.TimeCategoryName1,
+                EG.TimeCategoryName2
+            ) AS T 
+            LEFT JOIN ErpBaseGoodsSize EBGS ON T.SizeId=EBGS.SizeId
+            WHERE EBGS.IsEnable=1
+            GROUP BY
+                T.WarehouseName,
+                T.GoodsNo,
+                T.TimeCategoryName1,
+                T.TimeCategoryName2
+        ";
+        $select_spring = $this->db_sqlsrv->query($sql_spring);
+        if ($select_spring) {
+            $this->db_bi->execute('TRUNCATE sp_ww_zt_spring_2023;');
+
+            $select_chunk2 = array_chunk($select_spring, 500);
+    
+            foreach($select_chunk2 as $key2 => $val2) {
+                $status = $this->db_bi->table('sp_ww_zt_spring_2023')->insertAll($val2);
+            }
             // $this->db_bi->table('retail_2week_by_wangwei')->insertAll($select);
             return json([
                 'status' => 1,
                 'msg' => 'success',
-                'content' => 'sp_ww_zt 更新成功！'
+                'content' => 'sp_ww_zt、sp_ww_zt_spring_2023 更新成功！'
             ]);
-        }
+        }        
     }
+
+    // public function sp_ww_zt_spring_2023() {
+
+    // }
 }
