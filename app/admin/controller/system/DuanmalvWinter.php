@@ -171,10 +171,10 @@ class DuanmalvWinter extends AdminController
 
         return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 
         'goodsNo_nc' => $goodsNo_all_nc,
-        'goodsNo_gz' => $goodsNo_all_nc,
-        'goodsNo_wh' => $goodsNo_all_nc,
-        'goodsNo_gy' => $goodsNo_all_nc,
-        'goodsNo_cs' => $goodsNo_all_nc,
+        'goodsNo_gz' => $goodsNo_all_gz,
+        'goodsNo_wh' => $goodsNo_all_wh,
+        'goodsNo_gy' => $goodsNo_all_gy,
+        'goodsNo_cs' => $goodsNo_all_cs,
         'season' => $season]]);
     }
 
