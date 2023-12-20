@@ -163,12 +163,7 @@ class DuanmalvWinter extends BaseController
                 EG.CategoryName AS 小类,
                 SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
                 EG.StyleCategoryName AS 风格,
-                EG.GoodsNo  AS 商品代码,
-    --          ERG.UnitPrice AS 零售价,
-    -- 								CASE
-    -- 									WHEN SUM (ERG.Quantity)>0 THEN SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity)
-    -- 									ELSE 0
-    -- 								END  AS 当前零售价,
+                EG.GoodsNo  AS 商品代码,         
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
                 SUM ( ERG.Quantity ) AS 销售数量,
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) AS 销售金额,
@@ -189,8 +184,8 @@ class DuanmalvWinter extends BaseController
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('{$select_config['年份']}')
-                AND ER.CustomerName NOT IN ( {$noCustomer} )
-                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+        --      AND ER.CustomerName NOT IN ( {$noCustomer} )
+        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'

@@ -189,8 +189,8 @@ class DuanmalvSummer extends BaseController
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ('{$select_config['年份']}')
-                AND ER.CustomerName NOT IN ( {$noCustomer} )
-                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+        --      AND ER.CustomerName NOT IN ( {$noCustomer} )
+        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
