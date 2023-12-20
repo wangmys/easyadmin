@@ -84,6 +84,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.TimeCategoryName1 IN (2023,2022)
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY 
         
             EC.CustomerCode,
@@ -148,6 +150,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY
         
             EC.CustomerCode,
@@ -196,6 +200,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY 
         
             EC.CustomerCode,
@@ -242,6 +248,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY 
         
         EC.CustomerCode,
@@ -281,6 +289,8 @@ class sp_customer_stock_skc_2 extends BaseController
             AND EG.TimeCategoryName1 IN (2023,2022)
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
+        
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
         
         GROUP BY	
         
@@ -358,6 +368,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY 
         
             EC.CustomerCode,
@@ -403,6 +415,8 @@ class sp_customer_stock_skc_2 extends BaseController
             AND EG.TimeCategoryName1 IN (2023,2022)
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
+        
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
         
         GROUP BY 
         
@@ -455,6 +469,8 @@ class sp_customer_stock_skc_2 extends BaseController
             AND EG.TimeCategoryName1 IN (2023,2022)
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
+        
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
         
         GROUP BY	
         
@@ -632,6 +648,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY
         
             EC.CustomerCode,
@@ -678,6 +696,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
         GROUP BY 
         
             EC.CustomerCode,
@@ -723,6 +743,8 @@ class sp_customer_stock_skc_2 extends BaseController
             AND EG.TimeCategoryName1 IN (2023,2022)
         
             AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
+        
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
         
         GROUP BY 
         
@@ -776,13 +798,13 @@ class sp_customer_stock_skc_2 extends BaseController
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T2.大于2SKC)
         
-                     ELSE SUM(T2.SKC) END,0)	预计库存skc,
+                     ELSE SUM(T2.大于2SKC) END,0)	预计库存skc,
         
             IFNULL(CASE WHEN EG.TimeCategoryName2 IN ('初夏','盛夏','夏季') THEN SUM(T1.大于3SKC)
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T1.大于2SKC)
         
-                     ELSE SUM(T1.SKC) END,0)	店铺库存skc,
+                     ELSE SUM(T1.大于2SKC) END,0)	店铺库存skc,
         
                      
         
@@ -790,7 +812,7 @@ class sp_customer_stock_skc_2 extends BaseController
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T7.大于2SKC)
         
-                     ELSE SUM(T7.SKC) END,0) 
+                     ELSE SUM(T7.大于2SKC) END,0) 
         
                      - 
         
@@ -798,7 +820,7 @@ class sp_customer_stock_skc_2 extends BaseController
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T1.大于2SKC)
         
-                     ELSE SUM(T1.SKC) END,0) 在途库存skc,
+                     ELSE SUM(T1.大于2SKC) END,0) 在途库存skc,
         
                      
         
@@ -806,7 +828,7 @@ class sp_customer_stock_skc_2 extends BaseController
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T2.大于2SKC)
         
-                     ELSE SUM(T2.SKC) END,0) 
+                     ELSE SUM(T2.大于2SKC) END,0) 
         
                      - 
         
@@ -814,7 +836,7 @@ class sp_customer_stock_skc_2 extends BaseController
         
                      WHEN EG.TimeCategoryName2 IN ('初秋','深秋','秋季') THEN SUM(T7.大于2SKC)
         
-                     ELSE SUM(T7.SKC) END,0) 已配未发skc,
+                     ELSE SUM(T7.大于2SKC) END,0) 已配未发skc,
         
             SUM(T2.Quantity) 预计库存,
         
@@ -864,6 +886,8 @@ class sp_customer_stock_skc_2 extends BaseController
         
             AND EG.GoodsNo !='B62111354'
         
+            AND EG.GoodsNo NOT IN ('B72212008','B72212007','B72212004','B72212006','B72212005','B72212003')
+        
             -- AND EC.CustomerName='南宁一店'
         
         GROUP BY
@@ -889,6 +913,8 @@ class sp_customer_stock_skc_2 extends BaseController
                      ELSE EG.StyleCategoryName END
         
         ORDER BY EC.CustomerName
+        
+        
                
         ";
 
