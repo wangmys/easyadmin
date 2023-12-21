@@ -63,9 +63,23 @@ class DuanmalvWinter extends AdminController
         $customer_all = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
+        $year_all = [
+            ['name' => 2023, 'value' => '2023'],
+            ['name' => 2024, 'value' => '2024']
+        ];
 
         $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->find();
+        $select_year = explode(',', $select_config['年份']);
         $select_noCustomer = explode(',', $select_config['不考核门店']);
+
+        // 年份选中
+        foreach ($select_year as $key => $val) {
+            foreach ($year_all as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $year_all[$key2]['selected'] = true;
+                }
+            } 
+        }
 
         // 不考核门店选中
         foreach ($select_noCustomer as $key => $val) {
@@ -76,6 +90,7 @@ class DuanmalvWinter extends AdminController
             } 
         }
 
+        
         $goodsNo_all = $this->db_bi->query("
             SELECT
                 货号 as name,
@@ -169,7 +184,7 @@ class DuanmalvWinter extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 'year' => $year_all,
         'goodsNo_nc' => $goodsNo_all_nc,
         'goodsNo_gz' => $goodsNo_all_gz,
         'goodsNo_wh' => $goodsNo_all_wh,

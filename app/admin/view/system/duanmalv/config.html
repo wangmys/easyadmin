@@ -95,6 +95,7 @@
         }
         .layui-form-label {
             width: 120px !important;
+            padding-left: 0 !important;
         }
 
         .layui-input-inline {
@@ -115,7 +116,7 @@
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
                 <div class="flex row end between">
-                    <div class="flex col between al-start " style="width:95%; height: 150px;">
+                    <div class="flex col between al-start " style="width:95%; height: 450px;">
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
                                 <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">下装连码数</label>
@@ -182,6 +183,12 @@
                                     <input type="number" name='top' autocomplete="off" value="{$config['top']}" maxlength="4" placeholder="0"
                                         class="layui-input" lay-verify="required">
                                 </div> 
+
+                                
+                                <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">年份</label>
+                                <div class="layui-input-inline" style="width: 250px !important;">
+                                    <div id="xm-year" class="xm-select-demo"></div>
+                                </div>
                             </div>  
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
@@ -194,14 +201,54 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">五大云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao" class="xm-select-demo"></div>
                                 </div>
                             </div>  
                         </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">南昌云仓不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao-nc" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">广州云仓不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao-gz" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">武汉云仓不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao-wh" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">贵阳云仓不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao-gy" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
+                        <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">长沙云仓不考核货号</label>
+                                <div class="layui-input-inline" style="width: 1250px !important;">
+                                    <div id="xm-nohuohao-cs" class="xm-select-demo"></div>
+                                </div>
+                            </div>  
+                        </div>
                     </div>
-                    <div class="" style="width:5%; height:150px;">
+                    <div class="" style="width:5%; height:450px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
                         </button>
@@ -322,6 +369,78 @@
                     // showCount: 1,
                     name:'季节归集',
                     data: res.data.season
+                })
+
+                xmSelect.render({
+                    el: '#xm-year', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'年份',
+                    data: res.data.year
+                })
+
+                xmSelect.render({
+                    el: '#xm-nohuohao-nc', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'南昌不考核货号',
+                    data: res.data.goodsNo_nc
+                })
+
+                xmSelect.render({
+                    el: '#xm-nohuohao-gz', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'广州不考核货号',
+                    data: res.data.goodsNo_gz
+                })
+
+                xmSelect.render({
+                    el: '#xm-nohuohao-wh', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'武汉不考核货号',
+                    data: res.data.goodsNo_wh
+                })
+
+                xmSelect.render({
+                    el: '#xm-nohuohao-gy', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'贵阳不考核货号',
+                    data: res.data.goodsNo_gy
+                })
+
+                xmSelect.render({
+                    el: '#xm-nohuohao-cs', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#f74060',
+                    },
+                    // showCount: 1,
+                    name:'长沙不考核货号',
+                    data: res.data.goodsNo_cs
                 })
             })
             $("#season_id").val("{$config['季节归集']}");
