@@ -121,22 +121,28 @@
                                         class="layui-input" lay-verify="required">
                                 </div>
 
-                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">店留量<=</label>
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">店留量1<=</label>
                                 <div class="layui-input-inline" style="width: 100px !important;">
-                                    <input type="number" name='店留量' autocomplete="off" value="{$config['店留量']}" placeholder="0.3"
+                                    <input type="number" name='店留量1' autocomplete="off" value="{$config['店留量1']}" placeholder="0.3"
                                         class="layui-input" lay-verify="required">
                                 </div>
 
-                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">折率</label>
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">店留量2<=</label>
                                 <div class="layui-input-inline" style="width: 100px !important;">
-                                    <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" placeholder="1"
+                                    <input type="number" name='店留量2' autocomplete="off" value="{$config['店留量2']}" placeholder="0.3"
+                                        class="layui-input" lay-verify="required">
+                                </div>
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">总入量1</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='总入量1' autocomplete="off" value="{$config['总入量1']}" maxlength="2"
                                         class="layui-input" lay-verify="required">
                                 </div> 
 
-                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">总入量</label>
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">总入量2</label>
                                 <div class="layui-input-inline" style="width: 100px !important;">
-                                    <input type="number" name='总入量' autocomplete="off" value="{$config['总入量']}" maxlength="2"
-                                        class="layui-input" lay-verify="required">
+                                    <input type="number" name='总入量2' autocomplete="off" value="{$config['总入量2']}" maxlength="2"
+                                        class="layui-input" lay-verify="">
                                 </div> 
                             </div>
                         </div>
@@ -161,6 +167,12 @@
                                 <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">松紧短裤 零售></label>
                                 <div class="layui-input-inline" style="width: 80px !important;">
                                     <input type="number" name='松紧短裤' autocomplete="off" value="{$config['松紧短裤']}" maxlength="4" placeholder="0"
+                                        class="layui-input" lay-verify="required">
+                                </div> 
+
+                                <label class="layui-form-label" style="width: 120px !important; text-align: center; overflow: visible;">折率</label>
+                                <div class="layui-input-inline" style="width: 100px !important;">
+                                    <input type="number" name='折率' autocomplete="off" value="{$config['折率']}" placeholder="1"
                                         class="layui-input" lay-verify="required">
                                 </div> 
                             </div>  

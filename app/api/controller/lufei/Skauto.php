@@ -775,16 +775,24 @@ class Skauto extends BaseController
     // 店留量 30%
     public function updateSkautoRes() {
         $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
+
+        if ($find_config['总入量2']) {
+            $field1 = " when t1.总入量 <= {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '售空' "; 
+            $field2 = " when t1.总入量 <= {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '即将售空' ";
+        } else {
+            $field1 = '';
+            $field2 = '';
+        }
         $sql = "
         select 
-            (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) as test,
             t1.*,
             case
-            when t1.总入量 - t1.累销数量 <=0 and t1.店铺库存 <=0 then '售空'
-            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= {$find_config['店留量']}
-                and t1.店铺库存>0 and t1.店铺库存 <=5 then '即将售空'
+            when t1.总入量 > {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '售空'
+            $field1
+            when t1.总入量 > {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '即将售空'
+            $field2
             end as 售空提醒
-            from  
+        from  
             (select 
                     云仓,商品负责人,省份,经营模式,店铺名称,一级分类,二级分类,分类,风格,货号,零售价,当前零售价,折率,上市天数,销售天数,总入量,累销数量,店铺库存,近一周销,近两周销,云仓可用,首单日期,更新日期,
                     IFNULL(在途库存, 0) as 在途库存,
@@ -793,7 +801,7 @@ class Skauto extends BaseController
                     from cwl_skauto 
             where 
             `销售天数`<= {$find_config['销售天数']} 
-            and 总入量 > {$find_config['总入量']} 
+            and 总入量 > {$find_config['总入量1']} 
             and ( 折率 >= {$find_config['折率']} || (折率 < {$find_config['折率']} AND 
                     (
                             (二级分类 = '短T' AND 当前零售价 > {$find_config['短T']}) 
@@ -906,6 +914,139 @@ class Skauto extends BaseController
             ]);
         }       
     }
+
+    // public function updateSkautoRes() {
+    //     $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
+    //     $sql = "
+    //     select 
+    //         (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) as test,
+    //         t1.*,
+    //         case
+    //         when t1.总入量 - t1.累销数量 <=0 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量']} then '售空'
+    //         when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量']} then '即将售空'
+    //         end as 售空提醒
+    //     from  
+    //         (select 
+    //                 云仓,商品负责人,省份,经营模式,店铺名称,一级分类,二级分类,分类,风格,货号,零售价,当前零售价,折率,上市天数,销售天数,总入量,累销数量,店铺库存,近一周销,近两周销,云仓可用,首单日期,更新日期,
+    //                 IFNULL(在途库存, 0) as 在途库存,
+    //                 IFNULL(已配未发, 0) as 已配未发,
+    //                 季节,季节归集
+    //                 from cwl_skauto 
+    //         where 
+    //         `销售天数`<= {$find_config['销售天数']} 
+    //         and 总入量 > {$find_config['总入量']} 
+    //         and ( 折率 >= {$find_config['折率']} || (折率 < {$find_config['折率']} AND 
+    //                 (
+    //                         (二级分类 = '短T' AND 当前零售价 > {$find_config['短T']}) 
+    //                     OR (二级分类 = '休闲短衬' AND 当前零售价 > {$find_config['休闲短衬']})
+    //                     OR (二级分类 = '休闲短裤' AND 当前零售价 > {$find_config['休闲短裤']}) 
+    //                     OR (二级分类 = '松紧短裤' AND 当前零售价 > {$find_config['松紧短裤']}) 
+    //                     OR (二级分类 = '牛仔短裤' AND 当前零售价 > {$find_config['牛仔短裤']}) 
+    //                     OR (二级分类 = '休闲长裤' AND 当前零售价 > {$find_config['休闲长裤']}) 
+    //                     OR (二级分类 = '牛仔长裤' AND 当前零售价 > {$find_config['牛仔长裤']}) 
+    //                     OR (二级分类 = '松紧长裤' AND 当前零售价 > {$find_config['松紧长裤']}) 
+    //                 ))
+    //             )
+    //         ) as t1   
+    //     "; 
+    //     $select = $this->db_easyA->query($sql);
+    //     $count = count($select);
+    //     if ($select) {
+    //         $this->db_easyA->execute('TRUNCATE cwl_skauto_res;');
+
+    //         $chunk_list = array_chunk($select, 500);
+
+    //         foreach($chunk_list as $key => $val) {
+    //             // 基础结果 
+    //             $insert = $this->db_easyA->table('cwl_skauto_res')->strict(false)->insertAll($val);
+    //         }
+
+    //         // 需要匹配有业绩没闭店的店铺
+    //         $sql_专员店铺预计库存 = "
+    //             UPDATE
+    //                 cwl_skauto_res as r
+    //             LEFT JOIN (
+    //                 SELECT
+    //                 s.商品负责人,s.货号,
+    //                     sum(预计库存数量) AS 预计库存数量 
+    //                 FROM sp_sk as s
+    //                 LEFT JOIN customer_pro as p ON s.店铺名称 = p.CustomerName
+    //                 WHERE 	
+    //                     s.店铺名称 = p.CustomerName
+    //                 GROUP BY
+    //                     s.商品负责人,s.货号
+    //             ) as t on r.商品负责人 = t.商品负责人 and r.货号 = t.货号
+    //             SET
+    //                 r.专员店铺预计库存 = t.预计库存数量
+    //             WHERE 1
+    //         ";
+    //         $this->db_easyA->execute($sql_专员店铺预计库存);
+
+    //         $sql_专员货号周销合计 = "
+    //             UPDATE
+    //                     cwl_skauto_res as r
+    //             LEFT JOIN (
+    //                 SELECT y.货号,p.CustomItem17 as 商品负责人, sum(合计) as 专员货号周销合计 FROM sjp_yizhou as y
+    //                 LEFT JOIN customer_pro as p ON y.店铺名称 = p.CustomerName
+    //                 WHERE 	
+    //                         y.店铺名称 = p.CustomerName
+    //                 GROUP BY
+    //                         p.CustomItem17,y.货号
+    //             ) as t on r.商品负责人 = t.商品负责人 and r.货号 = t.货号
+    //             SET
+    //                     r.专员货号周销合计 = t.专员货号周销合计
+    //             WHERE 1            
+    //         ";
+    //         $this->db_easyA->execute($sql_专员货号周销合计);
+
+    //         $sql_专员货号周转 = "
+    //             UPDATE
+    //                 cwl_skauto_res
+    //             SET
+    //                 专员货号周转 = ROUND(专员店铺预计库存 / 专员货号周销合计, 1)
+    //             WHERE 1            
+    //         ";
+    //         $this->db_easyA->execute($sql_专员货号周转);
+            
+    //         $this->db_easyA->table('cwl_skauto_config')->where('id=1')->strict(false)->update([
+    //             'skauto_res_updatetime' => date('Y-m-d H:i:s')
+    //         ]);  
+
+    //         // 同步bi的表
+    //         $sql_ww = "
+    //             SELECT
+    //                     *
+    //             from cwl_skauto_res 
+    //             where 1
+    //                 AND 在途库存 + 已配未发 <= 0
+    //                 AND 售空提醒 IN ('售空', '即将售空')
+    //         ";
+    //         $select_ww = $this->db_easyA->query($sql_ww);
+
+    //         if ($select_ww) {
+    //             $this->db_bi->execute('TRUNCATE ww_skauto_res;');
+
+    //             $chunk_list2 = array_chunk($select_ww, 500);
+
+    //             foreach($chunk_list2 as $key2 => $val2) {
+    //                 // 基础结果 
+    //                 $insert = $this->db_bi->table('ww_skauto_res')->strict(false)->insertAll($val2);
+    //             }
+    //         }
+
+    //         return json([
+    //             'status' => 1,
+    //             'msg' => 'success',
+    //             'content' => "cwl_skauto_res  更新成功，数量：{$count}！"
+    //         ]);
+    //     } else {
+    //         return json([
+    //             'status' => 0,
+    //             'msg' => 'error',
+    //             'content' => "cwl_skauto_res  更新失败，数量：{$count}！"
+    //         ]);
+    //     }       
+    // }
 
     public function updateTable() {
         $sql = "
