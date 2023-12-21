@@ -113,6 +113,8 @@ class DuanmalvWinter extends BaseController
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // $seasion = explode(',', $select_config['季节归集']);
 
+        // 年份
+        $year = xmSelectInput($select_config['年份']);
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
         // 不考核货号
@@ -183,8 +185,8 @@ class DuanmalvWinter extends BaseController
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('{$select_config['年份']}')
-        --      AND ER.CustomerName NOT IN ( {$noCustomer} )
+                AND EG.TimeCategoryName1 IN ({$year})
+                AND ER.CustomerName NOT IN ( {$noCustomer} )
         --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
@@ -342,6 +344,8 @@ class DuanmalvWinter extends BaseController
     public function sk_first()
     {
         $select_config = $this->config;
+        // 年份
+        $year = xmSelectInput($select_config['年份']);
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
@@ -595,7 +599,7 @@ class DuanmalvWinter extends BaseController
                     AND sk.店铺名称 NOT IN ({$noCustomer})
                     AND sk.货号 NOT IN ({$noGoodsNo})
                 --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
-                -- 	AND sk.年份 = 2023
+                 	AND sk.年份 in ({$year})
                 -- 	AND sk.省份='广东省'
                 -- 	AND sk.货号='B32101027'
                 GROUP BY 
@@ -604,8 +608,6 @@ class DuanmalvWinter extends BaseController
                     sk.货号
                 -- limit 100    
         ";
-
-        // die;
 		
         $select_sk = $this->db_easyA->query($sql);
         $count = count($select_sk);

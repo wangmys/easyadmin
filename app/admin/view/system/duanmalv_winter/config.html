@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>秋_断码率配置</title>
+    <title>冬_断码率配置</title>
     <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
     <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
     <script type="text/javascript" src="__STATIC__/ok/js/xm-select.js"></script>
@@ -183,6 +183,12 @@
                                     <input type="number" name='top' autocomplete="off" value="{$config['top']}" maxlength="4" placeholder="0"
                                         class="layui-input" lay-verify="required">
                                 </div> 
+
+                                
+                                <label class="layui-form-label" style="width: 141px !important; text-align: center; overflow: visible;">年份</label>
+                                <div class="layui-input-inline" style="width: 250px !important;">
+                                    <div id="xm-year" class="xm-select-demo"></div>
+                                </div>
                             </div>  
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
@@ -195,7 +201,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: center; overflow: visible;">不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">五大云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao" class="xm-select-demo"></div>
                                 </div>
@@ -203,7 +209,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: left; overflow: visible;">南昌不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">南昌云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao-nc" class="xm-select-demo"></div>
                                 </div>
@@ -211,7 +217,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: left; overflow: visible;">广州不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">广州云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao-gz" class="xm-select-demo"></div>
                                 </div>
@@ -219,7 +225,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: left; overflow: visible;">武汉不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">武汉云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao-wh" class="xm-select-demo"></div>
                                 </div>
@@ -227,7 +233,7 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: left; overflow: visible;">贵阳不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">贵阳云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao-gy" class="xm-select-demo"></div>
                                 </div>
@@ -235,14 +241,14 @@
                         </div>
                         <div class="layui-col-md12 layui-col-sm12 layui-col-space5">
                             <div class="layui-form-item">
-                                <label class="layui-form-label" style="width: 110px !important; text-align: left; overflow: visible;">长沙不考核货号</label>
+                                <label class="layui-form-label" style="width: 130px !important; text-align: left; overflow: visible;">长沙云仓不考核货号</label>
                                 <div class="layui-input-inline" style="width: 1250px !important;">
                                     <div id="xm-nohuohao-cs" class="xm-select-demo"></div>
                                 </div>
                             </div>  
                         </div>
                     </div>
-                    <div class="" style="width:5%; height:150px;">
+                    <div class="" style="width:5%; height:450px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="saveMap"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">保存条件
                         </button>
@@ -307,6 +313,21 @@
             ]
         })
 
+        xmSelect.render({
+            el: '#xm-year', 
+            filterable: true,
+            toolbar: {show: true},
+            theme: {
+                color: '#1cbbb4',
+            },
+            // showCount: 1,
+            name:'年份',
+            data: [
+                {name: "2024", value: "2024", selected: false},
+                {name: "2023", value: "2023", selected: false},
+            ]
+        })
+
 
         //监听保存
         form.on('submit(saveMap)', function (res) {
@@ -363,6 +384,18 @@
                     // showCount: 1,
                     name:'季节归集',
                     data: res.data.season
+                })
+
+                xmSelect.render({
+                    el: '#xm-year', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'年份',
+                    data: res.data.year
                 })
 
                 xmSelect.render({

@@ -63,9 +63,23 @@ class Duanmalv extends AdminController
         $customer_all = $this->db_easyA->query("
             SELECT 店铺名称 as name, 店铺名称 as value FROM customer_first WHERE  RegionID <> 55
         ");
+        $year_all = [
+            ['name' => 2023, 'value' => '2023'],
+            ['name' => 2024, 'value' => '2024']
+        ];
 
-        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->field('不考核门店,不考核货号,季节归集')->where('id=1')->find();
+        $select_config = $this->db_easyA->table('cwl_duanmalv_config')->where('id=1')->find();
+        $select_year = explode(',', $select_config['年份']);
         $select_noCustomer = explode(',', $select_config['不考核门店']);
+
+        // 年份选中
+        foreach ($select_year as $key => $val) {
+            foreach ($year_all as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $year_all[$key2]['selected'] = true;
+                }
+            } 
+        }
 
         // 不考核门店选中
         foreach ($select_noCustomer as $key => $val) {
@@ -85,13 +99,66 @@ class Duanmalv extends AdminController
             GROUP BY
                 货号
         ");
+
+        $goodsNo_all_nc = $goodsNo_all;
+        $goodsNo_all_gz = $goodsNo_all;
+        $goodsNo_all_wh = $goodsNo_all;
+        $goodsNo_all_gy = $goodsNo_all;
+        $goodsNo_all_cs = $goodsNo_all;
+
         $select_noGoodsNo = explode(',', $select_config['不考核货号']);
+        $select_noGoodsNo_nc = explode(',', $select_config['南昌不考核货号']);
+        $select_noGoodsNo_gz = explode(',', $select_config['广州不考核货号']);
+        $select_noGoodsNo_wh = explode(',', $select_config['武汉不考核货号']);
+        $select_noGoodsNo_gy = explode(',', $select_config['贵阳不考核货号']);
+        $select_noGoodsNo_cs = explode(',', $select_config['长沙不考核货号']);
 
         // 不考核货号选中
         foreach ($select_noGoodsNo as $key => $val) {
             foreach ($goodsNo_all as $key2 => $val2) {
                 if ($val == $val2['name']) {
                     $goodsNo_all[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        // 南京不考核货号选中
+        foreach ($select_noGoodsNo_nc as $key => $val) {
+            foreach ($goodsNo_all_nc as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all_nc[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        foreach ($select_noGoodsNo_gz as $key => $val) {
+            foreach ($goodsNo_all_gz as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all_gz[$key2]['selected'] = true;
+                }
+            } 
+        }
+        
+        foreach ($select_noGoodsNo_wh as $key => $val) {
+            foreach ($goodsNo_all_wh as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all_wh[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        foreach ($select_noGoodsNo_gy as $key => $val) {
+            foreach ($goodsNo_all_gy as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all_gy[$key2]['selected'] = true;
+                }
+            } 
+        }
+
+        foreach ($select_noGoodsNo_cs as $key => $val) {
+            foreach ($goodsNo_all_cs as $key2 => $val2) {
+                if ($val == $val2['name']) {
+                    $goodsNo_all_cs[$key2]['selected'] = true;
                 }
             } 
         }
@@ -116,7 +183,13 @@ class Duanmalv extends AdminController
         // 门店
         // $storeAll = SpWwBudongxiaoDetail::getMapStore();
 
-        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 'season' => $season]]);
+        return json(["code" => "0", "msg" => "", "data" => ['customer' => $customer_all, 'goodsNo' => $goodsNo_all, 'year' => $year_all,
+        'goodsNo_nc' => $goodsNo_all_nc,
+        'goodsNo_gz' => $goodsNo_all_gz,
+        'goodsNo_wh' => $goodsNo_all_wh,
+        'goodsNo_gy' => $goodsNo_all_gy,
+        'goodsNo_cs' => $goodsNo_all_cs,
+        'season' => $season]]);
     }
 
     public function saveMap() {
