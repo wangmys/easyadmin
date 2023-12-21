@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\system\puhuo;
 
+use app\admin\model\bi\SpLypPuhuoConfigModel;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
@@ -34,11 +35,15 @@ class Qiwenconfig extends AdminController
         $hottocold_list = $this->service->get_qiwen_score('hottocold');
         $qiwen_head = ['yuncang', 'province', 'wenqu', 'qiwen_score'];
         $qiwen_head_hottocold = ['yuncang', 'province', 'wenqu', 'qiwen_score'];
+
+        $config=SpLypPuhuoConfigModel::where(1)->find()->toArray();
+
         $this->assign([
             'coldtohot_list' => $coldtohot_list,
             'hottocold_list' => $hottocold_list,
             'qiwen_head' => $qiwen_head,
             'qiwen_head_hottocold' => $qiwen_head_hottocold,
+            'config' =>$config
         ]);
 
         return $this->fetch();
@@ -158,6 +163,20 @@ class Qiwenconfig extends AdminController
         }
         return $this->success('删除成功');
 
+    }
+
+
+    /**
+     * @return void
+     * @NodeAnotation(title="气温方案选择",auth=false)
+     */
+    public function qiwentype(){
+
+        $value=$this->request->param('if_hottocold');
+
+        SpLypPuhuoConfigModel::where(1)->update(['if_hottocold'=>$value?:2]);
+
+        $this->success('保存成功');
     }
 
 }

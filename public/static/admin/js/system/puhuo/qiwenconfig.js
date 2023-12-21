@@ -13,8 +13,22 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
         index: function () {
              var that = this;
              // 调用
+             this.qiwenconfig();
              this.coldtohot();
              this.hottocold();
+        },
+        qiwenconfig:function () {
+            $('body').on('click', '#qiwentype-sub', function (obj) {
+                let form = $('#qiwen-form').serializeArray();
+                console.log('form', form)
+
+                $.post('qiwentype', form, function (res) {
+                    layer.msg(res.msg, {icon: 1, time: 2000})
+
+                })
+            })
+
+
         },
         // 保存配置
         saveConfig:function (element,_url,_data) {

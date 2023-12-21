@@ -3,12 +3,29 @@
 
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
             <ul class="layui-tab-title">
-                
-                <li class="layui-this">气温评分-冷到热</li>
+                <li class="layui-this">气温方案配置</li>
+                <li class="">气温评分-冷到热</li>
                 <li>气温评分-热到冷</li>
             </ul>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show">
+                    <form id="qiwen-form" class="layui-form layui-form-pane" lay-filter="example">
+                        <div class="layui-form-item" style="margin-top: 50px">
+                            <label class="layui-form-label">气温方案</label>
+                            <div class="layui-input-inline">
+                                <select id="if_hottocold" name="if_hottocold" lay-verify="">
+                                    <option value="1" {if $config.if_hottocold=='1'}selected=""{/if}>热到冷</option>
+                                    <option value="2" {if $config.if_hottocold=='2'}selected=""{/if}>冷到热</option>
+                                </select>
+                            </div>
+                            <div class="layui-btn" id="qiwentype-sub">保存</div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+                <div class="layui-tab-item">
                     {include file="system/puhuo/qiwenconfig/coldtohot" /}
                 </div>
                 <div class="layui-tab-item">
