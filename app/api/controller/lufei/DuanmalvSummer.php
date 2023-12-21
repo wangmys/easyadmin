@@ -113,6 +113,8 @@ class DuanmalvSummer extends BaseController
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // $seasion = explode(',', $select_config['季节归集']);
 
+        // 年份
+        $year = xmSelectInput($select_config['年份']);
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
         // 不考核货号
@@ -188,8 +190,8 @@ class DuanmalvSummer extends BaseController
                 AND EG.CategoryName1 NOT IN ('配饰', '人事物料')
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 IN ('{$select_config['年份']}')
-        --      AND ER.CustomerName NOT IN ( {$noCustomer} )
+                AND EG.TimeCategoryName1 IN ({$year})
+                AND ER.CustomerName NOT IN ( {$noCustomer} )
         --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
@@ -347,10 +349,18 @@ class DuanmalvSummer extends BaseController
     public function sk_first()
     {
         $select_config = $this->config;
+        // 年份
+        $year = xmSelectInput($select_config['年份']);
         $seasion = $this->seasionHandle($select_config['季节归集']); 
         // 不考核门店
         $noCustomer = xmSelectInput($select_config['不考核门店']);
         $noGoodsNo = xmSelectInput($select_config['不考核货号']);
+
+        $noGoodsNo_nc = xmSelectInput($select_config['南昌不考核货号']);
+        $noGoodsNo_gz = xmSelectInput($select_config['广州不考核货号']);
+        $noGoodsNo_wh = xmSelectInput($select_config['武汉不考核货号']);
+        $noGoodsNo_gy = xmSelectInput($select_config['贵阳不考核货号']);
+        $noGoodsNo_cs = xmSelectInput($select_config['长沙不考核货号']);
         $sql = "
             SELECT 
                 sk.云仓,
@@ -576,7 +586,7 @@ class DuanmalvSummer extends BaseController
                     AND sk.店铺名称 NOT IN ({$noCustomer})
                     AND sk.货号 NOT IN ({$noGoodsNo})
                 --    AND sk.店铺名称 IN ('三江一店', '安化二店', '南宁二店')
-                -- 	AND sk.年份 = 2023
+                    AND sk.年份 in ({$year})    
                 -- 	AND sk.省份='广东省'
                 -- 	AND sk.货号='B32101027'
                 GROUP BY 
@@ -607,6 +617,23 @@ class DuanmalvSummer extends BaseController
                     break;
                 }
             }
+
+            // 删除云仓不要货号的记录
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_sk_summer where 云仓='南昌云仓' and 货号 in ({$noGoodsNo_nc})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_sk_summer where 云仓='广州云仓' and 货号 in ({$noGoodsNo_gz})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_sk_summer where 云仓='武汉云仓' and 货号 in ({$noGoodsNo_wh})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_sk_summer where 云仓='长沙云仓' and 货号 in ({$noGoodsNo_cs})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_sk_summer where 云仓='贵阳云仓' and 货号 in ({$noGoodsNo_gy})
+            ");
 
             if ($status) {
                 // $this->db_easyA->commit();
