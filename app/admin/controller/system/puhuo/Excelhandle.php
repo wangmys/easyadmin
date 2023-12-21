@@ -122,18 +122,12 @@ class Excelhandle extends AdminController
 
     }
 
-    public function runing($status = 1)
-    {
 
-        if ($status == 1) {
-            $runing = Cache::store('cache')->set('runing', '1', 3600);
-        } else {
-            $runing = Cache::store('cache')->set('runing', '0', 3600);
-        }
 
-        return 'ok';
-    }
-
+    /**
+     * @return \think\response\Json
+     * @NodeAnotation(title="运行",auth=false)
+     */
     public function xm_select()
     {
         $res = $this->mysql->table('sp_lyp_puhuo_excel')->where(function ($q) {
@@ -267,6 +261,11 @@ class Excelhandle extends AdminController
     }
 
 
+    /**
+     * @param $tag
+     * @return string|void
+     * @NodeAnotation(title="运行",auth=false)
+     */
     public function export_excel_runing($tag)
     {
 
@@ -309,7 +308,8 @@ class Excelhandle extends AdminController
     }
 
     /**
-     * @NodeAnotation(title="excel转换")
+     * @return \think\response\Json|void
+     * @NodeAnotation(title="excel转换",auth=false)
      */
     public function import_excel()
     {
