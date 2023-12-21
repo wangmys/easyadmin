@@ -777,8 +777,8 @@ class Skauto extends BaseController
         $find_config = $this->db_easyA->table('cwl_skauto_config')->where('id=1')->find();
 
         if ($find_config['总入量2']) {
-            $field1 = " when t1.总入量 <= {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '售空' "; 
-            $field2 = " when t1.总入量 <= {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '即将售空' ";
+            $field1 = " when t1.总入量 <= {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (case when t1.店铺库存< 0 then 0 else t1.店铺库存 end + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '售空' "; 
+            $field2 = " when t1.总入量 <= {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (case when t1.店铺库存< 0 then 0 else t1.店铺库存 end + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量2']} then '即将售空' ";
         } else {
             $field1 = '';
             $field2 = '';
@@ -787,9 +787,9 @@ class Skauto extends BaseController
         select 
             t1.*,
             case
-            when t1.总入量 > {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '售空'
+            when t1.总入量 > {$find_config['总入量2']} and t1.总入量 - t1.累销数量 <=0 and (case when t1.店铺库存< 0 then 0 else t1.店铺库存 end + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '售空'
             $field1
-            when t1.总入量 > {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.店铺库存 + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '即将售空'
+            when t1.总入量 > {$find_config['总入量2']}  and t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (case when t1.店铺库存< 0 then 0 else t1.店铺库存 end + t1.在途库存 + t1.已配未发) / t1.总入量 <= {$find_config['店留量1']} then '即将售空'
             $field2
             end as 售空提醒
         from  
