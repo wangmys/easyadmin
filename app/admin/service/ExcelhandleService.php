@@ -525,7 +525,7 @@ class ExcelhandleService
     
     WHERE EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+       -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY  
@@ -570,7 +570,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -613,7 +613,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+       -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -654,7 +654,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
 
     
     GROUP BY
@@ -695,7 +695,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -738,7 +738,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+     --   AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
