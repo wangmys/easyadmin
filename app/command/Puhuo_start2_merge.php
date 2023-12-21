@@ -3980,16 +3980,25 @@ class Puhuo_start2_merge extends Command
             or (CategoryName1 = '下装' and CategoryName2 like '%松紧%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
 
         }
-        //套西
-        if ($store_puhuo_lianma_tx == 2) {
-            $sql_tx=" or (CategoryName2  like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0) or  (Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
-        }else if($store_puhuo_lianma_tx == 3){
-            $sql_tx=" or (CategoryName2  like '%套西%'  and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
-        }else if($store_puhuo_lianma_tx == 4){
-            $sql_tx=" or (CategoryName2  like '%套西%' and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0)  )) ";
-        }else{//其他默认使用3
-            $sql_tx=" or (CategoryName2  like '%套西%'  and ( (Stock_30_puhuo >0 and Stock_31_puhuo >0 and Stock_32_puhuo >0)  or  (Stock_31_puhuo >0 and Stock_32_puhuo >0 and Stock_33_puhuo >0) )) ";
-        }
+        //套西个数
+        $sql_tx=" or (
+        CategoryName1 ='外套' and  CategoryName2  like '%套西%'  and 	 (
+     IF(Stock_00_puhuo >0,1,0) 
+     + IF(Stock_29_puhuo >0,1,0)
+     + IF(Stock_30_puhuo >0,1,0)
+     + IF(Stock_31_puhuo >0,1,0)
+     + IF(Stock_32_puhuo >0,1,0)
+     + IF(Stock_33_puhuo >0,1,0)
+     + IF(Stock_34_puhuo >0,1,0)
+     + IF(Stock_35_puhuo >0,1,0)
+     + IF(Stock_36_puhuo >0,1,0)
+     + IF(Stock_38_puhuo >0,1,0)
+     + IF(Stock_40_puhuo >0,1,0)
+     + IF(Stock_42_puhuo >0,1,0)
+     ) >= $store_puhuo_lianma_tx
+        ) ";
+
+
 
 
         //羊毛裤

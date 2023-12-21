@@ -35,7 +35,18 @@ class ExcelhandleService
 
         $data = [];
         $exDb = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->select()->toArray();
-        $CustomersKV = array_column($exDb, null, 'CustomerName');
+
+        $CustomersKV = [];
+        foreach ($exDb as $item) {
+            $aa = [
+                'WarehouseName' => $item['WarehouseName'],
+                'WarehouseCode' => $item['WarehouseCode'],
+                'CustomerName' => $item['CustomerName'],
+                'CustomItem17' => $item['CustomItem17'],
+            ];
+            $CustomersKV[$item['WarehouseName'] . '_' . $item['CustomerName']] = $aa;
+        }
+//        $CustomersKV = array_column($exDb, null, 'CustomerName');
 //        $Customers = array_values(array_unique(array_column($exDb, 'CustomerName')));
 //        $Customers = ['安康一店', '阿拉尔一店'];
         $CustomItem17Arr = array_values(array_unique(array_column($exDb, 'CustomItem17')));
@@ -60,12 +71,17 @@ class ExcelhandleService
         foreach ($CustomersKV as $cus => $item) {
 
             $cus_num = 1; //店铺包数
-            $yk_con = isset($config['特殊店铺'][$cus]['YK']) ? $config['特殊店铺'][$cus]['YK'] : $config['衣裤'];
-            $xl_con = isset($config['特殊店铺'][$cus]['XZ']) ? $config['特殊店铺'][$cus]['XZ'] : $config['鞋子'];
+            $yk_con = isset($config['特殊店铺'][$item['CustomerName']]['YK']) ? $config['特殊店铺'][$item['CustomerName']]['YK'] : $config['衣裤'];
+            $xl_con = isset($config['特殊店铺'][$item['CustomerName']]['XZ']) ? $config['特殊店铺'][$item['CustomerName']]['XZ'] : $config['鞋子'];
             //衣裤
-            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->where('CustomerName', $cus)->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)
+                ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
+                ->whereIn('CategoryName1', ['外套', '内搭', '下装'])
                 ->order('CategoryName1 ASC')->select()->toArray();
-            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)->where('admin_id', session('admin.id'))->where('CustomerName', $cus)->where('CategoryName1', '鞋履')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)
+                ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
+                ->where('CategoryName1', '鞋履')
+                ->select()->toArray();
             $total = 0; //总件数
             //处理衣裤
 
@@ -78,13 +94,13 @@ class ExcelhandleService
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
                         $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
-                        $data[$cus][] = $clothesPantsArr;
+                        $data[$item['CustomerName']][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
                         $numArr[$item['CustomItem17']]++;
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
                         $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
-                        $data[$cus][] = $clothesPantsArr;
+                        $data[$item['CustomerName']][] = $clothesPantsArr;
                     }
 
                 }
@@ -93,22 +109,22 @@ class ExcelhandleService
 
             //鞋子
             foreach ($shoes as $s_k => $s_v) {
-                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$cus][$s_k])) { //加到原来的
+                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$item['CustomerName']][$s_k])) { //加到原来的
                     $shoesArr = $s_v;
-                    $shoesArr['sort'] = $data[$cus][$s_k]['sort'];
-                    $shoesArr['uuid'] = $data[$cus][$s_k]['uuid'];
-                    $data[$cus][] = $shoesArr;
+                    $shoesArr['sort'] = $data[$item['CustomerName']][$s_k]['sort'];
+                    $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
+                    $data[$item['CustomerName']][] = $shoesArr;
                 } else {
                     $numArr[$item['CustomItem17']]++;
                     $shoesArr = $s_v;
                     $shoesArr['sort'] = $numArr[$item['CustomItem17']];
                     $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
-                    $data[$cus][] = $shoesArr;
+                    $data[$item['CustomerName']][] = $shoesArr;
 
                 }
 
             }
-            //更换店铺 包数更换
+            //更换云仓店铺 包数更换
             $numArr[$item['CustomItem17']]++;
 
         }
@@ -525,7 +541,7 @@ class ExcelhandleService
     
     WHERE EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+       -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY  
@@ -570,7 +586,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -613,7 +629,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+       -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -654,7 +670,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
 
     
     GROUP BY
@@ -695,7 +711,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+      --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
@@ -738,7 +754,7 @@ class ExcelhandleService
     
         AND EG.TimeCategoryName1>2022
     
-        AND EG.CategoryName1 NOT IN ('物料','人事物料')
+     --   AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
     
     GROUP BY
