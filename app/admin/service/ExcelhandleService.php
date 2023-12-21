@@ -106,7 +106,7 @@ class ExcelhandleService
                 }
             }
 
-
+            $no = 0;
             //鞋子
             foreach ($shoes as $s_k => $s_v) {
                 if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$item['CustomerName']][$s_k])) { //加到原来的
@@ -115,11 +115,21 @@ class ExcelhandleService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
-                    $numArr[$item['CustomItem17']]++;
-                    $shoesArr = $s_v;
-                    $shoesArr['sort'] = $numArr[$item['CustomItem17']];
-                    $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
-                    $data[$item['CustomerName']][] = $shoesArr;
+                    if ($no != 0) {
+                        $shoesArr = $s_v;
+                        $shoesArr['sort'] = $no;
+                        $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($no, 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $shoesArr;
+                    } else {
+                        $numArr[$item['CustomItem17']]++;
+                        $no = $numArr[$item['CustomItem17']];
+                        $shoesArr = $s_v;
+                        $shoesArr['sort'] = $numArr[$item['CustomItem17']];
+                        $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $shoesArr;
+
+                    }
+
 
                 }
 
