@@ -521,8 +521,6 @@ class Puhuo_start2_merge extends Command
                                         $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
                                         //sp_lyp_puhuo_wait_goods处理
                                         unset($v_data['create_time']);
-                                        unset($v_data['id']);
-
                                         try {
                                             $res=$this->puhuo_wait_goods_model::where([['admin_id', '=', $admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
                                         } catch (\exception $e) {
@@ -639,8 +637,9 @@ class Puhuo_start2_merge extends Command
 
         ######################套装套西处理start##########################
         //铺 套装套西
-//        $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
-//    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd);
+
+        $this->puhuo_taozhuang($data_taozhuang, $all_customer_arr, $all_customer_arr_state, $customer_level, $qiwen_config_arr, $ti_goods, $fill_rate_level,
+    $dongxiao_rate_level, $daxiao_res, $puhuo_config, $puhuo_zdkphmd);
         ######################套装套西处理end##########################
 
         //记录铺货日志：
@@ -826,6 +825,7 @@ class Puhuo_start2_merge extends Command
                                     // echo $dongxiao_rate_score;die;
     
                                     $add_data = [
+                                        'admin_id' => $this->admin_id,
                                         'Yuncang' => $WarehouseName,
                                         'State' => $v_customer['State'] ?: '',
                                         'GoodsNo' => $GoodsNo,
@@ -983,11 +983,9 @@ class Puhuo_start2_merge extends Command
                                             //近14天有无上柜过
                                             $current_14days = $this->puhuo_shangshiday_model::where([['CustomerId', '=', $v_customer['CustomerId']], ['GoodsNo', '=', $GoodsNo],  ['StockDate', '>=', date('Y-m-d H:i:s', strtotime("-{$puhuo_config['listing_days']} days"))]])->field('GoodsNo')->find();
                                             // print_r($current_14days);die;
-    
                                             //满足条件的才铺货
                                             $can_puhuo = $this->check_can_puhuo($rule, $v_data, $puhuo_config, $goods_yuji_stock, $current_14days);
 
-                                            // print_r($can_puhuo);die;
                                             $uuid = uuid();
                                             if ($can_puhuo['if_can_puhuo']) {
     
@@ -1003,13 +1001,12 @@ class Puhuo_start2_merge extends Command
                                                     $v_data['Stock_Quantity_puhuo'] = $v_data['Stock_Quantity_puhuo']-$cut_stock;
                                                     //sp_lyp_puhuo_wait_goods处理
                                                     unset($v_data['create_time']);
-                                                    unset($v_data['id']);
                                                     // print_r($v_data);die;
-                                                    $this->puhuo_wait_goods_model::where([['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
+                                                    $this->puhuo_wait_goods_model::where([['admin_id','=',$this->admin_id],['WarehouseName', '=', $WarehouseName], ['GoodsNo', '=', $GoodsNo]])->update($v_data);
                                                 }
-    
                                                 //sp_lyp_puhuo_log、sp_lyp_puhuo_cur_log处理
                                                 $puhuo_log = [
+                                                    'admin_id' => $this->admin_id,
                                                     'uuid' => $uuid,
                                                     'WarehouseName' => $WarehouseName,
                                                     'GoodsNo' => $GoodsNo,
@@ -1040,6 +1037,7 @@ class Puhuo_start2_merge extends Command
                                             } else {//不铺
                                                 
                                                 $puhuo_log = [
+                                                    'admin_id' => $this->admin_id,
                                                     'uuid' => $uuid,
                                                     'WarehouseName' => $WarehouseName,
                                                     'GoodsNo' => $GoodsNo,
@@ -1070,15 +1068,15 @@ class Puhuo_start2_merge extends Command
                                             //记录铺货日志：
                                             Log::channel('puhuo')->write('##############套装套西-云仓-货号-店铺:'.$WarehouseName.$GoodsNo.$v_customer['CustomerName'].'##############'.json_encode(['rule'=>$rule, 'v_data'=>$v_data, 'goods_yuji_stock'=>$goods_yuji_stock, 'current_14days'=>$current_14days, 'can_puhuo***result***：'=>$can_puhuo]) );
 
-                                            $this->puhuo_customer_sort_model::where([['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
+                                            $this->puhuo_customer_sort_model::where([['admin_id','=',$this->admin_id],['GoodsNo', '=', $GoodsNo], ['CustomerName', '=', $v_customer['CustomerName']]])->update(['cur_log_uuid' => $uuid]);
     
                                         }
     
                                         ######################大小码铺货逻辑start(只针对 主码 可铺的店进行大小码 铺货)############################
-                                        
-                                        $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
 
-//                                        dd($add_puhuo_log);
+                                        // M 注释2023-12-22  不检测大小码
+//                                        $add_puhuo_log = $this->check_daxiaoma($daxiaoma_puhuo_log, $daxiaoma_skcnum_score_sort, $add_puhuo_log, $v_data, $puhuo_config);
+
                                         $res_taozhuang[] = $add_puhuo_log;
                                         //要查询最新的库存数据出来
                                         $cur_goods = $this->puhuo_wait_goods_model::where([['id', '=', $v_data['id']]])->find();
@@ -1101,6 +1099,8 @@ class Puhuo_start2_merge extends Command
                                         Db::commit();
                                     } catch (\Exception $e) {
                                         Db::rollback();
+
+                                        dd($e->getMessage());
                                     }
     
     
@@ -1596,17 +1596,24 @@ class Puhuo_start2_merge extends Command
         } else {
 
             // print_r($pu_arr);die;
-            if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
+            if ($v_data['CategoryName1']=='外套' && strstr($v_data['CategoryName2'], '套西')) {
+                $lianma_num=$puhuo_config['store_puhuo_lianma_tx'];
+            } else if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
                 $lianma_num = $puhuo_config['store_puhuo_lianma_nd'];
             } else if($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '羊毛裤')) {
                 $lianma_num = $puhuo_config['store_puhuo_lianma_ymk'];
             } else {
                 $lianma_num = $puhuo_config['store_puhuo_lianma_xz'];
             }
-
             if (count($pu_arr) < $lianma_num) {//小于中间码连码标准，肯定不能铺货
                 $can = false;
             } else {
+
+                //处理西裤 配置是个数 直接返回
+                if ($v_data['CategoryName1'] == '外套' && strstr($v_data['CategoryName2'], '套西')) {
+                    return ['if_can_puhuo' => $can, 'data' => $pu_arr];
+                }
+
 
                 $pu_arr_keys = [];
                 foreach ($pu_arr as $k_pu=>$v_pu) {
@@ -1624,7 +1631,6 @@ class Puhuo_start2_merge extends Command
                         if (count($v_keys) < $lianma_num) unset($pu_arr_keys[$k_keys]);
                     }
                 }
-                // print_r($pu_arr_keys);die;
 
                 //最终得出 将要铺的 各个尺码 数
                 if (!$pu_arr_keys) {
@@ -1648,7 +1654,6 @@ class Puhuo_start2_merge extends Command
                         $new_pu_arr['Stock_'.$sign_vv.'_puhuo'] = $pu_arr['Stock_'.$sign_vv.'_puhuo'] ?? 0;
                     }
                     $pu_arr = $new_pu_arr;
-
                     //最后判断主码连码情况，进一步确认是否可铺
                     $end_pu_arr = [];
                     if (in_array($v_data['CategoryName1'], ['内搭', '外套', '鞋履']) || ($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '松紧'))) {
@@ -1660,6 +1665,7 @@ class Puhuo_start2_merge extends Command
                         $end_pu_arr['33'] = $pu_arr['Stock_33_puhuo'] ?? 0;
 
                         $pu_arr = $this->deal_end_pu_arr($end_pu_arr, $lianma_num);
+
 
                     } else if($v_data['CategoryName1']=='下装' && strstr($v_data['CategoryName2'], '羊毛裤')) {
 
