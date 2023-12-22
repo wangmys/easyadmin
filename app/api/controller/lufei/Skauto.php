@@ -924,7 +924,7 @@ class Skauto extends BaseController
             t1.*,
             case
             when t1.总入量 - t1.累销数量 <=0 and t1.店铺库存 <=0 then '售空'
-            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= {$find_config['店留量']}
+            when t1.总入量 - t1.累销数量 > 0 and t1.总入量 - t1.累销数量 <= 5 and (t1.总入量 + t1.已配未发 + t1.`在途库存` - t1.`累销数量`) / (t1.总入量+t1.已配未发+t1.在途库存) <= {$find_config['店留量1']}
                 and t1.店铺库存>0 and t1.店铺库存 <=5 then '即将售空'
             end as 售空提醒
             from  
@@ -936,7 +936,7 @@ class Skauto extends BaseController
                     from cwl_skauto 
             where 
             `销售天数`<= {$find_config['销售天数']} 
-            and 总入量 > {$find_config['总入量']} 
+            and 总入量 > {$find_config['总入量1']} 
             and ( 折率 >= {$find_config['折率']} || (折率 < {$find_config['折率']} AND 
                     (
                             (二级分类 = '短T' AND 当前零售价 > {$find_config['短T']}) 
