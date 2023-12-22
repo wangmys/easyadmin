@@ -619,7 +619,7 @@
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['售空提醒']}</div>`;
                         } else if (data['售空提醒'] == '售空') {
-                            return `<span style="color: red;">${data['售空提醒']}</span>`;
+                            return `<div style="color: white; font-weight:bold; background:red;">${data['售空提醒']}</div>`;
                         } else {
                             return '';
                         }
