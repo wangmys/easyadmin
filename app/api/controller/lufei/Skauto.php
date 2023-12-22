@@ -1020,7 +1020,6 @@ class Skauto extends BaseController
                         *
                 from cwl_skauto_res 
                 where 1
-                    AND 在途库存 + 已配未发 <= 0
                     AND 售空提醒 IN ('售空', '即将售空')
             ";
             $select_ww = $this->db_easyA->query($sql_ww);
@@ -1056,7 +1055,6 @@ class Skauto extends BaseController
                     *
             from cwl_skauto_res 
             where 1
-                AND 在途库存 + 已配未发 <= 0
                 AND 售空提醒 IN ('售空', '即将售空')
         ";
         $select = $this->db_easyA->query($sql);
