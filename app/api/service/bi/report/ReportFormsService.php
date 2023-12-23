@@ -4751,7 +4751,7 @@ class ReportFormsService
             $fday = $find_festival['节日天数'];
             $find_lastyear = $this->db_easyA->table('cwl_festival_config')->where([
                 ['节日天数', '=', $fday],
-                ['年份', '=', 2022]
+                ['年份', '=', '去年']
             ])->find();
             $year2022 = $find_lastyear['节日日期'];
         } else {
@@ -4817,7 +4817,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $filename,   //保存的文件名
-                'title' => "{$type}老店【国庆假期】业绩同比 [" . $date . ']',
+                'title' => "{$type}老店【元旦假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,
@@ -4932,7 +4932,7 @@ class ReportFormsService
                 'code' => $code,
                 'row' => count($list),          //数据的行数
                 'file_name' => $code . '.jpg',   //保存的文件名
-                'title' => "省份老店【国庆假期】业绩同比 [" . $date . ']',
+                'title' => "省份老店【元旦假期】业绩同比 [" . $date . ']',
                 'table_time' => date("Y-m-d H:i:s"),
                 'data' => $list,
                 'table_explain' => $table_explain,

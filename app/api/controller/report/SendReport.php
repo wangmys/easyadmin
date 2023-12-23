@@ -2361,17 +2361,17 @@ class SendReport extends BaseController
         $model = new $name;
         $send_data = [
             'S115Ajm' => [
-                'title' => '加盟老店【国庆假期】业绩同比 表号:S115A',
+                'title' => '加盟老店【元旦假期】业绩同比 表号:S115A',
                 // 'title' => '测试S108A',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Ajm.jpg?v=" . time()
             ],
             'S115Azy' => [
-                'title' => '直营老店【国庆假期】业绩同比 表号:S115A',
+                'title' => '直营老店【元旦假期】业绩同比 表号:S115A',
                 // 'title' => '测试S108B',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Azy.jpg?v=" . time()
             ],
             'S115B' => [
-                'title' => '省份老店【国庆假期】业绩同比 表号:S115B',
+                'title' => '省份老店【元旦假期】业绩同比 表号:S115B',
                 // 'title' => '测试S109',
                 'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115B.jpg?v=" . time()
             ],
@@ -2384,8 +2384,8 @@ class SendReport extends BaseController
             $headers = get_headers($v['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
                 // 推送
-                $res[] = $model->send($v['title'],$v['jpg_url']);
-                // $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+                // $res[] = $model->send($v['title'],$v['jpg_url']);
+                $res[] = $model->send($v['title'],$v['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
                 // echo $v['title'];
                 // echo '<br>';
             }
@@ -2405,7 +2405,7 @@ class SendReport extends BaseController
         $this->service->create_table_s115B($date);
 
         // 发送数据报表
-        // $this->send_festival();
+        $this->send_festival();
     }
 
 
