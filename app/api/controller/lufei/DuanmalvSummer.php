@@ -80,7 +80,6 @@ class DuanmalvSummer extends BaseController
     public function autoUpdate() {
         $this->zt_1();
         $this->retail_first();
-        $this->retail_first();
         $this->retail_second();
 
         $this->sk_first();
@@ -192,7 +191,7 @@ class DuanmalvSummer extends BaseController
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ({$year})
                 AND ER.CustomerName NOT IN ( {$noCustomer} )
-        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'

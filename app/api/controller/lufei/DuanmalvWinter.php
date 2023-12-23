@@ -80,7 +80,6 @@ class DuanmalvWinter extends BaseController
     public function autoUpdate() {
         $this->zt_1();
         $this->retail_first();
-        $this->retail_first();
         $this->retail_second();
 
         $this->sk_first();
