@@ -1064,8 +1064,8 @@ class DuanmalvWinter extends BaseController
             end as 销售TOP分配,
             case
                 m1.风格
-                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + ifnull(m1.销售金额) / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
-                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + ifnull(m1.销售金额) / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
             end as 实际分配TOP
         FROM
             (SELECT sk.经营模式,
