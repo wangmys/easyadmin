@@ -38,7 +38,6 @@ class Excelhandle extends AdminController
     }
 
 
-
     /**
      * @return mixed|\think\response\Json
      * @NodeAnotation(title="铺货excel列表",auth=true)
@@ -121,7 +120,6 @@ class Excelhandle extends AdminController
         return $this->fetch();
 
     }
-
 
 
     /**
@@ -298,7 +296,7 @@ class Excelhandle extends AdminController
                 ['*状态/1草稿,2预发布,3确定发布', 'status', 'number'],
                 ['备注', 'remark'],
             ];
-            ExcelService::export($data, $header, date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count);
+            ExcelService::export($data, [$header], date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count);
         }
 
 
