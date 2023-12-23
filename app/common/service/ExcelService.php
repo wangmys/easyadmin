@@ -7,12 +7,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 
 /**
  * 支持设置单元格文本格式
- * 支持图片的导入导出
+ * 支持图片的导入导出  已处理远程图片
  * Class ExcelService
  * @package app\common\service
  * @ControllerAnnotation(title="EXCEL导入导出",auth=true)
@@ -107,10 +108,17 @@ class ExcelService
     /**
      *
      * $header = [
-     * ['名称', 'name', 'text', '10'],
-     * ['图片', 'pic', 'image', '10'],
-     * ['性别', 'sex', 'text', '10'],
-     * ];
+     * [
+     *   ['组合', 2], // 2 colspan 占格数
+     *   ['时间', 3],
+     *   ['大小', 3],
+     *  ],
+     *  [
+     *   ['名称', 'name', 'text', '10','fcf7b6'],
+     *   ['图片', 'pic', 'image', '10','fcf7b6'],
+     *   ['性别', 'sex', 'text', '10','fcf7b6'],
+     *  ]
+     *  ];
      * $data = [
      * ['name' => '张三', 'pic' => 'https://sha.babiboy.com/m/images/dindin_template/test.jpg', 'sex' => '男'],
      * ['name' => '李四', 'pic' => 'static/dingding/s101.png', 'sex' => '女'],
@@ -123,17 +131,38 @@ class ExcelService
      * @param $data [2] 类型：text、number、image
      * @param $data [3] 行宽
      * @param $data [3] image ['图片', 'pic', 'image','15']
+     * @param $data [4] 颜色]
      * @param $header   表头
      * @param $fileName 文件名
+     * @param $path 保存文件路径 'test.xlsx'
      * @return string|void
      * @NodeAnotation(title="导出",auth=false)
      */
-    public static function export($data, $header, $fileName = '导出EXcel')
+    public static function export($data, $header, $fileName = '导出EXcel', $path = '')
     {
 
         $spreadsheet = new Spreadsheet();
         //获取活动工作簿
         $worksheet = $spreadsheet->getActiveSheet();
+
+        $header_num = count($header); //表头头占行数
+        foreach ($header as $key => $item) {  //处理多级表头
+            if ($header_num == $key + 1) {
+                break;
+            }
+            $xyNum = 1;
+            foreach ($item as $k_s => $v_s) {
+                $colspan = $v_s[1] ?? 1;
+                $x = Coordinate::stringFromColumnIndex($xyNum);
+                $worksheet->setCellValueExplicit($x . ($key + 1), $v_s[0], DataType::TYPE_STRING);
+                $xy1 = Coordinate::stringFromColumnIndex($xyNum) . ($key + 1);
+                $xyNum = $colspan + $xyNum;
+                $xy2 = Coordinate::stringFromColumnIndex($xyNum - 1) . ($key + 1);
+                $worksheet->mergeCells("$xy1:$xy2");
+            }
+        }
+
+        $header = $header[$header_num - 1];
         $num = 0;
         foreach ($header as $key => $item) {
 
@@ -141,8 +170,19 @@ class ExcelService
             $width = (isset($item[3]) && !empty($item[3])) ? $item[3] : 10;
             //设置要自动调整宽度的行
             $worksheet->getColumnDimension($x)->setWidth($width);
+            //设置颜色
+            if (isset($item[4]) && !empty($item[4])) {
+
+                $worksheet->getStyle($x . $header_num)
+                    ->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID) // 设置填充样式
+                    ->getStartColor()
+//                    ->setRGB('fcf7b6');
+                    ->setRGB($item[4]);
+            }
+
             //设置单元格表头
-            $worksheet->setCellValueExplicit($x . 1, $item[0], DataType::TYPE_STRING);
+            $worksheet->setCellValueExplicit($x . $header_num, $item[0], DataType::TYPE_STRING);
             $arr = array_column($data, $item['1']);
             if ($key > 0 && count($arr) != $num) {
                 return '字段数据不全，请检查';
@@ -159,7 +199,7 @@ class ExcelService
                     $s_v = $path . $fileName;
                 }
                 //坐标
-                $xy = Coordinate::stringFromColumnIndex($key + 1) . ($s_k + 2);
+                $xy = Coordinate::stringFromColumnIndex($key + 1) . ($s_k + 1 + $header_num);
                 if (isset($item[2]) && $item[2] == 'number') {
                     $type = DataType::TYPE_NUMERIC;
                     //写入数据
@@ -173,8 +213,8 @@ class ExcelService
                         continue;
                     }
                     $size = getimagesize($imagePath);
-                    $imgWidthMul=$size[0]/50;
-                    $imgHeightMul=$size[1]/50;
+                    $imgWidthMul = $size[0] / 50;
+                    $imgHeightMul = $size[1] / 50;
                     $drawing = new Drawing();
                     $drawing->setName($imagePath);
                     $drawing->setDescription('Image inserted by PhpSpreadsheet');
@@ -184,7 +224,7 @@ class ExcelService
 //                    $drawing->setOffsetX(0);
 //                    $drawing->setOffsetY(5);
                     //设置图片宽高
-                    $drawing->setWidthAndHeight(floor($size[0]/$imgWidthMul), floor($size[1]/$imgHeightMul));
+                    $drawing->setWidthAndHeight(floor($size[0] / $imgWidthMul), floor($size[1] / $imgHeightMul));
                     $drawing->setResizeProportional(true);
                     $drawing->setWorksheet($worksheet);
                 } else {
@@ -198,14 +238,43 @@ class ExcelService
             }
         }
 
-        ob_end_clean(); //清除缓冲区
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
-        header('Cache-Control: max-age=0');
+        // 获取总列数
+        $colspan = $worksheet->getHighestColumn();
+        //获取总行数
+        $rowspan = $worksheet->getHighestRow();
 
-        $write = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $write->save('php://output');
-        exit;
+        //设置excel居中
+        $worksheet->getStyle('A1:' . $colspan . $rowspan)->getAlignment()->setHorizontal('center');
+        //设置excel边框
+        $worksheet->getStyle('A1:' . $colspan . $rowspan)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);  // 所有边框
+
+//        // 设置A2到K2的背景色，也可以单独指定单元格
+//        $worksheet->getStyle('B1:B'.$rowspan)
+//            ->getFill()
+//            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID) // 设置填充样式
+//            ->getStartColor()
+//            ->setRGB('fcf7b6'); // 可以忽略透明，直接使用RGB
+
+        ob_end_clean(); //清除缓冲区
+
+        if ($path) {
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+            $write = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $write->save($path . $fileName . '.xlsx');
+
+        } else {
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            $write = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $write->save('php://output');
+            exit;
+        }
+
+        return $path;
 
     }
 
