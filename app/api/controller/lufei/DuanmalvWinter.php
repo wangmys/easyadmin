@@ -80,7 +80,6 @@ class DuanmalvWinter extends BaseController
     public function autoUpdate() {
         $this->zt_1();
         $this->retail_first();
-        $this->retail_first();
         $this->retail_second();
 
         $this->sk_first();
@@ -187,7 +186,7 @@ class DuanmalvWinter extends BaseController
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ({$year})
                 AND ER.CustomerName NOT IN ( {$noCustomer} )
-        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
@@ -1064,8 +1063,8 @@ class DuanmalvWinter extends BaseController
             end as 销售TOP分配,
             case
                 m1.风格
-                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
-                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
             end as 实际分配TOP
         FROM
             (SELECT sk.经营模式,
@@ -1097,7 +1096,10 @@ class DuanmalvWinter extends BaseController
                 GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
                 order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
         ";
+
+        // die;
         $select = $this->db_easyA->query($sql2);
+
         if ($select) {
             // 删除 需要计算排名的
             // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
@@ -1292,11 +1294,13 @@ class DuanmalvWinter extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table6_winter')->where(1)->delete();
+            $this->db_bi->table('ww_duanmalv_table6_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table6_winter')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_duanmalv_table6_winter')->strict(false)->insertAll($val);
             }
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table6_updatetime' => date('Y-m-d H:i:s')

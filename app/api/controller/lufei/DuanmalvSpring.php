@@ -80,7 +80,6 @@ class DuanmalvSpring extends BaseController
     public function autoUpdate() {
         $this->zt_1();
         $this->retail_first();
-        $this->retail_first();
         $this->retail_second();
 
         $this->sk_first();
@@ -191,8 +190,8 @@ class DuanmalvSpring extends BaseController
                 AND EC.CustomItem17 IS NOT NULL
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ({$year})
-        --      AND ER.CustomerName NOT IN ( {$noCustomer} )
-        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+                AND ER.CustomerName NOT IN ( {$noCustomer} )
+                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
@@ -1053,8 +1052,8 @@ class DuanmalvSpring extends BaseController
             end as 销售TOP分配,
             case
                 m1.风格
-                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
-                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + m1.销售金额 / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
+                when '基本款' then round((m1.SKC数 / m1.店铺SKC数_基本款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_基本款 * {$this->top}) / 2, 0)
+                when '引流款' then round((m1.SKC数 / m1.店铺SKC数_引流款 * {$this->top} + ifnull(m1.销售金额, 0) / m1.店铺总销售金额_引流款 * {$this->top}) / 2, 0)
             end as 实际分配TOP
         FROM
             (SELECT sk.经营模式,
@@ -1281,11 +1280,13 @@ class DuanmalvSpring extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table6_spring')->where(1)->delete();
+            $this->db_bi->table('ww_duanmalv_table6_spring')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table6_spring')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_duanmalv_table6_spring')->strict(false)->insertAll($val);
             }
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=3')->strict(false)->update([
                 'table6_updatetime' => date('Y-m-d H:i:s')
