@@ -187,7 +187,7 @@ class DuanmalvWinter extends BaseController
                 AND EBC.Mathod IN ('直营', '加盟')
                 AND EG.TimeCategoryName1 IN ({$year})
                 AND ER.CustomerName NOT IN ( {$noCustomer} )
-        --      AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
+                AND EG.GoodsNo NOT IN ( {$noGoodsNo} )
         --      AND ERG.Quantity  > 0
         --      AND ERG.DiscountPrice > 0
         -- 		AND ER.CustomerName = '舒城一店'
@@ -1097,7 +1097,14 @@ class DuanmalvWinter extends BaseController
                 GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
                 order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
         ";
+
+        // die;
         $select = $this->db_easyA->query($sql2);
+
+        echo '<pre>';
+        print_r($select);
+
+        die;
         if ($select) {
             // 删除 需要计算排名的
             // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
