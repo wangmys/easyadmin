@@ -47,16 +47,18 @@ class Festival extends BaseController
         $this->db_sqlsrv = Db::connect('sqlsrv');
 
         $select_festivalDate = $this->db_easyA->table('cwl_festival_config')->where([
-            ['节日', '=', '国庆']
+            ['节日', '=', '元旦']
         ])->select();
         $this->festivalArr = $select_festivalDate;    
 
         $date = date('Y-m-d');
 
         // 测试
-        // $date = '2023-09-26';
+        $date = '2022-12-31';
 
         $date_res = $this->isFestavalDate($date);
+
+        // dump($date_res);die;
         if ($date_res) {
             $this->节日日期_2023 = $date_res['节日日期'];
             // echo '<br>';
@@ -66,13 +68,13 @@ class Festival extends BaseController
             $find_2022 = $this->db_easyA->table('cwl_festival_config')->where([
                 ['节日', '=', $this->节日],
                 ['节日天数', '=', $this->节日天数],
-                ['年份', '=', 2022],
+                ['年份', '=', '去年'],
             ])->find();
 
             $find_2021 = $this->db_easyA->table('cwl_festival_config')->where([
                 ['节日', '=', $this->节日],
                 ['节日天数', '=', $this->节日天数],
-                ['年份', '=', 2021],
+                ['年份', '=', '前年'],
             ])->find();
             $this->节日日期_2022 = $find_2022['节日日期'];
             $this->节日日期_2021 = $find_2021['节日日期'];
@@ -104,35 +106,11 @@ class Festival extends BaseController
     public function duanwu_data_handle1() {
 
         // 跑数据源
+        // $this->festival_data(true);
         $this->festival_data(true);
-
-        
         $this->createTable1();
         $this->createTable2();
-
         die;
-
-
-        // echo '<pre>';
-        // $this->duanwu_data(true);
-
-        // echo $this->节日日期_2021;die;
-        // if ($this->festival_date == '2023-09-17') {
-        //     $this->duanwu_handle_1day();
-        //     $this->createTable2(1);
-        //     $this->createTable3(1);
-        //     $this->createTable4(1);
-        // } elseif ($this->festival_date == '2023-09-18') {
-        //     $this->duanwu_handle_2day();
-        //     $this->createTable2(2);
-        //     $this->createTable3(2);
-        //     $this->createTable4(2);
-        // } elseif ($this->festival_date == '2023-09-19') {
-        //     $this->duanwu_handle_3day();
-        //     $this->createTable2(3);
-        //     $this->createTable3(3);
-        //     $this->createTable4(3);
-        // }
     }
 
     // 节日3年数据源

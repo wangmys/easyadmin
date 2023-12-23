@@ -80,15 +80,23 @@ class DuanmalvWinter extends BaseController
     public function autoUpdate() {
         $this->zt_1();
         $this->retail_first();
+
         $this->retail_second();
 
+        
         $this->sk_first();
+        
         $this->sk_second();
         $this->sk_third();
+        
+
 
         $this->handle_1_new(); 
+        
         $this->handle_2(); 
+        
         $this->handle_3();
+        // die;
 
         $this->table6();
         $this->table4();
@@ -162,7 +170,6 @@ class DuanmalvWinter extends BaseController
                 EG.CategoryName1 AS 大类,
                 EG.CategoryName2 AS 中类,
                 EG.CategoryName AS 小类,
-                SUBSTRING ( EG.CategoryName, 1, 2 ) AS 领型,
                 EG.StyleCategoryName AS 风格,
                 EG.GoodsNo  AS 商品代码,         
                 SUM ( ERG.Quantity * ERG.DiscountPrice ) / SUM (ERG.Quantity) AS 当前零售价,
@@ -233,6 +240,29 @@ class DuanmalvWinter extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_retail_winter')->strict(false)->insertAll($val);
             }
 
+            $noGoodsNo_nc = xmSelectInput($select_config['南昌不考核货号']);
+            $noGoodsNo_gz = xmSelectInput($select_config['广州不考核货号']);
+            $noGoodsNo_wh = xmSelectInput($select_config['武汉不考核货号']);
+            $noGoodsNo_gy = xmSelectInput($select_config['贵阳不考核货号']);
+            $noGoodsNo_cs = xmSelectInput($select_config['长沙不考核货号']);
+            // 删除云仓不要货号的记录
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_winter where 店铺云仓='南昌云仓' and 商品代码 in ({$noGoodsNo_nc})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_winter where 店铺云仓='广州云仓' and 商品代码 in ({$noGoodsNo_gz})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_winter where 店铺云仓='武汉云仓' and 商品代码 in ({$noGoodsNo_wh})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_winter where 店铺云仓='长沙云仓' and 商品代码 in ({$noGoodsNo_cs})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_winter where 店铺云仓='贵阳云仓' and 商品代码 in ({$noGoodsNo_gy})
+            ");
+
+
             return json([
                 'status' => 1,
                 'msg' => 'success',
@@ -273,9 +303,7 @@ class DuanmalvWinter extends BaseController
                 a.季节归集,
                 a.二级时间分类,
                 a.大类,
-                -- a.中类,
                 a.小类,
-                -- a.风格,
                 a.商品代码,
                 a.零售价,
                 a.当前零售价,
@@ -286,24 +314,19 @@ class DuanmalvWinter extends BaseController
                 CASE
                     WHEN 
                         a.中类 = @中类 and 
-                        a.风格 = @风格 and 
-                        a.领型 = @领型 
+                        a.风格 = @风格
                     THEN
                         @rank := @rank + 1 ELSE @rank := 1
                 END AS 排名,
                 @中类 := a.中类 AS 中类,
-                @风格 := a.风格 AS 风格,
-                @领型 := a.领型 AS 领型
+                @风格 := a.风格 AS 风格
                 FROM
                     cwl_duanmalv_retail_winter a,
-                    ( SELECT @中类 := null,  @风格 := null,  @领型 := null, @rank := 0 ) T
+                    ( SELECT @中类 := null,  @风格 := null, @rank := 0 ) T
                 WHERE
                     折率 >= {$find_config['折率']}
-                --  折率 >= 0.9    
-                -- 	AND 中类='休闲长裤'
-                -- 	AND 店铺名称 = '三江一店'
                 ORDER BY
-                    a.店铺名称 ASC,a.中类 ASC, a.风格 ASC,a.领型 ASC,a.销售数量 DESC
+                    a.店铺名称 ASC,a.中类 ASC, a.风格 ASC,a.销售数量 DESC
         "); 
 
         // echo '<pre>';
@@ -387,7 +410,6 @@ class DuanmalvWinter extends BaseController
                 sk.二级分类,
                 sk.分类,
                 sk.风格,
-                SUBSTRING(sk.分类, 1, 2) as 领型,
                 sk.货号,
                 sk.`总入量00/28/37/44/100/160/S`,
                 sk.`总入量29/38/46/105/165/M`,
@@ -1019,13 +1041,12 @@ class DuanmalvWinter extends BaseController
                     sk.风格,
                     sk.一级分类,
                     sk.二级分类,
-                    sk.领型,
                     sum(case 
                         sk.`标准齐码识别修订`
                         when '断码' then 1 else 0
                     end) as 总断码数, 	
                     ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 AND
-                    sk.领型=领型 and 店铺SKC计数=1) AS SKC数,
+                     店铺SKC计数=1) AS SKC数,
                     ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 ) AS 店铺总SKC数,
                     sum(dr.销售金额) AS 销售金额,
                     (select sum(IFNULL(销售金额, 0)) from cwl_duanmalv_retail_winter where 店铺名称=sk.店铺名称 AND 风格=sk.风格) AS 店铺总销售金额
@@ -1033,8 +1054,8 @@ class DuanmalvWinter extends BaseController
                     LEFT JOIN cwl_duanmalv_retail_winter as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
                     where 
                     sk.风格 IN ('基本款', '引流款')
-                    GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
-                    order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
+                    GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类	
+                    order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`) AS m1
         ";
 
         // top60 top50 销售top分配 skctop分配
@@ -1075,13 +1096,12 @@ class DuanmalvWinter extends BaseController
                 sk.风格,
                 sk.一级分类,
                 sk.二级分类,
-                sk.领型,
                 sum(case 
                     sk.`标准齐码识别修订`
                     when '断码' then 1 else 0
                 end) as 总断码数, 	
-                ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 AND
-                sk.领型=领型 and 店铺SKC计数=1) AS SKC数,
+                ( SELECT count(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = sk.风格 AND sk.一级分类=一级分类 AND sk.二级分类=二级分类 
+                and 店铺SKC计数=1) AS SKC数,
                 ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 ) AS 店铺总SKC数,
                 ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = '基本款' ) AS 店铺SKC数_基本款,
                 ( SELECT sum(店铺SKC计数 ) FROM cwl_duanmalv_sk_winter WHERE 店铺名称 = sk.店铺名称 AND 风格 = '引流款' ) AS 店铺SKC数_引流款,
@@ -1093,8 +1113,8 @@ class DuanmalvWinter extends BaseController
                 LEFT JOIN cwl_duanmalv_retail_winter as dr ON sk.货号 = dr.`商品代码` AND sk.`店铺名称` = dr.`店铺名称` 
             where 1
                 AND sk.风格 IN ('基本款', '引流款')
-                GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类, sk.领型	
-                order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`, sk.领型) AS m1
+                GROUP BY sk.店铺名称, sk.风格, sk.一级分类, sk.二级分类	
+                order by sk.`经营模式`, sk.云仓, sk.省份, sk.店铺名称, sk.风格, sk.`一级分类`, sk.`二级分类`) AS m1
         ";
 
         // die;
@@ -1129,14 +1149,12 @@ class DuanmalvWinter extends BaseController
                 LEFT JOIN cwl_duanmalv_sk_winter sk ON h.店铺名称 = sk.店铺名称 
                 AND h.`二级分类` = sk.`二级分类` 
                 AND h.风格=sk.风格
-                AND h.领型 = sk.领型
                 SET sk.`是否TOP60` = '是'
             WHERE	
                 h.`店铺名称`=sk.`店铺名称` 
                 AND h.风格=sk.风格
                 and h.`一级分类`=sk.`一级分类`
                 and h.二级分类=sk.`二级分类` 
-                and h.领型=sk.领型
                 and sk.`店铺近一周排名` > 0
                 and sk.`店铺近一周排名` <= h.`实际分配TOP`
                 and sk.标准齐码识别修订 = '断码'
@@ -1204,7 +1222,6 @@ class DuanmalvWinter extends BaseController
             SELECT sk.店铺名称,
                 sk.一级分类,
                 sk.二级分类, 
-                sk.领型,
                 sk.风格, 
                 sk.货号,
                 sk.是否TOP60考核款,
@@ -1218,7 +1235,7 @@ class DuanmalvWinter extends BaseController
                 COUNT(1) AS 全部断码SKC数	
                 from cwl_duanmalv_sk_winter sk 
             WHERE sk.`是否TOP60`='是'
-            GROUP BY sk.`店铺名称`,sk.风格, sk.一级分类,sk.`二级分类`,sk.领型
+            GROUP BY sk.`店铺名称`,sk.风格, sk.一级分类,sk.`二级分类`
         ";
         $select = $this->db_easyA->query($sql);
         
@@ -1232,7 +1249,6 @@ class DuanmalvWinter extends BaseController
                 AND h.风格 = skg.风格 
                 AND h.一级分类 = skg.`一级分类` 
                 AND h.`二级分类` = skg.`二级分类` 
-                AND h.领型 = skg.领型 
                 SET 
                     h.TOP断码SKC数 = skg.TOP断码SKC数, 
                     h.全部断码SKC数 = skg.全部断码SKC数 
@@ -1282,7 +1298,6 @@ class DuanmalvWinter extends BaseController
                 风格,
                 一级分类,
                 二级分类,
-                领型,
                 SKC数 as 领型SKC数,
                 总断码数 as 领型断码数,
                 1 - 总断码数 / SKC数 as 领型齐码率
@@ -1428,7 +1443,6 @@ class DuanmalvWinter extends BaseController
                 sk.风格,
                 sk.一级分类 AS 大类,
                 sk.二级分类 AS 中类,
-                sk.领型,
                 sk.货号,
                 sk.省份,
                 sum(sk.`店铺SKC计数`) as 上柜数,
@@ -1503,20 +1517,17 @@ class DuanmalvWinter extends BaseController
                 a.断码率,
             CASE	
                 WHEN a.中类 = @中类 
-                AND a.风格 = @风格 
-                AND a.领型 = @领型 THEN
+                AND a.风格 = @风格 THEN
                     @rank := @rank + 1 ELSE @rank := 1 
                 END AS 单款排名,
                 @风格 := a.风格 AS 风格,
-                @中类 := a.中类 AS 中类,
-                @领型 := a.领型 AS 领型 
+                @中类 := a.中类 AS 中类
             FROM
                 (
                 SELECT
                     sk.风格,
                     sk.一级分类 AS 大类,
                     sk.二级分类 AS 中类,
-                    sk.领型,
                     sk.货号,
                     sum( sk.`店铺SKC计数` ) AS 上柜数,
                     sum( CASE sk.标准齐码识别修订 WHEN '断码' THEN 1 ELSE 0 END ) AS 断码家数,
@@ -1526,9 +1537,9 @@ class DuanmalvWinter extends BaseController
                 GROUP BY
                     sk.货号 
                 ORDER BY
-                    风格,大类,中类,领型,断码率 DESC 
+                    风格,大类,中类,断码率 DESC 
                 ) AS a,
-            ( SELECT @中类 := NULL, @风格 := NULL, @领型 := NULL, @rank := 0 ) T 
+            ( SELECT @中类 := NULL, @风格 := NULL, @rank := 0 ) T 
         ";
         $select = $this->db_easyA->query($sql);
         if ($select) {
@@ -1543,15 +1554,14 @@ class DuanmalvWinter extends BaseController
                 UPDATE cwl_duanmalv_table3_winter AS A
                 LEFT JOIN (
                     SELECT
-                        风格,大类,中类,领型,
+                        风格,大类,中类,
                         MAX(单款排名) AS 最后排名 
                     FROM
                         `cwl_duanmalv_table3_winter` 
                     GROUP BY
-                    风格,大类,中类,领型) AS B ON A.风格 = B.风格 
+                    风格,大类,中类) AS B ON A.风格 = B.风格 
                     AND A.大类 = B.大类 
                     AND A.中类 = B.中类 
-                    AND A.领型 = B.领型 
                     SET A.排名率 = ROUND(
                         A.单款排名 / B.最后排名, 4)
             ";

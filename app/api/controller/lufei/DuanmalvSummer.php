@@ -238,6 +238,28 @@ class DuanmalvSummer extends BaseController
                 $insert = $this->db_easyA->table('cwl_duanmalv_retail_summer')->strict(false)->insertAll($val);
             }
 
+            $noGoodsNo_nc = xmSelectInput($select_config['南昌不考核货号']);
+            $noGoodsNo_gz = xmSelectInput($select_config['广州不考核货号']);
+            $noGoodsNo_wh = xmSelectInput($select_config['武汉不考核货号']);
+            $noGoodsNo_gy = xmSelectInput($select_config['贵阳不考核货号']);
+            $noGoodsNo_cs = xmSelectInput($select_config['长沙不考核货号']);
+            // 删除云仓不要货号的记录
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_summer where 店铺云仓='南昌云仓' and 商品代码 in ({$noGoodsNo_nc})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_summer where 店铺云仓='广州云仓' and 商品代码 in ({$noGoodsNo_gz})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_summer where 店铺云仓='武汉云仓' and 商品代码 in ({$noGoodsNo_wh})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_summer where 店铺云仓='长沙云仓' and 商品代码 in ({$noGoodsNo_cs})
+            ");
+            $this->db_easyA->execute("
+                DELETE FROM cwl_duanmalv_retail_summer where 店铺云仓='贵阳云仓' and 商品代码 in ({$noGoodsNo_gy})
+            ");
+
             return json([
                 'status' => 1,
                 'msg' => 'success',

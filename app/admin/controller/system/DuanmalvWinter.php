@@ -456,12 +456,8 @@ class DuanmalvWinter extends AdminController
                     sk.累销数量,
                     h.`实际分配TOP`                
                 FROM cwl_duanmalv_sk_winter AS sk
-                RIGHT JOIN cwl_duanmalv_handle_1_winter h ON sk.店铺名称 = h.`店铺名称`
+                RIGHT JOIN cwl_duanmalv_handle_1_winter h ON sk.店铺名称 = h.`店铺名称` AND sk.`一级分类` = h.`一级分类` AND sk.`二级分类` = h.`二级分类` AND sk.风格 = h.风格 
                 WHERE 1
-                    AND sk.`一级分类` = h.`一级分类` 
-                    AND sk.`二级分类` = h.`二级分类` 
-                    AND sk.领型 = h.领型 
-                    AND sk.风格 = h.风格 
                     {$map1}
                     {$map2}
                     {$map3}
@@ -475,9 +471,10 @@ class DuanmalvWinter extends AdminController
                     {$map11}
                     {$map12}
                 ORDER BY 
-                    sk.云仓, sk.`商品负责人` desc, sk.店铺名称, sk.风格, sk.季节, sk.一级分类, sk.二级分类, sk.分类, sk.领型
+                    sk.云仓, sk.`商品负责人` desc, sk.店铺名称, sk.风格, sk.季节, sk.一级分类, sk.二级分类, sk.分类
                 LIMIT {$pageParams1}, {$pageParams2}  
             ";
+            // die;
             
             $select = $this->db_easyA->query($sql);
 

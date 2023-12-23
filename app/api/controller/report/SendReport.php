@@ -2405,7 +2405,7 @@ class SendReport extends BaseController
         $this->service->create_table_s115B($date);
 
         // 发送数据报表
-        $this->send_festival();
+        // $this->send_festival();
     }
 
 
