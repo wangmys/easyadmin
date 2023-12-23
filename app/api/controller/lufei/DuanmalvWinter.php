@@ -1101,10 +1101,6 @@ class DuanmalvWinter extends BaseController
         // die;
         $select = $this->db_easyA->query($sql2);
 
-        echo '<pre>';
-        print_r($select);
-
-        die;
         if ($select) {
             // 删除 需要计算排名的
             // $this->db_easyA->table('cwl_duanmalv_handle_1')->where(1)->delete();
@@ -1299,11 +1295,13 @@ class DuanmalvWinter extends BaseController
         $select = $this->db_easyA->query($sql);
         if ($select) {
             $this->db_easyA->table('cwl_duanmalv_table6_winter')->where(1)->delete();
+            $this->db_bi->table('ww_duanmalv_table6_winter')->where(1)->delete();
             $chunk_list = array_chunk($select, 500);
             $status = true;
             foreach($chunk_list as $key => $val) {
                 // 基础结果 
                 $this->db_easyA->table('cwl_duanmalv_table6_winter')->strict(false)->insertAll($val);
+                $this->db_bi->table('ww_duanmalv_table6_winter')->strict(false)->insertAll($val);
             }
             $this->db_easyA->table('cwl_duanmalv_config')->where('id=2')->strict(false)->update([
                 'table6_updatetime' => date('Y-m-d H:i:s')
