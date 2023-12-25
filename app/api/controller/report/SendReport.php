@@ -2393,7 +2393,7 @@ class SendReport extends BaseController
         return json($res);
     }
 
-    // 国庆报表
+    // 节日报表
     public function festival_data()
     {
         $date = input('date') ? input('date') : date('Y-m-d', time());
@@ -2403,7 +2403,7 @@ class SendReport extends BaseController
         echo http_get($url);
     }   
 
-    // 国庆报表
+    // 节日报表
     public function run_festival()
     {
         $date = input('date') ? input('date') : date('Y-m-d', time());

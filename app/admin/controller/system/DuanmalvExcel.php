@@ -352,7 +352,6 @@ class DuanmalvExcel extends AdminController
                     sk.一级分类,
                     sk.二级分类,
                     sk.分类,
-                    sk.领型,
                     sk.风格,
                     sk.货号,
                     sk.`预计00/28/37/44/100/160/S`,
@@ -385,11 +384,10 @@ class DuanmalvExcel extends AdminController
                 WHERE 1
                     AND sk.`一级分类` = h.`一级分类` 
                     AND sk.`二级分类` = h.`二级分类` 
-                    AND sk.领型 = h.领型 
                     AND sk.风格 = h.风格 
                     {$map}
                 ORDER BY 
-                    sk.云仓, sk.`商品负责人` desc, sk.店铺名称, sk.风格, sk.季节, sk.一级分类, sk.二级分类, sk.分类, sk.领型
+                    sk.云仓, sk.`商品负责人` desc, sk.店铺名称, sk.风格, sk.季节, sk.一级分类, sk.二级分类, sk.分类
             ";
             $select = $this->db_easyA->query($sql);
             $header = [];
