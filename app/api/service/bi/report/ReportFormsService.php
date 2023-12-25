@@ -4767,13 +4767,13 @@ class ReportFormsService
                 concat(round(前年累计增长 * 100, 1), '%') AS 前年累计增长,
                 concat(round(去年累计增长 * 100, 1), '%') AS 去年累计增长,
                 case
-                    when 销售金额2021 !=0 then round(销售金额2021, 1) else ''
+                    when 销售金额前年 !=0 then round(销售金额前年, 1) else ''
                 end as 前年同日销额,
                 case
-                    when 销售金额2022 !=0 then round(销售金额2022, 1) else ''
+                    when 销售金额去年 !=0 then round(销售金额去年, 1) else ''
                 end as 去年同日销额,
                 case
-                    when 销售金额2023 !=0 then round(销售金额2023, 1) else ''
+                    when 销售金额今年 !=0 then round(销售金额今年, 1) else ''
                 end as 今日销额,
                 round(前年累销额, 1) as 前年累销额,
                 round(去年累销额, 1) as 去年累销额,
@@ -4782,7 +4782,7 @@ class ReportFormsService
             WHERE 
                 节日天数='{$fday}' 
                 AND 经营属性='{$type}' 
-                AND (`销售金额2022` > 0 OR `首单日期` <= '{$year2022}')
+                AND (`销售金额去年` > 0 OR `首单日期` <= '{$year2022}')
             order by 省份 DESC
         ";
 
@@ -4824,7 +4824,8 @@ class ReportFormsService
                 'table_header' => $table_header,
                 'field_width' => $field_width,
                 'banben' => '          编号: ' . $code ,
-                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+                // 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+                'file_path' => "./img/" . date('Ymd', strtotime($date)) . '/'  //文件保存路径
             ];
     
             // 生成图片
@@ -4872,26 +4873,26 @@ class ReportFormsService
         $sql = "
             select 
                 省份,经营属性 as 性质,
-                concat(round(去年日增长 * 100, 1), '%') AS `23(22老店)".PHP_EOL."日增长`,
-                concat(round(前年日增长 * 100, 1), '%') AS `23(21老店)".PHP_EOL."日增长`,
-                concat(round(去年累计增长 * 100, 1), '%') AS `23(22老店)".PHP_EOL."累计增长`,
-                concat(round(前年累计增长 * 100, 1), '%') AS `23(21老店)".PHP_EOL."累计增长`,
+                concat(round(去年日增长 * 100, 1), '%') AS `24(23老店)".PHP_EOL."日增长`,
+                concat(round(前年日增长 * 100, 1), '%') AS `24(22老店)".PHP_EOL."日增长`,
+                concat(round(去年累计增长 * 100, 1), '%') AS `24(23老店)".PHP_EOL."累计增长`,
+                concat(round(前年累计增长 * 100, 1), '%') AS `24(22老店)".PHP_EOL."累计增长`,
 
-                round(今日销额同比去年, 1) as `23(22老店)".PHP_EOL."同日销额`,
-                round(去年同日销额, 1) as `22老店".PHP_EOL."同日销额`,
+                round(今日销额同比去年, 1) as `24(23老店)".PHP_EOL."同日销额`,
+                round(去年同日销额, 1) as `23老店".PHP_EOL."同日销额`,
 
-                round(今日销额同比前年, 1) as `23(21老店)".PHP_EOL."同日销额`,
+                round(今日销额同比前年, 1) as `24(22老店)".PHP_EOL."同日销额`,
                 case
                     when 前年同日销额 > 0 then round(前年同日销额, 1) else ''
-                end as `21老店".PHP_EOL."同日销额`,
+                end as `22老店".PHP_EOL."同日销额`,
                
 
 
-                round(今年累销额同比去年, 1) as `23(22老店)".PHP_EOL."假期累销额`,
-                round(去年累销额, 1) as `22老店".PHP_EOL."假期累销额`,
+                round(今年累销额同比去年, 1) as `24(23老店)".PHP_EOL."假期累销额`,
+                round(去年累销额, 1) as `23老店".PHP_EOL."假期累销额`,
 
-                round(今年累销额同比前年, 1) as `23(21老店)".PHP_EOL."假期累销额`,
-                round(前年累销额, 1) as `21老店".PHP_EOL."假期累销额`
+                round(今年累销额同比前年, 1) as `24(22老店)".PHP_EOL."假期累销额`,
+                round(前年累销额, 1) as `22老店".PHP_EOL."假期累销额`
 
 
                   
@@ -4939,16 +4940,17 @@ class ReportFormsService
                 'table_header' => $table_header,
                 'field_width' => $field_width,
                 'banben' => '        编号: ' . $code ,
-                'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+                // 'file_path' => "./img/" . date('Ymd', strtotime('+1day')) . '/'  //文件保存路径
+                'file_path' => "./img/" . date('Ymd', strtotime($date)) . '/'  //文件保存路径
             ];
     
             // 生成图片
             // return $this->create_image($params);
             return $this->create_image_festival($params, [
-                '23(22老店)'.PHP_EOL.'日增长' => 3,
-                '23(21老店)'.PHP_EOL.'日增长' => 4,
-                '23(22老店)'.PHP_EOL.'累计增长' => 5,
-                '23(21老店)'.PHP_EOL.'累计增长' => 6,
+                '24(23老店)'.PHP_EOL.'日增长' => 3,
+                '24(22老店)'.PHP_EOL.'日增长' => 4,
+                '24(23老店)'.PHP_EOL.'累计增长' => 5,
+                '24(22老店)'.PHP_EOL.'累计增长' => 6,
             ]);
         } else {
             return false;

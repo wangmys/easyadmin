@@ -2355,7 +2355,7 @@ class SendReport extends BaseController
     }
 
 
-    public function send_festival()
+    public function send_festival($date)
     {
         $name = '\app\api\service\DingdingService';
         $model = new $name;
@@ -2363,17 +2363,17 @@ class SendReport extends BaseController
             'S115Ajm' => [
                 'title' => '加盟老店【元旦假期】业绩同比 表号:S115A',
                 // 'title' => '测试S108A',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Ajm.jpg?v=" . time()
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime($date))."/S115Ajm.jpg?v=" . time()
             ],
             'S115Azy' => [
                 'title' => '直营老店【元旦假期】业绩同比 表号:S115A',
                 // 'title' => '测试S108B',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115Azy.jpg?v=" . time()
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime($date))."/S115Azy.jpg?v=" . time()
             ],
             'S115B' => [
                 'title' => '省份老店【元旦假期】业绩同比 表号:S115B',
                 // 'title' => '测试S109',
-                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime('+1day'))."/S115B.jpg?v=" . time()
+                'jpg_url' => $this->request->domain()."/img/".date('Ymd',strtotime($date))."/S115B.jpg?v=" . time()
             ],
         ];
 
@@ -2394,18 +2394,28 @@ class SendReport extends BaseController
     }
 
     // 国庆报表
-    public function run_festival10()
+    public function festival_data()
     {
         $date = input('date') ? input('date') : date('Y-m-d', time());
-        $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1";
-        http_get($url);
+        $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1?date=" . $date;
+        // $url = "http://www.easyadmin1.com/api/lufei.Festival/duanwu_data_handle1?date=" . $date;
+        // http_get($url);
+        echo http_get($url);
+    }   
+
+    // 国庆报表
+    public function run_festival()
+    {
+        $date = input('date') ? input('date') : date('Y-m-d', time());
+        // $url = "http://im.babiboy.com/api/lufei.Festival/duanwu_data_handle1";
+        // http_get($url);
 
         $this->service->create_table_s115A('直营', $date);
         $this->service->create_table_s115A('加盟', $date);
         $this->service->create_table_s115B($date);
 
         // 发送数据报表
-        $this->send_festival();
+        $this->send_festival($date);
     }
 
 
