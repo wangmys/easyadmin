@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>最终铺货数据</title>
+    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
+    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
+    <style>
+        body {
+            overflow: hidden;
+        }
+        xm-select{
+            min-height: 32px;
+        }
+        .layui-table-cell {
+            font-size: 12px;
+            padding: 0 5px;
+            height: auto;
+            /*text-align: left;*/
+        }
+
+        .ok-form {
+            margin-top: 5px;
+        }
+
+        .layui-btn+.layui-btn {
+            margin-left: 3px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 0px;
+            height: 30px;
+        }
+
+        .layui-input,
+        .layui-select,
+        .layui-textarea {
+            height: 32px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            height: 32px;
+            line-height: 15px;
+        }
+
+        .layui-form-select dl dd,
+        .layui-form-select dl dt {
+            line-height: 32px;
+        }
+
+        .layui-form-select dl {
+            padding: 0px 0;
+        }
+
+        .layui-table th {
+            font-weight: bolder;
+        }
+
+        .layui-form-pane .layui-form-label {
+            text-align: right;
+        }
+
+        .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            background-color: #ffcc00;
+            color: #666
+        }
+
+        .layui-colorpicker {
+            width: 30px;
+            height: 10px;
+            line-height: 30px;
+            padding: 0px;
+        }
+
+
+        .layui-table-cell{
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+        }
+        /* .layui-unselect .layui-form-select {
+            width: 80px !important;
+        }  */
+        .layui-col-md1 {
+            width: 11.333% !important;
+        }
+        .layui-form-label {
+            width: 130px !important;
+        }
+
+        .layui-input-inline {
+            width: 40px;
+        }
+
+
+        .layui-table-box .layui-table-header th {
+            height: 39px;
+            line-height: 12px;
+        }
+        .layui-table-box .layui-table-header th .layui-table-cell{
+            height: 32px;
+            line-height: 12px;
+            word-break: break-all;
+            white-space: normal;
+        }
+        .layui-table-view .layui-table td, .layui-table-view .layui-table th{
+            padding: 2px 0;
+            border-top: none;
+            border-left: none;
+        }
+
+    </style>
+</head>
+
+<body class="" style="background-color: #ffffff;">
+<div class="layui-tab-item layui-show">
+    <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+        <form class="layui-form layui-form-pane ok-form layui-col-space8">
+            <div class="flex row end between">
+                <div class="flex col between al-start" style="width:80%; height: 36px;">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">云仓</label>
+                        <div class="layui-input-inline" style="width: 90px !important;">
+                            <div id="xm-WarehouseName" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">大类选择</label>
+                        <div class="layui-input-inline" style="width: 80px !important;">
+                            <div id="xm-CategoryName1" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">店铺名称</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-CustomerName" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">货号</label>
+                        <div class="layui-input-inline" style="width: 130px !important;">
+                            <div id="xm-GoodsNo" class="xm-select-demo"></div>
+                        </div>
+                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">商品专员</label>
+                        <div class="layui-input-inline" style="width: 100px !important;">
+                            <div id="xm-CustomItem17" class="xm-select-demo"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex row" style="width:24%; height: 40px;">
+                    <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                    </button>
+
+                    <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="mapBtndd"
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 15px;height: 30px;
+                        line-height: 30px;
+                        padding: 0 10px;
+                        font-size: 12px;">导单转换
+                    </button>
+
+                    <button1 class="layui-btn layui-btn-sm1 mapBtnex"
+                             style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 15px;height: 30px;
+                        line-height: 30px;
+                        padding: 0 10px;
+                        font-size: 12px;">excel转换
+                    </button1>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
+    <table class="layui-hide" id="table" lay-filter="table">
+        <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
+    </table>
+    <div id="page"></div>
+</div>
+<button id="import_excel" style="display:none;">【导入】excel转换表</button>
+</body>
+
+</html>
+<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
+<script src="__STATIC__/plugs/lay-module/xmSelect/xm-select.js" charset="utf-8"></script>
+<script src="__STATIC__/plugs/require-2.3.6/require.js?v={$version}" charset="utf-8"></script>
+
+<script>
+    watermark({ "watermark_txt": '南昌索歌服饰' });
+
+    layui.use(['form', 'jquery', 'layer', 'table', 'laydate', 'laypage', 'upload'], function () {
+        let form = layui.form
+            , $ = layui.$
+            , layer = layui.layer
+            , table = layui.table
+            , laydate = layui.laydate
+            , laypage = layui.laypage
+            , upload = layui.upload
+            , url_import = "{:url('admin/system.puhuo.Revise/import_excel')}"
+            , url1 = "{:url('admin/system.puhuo.Revise/index')}"
+            , url_getXmMapSelect = "{:url('admin/system.puhuo.Revise/getXmMapSelect')}"
+
+        initFn();
+        startTable();
+
+        function initFn() {
+            $.get(url_getXmMapSelect, {}, function(res) {
+
+                //云仓
+                xmSelect.render({
+                    el: '#xm-WarehouseName',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'WarehouseName',
+                    data: res.data.WarehouseName
+                })
+                //大类选择
+                xmSelect.render({
+                    el: '#xm-CategoryName1',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'CategoryName1',
+                    data: res.data.CategoryName1
+                })
+                //店铺名称
+                xmSelect.render({
+                    el: '#xm-CustomerName',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'CustomerName',
+                    data: res.data.CustomerName
+                })
+                //货号
+                xmSelect.render({
+                    el: '#xm-GoodsNo',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'GoodsNo',
+                    data: res.data.GoodsNo
+                })
+
+                //货号
+                xmSelect.render({
+                    el: '#xm-CustomItem17',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'CustomItem17',
+                    data: res.data.CustomItem17
+                })
+
+            }, 'json')
+        }
+
+        //监听保存
+        form.on('submit(mapBtn)', function (data) {
+            table.reload('table', {
+                where: data.field
+                , method: 'post'
+                , url: url1
+                , loading: true
+                , page: true
+                , limit: data.field.limit
+            })
+
+            return false;
+        });
+
+        //导单转换
+        form.on('submit(mapBtndd)', function (data) {
+
+            if (data.field.is_puhuo != '可铺') {
+                layer.confirm('只转换可铺数据，请确认',{},function () {
+
+                    layer.closeAll()
+
+                    $.post(url2, data.field, function(res) {
+                        // console.log(res);
+                        if (res.status == 1) {
+                            location.href = url2 + '?code=' + res.code
+                            alert('数据有点多，请耐心等待');
+                        } else {
+                            alert(res.msg);
+                        }
+                    })
+                    // return false;
+
+                })
+            } else {
+
+                $.post(url2, data.field, function(res) {
+                    // console.log(res);
+                    if (res.status == 1) {
+                        location.href = url2 + '?code=' + res.code
+                        alert('数据有点多，请耐心等待');
+                    } else {
+                        alert(res.msg);
+                    }
+                })
+
+            }
+            return false;
+
+        });
+
+        //excel转换
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#import_excel'
+            ,url: url_import //此处配置你自己的上传接口即可
+            ,accept: 'file' //普通文件
+            ,before: function (obj) {
+                // console.log(obj);
+                //开始加载效果
+                layui.use('layer', function () {
+                    layui.layer.load();
+                    //console.log(Lodingindex) opacity
+                    $(".layui-layer-shade").css('background', '#000000')
+                    $(".layui-layer-shade").css('opacity', '0.2')
+                    $(".layui-layer-shade").click(function (event) {
+                        event.stopPropagation();
+                    })
+                })
+            }
+            ,error: function() {
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+            }
+            ,done: function(res) {
+                console.log('res:....', res);
+                //上传成功结束加载效果
+                layui.use('layer', function () {
+                    setTimeout(function () {
+                        layui.layer.closeAll();
+                    }, 2000);
+                });
+                if (res.code != 0) {
+                    alert('上传失败！' + res.msg);
+                } else {
+                    location.href = url_import + '?excel_url=' + res.data;
+                    alert('数据有点多，请耐心等待');
+                    // window.location.reload();//重新刷新页面
+                }
+            }
+        });
+
+        //导入操作
+        $('body').on('click', '.mapBtnex', function () {
+            $('#import_excel').click();
+        });
+
+
+        function startTable() {
+            table.render({
+                elem: '#table'
+                ,url: url1
+                , loading: true
+                , method: 'post'
+                , page: true
+                , limit: 1000
+                , limits: [1000, 5000, 10000, 20000]
+                , height: 780
+                , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [
+                    [
+                        {type: "checkbox",fixed:'left'},
+                        { field: 'TimeCategoryName2', title: '季节', align: 'center', fixed:'left', width: 35}
+                        , { field: 'CategoryName1', title: '一级分类', align: 'center', fixed:'left', width: 55}
+                        , { field: 'CategoryName2', title: '二级分类', align: 'center', width: 55}
+                        , { field: 'CategoryName', title: '分类', align: 'center', width: 75}
+                        , { field: 'Lingxing', title: '领型', align: 'center', width: 35}
+                        , { field: 'ColorDesc', title: '颜色', align: 'center', width: 35}
+                        , { field: 'UnitPrice', title: '零售价', align: 'center', width: 45}
+                        , { field: 'GoodsNo', title: '货号', align: 'center', width: 70}
+                        , { field: 'StyleCategoryName2', title: '货品等级', align: 'center', width: 55}
+                        , { field: 'StyleCategoryName', title: '风格', align: 'center', width: 45}
+                        //  ,{field: 'img', width: 80, title: '图片', search: false, templet: table.image,imageHeight:30,merge: true}
+                        //  ,{field: 'img', width: 80, title: '图片', search: false, templet: '<div><img src="{}"/></div>',imageHeight:30,merge: true}
+                        , { field: 'CustomItem17', title: '商品专员', align: 'center', width: 50}
+                        , { field: 'State', title: '省份', align: 'center', width: 35}
+                        , { field: 'CustomerName', title: '店铺名称', align: 'center', width: 70}
+                        , { field: 'Mathod', title: '经营模式', align: 'center', width: 55}
+                        , { field: 'CustomerGrade', title: '店铺等级', align: 'center', width: 55}
+                        , { field: 'StoreArea', title: '店铺面积', align: 'center', width: 55}
+                        , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
+                        //  , { field: 'StyleCategoryName1', title: '一级风格', align: 'center', width: 55}
+                        , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
+                        , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50}
+                        , { field: 'Stock_29_puhuo', title: '29/46/38/M', align: 'center', width: 50}
+                        , { field: 'Stock_30_puhuo', title: '30/48/39/L', align: 'center', width: 50}
+                        , { field: 'Stock_31_puhuo', title: '31/50/40/XL', align: 'center', width: 50}
+                        , { field: 'Stock_32_puhuo', title: '32/52/41/2XL', align: 'center', width: 50}
+                        , { field: 'Stock_33_puhuo', title: '33/54/42/3XL', align: 'center', width: 50}
+                        , { field: 'Stock_34_puhuo', title: '34/56/43/4XL', align: 'center', width: 50}
+                        , { field: 'Stock_35_puhuo', title: '35/58/44/5XL', align: 'center', width: 50}
+                        , { field: 'Stock_36_puhuo', title: '36/6XL', align: 'center', width: 35}
+                        , { field: 'Stock_38_puhuo', title: '38/7XL', align: 'center', width: 35}
+                        , { field: 'Stock_40_puhuo', title: '40/8XL', align: 'center', width: 35}
+                        , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30}
+                        , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30}
+                        , { field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40}
+                    ],
+
+                ]
+                ,done: function (res, curr, count) {
+                    $('#hid_count').val(res.count);
+
+                    var data = res.data;
+                    $.each(data, function(index, value){
+                        if (value.is_total == 1) {
+
+                            if (value.CustomerName == '余量') {
+                                $('tr[data-index="'+index+'"]').css({
+                                    'background-color': 'rgb(225, 225, 0)', 'color': '#000', 'font-weight':'bold'
+                                });
+                            } else {
+                                $('tr[data-index="'+index+'"]').css({
+                                    'background-color': 'rgb(110, 170, 46)', 'color': '#000', 'font-weight':'bold'
+                                });
+                            }
+
+                        }
+                    });
+
+
+
+                }
+            });
+        }
+    });
+
+</script>
