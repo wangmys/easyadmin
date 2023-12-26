@@ -90,16 +90,17 @@ class ExcelhandleService
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
+                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
                     if ($total <= $yk_con * $cus_num) {
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
-                        $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $clothesPantsArr['uuid'] =$shoper. $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
                         $numArr[$item['CustomItem17']]++;
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
-                        $clothesPantsArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $clothesPantsArr['uuid'] = $shoper . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $clothesPantsArr;
                     }
 
@@ -115,17 +116,19 @@ class ExcelhandleService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
+                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+
                     if ($no != 0) {
                         $shoesArr = $s_v;
                         $shoesArr['sort'] = $no;
-                        $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($no, 3, '0', STR_PAD_LEFT);
+                        $shoesArr['uuid'] = $shoper . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($no, 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $shoesArr;
                     } else {
                         $numArr[$item['CustomItem17']]++;
                         $no = $numArr[$item['CustomItem17']];
                         $shoesArr = $s_v;
                         $shoesArr['sort'] = $numArr[$item['CustomItem17']];
-                        $shoesArr['uuid'] = $config['商品负责人'][$item['CustomItem17']] . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $shoesArr['uuid'] = $shoper. $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $shoesArr;
 
                     }
