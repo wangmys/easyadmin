@@ -124,7 +124,7 @@ class PuhuoService
 
         }
         // print_r([$pageLimit, $page]);die;
-        
+
         $data = [
             'count' => $list ? $list['total'] : 0,
             'data'  => $list ? $list['data'] : 0,
@@ -229,7 +229,7 @@ class PuhuoService
 
         }
         // print_r([$pageLimit, $page]);die;
-        
+
         $data = [
             'count' => $list ? $list['total'] : 0,
             'data'  => $list ? $list['data'] : 0,
@@ -333,7 +333,7 @@ class PuhuoService
                 $list = $list ? $list->toArray() : [];
 
         }
-        
+
         $data = [
             'count' => $list ? $list['total'] : 0,
             'data'  => $list ? $list['data'] : 0,
@@ -453,7 +453,7 @@ class PuhuoService
                 $list = $list ? $list->toArray() : [];
 
         }
-        
+
         $data = [
             'count' => $list ? $list['total'] : 0,
             'data'  => $list ? $list['data'] : 0,
@@ -462,7 +462,7 @@ class PuhuoService
 
     }
 
-    public function change_caogao_status($res_data) { 
+    public function change_caogao_status($res_data) {
 
         if ($res_data) {
             $chunk_list = array_chunk($res_data, 500);
@@ -528,8 +528,8 @@ class PuhuoService
         if ($CategoryName1) {
             $where_store[] = ['lpwg.CategoryName1', 'in', $CategoryName1];
         }
-        $wait_goods_model = new SpLypPuhuoWaitGoodsModel;      
-        $customer_sort_model = new SpLypPuhuoCustomerSortModel;      
+        $wait_goods_model = new SpLypPuhuoWaitGoodsModel;
+        $customer_sort_model = new SpLypPuhuoCustomerSortModel;
         $where1 = array_merge($where, [['lpwg.CategoryName1', '=', '内搭']]);
         $where2 = array_merge($where, [['lpwg.CategoryName1', '=', '外套']]);
         $where3 = array_merge($where, [['lpwg.CategoryName1', '=', '下装']]);
@@ -821,7 +821,7 @@ class PuhuoService
                             }
                         }
                         $v_res['Selecttype_str'] = '多省';
-                        break;    
+                        break;
 
                     case 3: //商品专员
                         if ($select_list['goods_manager_list']) {
@@ -833,7 +833,7 @@ class PuhuoService
                             }
                         }
                         $v_res['Selecttype_str'] = '商品专员';
-                        break;        
+                        break;
 
                     case 4: //经营模式
                         if ($select_list['mathod_list']) {
@@ -845,7 +845,7 @@ class PuhuoService
                             }
                         }
                         $v_res['Selecttype_str'] = '经营模式';
-                        break;    
+                        break;
                     default:
                     $v_res['Selecttype_str'] = '';
                     break;
@@ -909,7 +909,7 @@ class PuhuoService
                         }
                         $v_res['Selecttype_str'] = '单店';
                         $v_res['Commonfield'] = $v_res['Commonfield'] ? implode(' ', explode(',', $v_res['Commonfield'])) : '';
-                        break;    
+                        break;
 
                     default:
                     $v_res['Selecttype_str'] = '';
@@ -1069,9 +1069,9 @@ class PuhuoService
         if ($post['id']) {
 
             $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
-            
+
         } else {
-            
+
             $exist_goods = $ZdyYuncangGoodsModel::where([['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
 
         }
@@ -1106,9 +1106,9 @@ class PuhuoService
         if ($post['id']) {
 
             $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
-            
+
         } else {
-            
+
             $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
 
         }
@@ -1154,7 +1154,7 @@ class PuhuoService
         Db::startTrans();
         try {
             if ($id) {//修改
-                
+
                 SpLypPuhuoZdySetModel::where([['id', '=', $id]])->update($add_data);
                 $ZdyYuncangGoodsModel::where([['set_id', '=', $id]])->delete();
 
@@ -1269,7 +1269,7 @@ class PuhuoService
         Db::startTrans();
         try {
             if ($id) {//修改
-                
+
                 SpLypPuhuoZdySet2Model::where([['id', '=', $id]])->update($add_data);
                 $ZdyYuncangGoodsModel::where([['set_id', '=', $id]])->delete();
 
@@ -1459,13 +1459,13 @@ class PuhuoService
         $res_end_data = $res_end_data ? $res_end_data->toArray() : [];
         if (!$res_end_data) {
             return json(["code" => "400", "msg" => "请选择可铺数据保存", "data" => []]);
-        } 
+        }
         if ($res_end_data) {
             foreach ($res_end_data as &$v_end_data) {
                 unset($v_end_data['create_time']);
             }
         }
-        
+
         $chunk_list = array_chunk($res_end_data, 500);
         foreach($chunk_list as $key => $val) {
             $uuid_arr = array_column($val, 'uuid');
@@ -1474,6 +1474,32 @@ class PuhuoService
         }
 
         return json(["code" => "200", "msg" => "保存成功", "data" => []]);
+
+    }
+
+    /**
+     *保存修订
+     * @return void
+     */
+    public function revise()
+    {
+
+        try {
+            $where = [
+                ['Stock_Quantity_puhuo', '>', 0],
+                ['admin_id', '=', session('admin.id')],
+            ];
+            $list = SpLypPuhuoEndDataModel::where($where)->field('*')->select()->toArray();
+
+            $this->easy_db->table('sp_lyp_puhuo_end_data_revise')->where('admin_id', session('admin.id'))->delete();
+            $chunk_list = array_chunk($list, 500);
+            foreach ($chunk_list as $key => $val) {
+                $insert = $this->easy_db->table('sp_lyp_puhuo_end_data_revise')->strict(false)->insertAll($val);
+            }
+        } catch (\Exception $e) {
+            dd($e);
+        }
+
 
     }
 

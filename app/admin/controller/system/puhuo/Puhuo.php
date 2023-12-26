@@ -560,5 +560,16 @@ class Puhuo extends AdminController
 
     }
 
+    /**
+     * @return void
+     * @NodeAnotation(title="保存修订")
+     */
+    public function save_revise(){
+
+        $this->service->revise();
+
+        $this->success('okkk');
+    }
+
 
 }

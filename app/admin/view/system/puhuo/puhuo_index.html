@@ -207,6 +207,9 @@
       <span class="layui-badge">店铺数：<b id="store_num">{$store_num}</b></span>
 
       <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao" style="margin: 0px 0px 0px 100px;" lay-event="save_caogao"><b style="color:red;">保存草稿</b></button>
+      <button class="layui-btn layui-btn-sm save_revise" style="margin: 0px 0px 0px 20px;background-color: #6faa2f " lay-event="save_revise">
+          <b style="color:#fff;">保存到修订</b>
+      </button>
 
       <!-- <button class="layui-btn layui-btn-sm zhouxiao" lay-event="delete">周销</button>
       <button class="layui-btn layui-btn-sm yujiskc" lay-event="update">预计在途skc</button>
@@ -231,6 +234,7 @@
             , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan')}" 
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelect')}"
             , url_save_caogao = "{:url('admin/system.puhuo.Puhuo/save_caogao')}"
+            , url_save_revise = "{:url('admin/system.puhuo.Puhuo/save_revise')}"
 
         initFn();
         startTable();
@@ -575,6 +579,21 @@
                             }
                         })
                         return false; 
+
+                    });
+
+                    //保存修订
+                    $('.save_revise').click(function() {
+
+                        $.post(url_save_revise, {}, function(res) {
+                            //console.log(res);
+                            if (res.code == 200) {
+                                alert('保存成功');
+                            } else {
+                                alert(res.msg);
+                            }
+                        })
+                        return false;
 
                     });
 
