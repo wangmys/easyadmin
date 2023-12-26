@@ -182,7 +182,7 @@ class Festival extends BaseController
                         EBC.Mathod	
                     ORDER BY EC.State ASC
                 ";
-      
+    
                 
                 $select = $this->db_sqlsrv->query($sql);
                 // dump($select);die;
@@ -202,7 +202,7 @@ class Festival extends BaseController
         
                 }   
                 
-                // 2021年特殊处理
+                // 去年特殊处理  补丁
                 if ($v['年份'] == '前年') {
                     $sql_特殊店铺 = "         
                         SELECT
@@ -231,30 +231,16 @@ class Festival extends BaseController
                             AND ER.RetailDate < DATEADD( DAY, +1, '{$v['节日日期']}' ) 
                             AND ER.CodingCodeText = '已审结'
                             AND EC.CustomerName NOT LIKE '%内购%'
-                            AND ER.CustomerName IN ('丰顺一店'
-                                                    ,'兴宁一店'
-                                                    ,'厚街一店'
-                                                    ,'塘厦一店'
-                                                    ,'太和一店'
-                                                    ,'开平一店'
-                                                    ,'德庆一店'
-                                                    ,'惠东一店'
-                                                    ,'水口一店'
-                                                    ,'河源一店'
-                                                    ,'河源二店'
-                                                    ,'英德一店'
-                                                    ,'西乡一店'
-                                                    ,'樵岭一店 '
-                                                    ,'阳春一店'
-                                                    ,'顺德一店'
-                                                    ,'龙岗一店'
-                                                    ,'龙川一店') 
+                            AND ER.CustomerName IN ('丰顺一店', '兴宁一店', '厚街一店', '塘厦一店', '太和一店', '开平一店', '德庆一店', '惠东一店', '水口一店', '河源一店'
+                                                    ,'河源二店', '英德一店' ,'西乡一店' ,'樵岭一店','阳春一店','顺德一店','龙岗一店', '龙川一店'
+                                                    ,'大石二店', '蕉岭一店', '罗定一店', '狮岭一店', '塘厦二店', '西樵一店', '阳春二店') 
                         GROUP BY 
                             ER.CustomerName,
                             EC.State,
                             EBC.Mathod	
                         ORDER BY EC.State ASC
                     ";
+
                     $select_特殊 = $this->db_sqlsrv->query($sql_特殊店铺);
             
                     if ($select_特殊) {
