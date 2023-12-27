@@ -177,15 +177,17 @@
     </table>
     <div id="page"></div>
 </div>
-<button id="import_excel" style="display:none;">【导入】excel转换表</button>
 </body>
 
 </html>
-<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-bg-orange set" style="margin: 0px 0px 0px 0px;"><b style="color:#0152ff;">操作</b></button>
+    </div>
+</script>
+<!--<script src="__STATIC__/ok/lib/layui/layui.js"></script>-->
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script src="__STATIC__/plugs/lay-module/xmSelect/xm-select.js" charset="utf-8"></script>
-<script src="__STATIC__/plugs/require-2.3.6/require.js?v={$version}" charset="utf-8"></script>
-
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
 
@@ -200,6 +202,7 @@
             , url_import = "{:url('admin/system.puhuo.Revise/import_excel')}"
             , url1 = "{:url('admin/system.puhuo.Revise/index')}"
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Revise/getXmMapSelect')}"
+            , url_set = "{:url('admin/system.puhuo.Revise/set')}"
 
         initFn();
         startTable();
@@ -276,11 +279,6 @@
         form.on('submit(mapBtn)', function (data) {
             table.reload('table', {
                 where: data.field
-                , method: 'post'
-                , url: url1
-                , loading: true
-                , page: true
-                , limit: data.field.limit
             })
 
             return false;
@@ -323,55 +321,15 @@
 
         });
 
-        //excel转换
-        //指定允许上传的文件类型
-        upload.render({
-            elem: '#import_excel'
-            ,url: url_import //此处配置你自己的上传接口即可
-            ,accept: 'file' //普通文件
-            ,before: function (obj) {
-                // console.log(obj);
-                //开始加载效果
-                layui.use('layer', function () {
-                    layui.layer.load();
-                    //console.log(Lodingindex) opacity
-                    $(".layui-layer-shade").css('background', '#000000')
-                    $(".layui-layer-shade").css('opacity', '0.2')
-                    $(".layui-layer-shade").click(function (event) {
-                        event.stopPropagation();
-                    })
-                })
-            }
-            ,error: function() {
-                //上传成功结束加载效果
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 2000);
-                });
-            }
-            ,done: function(res) {
-                console.log('res:....', res);
-                //上传成功结束加载效果
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 2000);
-                });
-                if (res.code != 0) {
-                    alert('上传失败！' + res.msg);
-                } else {
-                    location.href = url_import + '?excel_url=' + res.data;
-                    alert('数据有点多，请耐心等待');
-                    // window.location.reload();//重新刷新页面
-                }
-            }
-        });
-
-        //导入操作
-        $('body').on('click', '.mapBtnex', function () {
-            $('#import_excel').click();
-        });
+        $(document).on('click', '.set', function(data){
+            console.log('set')
+            layer.open({
+                title: '操作'
+                ,type: 2
+                ,area: ['40%', '80%'] // 100%全屏
+                ,content: url_set
+            });
+        })
 
 
         function startTable() {
@@ -380,6 +338,7 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
+                , toolbar: '#toolbar1'
                 , page: true
                 , limit: 1000
                 , limits: [1000, 5000, 10000, 20000]

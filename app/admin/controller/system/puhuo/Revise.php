@@ -81,12 +81,44 @@ class Revise extends AdminController
     }
 
 
+    /**
+     * @return \think\response\Json
+     * @NodeAnotation(title="XM",auth=false)
+     */
     public function getXmMapSelect(){
 
 
         return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
 
     }
+
+
+    /**
+     * @return mixed
+     * @NodeAnotation(title="设置页面",auth=false)
+     */
+    public function set(){
+
+        return $this->fetch();
+
+    }
+
+
+    /**
+     * @return void
+     * @NodeAnotation(title="保存",auth=false)
+     */
+    public function set_revise(){
+
+        $param = $this->request->param();
+
+        $this->service->set_revise($param);
+
+        $this->success('ok');
+
+    }
+
+
 
 
 }
