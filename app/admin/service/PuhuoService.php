@@ -1578,12 +1578,32 @@ class PuhuoService
             }
             foreach ($list as &$item) {
                 if ($item['CustomerName'] == '余量') {
+
+                    // 1. 方案
+//                    $yunc = $this->easy_db->table('sp_lyp_puhuo_yuncangkeyong')
+//                        ->where(['GoodsNo' => $item['GoodsNo'], 'WarehouseName' => $item['WarehouseName'], 'admin_id' => $item['admin_id']])->find();
+//                    $item['Stock_00_puhuo'] = $yunc['Stock_00'];
+//                    $item['Stock_29_puhuo'] = $yunc['Stock_29'];
+//                    $item['Stock_30_puhuo'] = $yunc['Stock_30'];
+//                    $item['Stock_31_puhuo'] = $yunc['Stock_31'];
+//                    $item['Stock_32_puhuo'] = $yunc['Stock_32'];
+//                    $item['Stock_33_puhuo'] = $yunc['Stock_33'];
+//                    $item['Stock_34_puhuo'] = $yunc['Stock_34'];
+//                    $item['Stock_35_puhuo'] = $yunc['Stock_35'];
+//                    $item['Stock_36_puhuo'] = $yunc['Stock_36'];
+//                    $item['Stock_38_puhuo'] = $yunc['Stock_38'];
+//                    $item['Stock_40_puhuo'] = $yunc['Stock_40'];
+//                    $item['Stock_42_puhuo'] = $yunc['Stock_42'];
+//                    $item['Stock_Quantity_puhuo'] = $yunc['Stock_Quantity'] - ($yunc['Stock_Quantity_puhuo']- $item['Stock_Quantity_puhuo']);
+
+                    //2. 方案
                     $Stock_Quantity_puhuo = 0;
                     $configYl = $yuiliu[$item['WarehouseName']];
                     foreach ($item as $son => $son_v) {
                         if (in_array($son, array_keys($configYl))) {
                             $x = -($stock[$item['WarehouseName'] . $item['GoodsNo']][$son] / ($configYl[$son] / 100 - 1));
                             $x = (int)round($x, 0);
+                            $x = $x - ($stock[$item['WarehouseName'] . $item['GoodsNo']][$son] - $item[$son]);
                             $Stock_Quantity_puhuo += $x - $item[$son];
                             $item[$son] = $x;
                         }
