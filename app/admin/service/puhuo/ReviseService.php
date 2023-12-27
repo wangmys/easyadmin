@@ -141,4 +141,158 @@ class ReviseService
     }
 
 
+    public function order_no($where = [])
+    {
+
+        $config = $this->mysql->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['特殊店铺'] = array_column(json_decode($config['特殊店铺'], true), null, 'CustomerName');
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
+
+        $data = [];
+        $exDb = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)->where('admin_id', session('admin.id'))->select()->toArray();
+
+        $CustomersKV = [];
+        foreach ($exDb as $item) {
+            $aa = [
+                'WarehouseName' => $item['WarehouseName'],
+                'WarehouseCode' => $item['WarehouseCode'],
+                'CustomerName' => $item['CustomerName'],
+                'CustomItem17' => $item['CustomItem17'],
+            ];
+            $CustomersKV[$item['WarehouseName'] . '_' . $item['CustomerName']] = $aa;
+        }
+//        $CustomersKV = array_column($exDb, null, 'CustomerName');
+//        $Customers = array_values(array_unique(array_column($exDb, 'CustomerName')));
+//        $Customers = ['安康一店', '阿拉尔一店'];
+        $CustomItem17Arr = array_values(array_unique(array_column($exDb, 'CustomItem17')));
+
+        $numArr = [];
+        foreach ($CustomItem17Arr as $item) {
+            $numArr[$item] = 1;
+
+        }
+
+        foreach ($CustomItem17Arr as $item) {
+            $sortWhere = [
+                'CustomItem17' => $item,
+                'date' => date('Y-m-d')
+            ];
+            $sortDb = $this->mysql->table('sp_lyp_puhuo_excel_data')->where($sortWhere)->where('admin_id', session('admin.id'))->order('sort desc')->value('sort');
+            if ($sortDb) {
+                $numArr[$item] = (int)$sortDb + 1;
+            }
+        }
+
+        foreach ($CustomersKV as $cus => $item) {
+
+            $cus_num = 1; //店铺包数
+            $yk_con = isset($config['特殊店铺'][$item['CustomerName']]['YK']) ? $config['特殊店铺'][$item['CustomerName']]['YK'] : $config['衣裤'];
+            $xl_con = isset($config['特殊店铺'][$item['CustomerName']]['XZ']) ? $config['特殊店铺'][$item['CustomerName']]['XZ'] : $config['鞋子'];
+            //衣裤
+            $clothesPants = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)
+                ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
+                ->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+                ->order('CategoryName1 ASC')->select()->toArray();
+            $shoes = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)
+                ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
+                ->where('CategoryName1', '鞋履')
+                ->select()->toArray();
+            $total = 0; //总件数
+            //处理衣裤
+
+            foreach ($clothesPants as $cp_v) {
+
+                $clothesPantsArr = $cp_v;
+                if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
+                    $total = $total + $cp_v['Stock_Quantity_puhuo'];
+                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
+                    if ($total <= $yk_con * $cus_num) {
+
+                        $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
+                        $clothesPantsArr['uuid'] =$shoper. $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $clothesPantsArr;
+                    } else {
+                        $cus_num++;
+                        $numArr[$item['CustomItem17']]++;
+                        $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
+                        $clothesPantsArr['uuid'] = $shoper . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $clothesPantsArr;
+                    }
+
+                }
+            }
+
+            $no = 0;
+            //鞋子
+            foreach ($shoes as $s_k => $s_v) {
+                if ($s_v['Stock_Quantity_puhuo'] <= $xl_con && isset($data[$item['CustomerName']][$s_k])) { //加到原来的
+                    $shoesArr = $s_v;
+                    $shoesArr['sort'] = $data[$item['CustomerName']][$s_k]['sort'];
+                    $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
+                    $data[$item['CustomerName']][] = $shoesArr;
+                } else {
+                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+
+                    if ($no != 0) {
+                        $shoesArr = $s_v;
+                        $shoesArr['sort'] = $no;
+                        $shoesArr['uuid'] = $shoper . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($no, 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $shoesArr;
+                    } else {
+                        $numArr[$item['CustomItem17']]++;
+                        $no = $numArr[$item['CustomItem17']];
+                        $shoesArr = $s_v;
+                        $shoesArr['sort'] = $numArr[$item['CustomItem17']];
+                        $shoesArr['uuid'] = $shoper. $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $data[$item['CustomerName']][] = $shoesArr;
+
+                    }
+
+
+                }
+
+            }
+            //更换云仓店铺 包数更换
+            $numArr[$item['CustomItem17']]++;
+
+        }
+        $return = [];
+        foreach ($data as $item) {
+            foreach ($item as $son) {
+                $return[] = $son;
+            }
+        }
+
+        $CustomItem17Sort = array_column($return, 'CustomItem17');
+        $sortArr = array_column($return, 'sort');
+        array_multisort($CustomItem17Sort, SORT_ASC, $sortArr, SORT_ASC, $return);
+
+        return $return;
+
+    }
+
+    public function Size($GoodsNo){
+
+        $sql = "SELECT
+    bgs.Size
+FROM
+    ErpGoods a
+    LEFT JOIN ErpGoodsSize gs ON gs.GoodsId= a.GoodsId
+    LEFT JOIN ErpBaseGoodsSize bgs ON bgs.SizeId= gs.SizeId 
+WHERE
+    gs.IsEnable=1 and
+    a.GoodsNo= '{$GoodsNo}'
+ORDER BY
+    bgs.ViewOrder ASC";
+
+        $erpSize = Db::connect('sqlsrv')->query($sql);
+        $erpSize = array_column($erpSize, 'Size');
+
+        return $erpSize;
+
+
+    }
+
+
+
 }
