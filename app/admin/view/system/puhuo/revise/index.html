@@ -162,12 +162,6 @@
                         font-size: 12px;">导单转换
                     </button>
 
-                    <button1 class="layui-btn layui-btn-sm1 mapBtnex"
-                             style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 15px;height: 30px;
-                        line-height: 30px;
-                        padding: 0 10px;
-                        font-size: 12px;">excel转换
-                    </button1>
                 </div>
             </div>
         </form>
@@ -289,37 +283,11 @@
 
         //导单转换
         form.on('submit(mapBtndd)', function (data) {
-
-            if (data.field.is_puhuo != '可铺') {
-                layer.confirm('只转换可铺数据，请确认',{},function () {
-
-                    layer.closeAll()
-
-                    $.post(url2, data.field, function(res) {
-                        // console.log(res);
-                        if (res.status == 1) {
-                            location.href = url2 + '?code=' + res.code
-                            alert('数据有点多，请耐心等待');
-                        } else {
-                            alert(res.msg);
-                        }
-                    })
-                    // return false;
-
-                })
-            } else {
-
-                $.post(url2, data.field, function(res) {
-                    // console.log(res);
-                    if (res.status == 1) {
-                        location.href = url2 + '?code=' + res.code
-                        alert('数据有点多，请耐心等待');
-                    } else {
-                        alert(res.msg);
-                    }
-                })
-
-            }
+            layer.load(0);
+            $.get('excel',  data.field, function (res) {
+                location.href = res.data.url;
+                layer.closeAll();
+            })
             return false;
 
         });

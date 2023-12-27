@@ -119,6 +119,28 @@ class Revise extends AdminController
     }
 
 
+    /**
+     * @return void
+     * @NodeAnotation(title="导单功能",auth=false)
+     */
+    public function excel(){
+
+
+        $header = array_merge($arr2, $arr3);
+
+        $data = $this->service->index($where);
+
+        $path = 'm/excel/' . date('Ymd') . '/';
+        $fileName = '导购月业绩' . date('Ymd');
+        ExcelService::export($data['list'], [$header], $fileName, $path);
+        $url = $this->request->domain() . '/' . $path . $fileName . '.xlsx';
+        $this->success('ok', ['url' => $url]);
+
+
+
+    }
+
+
 
 
 }
