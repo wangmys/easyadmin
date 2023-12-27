@@ -129,7 +129,9 @@ class Revise extends AdminController
     public function excel()
     {
 
-        $where = [];
+        $where = [
+            ['is_total', '=', '0']
+        ];
         $res = $this->service->order_no($where);
         $date = date('Y-m-d');
         $tag = date('YmdHis');
@@ -248,7 +250,7 @@ class Revise extends AdminController
 
             $path = 'm/excel/' . date('Ymd') . '/';
             $fileName = date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count;
-            ExcelService::export($data, [$header], $fileName,$path);
+            ExcelService::export($data, [$header], $fileName, $path);
 
             $url = $this->request->domain() . '/' . $path . $fileName . '.xlsx';
             $this->success('ok', ['url' => $url]);
