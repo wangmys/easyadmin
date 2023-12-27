@@ -38,7 +38,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         $("#msg").css('color', 'red');
                         $("#msg").html('上传失败');
                         $("#msg").show();
-                        layer.msg(res.msg,{time: 2000, icon: 2})
+                        layer.msg(res.msg, {time: 2000, icon: 2})
                     } else {
                         $("#msg").show();
                         layer.msg('上传成功，请刷新页面', {time: 2000, icon: 1});

@@ -2,6 +2,7 @@
 
 //puhuo 服务层
 namespace app\admin\service;
+
 use app\admin\model\bi\SpLypPuhuoCustomerSortModel;
 use app\admin\model\bi\SpLypPuhuoCurLogModel;
 use app\admin\model\bi\SpLypPuhuoWaitGoodsModel;
@@ -31,13 +32,16 @@ class PuhuoService
 {
 
     use Singleton;
+
     protected $easy_db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->easy_db = Db::connect("mysql");
     }
 
-    public function puhuo_index($params) {
+    public function puhuo_index($params)
+    {
 
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
@@ -82,10 +86,10 @@ class PuhuoService
                 }
                 $list = SpLypPuhuoEndDataModel::where($where)->field('*')
                     ->paginate([
-                        'list_rows'=> $pageLimit,
+                        'list_rows' => $pageLimit,
                         'page' => $page,
                     ]);
-                    $list = $list ? $list->toArray() : [];
+                $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 
@@ -106,10 +110,10 @@ class PuhuoService
                     }
                     $q->where($where);
                 })->field('*')
-                ->paginate([
-                    'list_rows'=> $pageLimit,
-                    'page' => $page,
-                ]);
+                    ->paginate([
+                        'list_rows' => $pageLimit,
+                        'page' => $page,
+                    ]);
                 $list = $list ? $list->toArray() : [];
 
             }
@@ -117,23 +121,24 @@ class PuhuoService
 
             $list = SpLypPuhuoEndDataModel::where($where)->field('*')
                 ->paginate([
-                    'list_rows'=> $pageLimit,
+                    'list_rows' => $pageLimit,
                     'page' => $page,
                 ]);
-                $list = $list ? $list->toArray() : [];
+            $list = $list ? $list->toArray() : [];
 
         }
         // print_r([$pageLimit, $page]);die;
 
         $data = [
             'count' => $list ? $list['total'] : 0,
-            'data'  => $list ? $list['data'] : 0,
+            'data' => $list ? $list['data'] : 0,
         ];
         return $data;
 
     }
 
-    public function caogao_index($params) {
+    public function caogao_index($params)
+    {
 
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
@@ -170,7 +175,7 @@ class PuhuoService
             $where[] = ['is_delete', '=', $is_delete];
         }
         if ($setTime1 && $setTime2) {
-            $setTime2 = $setTime2.' 23:59:59';
+            $setTime2 = $setTime2 . ' 23:59:59';
             $where[] = ['create_time', 'between', [$setTime1, $setTime2]];
         }
         // if ($score_sort) {
@@ -187,10 +192,10 @@ class PuhuoService
                 }
                 $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
                     ->paginate([
-                        'list_rows'=> $pageLimit,
+                        'list_rows' => $pageLimit,
                         'page' => $page,
                     ]);
-                    $list = $list ? $list->toArray() : [];
+                $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 
@@ -211,10 +216,10 @@ class PuhuoService
                     }
                     $q->where($where);
                 })->field('*')
-                ->paginate([
-                    'list_rows'=> $pageLimit,
-                    'page' => $page,
-                ]);
+                    ->paginate([
+                        'list_rows' => $pageLimit,
+                        'page' => $page,
+                    ]);
                 $list = $list ? $list->toArray() : [];
 
             }
@@ -222,23 +227,24 @@ class PuhuoService
 
             $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
                 ->paginate([
-                    'list_rows'=> $pageLimit,
+                    'list_rows' => $pageLimit,
                     'page' => $page,
                 ]);
-                $list = $list ? $list->toArray() : [];
+            $list = $list ? $list->toArray() : [];
 
         }
         // print_r([$pageLimit, $page]);die;
 
         $data = [
             'count' => $list ? $list['total'] : 0,
-            'data'  => $list ? $list['data'] : 0,
+            'data' => $list ? $list['data'] : 0,
         ];
         return $data;
 
     }
 
-    public function puhuo_daodan($params) {
+    public function puhuo_daodan($params)
+    {
 
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
@@ -282,15 +288,15 @@ class PuhuoService
                     $where[] = ['lped.Stock_Quantity_puhuo', '>', 0];
                 }
                 $list = SpLypPuhuoEndDataModel::where($where)
-                ->alias('lped')
-                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lped.GoodsNo=lpwg.GoodsNo and lped.WarehouseName=lpwg.WarehouseName', 'left')
-                ->field('lped.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                    ->alias('lped')
+                    ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lped.GoodsNo=lpwg.GoodsNo and lped.WarehouseName=lpwg.WarehouseName', 'left')
+                    ->field('lped.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
                 lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
-                ->paginate([
-                        'list_rows'=> $pageLimit,
+                    ->paginate([
+                        'list_rows' => $pageLimit,
                         'page' => $page,
                     ]);
-                    $list = $list ? $list->toArray() : [];
+                $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 
@@ -327,22 +333,23 @@ class PuhuoService
                 lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
                 // ->field('*')
                 ->paginate([
-                    'list_rows'=> $pageLimit,
+                    'list_rows' => $pageLimit,
                     'page' => $page,
                 ]);
-                $list = $list ? $list->toArray() : [];
+            $list = $list ? $list->toArray() : [];
 
         }
 
         $data = [
             'count' => $list ? $list['total'] : 0,
-            'data'  => $list ? $list['data'] : 0,
+            'data' => $list ? $list['data'] : 0,
         ];
         return $data;
 
     }
 
-    public function puhuo_daodan_caogao($params) {
+    public function puhuo_daodan_caogao($params)
+    {
 
         $pageLimit = $params['limit'] ?? 15;//每页条数
         $page = $params['page'] ?? 1;//当前页
@@ -384,7 +391,7 @@ class PuhuoService
             $where[] = ['lpc.is_delete', '=', $is_delete];
         }
         if ($setTime1 && $setTime2) {
-            $setTime2 = $setTime2.' 23:59:59';
+            $setTime2 = $setTime2 . ' 23:59:59';
             $where[] = ['lpc.create_time', 'between', [$setTime1, $setTime2]];
         }
 
@@ -402,15 +409,15 @@ class PuhuoService
                     $where[] = ['lpc.Stock_Quantity_puhuo', '>', 0];
                 }
                 $list = SpLypPuhuoCaogaoModel::where($where)
-                ->alias('lpc')
-                ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpc.GoodsNo=lpwg.GoodsNo and lpc.WarehouseName=lpwg.WarehouseName', 'left')
-                ->field('lpc.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
+                    ->alias('lpc')
+                    ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpc.GoodsNo=lpwg.GoodsNo and lpc.WarehouseName=lpwg.WarehouseName', 'left')
+                    ->field('lpc.*,lpwg.Stock_00_size,lpwg.Stock_29_size,lpwg.Stock_30_size,lpwg.Stock_31_size,lpwg.Stock_32_size,lpwg.Stock_33_size,
                 lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
-                ->paginate([
-                        'list_rows'=> $pageLimit,
+                    ->paginate([
+                        'list_rows' => $pageLimit,
                         'page' => $page,
                     ]);
-                    $list = $list ? $list->toArray() : [];
+                $list = $list ? $list->toArray() : [];
 
             } else {//不可铺
 
@@ -447,26 +454,27 @@ class PuhuoService
                 lpwg.Stock_34_size,lpwg.Stock_35_size,lpwg.Stock_36_size,lpwg.Stock_38_size,lpwg.Stock_40_size,lpwg.Stock_42_size')
                 // ->field('*')
                 ->paginate([
-                    'list_rows'=> $pageLimit,
+                    'list_rows' => $pageLimit,
                     'page' => $page,
                 ]);
-                $list = $list ? $list->toArray() : [];
+            $list = $list ? $list->toArray() : [];
 
         }
 
         $data = [
             'count' => $list ? $list['total'] : 0,
-            'data'  => $list ? $list['data'] : 0,
+            'data' => $list ? $list['data'] : 0,
         ];
         return $data;
 
     }
 
-    public function change_caogao_status($res_data) {
+    public function change_caogao_status($res_data)
+    {
 
         if ($res_data) {
             $chunk_list = array_chunk($res_data, 500);
-            foreach($chunk_list as $key => $val) {
+            foreach ($chunk_list as $key => $val) {
                 $uuid_arr = $val ? array_column($val, 'uuid') : [];
                 if ($uuid_arr) {
                     SpLypPuhuoCaogaoModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete' => 1]);
@@ -476,19 +484,21 @@ class PuhuoService
 
     }
 
-    public function add_puhuo_daodan($res_data) {
+    public function add_puhuo_daodan($res_data)
+    {
 
         if ($res_data) {
             // $this->easy_db->query("truncate table sp_lyp_puhuo_daodan;");
             $chunk_list = array_chunk($res_data, 1000);
-            foreach($chunk_list as $key => $val) {
+            foreach ($chunk_list as $key => $val) {
                 $insert = $this->easy_db->table('sp_lyp_puhuo_daodan')->strict(false)->insertAll($val);
             }
         }
 
     }
 
-    public function getXmMapSelect($sign = 1) {
+    public function getXmMapSelect($sign = 1)
+    {
 
         if ($sign == 1) {
             $WarehouseName = $this->easy_db->query("select WarehouseName as name, WarehouseName as value from sp_lyp_puhuo_cur_log  group by WarehouseName;");
@@ -504,12 +514,13 @@ class PuhuoService
             $CustomItem17 = $this->easy_db->query("select CustomItem17 as name, CustomItem17 as value from sp_lyp_puhuo_caogao where CustomItem17!='' group by CustomItem17;");
         }
 
-        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo'=>$GoodsNo, 'CustomerName'=>$CustomerName, 'CustomItem17'=>$CustomItem17, 'is_puhuo' => [['name'=>'可铺', 'value'=>'可铺'], ['name'=>'不可铺', 'value'=>'可铺']]];
+        return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo' => $GoodsNo, 'CustomerName' => $CustomerName, 'CustomItem17' => $CustomItem17, 'is_puhuo' => [['name' => '可铺', 'value' => '可铺'], ['name' => '不可铺', 'value' => '可铺']]];
 
     }
 
     //铺货-统计
-    public function puhuo_statistic($params) {
+    public function puhuo_statistic($params)
+    {
 
         $WarehouseName = $params['WarehouseName'] ?? '';
         $CategoryName1 = $params['CategoryName1'] ?? '';
@@ -517,8 +528,7 @@ class PuhuoService
         $where = $where_store = [];
         if ($WarehouseName) {
             $where[] = ['lpwg.WarehouseName', 'in', $WarehouseName];
-        }
-        else {//暂时使用，目前只有贵阳云仓数据 上线后去掉 20230823
+        } else {//暂时使用，目前只有贵阳云仓数据 上线后去掉 20230823
 
             $WarehouseName = $this->easy_db->query("select distinct WarehouseName from sp_lyp_puhuo_cur_log;");
             $WarehouseName = $WarehouseName ? array_column($WarehouseName, 'WarehouseName') : [];
@@ -541,18 +551,19 @@ class PuhuoService
 
         $where_store_merge = array_merge($where, $where_store);
         $store_num = $customer_sort_model::where($where_store_merge)->alias('lpcs')
-        ->join(['sp_lyp_puhuo_cur_log' => 'lpcl'], 'lpcs.cur_log_uuid=lpcl.uuid', 'left')
-        ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpcs.GoodsNo=lpwg.GoodsNo and lpcs.Yuncang=lpwg.WarehouseName', 'left')
-        ->count('distinct lpcs.CustomerId');
+            ->join(['sp_lyp_puhuo_cur_log' => 'lpcl'], 'lpcs.cur_log_uuid=lpcl.uuid', 'left')
+            ->join(['sp_lyp_puhuo_wait_goods' => 'lpwg'], 'lpcs.GoodsNo=lpwg.GoodsNo and lpcs.Yuncang=lpwg.WarehouseName', 'left')
+            ->count('distinct lpcs.CustomerId');
 
-        return ['nd'=>$nd, 'wt'=>$wt, 'xz'=>$xz, 'xl'=>$xl, 'store_num'=>$store_num];
+        return ['nd' => $nd, 'wt' => $wt, 'xz' => $xz, 'xl' => $xl, 'store_num' => $store_num];
 
     }
 
     /**
      * 获取铺货配置
      */
-    public function get_puhuo_config() {
+    public function get_puhuo_config()
+    {
 
         return SpLypPuhuoConfigModel::where([['config_str', '=', 'puhuo_config']])->find();
 
@@ -561,7 +572,8 @@ class PuhuoService
     /**
      * 获取铺货配置2
      */
-    public function get_puhuo_config2() {
+    public function get_puhuo_config2()
+    {
 
         $res = SpLypPuhuoWarehouseReserveConfigModel::select();
         $res = $res ? $res->toArray() : [];
@@ -572,7 +584,8 @@ class PuhuoService
     /**
      * 保存仓库预留参数配置/保存门店上铺货连码标准配置/保存仓库齐码参数配置
      */
-    public function save_warehouse_config($data) {
+    public function save_warehouse_config($data)
+    {
 
         $id = null;
         if ($data) {
@@ -588,7 +601,8 @@ class PuhuoService
     /**
      * 保存仓库预留参数配置/保存门店上铺货连码标准配置/保存仓库齐码参数配置2
      */
-    public function save_warehouse_config2($data) {
+    public function save_warehouse_config2($data)
+    {
 
         $id = $data['id'] ?? 0;
         if ($id) {
@@ -601,7 +615,8 @@ class PuhuoService
     /**
      * 获取评分标准
      */
-    public function get_puhuo_score($config_str) {
+    public function get_puhuo_score($config_str)
+    {
 
         $res = SpLypPuhuoScoreModel::where([['config_str', '=', $config_str]])->select();
         $res = $res ? $res->toArray() : [];
@@ -612,7 +627,8 @@ class PuhuoService
     /**
      * 检测是否已存在
      */
-    public function check_customer_level($post) {
+    public function check_customer_level($post)
+    {
 
         return SpLypPuhuoScoreModel::where([['config_str', '=', $post['config_str']], ['key', '=', $post['key']]])->field('id')->find();
 
@@ -621,7 +637,8 @@ class PuhuoService
     /**
      * 保存店铺评分标准配置
      */
-    public function save_customer_level($data) {
+    public function save_customer_level($data)
+    {
 
         $id = null;
         if ($data) {
@@ -646,7 +663,8 @@ class PuhuoService
     /**
      * 删除店铺评分标准配置
      */
-    public function del_customer_level($id) {
+    public function del_customer_level($id)
+    {
 
         return SpLypPuhuoScoreModel::where([['id', '=', $id]])->delete();
 
@@ -655,7 +673,8 @@ class PuhuoService
     /**
      * 获取气温评分标准
      */
-    public function get_qiwen_score($str='coldtohot') {
+    public function get_qiwen_score($str = 'coldtohot')
+    {
 
         if ($str == 'coldtohot') {
             $res = SpLypPuhuoColdtohotModel::where([])->select();
@@ -670,7 +689,8 @@ class PuhuoService
     /**
      * 检测是否已存在（冷到热）
      */
-    public function check_coldtohot($post) {
+    public function check_coldtohot($post)
+    {
 
         return SpLypPuhuoColdtohotModel::where([['yuncang', '=', $post['yuncang']], ['province', '=', $post['province']], ['wenqu', '=', $post['wenqu']]])->field('id')->find();
 
@@ -679,7 +699,8 @@ class PuhuoService
     /**
      * 保存气温评分标准配置（冷到热）
      */
-    public function save_coldtohot($data) {
+    public function save_coldtohot($data)
+    {
 
         $id = null;
         $msg = '';
@@ -703,14 +724,15 @@ class PuhuoService
 
             }
         }
-        return ['id'=>$id, 'msg'=>$msg];
+        return ['id' => $id, 'msg' => $msg];
 
     }
 
     /**
      * 检测是否已存在（热到冷）
      */
-    public function check_hottocold($post) {
+    public function check_hottocold($post)
+    {
 
         return SpLypPuhuoHottocoldModel::where([['yuncang', '=', $post['yuncang']], ['province', '=', $post['province']], ['wenqu', '=', $post['wenqu']]])->field('id')->find();
 
@@ -719,7 +741,8 @@ class PuhuoService
     /**
      * 保存气温评分标准配置（热到冷）
      */
-    public function save_hottocold($data) {
+    public function save_hottocold($data)
+    {
 
         $id = null;
         $msg = '';
@@ -743,14 +766,15 @@ class PuhuoService
 
             }
         }
-        return ['id'=>$id, 'msg'=>$msg];
+        return ['id' => $id, 'msg' => $msg];
 
     }
 
     /**
      * 删除气温评分标准配置（冷到热）
      */
-    public function del_coldtohot($id) {
+    public function del_coldtohot($id)
+    {
 
         return SpLypPuhuoColdtohotModel::where([['id', '=', $id]])->delete();
 
@@ -759,7 +783,8 @@ class PuhuoService
     /**
      * 删除气温评分标准配置(热到冷）
      */
-    public function del_hottocold($id) {
+    public function del_hottocold($id)
+    {
 
         return SpLypPuhuoHottocoldModel::where([['id', '=', $id]])->delete();
 
@@ -768,7 +793,8 @@ class PuhuoService
     /**
      * 获取指定款分类
      */
-    public function get_ti_goods_type() {
+    public function get_ti_goods_type()
+    {
 
         $res = SpLypPuhuoTiGoodsTypeModel::where([])->column('id,GoodsLevel', 'GoodsLevel');
         return $res;
@@ -778,7 +804,8 @@ class PuhuoService
     /**
      * 获取指定款分类
      */
-    public function get_zhiding_goods($Yuncang) {
+    public function get_zhiding_goods($Yuncang)
+    {
 
         $res = SpLypPuhuoZhidingGoodsModel::where([['Yuncang', '=', $Yuncang]])->column('GoodsNo');
         $res = $res ? implode(' ', $res) : '';
@@ -789,7 +816,8 @@ class PuhuoService
     /**
      * 获取各云仓 自定义铺货货品 配置列表
      */
-    public function get_zdy_goods($Yuncang) {
+    public function get_zdy_goods($Yuncang)
+    {
 
         $res = SpLypPuhuoZdySetModel::where([['Yuncang', '=', $Yuncang]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,if_taozhuang')->select();
         $res = $res ? $res->toArray() : [];
@@ -847,8 +875,8 @@ class PuhuoService
                         $v_res['Selecttype_str'] = '经营模式';
                         break;
                     default:
-                    $v_res['Selecttype_str'] = '';
-                    break;
+                        $v_res['Selecttype_str'] = '';
+                        break;
 
                 }
 
@@ -876,9 +904,10 @@ class PuhuoService
     /**
      * 获取各云仓 自定义铺货货品 配置列表2
      */
-    public function get_zdy_goods2($Yuncang) {
+    public function get_zdy_goods2($Yuncang)
+    {
 
-        $res = SpLypPuhuoZdySet2Model::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['admin_id', '=', session('admin.id')], ['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_store']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data($Yuncang);
         if ($res) {
@@ -912,8 +941,8 @@ class PuhuoService
                         break;
 
                     default:
-                    $v_res['Selecttype_str'] = '';
-                    break;
+                        $v_res['Selecttype_str'] = '';
+                        break;
 
                 }
 
@@ -941,9 +970,10 @@ class PuhuoService
     /**
      * 获取各云仓 自定义铺货货品 配置列表2zh
      */
-    public function get_zdy_goods2zh($Yuncang) {
+    public function get_zdy_goods2zh($Yuncang)
+    {
 
-        $res = SpLypPuhuoZdySet2Model::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
+        $res = SpLypPuhuoZdySet2Model::where([['admin_id', '=', session('admin.id')], ['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data2($Yuncang);
         // print_r($select_list);die;
@@ -965,8 +995,8 @@ class PuhuoService
                         break;
 
                     default:
-                    $v_res['Selecttype_str'] = '';
-                    break;
+                        $v_res['Selecttype_str'] = '';
+                        break;
 
                 }
 
@@ -992,7 +1022,8 @@ class PuhuoService
     }
 
     //获取多店、多省、商品专员、经营模式 下拉数据
-    public function get_select_data($yuncang) {
+    public function get_select_data($yuncang)
+    {
 
         $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
         $customer_list = $this->easy_db->Query("select CustomerName as name, CustomerId as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomerName;");
@@ -1004,7 +1035,8 @@ class PuhuoService
     }
 
     //获取组合（多省、商品专员、经营模式）下拉数据
-    public function get_select_data2($yuncang) {
+    public function get_select_data2($yuncang)
+    {
 
         $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
         $province_list = $this->easy_db->Query("select State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
@@ -1020,7 +1052,8 @@ class PuhuoService
     /**
      * 保存各个云仓指定铺货货品配置
      */
-    public function saveZhidingGoodsConfig($data) {
+    public function saveZhidingGoodsConfig($data)
+    {
 
         $Yuncang = $data['Yuncang'];
         $GoodsNo = $data['GoodsNo'] ? explode(' ', $data['GoodsNo']) : [];
@@ -1031,15 +1064,15 @@ class PuhuoService
         $res_data = [];
         if ($GoodsNo) {
             foreach ($GoodsNo as $v_goods) {
-                $v_goods = $v_goods ? trim($v_goods): '';
+                $v_goods = $v_goods ? trim($v_goods) : '';
                 if ($v_goods) {
-                    $res_data[] = ['Yuncang'=>$Yuncang, 'GoodsNo'=>$v_goods];
+                    $res_data[] = ['Yuncang' => $Yuncang, 'GoodsNo' => $v_goods];
                 }
             }
 
             if ($res_data) {
                 $chunk_list = array_chunk($res_data, 500);
-                foreach($chunk_list as $key => $val) {
+                foreach ($chunk_list as $key => $val) {
                     $insert = Db::connect("mysql")->table('sp_lyp_puhuo_zhiding_goods')->strict(false)->insertAll($val);
                 }
             }
@@ -1052,16 +1085,17 @@ class PuhuoService
     /*
     检测货号是否已存在
     */
-    public function checkPuhuoZdySetGoods($post) {
+    public function checkPuhuoZdySetGoods($post)
+    {
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoodsModel();
 
-        $return = ['error'=>'0', 'goodsno_str'=>''];
+        $return = ['error' => '0', 'goodsno_str' => ''];
 
         $goods = $post['GoodsNo'] ? explode(' ', $post['GoodsNo']) : [];
 
         //如果是套装套西，则货品个数必须是双数
-        if ($post['if_taozhuang'] == SpLypPuhuoZdySetModel::IF_TAOZHUANG['is_taozhuang'] && (count($goods)%2)) {
+        if ($post['if_taozhuang'] == SpLypPuhuoZdySetModel::IF_TAOZHUANG['is_taozhuang'] && (count($goods) % 2)) {
             $return['error'] = 2;
             return $return;
         }
@@ -1089,27 +1123,28 @@ class PuhuoService
     /*
     检测货号是否已存在2
     */
-    public function checkPuhuoZdySetGoods2($post) {
+    public function checkPuhuoZdySetGoods2($post)
+    {
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoods2Model();
 
-        $return = ['error'=>'0', 'goodsno_str'=>''];
+        $return = ['error' => '0', 'goodsno_str' => ''];
 
         $goods = $post['GoodsNo'] ? explode(' ', $post['GoodsNo']) : [];
 
         //如果是套装套西，则货品个数必须是双数
-        if ($post['if_taozhuang'] == SpLypPuhuoZdySet2Model::IF_TAOZHUANG['is_taozhuang'] && (count($goods)%2)) {
+        if ($post['if_taozhuang'] == SpLypPuhuoZdySet2Model::IF_TAOZHUANG['is_taozhuang'] && (count($goods) % 2)) {
             $return['error'] = 2;
             return $return;
         }
 
         if ($post['id']) {
 
-            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
+            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id', '=', session('admin.id')], ['Yuncang', '=', $post['Yuncang']], ['set_id', '<>', $post['id']]])->column('GoodsNo');
 
         } else {
 
-            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id','=',session('admin.id')],['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
+            $exist_goods = $ZdyYuncangGoodsModel::where([['admin_id', '=', session('admin.id')], ['Yuncang', '=', $post['Yuncang']]])->column('GoodsNo');
 
         }
 
@@ -1126,7 +1161,8 @@ class PuhuoService
     /**
      * 保存各个云仓铺货配置(多店/多省/商品专员/经营模式)
      */
-    public function savePuhuoZdySet($data) {
+    public function savePuhuoZdySet($data)
+    {
 
         $id = $data['id'];
         $Yuncang = $data['Yuncang'];
@@ -1190,7 +1226,8 @@ class PuhuoService
     /**
      * 保存各个云仓铺货配置2(多店/多省/商品专员/经营模式)
      */
-    public function savePuhuoZdySet2($data) {
+    public function savePuhuoZdySet2($data)
+    {
 
         $id = $data['id'];
         $Yuncang = $data['Yuncang'];
@@ -1261,7 +1298,7 @@ class PuhuoService
             'if_taozhuang' => $if_taozhuang,
             'if_zdmd' => $if_zdmd,
             'zuhe_customer' => $CustomerNames,
-            'admin_id' =>session('admin.id')
+            'admin_id' => session('admin.id')
         ];
 
         $ZdyYuncangGoodsModel = new SpLypPuhuoZdyYuncangGoods2Model();
@@ -1287,7 +1324,7 @@ class PuhuoService
                         'Yuncang' => $Yuncang,
                         'GoodsNo' => $v_goodsno,
                         'set_id' => $id,
-                        'admin_id' =>session('admin.id')
+                        'admin_id' => session('admin.id')
                     ];
                 }
             }
@@ -1306,7 +1343,8 @@ class PuhuoService
     /**
      * 删除铺货配置(多店/多省/商品专员/经营模式)
      */
-    public function delPuhuoZdySet($id) {
+    public function delPuhuoZdySet($id)
+    {
 
         Db::startTrans();
         try {
@@ -1325,7 +1363,8 @@ class PuhuoService
     /**
      * 删除铺货配置2(多店/多省/商品专员/经营模式)
      */
-    public function delPuhuoZdySet2($id) {
+    public function delPuhuoZdySet2($id)
+    {
 
         Db::startTrans();
         try {
@@ -1344,7 +1383,8 @@ class PuhuoService
     /**
      * 删除剔除指定款货品等级配置
      */
-    public function del_ti_goods_type($id) {
+    public function del_ti_goods_type($id)
+    {
 
         return SpLypPuhuoTiGoodsTypeModel::where([['id', '=', $id]])->delete();
 
@@ -1353,7 +1393,8 @@ class PuhuoService
     /**
      * 检测是否已存在
      */
-    public function check_ti_goods_type($post) {
+    public function check_ti_goods_type($post)
+    {
 
         return SpLypPuhuoTiGoodsTypeModel::where([['GoodsLevel', '=', $post['GoodsLevel']]])->field('id')->find();
 
@@ -1362,7 +1403,8 @@ class PuhuoService
     /**
      * 保存剔除指定款货品等级配置
      */
-    public function save_ti_goods_type($data) {
+    public function save_ti_goods_type($data)
+    {
 
         $id = null;
         $msg = '';
@@ -1384,16 +1426,17 @@ class PuhuoService
 
             }
         }
-        return ['id'=>$id, 'msg'=>$msg];
+        return ['id' => $id, 'msg' => $msg];
 
     }
 
     /**
      * 获取手动铺货执行记录
      */
-    public function get_puhuo_run() {
+    public function get_puhuo_run()
+    {
 
-        $res = SpLypPuhuoRunModel::where([['admin_id','=',session('admin.id')]])->order('id desc')->find();
+        $res = SpLypPuhuoRunModel::where([['admin_id', '=', session('admin.id')]])->order('id desc')->find();
         $res = $res ? $res->toArray() : [];
         return $res;
 
@@ -1402,19 +1445,21 @@ class PuhuoService
     /**
      * 获取铺货货品个数
      */
-    public function get_puhuo_goods_count() {
+    public function get_puhuo_goods_count()
+    {
 
-        return SpLypPuhuoZdyYuncangGoods2Model::where(['admin_id'=>session('admin.id')])->count();
+        return SpLypPuhuoZdyYuncangGoods2Model::where(['admin_id' => session('admin.id')])->count();
 
     }
 
     /**
      * 获取钉钉推送用户
      */
-    public function get_dingding_user() {
+    public function get_dingding_user()
+    {
 
         $dd_user = $this->easy_db->query("select name as name, userid as value from dd_user  group by userid;");
-        $sel_dd_user = SpLypPuhuoDdUserModel::where(['admin_id'=>session('admin.id')])->column('userid');
+        $sel_dd_user = SpLypPuhuoDdUserModel::where(['admin_id' => session('admin.id')])->column('userid');
         foreach ($dd_user as &$v_user) {
             if (in_array($v_user['value'], $sel_dd_user)) {
                 $v_user['selected'] = true;
@@ -1427,15 +1472,16 @@ class PuhuoService
     /**
      * 保存钉钉推送用户
      */
-    public function save_dingding_user($dingding) {
+    public function save_dingding_user($dingding)
+    {
 
 //        $this->easy_db->query("truncate table sp_lyp_puhuo_dd_user;");
-        $this->easy_db->table('sp_lyp_puhuo_dd_user')->where(['admin_id'=>session('admin.id')])->delete();
+        $this->easy_db->table('sp_lyp_puhuo_dd_user')->where(['admin_id' => session('admin.id')])->delete();
         $select_dd_user = DdUserModel::where([['userid', 'in', $dingding ? explode(',', $dingding) : []]])->field('userid,name')->select();
         $select_dd_user = $select_dd_user ? $select_dd_user->toArray() : [];
         if ($select_dd_user) {
             foreach ($select_dd_user as &$v_sel) {
-                $v_sel['admin_id']=session('admin.id');
+                $v_sel['admin_id'] = session('admin.id');
                 SpLypPuhuoDdUserModel::create($v_sel);
             }
         }
@@ -1445,7 +1491,8 @@ class PuhuoService
     /**
      * 处理草稿数据
      */
-    public function deal_caogao($params) {
+    public function deal_caogao($params)
+    {
 
         $caogao_arr = $params['caogao_arr'] ?? [];
 
@@ -1467,9 +1514,9 @@ class PuhuoService
         }
 
         $chunk_list = array_chunk($res_end_data, 500);
-        foreach($chunk_list as $key => $val) {
+        foreach ($chunk_list as $key => $val) {
             $uuid_arr = array_column($val, 'uuid');
-            SpLypPuhuoEndDataModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete'=>1]);
+            SpLypPuhuoEndDataModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete' => 1]);
             $insert = $this->easy_db->table('sp_lyp_puhuo_caogao')->strict(false)->insertAll($val);
         }
 
@@ -1486,10 +1533,85 @@ class PuhuoService
 
         try {
             $where = [
+                ['is_total', '=', 0],
                 ['Stock_Quantity_puhuo', '>', 0],
                 ['admin_id', '=', session('admin.id')],
             ];
-            $list = SpLypPuhuoEndDataModel::where($where)->field('*')->select()->toArray();
+            $list = SpLypPuhuoEndDataModel::where(function ($q) use ($where) {
+                $q->where($where);
+            })->whereOr(function ($q) use ($where) {
+                $q->where([['admin_id', '=', session('admin.id')], ['is_total', '=', '1'], ['CustomerName', '=', '余量']]);
+            })->field('*')
+                ->select()->toArray();
+            $stockDb = $this->easy_db->table('sp_lyp_puhuo_end_data')->where([
+                ['is_total', '=', 1],
+                ['CustomerName', '<>', '余量'],
+                ['Stock_Quantity_puhuo', '>', 0],
+                ['admin_id', '=', session('admin.id')],
+            ])->select()->toArray();
+
+
+            //库存
+            $stock = [];
+            foreach ($stockDb as $key => $item) {
+                $stock[$item['WarehouseName'] . $item['GoodsNo']] = $item;
+            }
+            $yuiliu = [];
+            $Dbyuliu = $this->easy_db->table('sp_lyp_puhuo_warehouse_reserve_config')->select()->toArray();
+            foreach ($Dbyuliu as $key => &$item) {
+                $yuiliu[$item['config_str']] = [
+//                    'WarehouseName' => $item['config_str'],
+                    'Stock_00_puhuo' => $item['_28'],
+                    'Stock_29_puhuo' => $item['_29'],
+                    'Stock_30_puhuo' => $item['_30'],
+                    'Stock_31_puhuo' => $item['_31'],
+                    'Stock_32_puhuo' => $item['_32'],
+                    'Stock_33_puhuo' => $item['_33'],
+                    'Stock_34_puhuo' => $item['_34'],
+                    'Stock_35_puhuo' => $item['_35'],
+                    'Stock_36_puhuo' => $item['_36'],
+                    'Stock_38_puhuo' => $item['_38'],
+                    'Stock_40_puhuo' => $item['_40'],
+                    'Stock_42_puhuo' => $item['_42'],
+                ];
+
+            }
+            foreach ($list as &$item) {
+                if ($item['CustomerName'] == '余量') {
+
+                    // 1. 方案
+//                    $yunc = $this->easy_db->table('sp_lyp_puhuo_yuncangkeyong')
+//                        ->where(['GoodsNo' => $item['GoodsNo'], 'WarehouseName' => $item['WarehouseName'], 'admin_id' => $item['admin_id']])->find();
+//                    $item['Stock_00_puhuo'] = $yunc['Stock_00'];
+//                    $item['Stock_29_puhuo'] = $yunc['Stock_29'];
+//                    $item['Stock_30_puhuo'] = $yunc['Stock_30'];
+//                    $item['Stock_31_puhuo'] = $yunc['Stock_31'];
+//                    $item['Stock_32_puhuo'] = $yunc['Stock_32'];
+//                    $item['Stock_33_puhuo'] = $yunc['Stock_33'];
+//                    $item['Stock_34_puhuo'] = $yunc['Stock_34'];
+//                    $item['Stock_35_puhuo'] = $yunc['Stock_35'];
+//                    $item['Stock_36_puhuo'] = $yunc['Stock_36'];
+//                    $item['Stock_38_puhuo'] = $yunc['Stock_38'];
+//                    $item['Stock_40_puhuo'] = $yunc['Stock_40'];
+//                    $item['Stock_42_puhuo'] = $yunc['Stock_42'];
+//                    $item['Stock_Quantity_puhuo'] = $yunc['Stock_Quantity'] - ($yunc['Stock_Quantity_puhuo']- $item['Stock_Quantity_puhuo']);
+
+                    //2. 方案
+                    $Stock_Quantity_puhuo = 0;
+                    $configYl = $yuiliu[$item['WarehouseName']];
+                    foreach ($item as $son => $son_v) {
+                        if (in_array($son, array_keys($configYl))) {
+                            $x = -($stock[$item['WarehouseName'] . $item['GoodsNo']][$son] / ($configYl[$son] / 100 - 1));
+                            $x = (int)round($x, 0);
+                            $x = $x - ($stock[$item['WarehouseName'] . $item['GoodsNo']][$son] - $item[$son]);
+                            $Stock_Quantity_puhuo += $x - $item[$son];
+                            $item[$son] = $x;
+                        }
+                    }
+                    $item['Stock_Quantity_puhuo'] += $Stock_Quantity_puhuo;
+                }
+
+            }
 
             $this->easy_db->table('sp_lyp_puhuo_end_data_revise')->where('admin_id', session('admin.id'))->delete();
             $chunk_list = array_chunk($list, 500);

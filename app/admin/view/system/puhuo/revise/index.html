@@ -34,6 +34,9 @@
             margin-bottom: 0px;
             height: 30px;
         }
+        .red{
+            color: red;
+        }
 
         .layui-input,
         .layui-select,
@@ -159,12 +162,6 @@
                         font-size: 12px;">导单转换
                     </button>
 
-                    <button1 class="layui-btn layui-btn-sm1 mapBtnex"
-                             style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 15px;height: 30px;
-                        line-height: 30px;
-                        padding: 0 10px;
-                        font-size: 12px;">excel转换
-                    </button1>
                 </div>
             </div>
         </form>
@@ -177,15 +174,17 @@
     </table>
     <div id="page"></div>
 </div>
-<button id="import_excel" style="display:none;">【导入】excel转换表</button>
 </body>
 
 </html>
-<script src="__STATIC__/ok/lib/layui/layui.js"></script>
+<script type="text/html" id="toolbar1">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-bg-orange set" style="margin: 0px 0px 0px 0px;"><b style="color:#0152ff;">操作</b></button>
+    </div>
+</script>
+<!--<script src="__STATIC__/ok/lib/layui/layui.js"></script>-->
 <script type="text/javascript" src="__STATIC__/ok/js/watermark.js"></script>
 <script src="__STATIC__/plugs/lay-module/xmSelect/xm-select.js" charset="utf-8"></script>
-<script src="__STATIC__/plugs/require-2.3.6/require.js?v={$version}" charset="utf-8"></script>
-
 <script>
     watermark({ "watermark_txt": '南昌索歌服饰' });
 
@@ -200,6 +199,7 @@
             , url_import = "{:url('admin/system.puhuo.Revise/import_excel')}"
             , url1 = "{:url('admin/system.puhuo.Revise/index')}"
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Revise/getXmMapSelect')}"
+            , url_set = "{:url('admin/system.puhuo.Revise/set')}"
 
         initFn();
         startTable();
@@ -276,11 +276,6 @@
         form.on('submit(mapBtn)', function (data) {
             table.reload('table', {
                 where: data.field
-                , method: 'post'
-                , url: url1
-                , loading: true
-                , page: true
-                , limit: data.field.limit
             })
 
             return false;
@@ -288,90 +283,24 @@
 
         //导单转换
         form.on('submit(mapBtndd)', function (data) {
-
-            if (data.field.is_puhuo != '可铺') {
-                layer.confirm('只转换可铺数据，请确认',{},function () {
-
-                    layer.closeAll()
-
-                    $.post(url2, data.field, function(res) {
-                        // console.log(res);
-                        if (res.status == 1) {
-                            location.href = url2 + '?code=' + res.code
-                            alert('数据有点多，请耐心等待');
-                        } else {
-                            alert(res.msg);
-                        }
-                    })
-                    // return false;
-
-                })
-            } else {
-
-                $.post(url2, data.field, function(res) {
-                    // console.log(res);
-                    if (res.status == 1) {
-                        location.href = url2 + '?code=' + res.code
-                        alert('数据有点多，请耐心等待');
-                    } else {
-                        alert(res.msg);
-                    }
-                })
-
-            }
+            layer.load(0);
+            $.get('excel',  data.field, function (res) {
+                location.href = res.data.url;
+                layer.closeAll();
+            })
             return false;
 
         });
 
-        //excel转换
-        //指定允许上传的文件类型
-        upload.render({
-            elem: '#import_excel'
-            ,url: url_import //此处配置你自己的上传接口即可
-            ,accept: 'file' //普通文件
-            ,before: function (obj) {
-                // console.log(obj);
-                //开始加载效果
-                layui.use('layer', function () {
-                    layui.layer.load();
-                    //console.log(Lodingindex) opacity
-                    $(".layui-layer-shade").css('background', '#000000')
-                    $(".layui-layer-shade").css('opacity', '0.2')
-                    $(".layui-layer-shade").click(function (event) {
-                        event.stopPropagation();
-                    })
-                })
-            }
-            ,error: function() {
-                //上传成功结束加载效果
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 2000);
-                });
-            }
-            ,done: function(res) {
-                console.log('res:....', res);
-                //上传成功结束加载效果
-                layui.use('layer', function () {
-                    setTimeout(function () {
-                        layui.layer.closeAll();
-                    }, 2000);
-                });
-                if (res.code != 0) {
-                    alert('上传失败！' + res.msg);
-                } else {
-                    location.href = url_import + '?excel_url=' + res.data;
-                    alert('数据有点多，请耐心等待');
-                    // window.location.reload();//重新刷新页面
-                }
-            }
-        });
-
-        //导入操作
-        $('body').on('click', '.mapBtnex', function () {
-            $('#import_excel').click();
-        });
+        $(document).on('click', '.set', function(data){
+            console.log('set')
+            layer.open({
+                title: '操作'
+                ,type: 2
+                ,area: ['40%', '80%'] // 100%全屏
+                ,content: url_set
+            });
+        })
 
 
         function startTable() {
@@ -380,6 +309,7 @@
                 ,url: url1
                 , loading: true
                 , method: 'post'
+                , toolbar: '#toolbar1'
                 , page: true
                 , limit: 1000
                 , limits: [1000, 5000, 10000, 20000]
@@ -387,11 +317,11 @@
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                        {type: "checkbox",fixed:'left'},
+                        // {type: "checkbox",fixed:'left'},
                         { field: 'TimeCategoryName2', title: '季节', align: 'center', fixed:'left', width: 35}
                         , { field: 'CategoryName1', title: '一级分类', align: 'center', fixed:'left', width: 55}
                         , { field: 'CategoryName2', title: '二级分类', align: 'center', width: 55}
-                        , { field: 'CategoryName', title: '分类', align: 'center', width: 75}
+                        , { field: 'CategoryName', title: '分类', align: 'center', width: 100}
                         , { field: 'Lingxing', title: '领型', align: 'center', width: 35}
                         , { field: 'ColorDesc', title: '颜色', align: 'center', width: 35}
                         , { field: 'UnitPrice', title: '零售价', align: 'center', width: 45}
@@ -409,19 +339,127 @@
                         , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 50}
                         //  , { field: 'StyleCategoryName1', title: '一级风格', align: 'center', width: 55}
                         , { field: 'score_sort', title: '店铺排名', align: 'center', width: 55}
-                        , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50}
-                        , { field: 'Stock_29_puhuo', title: '29/46/38/M', align: 'center', width: 50}
-                        , { field: 'Stock_30_puhuo', title: '30/48/39/L', align: 'center', width: 50}
-                        , { field: 'Stock_31_puhuo', title: '31/50/40/XL', align: 'center', width: 50}
-                        , { field: 'Stock_32_puhuo', title: '32/52/41/2XL', align: 'center', width: 50}
-                        , { field: 'Stock_33_puhuo', title: '33/54/42/3XL', align: 'center', width: 50}
-                        , { field: 'Stock_34_puhuo', title: '34/56/43/4XL', align: 'center', width: 50}
-                        , { field: 'Stock_35_puhuo', title: '35/58/44/5XL', align: 'center', width: 50}
-                        , { field: 'Stock_36_puhuo', title: '36/6XL', align: 'center', width: 35}
-                        , { field: 'Stock_38_puhuo', title: '38/7XL', align: 'center', width: 35}
-                        , { field: 'Stock_40_puhuo', title: '40/8XL', align: 'center', width: 35}
-                        , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30}
-                        , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30}
+                        , { field: 'Stock_00_puhuo', title: '28/44/37/S', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_00_puhuo >=0){
+                                return `<span >${d.Stock_00_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_00_puhuo}</span>`
+                            }
+
+                        }}
+                        , { field: 'Stock_29_puhuo', title: '29/46/38/M', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_29_puhuo >=0){
+                                return `<span >${d.Stock_29_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_29_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_30_puhuo', title: '30/48/39/L', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_30_puhuo >=0){
+                                return `<span >${d.Stock_30_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_30_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_31_puhuo', title: '31/50/40/XL', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_31_puhuo >=0){
+                                return `<span >${d.Stock_31_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_31_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_32_puhuo', title: '32/52/41/2XL', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_32_puhuo >=0){
+                                return `<span >${d.Stock_32_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_32_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_33_puhuo', title: '33/54/42/3XL', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_33_puhuo >=0){
+                                return `<span >${d.Stock_33_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_33_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_34_puhuo', title: '34/56/43/4XL', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_34_puhuo >=0){
+                                return `<span >${d.Stock_34_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_34_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_35_puhuo', title: '35/58/44/5XL', align: 'center', width: 50,templet:function (d) {
+
+                            if(d.Stock_35_puhuo >=0){
+                                return `<span >${d.Stock_35_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_35_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_36_puhuo', title: '36/6XL', align: 'center', width: 35,templet:function (d) {
+
+                            if(d.Stock_36_puhuo >=0){
+                                return `<span >${d.Stock_36_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_36_puhuo}</span>`
+                            }
+
+
+                        }}
+                        , { field: 'Stock_38_puhuo', title: '38/7XL', align: 'center', width: 35,templet:function (d) {
+
+                            if(d.Stock_38_puhuo >=0){
+                                return `<span >${d.Stock_38_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_38_puhuo}</span>`
+                            }
+
+                        }}
+                        , { field: 'Stock_40_puhuo', title: '40/8XL', align: 'center', width: 35,templet:function (d) {
+                            if(d.Stock_40_puhuo >=0){
+                                return `<span >${d.Stock_40_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_40_puhuo}</span>`
+                            }
+                        }}
+                        , { field: 'Stock_42_puhuo', title: '42', align: 'center', width: 30,templet:function (d) {
+                            if(d.Stock_42_puhuo >=0){
+                                return `<span >${d.Stock_42_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_42_puhuo}</span>`
+                            }
+
+                        }}
+                        , { field: 'Stock_44_puhuo', title: '44', align: 'center', width: 30,templet:function (d) {
+                            if(d.Stock_44_puhuo >=0){
+                                return `<span >${d.Stock_44_puhuo}</span>`
+                            }else {
+                                return `<span class="red">${d.Stock_44_puhuo}</span>`
+                            }
+
+                        }}
                         , { field: 'Stock_Quantity_puhuo', title: '合计', align: 'center', width: 40}
                     ],
 

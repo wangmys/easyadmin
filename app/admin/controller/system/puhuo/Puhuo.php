@@ -568,7 +568,7 @@ class Puhuo extends AdminController
 
         $this->service->revise();
 
-        $this->success('okkk');
+        $this->success('ok');
     }
 
 
