@@ -74,17 +74,23 @@ class ReviseService
         $GoodsNo = $this->xm($db, 'GoodsNo');
         $CustomerName = $this->xm($db, 'CustomerName');
         $CustomItem17 = $this->xm($db, 'CustomItem17');
+        $State = $this->xm($db, 'State');
 
-        $level = [
-            ['name' => 'A', 'value' => 'A'],
-            ['name' => 'B', 'value' => 'B'],
-            ['name' => 'C', 'value' => 'C'],
-            ['name' => 'D', 'value' => 'D'],
-            ['name' => 'S', 'value' => 'S'],
-            ['name' => 'SS', 'value' => 'SS'],
-        ];
-        if ($isLevel ==1) {
-            $CustomerName = array_merge($level, $CustomerName);
+
+        if ($isLevel == 1) {
+            $level = [
+                ['name' => 'A', 'value' => 'A'],
+                ['name' => 'B', 'value' => 'B'],
+                ['name' => 'C', 'value' => 'C'],
+                ['name' => 'D', 'value' => 'D'],
+                ['name' => 'S', 'value' => 'S'],
+                ['name' => 'SS', 'value' => 'SS'],
+            ];
+            $Mathod = [
+                ['name' => '直营', 'value' => '直营'],
+                ['name' => '加盟', 'value' => '加盟'],
+            ];
+            $CustomerName = array_merge($Mathod, $CustomItem17, $level, $CustomerName, $State);
         }
 
         $Size = [
@@ -102,7 +108,7 @@ class ReviseService
             ['name' => '42', 'value' => 'Stock_42_puhuo'],
             ['name' => '44', 'value' => 'Stock_44_puhuo'],
         ];
-        return compact('WarehouseName', 'CategoryName1', 'GoodsNo', 'CustomerName', 'CustomItem17', 'Size');
+        return compact('WarehouseName', 'State', 'CategoryName1', 'GoodsNo', 'CustomerName', 'CustomItem17', 'Size');
 
     }
 
@@ -134,7 +140,7 @@ class ReviseService
 
             $where2 = [];
             if (isset($param['CustomerName']) && !empty($param['CustomerName'])) {
-                $where2[] = ['CustomerName|CustomerGrade', 'IN', explode(',', $param['CustomerName'])];
+                $where2[] = ['CustomerName|CustomerGrade|Mathod|CustomItem17|State', 'IN', explode(',', $param['CustomerName'])];
             }
             $minMax = range($param['min'], $param['max'], 1);
             $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where2)->where($where)->select()->toArray();
