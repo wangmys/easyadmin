@@ -170,13 +170,8 @@
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
                         </button>
+                        <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:#0051ff;">导单转换</b></button>
 
-                        <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="mapBtndd"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 46px;height: 30px;
-                        line-height: 30px;
-                        padding: 0 10px;
-                        font-size: 12px;">导单转换
-                        </button>
                     </div>
                 </div>  
             </form>
@@ -201,7 +196,6 @@
 
       <button class="layui-btn layui-btn-sm layui-bg-orange del" style="margin: 0px 0px 0px 10px;" lay-event="del"><b style="color:#e040fb;">勾选删除</b></button>
       <button class="layui-btn layui-btn-sm layui-bg-orange del_all" style="margin: 0px 0px 0px 10px;" lay-event="del_all"><b style="color:#e040fb;">一键全删</b></button>
-        <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:red;">导单转换</b></button>
 
     </div>
 </script>
@@ -216,7 +210,7 @@
             , laydate = layui.laydate
             , laypage = layui.laypage
             , url1 = "{:url('admin/system.puhuo.Puhuo/caogao_index')}" 
-            , url2 = "{:url('admin/system.puhuo.Puhuo/puhuo_daodan_caogao')}" 
+            , url2 = "{:url('admin/system.puhuo.Puhuo/excel_caogao')}"
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Puhuo/getXmMapSelectCaogao')}"
             , url_del = "{:url('admin/system.puhuo.Puhuo/delete')}"
             // , url_save_caogao_daodan = "{:url('admin/system.puhuo.Puhuo/save_caogao_daodan')}"
@@ -389,27 +383,6 @@
             return false; 
         });
 
-        //导单转换
-        form.on('submit(mapBtndd)', function (data) {
-
-            //test...
-            // var checkStatus = table.checkStatus('table');
-            // data = checkStatus.data;
-            // console.log(data);return false;
-
-            $.post(url2, data.field, function(res) {
-                console.log(res);//return false;
-                if (res.status == 1) {
-                    location.href = url2 + '?code=' + res.code
-                    alert('数据有点多，请耐心等待');
-                    window.location.reload();
-                } else {
-                    alert(res.msg);
-                }
-            })
-            return false; 
-
-        });
 
         function startTable() {
             table.render({
@@ -560,16 +533,11 @@
                         var post_data = {
                             'caogao_uuid' : caogao_arr
                         };
+                        layer.load(0);
                         $.post(url2, post_data, function(res) {
-                            // console.log(res);
-                            if (res.status == 1) {
-                                // alert('保存成功');
-                                location.href = url2 + '?code=' + res.code
-                                alert('数据有点多，请耐心等待');
-                                window.location.reload();
-                            } else {
-                                alert(res.msg);
-                            }
+                            layer.closeAll();
+                            location.href = res.data.url;
+                            return false;
                         })
                         return false; 
 

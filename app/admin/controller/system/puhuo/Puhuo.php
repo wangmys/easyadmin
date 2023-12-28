@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller\system\puhuo;
 
+use app\common\service\ExcelService;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use app\common\controller\AdminController;
@@ -21,11 +22,14 @@ class Puhuo extends AdminController
 {
     protected $service;
     protected $request;
+    protected $mysql;
 
     public function __construct(Request $request)
     {
         $this->service = new PuhuoService();
         $this->request = $request;
+        $this->mysql = Db::connect("mysql");
+
     }
 
     /**
@@ -186,119 +190,152 @@ class Puhuo extends AdminController
 
     }
 
+
+
     /**
-     * @NodeAnotation(title="导单转换-草稿")
+     * @return void
+     * @NodeAnotation(title="草稿导单功能",auth=false)
      */
-    public function puhuo_daodan_caogao() {
+    public function excel_caogao()
+    {
 
-        $params = $this->request->param();
+        $param=$this->request->param();
 
-        if (request()->isAjax()) {
+        $where=[
+            ['uuid','in',$param['caogao_uuid']]
+        ];
 
-            // $params['is_puhuo'] = '可铺';
-            $params['page'] = 1;
-            $params['limit'] = 1000000;
+        $res = $this->service->caogao_order_no($where);
 
-            $code = rand_code(6);
-            cache($code, json_encode($params), 36000);
+        $date = date('Y-m-d');
+        $tag = date('YmdHis');
+        $excel_output_data = [];
+        $config = Db::connect('mysql')->table('sp_lyp_puhuo_excel_config')->where(1)->find();
+        $config['商品负责人'] = json_decode($config['商品负责人'], true);
 
-            $res = $this->service->puhuo_daodan_caogao($params);
-            // print_r($res);die;
-
-            if ($res && $res['data']) {
-                return json([
-                    'status' => 1,
-                    'code' => $code,
-                ]);
-            } else {
-                return json([
-                    'status' => 400,
-                    'msg' => '无数据，请检查筛选条件',
-                ]);
+        $remarkArr = [];
+        foreach ($res as $item) {
+            $str = $item['CategoryName1'] ? mb_substr($item['CategoryName1'], 0, 1) : '';
+            if (!isset($remarkArr[$item['sort']])) {
+                $remarkArr[$item['sort']] = [];
             }
+            if (!in_array($str, $remarkArr[$item['sort']])) {
+                $remarkArr[$item['sort']][] = $str;
+            }
+        }
 
-        } else {
-
-            $code = input('code');
-            $params = cache($code);
-            $params = $params ? json_decode($params, true) : [];
-
-            $res = $this->service->puhuo_daodan_caogao($params);
-            // print_r($res);die;
-
-            if ($res && $res['data']) {
-
-                $excel_output_data = [];
-                foreach ($res['data'] as $k_res=>$v_res) {
-
-                    if ($v_res['is_total']) continue;
-
-                    $order_no = 'SX'.date('Ymd').sprintf("%03d", ++$k_res);//(++$k_res);
-
-                    $tmp_arr = [
-                        'order_no' => $order_no,
-                        'WarehouseCode' => $v_res['WarehouseCode'],
-                        'CustomerCode' => $v_res['CustomerCode'],
-                        'send_out' => 'Y',
-                        're_confirm' => 'Y',
-                        'GoodsNo' => $v_res['GoodsNo'],
-                        'Size' => '',//
-                        'ColorCode' => $v_res['ColorCode'],
-                        'puhuo_num' => 0,//
-                        'status' => 2,
-                        'remark' => $v_res['CategoryName1'],
-                    ];
-
-                    $size_arr = [
-                        ['puhuo_num'=>$v_res['Stock_00_puhuo'], 'Size'=>$v_res['Stock_00_size']],
-                        ['puhuo_num'=>$v_res['Stock_29_puhuo'], 'Size'=>$v_res['Stock_29_size']],
-                        ['puhuo_num'=>$v_res['Stock_30_puhuo'], 'Size'=>$v_res['Stock_30_size']],
-                        ['puhuo_num'=>$v_res['Stock_31_puhuo'], 'Size'=>$v_res['Stock_31_size']],
-                        ['puhuo_num'=>$v_res['Stock_32_puhuo'], 'Size'=>$v_res['Stock_32_size']],
-                        ['puhuo_num'=>$v_res['Stock_33_puhuo'], 'Size'=>$v_res['Stock_33_size']],
-                        ['puhuo_num'=>$v_res['Stock_34_puhuo'], 'Size'=>$v_res['Stock_34_size']],
-                        ['puhuo_num'=>$v_res['Stock_35_puhuo'], 'Size'=>$v_res['Stock_35_size']],
-                        ['puhuo_num'=>$v_res['Stock_36_puhuo'], 'Size'=>$v_res['Stock_36_size']],
-                        ['puhuo_num'=>$v_res['Stock_38_puhuo'], 'Size'=>$v_res['Stock_38_size']],
-                        ['puhuo_num'=>$v_res['Stock_40_puhuo'], 'Size'=>$v_res['Stock_40_size']],
-                        ['puhuo_num'=>$v_res['Stock_42_puhuo'], 'Size'=>$v_res['Stock_42_size']],
-                    ];
-                    foreach ($size_arr as $k_size_arr=>&$v_size_arr) {
-                        if ($v_size_arr['puhuo_num']) {
-                            $tmp_arr['Size'] = $v_size_arr['Size'];
-                            $tmp_arr['puhuo_num'] = $v_size_arr['puhuo_num'];
-                            $excel_output_data[] = $tmp_arr;
-                        }
-                    }
-
+        foreach ($res as $k_res => $v_res) {
+            $Color = $this->service->Color($v_res['GoodsNo']);
+            $tmp_arr = [
+                'uuid' => $v_res['uuid'],
+                'date' => $date,
+                'sort' => $v_res['sort'],
+                'CustomItem17' => $v_res['CustomItem17'],
+                'tag' => $tag,
+                'WarehouseCode' => $v_res['WarehouseCode'],
+                'CustomerCode' => $v_res['CustomerCode'],
+                'send_out' => 'Y',
+                're_confirm' => 'Y',
+                'GoodsNo' => $v_res['GoodsNo'],
+                'Size' => '',
+                'ColorCode' => $Color['ColorCode'],
+                'puhuo_num' => 0,
+                'status' => 2,
+                'remark' => implode('/', $remarkArr[$v_res['sort']]),
+                'admin_id' => session('admin.id')
+            ];
+            $Size = $this->service->Size($v_res['GoodsNo']);
+            $size_arr = [
+                ['puhuo_num' => $v_res['Stock_00_puhuo'], 'Size' => $Size[0] ?? ''],
+                ['puhuo_num' => $v_res['Stock_29_puhuo'], 'Size' => $Size[1] ?? ''],
+                ['puhuo_num' => $v_res['Stock_30_puhuo'], 'Size' => $Size[2] ?? ''],
+                ['puhuo_num' => $v_res['Stock_31_puhuo'], 'Size' => $Size[3] ?? ''],
+                ['puhuo_num' => $v_res['Stock_32_puhuo'], 'Size' => $Size[4] ?? ''],
+                ['puhuo_num' => $v_res['Stock_33_puhuo'], 'Size' => $Size[5] ?? ''],
+                ['puhuo_num' => $v_res['Stock_34_puhuo'], 'Size' => $Size[6] ?? ''],
+                ['puhuo_num' => $v_res['Stock_35_puhuo'], 'Size' => $Size[7] ?? ''],
+                ['puhuo_num' => $v_res['Stock_36_puhuo'], 'Size' => $Size[8] ?? ''],
+                ['puhuo_num' => $v_res['Stock_38_puhuo'], 'Size' => $Size[9] ?? ''],
+                ['puhuo_num' => $v_res['Stock_40_puhuo'], 'Size' => $Size[10] ?? ''],
+                ['puhuo_num' => $v_res['Stock_42_puhuo'], 'Size' => $Size[11] ?? ''],
+            ];
+            foreach ($size_arr as $k_size_arr => $v_size_arr) {
+                if ($v_size_arr['puhuo_num'] && $v_size_arr['Size']) {
+                    $tmp_arr['Size'] = $v_size_arr['Size'];
+                    $tmp_arr['puhuo_num'] = $v_size_arr['puhuo_num'];
+                    $excel_output_data[] = $tmp_arr;
                 }
-
-                //变更导单状态
-                $this->service->change_caogao_status($res['data']);
-
-                $this->service->add_puhuo_daodan($excel_output_data);
-
-                $header = [
-                    ['*订单号', 'order_no'],
-                    ['*仓库编号', 'WarehouseCode'],
-                    ['*店铺编号', 'CustomerCode'],
-                    ['*打包后立即发出', 'send_out'],
-                    ['*差异出货需二次确认', 're_confirm'],
-                    ['*货号', 'GoodsNo'],
-                    ['*尺码', 'Size'],
-                    ['*颜色编码', 'ColorCode'],
-                    ['*铺货数', 'puhuo_num'],
-                    ['*状态/1草稿,2预发布,3确定发布', 'status'],
-                    ['备注', 'remark'],
-                ];
-
-                return Excel::exportData($excel_output_data, $header, 'puhuo_daodan_caogao_' .count($excel_output_data) , 'xlsx');
-
             }
 
         }
+        try {
+            $chunk_list = array_chunk($excel_output_data, 500);
+            if ($chunk_list) {
+                foreach ($chunk_list as $key => $val) {
+                    $this->mysql->table('sp_lyp_puhuo_excel_data')->strict(false)->insertAll($val);
+                }
+            }
+        } catch (Exception $e) {
+            dd($e->getMessage());
+        }
+        return $this->export_excel_caogao_runing($tag);
+
 
     }
+
+
+    /**
+     * @param $tag
+     * @return string|void
+     * @NodeAnotation(title="运行",auth=false)
+     */
+    public function export_excel_caogao_runing($tag)
+    {
+
+        $data = $this->mysql->table('sp_lyp_puhuo_excel_data')->where('tag', $tag)->select()->toArray();
+
+        if (empty($data)) {
+            echo '数据为空,请核对';
+            die;
+        }
+        $where = [
+            ['date', '=', date('Y-m-d')],
+            ['CustomItem17', '=', $data[0]['CustomItem17']],
+        ];
+        $count = $this->mysql->table('sp_lyp_puhuo_excel_data')
+            ->where($where)
+            ->group('tag')
+            ->select()->toArray();
+        $count = count($count);
+        if ($data) {
+            $header = [
+                ['*订单号', 'uuid', 'text', 18],
+                ['*仓库编号', 'WarehouseCode', 'text'],
+                ['*店铺编号', 'CustomerCode', 'text'],
+                ['*打包后立即发出', 'send_out', 'text'],
+                ['*差异出货需二次确认', 're_confirm', 'text'],
+                ['*货号', 'GoodsNo', 'text', 12],
+                ['*尺码', 'Size', 'text'],
+                ['*颜色编码', 'ColorCode', 'text'],
+                ['*铺货数', 'puhuo_num', 'number'],
+                ['*状态/1草稿,2预发布,3确定发布', 'status', 'number'],
+                ['备注', 'remark'],
+            ];
+
+            $path = 'm/excel/' . date('Ymd') . '/';
+            $fileName = date('Ymd') . '_' . $data[0]['CustomItem17'] . '_' . $count;
+            ExcelService::export($data, [$header], $fileName, $path);
+
+            $url = $this->request->domain() . '/' . $path . $fileName . '.xlsx';
+            $this->success('ok', ['url' => $url]);
+        }
+
+
+        return 'error';
+
+
+    }
+
 
     // 获取筛选栏多选参数
     public function getXmMapSelect() {
