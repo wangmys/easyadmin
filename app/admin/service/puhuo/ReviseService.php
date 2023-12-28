@@ -205,11 +205,11 @@ class ReviseService
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
-                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
+                    $shoper = $config['商品负责人'][$item['CustomItem17']] ?? 'SG';
                     if ($total <= $yk_con * $cus_num) {
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
-                        $clothesPantsArr['uuid'] =$shoper. $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $clothesPantsArr['uuid'] = $shoper . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
@@ -231,7 +231,7 @@ class ReviseService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
-                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+                    $shoper = $config['商品负责人'][$item['CustomItem17']] ?? 'SG';
 
                     if ($no != 0) {
                         $shoesArr = $s_v;
@@ -243,7 +243,7 @@ class ReviseService
                         $no = $numArr[$item['CustomItem17']];
                         $shoesArr = $s_v;
                         $shoesArr['sort'] = $numArr[$item['CustomItem17']];
-                        $shoesArr['uuid'] = $shoper. $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $shoesArr['uuid'] = $shoper . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $shoesArr;
 
                     }
@@ -271,7 +271,8 @@ class ReviseService
 
     }
 
-    public function Size($GoodsNo){
+    public function Size($GoodsNo)
+    {
 
         $sql = "SELECT
     bgs.Size
@@ -293,7 +294,8 @@ ORDER BY
 
     }
 
-    public function Color($GoodsNo){
+    public function Color($GoodsNo)
+    {
 
         $erp = Db::connect('sqlsrv')->table('ErpGoods')->alias('a')->where('a.GoodsNo', $GoodsNo)
             ->leftjoin('ErpGoodsColor c', 'c.GoodsId=a.GoodsId')
@@ -303,7 +305,6 @@ ORDER BY
         return $erp;
 
     }
-
 
 
 }

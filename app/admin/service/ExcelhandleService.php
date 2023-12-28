@@ -90,7 +90,7 @@ class ExcelhandleService
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
-                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
+                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'SG';
                     if ($total <= $yk_con * $cus_num) {
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
@@ -116,7 +116,7 @@ class ExcelhandleService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
-                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'SG';
 
                     if ($no != 0) {
                         $shoesArr = $s_v;
