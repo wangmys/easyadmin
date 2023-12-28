@@ -34,10 +34,12 @@ class PuhuoService
     use Singleton;
 
     protected $easy_db;
+    protected $erp;
 
     public function __construct()
     {
         $this->easy_db = Db::connect("mysql");
+        $this->erp = Db::connect('sqlsrv');
     }
 
     public function puhuo_index($params)
@@ -1577,6 +1579,9 @@ class PuhuoService
 
             }
             foreach ($list as &$item) {
+                $item['CustomItem14']='';
+                $item['CustomItem25']='';
+                $item['CustomItem45']='';
                 if ($item['CustomerName'] == '余量') {
 
                     // 1. 方案
@@ -1609,6 +1614,16 @@ class PuhuoService
                         }
                     }
                     $item['Stock_Quantity_puhuo'] += $Stock_Quantity_puhuo;
+                }else{
+                    $cus= $this->erp->table('ErpCustomer')->where(['CustomerId'=>$item['CustomerId']])->field('CustomItem14,CustomItem25,CustomItem45')->find();
+
+                    if(!$cus){
+                        dd($cus);
+                    }
+                    $item['CustomItem14']=$cus['CustomItem14']??'';
+                    $item['CustomItem25']=$cus['CustomItem25']??'';
+                    $item['CustomItem45']=$cus['CustomItem45']??'';
+
                 }
 
             }
