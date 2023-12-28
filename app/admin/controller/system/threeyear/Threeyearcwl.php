@@ -47,11 +47,14 @@ class Threeyearcwl extends AdminController
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['年']);
                 $map年 = " AND m.`Year` IN ({$mapStr})";
+                $map年_fm = " AND `Year` IN ({$mapStr})";
                 $年 = $input['年'];
             } else {
                 $map年 = "AND m.`Year` IN ('2023', '2022', '2021')";
+                $map年_fm = " AND `Year` IN ('2023', '2022', '2021')";
                 $年 = "";
             }
+
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓']);
@@ -103,16 +106,6 @@ class Threeyearcwl extends AdminController
             }
 
             // 分母
-            if (!empty($input['年_fm'])) {
-                // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['年_fm']);
-                $map年_fm = " AND `Year` IN ({$mapStr})";
-                $年_fm = $input['年'];
-            } else {
-                // 年份全选
-                $map年_fm  = "";
-                $年_fm = "";
-            }
             if (!empty($input['云仓_fm'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓_fm']);
@@ -172,8 +165,9 @@ class Threeyearcwl extends AdminController
             // echo '<br>';
             
 
-            $执行sql = $this->sqlHandle($年, $map, $map_fm);
+            echo  $执行sql = $this->sqlHandle($年, $map, $map_fm);
 
+            die;
             $select = $this->db_easyA->query($执行sql);
             echo '<pre>';
             print_r($select);
@@ -243,8 +237,8 @@ class Threeyearcwl extends AdminController
                                 {$map_fm}
 
                     group by 
-                        `Month`,`Week`
-                    ) AS t on m.`Month` = t.`Month` and m.`Week`= t.`Week`
+                        `Year`,`Month`,`Week`
+                    ) AS t on m.`Year` = t.`Year` and m.`Month` = t.`Month` and m.`Week`= t.`Week`
                     LEFT JOIN sp_customer_stock_sale_threeyear2_customer as c on m.Year = c.年 and m.Week = c.周 
                     where 1
                         {$map}

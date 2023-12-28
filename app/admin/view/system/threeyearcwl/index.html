@@ -133,7 +133,7 @@
                                 <div class="xm-select-demo xm-Year"></div>
                             </div> -->
                             <div class="layui-input-inline" style="width: 150px !important;">
-                                <select id="xm-Mathod" name="年" lay-verify="">
+                                <select name="年" lay-verify="">
                                     <option value="">请选择</option>
                                     <option value="2023">2023</option>
                                     <option value="2022">2022</option>
@@ -268,10 +268,6 @@
 
                         <!-- 分母 -->
                         <div class="layui-form-item">
-                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
-                            <div class="layui-input-inline" style="width: 150px !important;">
-                                <div class="xm-select-demo xm-Year-fm"></div>
-                            </div>
                             <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">云仓</label>
                             <div class="layui-input-inline" style="width: 150px !important;">
                                 <div id="xm-Yuncang" class="xm-select-demo xm-Yuncang-fm"></div>
@@ -370,17 +366,17 @@
         //         {name: "2021", value: "2021", selected: true},
         //     ]
         // })
-        xmSelect.render({
-            el: '.xm-Year-fm', 
-            filterable: true,
-            // toolbar: {show: true},
-            name: '年_fm',
-            data: [
-                {name: "2023", value: "2023", selected: ""},
-                {name: "2022", value: "2022", selected: ""},
-                {name: "2021", value: "2021", selected: true},
-            ]
-        })
+        // xmSelect.render({
+        //     el: '.xm-Year-fm', 
+        //     filterable: true,
+        //     // toolbar: {show: true},
+        //     name: '年_fm',
+        //     data: [
+        //         {name: "2023", value: "2023", selected: ""},
+        //         {name: "2022", value: "2022", selected: ""},
+        //         {name: "2021", value: "2021", selected: true},
+        //     ]
+        // })
 
         //月
         xmSelect.render({
