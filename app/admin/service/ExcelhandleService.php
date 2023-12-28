@@ -552,7 +552,7 @@ class ExcelhandleService
     
     LEFT JOIN ErpGoods EG ON EWS.GoodsId=EG.GoodsId
     
-    WHERE  1
+    -- WHERE  
        -- EG.TimeCategoryName1>2022
     
        -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
