@@ -293,6 +293,17 @@ ORDER BY
 
     }
 
+    public function Color($GoodsNo){
+
+        $erp = Db::connect('sqlsrv')->table('ErpGoods')->alias('a')->where('a.GoodsNo', $GoodsNo)
+            ->leftjoin('ErpGoodsColor c', 'c.GoodsId=a.GoodsId')
+            ->field('a.*,c.ColorDesc, c.ColorCode')
+            ->find();
+
+        return $erp;
+
+    }
+
 
 
 }
