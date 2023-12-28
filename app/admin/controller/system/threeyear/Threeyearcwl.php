@@ -49,7 +49,7 @@ class Threeyearcwl extends AdminController
                 $map年 = " AND m.`Year` IN ({$mapStr})";
                 $年 = $input['年'];
             } else {
-                $map年 = "";
+                $map年 = "AND m.`Year` IN ('2023', '2022', '2021')";
                 $年 = "";
             }
             if (!empty($input['云仓'])) {
@@ -109,65 +109,74 @@ class Threeyearcwl extends AdminController
                 $map年_fm = " AND `Year` IN ({$mapStr})";
                 $年_fm = $input['年'];
             } else {
-                $map年 = "";
-                $年 = "";
+                // 年份全选
+                $map年_fm  = "";
+                $年_fm = "";
             }
-            if (!empty($input['云仓'])) {
+            if (!empty($input['云仓_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['云仓']);
-                $map云仓 = " AND m.`CustomItem15` IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['云仓_fm']);
+                $map云仓_fm = " AND `CustomItem15` IN ({$mapStr})";
             } else {
-                $map云仓 = "";
+                $map云仓_fm = "";
             }
-            if (!empty($input['温带'])) {
+            if (!empty($input['温带_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['温带']);
-                $map温带 = " AND m.WenDai IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['温带_fm']);
+                $map温带_fm = " AND WenDai IN ({$mapStr})";
             } else {
-                $map温带 = "";
+                $map温带_fm = "";
             }   
-            if (!empty($input['温区'])) {
+            if (!empty($input['温区_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['温区']);
-                $map温区 = " AND m.WenQu IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['温区_fm']);
+                $map温区_fm = " AND WenQu IN ({$mapStr})";
             } else {
-                $map温区 = "";
+                $map温区_fm = "";
             }
-            if (!empty($input['季节归集'])) {
+            if (!empty($input['季节归集_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['季节归集']);
-                $map季节归集 = " AND m.Season IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['季节归集_fm']);
+                $map季节归集_fm = " AND Season IN ({$mapStr})";
             } else {
-                $map季节归集 = "";
+                $map季节归集_fm = "";
             }
-            if (!empty($input['季节'])) {
+            if (!empty($input['季节_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['季节']);
-                $map季节 = " AND m.TimeCategoryName2 IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['季节_fm']);
+                $map季节_fm = " AND TimeCategoryName2 IN ({$mapStr})";
             } else {
-                $map季节= "";
+                $map季节_fm = "";
             }
-            if (!empty($input['经营模式'])) {
+            if (!empty($input['经营模式_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['经营模式']);
-                $map经营模式 = " AND m.Mathod IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['经营模式_fm']);
+                $map经营模式_fm = " AND Mathod IN ({$mapStr})";
             } else {
-                $map经营模式 = "";
+                $map经营模式_fm = "";
             }
-            if (!empty($input['风格'])) {
+            if (!empty($input['风格_fm'])) {
                 // echo $input['商品负责人'];
-                $mapStr = xmSelectInput($input['风格']);
-                $map风格 = " AND m.StyleCategoryName IN ({$mapStr})";
+                $mapStr = xmSelectInput($input['风格_fm']);
+                $map风格_fm = " AND StyleCategoryName IN ({$mapStr})";
             } else {
-                $map风格 = "";
+                $map风格_fm = "";
             }
 
-            echo $map = $map年 . $map云仓 . $map温带 . $map温区 . $map经营模式 . $map季节归集 . $map季节 . $map风格;
+            $map = $map年 . $map云仓 . $map温带 . $map温区 . $map经营模式 . $map季节归集 . $map季节 . $map风格;
 
-            echo '<br>';
+            // echo '<br>';
+            
+            $map_fm = $map年_fm . $map云仓_fm . $map温带_fm . $map温区_fm . $map经营模式_fm . $map季节归集_fm . $map季节_fm . $map风格_fm;
 
-            echo $this->sqlHandle($年, $map);
+            // echo '<br>';
+            
 
+            $执行sql = $this->sqlHandle($年, $map, $map_fm);
+
+            $select = $this->db_easyA->query($执行sql);
+            echo '<pre>';
+            print_r($select);
             // $count = count($select);
             // return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
@@ -179,9 +188,15 @@ class Threeyearcwl extends AdminController
     }
 
     // sql组合
-    public function sqlHandle($年 = '', $map) {
+    public function sqlHandle($年 = '', $map, $map_fm) {
         if ($年) {
-            $表 = "_{$年}";
+            // 如果是 2022 或 2021一个年份的
+            if (strlen($年) == 4) {
+                $表 = "_{$年}";
+            } else {
+                // 如果是 2022,2021这种多选的
+                $表 = "";
+            }
         } else {
             $表 = "";
         }
@@ -225,22 +240,17 @@ class Threeyearcwl extends AdminController
                             FROM
                                 `sp_customer_stock_sale_threeyear2_week`
                             where 1
-                                and `Year` in ({$年})
-                                and CategoryName1 in ('内搭', '外套', '下装', '鞋履')
-                                and StyleCategoryName in ('基本款', '引流款')
+                                {$map_fm}
+
                     group by 
                         `Month`,`Week`
                     ) AS t on m.`Month` = t.`Month` and m.`Week`= t.`Week`
                     LEFT JOIN sp_customer_stock_sale_threeyear2_customer as c on m.Year = c.年 and m.Week = c.周 
                     where 1
-                        $map
-                    --    and m.`Year` in ({$年})
-                    -- 	and m.`Month` in (1)
-                    -- 	and m.`Week` in (1)
-                    --  and m.CategoryName1 in ('内搭')
-                    --  and m.StyleCategoryName in ('基本款')
+                        {$map}
+
                     group by 
-                        m.`Year`,m.`Month`,m.`Week`,m.CategoryName1
+                        m.`Year`,m.`Month`,m.`Week`
                 ) AS res
             ) AS res2 
         ";

@@ -126,11 +126,19 @@
         <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8" lay-filter='searchFormHead'>
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 105px;">
+                    <div class="flex col between al-start" style="width:95%; height: 140px;">
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
+                            <!-- <div class="layui-input-inline" style="width: 150px !important;">
+                                <div class="xm-select-demo xm-Year"></div>
+                            </div> -->
                             <div class="layui-input-inline" style="width: 150px !important;">
-                                <div id="xm-Year" class="xm-select-demo xm-Year"></div>
+                                <select id="xm-Mathod" name="年" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                </select>
                             </div>
                             <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">云仓</label>
                             <div class="layui-input-inline" style="width: 150px !important;">
@@ -258,8 +266,53 @@
                             </div>
                         </div>
 
+                        <!-- 分母 -->
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div class="xm-select-demo xm-Year-fm"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">云仓</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-Yuncang" class="xm-select-demo xm-Yuncang-fm"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">温带</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-WenDai" class="xm-select-demo xm-WenDai-fm"></div>
+                            </div>
+                            
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">温区</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-WenQu" class="xm-select-demo xm-WenQu-fm"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">经营模式</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <select id="xm-Mathod" name="经营模式_fm" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value="加盟">加盟</option>
+                                    <option value="直营">直营</option>
+                                </select>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: left; overflow: visible;">季节归集</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-Season" class="xm-select-demo xm-Season-fm"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <div id="xm-TimeCategoryName2" class="xm-select-demo xm-TimeCategoryName2-fm"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">风格</label>
+                            <div class="layui-input-inline" style="width: 150px !important;">
+                                <select id="xm-StyleCategoryName" name="风格_fm" lay-verify="">
+                                    <option value="">请选择</option>
+                                    <option value="基本款">基本款</option>
+                                    <option value="引流款">引流款</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="flex col between" style="width:5%; height: 105px;">
+                    <div class="flex col between" style="width:5%; height: 140px;">
                         <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
                         style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
                         </button>
@@ -306,11 +359,22 @@
         startTable();
 
         //销售年份
+        // xmSelect.render({
+        //     el: '.xm-Year', 
+        //     filterable: true,
+        //     // toolbar: {show: true},
+        //     name: '年',
+        //     data: [
+        //         {name: "2023", value: "2023", selected: ""},
+        //         {name: "2022", value: "2022", selected: ""},
+        //         {name: "2021", value: "2021", selected: true},
+        //     ]
+        // })
         xmSelect.render({
-            el: '.xm-Year', 
+            el: '.xm-Year-fm', 
             filterable: true,
             // toolbar: {show: true},
-            name: '年',
+            name: '年_fm',
             data: [
                 {name: "2023", value: "2023", selected: ""},
                 {name: "2022", value: "2022", selected: ""},
@@ -339,6 +403,7 @@
                 {name: "12月", value: "12", selected: ""},
             ]
         })
+        
 
         //大区
         xmSelect.render({
@@ -359,6 +424,20 @@
             el: '.xm-Yuncang', 
             filterable: true,
             name: '云仓',
+            // showCount: 1,
+            data: [
+                {name: "南昌云仓", value: "南昌云仓", selected: ""},
+                {name: "广州云仓", value: "广州云仓", selected: ""},
+                {name: "武汉云仓", value: "武汉云仓", selected: ""},
+                {name: "西安云仓", value: "西安云仓", selected: ""},
+                {name: "贵阳云仓", value: "贵阳云仓", selected: ""},
+                {name: "长沙云仓", value: "长沙云仓", selected: ""},
+            ]
+        })
+        xmSelect.render({
+            el: '.xm-Yuncang-fm', 
+            filterable: true,
+            name: '云仓_fm',
             // showCount: 1,
             data: [
                 {name: "南昌云仓", value: "南昌云仓", selected: ""},
@@ -416,120 +495,22 @@
                 {name: "南", value: "南", selected: ""},
             ]
         })
-        //温区
-        // xmSelect.render({
-        //     el: '#xm-WenQu', 
-        //     filterable: true,
-        //     name: '温区',
-        //     // showCount: 1,
-        //     data: []
-        // })
-        //省份
-        // xmSelect.render({
-        //     el: '#xm-State', 
-        //     filterable: true,
-        //     name: '省份',
-        //     // showCount: 1,
-        //     data: []
-        // })
-        //经营模式
-        // xmSelect.render({
-        //     el: '#xm-Mathod', 
-        //     filterable: true,
-        //     name: '经营模式',
-        //     // showCount: 1,
-        //     data: []
-        // })
-
-
-        //新旧品
-        // xmSelect.render({
-        //     el: '#xm-NewOld', 
-        //     filterable: true,
-        //     name: '商品负责人',
-        //     // showCount: 1,
-        //     data: []
-        // })
-        //季节
-        // xmSelect.render({
-        //     el: '#xm-Season', 
-        //     filterable: true,
-        //     name: '季节',
-        //     // showCount: 1,
-        //     data: []
-        // })
-        //风格
-        // xmSelect.render({
-        //     el: '#xm-StyleCategoryName', 
-        //     filterable: true,
-        //     name: '风格',
-        //     // showCount: 1,
-        //     data: []
-        // })
-        //一级分类
-        // xmSelect.render({
-        //     el: '#xm-CategoryName1', 
-        //     filterable: true,
-        //     name: '一级分类',
-        //     data: []
-        // })
-        //二级分类
-        // xmSelect.render({
-        //     el: '#xm-CategoryName2', 
-        //     filterable: true,
-        //     name: '二级分类',
-        //     data: []
-        // })
-        //分类
-        // xmSelect.render({
-        //     el: '#xm-CategoryName', 
-        //     filterable: true,
-        //     name: '分类',
-        //     data: []
-        // })
-        //深浅色
-        // xmSelect.render({
-        //     el: '#xm-CustomItem46', 
-        //     filterable: true,
-        //     name: '深浅色',
-        //     data: []
-        // })
-
-        //二级时间分类
-        // xmSelect.render({
-        //     el: '#xm-TimeCategoryName2', 
-        //     filterable: true,
-        //     name: '二级时间分类',
-        //     data: []
-        // })
-        // //时间分类
-        // xmSelect.render({
-        //     el: '#xm-TimeCategoryName', 
-        //     filterable: true,
-        //     name: '时间分类',
-        //     data: []
-        // })
-        // //厚度
-        // xmSelect.render({
-        //     el: '#xm-CustomItem17', 
-        //     filterable: true,
-        //     name: '厚度',
-        //     data: []
-        // })
-        // //适龄段
-        // xmSelect.render({
-        //     el: '#xm-CustomItem1', 
-        //     filterable: true,
-        //     name: '适龄段',
-        //     data: []
-        // })
-        // //时尚度
-        // xmSelect.render({
-        //     el: '#xm-CustomItem45', 
-        //     filterable: true,
-        //     name: '时尚度',
-        //     data: []
-        // })
+        xmSelect.render({
+            el: '.xm-WenDai-fm', 
+            filterable: true,
+            toolbar: {show: true},
+            name: '温带_fm',
+            // showCount: 1,
+            theme: {
+                color: '#1cbbb4',
+            },
+            data: [
+                {name: "中", value: "中", selected: ""},
+                {name: "云贵", value: "云贵", selected: ""},
+                {name: "北", value: "北", selected: ""},
+                {name: "南", value: "南", selected: ""},
+            ]
+        })
         //色感
         xmSelect.render({
             el: '#xm-CustomItem47', 
@@ -584,60 +565,6 @@
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
-                // console.log(res);
-
-                //销售年份
-                // xmSelect.render({
-                //     el: '#xm-Year', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'Year',
-                //     data: res.data.Year
-                // })
-
-                //月
-                // xmSelect.render({
-                //     el: '#xm-Month', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'Month',
-                //     data: res.data.Month
-                // })
-
-                //大区
-                // xmSelect.render({
-                //     el: '#xm-YunCang', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'YunCang',
-                //     data: res.data.YunCang
-                // })
-                //温带
-                // xmSelect.render({
-                //     el: '#xm-WenDai', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'WenDai',
-                //     data: res.data.WenDai
-                // })
-
-                console.log(res.data.WenQu)
                 //温区
                 xmSelect.render({
                     el: '.xm-WenQu', 
@@ -650,7 +577,17 @@
                     name:'温区',
                     data: res.data.WenQu
                 })
-
+                xmSelect.render({
+                    el: '.xm-WenQu-fm', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'温区_fm',
+                    data: res.data.WenQu
+                })
                 //省份
                 xmSelect.render({
                     el: '.xm-State', 
@@ -663,33 +600,6 @@
                     name:'省份',
                     data: res.data.State
                 })
-
-                //经营模式
-                // xmSelect.render({
-                //     el: '#xm-Mathod', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'Mathod',
-                //     data: res.data.Mathod
-                // })
-
-
-                //新旧品
-                // xmSelect.render({
-                //     el: '#xm-NewOld', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'NewOld',
-                //     data: res.data.NewOld
-                // })
                 //季节
                 xmSelect.render({
                     el: '.xm-Season', 
@@ -702,18 +612,17 @@
                     name:'季节归集',
                     data: res.data.Season
                 })
-                //风格
-                // xmSelect.render({
-                //     el: '#xm-StyleCategoryName', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'StyleCategoryName',
-                //     data: res.data.StyleCategoryName
-                // })
+                xmSelect.render({
+                    el: '.xm-Season-fm', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'季节归集_fm',
+                    data: res.data.Season
+                })
                 // 一级分类
                 xmSelect.render({
                     el: '.xm-CategoryName1', 
@@ -757,6 +666,16 @@
                         color: '#1cbbb4',
                     },
                     name:'季节',
+                    data: res.data.TimeCategoryName2
+                })
+                xmSelect.render({
+                    el: '.xm-TimeCategoryName2-fm', 
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    name:'季节_fm',
                     data: res.data.TimeCategoryName2
                 })
                 //波段
@@ -803,53 +722,8 @@
                     name:'时尚度',
                     data: res.data.CustomItem45
                 })
-                // //秋冬云仓
-                // xmSelect.render({
-                //     el: '#xm-CustomItem65', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     name:'CustomItem65',
-                //     data: res.data.CustomItem65
-                // })
-                // //春夏云仓
-                // xmSelect.render({
-                //     el: '#xm-CustomItem66', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     name:'CustomItem66',
-                //     data: res.data.CustomItem66
-                // })
-                
-                //南中北
-                // xmSelect.render({
-                //     el: '#xm-nanzhongbei', 
-                //     filterable: true,
-                //     toolbar: {show: true},
-                //     theme: {
-                //         color: '#1cbbb4',
-                //     },
-                //     // showCount: 1,
-                //     name:'nanzhongbei',
-                //     data: res.data.nanzhongbei
-                // })
-                // 日期选择器
-                // laydate.render({
-                //     name:'setTime1',
-                //     elem: '#setTime1'
-                // });
-                // laydate.render({
-                //     name:'setTime2',
-                //     elem: '#setTime2'
-                // });
-
-
             }, 'json')
+
         }
 
         //监听保存
