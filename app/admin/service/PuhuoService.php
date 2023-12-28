@@ -159,7 +159,7 @@ class PuhuoService
         $setTime2 = $params['setTime2'] ?? '';//结束日期
 
         $where = $list = [];
-//         $where[] = ['is_delete', '=', 2];
+        $where[] = ['admin_id', '=', session('admin.id')];
         if ($WarehouseName) {
             $where[] = ['WarehouseName', 'in', $WarehouseName];
         }
