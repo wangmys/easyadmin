@@ -2,12 +2,24 @@
     body {
         background-color: #fff;
     }
+
+     .layui-form-item .required:after {
+        content: '*';
+        color: red;
+        position: absolute;
+        margin-left: 4px;
+        font-weight: bold;
+        line-height: 1.8em;
+        top: 6px;
+        right: 5px;
+    }
+
 </style>
 <div class="layuimini-container">
     <form id="app-form" class="layui-form" lay-filter="example">
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">云仓</label>
+                <label class="layui-form-label required">云仓</label>
                 <div class="layui-input-inline">
                     <div id="xm-WarehouseName" class="xm-select"></div>
                 </div>
@@ -16,7 +28,7 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-block">
-                <label class="layui-form-label">货号</label>
+                <label class="layui-form-label required">货号</label>
                 <div class="layui-input-block">
                     <div id="xm-select" class="xm-select"></div>
                 </div>
@@ -25,7 +37,7 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-block">
-                <label class="layui-form-label">店铺</label>
+                <label class="layui-form-label">筛选条件</label>
                 <div class="layui-input-block">
                     <div id="xm-CustomerName" class="xm-select"></div>
                 </div>
@@ -33,9 +45,9 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">尺码</label>
-                <div class="layui-input-inline">
+            <div class="layui-block">
+                <label class="layui-form-label required">尺码</label>
+                <div class="layui-input-block">
                     <div id="xm-size" class="xm-select"></div>
                 </div>
 
@@ -43,7 +55,7 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">件数范围</label>
+                <label class="layui-form-label required">件数范围</label>
                 <div class="layui-input-inline" style="width: 100px;">
                     <input type="number" name="min" lay-verify="required" placeholder="" autocomplete="off"
                            class="layui-input">
@@ -57,7 +69,7 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">加减数值</label>
+                <label class="layui-form-label required">加减数值</label>
                 <div class="layui-input-inline">
                     <input type="number" name="number" lay-verify="required" autocomplete="off"
                            class="layui-input demo-phone">
@@ -90,6 +102,11 @@
         //提交事件
         form.on('submit(sub)', function (data) {
             let field = data.field
+
+            if (!field.WarehouseName) {
+                xm3.warning();
+                return false
+            }
             if (!field.GoodsNo) {
                 xm1.warning();
                 return false
@@ -98,10 +115,7 @@
                 xm2.warning();
                 return false
             }
-            if (!field.Size) {
-                xm3.warning();
-                return false
-            }
+
 
             $.post('set_revise', data.field, function (res) {
                 if (res.code == 1) {
@@ -120,7 +134,7 @@
         });
 
         let int_data = function () {
-            $.get('getXmMapSelect', {}, function (res) {
+            $.get('getXmMapSelect?level=1', {}, function (res) {
                 xm1 = xmSelect.render({
                     el: '#xm-select',
                     icon: 'show',
@@ -182,7 +196,7 @@
                     tips: '请选择',
                     // radio: true,
                     toolbar: {
-                        show: false,
+                        show: true,
                     },
                     height: '320px',
                     direction: 'auto',

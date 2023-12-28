@@ -34,10 +34,12 @@ class PuhuoService
     use Singleton;
 
     protected $easy_db;
+    protected $erp;
 
     public function __construct()
     {
         $this->easy_db = Db::connect("mysql");
+        $this->erp = Db::connect('sqlsrv');
     }
 
     public function puhuo_index($params)
@@ -1577,6 +1579,10 @@ class PuhuoService
 
             }
             foreach ($list as &$item) {
+                $item['wenqu'] = '';
+                $item['CustomItem14'] = '';
+                $item['CustomItem25'] = '';
+                $item['CustomItem45'] = '';
                 if ($item['CustomerName'] == '余量') {
 
                     // 1. 方案
@@ -1609,6 +1615,20 @@ class PuhuoService
                         }
                     }
                     $item['Stock_Quantity_puhuo'] += $Stock_Quantity_puhuo;
+                } else {
+                    $cus = $this->erp->table('ErpCustomer')->where(['CustomerId' => $item['CustomerId']])->field('CustomItem14,CustomItem25,CustomItem45')->find();
+                    $puhuoConfig = $this->easy_db->table('sp_lyp_puhuo_config')->where(1)->find();
+
+                    if ($puhuoConfig['if_hottocold'] == 2) {
+                        $wenqu = $this->easy_db->table('sp_lyp_puhuo_coldtohot')->where([['province', 'like', '%' . $item['State'] . '%']])->find();
+                    } else {
+                        $wenqu = $this->easy_db->table('sp_lyp_puhuo_hottocold')->where([['province', 'like', '%' . $item['State'] . '%']])->find();
+                    }
+                    $item['wenqu'] = $wenqu['wenqu'] ?? '';
+                    $item['CustomItem14'] = $cus['CustomItem14'] ?? '';
+                    $item['CustomItem25'] = $cus['CustomItem25'] ?? '';
+                    $item['CustomItem45'] = $cus['CustomItem45'] ?? '';
+
                 }
 
             }
