@@ -89,9 +89,10 @@ class BudongxiaosystemWinter extends AdminController
             if (checkAdmin()) {
                 $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->select()->toArray();
             } else {
-                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->where([
-                    ['商品负责人', '=', session('admin.name')],
-                ])->select()->toArray();
+                // $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->where([
+                //     ['商品负责人', '=', session('admin.name')],
+                // ])->select()->toArray();
+                $select_result = $this->db_easyA->table('cwl_budongxiao_result_sys_winter')->where($map)->select()->toArray();
             }
              
             // $select_static = $this->single_statistics($select_map['rand_code']);
@@ -289,7 +290,7 @@ class BudongxiaosystemWinter extends AdminController
      * 单店不动销计算明细 导出
      */
     public function excel_history_detail() {
-        if (checkAdmin()) {
+        if (checkAdmin() || 1) {
             $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys_winter')->where(1)->select()->toArray();
         } else {
             $select_result = $this->db_easyA->table('cwl_budongxiao_history_sys_winter')->where([
@@ -768,7 +769,7 @@ class BudongxiaosystemWinter extends AdminController
     // 单店不动销 详情
     public function single_statistics($rand_code) {
         $rand_code = input('rand_code');
-        if (checkAdmin()) {
+        if (checkAdmin() || 1) {
             $sql = "    
                 SELECT
                     *,
