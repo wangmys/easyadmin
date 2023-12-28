@@ -134,7 +134,7 @@
         });
 
         let int_data = function () {
-            $.get('getXmMapSelect', {}, function (res) {
+            $.get('getXmMapSelect?level=1', {}, function (res) {
                 xm1 = xmSelect.render({
                     el: '#xm-select',
                     icon: 'show',

@@ -85,11 +85,11 @@ class Revise extends AdminController
      * @return \think\response\Json
      * @NodeAnotation(title="XM",auth=false)
      */
-    public function getXmMapSelect()
+    public function getXmMapSelect($level=0)
     {
 
 
-        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect($level)]);
 
     }
 

@@ -65,7 +65,7 @@ class ReviseService
 
     }
 
-    public function getXmMapSelect()
+    public function getXmMapSelect($isLevel = 0)
     {
 
         $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where([['CustomerName', '<>', '余量'], ['admin_id', '=', session('admin.id')]])->select()->toArray();
@@ -74,6 +74,18 @@ class ReviseService
         $GoodsNo = $this->xm($db, 'GoodsNo');
         $CustomerName = $this->xm($db, 'CustomerName');
         $CustomItem17 = $this->xm($db, 'CustomItem17');
+
+        $level = [
+            ['name' => 'A', 'value' => 'A'],
+            ['name' => 'B', 'value' => 'B'],
+            ['name' => 'C', 'value' => 'C'],
+            ['name' => 'D', 'value' => 'D'],
+            ['name' => 'S', 'value' => 'S'],
+            ['name' => 'SS', 'value' => 'S'],
+        ];
+        if ($isLevel ==1) {
+            $CustomerName = array_merge($level, $CustomerName);
+        }
 
         $Size = [
             ['name' => '28/44/37/S', 'value' => 'Stock_00_puhuo'],
@@ -122,7 +134,7 @@ class ReviseService
 
             $where2 = [];
             if (isset($param['CustomerName']) && !empty($param['CustomerName'])) {
-                $where2[] = ['CustomerName', 'IN', explode(',', $param['CustomerName'])];
+                $where2[] = ['CustomerName|CustomerGrade', 'IN', explode(',', $param['CustomerName'])];
             }
             $minMax = range($param['min'], $param['max'], 1);
             $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where2)->where($where)->select()->toArray();
