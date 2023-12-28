@@ -68,7 +68,7 @@ class ReviseService
     public function getXmMapSelect()
     {
 
-        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['admin_id' => session('admin.id')])->select()->toArray();
+        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where([['CustomerName', '<>', '余量'], ['admin_id', '=', session('admin.id')]])->select()->toArray();
         $WarehouseName = $this->xm($db, 'WarehouseName');
         $CategoryName1 = $this->xm($db, 'CategoryName1');
         $GoodsNo = $this->xm($db, 'GoodsNo');
@@ -111,30 +111,42 @@ class ReviseService
 
     public function set_revise($param)
     {
+        $GoodsNoList = explode(',', $param['GoodsNo']);
 
-        $where = [
-            ['GoodsNo', '=', $param['GoodsNo']],
-            ['WarehouseName', '=', $param['WarehouseName']],
-            ['admin_id', '=', session('admin.id')],
-        ];
-        $minMax = range($param['min'], $param['max'], 1);
-        $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where)->select()->toArray();
-        $total = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->find();
-        foreach ($list as &$item) {
-            foreach ($item as $son => &$son_v) {
-                if (in_array($son, explode(',', $param['Size'])) && in_array($son_v, $minMax)) {
-                    $total[$son] -= $param['number'];
-                    $total['Stock_Quantity_puhuo'] -= $param['number'];
+        foreach ($GoodsNoList as $GoodsNo) {
+            $where = [
+                ['GoodsNo', '=', $GoodsNo],
+                ['WarehouseName', '=', $param['WarehouseName']],
+                ['admin_id', '=', session('admin.id')],
+            ];
 
-                    $item[$son] += $param['number'];
-                    $item['Stock_Quantity_puhuo'] += $param['number'];
-                }
+            $where2 = [];
+            if (isset($param['CustomerName']) && !empty($param['CustomerName'])) {
+                $where2[] = ['CustomerName', 'IN', explode(',', $param['CustomerName'])];
             }
-            $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)->where(['CustomerName' => $item['CustomerName']])->update($item);
-        }
-        //修改余量
-        $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->update($total);
+            $minMax = range($param['min'], $param['max'], 1);
+            $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where2)->where($where)->select()->toArray();
 
+            $total = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->find();
+            foreach ($list as &$item) {
+                foreach ($item as $son => &$son_v) {
+                    if (in_array($son, explode(',', $param['Size'])) && in_array($son_v, $minMax)) {
+                        if (($item[$son] + $param['number']) < 0) {
+                            continue;
+                        }
+                        $total[$son] -= $param['number'];
+                        $total['Stock_Quantity_puhuo'] -= $param['number'];
+
+                        $item[$son] += $param['number'];
+                        $item['Stock_Quantity_puhuo'] += $param['number'];
+                    }
+                }
+                $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)->where(['CustomerName' => $item['CustomerName']])->update($item);
+            }
+            //修改余量
+            $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->update($total);
+
+        }
 
         return true;
 
