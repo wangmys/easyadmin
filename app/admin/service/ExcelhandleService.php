@@ -90,7 +90,7 @@ class ExcelhandleService
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
-                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
+                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'SG';
                     if ($total <= $yk_con * $cus_num) {
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
@@ -116,7 +116,7 @@ class ExcelhandleService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
-                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'SG';
 
                     if ($no != 0) {
                         $shoesArr = $s_v;
@@ -552,7 +552,8 @@ class ExcelhandleService
     
     LEFT JOIN ErpGoods EG ON EWS.GoodsId=EG.GoodsId
     
-    WHERE EG.TimeCategoryName1>2022
+    WHERE  1
+       -- EG.TimeCategoryName1>2022
     
        -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
@@ -597,7 +598,7 @@ class ExcelhandleService
     
                     ) 
     
-        AND EG.TimeCategoryName1>2022
+      --  AND EG.TimeCategoryName1>2022
     
       --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
@@ -640,7 +641,7 @@ class ExcelhandleService
     
         AND EDG.SortingID IS NULL
     
-        AND EG.TimeCategoryName1>2022
+     --   AND EG.TimeCategoryName1>2022
     
        -- AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
@@ -681,7 +682,7 @@ class ExcelhandleService
     
     WHERE (EPRN.IsCompleted = 0 OR EPRN.IsCompleted IS NULL) 
     
-        AND EG.TimeCategoryName1>2022
+     --   AND EG.TimeCategoryName1>2022
     
       --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
 
@@ -722,7 +723,7 @@ class ExcelhandleService
     
     WHERE EPCR.CodingCode= 'StartNode1'
     
-        AND EG.TimeCategoryName1>2022
+      --  AND EG.TimeCategoryName1>2022
     
       --  AND EG.CategoryName1 NOT IN ('物料','人事物料')
     
@@ -765,7 +766,7 @@ class ExcelhandleService
     
         AND (EI.CodingCode= 'StartNode1' OR (EI.CodingCode= 'EndNode2' AND EI.IsCompleted=0 ))
     
-        AND EG.TimeCategoryName1>2022
+      --  AND EG.TimeCategoryName1>2022
     
      --   AND EG.CategoryName1 NOT IN ('物料','人事物料')
     

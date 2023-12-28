@@ -15,10 +15,19 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <div class="layui-inline">
+            <div class="layui-block">
                 <label class="layui-form-label">货号</label>
-                <div class="layui-input-inline">
+                <div class="layui-input-block">
                     <div id="xm-select" class="xm-select"></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-block">
+                <label class="layui-form-label">店铺</label>
+                <div class="layui-input-block">
+                    <div id="xm-CustomerName" class="xm-select"></div>
                 </div>
 
             </div>
@@ -74,7 +83,8 @@
             , $ = layui.jquery
             , xm1
             , xm2
-            , xm3;
+            , xm3
+            , xm4;
 
 
         //提交事件
@@ -115,7 +125,7 @@
                     el: '#xm-select',
                     icon: 'show',
                     tips: '请选择',
-                    radio: true,
+                    // radio: true,
                     toolbar: {
                         show: true,
                     },
@@ -166,7 +176,24 @@
                     name: 'WarehouseName',
                     data: res.data.WarehouseName
                 });
-
+                xm4 = xmSelect.render({
+                    el: '#xm-CustomerName',
+                    icon: 'show',
+                    tips: '请选择',
+                    // radio: true,
+                    toolbar: {
+                        show: false,
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    name: 'CustomerName',
+                    data: res.data.CustomerName
+                });
                 layui.form.render("select");
             });
 

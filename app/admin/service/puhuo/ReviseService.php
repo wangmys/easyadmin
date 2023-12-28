@@ -68,7 +68,7 @@ class ReviseService
     public function getXmMapSelect()
     {
 
-        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['admin_id' => session('admin.id')])->select()->toArray();
+        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where([['CustomerName', '<>', '余量'], ['admin_id', '=', session('admin.id')]])->select()->toArray();
         $WarehouseName = $this->xm($db, 'WarehouseName');
         $CategoryName1 = $this->xm($db, 'CategoryName1');
         $GoodsNo = $this->xm($db, 'GoodsNo');
@@ -111,30 +111,42 @@ class ReviseService
 
     public function set_revise($param)
     {
+        $GoodsNoList = explode(',', $param['GoodsNo']);
 
-        $where = [
-            ['GoodsNo', '=', $param['GoodsNo']],
-            ['WarehouseName', '=', $param['WarehouseName']],
-            ['admin_id', '=', session('admin.id')],
-        ];
-        $minMax = range($param['min'], $param['max'], 1);
-        $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where)->select()->toArray();
-        $total = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->find();
-        foreach ($list as &$item) {
-            foreach ($item as $son => &$son_v) {
-                if (in_array($son, explode(',', $param['Size'])) && in_array($son_v, $minMax)) {
-                    $total[$son] -= $param['number'];
-                    $total['Stock_Quantity_puhuo'] -= $param['number'];
+        foreach ($GoodsNoList as $GoodsNo) {
+            $where = [
+                ['GoodsNo', '=', $GoodsNo],
+                ['WarehouseName', '=', $param['WarehouseName']],
+                ['admin_id', '=', session('admin.id')],
+            ];
 
-                    $item[$son] += $param['number'];
-                    $item['Stock_Quantity_puhuo'] += $param['number'];
-                }
+            $where2 = [];
+            if (isset($param['CustomerName']) && !empty($param['CustomerName'])) {
+                $where2[] = ['CustomerName', 'IN', explode(',', $param['CustomerName'])];
             }
-            $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)->where(['CustomerName' => $item['CustomerName']])->update($item);
-        }
-        //修改余量
-        $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->update($total);
+            $minMax = range($param['min'], $param['max'], 1);
+            $list = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where('is_total', '0')->where($where2)->where($where)->select()->toArray();
 
+            $total = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->find();
+            foreach ($list as &$item) {
+                foreach ($item as $son => &$son_v) {
+                    if (in_array($son, explode(',', $param['Size'])) && in_array($son_v, $minMax)) {
+                        if (($item[$son] + $param['number']) < 0) {
+                            continue;
+                        }
+                        $total[$son] -= $param['number'];
+                        $total['Stock_Quantity_puhuo'] -= $param['number'];
+
+                        $item[$son] += $param['number'];
+                        $item['Stock_Quantity_puhuo'] += $param['number'];
+                    }
+                }
+                $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where($where)->where(['CustomerName' => $item['CustomerName']])->update($item);
+            }
+            //修改余量
+            $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where(['is_total' => 1, 'CustomerName' => '余量'])->where($where)->update($total);
+
+        }
 
         return true;
 
@@ -205,11 +217,11 @@ class ReviseService
                 $clothesPantsArr = $cp_v;
                 if ($cp_v['Stock_Quantity_puhuo'] < $yk_con) { //单货号小于配置
                     $total = $total + $cp_v['Stock_Quantity_puhuo'];
-                    $shoper= $config['商品负责人'][$item['CustomItem17']] ??'XXX';
+                    $shoper = $config['商品负责人'][$item['CustomItem17']] ?? 'SG';
                     if ($total <= $yk_con * $cus_num) {
 
                         $clothesPantsArr['sort'] = $numArr[$item['CustomItem17']];
-                        $clothesPantsArr['uuid'] =$shoper. $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $clothesPantsArr['uuid'] = $shoper . $config[$cp_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $clothesPantsArr;
                     } else {
                         $cus_num++;
@@ -231,7 +243,7 @@ class ReviseService
                     $shoesArr['uuid'] = $data[$item['CustomerName']][$s_k]['uuid'];
                     $data[$item['CustomerName']][] = $shoesArr;
                 } else {
-                    $shoper= $config['商品负责人'][$item['CustomItem17']]??'XXX';
+                    $shoper = $config['商品负责人'][$item['CustomItem17']] ?? 'SG';
 
                     if ($no != 0) {
                         $shoesArr = $s_v;
@@ -243,7 +255,7 @@ class ReviseService
                         $no = $numArr[$item['CustomItem17']];
                         $shoesArr = $s_v;
                         $shoesArr['sort'] = $numArr[$item['CustomItem17']];
-                        $shoesArr['uuid'] = $shoper. $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
+                        $shoesArr['uuid'] = $shoper . $config[$s_v['xingzhi']] . date('Ymd') . str_pad($numArr[$item['CustomItem17']], 3, '0', STR_PAD_LEFT);
                         $data[$item['CustomerName']][] = $shoesArr;
 
                     }
@@ -271,7 +283,8 @@ class ReviseService
 
     }
 
-    public function Size($GoodsNo){
+    public function Size($GoodsNo)
+    {
 
         $sql = "SELECT
     bgs.Size
@@ -293,6 +306,17 @@ ORDER BY
 
     }
 
+    public function Color($GoodsNo)
+    {
+
+        $erp = Db::connect('sqlsrv')->table('ErpGoods')->alias('a')->where('a.GoodsNo', $GoodsNo)
+            ->leftjoin('ErpGoodsColor c', 'c.GoodsId=a.GoodsId')
+            ->field('a.*,c.ColorDesc, c.ColorCode')
+            ->find();
+
+        return $erp;
+
+    }
 
 
 }

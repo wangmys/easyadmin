@@ -151,6 +151,7 @@ class Revise extends AdminController
         }
 
         foreach ($res as $k_res => $v_res) {
+            $Color = $this->service->Color($v_res['GoodsNo']);
             $tmp_arr = [
                 'uuid' => $v_res['uuid'],
                 'date' => $date,
@@ -163,14 +164,13 @@ class Revise extends AdminController
                 're_confirm' => 'Y',
                 'GoodsNo' => $v_res['GoodsNo'],
                 'Size' => '',
-                'ColorCode' => $v_res['ColorCode'],
+                'ColorCode' => $Color['ColorCode'],
                 'puhuo_num' => 0,
                 'status' => 2,
                 'remark' => implode('/', $remarkArr[$v_res['sort']]),
                 'admin_id' => session('admin.id')
             ];
             $Size = $this->service->Size($v_res['GoodsNo']);
-
             $size_arr = [
                 ['puhuo_num' => $v_res['Stock_00_puhuo'], 'Size' => $Size[0] ?? ''],
                 ['puhuo_num' => $v_res['Stock_29_puhuo'], 'Size' => $Size[1] ?? ''],
