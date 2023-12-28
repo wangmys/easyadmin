@@ -81,7 +81,7 @@ class ReviseService
             ['name' => 'C', 'value' => 'C'],
             ['name' => 'D', 'value' => 'D'],
             ['name' => 'S', 'value' => 'S'],
-            ['name' => 'SS', 'value' => 'S'],
+            ['name' => 'SS', 'value' => 'SS'],
         ];
         if ($isLevel ==1) {
             $CustomerName = array_merge($level, $CustomerName);
