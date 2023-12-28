@@ -133,6 +133,7 @@ class ReviseService
 
         foreach ($GoodsNoList as $GoodsNo) {
             $where = [
+                ['is_delete', '=', 2],
                 ['GoodsNo', '=', $GoodsNo],
                 ['WarehouseName', '=', $param['WarehouseName']],
                 ['admin_id', '=', session('admin.id')],

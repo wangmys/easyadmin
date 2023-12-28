@@ -130,7 +130,8 @@ class Revise extends AdminController
     {
 
         $where = [
-            ['is_total', '=', '0']
+            ['is_total', '=', '0'],
+            ['is_delete', '=', '2'],
         ];
         $res = $this->service->order_no($where);
         $date = date('Y-m-d');
