@@ -42,99 +42,134 @@ class Threeyearcwl extends AdminController
             // $pageParams1 = 0;
             // $pageParams2 = 100;
 
+            // 筛选项
             if (!empty($input['年'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['年']);
-                $map_年 = " AND m.`Year` IN ({$mapStr})";
+                $map年 = " AND m.`Year` IN ({$mapStr})";
+                $年 = $input['年'];
             } else {
-                $map_年 = "";
+                $map年 = "";
+                $年 = "";
             }
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓']);
-                $map_云仓 = " AND m.`CustomItem15` IN ({$mapStr})";
+                $map云仓 = " AND m.`CustomItem15` IN ({$mapStr})";
             } else {
-                $map_云仓 = "";
+                $map云仓 = "";
             }
             if (!empty($input['温带'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['温带']);
-                $map_温带 = " AND 省份 IN ({$mapStr})";
+                $map温带 = " AND m.WenDai IN ({$mapStr})";
             } else {
-                $map3 = "";
+                $map温带 = "";
             }   
+            if (!empty($input['温区'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['温区']);
+                $map温区 = " AND m.WenQu IN ({$mapStr})";
+            } else {
+                $map温区 = "";
+            }
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['季节归集']);
+                $map季节归集 = " AND m.Season IN ({$mapStr})";
+            } else {
+                $map季节归集 = "";
+            }
+            if (!empty($input['季节'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['季节']);
+                $map季节 = " AND m.TimeCategoryName2 IN ({$mapStr})";
+            } else {
+                $map季节= "";
+            }
             if (!empty($input['经营模式'])) {
                 // echo $input['商品负责人'];
-                $map4Str = xmSelectInput($input['经营模式']);
-                $map4 = " AND 经营模式 IN ({$map4Str})";
+                $mapStr = xmSelectInput($input['经营模式']);
+                $map经营模式 = " AND m.Mathod IN ({$mapStr})";
             } else {
-                $map4 = "";
-            }
-            if (!empty($input['店铺名称'])) {
-                // echo $input['商品负责人'];
-                $map5Str = xmSelectInput($input['店铺名称']);
-                $map5 = " AND 店铺名称 IN ({$map5Str})";
-            } else {
-                $map5 = "";
-            }
-            if (!empty($input['大类'])) {
-                // echo $input['商品负责人'];
-                $map6Str = xmSelectInput($input['大类']);
-                $map6 = " AND 一级分类 IN ({$map6Str})";
-            } else {
-                $map6 = "";
-            }
-            if (!empty($input['中类'])) {
-                // echo $input['商品负责人'];
-                $map7Str = xmSelectInput($input['中类']);
-                $map7 = " AND 二级分类 IN ({$map7Str})";
-            } else {
-                $map7 = "";
-            }
-            if (!empty($input['分类'])) {
-                // echo $input['商品负责人'];
-                $map8Str = xmSelectInput($input['分类']);
-                $map8 = " AND 分类 IN ({$map8Str})";
-            } else {
-                $map8 = "";
-            }
-            if (!empty($input['货号'])) {
-                // echo $input['商品负责人'];
-                $map9Str = xmSelectInput($input['货号']);
-                $map9 = " AND 货号 IN ({$map9Str})";
-            } else {
-                $map9 = "";
+                $map经营模式 = "";
             }
             if (!empty($input['风格'])) {
                 // echo $input['商品负责人'];
-                $map10Str = xmSelectInput($input['风格']);
-                $map10 = " AND 风格 IN ({$map10Str})";
+                $mapStr = xmSelectInput($input['风格']);
+                $map风格 = " AND m.StyleCategoryName IN ({$mapStr})";
             } else {
-                $map10 = "";
+                $map风格 = "";
             }
-            if (!empty($input['提醒备注'])) {
+
+            // 分母
+            if (!empty($input['年_fm'])) {
                 // echo $input['商品负责人'];
-                $map11Str = xmSelectInput($input['提醒备注']);
-                $map11 = " AND 提醒备注 IN ({$map11Str})";
+                $mapStr = xmSelectInput($input['年_fm']);
+                $map年_fm = " AND `Year` IN ({$mapStr})";
+                $年_fm = $input['年'];
             } else {
-                $map11 = "";
+                $map年 = "";
+                $年 = "";
             }
-            if (!empty($input['超量个数'])) {
-                $map12 = " AND 超量个数 = {$input['超量个数']}";
+            if (!empty($input['云仓'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['云仓']);
+                $map云仓 = " AND m.`CustomItem15` IN ({$mapStr})";
             } else {
-                $map12 = "";
+                $map云仓 = "";
+            }
+            if (!empty($input['温带'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['温带']);
+                $map温带 = " AND m.WenDai IN ({$mapStr})";
+            } else {
+                $map温带 = "";
+            }   
+            if (!empty($input['温区'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['温区']);
+                $map温区 = " AND m.WenQu IN ({$mapStr})";
+            } else {
+                $map温区 = "";
+            }
+            if (!empty($input['季节归集'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['季节归集']);
+                $map季节归集 = " AND m.Season IN ({$mapStr})";
+            } else {
+                $map季节归集 = "";
             }
             if (!empty($input['季节'])) {
-                $map13Str = xmSelectInput($input['季节']);
-                $map13 = " AND 季节 IN ($map13Str)";
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['季节']);
+                $map季节 = " AND m.TimeCategoryName2 IN ({$mapStr})";
             } else {
-                $map13 = "";
+                $map季节= "";
+            }
+            if (!empty($input['经营模式'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['经营模式']);
+                $map经营模式 = " AND m.Mathod IN ({$mapStr})";
+            } else {
+                $map经营模式 = "";
+            }
+            if (!empty($input['风格'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['风格']);
+                $map风格 = " AND m.StyleCategoryName IN ({$mapStr})";
+            } else {
+                $map风格 = "";
             }
 
+            echo $map = $map年 . $map云仓 . $map温带 . $map温区 . $map经营模式 . $map季节归集 . $map季节 . $map风格;
 
+            echo '<br>';
 
-            $count = count($select);
-            return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+            echo $this->sqlHandle($年, $map);
+
+            // $count = count($select);
+            // return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
         } else {
 
             return View('system/threeyearcwl/index', [
@@ -144,9 +179,9 @@ class Threeyearcwl extends AdminController
     }
 
     // sql组合
-    public function sqlHandle($年份 = '') {
-        if ($年份) {
-            $表 = "_{$年份}";
+    public function sqlHandle($年 = '', $map) {
+        if ($年) {
+            $表 = "_{$年}";
         } else {
             $表 = "";
         }
@@ -190,7 +225,7 @@ class Threeyearcwl extends AdminController
                             FROM
                                 `sp_customer_stock_sale_threeyear2_week`
                             where 1
-                                and `Year` in ({$年份})
+                                and `Year` in ({$年})
                                 and CategoryName1 in ('内搭', '外套', '下装', '鞋履')
                                 and StyleCategoryName in ('基本款', '引流款')
                     group by 
@@ -198,7 +233,8 @@ class Threeyearcwl extends AdminController
                     ) AS t on m.`Month` = t.`Month` and m.`Week`= t.`Week`
                     LEFT JOIN sp_customer_stock_sale_threeyear2_customer as c on m.Year = c.年 and m.Week = c.周 
                     where 1
-                        and m.`Year` in ({$年份})
+                        $map
+                    --    and m.`Year` in ({$年})
                     -- 	and m.`Month` in (1)
                     -- 	and m.`Week` in (1)
                     --  and m.CategoryName1 in ('内搭')

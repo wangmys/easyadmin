@@ -81,7 +81,7 @@ class Skauto extends AdminController
             }
 
             // dump($input);die;
-            if (checkAdmin()) {
+            if (checkAdmin() || 1) {
                 if (!empty($input['商品负责人'])) {
                     // echo $input['商品负责人'];
                     $map1Str = xmSelectInput($input['商品负责人']);
@@ -280,18 +280,15 @@ class Skauto extends AdminController
                     }
                 }
             }
-            if (checkAdmin()) {
-                if (!empty($input['商品负责人'])) {
-                    // echo $input['商品负责人'];
-                    $map1Str = xmSelectInput($input['商品负责人']);
-                    $map1 = " AND 商品负责人 IN ({$map1Str})";
-                } else {
-                    $map1 = "";
-                }
+
+            if (!empty($input['商品负责人'])) {
+                // echo $input['商品负责人'];
+                $map1Str = xmSelectInput($input['商品负责人']);
+                $map1 = " AND 商品负责人 IN ({$map1Str})";
             } else {
-                $admin = session('admin.name');
-                $map1 = " AND 商品负责人 IN ('{$admin}')";
+                $map1 = "";
             }
+
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $map2Str = xmSelectInput($input['云仓']);
