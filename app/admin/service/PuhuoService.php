@@ -1579,9 +1579,10 @@ class PuhuoService
 
             }
             foreach ($list as &$item) {
-                $item['CustomItem14']='';
-                $item['CustomItem25']='';
-                $item['CustomItem45']='';
+                $item['wenqu'] = '';
+                $item['CustomItem14'] = '';
+                $item['CustomItem25'] = '';
+                $item['CustomItem45'] = '';
                 if ($item['CustomerName'] == '余量') {
 
                     // 1. 方案
@@ -1614,15 +1615,19 @@ class PuhuoService
                         }
                     }
                     $item['Stock_Quantity_puhuo'] += $Stock_Quantity_puhuo;
-                }else{
-                    $cus= $this->erp->table('ErpCustomer')->where(['CustomerId'=>$item['CustomerId']])->field('CustomItem14,CustomItem25,CustomItem45')->find();
+                } else {
+                    $cus = $this->erp->table('ErpCustomer')->where(['CustomerId' => $item['CustomerId']])->field('CustomItem14,CustomItem25,CustomItem45')->find();
+                    $puhuoConfig = $this->easy_db->table('sp_lyp_puhuo_config')->where(1)->find();
 
-                    if(!$cus){
-                        dd($cus);
+                    if ($puhuoConfig['if_hottocold'] == 2) {
+                        $wenqu = $this->easy_db->table('sp_lyp_puhuo_coldtohot')->where([['province', 'like', '%' . $item['State'] . '%']])->find();
+                    } else {
+                        $wenqu = $this->easy_db->table('sp_lyp_puhuo_hottocold')->where([['province', 'like', '%' . $item['State'] . '%']])->find();
                     }
-                    $item['CustomItem14']=$cus['CustomItem14']??'';
-                    $item['CustomItem25']=$cus['CustomItem25']??'';
-                    $item['CustomItem45']=$cus['CustomItem45']??'';
+                    $item['wenqu'] = $wenqu['wenqu'] ?? '';
+                    $item['CustomItem14'] = $cus['CustomItem14'] ?? '';
+                    $item['CustomItem25'] = $cus['CustomItem25'] ?? '';
+                    $item['CustomItem45'] = $cus['CustomItem45'] ?? '';
 
                 }
 
