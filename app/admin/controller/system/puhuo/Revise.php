@@ -262,5 +262,26 @@ class Revise extends AdminController
 
     }
 
+    /**
+     * @return void
+     * @NodeAnotation(title="保存草稿",auth=false)
+     */
+    public function save_caogao(){
+
+        $params = $this->request->param();
+
+        if (request()->isAjax()) {
+            $res = $this->service->deal_caogao($params);
+            return $res;
+        } else {
+            return json(["code" => "500", "msg" => "error", "data" => []]);
+
+        }
+
+
+    }
+
+
+
 
 }

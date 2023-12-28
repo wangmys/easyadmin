@@ -70,7 +70,7 @@ class Puhuo extends AdminController
             return json(array_merge(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'],  'create_time' => date('Y-m-d')], $statistic));
         } else {
             return View('system/puhuo/puhuo_index', $statistic);
-        }        
+        }
 
     }
 
@@ -88,7 +88,7 @@ class Puhuo extends AdminController
             $params['limit'] = 1000000;
 
             $code = rand_code(6);
-            cache($code, json_encode($params), 36000);	
+            cache($code, json_encode($params), 36000);
 
             $res = $this->service->puhuo_daodan($params);
             // print_r($res);die;
@@ -110,7 +110,7 @@ class Puhuo extends AdminController
             $code = input('code');
             $params = cache($code);
             $params = $params ? json_decode($params, true) : [];
-            
+
             $res = $this->service->puhuo_daodan($params);
             // print_r($res);die;
 
@@ -177,12 +177,12 @@ class Puhuo extends AdminController
                     ['*状态/1草稿,2预发布,3确定发布', 'status'],
                     ['备注', 'remark'],
                 ];
-    
+
                 return Excel::exportData($excel_output_data, $header, 'puhuo_daodan_' .count($excel_output_data) , 'xlsx');
 
             }
 
-        }        
+        }
 
     }
 
@@ -222,7 +222,7 @@ class Puhuo extends AdminController
             $code = input('code');
             $params = cache($code);
             $params = $params ? json_decode($params, true) : [];
-            
+
             $res = $this->service->puhuo_daodan_caogao($params);
             // print_r($res);die;
 
@@ -291,12 +291,12 @@ class Puhuo extends AdminController
                     ['*状态/1草稿,2预发布,3确定发布', 'status'],
                     ['备注', 'remark'],
                 ];
-    
+
                 return Excel::exportData($excel_output_data, $header, 'puhuo_daodan_caogao_' .count($excel_output_data) , 'xlsx');
 
             }
 
-        }        
+        }
 
     }
 
@@ -304,14 +304,14 @@ class Puhuo extends AdminController
     public function getXmMapSelect() {
 
         return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect()]);
-        
+
     }
 
     // 获取筛选栏多选参数-草稿
     public function getXmMapSelectCaogao() {
 
         return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect(2)]);
-        
+
     }
 
     /**
@@ -330,7 +330,7 @@ class Puhuo extends AdminController
 
             return json(["code" => "500", "msg" => "error", "data" => []]);
 
-        }        
+        }
 
     }
 
@@ -376,7 +376,7 @@ class Puhuo extends AdminController
             return json(array_merge(["code" => "0", "msg" => "", "count" => $res['count'], "data" => $res['data'],  'create_time' => date('Y-m-d')], $statistic));
         } else {
             return View('system/puhuo/caogao_index', ['setTime1' => date('Y-m-d'), 'setTime2' => date('Y-m-d')]);
-        }        
+        }
 
     }
 
@@ -438,7 +438,7 @@ class Puhuo extends AdminController
 
             if ($res) {
 
-                $excel_output_data = []; 
+                $excel_output_data = [];
                 foreach ($res as $k_res=>$v_res) {
 
                     // $order_no = uuid('SX');//date('Ymd').(++$k_res);
@@ -521,7 +521,7 @@ class Puhuo extends AdminController
                     ['*状态/1草稿,2预发布,3确定发布', 'status'],
                     ['备注', 'remark'],
                 ];
-    
+
                 return Excel::exportData($end_output_data, $header, 'import_excel_zhuanhuan' .count($end_output_data) , 'xlsx');
 
             }
@@ -543,20 +543,25 @@ class Puhuo extends AdminController
 
     }
 
-    public function delete(){
 
-        $param=$this->request->param();
+    /**
+     * @return null
+     * @NodeAnotation(title="",auth=false)
+     */
+    public function delete()
+    {
 
-        $db=Db::connect('mysql');
+        $param = $this->request->param();
 
-        if($param['all'] ==1){
-            $res=$db->table('sp_lyp_puhuo_caogao')->whereNotNull('uuid')->update(['is_delete'=>1]);
-        }else{
-            $res=$db->table('sp_lyp_puhuo_caogao')->whereIn('uuid',$param['uuid'])->update(['is_delete'=>1]);
+        $db = Db::connect('mysql');
+
+        if ($param['all'] == 1) {
+            $res = $db->table('sp_lyp_puhuo_caogao')->where([['admin_id', '=', session('admin.id')]])->delete();
+        } else {
+            $res = $db->table('sp_lyp_puhuo_caogao')->where([['admin_id', '=', session('admin.id')], ['uid', 'IN', explode(',', $param['uuid'])]])->delete();
         }
 
-        return $this->success('ok',$param);
-
+        return $this->success('ok', $param);
 
     }
 

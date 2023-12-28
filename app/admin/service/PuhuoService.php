@@ -157,7 +157,7 @@ class PuhuoService
         $setTime2 = $params['setTime2'] ?? '';//结束日期
 
         $where = $list = [];
-        // $where[] = ['is_delete', '=', 2];
+//         $where[] = ['is_delete', '=', 2];
         if ($WarehouseName) {
             $where[] = ['WarehouseName', 'in', $WarehouseName];
         }
@@ -180,61 +180,20 @@ class PuhuoService
             $setTime2 = $setTime2 . ' 23:59:59';
             $where[] = ['create_time', 'between', [$setTime1, $setTime2]];
         }
-        // if ($score_sort) {
-        //     $where[] = ['score_sort', '<=', $score_sort];
-        // }
-        if ($is_puhuo) {
-            if ($is_puhuo == '可铺') {//可铺
 
-                if ($kepu_sort) {
-                    $where[] = ['kepu_sort', '<>', 0];
-                    $where[] = ['kepu_sort', '<=', $kepu_sort];
-                } else {
-                    $where[] = ['Stock_Quantity_puhuo', '>', 0];
-                }
-                $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
-                    ->paginate([
-                        'list_rows' => $pageLimit,
-                        'page' => $page,
-                    ]);
-                $list = $list ? $list->toArray() : [];
-
-            } else {//不可铺
-
-                $where[] = ['is_total', '>', 0];
-                $list = SpLypPuhuoCaogaoModel::where($where)->whereOr(function ($q) use ($WarehouseName, $CategoryName1, $GoodsNo, $CustomerName) {
-                    $where = [['is_total', '=', 0], ['Stock_Quantity_puhuo', '=', 0]];
-                    if ($WarehouseName) {
-                        $where[] = ['WarehouseName', 'in', $WarehouseName];
-                    }
-                    if ($CategoryName1) {
-                        $where[] = ['CategoryName1', 'in', $CategoryName1];
-                    }
-                    if ($GoodsNo) {
-                        $where[] = ['GoodsNo', 'in', $GoodsNo];
-                    }
-                    if ($CustomerName) {
-                        $where[] = ['CustomerName', 'in', $CustomerName];
-                    }
-                    $q->where($where);
-                })->field('*')
-                    ->paginate([
-                        'list_rows' => $pageLimit,
-                        'page' => $page,
-                    ]);
-                $list = $list ? $list->toArray() : [];
-
-            }
+        if ($kepu_sort) {
+            $where[] = ['kepu_sort', '<>', 0];
+            $where[] = ['kepu_sort', '<=', $kepu_sort];
         } else {
-
-            $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
-                ->paginate([
-                    'list_rows' => $pageLimit,
-                    'page' => $page,
-                ]);
-            $list = $list ? $list->toArray() : [];
-
+            $where[] = ['Stock_Quantity_puhuo', '>', 0];
         }
+        $list = SpLypPuhuoCaogaoModel::where($where)->field('*')
+            ->paginate([
+                'list_rows' => $pageLimit,
+                'page' => $page,
+            ]);
+        $list = $list ? $list->toArray() : [];
+
         // print_r([$pageLimit, $page]);die;
 
         $data = [
