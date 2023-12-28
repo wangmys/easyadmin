@@ -102,6 +102,11 @@
         //提交事件
         form.on('submit(sub)', function (data) {
             let field = data.field
+
+            if (!field.WarehouseName) {
+                xm3.warning();
+                return false
+            }
             if (!field.GoodsNo) {
                 xm1.warning();
                 return false
@@ -110,10 +115,7 @@
                 xm2.warning();
                 return false
             }
-            if (!field.Size) {
-                xm3.warning();
-                return false
-            }
+
 
             $.post('set_revise', data.field, function (res) {
                 if (res.code == 1) {
