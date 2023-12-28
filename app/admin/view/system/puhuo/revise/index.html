@@ -161,7 +161,12 @@
                         padding: 0 10px;
                         font-size: 12px;">导单转换
                     </button>
-
+                    <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="save_caogao"
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: red; line-height: 25px; float:right; margin-left: 15px;height: 30px;
+                        line-height: 30px;
+                        padding: 0 10px;
+                        font-size: 12px;">保存草稿
+                    </button>
                 </div>
             </div>
         </form>
@@ -200,6 +205,7 @@
             , url1 = "{:url('admin/system.puhuo.Revise/index')}"
             , url_getXmMapSelect = "{:url('admin/system.puhuo.Revise/getXmMapSelect')}"
             , url_set = "{:url('admin/system.puhuo.Revise/set')}"
+            , url_save_caogao = "{:url('admin/system.puhuo.Revise/save_caogao')}"
 
         initFn();
         startTable();
@@ -292,6 +298,36 @@
 
         });
 
+        //保存草稿
+        form.on('submit(save_caogao)', function (data) {
+
+            var checkStatus = table.checkStatus('table');
+            data = checkStatus.data;
+
+            if (!data.length) {
+                alert('请勾选需要保存为草稿的数据');return false;
+            }
+            var caogao_arr = [];
+            $.each(data, function(index, value){
+                caogao_arr.push(data[index].uuid);
+            });
+
+            var post_data = {
+                'caogao_arr' : caogao_arr
+            };
+            $.post(url_save_caogao, post_data, function(res) {
+                //console.log(res);
+                if (res.code == 200) {
+                    alert('保存成功');
+                    window.location.reload();
+                } else {
+                    alert(res.msg);
+                }
+            })
+            return false;
+
+        });
+
         $(document).on('click', '.set', function(data){
             console.log('set')
             layer.open({
@@ -317,9 +353,9 @@
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
-                        // {type: "checkbox",fixed:'left'},
+                        {type: "checkbox",fixed:'left', width: 25},
                         { field: 'TimeCategoryName2', title: '季节', align: 'center', fixed:'left', width: 35}
-                        , { field: 'CategoryName1', title: '一级分类', align: 'center', fixed:'left', width: 55}
+                        , { field: 'CategoryName1', title: '一级分类', align: 'center', fixed:'left', width: 45}
                         , { field: 'CategoryName2', title: '二级分类', align: 'center', width: 55}
                         , { field: 'CategoryName', title: '分类', align: 'center', width: 70}
                         , { field: 'Lingxing', title: '领型', align: 'center', width: 35}
@@ -332,7 +368,7 @@
                         //  ,{field: 'img', width: 80, title: '图片', search: false, templet: '<div><img src="{}"/></div>',imageHeight:30,merge: true}
                         , { field: 'CustomItem17', title: '商品专员', align: 'center', width: 50}
                         , { field: 'State', title: '省份', align: 'center', width: 35}
-                        , { field: 'wenqu', title: '温区', align: 'center', width: 40}
+                        , { field: 'wenqu', title: '温区', align: 'center', width: 38}
                         , { field: 'CustomerName', title: '店铺名称', align: 'center', width: 70}
                         , { field: 'Mathod', title: '经营模式', align: 'center', width: 50}
                         , { field: 'CustomerGrade', title: '店铺等级', align: 'center', width: 40}

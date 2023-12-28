@@ -133,6 +133,7 @@ class ReviseService
 
         foreach ($GoodsNoList as $GoodsNo) {
             $where = [
+                ['is_delete', '=', 2],
                 ['GoodsNo', '=', $GoodsNo],
                 ['WarehouseName', '=', $param['WarehouseName']],
                 ['admin_id', '=', session('admin.id')],
@@ -333,6 +334,30 @@ ORDER BY
             ->find();
 
         return $erp;
+
+    }
+
+
+    /**
+     * 处理草稿数据
+     */
+    public function deal_caogao($params)
+    {
+
+        $caogao_arr = $params['caogao_arr'] ?? [];
+        $caogao_arr = array_values(array_diff($caogao_arr, ['']));
+        $res_end_data = SpLypPuhuoEndDataReviseModel::where([['uuid', 'in', $caogao_arr]])->select()->toArray();
+        foreach ($res_end_data as &$v_end_data) {
+            unset($v_end_data['create_time']);
+        }
+        $chunk_list = array_chunk($res_end_data, 500);
+        foreach ($chunk_list as $key => $val) {
+            $uuid_arr = array_column($val, 'uuid');
+            SpLypPuhuoEndDataReviseModel::where([['uuid', 'in', $uuid_arr]])->update(['is_delete' => 1]);
+            $insert = $this->mysql->table('sp_lyp_puhuo_caogao')->strict(false)->insertAll($val);
+        }
+
+        return json(["code" => "200", "msg" => "保存成功", "data" => []]);
 
     }
 
