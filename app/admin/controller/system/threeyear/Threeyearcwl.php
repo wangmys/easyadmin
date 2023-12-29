@@ -55,6 +55,7 @@ class Threeyearcwl extends AdminController
                 $年 = "";
             }
 
+            #################### 分子1 ####################
             if (!empty($input['云仓'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓']);
@@ -105,7 +106,135 @@ class Threeyearcwl extends AdminController
                 $map风格 = "";
             }
 
-            // 分母
+            #################### 分子2 ####################
+            if (!empty($input['一级分类'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['一级分类']);
+                $map一级分类 = " AND m.`CategoryName1` IN ({$mapStr})";
+            } else {
+                $map一级分类 = "";
+            } 
+            if (!empty($input['二级分类'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['二级分类']);
+                $map二级分类 = " AND m.CategoryName2 IN ({$mapStr})";
+            } else {
+                $map二级分类 = "";
+            }
+            if (!empty($input['分类'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['分类']);
+                $map分类 = " AND m.CategoryName IN ({$mapStr})";
+            } else {
+                $map分类 = "";
+            }
+            if (!empty($input['波段'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['波段']);
+                $map波段 = " AND m.TimeCategoryName IN ({$mapStr})";
+            } else {
+                $map波段 = "";
+            }
+            if (!empty($input['厚度'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['厚度']);
+                $map厚度 = " AND m.CustomItem17 IN ({$mapStr})";
+            } else {
+                $map厚度 = "";
+            } 
+            if (!empty($input['省份'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['省份']);
+                $map省份 = " AND m.State IN ({$mapStr})";
+            } else {
+                $map省份 = "";
+            }
+            if (!empty($input['大区'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['大区']);
+                $map大区 = " AND m.YunCang IN ({$mapStr})";
+            } else {
+                $map大区 = "";
+            } 
+            if (!empty($input['新旧品'])) {
+                // echo $input['商品负责人'];
+                $mapStr = $input['新旧品'];
+                // print_r($mapStr); die;
+                if ($mapStr == '新品') {
+                    $map新旧品 = " AND m.TimeCategoryName1 IN ('2024', '2023')";
+                } else {
+                    $map新旧品 = " AND m.TimeCategoryName1 IN ('2022', '2021', '2020')";
+                }
+            } else {
+                $map新旧品 = "";
+            }
+
+            #################### 分子3 ####################
+            if (!empty($input['月份'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['月份']);
+                $map月份 = " AND m.`Month` IN ({$mapStr})";
+            } else {
+                $map月份 = "";
+            } 
+
+            if (!empty($input['春夏云仓'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['春夏云仓']);
+                $map春夏云仓 = " AND m.`CustomItem66` IN ({$mapStr})";
+            } else {
+                $map春夏云仓 = "";
+            } 
+
+            if (!empty($input['秋冬云仓'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['秋冬云仓']);
+                $map秋冬云仓 = " AND m.`CustomItem65` IN ({$mapStr})";
+            } else {
+                $map秋冬云仓 = "";
+            } 
+
+            if (!empty($input['深浅色'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['深浅色']);
+                $map深浅色 = " AND m.`CustomItem46` IN ({$mapStr})";
+            } else {
+                $map深浅色 = "";
+            } 
+
+            if (!empty($input['适龄段'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['适龄段']);
+                $map适龄段 = " AND m.`CustomItem1` IN ({$mapStr})";
+            } else {
+                $map适龄段 = "";
+            } 
+
+            if (!empty($input['时尚度'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['时尚度']);
+                $map时尚度 = " AND m.`CustomItem45` IN ({$mapStr})";
+            } else {
+                $map时尚度 = "";
+            } 
+
+            if (!empty($input['色感'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['色感']);
+                $map色感 = " AND m.`CustomItem47` IN ({$mapStr})";
+            } else {
+                $map色感 = "";
+            } 
+
+            if (!empty($input['色系'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['色系']);
+                $map色系 = " AND m.`CustomItem48` IN ({$mapStr})";
+            } else {
+                $map色系 = "";
+            } 
+            
+            #################### 分母1 ####################
             if (!empty($input['云仓_fm'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓_fm']);
@@ -156,23 +285,154 @@ class Threeyearcwl extends AdminController
                 $map风格_fm = "";
             }
 
-            $map = $map年 . $map云仓 . $map温带 . $map温区 . $map经营模式 . $map季节归集 . $map季节 . $map风格;
+            #################### 分母2 ####################
+            if (!empty($input['一级分类_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['一级分类_fm']);
+                $map一级分类_fm = " AND `CategoryName1` IN ({$mapStr})";
+            } else {
+                $map一级分类_fm = "";
+            }
+            if (!empty($input['二级分类_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['二级分类_fm']);
+                $map二级分类_fm = " AND CategoryName2 IN ({$mapStr})";
+            } else {
+                $map二级分类_fm = "";
+            }
+            if (!empty($input['分类_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['分类_fm']);
+                $map分类_fm = " AND CategoryName IN ({$mapStr})";
+            } else {
+                $map分类_fm = "";
+            }
+            if (!empty($input['波段_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['波段_fm']);
+                $map波段_fm = " AND TimeCategoryName IN ({$mapStr})";
+            } else {
+                $map波段_fm = "";
+            }
+            if (!empty($input['厚度_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['厚度_fm']);
+                $map厚度_fm = " AND CustomItem17 IN ({$mapStr})";
+            } else {
+                $map厚度_fm = "";
+            } 
+            if (!empty($input['省份_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['省份_fm']);
+                $map省份_fm = " AND State IN ({$mapStr})";
+            } else {
+                $map省份_fm = "";
+            }
+            if (!empty($input['大区_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['大区_fm']);
+                $map大区_fm = " AND YunCang IN ({$mapStr})";
+            } else {
+                $map大区_fm = "";
+            } 
+            if (!empty($input['新旧品_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = $input['新旧品_fm'];
+                // print_r($mapStr); die;
+                if ($mapStr == '新品') {
+                    $map新旧品_fm = " AND TimeCategoryName1 IN ('2024', '2023')";
+                } else {
+                    $map新旧品_fm = " AND TimeCategoryName1 IN ('2022', '2021', '2020')";
+                }
+            } else {
+                $map新旧品_fm = "";
+            }
 
-            // echo '<br>';
+            #################### 分母3 ####################
+
+            if (!empty($input['春夏云仓_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['春夏云仓_fm']);
+                $map春夏云仓_fm = " AND `CustomItem66` IN ({$mapStr})";
+            } else {
+                $map春夏云仓_fm = "";
+            } 
+
+            if (!empty($input['秋冬云仓_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['秋冬云仓_fm']);
+                $map秋冬云仓_fm = " AND `CustomItem65` IN ({$mapStr})";
+            } else {
+                $map秋冬云仓_fm = "";
+            } 
+
+            if (!empty($input['深浅色_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['深浅色_fm']);
+                $map深浅色_fm = " AND `CustomItem46` IN ({$mapStr})";
+            } else {
+                $map深浅色_fm = "";
+            } 
+
+            if (!empty($input['适龄段_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['适龄段_fm']);
+                $map适龄段_fm = " AND `CustomItem1` IN ({$mapStr})";
+            } else {
+                $map适龄段_fm = "";
+            } 
+
+            if (!empty($input['时尚度_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['时尚度_fm']);
+                $map时尚度_fm = " AND `CustomItem45` IN ({$mapStr})";
+            } else {
+                $map时尚度_fm = "";
+            } 
+
+            if (!empty($input['色感_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['色感_fm']);
+                $map色感_fm = " AND `CustomItem47` IN ({$mapStr})";
+            } else {
+                $map色感_fm = "";
+            } 
+
+            if (!empty($input['色系_fm'])) {
+                // echo $input['商品负责人'];
+                $mapStr = xmSelectInput($input['色系_fm']);
+                $map色系_fm = " AND `CustomItem48` IN ({$mapStr})";
+            } else {
+                $map色系_fm = "";
+            } 
             
-            $map_fm = $map年_fm . $map云仓_fm . $map温带_fm . $map温区_fm . $map经营模式_fm . $map季节归集_fm . $map季节_fm . $map风格_fm;
+            // 分子
+            $map1 = $map年 . $map云仓 . $map温带 . $map温区 . $map经营模式 . $map季节归集 . $map季节 . $map风格;
+            $map2 = $map一级分类 . $map二级分类 . $map分类 . $map波段 . $map厚度 . $map省份 . $map大区 . $map新旧品;
+            $map3 = $map月份 . $map春夏云仓 . $map秋冬云仓 . $map深浅色 . $map适龄段 . $map时尚度 . $map色感 . $map色系;
+            $map = $map1 . $map2 . $map3;
 
-            // echo '<br>';
-            
+            // 分母
+            $map_fm_1 = $map年_fm . $map云仓_fm . $map温带_fm . $map温区_fm . $map经营模式_fm . $map季节归集_fm . $map季节_fm . $map风格_fm;
+            $map_fm_2 = $map一级分类_fm . $map二级分类_fm . $map分类_fm . $map波段_fm . $map厚度_fm . $map省份_fm . $map大区_fm . $map新旧品_fm;
+            $map_fm_3 = $map春夏云仓_fm . $map秋冬云仓_fm . $map深浅色_fm . $map适龄段_fm . $map时尚度_fm . $map色感_fm .$map色系_fm;
+            $map_fm = $map_fm_1 . $map_fm_2 . $map_fm_3;
 
-            echo  $执行sql = $this->sqlHandle($年, $map, $map_fm);
-
-            die;
+            $执行sql = $this->sqlHandle($年, $map, $map_fm);
             $select = $this->db_easyA->query($执行sql);
-            echo '<pre>';
-            print_r($select);
+          
+            
+            // if (empty(cache('threeyear_test'))) {
+            //     $select = $this->db_easyA->query($执行sql);
+            //     cache('threeyear_test', $select, 259200);
+            // } 
+
+            // $select = cache('threeyear_test');
+            // echo '<pre>';
+            // print_r($select);
+            $res = $this->dataHandle($select);
             // $count = count($select);
-            // return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select]);
+            return json(["code" => "0", "msg" => "", "count" => count($res), "data" => $res]);
         } else {
 
             return View('system/threeyearcwl/index', [
@@ -197,9 +457,14 @@ class Threeyearcwl extends AdminController
         // t是分母部分
         $sql = "
             SELECT 
-                res2.*,
-                res2.业绩占比 / res2.库存占比 as 效率,
-                ifnull(res2.店均库存量, 0) / res2.店均周销量 * 7 as `店周转(天)`
+                res2.`Year`, res2.`Month`, res2.`Week`, res2.店铺数, res2.周期, res2.分子库存数量, res2.分子库存成本金额, res2.分子销量, res2.分子销额, res2.分母库存数量,res2.分母库存成本金额,res2.分母销量,res2.分母销额,
+                concat(round(res2.业绩占比 * 100, 1), '%') as 业绩占比,
+                concat(round(res2.库存占比 * 100, 1), '%') as 库存占比,
+                round(res2.店均周销量, 0) as 店均周销量,
+                round(res2.店均库存量, 0) as 店均库存量,
+                concat(round(res2.折扣 * 100, 1), '%') as 折扣,
+                concat(round(res2.业绩占比 / res2.库存占比 * 100, 1), '%') as 效率,
+                round(ifnull(res2.店均库存量, 0) / res2.店均周销量 * 7, 1) as `店周转(天)`
             from 
             (
                 SELECT 
@@ -211,7 +476,7 @@ class Threeyearcwl extends AdminController
                 FROM (
                     SELECT
                         m.`Year`,m.`Month`,m.`Week`,c.店铺数,
-                        CategoryName1,
+                        CONCAT(SUBSTRING(start_time, 6, 5), '/', SUBSTRING(end_time, 6, 5)) as '周期',
                         sum(m.StockQuantity) as 分子库存数量,
                         sum(m.StockCost) as 分子库存成本金额,
                         sum(m.SaleQuantity) as 分子销量,
@@ -252,8 +517,153 @@ class Threeyearcwl extends AdminController
         // $select = $this->db_easyA->query($sql_2023);
     }
 
-    public function test() {
-        echo $this->sqlHandle(2021);
+    // 头部数据缓存处理
+    public function headerHandle() {
+        // 表头信息
+        if (empty(cache('threeyear_header_' . '2021')) || empty(cache('threeyear_header_' . '2022')) || empty(cache('threeyear_header_' . '2023'))) {
+            $sql_2021 = "
+                SELECT
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week`,
+                    CONCAT(
+                        SUBSTRING( start_time, 6, 5 ),
+                        '/',
+                    SUBSTRING( end_time, 6, 5 )) AS '周期'
+                FROM
+                    `sp_customer_stock_sale_threeyear2_week` AS m
+                WHERE
+                    1 
+                    AND m.`Year` IN ( '2021') 
+                GROUP BY
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week` 
+            ";
+            $sql_2022 = "
+                SELECT
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week`,
+                    CONCAT(
+                        SUBSTRING( start_time, 6, 5 ),
+                        '/',
+                    SUBSTRING( end_time, 6, 5 )) AS '周期'
+                FROM
+                    `sp_customer_stock_sale_threeyear2_week` AS m
+                WHERE
+                    1 
+                    AND m.`Year` IN ( '2022') 
+                GROUP BY
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week` 
+            ";
+            $sql_2023 = "
+                SELECT
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week`,
+                    CONCAT(
+                        SUBSTRING( start_time, 6, 5 ),
+                        '/',
+                    SUBSTRING( end_time, 6, 5 )) AS '周期'
+                FROM
+                    `sp_customer_stock_sale_threeyear2_week` AS m
+                WHERE
+                    1 
+                    AND m.`Year` IN ( '2023') 
+                GROUP BY
+                    m.`Year`,
+                    m.`Month`,
+                    m.`Week` 
+            ";
+            $select_header_2021 = $this->db_easyA->query($sql_2021);
+            $select_header_2022 = $this->db_easyA->query($sql_2022);
+            $select_header_2023 = $this->db_easyA->query($sql_2023);
+            cache('threeyear_header_2021', $select_header_2021, 259200);
+            cache('threeyear_header_2022', $select_header_2022, 259200);
+            cache('threeyear_header_2023', $select_header_2023, 259200);
+        }
+    }
+
+    // 组合结果
+    public function dataHandle($select = []) {
+        $this->headerHandle();
+        $count = count($select);
+        
+        $展示年 = $select[$count - 1]['Year'];
+        $header = cache('threeyear_header_' . $展示年);
+
+        // 当年
+        $current_year = '2023';
+        foreach ($header as $key => $val) {
+            $header[$key]['年'] = $展示年;
+            $header[$key]['周'] = "第{$val['Week']}周";
+            $header[$key]['月'] = "{$val['Month']}月";
+            foreach ($select as $key2 => $val2) {
+                if ($val2['Year'] == $current_year && $val['Week'] == $val2['Week']) {
+                    $header[$key]['今年店铺数'] = $val2['店铺数']; 
+                    $header[$key]['今年库存数量'] = $val2['分子库存数量']; 
+                    $header[$key]['今年库存成本金额'] = $val2['分子库存成本金额']; 
+                    $header[$key]['今年销量(周)'] = $val2['分子销量']; 
+                    $header[$key]['今年销额'] = $val2['分子销额']; 
+                    $header[$key]['今年分母库存数量'] = $val2['分母库存数量']; 
+                    $header[$key]['今年分母库存成本金额'] = $val2['分母库存成本金额']; 
+                    $header[$key]['今年分母销量'] = $val2['分母销量']; 
+                    $header[$key]['今年分母销额'] = $val2['分母销额']; 
+                    $header[$key]['今年业绩占比'] = $val2['业绩占比']; 
+                    $header[$key]['今年库存占比'] = $val2['库存占比']; 
+                    $header[$key]['今年店均周销量'] = $val2['店均周销量']; 
+                    $header[$key]['今年店均库存量'] = $val2['店均库存量']; 
+                    $header[$key]['今年折扣'] = $val2['折扣']; 
+                    $header[$key]['今年效率'] = $val2['效率']; 
+                    $header[$key]['今年店周转(天)'] = $val2['店周转(天)']; 
+                    // break;
+                }
+                if ($val2['Year'] == $current_year - 1 && $val['Week'] == $val2['Week']) {
+                    $header[$key]['去年店铺数'] = $val2['店铺数']; 
+                    $header[$key]['去年库存数量'] = $val2['分子库存数量']; 
+                    $header[$key]['去年库存成本金额'] = $val2['分子库存成本金额']; 
+                    $header[$key]['去年销量(周)'] = $val2['分子销量']; 
+                    $header[$key]['去年销额'] = $val2['分子销额']; 
+                    $header[$key]['去年分母库存数量'] = $val2['分母库存数量']; 
+                    $header[$key]['去年分母库存成本金额'] = $val2['分母库存成本金额']; 
+                    $header[$key]['去年分母销量'] = $val2['分母销量']; 
+                    $header[$key]['去年分母销额'] = $val2['分母销额']; 
+                    $header[$key]['去年业绩占比'] = $val2['业绩占比']; 
+                    $header[$key]['去年库存占比'] = $val2['库存占比']; 
+                    $header[$key]['去年店均周销量'] = $val2['店均周销量']; 
+                    $header[$key]['去年店均库存量'] = $val2['店均库存量']; 
+                    $header[$key]['去年折扣'] = $val2['折扣']; 
+                    $header[$key]['去年效率'] = $val2['效率']; 
+                    $header[$key]['去年店周转(天)'] = $val2['店周转(天)']; 
+                    // break;
+                }
+                if ($val2['Year'] == $current_year - 2 && $val['Week'] == $val2['Week']) {
+                    $header[$key]['前年店铺数'] = $val2['店铺数']; 
+                    $header[$key]['前年库存数量'] = $val2['分子库存数量']; 
+                    $header[$key]['前年库存成本金额'] = $val2['分子库存成本金额']; 
+                    $header[$key]['前年销量(周)'] = $val2['分子销量']; 
+                    $header[$key]['前年销额'] = $val2['分子销额']; 
+                    $header[$key]['前年分母库存数量'] = $val2['分母库存数量']; 
+                    $header[$key]['前年分母库存成本金额'] = $val2['分母库存成本金额']; 
+                    $header[$key]['前年分母销量'] = $val2['分母销量']; 
+                    $header[$key]['前年分母销额'] = $val2['分母销额']; 
+                    $header[$key]['前年业绩占比'] = $val2['业绩占比']; 
+                    $header[$key]['前年库存占比'] = $val2['库存占比']; 
+                    $header[$key]['前年店均周销量'] = $val2['店均周销量']; 
+                    $header[$key]['前年店均库存量'] = $val2['店均库存量']; 
+                    $header[$key]['前年折扣'] = $val2['折扣']; 
+                    $header[$key]['前年效率'] = $val2['效率']; 
+                    $header[$key]['前年店周转(天)'] = $val2['店周转(天)']; 
+                    // break;
+                }
+            }
+        }
+
+        // dump($header);
+        return $header;
     }
 
     // 获取筛选栏多选参数
