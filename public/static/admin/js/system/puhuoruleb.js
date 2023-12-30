@@ -78,7 +78,15 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     height: 800,
                     limit: 1000,
                     toolbar:[
-                        'add','delete','custom_import'
+                        'add','delete', [{
+                            text: '模板下载',
+                            url: 'http://im.babiboy.com/static/m/images/铺货规则模板.xlsx',
+                            method: 'none',
+                            auth: 'add',
+                            class: 'layui-btn layui-btn-normal layui-btn-sm excel_tpl',
+                            // icon: 'fa fa-plus ',
+                            // extend: 'data-full="true"',
+                        }],'custom_import'
                     ],
                     // defaultToolbar: false, //这里在右边显示
                     limits:[1000,2000,3000],

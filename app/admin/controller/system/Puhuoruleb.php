@@ -490,7 +490,6 @@ class Puhuoruleb extends AdminController
                     'T' => '合计',
 
                 ];
-
                 $data = importExcel($info, $read_column);
                 if (!$data) {
                     return json(['code' => 500, 'msg' => 'error,读取不到数据']);
