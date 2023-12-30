@@ -79,7 +79,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             })
 
             $('body').on('click', '#excel_tpl', function (obj) {
-                location.href = 'http://im.babiboy.com/static/m/images/puhuo_tpl.xlsx';
+                location.href = 'http://im.babiboy.com/static/m/images/铺货模板.xlsx';
 
             })
             $('body').on('click', '#export_excel_all', function (obj) {

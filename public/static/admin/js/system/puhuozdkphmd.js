@@ -18,7 +18,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
         index: function () {
 
             $('body').on('click', '.excel_tpl', function (obj) {
-                location.href = 'http://im.babiboy.com/static/m/images/level_tpl.xlsx';
+                location.href = 'http://im.babiboy.com/static/m/images/货品等级模板.xlsx';
 
             })
 
