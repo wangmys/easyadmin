@@ -347,7 +347,7 @@ class Puhuo extends AdminController
     // 获取筛选栏多选参数-草稿
     public function getXmMapSelectCaogao() {
 
-        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelect(2)]);
+        return json(["code" => "0", "msg" => "", "data" => $this->service->getXmMapSelectCaogao()]);
 
     }
 

@@ -178,8 +178,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar: ['refresh']
                 , limit: 30000
                 , limits: [200, 500, 1000, 5000, 10000, 20000]
-                , height: 650,
-                totalRow: true
+                , height: window.innerHeight - 115
+                ,totalRow: true
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [

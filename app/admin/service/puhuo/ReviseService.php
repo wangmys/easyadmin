@@ -49,6 +49,15 @@ class ReviseService
         if ($CustomItem17) {
             $where[] = ['CustomItem17', 'in', $CustomItem17];
         }
+        if (isset($params['wenqu']) && !empty($params['wenqu'])) {
+            $where[] = ['wenqu', 'in', $params['wenqu']];
+        }
+        if (isset($params['TimeCategoryName2']) && !empty($params['TimeCategoryName2'])) {
+            $where[] = ['TimeCategoryName2', 'in', $params['TimeCategoryName2']];
+        }
+        if (isset($params['State']) && !empty($params['State'])) {
+            $where[] = ['State', 'in', $params['State']];
+        }
 
         $list = SpLypPuhuoEndDataReviseModel::where($where)->field('*')
             ->paginate([
@@ -68,13 +77,15 @@ class ReviseService
     public function getXmMapSelect($isLevel = 0)
     {
 
-        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where([['CustomerName', '<>', '余量'], ['admin_id', '=', session('admin.id')]])->select()->toArray();
+        $db = $this->mysql->table('sp_lyp_puhuo_end_data_revise')->where([['CustomerName', '<>', '余量'], ['is_delete', '<>', 1], ['admin_id', '=', session('admin.id')]])->select()->toArray();
         $WarehouseName = $this->xm($db, 'WarehouseName');
         $CategoryName1 = $this->xm($db, 'CategoryName1');
         $GoodsNo = $this->xm($db, 'GoodsNo');
         $CustomerName = $this->xm($db, 'CustomerName');
         $CustomItem17 = $this->xm($db, 'CustomItem17');
         $State = $this->xm($db, 'State');
+        $TimeCategoryName2 = $this->xm($db, 'TimeCategoryName2');
+        $wenqu = $this->xm($db, 'wenqu');
 
 
         if ($isLevel == 1) {
@@ -108,7 +119,7 @@ class ReviseService
             ['name' => '42', 'value' => 'Stock_42_puhuo'],
             ['name' => '44', 'value' => 'Stock_44_puhuo'],
         ];
-        return compact('WarehouseName', 'State', 'CategoryName1', 'GoodsNo', 'CustomerName', 'CustomItem17', 'Size');
+        return compact('WarehouseName', 'State', 'CategoryName1', 'GoodsNo', 'CustomerName', 'CustomItem17', 'Size', 'TimeCategoryName2', 'wenqu');
 
     }
 

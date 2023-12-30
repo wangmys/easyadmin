@@ -154,7 +154,6 @@ class PuhuoService
         $CustomItem17 = $params['CustomItem17'] ?? '';//商品专员
         // $score_sort = $params['score_sort'] ?? '';//店铺排名
         $kepu_sort = $params['kepu_sort'] ?? 0;//可铺店铺排名
-        $is_delete = $params['is_delete'] ?? 0;//是否导出
         $setTime1 = $params['setTime1'] ?? '';//开始日期
         $setTime2 = $params['setTime2'] ?? '';//结束日期
 
@@ -175,8 +174,19 @@ class PuhuoService
         if ($CustomItem17) {
             $where[] = ['CustomItem17', 'in', $CustomItem17];
         }
-        if ($is_delete) {
-            $where[] = ['is_delete', '=', $is_delete];
+        if (isset($params['State']) && !empty($params['State'])) {
+            $where[] = ['State', 'in', $params['State']];
+        }
+        if (isset($params['wenqu']) && !empty($params['wenqu'])) {
+            $where[] = ['wenqu', 'in', $params['wenqu']];
+        }
+        if (isset($params['TimeCategoryName2']) && !empty($params['TimeCategoryName2'])) {
+            $where[] = ['TimeCategoryName2', 'in', $params['TimeCategoryName2']];
+        }
+        if (isset($params['is_delete']) && $params['is_delete'] == 1) {
+            $where[] = ['is_delete', '=', 1];
+        } else {
+            $where[] = ['is_delete', '=', 2];
         }
         if ($setTime1 && $setTime2) {
             $setTime2 = $setTime2 . ' 23:59:59';
@@ -478,6 +488,22 @@ class PuhuoService
         }
 
         return ['WarehouseName' => $WarehouseName, 'CategoryName1' => $CategoryName1, 'GoodsNo' => $GoodsNo, 'CustomerName' => $CustomerName, 'CustomItem17' => $CustomItem17, 'is_puhuo' => [['name' => '可铺', 'value' => '可铺'], ['name' => '不可铺', 'value' => '可铺']]];
+
+    }
+
+    public function getXmMapSelectCaogao(){
+
+        $db = $this->mysql->table('sp_lyp_puhuo_caogao')->where([['is_delete', '<>',1 ],['admin_id','=',session('admin.id')]])->select()->toArray();
+        $WarehouseName = xm($db, 'WarehouseName');
+        $CategoryName1 = xm($db, 'CategoryName1');
+        $GoodsNo = xm($db, 'GoodsNo');
+        $CustomerName = xm($db, 'CustomerName');
+        $CustomItem17 = xm($db, 'CustomItem17');
+        $State = xm($db, 'State');
+        $TimeCategoryName2 = xm($db, 'TimeCategoryName2');
+        $wenqu = xm($db, 'wenqu');
+
+        return compact('WarehouseName', 'State', 'CategoryName1', 'GoodsNo', 'CustomerName', 'CustomItem17','TimeCategoryName2','wenqu');
 
     }
 
