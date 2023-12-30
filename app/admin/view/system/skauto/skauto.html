@@ -568,7 +568,7 @@
                     , { field: '销售天数', title: '销售天数', align: 'center', templet: function (data) {
                         if (data['销售天数'] <= 10) {
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
-                            return `<div style='color:#ffffff; font-weight:bold; background:red;'>${data['销售天数']}</div>`;
+                            return `<div style="color: red; font-weight:bold; background:#d6fffb;">${data['销售天数']}</div>`;
                         } else {
                             return data['销售天数'];
                         }
@@ -619,7 +619,7 @@
                             // return (data['售空提醒'] * 100).toFixed(1) + '%';
                             return `<div style='color:red; font-weight:bold; background:yellow;'>${data['售空提醒']}</div>`;
                         } else if (data['售空提醒'] == '售空') {
-                            return `<div style="color: white; font-weight:bold; background:red;">${data['售空提醒']}</div>`;
+                            return `<div style="color: #000000; font-weight:bold; background:#f78484;">${data['售空提醒']}</div>`;
                         } else {
                             return '';
                         }

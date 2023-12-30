@@ -1133,9 +1133,16 @@ class ThreeyearService
 
         $weather_new = [];
         if ($where_weather_new) {
-            $weather_new = $this->weather_data_model::where($where_weather_new)->alias('d')->field($field_weather)
-            ->join(['cus_weather_base' => 'b'], 'd.weather_prefix=b.weather_prefix', 'left')->group('Start_time, b.customer_name')->select();
-            $weather_new = $weather_new ? $weather_new->toArray() : [];
+            // $weather_new = $this->weather_data_model::where($where_weather_new)->alias('d')->field($field_weather)
+            // ->join(['cus_weather_base' => 'b'], 'd.weather_prefix=b.weather_prefix', 'left')->group('Start_time, b.customer_name')->select();
+            // $weather_new = $weather_new ? $weather_new->toArray() : [];
+
+            echo $weather_new = $this->weather_data_model::where($where_weather_new)->alias('d')->field($field_weather)
+            ->join(['cus_weather_base' => 'b'], 'd.weather_prefix=b.weather_prefix', 'left')->group('Start_time, b.customer_name')->fetchSql(1)->select();
+            die;
+
+            // echo '<pre>';
+            
             // print_r([$where_weather_new, $weather_new]);die;
         }
 
