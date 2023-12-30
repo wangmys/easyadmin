@@ -25,6 +25,7 @@ class Threeyear extends BaseController
     protected $db_easyA = '';
     protected $db_bi = '';
     protected $db_sqlsrv = '';
+    protected $db_tianqi = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -37,9 +38,11 @@ class Threeyear extends BaseController
         $this->db_easyA = Db::connect('mysql');
         $this->db_bi = Db::connect('mysql2');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_tianqi = Db::connect('tianqi');
 
     }
 
+    // 店铺数
     public function customerNum() {
         $sql_店铺数 = "
             select 
@@ -77,5 +80,46 @@ class Threeyear extends BaseController
         }
     }
 
+    // 天气
+    public function weather() {
+        $sql = "
+            SELECT
+                left(d.weather_time,4)`Year`,
+                CONCAT( FROM_DAYS( TO_DAYS( d.weather_time ) - MOD ( TO_DAYS( d.weather_time ) - 2, 7 )), ' 00:00:00' ) AS Start_time,
+                max( d.weather_time ) AS End_time,
+                b.customer_name as customer,
+                b.province as state,store_type as mathod,wendai,wenqu,yuncang,
+                max( d.max_c ) AS max_c,
+                min( d.min_c ) AS min_c,
+                CONCAT(
+                    SUBSTRING(
+                        CONCAT( FROM_DAYS( TO_DAYS( d.weather_time ) - MOD ( TO_DAYS( d.weather_time ) - 2, 7 )), ' 00:00:00' ),
+                        6,
+                        5 
+                    ),
+                    '/',
+                SUBSTRING( max( d.weather_time ), 6, 5 )) AS '周期' 
+            FROM
+                `cus_weather_data` `d`
+                LEFT JOIN `cus_weather_base` `b` ON `d`.`weather_prefix` = `b`.`weather_prefix` 
+            WHERE 1
+                AND `d`.`weather_time` >= '2021-01-04' 
+            -- 	AND `d`.`weather_time` <= '2022-01-02' 
+            -- 	AND `b`.`yuncang` IN ( '长沙云仓', '南昌云仓' ) 
+            GROUP BY
+                `Start_time`,
+                `b`.`customer_name`
+        ";
+        $select = $this->db_tianqi->query($sql);
+        if ($select) {
+            $this->db_easyA->execute('TRUNCATE sp_customer_stock_sale_threeyear2_weather;');
 
+            $chunk_list = array_chunk($select, 500);
+
+            foreach($chunk_list as $key => $val) {
+                // 基础结果 
+                $insert = $this->db_easyA->table('sp_customer_stock_sale_threeyear2_weather')->strict(false)->insertAll($val);
+            }
+        }
+    }
 }
