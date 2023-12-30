@@ -89,19 +89,61 @@ class ReviseService
 
 
         if ($isLevel == 1) {
-            $level = [
-                ['name' => 'A', 'value' => 'A'],
-                ['name' => 'B', 'value' => 'B'],
-                ['name' => 'C', 'value' => 'C'],
-                ['name' => 'D', 'value' => 'D'],
-                ['name' => 'S', 'value' => 'S'],
-                ['name' => 'SS', 'value' => 'SS'],
-            ];
-            $Mathod = [
-                ['name' => '直营', 'value' => '直营'],
-                ['name' => '加盟', 'value' => '加盟'],
-            ];
+            $cc = [];
+            foreach ($CustomItem17 as $item) {
+
+                if (isset($cc['商品专员'])) {
+                    $cc['商品专员']['children'] [] = $item;
+                } else {
+                    $cc['商品专员'] = ['name' => '商品专员', 'value' => '商品专员', 'children' => [$item]];
+                }
+            }
+            $cc = array_values($cc);
+            $CustomItem17 = $cc;
+
+            $rr = [];
+            foreach ($State as $item) {
+                if (isset($rr['省份'])) {
+                    $rr['省份']['children'] [] = $item;
+                } else {
+                    $rr['省份'] = ['name' => '省份', 'value' => '省份', 'children' => [$item]];
+                }
+            }
+            $rr = array_values($rr);
+            $State = $rr;
+
+            $hh = [];
+            foreach ($CustomerName as $item) {
+                if (isset($hh['店铺'])) {
+                    $hh['店铺']['children'] [] = $item;
+                } else {
+                    $hh['店铺'] = ['name' => '店铺', 'value' => '店铺', 'children' => [$item]];
+                }
+            }
+            $hh = array_values($hh);
+            $CustomerName = $hh;
+            $level = [[
+                'name' => '等级',
+                'value' => '等级',
+                'children' => [
+                    ['name' => 'A', 'value' => 'A', 'pid' => '等级'],
+                    ['name' => 'B', 'value' => 'B', 'pid' => '等级'],
+                    ['name' => 'C', 'value' => 'C', 'pid' => '等级'],
+                    ['name' => 'D', 'value' => 'D', 'pid' => '等级'],
+                    ['name' => 'S', 'value' => 'S', 'pid' => '等级'],
+                    ['name' => 'SS', 'value' => 'SS', 'pid' => '等级'],
+                ]
+            ]];
+            $Mathod = [[
+                'name' => '经营模式',
+                'value' => '经营模式',
+                'children' => [
+                    ['name' => '直营', 'value' => '直营', 'pid' => '经营模式'],
+                    ['name' => '加盟', 'value' => '加盟', 'pid' => '经营模式'],
+                ]
+            ]];
             $CustomerName = array_merge($Mathod, $CustomItem17, $level, $CustomerName, $State);
+
         }
 
         $Size = [

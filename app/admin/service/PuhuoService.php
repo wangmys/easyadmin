@@ -965,7 +965,6 @@ class PuhuoService
         $res = SpLypPuhuoZdySet2Model::where([['admin_id', '=', session('admin.id')], ['Yuncang', '=', $Yuncang], ['Selecttype', '=', SpLypPuhuoZdySet2Model::SELECT_TYPE['much_merge']]])->field('id,Yuncang,GoodsNo,Selecttype,Commonfield,rule_type,remain_store,remain_rule_type,if_taozhuang,if_zdmd')->select();
         $res = $res ? $res->toArray() : [];
         $select_list = $this->get_select_data2($Yuncang);
-        // print_r($select_list);die;
         if ($res) {
             foreach ($res as &$v_res) {//1组合(多省、商品专员、经营模式) 2多店
                 $Commonfield_arr = $v_res['Commonfield'] ? explode(',', $v_res['Commonfield']) : [];
@@ -988,11 +987,31 @@ class PuhuoService
                         break;
 
                 }
-
-                $v_res['Commonfield_select'] = $Commonfield_select;
+                $rr=[];
+                foreach ($Commonfield_select as $item){
+                    if(isset($rr[$item['pid']])){
+                        $rr[$item['pid']]['children'] []=$item;
+                    }else{
+                        $rr[$item['pid']]=['name'=>$item['pid'],'value'=>$item['pid'],'children'=>[$item]];
+                    }
+                }
+                $rr=array_values($rr);
+                $v_res['Commonfield_select'] = $rr;
 
             }
         }
+        $cc=[];
+        foreach ($select_list['merge_list'] as $item){
+
+            if(isset($cc[$item['pid']])){
+                $cc[$item['pid']]['children'] []=$item;
+            }else{
+                $cc[$item['pid']]=['name'=>$item['pid'],'value'=>$item['pid'],'children'=>[$item]];
+            }
+        }
+        $cc=array_values($cc);
+        $select_list['merge_list'] = $cc;
+
         $return = [];
         if ($Yuncang == '武汉云仓') {
             $return = ['wuhan_goods_config' => $res, 'wuhan_select_list' => $select_list];
@@ -1028,10 +1047,10 @@ class PuhuoService
     {
 
         $customer_regionid_notin_text = config('skc.customer_regionid_notin_text');
-        $province_list = $this->easy_db->Query("select State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
-        $goods_manager_list = $this->easy_db->Query("select CustomItem17 as name, concat('商品专员-', CustomItem17) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
-        $mathod_list = $this->easy_db->Query("select Mathod as name, concat('经营模式-', Mathod) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
-        $wenqu_list = $this->easy_db->Query("select CustomItem36 as name, concat('温区-', CustomItem36) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem36;");//温区
+        $province_list = $this->easy_db->Query("select '省份' as pid, State as name, concat('省份-', State) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by State;");
+        $goods_manager_list = $this->easy_db->Query("select '商品专员' as pid, CustomItem17 as name, concat('商品专员-', CustomItem17) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem17;");
+        $mathod_list = $this->easy_db->Query("select '经营模式' as pid,Mathod as name, concat('经营模式-', Mathod) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by Mathod;");//[['name' => '加盟', 'value' => '加盟'], ['name' => '直营', 'value' => '直营']];
+        $wenqu_list = $this->easy_db->Query("select '温区' as pid, CustomItem36 as name, concat('温区-', CustomItem36) as value from customer where CustomItem15='{$yuncang}' and Mathod in ('直营', '加盟') and Region not in ($customer_regionid_notin_text) and ShutOut=0 group by CustomItem36;");//温区
         $merge = array_merge($mathod_list, $province_list, $goods_manager_list, $wenqu_list);
 
         return ['merge_list' => $merge];
