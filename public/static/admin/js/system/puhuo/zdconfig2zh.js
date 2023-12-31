@@ -95,6 +95,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     list: ['ALL', 'CLEAR', 'REVERSE']
                 },
                 filterable: true,
+                tree: {
+                    show: true,
+                },
                 name: 'Commonfield[]',
                 data: function(){
                     return data
@@ -184,6 +187,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         list: ['ALL', 'CLEAR', 'REVERSE']
                     },
                     name: 'Commonfield[]',
+                    tree: {
+                        show: true,
+                    },
                     data: function(){
                         return merge_list_hidden
                     }
@@ -421,6 +427,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                         },
                         filterable: true,
                         name: 'Commonfield[]',
+                        tree: {
+                            show: true,
+                        },
                         data: function(){
                             return merge_list_hidden
                         }
@@ -633,6 +642,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     },
                     filterable: true,
                     name: 'Commonfield[]',
+                    tree: {
+                        show: true,
+                    },
                     data: function(){
                         return merge_list_hidden
                     }
@@ -839,6 +851,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     },
                     filterable: true,
                     name: 'Commonfield[]',
+                    tree: {
+                        show: true,
+                    },
                     data: function(){
                         return merge_list_hidden
                     }
@@ -1044,6 +1059,9 @@ define(["jquery", "easy-admin", "vue"], function ($, ea, Vue) {
                     },
                     filterable: true,
                     name: 'Commonfield[]',
+                    tree: {
+                        show: true,
+                    },
                     data: function(){
                         return merge_list_hidden
                     }

@@ -79,7 +79,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
             })
 
             $('body').on('click', '#excel_tpl', function (obj) {
-                location.href = 'http://im.babiboy.com/static/m/images/puhuo_tpl.xlsx';
+                location.href = 'http://im.babiboy.com/static/m/images/铺货模板.xlsx';
 
             })
             $('body').on('click', '#export_excel_all', function (obj) {
@@ -178,8 +178,8 @@ define(["jquery", "easy-admin"], function ($, ea) {
                 toolbar: ['refresh']
                 , limit: 30000
                 , limits: [200, 500, 1000, 5000, 10000, 20000]
-                , height: 650,
-                totalRow: true
+                , height: window.innerHeight - 115
+                ,totalRow: true
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [

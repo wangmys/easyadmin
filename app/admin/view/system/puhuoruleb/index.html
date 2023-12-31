@@ -60,6 +60,11 @@
             , url_import = "{:url('admin/system.puhuoruleb/import_rule')}"
         ;
 
+        $('body').on('click', '.excel_tpl', function (obj) {
+            location.href = 'http://im.babiboy.com/static/m/images/铺货规则模板.xlsx';
+
+        })
+
         //指定允许上传的文件类型
         upload.render({
             elem: '#import_rule'

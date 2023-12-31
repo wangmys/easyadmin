@@ -117,8 +117,6 @@
     <div class="layui-tab-item layui-show">
         <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8">
-                <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:80%; height: 60px;">
                         
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">云仓</label>
@@ -142,7 +140,19 @@
                             <div class="layui-input-inline" style="width: 100px !important;">
                                 <div id="xm-CustomItem17" class="xm-select-demo"></div>
                             </div>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">省份</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <div id="xm-State" class="xm-select-demo"></div>
+                            </div>
 
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">季节</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <div id="xm-TimeCategoryName2" class="xm-select-demo"></div>
+                            </div>
+                            <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">温区</label>
+                            <div class="layui-input-inline" style="width: 100px !important;">
+                                <div id="xm-wenqu" class="xm-select-demo"></div>
+                            </div>
                             <label class="layui-form-label" style="width: 90px !important; text-align: center; overflow: visible;">是否已导单</label>
                             <div class="layui-input-inline" style="width: 100px !important;">
                                 <select name="is_delete" lay-verify="">
@@ -153,7 +163,8 @@
                             </div>
                         </div>
 
-                        <div class="layui-form-item">
+                        <div class="layui-form-item" style="margin-top: 9px">
+
                             <label class="layui-form-label" style="width: 100px !important; text-align: center; overflow: visible;">开始日期</label>
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <input type="text" name="setTime1" class="layui-input" id="setTime1" value="{$setTime1}" placeholder="yyyy-MM-dd">
@@ -162,18 +173,16 @@
                             <div class="layui-input-inline" style="width: 130px !important;">
                                 <input type="text" name="setTime2" class="layui-input" id="setTime2" value="{$setTime2}" placeholder="yyyy-MM-dd">
                             </div>
+                            <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
+                                    style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">
+                                查询结果
+                            </button>
+                            <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan"
+                                    style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b
+                                    style="color:#0051ff;">导单转换</b>
+                            </button>
                         </div>
 
-                    </div>
-
-                    <div class="flex row" style="width:20%; height: 40px;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
-                        </button>
-                        <button class="layui-btn layui-btn-sm layui-bg-orange save_caogao_daodan" style="margin: 0px 0px 0px 10px;" lay-event="save_caogao_daodan"><b style="color:#0051ff;">导单转换</b></button>
-
-                    </div>
-                </div>  
             </form>
         </div>
     </div>
@@ -267,7 +276,28 @@
             name: 'CustomItem17',
             data: []
         })
+        xmSelect.render({
+            el: '#xm-TimeCategoryName2',
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'TimeCategoryName2',
+            data: []
+        })
 
+        xmSelect.render({
+            el: '#xm-State',
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'State',
+            data: []
+        })
+        xmSelect.render({
+            el: '#xm-wenqu',
+            filterable: true,
+            // toolbar: {show: true},
+            name: 'wenqu',
+            data: []
+        })
         // 日期选择器
         laydate.render({
             elem: '#setTime1'
@@ -356,6 +386,42 @@
                 })
 
 
+                xmSelect.render({
+                    el: '#xm-State',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'State',
+                    data: res.data.State
+                })
+
+
+                xmSelect.render({
+                    el: '#xm-wenqu',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'wenqu',
+                    data: res.data.wenqu
+                })
+
+                xmSelect.render({
+                    el: '#xm-TimeCategoryName2',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'TimeCategoryName2',
+                    data: res.data.TimeCategoryName2
+                })
                 // 日期选择器
                 laydate.render({
                     name:'setTime1',

@@ -721,3 +721,16 @@ function importExcel_m($file_path = '/', $read_column = array(), $start_row = 2)
     return $data;
 
 }
+
+ function xm($list, $field)
+{
+
+    $res = array_unique(array_column($list, $field));
+
+    $return = [];
+    foreach ($res as $item) {
+        $return[] = ['name' => $item, 'value' => $item];
+    }
+    return $return;
+
+}

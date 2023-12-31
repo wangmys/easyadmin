@@ -18,7 +18,7 @@
     }
 
     .layui-form-item {
-        margin-bottom: 0px;
+        margin-bottom: 8px;
         height: 30px;
     }
 
@@ -98,13 +98,34 @@
         border-top: none;
         border-left: none;
     }
+    .red{
+        color: red;
+    }
+    .layui-table-view{
+        margin: 0;
+    }
+    .layuimini-container{
+        padding:unset;
+    }
+    .layuimini-main{
+        padding: unset;
+    }
+    body {
+        overflow-y: hidden; /* 防止垂直滚动 */
+        /*height: 100%; !* 确保body元素高度为全屏高度 *!*/
+    }
+    xm-select {
+        min-height: 31px;
+        line-height: 31px;
+    }
+    form{
+        margin-top: 8px;
+    }
 
 </style>
 
 <div class="layuimini-container">
     <div class="layuimini-main" >
-        <fieldset id="searchFieldset_CustomerId" class="table-search-fieldset">
-            <legend>条件搜索</legend>
             <form class="layui-form layui-form-pane form-search" name="myform" lay-filter="myform">
                 <div class="layui-form-item layui-inline">
                     <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">云仓</label>
@@ -150,7 +171,6 @@
                     <div id="msg" style="display: none;color: #3FDD86;font-size: 22px;font-weight: 700" >已成功导入,请刷新页面</div>
                 </div>
             </form>
-        </fieldset>
         <table id="currentTable" class="layui-table layui-hide"
                data-auth-add="{:auth('system.auth/add')}"
                data-auth-edit="{:auth('system.auth/edit')}"

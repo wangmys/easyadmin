@@ -26,12 +26,15 @@ class Puhuozdkphmd extends AdminController
         'sort' => 'desc',
         'id'   => 'desc',
     ];
+    protected $mysql;
     const ProductMemberAuth = 7;
 
     public function __construct(App $app)
     {
         parent::__construct($app);
         $this->model = new SpLypPuhuoZdkphmdModel;
+        $this->mysql = Db::connect('mysql');
+
     }
 
     /**
@@ -69,6 +72,57 @@ class Puhuozdkphmd extends AdminController
         }
         return $this->fetch();
 
+    }
+
+    /**
+     * @return \think\response\Json|void
+     * @NodeAnotation(title="excel转换",auth=false)
+     */
+    public function import_excel()
+    {
+        if (request()->isAjax()) {
+
+            $file = request()->file('file');
+            $new_name = "import_excel" . '_' . uuid('zhuanhuan') . '.' . $file->getOriginalExtension();
+            $save_path = app()->getRootPath() . 'runtime/uploads/' . date('Ymd', time()) . '/';   //文件保存路径
+            $info = $file->move($save_path, $new_name);
+            //读取导入的需要转单的excel
+            $read_column = [
+                'A' => 'Yuncang',
+                'B' => 'Mathod',
+                'C' => 'B',
+                'D' => 'A1',
+                'E' => 'A2',
+                'F' => 'A3',
+                'G' => 'N',
+                'H' => 'H3',
+                'I' => 'H6',
+                'J' => 'K1',
+                'K' => 'K2',
+                'L' => 'X1',
+                'M' => 'X2',
+                'N' => 'X3',
+            ];
+            $excel_data = [];
+            $db = $this->mysql->table('sp_lyp_puhuo_zdkphmd')->select()->toArray();
+            foreach ($db as $item) {
+                $excel_data[$item['Yuncang'] . $item['Mathod'] . $item['B']] = $item;
+            }
+            $excel = importExcel_m($save_path . $new_name, $read_column);
+            $install = [];
+            foreach ($excel as $item) {
+                if (isset($excel_data[$item['Yuncang'] . $item['Mathod'] . $item['B']])) {
+                    $this->mysql->table('sp_lyp_puhuo_zdkphmd')->where(['Yuncang' => $item['Yuncang'], 'Mathod' => $item['Mathod'], 'B' => $item['B']])->update($item);
+                } else {
+                    $item['create_time'] = date('Y-m-d H:i:s');
+                    $item['update_time'] = date('Y-m-d H:i:s');
+                    $install[] = $item;
+                }
+            }
+            $this->mysql->table('sp_lyp_puhuo_zdkphmd')->insertAll($install);
+        }
+
+        $this->success('上传成功');
     }
 
     /**

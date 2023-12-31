@@ -1,190 +1,228 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>最终铺货数据</title>
-    <link rel="stylesheet" href="__STATIC__/ok/css/oksub.css">
-    <link rel="stylesheet" href="__STATIC__/admin/css/flex.css">
-    <style>
-        body {
-            overflow: hidden;
-        }
-        xm-select{
-            min-height: 32px;
-        }
-        .layui-table-cell {
-            font-size: 12px;
-            padding: 0 5px;
-            height: auto;
-            /*text-align: left;*/
-        }
+<style>
+    body {
+        /*overflow: hidden;*/
+    }
+    .layui-table-cell {
+        font-size: 12px;
+        padding: 0 5px;
+        height: auto;
+        /*text-align: left;*/
+    }
 
-        .ok-form {
-            margin-top: 5px;
-        }
+    .ok-form {
+        margin-top: 5px;
+    }
 
-        .layui-btn+.layui-btn {
-            margin-left: 3px;
-        }
+    .layui-btn+.layui-btn {
+        margin-left: 3px;
+    }
 
-        .layui-form-item {
-            margin-bottom: 0px;
-            height: 30px;
-        }
-        .red{
-            color: red;
-        }
+    .layui-form-item {
+        margin-bottom: 8px;
+        height: 30px;
+    }
 
-        .layui-input,
-        .layui-select,
-        .layui-textarea {
-            height: 32px;
-        }
+    .layui-input,
+    .layui-select,
+    .layui-textarea {
+        height: 32px;
+    }
 
-        .layui-form-pane .layui-form-label {
-            height: 32px;
-            line-height: 15px;
-        }
+    .layui-form-pane .layui-form-label {
+        height: 32px;
+        line-height: 15px;
+    }
 
-        .layui-form-select dl dd,
-        .layui-form-select dl dt {
-            line-height: 32px;
-        }
+    .layui-form-select dl dd,
+    .layui-form-select dl dt {
+        line-height: 32px;
+    }
 
-        .layui-form-select dl {
-            padding: 0px 0;
-        }
+    .layui-form-select dl {
+        padding: 0px 0;
+    }
 
-        .layui-table th {
-            font-weight: bolder;
-        }
+    .layui-table th {
+        font-weight: bolder;
+    }
 
-        .layui-form-pane .layui-form-label {
-            text-align: right;
-        }
+    .layui-form-pane .layui-form-label {
+        text-align: right;
+    }
 
-        .layui-laypage .layui-laypage-curr .layui-laypage-em {
-            background-color: #ffcc00;
-            color: #666
-        }
+    .layui-laypage .layui-laypage-curr .layui-laypage-em {
+        background-color: #ffcc00;
+        color: #666
+    }
 
-        .layui-colorpicker {
-            width: 30px;
-            height: 10px;
-            line-height: 30px;
-            padding: 0px;
-        }
+    .layui-colorpicker {
+        width: 30px;
+        height: 10px;
+        line-height: 30px;
+        padding: 0px;
+    }
 
 
-        .layui-table-cell{
-            height:auto;
-            overflow:visible;
-            text-overflow:inherit;
-        }
-        /* .layui-unselect .layui-form-select {
-            width: 80px !important;
-        }  */
-        .layui-col-md1 {
-            width: 11.333% !important;
-        }
-        .layui-form-label {
-            width: 130px !important;
-        }
+    .layui-table-cell{
+        height:auto;
+        overflow:visible;
+        text-overflow:inherit;
+    }
+    /* .layui-unselect .layui-form-select {
+        width: 80px !important;
+    }  */
+    .layui-col-md1 {
+        width: 11.333% !important;
+    }
+    .layui-form-label {
+        width: 130px !important;
+    }
 
-        .layui-input-inline {
-            width: 40px;
-        }
+    .layui-input-inline {
+        width: 40px;
+    }
 
 
-        .layui-table-box .layui-table-header th {
-            height: 39px;
-            line-height: 12px;
-        }
-        .layui-table-box .layui-table-header th .layui-table-cell{
-            height: 32px;
-            line-height: 12px;
-            word-break: break-all;
-            white-space: normal;
-        }
-        .layui-table-view .layui-table td, .layui-table-view .layui-table th{
-            padding: 2px 0;
-            border-top: none;
-            border-left: none;
-        }
+    .layui-table-box .layui-table-header th {
+        height: 39px;
+        line-height: 12px;
+    }
+    .layui-table-box .layui-table-header th .layui-table-cell{
+        height: 32px;
+        line-height: 12px;
+        word-break: break-all;
+        white-space: normal;
+    }
+    .layui-table-view .layui-table td, .layui-table-view .layui-table th{
+        padding: 2px 0;
+        border-top: none;
+        border-left: none;
+    }
+    .red{
+        color: red;
+    }
+    .layui-table-view{
+        margin: 0;
+    }
+    .layuimini-container{
+        padding:unset;
+    }
+    .layuimini-main{
+     padding: unset;
+    }
+    body {
+        overflow-y: hidden; /* 防止垂直滚动 */
+        /*height: 100%; !* 确保body元素高度为全屏高度 *!*/
+    }
+    xm-select {
+        min-height: 31px;
+         line-height: 31px;
+    }
+    form{
+        margin-top: 8px;
+    }
+</style>
 
-    </style>
-</head>
+<div class="layuimini-container">
+    <div class="layuimini-main" >
 
-<body class="" style="background-color: #ffffff;">
-<div class="layui-tab-item layui-show">
-    <div class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
-        <form class="layui-form layui-form-pane ok-form layui-col-space8">
-            <div class="flex row end between">
-                <div class="flex col between al-start" style="width:80%; height: 36px;">
-
-                    <div class="layui-form-item">
-                        <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">云仓</label>
-                        <div class="layui-input-inline" style="width: 90px !important;">
-                            <div id="xm-WarehouseName" class="xm-select-demo"></div>
-                        </div>
-                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">大类选择</label>
-                        <div class="layui-input-inline" style="width: 80px !important;">
-                            <div id="xm-CategoryName1" class="xm-select-demo"></div>
-                        </div>
-                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">店铺名称</label>
-                        <div class="layui-input-inline" style="width: 130px !important;">
-                            <div id="xm-CustomerName" class="xm-select-demo"></div>
-                        </div>
-                        <label class="layui-form-label" style="width: 50px !important; text-align: center; overflow: visible;">货号</label>
-                        <div class="layui-input-inline" style="width: 130px !important;">
-                            <div id="xm-GoodsNo" class="xm-select-demo"></div>
-                        </div>
-                        <label class="layui-form-label" style="width: 80px !important; text-align: center; overflow: visible;">商品专员</label>
-                        <div class="layui-input-inline" style="width: 100px !important;">
-                            <div id="xm-CustomItem17" class="xm-select-demo"></div>
+            <form class="layui-form layui-form-pane form-search" name="myform" lay-filter="myform">
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">云仓</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-WarehouseName" class="xm-select"></div>
                         </div>
                     </div>
-
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">大类选择</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-CategoryName1" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">店铺</label>
+                    <div class="layui-input-inline" style="width: 120px">
+                        <div  class="layui-input-inline" style="width: 120px">
+                            <div id="xm-CustomerName" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">货号</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-GoodsNo" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">商品专员</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-CustomItem17" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">省份</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-State" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">季节</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-TimeCategoryName2" class="xm-select"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label" style="line-height: 2; width: 100px !important; text-align: center; overflow: visible;">温区</label>
+                    <div class="layui-input-inline" style="width: 150px">
+                        <div  class="layui-input-inline" style="width: 150px">
+                            <div id="xm-wenqu" class="xm-select"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex row" style="width:24%; height: 40px;">
+
+                <div class="layui-form-item layui-inline">
                     <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
-                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px;">查询结果
                     </button>
 
                     <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="mapBtndd"
-                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right; margin-left: 15px;height: 30px;
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; margin-left: 15px;height: 30px;
                         line-height: 30px;
                         padding: 0 10px;
                         font-size: 12px;">导单转换
                     </button>
+
                     <button lay-submit class="layui-btn layui-btn-sm1" lay-filter="save_caogao"
-                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: red; line-height: 25px; float:right; margin-left: 15px;height: 30px;
+                            style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: red; line-height: 25px; margin-left: 15px;height: 30px;
                         line-height: 30px;
                         padding: 0 10px;
                         font-size: 12px;">保存草稿
                     </button>
                 </div>
-            </div>
-        </form>
+            </form>
+        <table class="layui-hide" id="table" lay-filter="table">
+        </table>
+
     </div>
 </div>
 
-<div style="border: 0px solid red; float: left; width: 100%; margin-top: 10px;">
-    <table class="layui-hide" id="table" lay-filter="table">
-        <div style="text-align: center; color:#0051ff;"> <a class="dateStr"></a></div>
-    </table>
-    <div id="page"></div>
-</div>
-</body>
-
-</html>
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm layui-bg-orange set" style="margin: 0px 0px 0px 0px;"><b style="color:#0152ff;">操作</b></button>
+        <button class="layui-btn layui-btn-sm layui-bg-orange set" style="margin: 0px 0px 0px 10px;"><b style="color:#0152ff;">操作</b></button>
     </div>
 </script>
 <!--<script src="__STATIC__/ok/lib/layui/layui.js"></script>-->
@@ -275,6 +313,43 @@
                     data: res.data.CustomItem17
                 })
 
+                //货号
+                xmSelect.render({
+                    el: '#xm-State',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'State',
+                    data: res.data.State
+                })
+                //货号
+                xmSelect.render({
+                    el: '#xm-TimeCategoryName2',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'TimeCategoryName2',
+                    data: res.data.TimeCategoryName2
+                })
+                //货号
+                xmSelect.render({
+                    el: '#xm-wenqu',
+                    filterable: true,
+                    toolbar: {show: true},
+                    theme: {
+                        color: '#1cbbb4',
+                    },
+                    // showCount: 1,
+                    name:'wenqu',
+                    data: res.data.wenqu
+                })
+
             }, 'json')
         }
 
@@ -349,7 +424,7 @@
                 , page: true
                 , limit: 1000
                 , limits: [1000, 5000, 10000, 20000]
-                , height: 780
+                , height: window.innerHeight - 110
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [
                     [
@@ -369,11 +444,11 @@
                         , { field: 'CustomItem17', title: '商品专员', align: 'center', width: 50}
                         , { field: 'State', title: '省份', align: 'center', width: 35}
                         , { field: 'wenqu', title: '温区', align: 'center', width: 38}
-                        , { field: 'CustomerName', title: '店铺名称', align: 'center', width: 70}
+                        , { field: 'CustomerName', title: '店铺名称', align: 'center', width: 50}
                         , { field: 'Mathod', title: '经营模式', align: 'center', width: 50}
                         , { field: 'CustomerGrade', title: '店铺等级', align: 'center', width: 40}
                         , { field: 'CustomItem14', title: '仓库面积', align: 'center', width: 60}
-                        , { field: 'StoreArea', title: '店铺面积', align: 'center', width: 55}
+                        , { field: 'StoreArea', title: '店铺面积', align: 'center', width: 50}
                         , { field: 'CustomItem25', title: '加盟客户', align: 'center', width: 50}
                         , { field: 'CustomItem45', title: '板墙窗数', align: 'center', width: 30}
                         , { field: 'xiuxian_num', title: '休闲裤台个数', align: 'center', width: 40}
