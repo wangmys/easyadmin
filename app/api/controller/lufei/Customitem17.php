@@ -409,7 +409,7 @@ class Customitem17 extends BaseController
     public function updateZhuanyuan() {
         $目标月份 = date('Y-m');
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
-        $本月最后一天 = date('Y-m-t'); 
+        $本月最后一天 = date('Y-m-t 23:59:59'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
 
         if (date('Y-m-d') == date('Y-m-01')) {
@@ -717,7 +717,7 @@ class Customitem17 extends BaseController
     public function updateZhuanyuan_total() {
         $目标月份 = date('Y-m');
         $截止日期 = date('Y-m-d', strtotime('-1 day'));
-        $本月最后一天 = date('Y-m-t'); 
+        $本月最后一天 = date('Y-m-t 23:59:59'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
         $str_近七天日期 = '';
         $getBefore7 = $this->getBefore7();
@@ -847,10 +847,21 @@ class Customitem17 extends BaseController
         $结束= date('Y-m-d 23:59:59');
         $截止日期 = date('Y-m-d H:i:s');
         $截止日期2 = date('Y-m-d');
-        $本月最后一天 = date('Y-m-t'); 
+        $本月最后一天 = date('Y-m-t 23:59:59'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期2), strtotime($本月最后一天));
 
         $目标月份 = date('Y-m');
+
+        ############
+        // $今天 = date('2023-12-31');
+        // $开始= date('2023-12-01 00:00:00');
+        // $结束= date('2023-12-31 23:59:59');
+        // $截止日期 = date('2023-12-31 H:i:s');
+        // $截止日期2 = date('2023-12-31');
+        // $本月最后一天 = date('2023-12-31 23:59:59'); 
+        // $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期2), strtotime($本月最后一天));
+
+        // $目标月份 = '2023-12-31';
 
         // 每月1号
         // if (date('Y-m-d') == date('Y-m-01')) {
@@ -859,6 +870,8 @@ class Customitem17 extends BaseController
         //     $本月最后一天 = date('Y-m-t', strtotime('-1month')); 
         //     $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期2), strtotime($本月最后一天));
         // }
+
+
 
         // die;
         $sql = "
@@ -873,7 +886,8 @@ class Customitem17 extends BaseController
         // print_r($select);die;
         if ($select) {
             // 删除历史数据
-            $this->db_easyA->execute("delete from cwl_customitem17_retail_current where 日期>='{$开始}' and 日期<='{$结束}'");
+            $delsql = "delete from cwl_customitem17_retail_current where 日期>='{$开始}' and 日期<='{$结束}'";
+            $this->db_easyA->execute($delsql);
             $chunk_list = array_chunk($select, 500);
 
             foreach($chunk_list as $key => $val) {
@@ -889,6 +903,122 @@ class Customitem17 extends BaseController
             $this->db_easyA->execute($sql_商品专员);
 
             
+            ################ 更新 cwl_customitem17_zhuanyuan_current ##################
+            // $sql_新表 = "
+            //     select 
+            //         t.商品专员,t.目标月份,
+            //         sum(t.本月目标) as 本月目标
+            //     from (
+            //             select 
+            //                     CustomerName as 店铺名称,
+            //                     State as 省份,
+            //                     Mathod as 经营模式,
+            //                     CustomItem17 as 商品专员,
+            //                     '{$目标月份}' as 目标月份,    
+            //                     m.本月目标
+            //             from customer_pro as c
+            //             left join sp_customer_mubiao_ww as m on c.CustomerName=m.店铺名称
+            //             group by 商品专员,经营模式,店铺名称
+            //     ) as t
+            //     group by t.商品专员
+            // ";
+            // $select_新表 = $this->db_easyA->query($sql_新表);
+
+            $sql_新表A = "
+                select 
+                    CustomItem17 as 商品专员,
+                    '{$目标月份}' as 目标月份   
+                from customer_pro 
+                Group by CustomItem17
+            ";
+            $select_新表A = $this->db_easyA->query($sql_新表A);
+            $delsql2 = "delete from cwl_customitem17_zhuanyuan_current where 目标月份='{$目标月份}'";
+            $this->db_easyA->execute($delsql2);
+            $this->db_easyA->table('cwl_customitem17_zhuanyuan_current')->strict(false)->insertAll($select_新表A);
+
+            $sql_目标直营 = "
+                update cwl_customitem17_zhuanyuan_current as c
+                left join (
+                        select 
+                            t.商品专员,t.目标月份,经营模式,
+                            sum(t.本月目标) as 目标
+                        from (
+                                select 
+                                        CustomerName as 店铺名称,
+                                        State as 省份,
+                                        Mathod as 经营模式,
+                                        CustomItem17 as 商品专员,
+                                        '{$目标月份}' as 目标月份,    
+                                        m.本月目标
+                                from customer_pro as c
+                                left join sp_customer_mubiao_ww as m on c.CustomerName=m.店铺名称
+                                where c.Mathod = '直营'
+                                group by 商品专员,经营模式,店铺名称
+                        ) as t
+                        group by t.商品专员,经营模式
+                ) as t1 on c.商品专员 = t1.商品专员 and c.目标月份 = t1.目标月份
+                set 
+                    c.目标_直营 = t1.目标
+                where 
+                    c.目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_目标直营);
+            $sql_目标加盟 = "
+                update cwl_customitem17_zhuanyuan_current as c
+                left join (
+                        select 
+                            t.商品专员,t.目标月份,经营模式,
+                            sum(t.本月目标) as 目标
+                        from (
+                                select 
+                                        CustomerName as 店铺名称,
+                                        State as 省份,
+                                        Mathod as 经营模式,
+                                        CustomItem17 as 商品专员,
+                                        '{$目标月份}' as 目标月份,    
+                                        m.本月目标
+                                from customer_pro as c
+                                left join sp_customer_mubiao_ww as m on c.CustomerName=m.店铺名称
+                                where c.Mathod = '加盟'
+                                group by 商品专员,经营模式,店铺名称
+                        ) as t
+                        group by t.商品专员,经营模式
+                ) as t1 on c.商品专员 = t1.商品专员 and c.目标月份 = t1.目标月份
+                set 
+                    c.目标_加盟 = t1.目标
+                where 
+                    c.目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_目标加盟);
+            $sql_目标合计 = "
+                update cwl_customitem17_zhuanyuan_current as c
+                left join (
+                        select 
+                            t.商品专员,t.目标月份,
+                            sum(t.本月目标) as 目标
+                        from (
+                                select 
+                                        CustomerName as 店铺名称,
+                                        State as 省份,
+                                        Mathod as 经营模式,
+                                        CustomItem17 as 商品专员,
+                                        '{$目标月份}' as 目标月份,    
+                                        m.本月目标
+                                from customer_pro as c
+                                left join sp_customer_mubiao_ww as m on c.CustomerName=m.店铺名称
+
+                                group by 商品专员,店铺名称
+                        ) as t
+                        group by t.商品专员
+                ) as t1 on c.商品专员 = t1.商品专员 and c.目标月份 = t1.目标月份
+                set 
+                    c.目标_合计 = t1.目标
+                where 
+                    c.目标月份 = '{$目标月份}'
+            ";
+            $this->db_easyA->execute($sql_目标合计);               
+            // die; 
+
             $sql_实际累计流水 = "
                 update cwl_customitem17_zhuanyuan_current as c 
                 left join (
@@ -1144,7 +1274,7 @@ class Customitem17 extends BaseController
     public function updateZhuanyuan_total_current() {
         $目标月份 = date('Y-m');
         $截止日期 = date('Y-m-d H:i:s');
-        $本月最后一天 = date('Y-m-t'); 
+        $本月最后一天 = date('Y-m-t 23:59:59'); 
         $到结束剩余天数 = $this->getDaysDiff(strtotime($截止日期), strtotime($本月最后一天));
         $str_近七天日期 = '';
         $getBefore7 = $this->getBefore7();
