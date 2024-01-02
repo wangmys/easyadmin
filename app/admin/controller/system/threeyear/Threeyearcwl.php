@@ -471,9 +471,9 @@ class Threeyearcwl extends AdminController
             $map_fm_3 = $map春夏云仓_fm . $map秋冬云仓_fm . $map深浅色_fm . $map适龄段_fm . $map时尚度_fm . $map色感_fm .$map色系_fm;
             $map_fm = $map_fm_1 . $map_fm_2 . $map_fm_3;
 
-            echo $执行sql = $this->sqlHandle($年, $map, $map_fm);
+            $执行sql = $this->sqlHandle($年, $map, $map_fm);
             
-            die;
+            
             $select = $this->db_easyA->query($执行sql);
           
             
