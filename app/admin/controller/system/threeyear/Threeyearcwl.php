@@ -496,6 +496,13 @@ class Threeyearcwl extends AdminController
         }
     }
 
+    // 测试
+    public function index2() { 
+        return View('system/threeyearcwl/index2', [
+
+        ]);
+    }
+
     // sql组合
     public function sqlHandle($年 = '', $map, $map_fm) {
         if ($年) {
