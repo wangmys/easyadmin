@@ -75,30 +75,36 @@ class CommandService
                         $name = mb_substr($v['创建人'], 3);
 
                         if ($pos === false) {
-                            $v['创建人'] = $v['创建人'];
+//                            $v['创建人'] = $v['创建人'];
                             $v['商品负责人'] = $v['创建人'];
-                            $item['创建人'] = $v['创建人'];
+//                            $item['创建人'] = $v['创建人'];
                             $item['商品负责人'] = $v['创建人'];
+                            $item['清空操作'] = $item['收货来源'];
                         } else {
-                            $v['创建人'] = $name;
+//                            $v['创建人'] = $name;
                             $v['商品负责人'] = $name;
-                            $item['创建人'] = $name;
+//                            $item['创建人'] = $name;
                             $item['商品负责人'] = $name;
+                            $item['清空操作'] = $item['收货来源'];
+
                         }
 
                     } else {
                         $pos = strstr($item['创建人'], "商品~");
                         $name = mb_substr($item['创建人'], 3);
                         if ($pos === false) {
-                            $v['创建人'] = $item['创建人'];
+//                            $v['创建人'] = $item['创建人'];
                             $v['商品负责人'] = $item['创建人'];
-                            $item['创建人'] = $item['创建人'];
+//                            $item['创建人'] = $item['创建人'];
                             $item['商品负责人'] = $item['创建人'];
+                            $item['清空操作'] = $item['收货来源'];
                         } else {
-                            $v['创建人'] = $name;
+//                            $v['创建人'] = $name;
                             $v['商品负责人'] = $name;
-                            $item['创建人'] = $name;
+//                            $item['创建人'] = $name;
                             $item['商品负责人'] = $name;
+                            $item['清空操作'] = $item['收货来源'];
+
                         }
                     }
 

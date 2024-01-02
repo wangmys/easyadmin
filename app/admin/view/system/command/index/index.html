@@ -7,6 +7,9 @@
     tr{
         pointer-events: none;
     }
+    xm-select{
+        width: 160px;
+    }
     .isRed{
         background-color:rgba(255,0,0,.2);
     }
@@ -15,12 +18,33 @@
 </style>
 <div class="layuimini-container">
         <div class="layuimini-main">
+            <fieldset id="searchFieldset_CustomerId" class="table-search-fieldset">
+                <legend>条件搜索</legend>
+                <form class="layui-form layui-form-pane form-search" name="myform" lay-filter="myform">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">商品负责人</label>
+                            <div id="more" class="layui-input-block">
+                                <div id="xm-select" class="xm-select"></div>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="时间" class="layui-input" id="test8" placeholder=" - ">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-btn layui-btn-normal" id="search">搜索</div>
+                            <button type="reset" class="layui-btn layui-btn-primary" data-table-reset="myform"> 重 置</button>
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
             <table id="currentTable" class="layui-table layui-hide" lay-filter="currentTable">
         </table>
     </div>
     </div>
 </div>
 <input type="text" id="manager" class="layui-hide" value="{:htmlspecialchars(json_encode($manager))}">
-<input type="text" id="searchValue" class="layui-hide" value="{$searchValue}">
-<input type="text" id="month" class="layui-hide" value="{:htmlspecialchars(json_encode($month))}">
-<input type="text" id="searchValue2" class="layui-hide" value="{:htmlspecialchars(json_encode($searchValue2))}">
+<input type="text" id="dateY" class="layui-hide" value="{:htmlspecialchars(json_encode($dateY))}">
