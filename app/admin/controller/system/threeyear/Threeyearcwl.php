@@ -522,7 +522,7 @@ class Threeyearcwl extends AdminController
                 res2.`Year`, res2.`Month`, res2.`Week`, res2.店铺数, res2.周期, res2.分子库存数量, res2.分子库存成本金额, res2.分子销量, res2.分子销额, res2.分母库存数量,res2.分母库存成本金额,res2.分母销量,res2.分母销额,
                 concat(round(res2.业绩占比 * 100, 1), '%') as 业绩占比,
                 concat(round(res2.库存占比 * 100, 1), '%') as 库存占比,
-                round(res2.店均周销量, 0) as 店均周销量,
+                round(res2.店均周销量, 1) as 店均周销量,
                 round(res2.店均库存量, 0) as 店均库存量,
                 concat(round(res2.折扣 * 100, 1), '%') as 折扣,
                 concat(round(res2.业绩占比 / res2.库存占比 * 100, 1), '%') as 效率,

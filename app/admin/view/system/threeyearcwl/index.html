@@ -118,15 +118,42 @@
             line-height:5px;
             font-size: 10px;
         }
+
+
+        th[data-key="1-0-4"],th[data-key="1-0-5"],th[data-key="1-0-6"],th[data-key="1-0-7"],th[data-key="1-0-8"],th[data-key="1-0-9"],th[data-key="1-0-10"],th[data-key="1-0-11"]
+        ,th[data-key="1-0-12"],th[data-key="1-0-13"],th[data-key="1-0-14"] {
+            background-color: #84d7fd !important;
+            /* color:#ffffff; */
+        }
+        th[data-key="1-0-15"],th[data-key="1-0-16"],th[data-key="1-0-17"],th[data-key="1-0-18"],th[data-key="1-0-19"],th[data-key="1-0-20"],th[data-key="1-0-21"],th[data-key="1-0-22"]
+        ,th[data-key="1-0-23"],th[data-key="1-0-24"],th[data-key="1-0-25"]{
+            background-color: #f4b382 !important;
+            /* color:#ffffff; */
+        }
+        th[data-key="1-0-26"],th[data-key="1-0-27"],th[data-key="1-0-28"],th[data-key="1-0-29"],th[data-key="1-0-30"],th[data-key="1-0-31"],th[data-key="1-0-32"],th[data-key="1-0-33"]
+        ,th[data-key="1-0-34"],th[data-key="1-0-35"],th[data-key="1-0-36"]{
+            background-color: #ffff00 !important;
+            /* color:#ffffff; */
+        }
+        th[data-key="1-5-3"] {
+            background-color: #add88d !important;
+            /* color:#ffffff; */
+        }
+
     </style>
 </head>
 
 <body class="" style="background-color: #ffffff;">
     <div class="layui-tab-item layui-show">
-        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff;">
+        <div id="map" class="layui-col-md12 layui-col-space8" style="background-color: #ffffff; display:block;">
             <form class="layui-form layui-form-pane ok-form layui-col-space8" lay-filter='searchFormHead'>
                 <div class="flex row end between">
-                    <div class="flex col between al-start" style="width:95%; height: 210px;">
+                    <div class="flex col around al-start" style="width:40px; height: 210px;">
+                        <a style="font-weight: bold; color:#0051ff;">分子</a>
+                        <a style="font-weight: bold; color:#0051ff;">分母</a>
+                    </div>
+                    <div class="flex col between al-start" style="width:97%; height: 210px;">
+
                         <!-- 分子1 -->
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
@@ -266,7 +293,7 @@
                         </div>
 
                         <!-------------------------------------------------- 分母 ------------------------------------------------------->
-                        <div class="test" style="width:96%;"></div>
+                        <div class="test" style="width:95%;"></div>
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="width: 60px !important; text-align: center; overflow: visible;">销售年份</label>
                             <div class="layui-input-inline" style="width: 150px !important;">
@@ -398,9 +425,9 @@
                         </div>
                     </div>
 
-                    <div class="flex col between" style="width:5%; height: 210px;">
-                        <button lay-submit class="layui-btn layui-btn-sm" lay-filter="mapBtn"
-                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询结果
+                    <div class="flex col between" style="width:2%; height: 210px;">
+                        <button lay-submit class="layui-btn layui-btn-xs" lay-filter="mapBtn"
+                        style="background-image: -webkit-linear-gradient(left,#ffcc00,#ffcc00);letter-spacing:1px;color: #0051ff; line-height: 25px; float:right;">查询
                         </button>
 
                     </div>
@@ -422,7 +449,7 @@
 <script type="text/html" id="toolbar1">
     <div class="layui-btn-container">
       <!-- <button class="layui-btn layui-btn-sm" lay-event="download">【导出】所有单省单款断码情况</button> -->
-      <!-- <button class="layui-btn layui-btn-sm saveselect" >保存筛选条件及筛选结果</button> -->
+      <button class="layui-btn layui-btn-xs offonbtn" lay-event="showhide" style="background-color:red;">隐藏条件</button>
       <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">删除 lay-event="delete" </button>
       <button class="layui-btn layui-btn-sm" lay-event="update">编辑</button> -->
     </div>
@@ -709,14 +736,31 @@
                     location.href = url_download_history_area
                     alert('数据有点多，请耐心等待');
                 break;
-                case 'delete':
-                layer.msg('删除');
+                case 'showhide':
+                    
+                    btnColorFn();
+                    $('#map').toggle(300);
+                    
                 break;
                 case 'update':
                 layer.msg('编辑');
                 break;
             };
         });
+
+        // 按钮开关颜色盘点
+        function btnColorFn() {
+            
+            var offonbtn = $('#map').css('display');
+            console.log(offonbtn);
+            if (offonbtn == 'block') {
+                $('.offonbtn').css('background', '#1c89f9');
+                $('.offonbtn').html('显示条件')
+            } else {
+                $('.offonbtn').css('background', 'red');
+                $('.offonbtn').html('隐藏条件')
+            }
+        }
 
         function initFn() {
             $.get(url_getXmMapSelect, {}, function(res) {
@@ -966,6 +1010,7 @@
             table.reload('table', {
                 where: data.field
                 , method: 'post'
+                , toolbar: '#toolbar1'
                 , url: url1
                 , loading: true
                 , page: true
@@ -975,32 +1020,41 @@
             return false; 
         });
 
-        //导出全部
-        // form.on('submit(downloadBtn)', function (data) {
+        // $('.saveselect').click(function() {
+        //     $('#map').toggle(500);
+        //     // var formValue = form.val("searchFormHead");
+        //     // // console.log('this is formvalue:', formValue);
 
-        //     $.post(url_download_history_area, data.field, function(res) {
-        //         // table.exportFile('#table', res, 'xls');
-        //         console.log(res) 
-        //         if (res.status == 1) {
-        //             if (res.count <= res.init_output_num) {
-        //                 location.href = url_download_history_area + '?code=' + res.code
-        //                 alert('数据有点多，请耐心等待');
-        //             } else {
-        //                 // alert('数据量太大了，请保存以下链接，稍后通过该链接下载吧：'+res.app_domain+'/upload/weather/customer_weather_'+res.code+'.csv');
-        //                 // location.href = url_download_history_area + '?code=' + res.code
-        //                 alert('数据量太大了：' + res.count + '，增加点筛选条件吧！');
-        //             }
-        //         }
-        //     })
+        //     // // $.post(url_saveSelect, formValue, function(res) {
+        //     // //     console.log(res);
+        //     // //     if (res.code == '500') {
+        //     // //         alert(res.msg);
+        //     // //     } else {
+        //     // //         alert('保存成功');
+        //     // //     }
 
-        //     return false; 
+        //     // // }, 'json')
+
+        //     // table.reload('table', {
+        //     //     where: formValue
+        //     //     , method: 'post'
+        //     //     , url: url_saveSelect
+        //     //     , loading: true
+        //     //     , page: true
+        //     //     , limit: 1000
+        //     // })
+        //     // return false; 
+
         // });
+
+
 
         function startTable() {
             var mapHeight = $('#map').height();
             // var yc = window.localStorage.getItem('viewCustomer_yc');
             // var gdno = window.localStorage.getItem('viewCustomer_gdno');
             var height = document.documentElement.clientHeight - mapHeight;
+            var height = document.documentElement.clientHeight - 0;
             table.render({
                 elem: '#table'
                 // ,url: url1
@@ -1015,7 +1069,7 @@
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
                 , cols: [[
-                    { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left'}
+                    { field: '年', title: '年', align: 'center', rowspan: 1, width: 35, fixed:'left'}
                     //  { field: '年', title: '年', align: 'center', rowspan: 1, fixed:'left', templet: 
                     // function (data) {
                     //     return `<div class="weather_div flex col around">
@@ -1025,12 +1079,12 @@
                     //     </div>`; 
     
                     // }}
-                    , { field: '周', title: '周', align: 'center', rowspan: 1, fixed:'left'}
-                    , { field: '月', title: '月', align: 'center', rowspan: 1, fixed:'left'}
+                    , { field: '周', title: '周', align: 'center', rowspan: 1, width: 50, fixed:'left'}
+                    , { field: '月', title: '月', align: 'center', rowspan: 1, width: 35, fixed:'left'}
                     , { field: '周期', title: '周期', align: 'center', rowspan: 1, width: 75, fixed:'left'}
                     , { field: '前年业绩占比', title: '前年业绩占比', align: 'center', rowspan: 1, width: 50} 
                     , { field: '前年库存占比', title: '前年库存占比', align: 'center', rowspan: 1, width: 50}
-                    , { field: '前年效率', title: '前年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '前年效率', title: '前年效率', align: 'center', rowspan: 1, width: 50}
                     , { field: '前年店铺数', title: '前年店铺数', align: 'center', rowspan: 1, width: 50}
                     , { field: '前年销量(周)', title: '前年销量(周)', align: 'center', rowspan: 1, width: 50}
                     // , { field: '前年库存量', title: '前年库存量', align: 'center', rowspan: 1, width: 70}
@@ -1043,7 +1097,7 @@
 
                     , { field: '去年业绩占比', title: '去年业绩占比', align: 'center', rowspan: 1, width: 50} 
                     , { field: '去年库存占比', title: '去年库存占比', align: 'center', rowspan: 1, width: 50}
-                    , { field: '去年效率', title: '去年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '去年效率', title: '去年效率', align: 'center', rowspan: 1, width: 50}
                     , { field: '去年店铺数', title: '去年店铺数', align: 'center', rowspan: 1, width: 50}
                     , { field: '去年销量(周)', title: '去年销量(周)', align: 'center', rowspan: 1, width: 50}
                     // , { field: '去年库存量', title: '去年库存量', align: 'center', rowspan: 1, width: 70}
@@ -1056,7 +1110,7 @@
 
                     , { field: '今年业绩占比', title: '今年业绩占比', align: 'center', rowspan: 1, width: 50} 
                     , { field: '今年库存占比', title: '今年库存占比', align: 'center', rowspan: 1, width: 50}
-                    , { field: '今年效率', title: '今年效率', align: 'center', rowspan: 1, width: 47}
+                    , { field: '今年效率', title: '今年效率', align: 'center', rowspan: 1, width: 50}
                     , { field: '今年店铺数', title: '今年店铺数', align: 'center', rowspan: 1, width: 50}
                     , { field: '今年销量(周)', title: '今年销量(周)', align: 'center', rowspan: 1, width: 50}
                     // , { field: '今年库存量', title: '今年库存量', align: 'center', rowspan: 1, width: 70}
@@ -1070,37 +1124,49 @@
                     ]
                 ]
                 ,done: function (res, curr, count) {
-                    //保存筛选条件
-                    $('.saveselect').click(function() {
-                        var formValue = form.val("searchFormHead");
-                        // console.log('this is formvalue:', formValue);
-
-                        // $.post(url_saveSelect, formValue, function(res) {
-                        //     console.log(res);
-                        //     if (res.code == '500') {
-                        //         alert(res.msg);
-                        //     } else {
-                        //         alert('保存成功');
-                        //     }
-
-                        // }, 'json')
-
-                        table.reload('table', {
-                            where: formValue
-                            , method: 'post'
-                            , url: url_saveSelect
-                            , loading: true
-                            , page: true
-                            , limit: 1000
-                        })
-                        return false; 
-
+                    //效率
+                    $('td[data-key="1-0-6"]').css({
+                        'background-color': '#dfdfdf', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-17"]').css({
+                        'background-color': '#dfdfdf', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-28"]').css({
+                        'background-color': '#dfdfdf', 'color': '#000', 'font-weight':'bold'
                     });
 
+                    //折扣
+                    $('td[data-key="1-0-9"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-20"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-31"]').css({
+                        'background-color': 'rgb(254,250,186)', 'color': '#000', 'font-weight':'bold'
+                    });
 
-                    if (res['if_save_select']) {
-                        alert('保存成功');
-                    }
+                    //销量(周)
+                    $('td[data-key="1-0-8"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-19"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-30"]').css({
+                        'color': 'red', 'font-weight':'bold'
+                    });
+
+                    //店均周销量
+                    $('td[data-key="1-0-10"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-21"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
+                    $('td[data-key="1-0-32"]').css({
+                        'color': '#c000ffe8', 'font-weight':'bold'
+                    });
 
 
                 }
