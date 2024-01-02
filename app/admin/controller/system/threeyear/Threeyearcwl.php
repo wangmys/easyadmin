@@ -161,9 +161,37 @@ class Threeyearcwl extends AdminController
                 $mapStr = $input['新旧品'];
                 // print_r($mapStr); die;
                 if ($mapStr == '新品') {
-                    $map新旧品 = " AND m.TimeCategoryName1 IN ('2024', '2023')";
+                    // $map新旧品 = " AND m.TimeCategoryName1 IN ('2024', '2023')";
+                    // $map新旧品 = " AND TimeCategoryName1 = `Year`";
+
+                    // 新品条件
+                    $map新旧品 = " 
+                        AND (
+                            m.TimeCategoryName1 >= m.`Year` 
+                            OR (
+                                m.TimeCategoryName1 = m.`Year` - 1 
+                                AND m.`Month` <= 6 
+                                AND ( m.Season = '冬季' )
+                            ) 
+                        )
+                    ";
                 } else {
-                    $map新旧品 = " AND m.TimeCategoryName1 IN ('2022', '2021', '2020')";
+                    // $map新旧品 = " AND m.TimeCategoryName1 IN ('2022', '2021', '2020')";
+                    // 旧品条件
+                    $map新旧品 = " 
+                        AND (
+                            m.TimeCategoryName1 < m.`Year` - 1
+                            OR (
+                                m.TimeCategoryName1 = m.`Year` - 1 
+                                AND m.`Month` > 6 
+                                AND m.Season = '冬季'
+                            ) 
+                            OR (
+                                m.TimeCategoryName1 = m.`Year` - 1 
+                                AND ( m.Season <> '冬季')
+                            ) 
+                        )
+                    ";
                 }
             } else {
                 $map新旧品 = "";
@@ -340,9 +368,34 @@ class Threeyearcwl extends AdminController
                 $mapStr = $input['新旧品_fm'];
                 // print_r($mapStr); die;
                 if ($mapStr == '新品') {
-                    $map新旧品_fm = " AND TimeCategoryName1 IN ('2024', '2023')";
+                    // $map新旧品_fm = " AND TimeCategoryName1 IN ('2024', '2023')";
+                    // 新品条件
+                    $map新旧品_fm = " 
+                        AND (
+                            TimeCategoryName1 >= `Year` 
+                            OR (
+                                TimeCategoryName1 = `Year` - 1 
+                                AND `Month` <= 6 
+                                AND ( Season = '冬季')
+                            ) 
+                        )
+                    ";
                 } else {
-                    $map新旧品_fm = " AND TimeCategoryName1 IN ('2022', '2021', '2020')";
+                    // 旧品条件
+                    $map新旧品_fm = " 
+                        AND (
+                            TimeCategoryName1 < `Year` - 1
+                            OR (
+                                TimeCategoryName1 = `Year` - 1 
+                                AND `Month` > 6 
+                                AND Season = '冬季'
+                            ) 
+                            OR (
+                                TimeCategoryName1 = `Year` - 1 
+                                AND ( Season <> '冬季')
+                            ) 
+                        )
+                    ";
                 }
             } else {
                 $map新旧品_fm = "";
@@ -418,7 +471,9 @@ class Threeyearcwl extends AdminController
             $map_fm_3 = $map春夏云仓_fm . $map秋冬云仓_fm . $map深浅色_fm . $map适龄段_fm . $map时尚度_fm . $map色感_fm .$map色系_fm;
             $map_fm = $map_fm_1 . $map_fm_2 . $map_fm_3;
 
-            $执行sql = $this->sqlHandle($年, $map, $map_fm);
+            echo $执行sql = $this->sqlHandle($年, $map, $map_fm);
+            
+            die;
             $select = $this->db_easyA->query($执行sql);
           
             
