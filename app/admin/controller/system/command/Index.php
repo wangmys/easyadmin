@@ -49,24 +49,21 @@ class Index extends AdminController
         $filters = json_decode($this->request->get('filter', '{}',null), true);
          // 商品负责人列表
         $manager = $this->errorLogModel->group('商品负责人')->order('id','asc')->column('商品负责人','商品负责人');
-        $month = $this->errorLogModel->group('month')->order('month ','desc')->column('month','month');
-
-        // dump($manager);die;
         // 获取参数
         $where = $this->request->get();
+
         if ($this->request->isAjax()) {
+
+            if(empty($where['时间'])){
+                $where['时间']=date('Y-m');
+            }
+            $time=[date('Y-m-01 00:00:00',strtotime($where['时间'])),date('Y-m-t 23:59:59',strtotime($where['时间']))];
             // 查询指令记录
-            $list = $this->errorLogModel->where(function ($q)use($filters,$manager){
-                if(!empty($filters['商品负责人'])){
-                     $q->whereIn('商品负责人',$filters['商品负责人']);
-                }else{
-//                     $user = session('admin');
-//                     if($user['id'] != AdminConstant::SUPER_ADMIN_ID) $q->whereIn('商品负责人',$user['name']);
+            $list = $this->errorLogModel->where(function ($q)use($where){
+                if(!empty($where['商品负责人'])){
+                     $q->whereIn('商品负责人',$where['商品负责人']);
                 }
-                if(!empty($filters['month'])){
-                     $q->whereIn('month',$filters['month']);
-                }
-            })->select();
+            })->whereBetweenTime('变动时间',$time[0],$time[1])->select();
             // 返回数据
             $data = [
                     'code'  => 0,
@@ -76,12 +73,15 @@ class Index extends AdminController
                 ];
             return json($data);
         }
+        $newManager=[];
+
+        foreach ($manager as  $item){
+            $newManager[]=['name'=>$item,'value'=>$item];
+        };
 
         return $this->fetch('',[
-            'manager' => $manager,
-            'searchValue' => reset($manager),
-            'month' => $month,
-            'searchValue2' => date('n'),
+            'manager' => $newManager,
+            'dateY' =>date('Y-m')
         ]);
     }
 
