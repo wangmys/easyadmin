@@ -163,8 +163,27 @@ class Threeyearcwl extends AdminController
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['大区']);
                 $map大区 = " AND m.YunCang IN ({$mapStr})";
+
+                $daquDate = explode(',', $input['大区']);
+                // echo '<pre>';
+                // print_r($daquDate); 
+                $温度表_大区1 = "";
+                foreach ($daquDate as $key => $val) {
+                    if ($val == '两广') {
+                        $温度表_大区1 .= "'广州云仓',";
+                    } elseif ($val == '长江以南') {
+                        $温度表_大区1 .= "'长沙云仓','南昌云仓',";
+                    } elseif ($val == '长江以北') {
+                        $温度表_大区1 .= "'武汉云仓','西安云仓',";
+                    } elseif ($val == '西南片区') {
+                        $温度表_大区1 .= "'贵阳云仓',";
+                    }        
+                }
+                $温度表_大区1 = mb_substr($温度表_大区1, 0, -1);
+                $温度表_大区 = " AND yuncang IN ($温度表_大区1)";
             } else {
                 $map大区 = "";
+                $温度表_大区 = "";
             } 
             if (!empty($input['新旧品'])) {
                 // echo $input['商品负责人'];
@@ -482,7 +501,7 @@ class Threeyearcwl extends AdminController
             $map_fm = $map_fm_1 . $map_fm_2 . $map_fm_3;
 
             // 温度表条件
-            $map_weather = $温度表_温带 . $温度表_温区 . $温度表_云仓 . $温度表_省份 . $温度表_经营模式;
+            $map_weather = $温度表_温带 . $温度表_温区 . $温度表_云仓 . $温度表_大区 . $温度表_省份 . $温度表_经营模式;
 
             $执行sql = $this->sqlHandle($年, $map, $map_fm, $map_weather);
             
