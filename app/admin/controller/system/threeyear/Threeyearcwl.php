@@ -505,7 +505,6 @@ class Threeyearcwl extends AdminController
 
             $执行sql = $this->sqlHandle($年, $map, $map_fm, $map_weather);
             
-            
             $select = $this->db_easyA->query($执行sql);
           
             
@@ -600,7 +599,28 @@ class Threeyearcwl extends AdminController
                     group by 
                         `Year`,`Month`,`Week`
                     ) AS t on m.`Year` = t.`Year` and m.`Month` = t.`Month` and m.`Week`= t.`Week`
-                    LEFT JOIN sp_customer_stock_sale_threeyear2_customer as c on m.Year = c.年 and m.Week = c.周 
+                    LEFT JOIN (
+                        select 
+                            t11.YEAR as 年,
+                            t11.WEEK as 周,
+                            sum(t11.max_num) as 店铺数
+                        from (
+                            SELECT YEAR,
+                                WEEK,
+                                concat( YunCang, WenDai, WenQu, State, Mathod ) AS 云仓温带温区省份性质,
+                                max( NUM ) AS max_num,
+                                concat( YEAR, WEEK ) AS year_week 
+                            FROM
+                                `sp_customer_stock_sale_threeyear2_week` as m
+                            WHERE 1
+                                {$map}
+                            GROUP BY
+                                `云仓温带温区省份性质`,
+                                `year_week`
+                        ) as t11
+                        group by t11.YEAR,t11.WEEK
+
+                    ) as c on m.Year = c.年 and m.Week = c.周 
                     where 1
                         {$map}
 
