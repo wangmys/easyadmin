@@ -2821,7 +2821,7 @@ class Tableupdate extends BaseController
                 AND ER.ReceiptNoticeDate>='2022-05-01 00:00:00'
                 AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
                 AND ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
-                            OR (EG.TimeCategoryName1=2023 ))
+                            OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
             GROUP BY
                 EW.WarehouseName,
                 EG.GoodsNo,
