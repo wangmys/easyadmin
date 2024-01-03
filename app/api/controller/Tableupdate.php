@@ -2817,11 +2817,10 @@ class Tableupdate extends BaseController
             LEFT JOIN ErpWarehouse EW ON ER.WarehouseId=EW.WarehouseId
             WHERE ER.CodingCodeText='已审结'
                 AND (ER.IsCompleted IS NULL OR ER.IsCompleted=0)
-                AND EW.WarehouseName IN ('广州云仓','南昌云仓','贵阳云仓','武汉云仓','长沙云仓')
+                AND EW.WarehouseName IN ('广州云仓','南昌云仓','贵阳云仓','武汉云仓','长沙云仓','西安云仓')
                 AND ER.ReceiptNoticeDate>='2022-05-01 00:00:00'
                 AND EG.CategoryName1 IN ('内搭','下装','鞋履','外套')
-                AND ((EG.TimeCategoryName1=2022 AND (EG.TimeCategoryName2 LIKE '%秋%' OR EG.TimeCategoryName2 LIKE '%冬%'))
-                            OR (EG.TimeCategoryName1=2023 ) OR (EG.TimeCategoryName1=2024 ) )
+                AND EG.TimeCategoryName1 IN (2022,2023,2024)
             GROUP BY
                 EW.WarehouseName,
                 EG.GoodsNo,
@@ -2835,7 +2834,7 @@ class Tableupdate extends BaseController
                 T.WarehouseName,
                 T.GoodsNo,
                 T.TimeCategoryName1,
-                T.TimeCategoryName2
+                T.TimeCategoryName2;
         ";
         $select = $this->db_sqlsrv->query($sql);
         if ($select) {
