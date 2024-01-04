@@ -76,7 +76,7 @@ class ExcelhandleService
             //衣裤
             $clothesPants = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)
                 ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
-                ->whereIn('CategoryName1', ['外套', '内搭', '下装'])
+                ->whereIn('CategoryName1', ['外套', '内搭', '下装','人事物料','物料','配饰'])
                 ->order('CategoryName1 ASC')->select()->toArray();
             $shoes = $this->mysql->table('sp_lyp_puhuo_excel')->where($where)
                 ->where(['admin_id' => session('admin.id'), 'CustomerName' => $item['CustomerName'], 'WarehouseName' => $item['WarehouseName']])
