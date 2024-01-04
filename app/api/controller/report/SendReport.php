@@ -2280,14 +2280,14 @@ class SendReport extends BaseController
             // echo '可推';
             // die;
             $date = input('date') ? input('date') : date('Y-m-d');
-            $this->servicePro->create_table_s201();
+            $this->servicePro->create_table_s201('S201', $date);
 
             $name = '\app\api\service\DingdingService';
             $model = new $name;
 
             $send_data = [
                 'title' => '农历【加盟】老店业绩同比 表号:S201',
-                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd')."/S201.jpg?v=" . time()
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd', strtotime($date))."/S201.jpg?v=" . time()
             ];
 
             dump($send_data);die;
