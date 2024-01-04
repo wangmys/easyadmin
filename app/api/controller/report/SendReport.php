@@ -2268,7 +2268,7 @@ class SendReport extends BaseController
     }
 
     // cwl 201 农历加盟
-    public function run_pro_s201()
+    public function run_pro_s201a()
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '41', '编号' => 'S201'])->find();
@@ -2306,7 +2306,7 @@ class SendReport extends BaseController
     }
 
     // cwl 202 农历直营
-    public function run_pro_s202()
+    public function run_pro_s202a()
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '42', '编号' => 'S202'])->find();
@@ -2344,7 +2344,7 @@ class SendReport extends BaseController
     }
 
     // cwl 203 农历直营
-    public function run_pro_s203()
+    public function run_pro_s203a()
     {
         $time = time();
         $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '43', '编号' => 'S203'])->find();
