@@ -2290,7 +2290,7 @@ class SendReport extends BaseController
                 'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd', strtotime($date))."/S201.jpg?v=" . time()
             ];
 
-            dump($send_data);die;
+            // dump($send_data);die;
             $res = [];
             $headers = get_headers($send_data['jpg_url']);
             if(substr($headers[0], 9, 3) == 200){
