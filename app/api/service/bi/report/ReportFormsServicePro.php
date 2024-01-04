@@ -40,6 +40,319 @@ class ReportFormsServicePro
         $this->db_sqlsrv = Db::connect('sqlsrv');
     }
 
+    // 24年农历同比 直营加盟老店
+    public function create_table_s201($code = 'S201', $date = '')
+    {
+        $date = $date ?: date('Y-m-d');
+        $dayPre = "";
+        $dayNum = $this->getDaysDiff(strtotime("{$date} 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        // 年前
+        // echo $this->getDaysDiff(strtotime("2024-02-09 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        // 年后
+        // $dayNum = $this->getDaysDiff(strtotime("2024-02-10 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        
+        if ($dayNum <= 0) {
+            $dayNum = - $dayNum + 1;
+            $dayPre = "春季第";
+        } else {
+            $dayPre = "年前第";
+        }
+        $dayTitle = $dayPre . ' ' . $dayNum . ' 天';
+        
+        switch ($code) {
+            case 'S201':
+                // $sql = "select 经营模式,省份,店铺名称,首单日期 as 开店日期,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('加盟','加盟合计')";
+                $title = "农历【加盟】老店业绩同比 [" . date("Y-m-d",  strtotime($date)) . ']';
+                $jingyingmoshi = '【加盟】';
+                $sql = "
+                    SELECT
+                        left(省份, 2) as 省份,
+                        店铺名称,
+                        今日同比前年同期递增率 as 前年日增长,
+                        今日同比去年同期递增率 as 去年日增长,
+                        今年累计同比前年累计递增率 as 前年累计增长,
+                        今年累计同比去年年累计递增率 as 去年累计增长,
+                        今日同期前年业绩 as 前年同日销额,
+                        去年同期_年前十八天起算 as 去年同日销额,
+                        今日业绩 as 今日销额,
+                        前年累计 as 前年累计销额,
+                        今年同期前年累计,
+                        去年累计_年前十八天起算 as 去年累计销额,
+                        今年同期去年累计
+                    FROM
+                        sp_newyear_2024_detail 
+                    WHERE
+                        业绩截止日期 = '{$date}' 
+                        AND 经营模式 IN ( '加盟' );
+                ";
+                // $sql2 = "
+                //     SELECT
+                //         '总计' as 省份,
+                //         '总计' as 店铺名称,
+                //         今日同比前年同期递增率 as 前年日增长,
+                //         今日同比去年同期递增率 as 去年日增长,
+                //         今年累计同比前年累计递增率 as 前年累计增长,
+                //         今年累计同比去年年累计递增率 as 去年累计增长,
+                //         今日同期前年业绩 as 前年同日销额,
+                //         去年同期_年前十八天起算 as 去年同日销额,
+                //         今日业绩 as 今日销额,
+                //         前年累计 as 前年累计销额,
+                //         今年同期前年累计,
+                //         去年累计_年前十八天起算 as 去年累计销额,
+                //         今年同期去年累计
+                //     FROM
+                //         sp_newyear_2024
+                //     WHERE
+                //         业绩截止日期 = '{$date}' 
+                //         AND 经营模式 IN ( '加盟' );
+                // ";
+                break;
+            default:
+                $title = "农历【直营】老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
+                $jingyingmoshi = '【直营】';
+                // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
+                // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
+                // 累销递增金额差 from old_customer_state_detail where 更新时间 = '$date' and  经营模式 in ('直营','直营合计')";
+                $sql = "
+                    SELECT
+                        left(省份, 2) as 省份,
+                        店铺名称,
+                        今日同比前年同期递增率 as 前年日增长,
+                        今日同比去年同期递增率 as 去年日增长,
+                        今年累计同比前年累计递增率 as 前年累计增长,
+                        今年累计同比去年年累计递增率 as 去年累计增长,
+                        今日同期前年业绩 as 前年同日销额,
+                        去年同期_年前十八天起算 as 去年同日销额,
+                        今日业绩 as 今日销额,
+                        前年累计 as 前年累计销额,
+                        今年同期前年累计,
+                        去年累计_年前十八天起算 as 去年累计销额,
+                        今年同期去年累计
+                    FROM
+                        sp_newyear_2024_detail 
+                    WHERE
+                        业绩截止日期 = '{$date}' 
+                    AND 经营模式 IN ( '直营' ); 
+                ";
+                // $sql2 = "
+                //     SELECT
+                //         '总计' as 省份,
+                //         '总计' as 店铺名称,
+                //         今日同比前年同期递增率 as 前年日增长,
+                //         今日同比去年同期递增率 as 去年日增长,
+                //         今年累计同比前年累计递增率 as 前年累计增长,
+                //         今年累计同比去年年累计递增率 as 去年累计增长,
+                //         今日同期前年业绩 as 前年同日销额,
+                //         去年同期_年前十八天起算 as 去年同日销额,
+                //         今日业绩 as 今日销额,
+                //         前年累计 as 前年累计销额,
+                //         今年同期前年累计,
+                //         去年累计_年前十八天起算 as 去年累计销额,
+                //         今年同期去年累计
+                //     FROM
+                //         sp_newyear_2024
+                //     WHERE
+                //         业绩截止日期 = '{$date}' 
+                //         AND 经营模式 IN ( '直营' );
+                // ";
+                break;
+        }
+        // echo $sql;
+        // echo '<br>';
+        // echo $sql2;die;
+        // $data1 = Db::connect("mysql2")->query($sql);
+        $data = Db::connect("mysql2")->query($sql);
+        // $data_合计 = Db::connect("mysql2")->query($sql2);
+        // $data = array_merge($data1, $data_合计);
+        // echo '<pre>';
+        // print_r($data);die;
+        if ($data) {
+            // echo '<pre>';
+            // print_r($data);
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 130;
+            }
+
+            $field_width[0] = 35;
+            $field_width[1] = 45;
+            $field_width[2] = 90;
+            $field_width[3] = 90;
+            $field_width[4] = 90;
+            $field_width[5] = 105;
+            $field_width[6] = 105;
+            $field_width[7] = 105;
+            $field_width[8] = 105;
+            $field_width[9] = 100;
+            $field_width[10] = 105;
+            $field_width[11] = 135;
+            $field_width[12] = 105;
+            $field_width[13] = 135;
+            // $field_width[15] = 90;
+
+            // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
+
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                // 0 => "{$jingyingmoshi} 今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,
+                0 => $dayTitle,
+            ];
+            //参数
+            $params = [
+                'row' => count($data),          //数据的行数
+                // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'file_name' =>  $code . '.jpg',      //保存的文件名
+                'title' => $title,
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '   图片报表编号: ' . $code,
+                'file_path' => "./img/cwl/" . date('Ymd', strtotime($date)) . '/'  //文件保存路径
+            ];
+            // return $this->create_image_bgcolor($params, [
+            //     '前年日增长' => 3,
+            //     '去年日增长' => 4,
+            //     '前年月增长' => 5,
+            //     '去年月增长' => 6,
+            // ]);
+                // 生成图片
+                return $this->create_image_bgcolor($params,
+                [
+                    // '前年日增长' => 3,
+                    // '去年日增长' => 4,
+                    // '前年月增长' => 5,
+                    // '去年月增长' => 6,
+                ]
+            );
+        }
+    }
+    // 24年农历同比 省份
+    public function create_table_s203($date = '')
+    {
+        $code = 'S203';
+        $date = $date ?: date('Y-m-d');
+        $dayPre = "";
+        $dayNum = $this->getDaysDiff(strtotime("{$date} 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        // 年前
+        // echo $this->getDaysDiff(strtotime("2024-02-09 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        // 年后
+        // $dayNum = $this->getDaysDiff(strtotime("2024-02-10 00:00:00"), strtotime('2024-02-10 00:00:00'));
+        
+        if ($dayNum <= 0) {
+            $dayNum = - $dayNum + 1;
+            $dayPre = "春季第";
+        } else {
+            $dayPre = "年前第";
+        }
+        $dayTitle = $dayPre . ' ' . $dayNum . ' 天';
+        $title = "农历省份老店业绩同比 [" . date("Y-m-d",  strtotime($date)) . ']';
+        $sql = "
+            SELECT
+                经营模式 as 性质,
+                left(省份, 2) as 省份,
+                今日同比前年同期递增率 as 前年日增长,
+                今日同比去年同期递增率 as 去年日增长,
+                今年累计同比前年累计递增率 as 前年累计增长,
+                今年累计同比去年年累计递增率 as 去年累计增长,
+                今日同期前年业绩 as 前年同日销额,
+                去年同期_年前十八天起算 as 去年同日销额,
+                今日业绩 as 今日销额,
+                前年累计 as 前年累计销额,
+                今年同期前年累计,
+                去年累计_年前十八天起算 as 去年累计销额,
+                今年同期去年累计
+            FROM
+                sp_newyear_2024_state 
+            WHERE
+                业绩截止日期 = '{$date}' 
+            GROUP BY 省份,经营模式
+        ";
+
+        $data = Db::connect("mysql2")->query($sql);
+        // $data_合计 = Db::connect("mysql2")->query($sql2);
+        // $data = array_merge($data1, $data_合计);
+        // echo '<pre>';
+        // print_r($data);die;
+        if ($data) {
+            // echo '<pre>';
+            // print_r($data);
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 130;
+            }
+
+            $field_width[0] = 35;
+            $field_width[1] = 45;
+            $field_width[2] = 90;
+            $field_width[3] = 90;
+            $field_width[4] = 90;
+            $field_width[5] = 105;
+            $field_width[6] = 105;
+            $field_width[7] = 105;
+            $field_width[8] = 105;
+            $field_width[9] = 100;
+            $field_width[10] = 105;
+            $field_width[11] = 135;
+            $field_width[12] = 105;
+            $field_width[13] = 135;
+            // $field_width[15] = 90;
+
+            // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
+
+            $table_explain = [
+                // 0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                // 0 => "今日:" . $week . " 去年今日:" . $last_year_week_today . " 前年今日:" . $the_year_week_today,$dayTitle
+                0 => $dayTitle,
+            ];
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($data),          //数据的行数
+                // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'file_name' =>  $code . '.jpg',      //保存的文件名
+                'title' => $title,
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '   图片报表编号: ' . $code,
+                'file_path' => "./img/cwl/" . date('Ymd', strtotime($date)) . '/'  //文件保存路径
+            ];
+            // return $this->create_image_bgcolor($params, [
+            //     '前年日增长' => 3,
+            //     '去年日增长' => 4,
+            //     '前年月增长' => 5,
+            //     '去年月增长' => 6,
+            // ]);
+            // 生成图片
+            return $this->create_image_bgcolor($params,
+                [
+                    // '前年日增长' => 3,
+                    // '去年日增长' => 4,
+                    // '前年月增长' => 5,
+                    // '去年月增长' => 6,
+                ]
+            );
+        }
+    }
+
     public function create_table_s101($code = 'S101', $date = '')
     {
         $date = $date ?: date('Y-m-d', strtotime('+1day'));
@@ -1978,11 +2291,14 @@ class ReportFormsServicePro
                 }
             }
 
-            if (@$params['code'] == 'S103') {
+            if (@$params['code'] == 'S103' || @$params['code'] == 'S203') {
                 if (isset($item['省份']) && $item['省份'] == '合计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow);
                 }
                 if (isset($item['经营']) && $item['经营'] == '总计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }   
+                if (isset($item['性质']) && $item['性质'] == '总计') {
                     imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
                 }   
             }
@@ -2361,5 +2677,10 @@ class ReportFormsServicePro
 
     }
 
-
+    
+    // 传入开始结束时间戳
+    public function getDaysDiff($beginDate, $endDate) {
+        $days = round( ($endDate - $beginDate) / 3600 / 24);
+        return $days;
+    }
 }
