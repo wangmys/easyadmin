@@ -221,6 +221,12 @@ class SendReport extends BaseController
             $this->servicePro->create_table_s010($date);
         } elseif ($name =='S032') {
             $this->servicePro->create_table_s032($date);
+        } elseif ($name =='S201') {
+            $this->servicePro->create_table_s201('S201', $date);
+        } elseif ($name =='S202') {
+            $this->servicePro->create_table_s201('S202', $date);
+        } elseif ($name =='S203') {
+            $this->servicePro->create_table_s203($date);
         } else {
             echo 'unknow';
         }
@@ -2259,6 +2265,44 @@ class SendReport extends BaseController
         $this->servicePro->create_table_s110B($date);
         // 发送数据报表
         $this->send_pro_test2();
+    }
+
+    // cwl 201 农历加盟
+    public function run_pro_s201()
+    {
+        $time = time();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '41', '编号' => 'S201'])->find();
+        
+        // dump($find);
+        $可推送时间范围 = explode('-', $find['可推送时间范围']);
+        // die;
+        if ( ($find && $find['状态'] == '开' && ( $time >= strtotime($可推送时间范围[0]) && $time <= strtotime($可推送时间范围[1]))) || input('user') == 'cwl' ) {
+            // echo '可推';
+            // die;
+            $date = input('date') ? input('date') : date('Y-m-d');
+            $this->servicePro->create_table_s201('S201', $date);
+
+            $name = '\app\api\service\DingdingService';
+            $model = new $name;
+
+            $send_data = [
+                'title' => '农历【加盟】老店业绩同比 表号:S201',
+                'jpg_url' => $this->request->domain()."/img/cwl/".date('Ymd', strtotime($date))."/S201.jpg?v=" . time()
+            ];
+
+            // dump($send_data);die;
+            $res = [];
+            $headers = get_headers($send_data['jpg_url']);
+            if(substr($headers[0], 9, 3) == 200){
+                // echo $send_data['jpg_url'];
+                // 推送
+                // $res[] = $model->send($send_data['title'], $send_data['jpg_url']);
+                $res[] = $model->sendHappy($send_data['title'],$send_data['jpg_url'], "https://oapi.dingtalk.com/robot/send?access_token=5091c1eb2c0f4593d79825856f26bc30dcb5f64722c3909e6909a1255630f8a2");
+            }
+            return json($res);
+        } else {
+            echo '不可推';
+        }
     }
 
     public function send_pro_test()

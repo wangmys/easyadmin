@@ -111,6 +111,26 @@ class DingdingService
         return $json = json_decode($result, false);
     }
 
+    // 农历推送专用
+    public function sendHappy($title = '数据表格', $jpg_url = '',$robot = '')
+    {
+        // 时间
+        $time = date('Y-m-d H:i:s');
+        $keyword = $this->keyword['hook_test_url2'];
+        $arr = [
+            'msgtype' => 'markdown',
+            'markdown' => [
+                'title' => [ "$title" . $keyword],
+                'text'=>"## **{$title}** \n> \n> #### 同比规则：\n> #### 1、23年同比数据从年前第18天开始对比。\n> #### 2、22年同比中年前第28天及年前第37天，共10天为22年1.4-1.10的星期几循环对应，另年前第38-40天为22.1.1/12.22/12.23。\n> ![screenshot]($jpg_url)\n> ###### $time \n"
+            ]
+        ];
+        // 推送地址
+        if(empty($robot)) $robot = $this->hook_test_url3;
+        $jsonStr = json_encode($arr); //转换为json格式
+        $result = curl_post($robot, $jsonStr);
+        return $json = json_decode($result, false);
+    }
+
     /**
      * 创建图片
      * @param $params

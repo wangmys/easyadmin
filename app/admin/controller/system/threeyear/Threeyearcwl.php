@@ -60,22 +60,28 @@ class Threeyearcwl extends AdminController
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['云仓']);
                 $map云仓 = " AND m.`CustomItem15` IN ({$mapStr})";
+                $温度表_云仓 = " AND yuncang IN ({$mapStr})";
             } else {
                 $map云仓 = "";
+                $温度表_云仓 = "";
             }
             if (!empty($input['温带'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['温带']);
                 $map温带 = " AND m.WenDai IN ({$mapStr})";
+                $温度表_温带 = " AND wendai IN ({$mapStr})";
             } else {
                 $map温带 = "";
+                $温度表_温带 = "";
             }   
             if (!empty($input['温区'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['温区']);
                 $map温区 = " AND m.WenQu IN ({$mapStr})";
+                $温度表_温区 = " AND wenqu IN ({$mapStr})";
             } else {
                 $map温区 = "";
+                $温度表_温区 = "";
             }
             if (!empty($input['季节归集'])) {
                 // echo $input['商品负责人'];
@@ -95,8 +101,10 @@ class Threeyearcwl extends AdminController
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['经营模式']);
                 $map经营模式 = " AND m.Mathod IN ({$mapStr})";
+                $温度表_经营模式 = " AND mathod IN ({$mapStr})";
             } else {
                 $map经营模式 = "";
+                $温度表_经营模式 = "";
             }
             if (!empty($input['风格'])) {
                 // echo $input['商品负责人'];
@@ -146,15 +154,36 @@ class Threeyearcwl extends AdminController
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['省份']);
                 $map省份 = " AND m.State IN ({$mapStr})";
+                $温度表_省份 = " AND state IN ({$mapStr})";
             } else {
                 $map省份 = "";
+                $温度表_省份 = "";
             }
             if (!empty($input['大区'])) {
                 // echo $input['商品负责人'];
                 $mapStr = xmSelectInput($input['大区']);
                 $map大区 = " AND m.YunCang IN ({$mapStr})";
+
+                $daquDate = explode(',', $input['大区']);
+                // echo '<pre>';
+                // print_r($daquDate); 
+                $温度表_大区1 = "";
+                foreach ($daquDate as $key => $val) {
+                    if ($val == '两广') {
+                        $温度表_大区1 .= "'广州云仓',";
+                    } elseif ($val == '长江以南') {
+                        $温度表_大区1 .= "'长沙云仓','南昌云仓',";
+                    } elseif ($val == '长江以北') {
+                        $温度表_大区1 .= "'武汉云仓','西安云仓',";
+                    } elseif ($val == '西南片区') {
+                        $温度表_大区1 .= "'贵阳云仓',";
+                    }        
+                }
+                $温度表_大区1 = mb_substr($温度表_大区1, 0, -1);
+                $温度表_大区 = " AND yuncang IN ($温度表_大区1)";
             } else {
                 $map大区 = "";
+                $温度表_大区 = "";
             } 
             if (!empty($input['新旧品'])) {
                 // echo $input['商品负责人'];
@@ -471,8 +500,10 @@ class Threeyearcwl extends AdminController
             $map_fm_3 = $map春夏云仓_fm . $map秋冬云仓_fm . $map深浅色_fm . $map适龄段_fm . $map时尚度_fm . $map色感_fm .$map色系_fm;
             $map_fm = $map_fm_1 . $map_fm_2 . $map_fm_3;
 
-            $执行sql = $this->sqlHandle($年, $map, $map_fm);
-            
+            // 温度表条件
+            $map_weather = $温度表_温带 . $温度表_温区 . $温度表_云仓 . $温度表_大区 . $温度表_省份 . $温度表_经营模式;
+
+            $执行sql = $this->sqlHandle($年, $map, $map_fm, $map_weather);
             
             $select = $this->db_easyA->query($执行sql);
           
@@ -504,7 +535,7 @@ class Threeyearcwl extends AdminController
     }
 
     // sql组合
-    public function sqlHandle($年 = '', $map, $map_fm) {
+    public function sqlHandle($年 = '', $map, $map_fm, $map_weather) {
         if ($年) {
             // 如果是 2022 或 2021一个年份的
             if (strlen($年) == 4) {
@@ -522,11 +553,13 @@ class Threeyearcwl extends AdminController
                 res2.`Year`, res2.`Month`, res2.`Week`, res2.店铺数, res2.周期, res2.分子库存数量, res2.分子库存成本金额, res2.分子销量, res2.分子销额, res2.分母库存数量,res2.分母库存成本金额,res2.分母销量,res2.分母销额,
                 concat(round(res2.业绩占比 * 100, 1), '%') as 业绩占比,
                 concat(round(res2.库存占比 * 100, 1), '%') as 库存占比,
-                round(res2.店均周销量, 0) as 店均周销量,
+                round(res2.店均周销量, 1) as 店均周销量,
                 round(res2.店均库存量, 0) as 店均库存量,
                 concat(round(res2.折扣 * 100, 1), '%') as 折扣,
                 concat(round(res2.业绩占比 / res2.库存占比 * 100, 1), '%') as 效率,
-                round(ifnull(res2.店均库存量, 0) / res2.店均周销量 * 7, 1) as `店周转(天)`
+                round(ifnull(res2.店均库存量, 0) / res2.店均周销量 * 7, 1) as `店周转(天)`,
+                w.max_c as 最高温,
+                w.min_c as 最低温
             from 
             (
                 SELECT 
@@ -566,7 +599,28 @@ class Threeyearcwl extends AdminController
                     group by 
                         `Year`,`Month`,`Week`
                     ) AS t on m.`Year` = t.`Year` and m.`Month` = t.`Month` and m.`Week`= t.`Week`
-                    LEFT JOIN sp_customer_stock_sale_threeyear2_customer as c on m.Year = c.年 and m.Week = c.周 
+                    LEFT JOIN (
+                        select 
+                            t11.YEAR as 年,
+                            t11.WEEK as 周,
+                            sum(t11.max_num) as 店铺数
+                        from (
+                            SELECT YEAR,
+                                WEEK,
+                                concat( YunCang, WenDai, WenQu, State, Mathod ) AS 云仓温带温区省份性质,
+                                max( NUM ) AS max_num,
+                                concat( YEAR, WEEK ) AS year_week 
+                            FROM
+                                `sp_customer_stock_sale_threeyear2_week` as m
+                            WHERE 1
+                                {$map}
+                            GROUP BY
+                                `云仓温带温区省份性质`,
+                                `year_week`
+                        ) as t11
+                        group by t11.YEAR,t11.WEEK
+
+                    ) as c on m.Year = c.年 and m.Week = c.周 
                     where 1
                         {$map}
 
@@ -574,6 +628,17 @@ class Threeyearcwl extends AdminController
                         m.`Year`,m.`Month`,m.`Week`
                 ) AS res
             ) AS res2 
+            LEFT JOIN (
+                SELECT
+                    Year,周期, 
+                    round(AVG(max_c), 1) as max_c, 
+                    round(AVG(min_c), 1) as min_c
+                FROM
+                    sp_customer_stock_sale_threeyear2_weather 
+                WHERE 1
+                    {$map_weather}
+                GROUP BY YEAR, 周期
+            ) as w on res2.`Year` = w.`Year` and res2.周期 = w.周期
         ";
         return $sql;
         // $select = $this->db_easyA->query($sql_2023);
@@ -681,6 +746,8 @@ class Threeyearcwl extends AdminController
                     $header[$key]['今年折扣'] = $val2['折扣']; 
                     $header[$key]['今年效率'] = $val2['效率']; 
                     $header[$key]['今年店周转(天)'] = $val2['店周转(天)']; 
+                    $header[$key]['今年最高温'] = $val2['最高温']; 
+                    $header[$key]['今年最低温'] = $val2['最低温']; 
                     // break;
                 }
                 if ($val2['Year'] == $current_year - 1 && $val['Week'] == $val2['Week']) {
@@ -700,6 +767,8 @@ class Threeyearcwl extends AdminController
                     $header[$key]['去年折扣'] = $val2['折扣']; 
                     $header[$key]['去年效率'] = $val2['效率']; 
                     $header[$key]['去年店周转(天)'] = $val2['店周转(天)']; 
+                    $header[$key]['去年最高温'] = $val2['最高温']; 
+                    $header[$key]['去年最低温'] = $val2['最低温']; 
                     // break;
                 }
                 if ($val2['Year'] == $current_year - 2 && $val['Week'] == $val2['Week']) {
@@ -719,6 +788,8 @@ class Threeyearcwl extends AdminController
                     $header[$key]['前年折扣'] = $val2['折扣']; 
                     $header[$key]['前年效率'] = $val2['效率']; 
                     $header[$key]['前年店周转(天)'] = $val2['店周转(天)']; 
+                    $header[$key]['前年最高温'] = $val2['最高温']; 
+                    $header[$key]['前年最低温'] = $val2['最低温']; 
                     // break;
                 }
             }

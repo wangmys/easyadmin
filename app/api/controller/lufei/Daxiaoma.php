@@ -70,6 +70,7 @@ class Daxiaoma extends BaseController
         $this->hpzl_2();
         $this->retail();
 
+        // die;
         $this->handle_1();
         $this->handle_2();
         $this->handle_3();
@@ -82,7 +83,7 @@ class Daxiaoma extends BaseController
         $year = date('Y', time());
 
         $sql = "
-            select * from sp_ww_hpzl where 年份 in ({$year})
+            select * from sp_ww_hpzl where 年份 in (2023,2024,2025)
         ";
 		
         $select = $this->db_bi->query($sql);
@@ -196,7 +197,7 @@ class Daxiaoma extends BaseController
     public function retail() {
         $sql_customer = "
             SELECT 
-                店铺名称,一级分类,二级分类,风格,一级风格,二级分类,季节归集,
+                店铺名称,一级分类,二级分类,风格,一级风格,季节归集,
                 round(`累销00/28/37/44/100/160/S` / `累销数量`, 3) as `占比00/28/37/44/100/160/S`,
                 round(`累销29/38/46/105/165/M` / `累销数量`, 3) as `占比29/38/46/105/165/M`,
                 round(`累销30/39/48/110/170/L` / `累销数量`, 3) as `占比30/39/48/110/170/L`,
