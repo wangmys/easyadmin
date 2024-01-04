@@ -2309,7 +2309,7 @@ class SendReport extends BaseController
     public function run_pro_s202()
     {
         $time = time();
-        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '41', '编号' => 'S202'])->find();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '42', '编号' => 'S202'])->find();
         
         // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
@@ -2347,7 +2347,7 @@ class SendReport extends BaseController
     public function run_pro_s203()
     {
         $time = time();
-        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '41', '编号' => 'S203'])->find();
+        $find = $this->db_easyA->table('dd_baobiao')->field('状态,可推送时间范围')->where(['id' => '43', '编号' => 'S203'])->find();
         
         // dump($find);
         $可推送时间范围 = explode('-', $find['可推送时间范围']);
