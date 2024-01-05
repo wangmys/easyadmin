@@ -108,7 +108,7 @@ class ReportFormsServicePro
                 // ";
                 break;
             default:
-                $title = "农历【直营】老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
+                $title = "农历【直营】老店业绩同比 [" . date("Y-m-d",  strtotime($date)) . ']';
                 $jingyingmoshi = '【直营】';
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
