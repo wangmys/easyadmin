@@ -65,6 +65,7 @@ class Wwdata extends BaseController
         SELECT
           店铺名称,季节,年份,
           '{$本周开始}/{$本周结束}' as 单据日期,
+          '本周' as 时间范围,
           修改后风格,一级分类,二级分类,分类,
           sum(数量) as 数量,
           sum(销售金额) as 销售金额,
@@ -85,6 +86,7 @@ class Wwdata extends BaseController
         SELECT
           店铺名称,季节,年份,
           '{$上周开始}/{$上周结束}' as 单据日期,
+          '上周' as 时间范围,
           修改后风格,一级分类,二级分类,分类,
           sum(数量) as 数量,
           sum(销售金额) as 销售金额,
