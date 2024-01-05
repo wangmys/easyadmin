@@ -72,13 +72,16 @@ class ReportFormsServicePro
                         今日同比去年同期递增率 as 去年日增长,
                         今年累计同比前年累计递增率 as 前年累计增长,
                         今年累计同比去年年累计递增率 as 去年累计增长,
-                        今日同期前年业绩 as 前年同日销额,
+                        
+                        前年同期 as 前年同日销额,
+                        今日同期前年业绩 as `今日销额(22)`,
                         去年同期_年前十八天起算 as 去年同日销额,
-                        今日业绩 as 今日销额,
+                        今年同期去年 as `今日销额(23)`,
+                        
                         前年累计 as 前年累计销额,
-                        今年同期前年累计,
+                        今年同期前年累计 as `今日累销额(22)`,
                         去年累计_年前十八天起算 as 去年累计销额,
-                        今年同期去年累计
+                        今年同期去年累计 as `今日累销额(23)`
                     FROM
                         sp_newyear_2024_detail 
                     WHERE
@@ -108,7 +111,7 @@ class ReportFormsServicePro
                 // ";
                 break;
             default:
-                $title = "农历【直营】老店业绩同比 [" . date("Y-m-d",  strtotime($date . '-1day')) . ']';
+                $title = "农历【直营】老店业绩同比 [" . date("Y-m-d",  strtotime($date)) . ']';
                 $jingyingmoshi = '【直营】';
                 // $sql = "select 经营模式,省份,店铺名称,前年同日,去年同日,昨天销量 as 昨日销额,前年对比今年昨日递增率 as 前年昨日递增率,
                 // 昨日递增率,前年同月,去年同月,本月业绩,前年对比今年累销递增率 as 前年累销递增率,累销递增金额差,前年累销递增金额差,
@@ -121,13 +124,16 @@ class ReportFormsServicePro
                         今日同比去年同期递增率 as 去年日增长,
                         今年累计同比前年累计递增率 as 前年累计增长,
                         今年累计同比去年年累计递增率 as 去年累计增长,
-                        今日同期前年业绩 as 前年同日销额,
+                        
+                        前年同期 as 前年同日销额,
+                        今日同期前年业绩 as `今日销额(22)`,
                         去年同期_年前十八天起算 as 去年同日销额,
-                        今日业绩 as 今日销额,
+                        今年同期去年 as `今日销额(23)`,
+                        
                         前年累计 as 前年累计销额,
-                        今年同期前年累计,
+                        今年同期前年累计 as `今日累销额(22)`,
                         去年累计_年前十八天起算 as 去年累计销额,
-                        今年同期去年累计
+                        今年同期去年累计 as `今日累销额(23)`
                     FROM
                         sp_newyear_2024_detail 
                     WHERE
@@ -182,13 +188,14 @@ class ReportFormsServicePro
             $field_width[4] = 90;
             $field_width[5] = 105;
             $field_width[6] = 105;
-            $field_width[7] = 105;
-            $field_width[8] = 105;
-            $field_width[9] = 100;
-            $field_width[10] = 105;
-            $field_width[11] = 135;
-            $field_width[12] = 105;
-            $field_width[13] = 135;
+            $field_width[7] = 110;
+            $field_width[8] = 110;
+            $field_width[9] = 110;
+            $field_width[10] = 110;
+            $field_width[11] = 110;
+            $field_width[12] = 120;
+            $field_width[13] = 110;
+            $field_width[14] = 120;
             // $field_width[15] = 90;
 
             // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
@@ -206,6 +213,7 @@ class ReportFormsServicePro
             ];
             //参数
             $params = [
+                'code' => $code,
                 'row' => count($data),          //数据的行数
                 // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
                 'file_name' =>  $code . '.jpg',      //保存的文件名
@@ -263,13 +271,16 @@ class ReportFormsServicePro
                 今日同比去年同期递增率 as 去年日增长,
                 今年累计同比前年累计递增率 as 前年累计增长,
                 今年累计同比去年年累计递增率 as 去年累计增长,
-                今日同期前年业绩 as 前年同日销额,
+                
+                前年同期 as 前年同日销额,
+                今日同期前年业绩 as `今日销额(22)`,
                 去年同期_年前十八天起算 as 去年同日销额,
-                今日业绩 as 今日销额,
+                今年同期去年 as `今日销额(23)`,
+                
                 前年累计 as 前年累计销额,
-                今年同期前年累计,
+                今年同期前年累计 as `今日累销额(22)`,
                 去年累计_年前十八天起算 as 去年累计销额,
-                今年同期去年累计
+                今年同期去年累计 as `今日累销额(23)`
             FROM
                 sp_newyear_2024_state 
             WHERE
@@ -293,18 +304,19 @@ class ReportFormsServicePro
 
             $field_width[0] = 35;
             $field_width[1] = 45;
-            $field_width[2] = 90;
+            $field_width[2] = 45;
             $field_width[3] = 90;
             $field_width[4] = 90;
             $field_width[5] = 105;
             $field_width[6] = 105;
-            $field_width[7] = 105;
-            $field_width[8] = 105;
-            $field_width[9] = 100;
-            $field_width[10] = 105;
-            $field_width[11] = 135;
-            $field_width[12] = 105;
-            $field_width[13] = 135;
+            $field_width[7] = 110;
+            $field_width[8] = 110;
+            $field_width[9] = 110;
+            $field_width[10] = 110;
+            $field_width[11] = 110;
+            $field_width[12] = 120;
+            $field_width[13] = 110;
+            $field_width[14] = 120;
             // $field_width[15] = 90;
 
             // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
@@ -2252,6 +2264,7 @@ class ReportFormsServicePro
         $blue2 = imagecolorallocate($img, 66, 182, 255); //设定图片背景色
         $yellow2 = imagecolorallocate($img, 250, 233, 84); //设定图片背景色
         $yellow3 = imagecolorallocate($img, 230, 244, 0); //设定图片背景色
+        $yellow4 = imagecolorallocate($img, 255, 251, 168); //设定图片背景色
         $green = imagecolorallocate($img, 24, 98, 0); //设定图片背景色
         $green2 = imagecolorallocate($img, 75, 234, 32); //设定图片背景色
         $chengse = imagecolorallocate($img, 255, 72, 22); //设定图片背景色
@@ -2337,7 +2350,22 @@ class ReportFormsServicePro
                 }
             }
 
-            
+            if (@$params['code'] == 'S201' || @$params['code'] == 'S202') {
+                if (isset($item['店铺名称']) && $item['店铺名称'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow4);
+                }
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            } 
+            if (@$params['code'] == 'S203') {
+                if (isset($item['省份']) && $item['省份'] == '合计') {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $yellow4);
+                }
+                if (isset($item['省份']) && $item['省份'] == '合计' && $item['性质'] == '总计' ) {
+                    imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+                }
+            } 
         }
         
         // 117标题颜色特殊处理
@@ -2382,6 +2410,31 @@ class ReportFormsServicePro
             imagefilledrectangle($img, $s118_x3, $s118_y1, $s118_x4, $y2, $yellow3);
             // 同比累计
             imagefilledrectangle($img, $s118_x4, $s118_y1, $s118_x5, $y2, $orange);
+            // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
+            // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
+        }
+
+        // 201标题颜色特殊处理
+        if (@$params['code'] == 'S201' || @$params['code'] == 'S202' || @$params['code'] == 'S203') { 
+            $s118_y1 = 38;
+            // 直营
+            $s118_x1 = $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2];
+            $s118_x2 = $s118_x1 + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5] + $params['field_width'][6];
+            // 加盟
+            $s118_x3 = $s118_x2 + $params['field_width'][7] + $params['field_width'][8] + $params['field_width'][9] + $params['field_width'][10];
+            // 累计
+            $s118_x4 = $s118_x3 + $params['field_width'][11] + $params['field_width'][12] + $params['field_width'][13] + $params['field_width'][14];
+            // // 同比累计
+            // $s118_x5 = $s118_x4 + $params['field_width'][15] + $params['field_width'][16] + $params['field_width'][17] + $params['field_width'][18];
+
+            // 直营
+            imagefilledrectangle($img, $s118_x1, $s118_y1, $s118_x2, $y2, $yellow2);
+            // 加盟
+            imagefilledrectangle($img, $s118_x2, $s118_y1, $s118_x3, $y2, $blue2);
+            // 累计
+            imagefilledrectangle($img, $s118_x3, $s118_y1, $s118_x4, $y2, $orange);
+            // 同比累计
+            // imagefilledrectangle($img, $s118_x4, $s118_y1, $s118_x5, $y2, $orange);
             // imagefilledrectangle($img, $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2], $s117_y1, 
             // $params['field_width'][0] + $params['field_width'][1] + $params['field_width'][2] + $params['field_width'][3] + $params['field_width'][4] + $params['field_width'][5], $y2, $chengse);
         }
@@ -2476,6 +2529,14 @@ class ReportFormsServicePro
         if ($params['banben'] == '图片报表编号: S106') {
             imagefilledrectangle($img, 350, $y1, $x2 + 3000, $y2, $yellow);
         }
+        // if (@$params['code'] == 'S201') {
+        //     if (isset($item['店铺名称']) && $item['店铺名称'] == '合计') {
+        //         imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $green);
+        //     }
+        //     if (isset($item['省份']) && $item['省份'] == '合计') {
+        //         imagefilledrectangle($img, 3, $y1 + 30 * ($key + 1), $base['img_width'] - 3, $y2 + 30 * ($key + 1), $orange);
+        //     }
+        // }
         foreach ($base['column_x_arr'] as $key => $x) {
             imageline($img, $x, $border_top, $x, $border_bottom, $border_coler); //画纵线
             $this_title_box = imagettfbbox($base['text_size'], 0, $font_west, $params['table_header'][$key]);
