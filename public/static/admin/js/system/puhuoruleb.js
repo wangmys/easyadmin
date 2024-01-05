@@ -89,7 +89,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                         }],'custom_import'
                     ],
                     // defaultToolbar: false, //这里在右边显示
-                    limits:[1000,2000,3000],
+                    limits:[1000,2000,3000,5000,100000],
                     cols: [cols],
                     done:function (res, curr, count) {
 
