@@ -24,11 +24,40 @@ class Wwdata extends BaseController
     public function ea_lyp_ww_cussale14day() {
 
       ini_set('memory_limit','1024M');
-      // $data = LypWwCussale14dayModel::where([['年份', '=', '2023'], ['']])->withoutField(['id', 'create_time'], false)->select();
-      // $data = $data ? $data->toArray() : [];
+
       $sql = "select 店铺名称,季节,年份,单据日期,修改后风格,一级分类,二级分类,分类,数量,销售金额,零售价金额 from ea_lyp_ww_cussale14day where 年份='2023' and 季节 like '%秋%' or 季节 like '%冬%';";
       $data = Db::connect("mysql")->Query($sql);
       return json($data);
+
+
+
+    }
+
+    public function ea_lyp_ww_cussale14day_cwl() {
+
+      ini_set('memory_limit','1024M');
+      // $data = LypWwCussale14dayModel::where([['年份', '=', '2023'], ['']])->withoutField(['id', 'create_time'], false)->select();
+      // $data = $data ? $data->toArray() : [];
+      if (empty(cache('ea_lyp_ww_cussale14day_cwl'))) {
+        $sql = "
+          SELECT
+            店铺名称,季节,年份,单据日期,修改后风格,一级分类,二级分类,分类,数量,销售金额,零售价金额 
+          FROM
+            ea_lyp_ww_cussale14day 
+          WHERE
+            年份 = '2023' 
+            AND 季节 in ('初秋', '深秋', '秋季') 
+            OR 季节 in ('初冬', '深冬', '冬季')
+        ";
+        $data = Db::connect("mysql")->Query($sql);
+
+        cache('ea_lyp_ww_cussale14day_cwl', $data, 86400);
+
+      } 
+
+      $res = cache('ea_lyp_ww_cussale14day_cwl');
+
+      return json($res);
 
     }
 
