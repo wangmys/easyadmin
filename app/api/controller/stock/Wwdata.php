@@ -131,6 +131,14 @@ class Wwdata extends BaseController
       
     }
 
+    public function check() {
+      dump(cache('ea_lyp_ww_cussale14day_pro'));
+    }
+
+    public function clean() {
+      cache('ea_lyp_ww_cussale14day_pro',null);
+    }
+
     public function sjp_leixiao() {
 
       ini_set('memory_limit','1024M');
