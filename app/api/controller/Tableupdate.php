@@ -2506,12 +2506,23 @@ class Tableupdate extends BaseController
             $find = $this->db_bi->table($val['跑数表'])->field($val['跑数表字段'])->where(1)->order("{$val['跑数表字段']} DESC")->find();
             // print_r($find);
             // die;
-            $this->db_easyA->table('dd_baobiao')->where([
-                'id' => $val['id'],
-                '编号' => $val['编号']
-            ])->update([
-                '跑数日期' => date('Y-m-d', strtotime('-1 day', strtotime($find[$val['跑数表字段']])))
-            ]);
+
+            if ($val['跑数表'] == "sp_newyear_2024_detail" || $val['跑数表'] == "sp_newyear_2024_state") {
+                $this->db_easyA->table('dd_baobiao')->where([
+                    'id' => $val['id'],
+                    '编号' => $val['编号']
+                ])->update([
+                    '跑数日期' => date('Y-m-d', strtotime($find[$val['跑数表字段']]))
+                ]);
+            } else {
+                $this->db_easyA->table('dd_baobiao')->where([
+                    'id' => $val['id'],
+                    '编号' => $val['编号']
+                ])->update([
+                    '跑数日期' => date('Y-m-d', strtotime('-1 day', strtotime($find[$val['跑数表字段']])))
+                ]);
+            }
+
         }
 
         $sql_康雷表 = "
