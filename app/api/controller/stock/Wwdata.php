@@ -51,7 +51,7 @@ class Wwdata extends BaseController
     }
 
     // cwl改进版 14天分2周  跑数用
-    public function ea_lyp_ww_cussale14day_handle() {
+    public function ea_lyp_ww_cussale14day_pro_handle() {
       ini_set('memory_limit','1024M');
 
       $date = date('Y-m-d');
