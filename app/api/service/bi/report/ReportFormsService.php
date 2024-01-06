@@ -600,177 +600,520 @@ class ReportFormsService
         
     }
 
-    //2022 春季货品销售报表
+    //2022 春季货品销售报表  不要了
+    // public function create_table_s013_old_buyaole()
+    // {
+    //     $code = 'S013';
+    //     $date = date('Y-m-d');
+    //     $sql = "
+    //     select 风格,一级分类,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,
+    //     SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,
+    //     sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,
+    //     sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,
+    //     sum(前一周销量) as 前一周销量 from spring_report where 更新日期 = '{$date}' and  一级分类 <> '合计' group by 风格,一级分类,二级分类  order by 风格,一级分类,二级分类";
+    //     $data = $this->db_bi->Query($sql);
+    //     $arr =  array_column($data, '合计库存数');
+    //     $sum = array_sum($arr);
+    //     $cols = array_column($data, '风格');
+    //     $styles = array_values( array_unique($cols));
+    //     $arr_counts =  array_count_values($cols);
+    //     $arr = [];
+    //     $all['风格'] = '汇总合计';
+    //     $all['一级分类'] = '';
+    //     $all['二级分类'] = '合计';
+    //     foreach ($data as $v=>$k){
+    //         foreach ($styles as $sv=>$sk){
+    //             if($k['风格'] === $sk){
+    //                 $arr[$sv]['风格'] =$sk;
+    //                 $arr[$sv]['一级分类'] =$sk.'合计';
+    //                 $arr[$sv]['二级分类'] ='合计';
+    //                 $arr[$sv] = arr_add_member($arr[$sv],$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
+    //             }
+    //         }
+
+    //         $all =  arr_add_member($all,$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
+    //     }
+    //     // echo '<pre>';
+        
+    //     $ls[0] = $arr[0];
+
+    //     // print_r($arr); 
+    //     // print_r($ls[0]); 
+    //     // die;
+
+    //     array_splice($data,13,0,$ls);
+    //     // $ls[0] = $arr[1];
+    //     $ls[0] = $arr[1];
+    //     $length = count($data);
+    //     array_splice($data,$length,0,$ls);
+    //     $ls[0] = $all;
+    //     array_splice($data,$length+1,0,$ls);
+
+    //     foreach ($data as $v=>$k){
+    //         $data[$v]['合计库存占比'] =number_format(round( $k['合计库存数'] / $sum,4)*100,2).'%';
+    //         $data[$v]['数量售罄率'] =  number_format(round( $k['累计销售'] /( $k['累计销售']  + $k['合计库存数']) ,4)*100,2).'%';
+    //         $data[$v]['成本售罄率'] =  number_format(round( $k['累销成本'] /( $k['累销成本']  + $k['合计库存成本']) ,4)*100,2).'%';
+    //         if($k['合计库存数'] > 0 &&$k['前一周销量'] >0){
+    //             $data[$v]['周转周'] =  number_format(round( $k['合计库存数'] /( ($k['前一周销量'] +$k['前两周销量'] +$k['前三周销量'])/3) ,4),2);
+    //         }else{
+    //             $data[$v]['周转周'] = 0;
+    //         }
+    //     }
+    //     $table_header = ['ID'];
+    //     $title = ['风格','二级分类','采购入库数','累计销售','数量售罄率','合计库存数','合计库存成本','周转周','仓库库存','仓库可用库存',
+    //         '仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累销成本','在途库存数量','店库存数量','前四周销量','前三周销量'
+    //         ,'前两周销量','前一周销量','合计库存占比','成本售罄率'];
+
+    //     $table_header = array_merge($table_header, $title);
+    //     foreach ($table_header as $v => $k) {
+    //         $field_width[$v] = 100;
+    //     }
+    //     $field_width[0] = 30;
+    //     $field_width[1] = 60;
+    //     $field_width[2] = 80;
+    //     $field_width[4] = 80;
+    //     $field_width[8] = 80;
+    //     $field_width[9] = 80;
+    //     $field_width[11] = 95;
+    //     $field_width[12] = 80;
+    //     $field_width[14] = 80;
+    //     $field_width[15] = 90;
+    //     $field_width[16] = 60;
+    //     $field_width[17] = 70;
+    //     $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+    //     $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+    //     $table_data= [];
+    //     foreach ($data as $V=>$k){
+    //         $new = [
+    //             '风格'=>$k['风格'],
+    //             '二级分类'=>$k['二级分类'],
+    //             '采购入库数'=>$k['采购入库数'],
+    //             '累计销售'=>$k['累计销售'],
+    //             '数量售罄率'=>$k['数量售罄率'],
+    //             '合计库存数'=>$k['合计库存数'],
+    //             '合计库存成本'=>$k['合计库存成本'],
+    //             '周转周'=>$k['周转周'],
+    //             '仓库库存'=>$k['仓库库存'],
+    //             '仓库可用库存'=>$k['仓库可用库存'],
+    //             '仓库库存成本'=>$k['仓库库存成本'],
+    //             '收仓在途'=>$k['收仓在途'],
+    //             '收仓在途成本'=>$k['收仓在途成本'],
+    //             '已配未发'=>$k['已配未发'],
+    //             '最后一周销'=>$k['最后一周销'],
+    //             '昨天销'=>$k['昨天销'],
+    //             '累销成本'=>$k['累销成本'],
+    //             '在途库存数量'=>$k['在途库存数量'],
+    //             '店库存数量'=>$k['店库存数量'],
+    //             '前四周销量'=>$k['前四周销量'],
+    //             '前三周销量'=>$k['前三周销量'],
+    //             '前两周销量'=>$k['前两周销量'],
+    //             '前一周销量'=>$k['前一周销量'],
+    //             '合计库存占比'=>$k['合计库存占比'],
+    //             '成本售罄率'=>$k['成本售罄率'],
+    //         ];
+
+    //         $table_data[]=$new;
+
+    //     }
+
+
+    //     // cwl
+    //     $data_handle = [];
+    //     // 新数组装最终结果
+    //     $data_new_cwl = [];
+    //     foreach ($table_data as $key => $val) {
+    //         if ($val['风格'] == '基本款' && $val['二级分类'] == '合计') {
+    //             $data_handle['基本款合计'] = $table_data[$key];
+    //             // 删
+    //             unset($table_data[$key]);
+    //         }
+    //         if ($val['风格'] == '引流款' && $val['二级分类'] == '合计') {
+    //             $data_handle['引流款合计'] = $table_data[$key];
+    //             // 删
+    //             unset($table_data[$key]);
+    //         }
+    //         if ($val['风格'] == '汇总合计' && $val['二级分类'] == '合计') {
+    //             $data_handle['汇总合计'] = $table_data[$key];
+    //             // 删
+    //             unset($table_data[$key]);
+    //         }
+    //     }
+    //     // dump($data_handle);
+    //     // echo '<pre>';
+    //     // print_r($table_data); 
+        
+    //     foreach ($table_data as $key => $val) {
+    //         $base = $table_data[0]['风格'];
+    //         if ($val['风格'] == $base) {
+    //             // $data_new_cwl[$key] = $table_data[$key];
+    //             array_push($data_new_cwl, $table_data[$key]);
+    //         } elseif ($val['风格'] != $base && $table_data[$key - 1]['风格'] == $base) {
+    //             // $data_new_cwl[$key] = $data_handle['基本款合计'];
+    //             array_push($data_new_cwl, $data_handle['基本款合计']);
+    //         } else {
+    //             // $data_new_cwl[$key] = $table_data[$key-1];
+    //             array_push($data_new_cwl, $table_data[$key-1]);
+    //         }
+    //     }
+    //     array_push($data_new_cwl, $table_data[count($table_data)]);
+    //     array_push($data_new_cwl, $data_handle['引流款合计']);
+    //     array_push($data_new_cwl, $data_handle['汇总合计']);
+
+    //     $table_explain = [
+    //         0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
+    //     ];
+
+    //     $params = [
+    //         'code' => $code,
+    //         'row' => count($data_new_cwl),          //数据的行数
+    //         'file_name' =>$code.'.jpg',      //保存的文件名
+    //         'title' => "2024 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+    //         'table_time' => date("Y-m-d H:i:s"),
+    //         'data' => $data_new_cwl,
+    //         'table_explain' => $table_explain,
+    //         'table_header' => $table_header,
+    //         'field_width' => $field_width,
+    //         'col' => '二级分类',
+    //         'color'=>16711877,
+    //         'field' => '合计',
+    //         'banben' => '           编号: '.$code,
+    //         'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+    //     ];
+
+
+    //     $this->create_image($params);
+    // }
+
+    //2024 春季货品销售报表 cwl改造版
     public function create_table_s013()
     {
-
         $code = 'S013';
         $date = date('Y-m-d');
-        $sql = "select 风格,一级分类,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,sum(前一周销量) as 前一周销量 from spring_report where 更新日期 = '$date' and  一级分类 <> '合计' group by 风格,一级分类,二级分类  order by 风格,一级分类,二级分类";
-        $data = $this->db_bi->Query($sql);
-        $arr =  array_column($data, '合计库存数');
-        $sum = array_sum($arr);
-        $cols = array_column($data, '风格');
-        $styles = array_values( array_unique($cols));
-        $arr_counts =  array_count_values($cols);
-        $arr = [];
-        $all['风格'] = '汇总合计';
-        $all['一级分类'] = '';
-        $all['二级分类'] = '合计';
-        foreach ($data as $v=>$k){
-            foreach ($styles as $sv=>$sk){
-                if($k['风格'] === $sk){
-                    $arr[$sv]['风格'] =$sk;
-                    $arr[$sv]['一级分类'] =$sk.'合计';
-                    $arr[$sv]['二级分类'] ='合计';
-                    $arr[$sv] = arr_add_member($arr[$sv],$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
-                }
+        // $date = '2024-01-05';
+
+        $sql_总库存数 = "
+            SELECT
+                sum(合计库存数) AS 合计库存数
+            FROM
+                spring_report 
+            WHERE
+                更新日期 = '2024-01-05' 
+                AND 一级分类 <> '合计' 
+        ";
+        $总库存数 = $this->db_bi->query($sql_总库存数);
+        $总库存数 =  $总库存数[0]['合计库存数'];
+
+        $sql_基本款 = "
+            select 
+                t.风格,t.二级分类,t.采购入库数,t.累计销售,
+                t.累计销售 / (ifnull(t.累计销售, 0) + ifnull(t.合计库存数, 0)) as 数量售罄率,
+                t.合计库存数,t.合计库存成本,
+                case 
+                    when t.合计库存数 > 0 and t.前一周销量 > 0
+                    then round(t.合计库存数 / ((ifnull(t.前一周销量, 0) + ifnull(t.前两周销量, 0) + ifnull(t.前三周销量, 0)) / 3), 2)
+                    else 0
+                end as 周转周,
+                t.仓库库存,t.仓库可用库存,t.仓库库存成本,t.收仓在途,t.收仓在途成本,t.已配未发,t.最后一周销,
+                t.昨天销,t.累销成本,t.在途库存数量,t.店库存数量,t.前四周销量,t.前三周销量,t.前两周销量,t.前一周销量,
+                round(t.合计库存数 / {$总库存数} * 100, 2) as 合计库存占比,
+                round(t.累销成本 / (t.累销成本 + t.合计库存成本) * 100, 2) as 成本售罄率
+            from (
+            select 
+                    风格,一级分类,二级分类,
+                    SUM(采购入库数) AS 采购入库数,
+                    sum(累计销售) as 累计销售,
+                    sum(合计库存数) as 合计库存数,
+                    sum(合计库存成本) as 合计库存成本,
+                    SUM(仓库库存) AS 仓库库存,
+                    SUM(仓库可用库存) AS 仓库可用库存,
+                    SUM(仓库库存成本) AS 仓库库存成本,
+                    SUM(收仓在途) AS 收仓在途,
+                    SUM(收仓在途成本) AS 收仓在途成本,
+                    sum(已配未发) as 已配未发,
+                    sum(最后一周销) as 最后一周销,
+                    sum(昨天销) as 昨天销,
+                    sum(累销成本) as 累销成本,
+                    sum(在途库存数量) as 在途库存数量,
+                    sum(店库存数量) as 店库存数量,
+                    sum(前四周销量) as 前四周销量,
+                    sum(前三周销量) as 前三周销量,
+                    sum(前两周销量) as 前两周销量,
+                    sum(前一周销量) as 前一周销量 
+                from spring_report 
+                where 
+                    更新日期 = '{$date}' 
+                    and  一级分类 <> '合计' 
+                    and  风格 in ('基本款')
+                group by 风格,一级分类,二级分类 
+                order by 风格,一级分类,二级分类
+            ) as t
+        ";
+        $data_基本款 = $this->db_bi->Query($sql_基本款);
+        // dump($data_基本款);die;
+
+        $sql_基本款合计 = "
+            select 
+                t.风格,t.二级分类,t.采购入库数,t.累计销售,
+                t.累计销售 / (ifnull(t.累计销售, 0) + ifnull(t.合计库存数, 0)) as 数量售罄率,
+                t.合计库存数,t.合计库存成本,
+                case 
+                    when t.合计库存数 > 0 and t.前一周销量 > 0
+                    then round(t.合计库存数 / ((ifnull(t.前一周销量, 0) + ifnull(t.前两周销量, 0) + ifnull(t.前三周销量, 0)) / 3), 2)
+                    else 0
+                end as 周转周,
+                t.仓库库存,t.仓库可用库存,t.仓库库存成本,t.收仓在途,t.收仓在途成本,t.已配未发,t.最后一周销,
+                t.昨天销,t.累销成本,t.在途库存数量,t.店库存数量,t.前四周销量,t.前三周销量,t.前两周销量,t.前一周销量,
+                round(t.合计库存数 / {$总库存数} * 100, 2) as 合计库存占比,
+                round(t.累销成本 / (t.累销成本 + t.合计库存成本) * 100, 2) as 成本售罄率
+            from (
+            select 
+                    风格,一级分类,二级分类,
+                    SUM(采购入库数) AS 采购入库数,
+                    sum(累计销售) as 累计销售,
+                    sum(合计库存数) as 合计库存数,
+                    sum(合计库存成本) as 合计库存成本,
+                    SUM(仓库库存) AS 仓库库存,
+                    SUM(仓库可用库存) AS 仓库可用库存,
+                    SUM(仓库库存成本) AS 仓库库存成本,
+                    SUM(收仓在途) AS 收仓在途,
+                    SUM(收仓在途成本) AS 收仓在途成本,
+                    sum(已配未发) as 已配未发,
+                    sum(最后一周销) as 最后一周销,
+                    sum(昨天销) as 昨天销,
+                    sum(累销成本) as 累销成本,
+                    sum(在途库存数量) as 在途库存数量,
+                    sum(店库存数量) as 店库存数量,
+                    sum(前四周销量) as 前四周销量,
+                    sum(前三周销量) as 前三周销量,
+                    sum(前两周销量) as 前两周销量,
+                    sum(前一周销量) as 前一周销量 
+                from spring_report 
+                where 
+                    更新日期 = '{$date}' 
+                    and  一级分类 = '合计' 
+                    and  风格 in ('基本款')
+                group by 风格,一级分类,二级分类 
+                order by 风格,一级分类,二级分类
+            ) as t
+        ";
+        $data_基本款合计 = $this->db_bi->Query($sql_基本款合计);
+
+        // 基本款完成
+        $data_基本款 = array_merge($data_基本款, $data_基本款合计);
+
+        $sql_引流款 = "
+            select 
+                t.风格,t.二级分类,t.采购入库数,t.累计销售,
+                t.累计销售 / (ifnull(t.累计销售, 0) + ifnull(t.合计库存数, 0)) as 数量售罄率,
+                t.合计库存数,t.合计库存成本,
+                case 
+                    when t.合计库存数 > 0 and t.前一周销量 > 0
+                    then round(t.合计库存数 / ((ifnull(t.前一周销量, 0) + ifnull(t.前两周销量, 0) + ifnull(t.前三周销量, 0)) / 3), 2)
+                    else 0
+                end as 周转周,
+                t.仓库库存,t.仓库可用库存,t.仓库库存成本,t.收仓在途,t.收仓在途成本,t.已配未发,t.最后一周销,
+                t.昨天销,t.累销成本,t.在途库存数量,t.店库存数量,t.前四周销量,t.前三周销量,t.前两周销量,t.前一周销量,
+                round(t.合计库存数 / {$总库存数} * 100, 2) as 合计库存占比,
+                round(t.累销成本 / (t.累销成本 + t.合计库存成本) * 100, 2) as 成本售罄率
+            from (
+            select 
+                    风格,一级分类,二级分类,
+                    SUM(采购入库数) AS 采购入库数,
+                    sum(累计销售) as 累计销售,
+                    sum(合计库存数) as 合计库存数,
+                    sum(合计库存成本) as 合计库存成本,
+                    SUM(仓库库存) AS 仓库库存,
+                    SUM(仓库可用库存) AS 仓库可用库存,
+                    SUM(仓库库存成本) AS 仓库库存成本,
+                    SUM(收仓在途) AS 收仓在途,
+                    SUM(收仓在途成本) AS 收仓在途成本,
+                    sum(已配未发) as 已配未发,
+                    sum(最后一周销) as 最后一周销,
+                    sum(昨天销) as 昨天销,
+                    sum(累销成本) as 累销成本,
+                    sum(在途库存数量) as 在途库存数量,
+                    sum(店库存数量) as 店库存数量,
+                    sum(前四周销量) as 前四周销量,
+                    sum(前三周销量) as 前三周销量,
+                    sum(前两周销量) as 前两周销量,
+                    sum(前一周销量) as 前一周销量 
+                from spring_report 
+                where 
+                    更新日期 = '{$date}' 
+                    and  一级分类 <> '合计' 
+                    and  风格 in ('引流款')
+                group by 风格,一级分类,二级分类 
+                order by 风格,一级分类,二级分类
+            ) as t
+        ";
+        $data_引流款 = $this->db_bi->Query($sql_引流款);
+
+        $sql_引流款合计 = "
+            select 
+                风格,二级分类,SUM(采购入库数) AS 采购入库数,SUM(仓库库存) AS 仓库库存,SUM(仓库可用库存) AS 仓库可用库存,
+                SUM(仓库库存成本) AS 仓库库存成本,SUM(收仓在途) AS 收仓在途,SUM(收仓在途成本) AS 收仓在途成本,sum(已配未发) as 已配未发,sum(最后一周销) as 最后一周销,
+                sum(昨天销) as 昨天销,sum(累计销售) as 累计销售,sum(累销成本) as 累销成本,sum(在途库存数量) as 在途库存数量,sum(店库存数量) as 店库存数量,
+                sum(合计库存数) as 合计库存数,sum(合计库存成本) as 合计库存成本,sum(前四周销量) as 前四周销量,sum(前三周销量) as 前三周销量,sum(前两周销量) as 前两周销量,
+                sum(前一周销量) as 前一周销量 from spring_report 
+            where 
+                更新日期 = '{$date}' 
+                and  一级分类 = '合计' 
+                and  风格 in ('引流款')
+            group by 风格,一级分类,二级分类 
+            order by 风格,一级分类,二级分类";
+
+        $sql_引流款合计 = "
+            select 
+                t.风格,t.二级分类,t.采购入库数,t.累计销售,
+                t.累计销售 / (ifnull(t.累计销售, 0) + ifnull(t.合计库存数, 0)) as 数量售罄率,
+                t.合计库存数,t.合计库存成本,
+                case 
+                    when t.合计库存数 > 0 and t.前一周销量 > 0
+                    then round(t.合计库存数 / ((ifnull(t.前一周销量, 0) + ifnull(t.前两周销量, 0) + ifnull(t.前三周销量, 0)) / 3), 2)
+                    else 0
+                end as 周转周,
+                t.仓库库存,t.仓库可用库存,t.仓库库存成本,t.收仓在途,t.收仓在途成本,t.已配未发,t.最后一周销,
+                t.昨天销,t.累销成本,t.在途库存数量,t.店库存数量,t.前四周销量,t.前三周销量,t.前两周销量,t.前一周销量,
+                round(t.合计库存数 / {$总库存数} * 100, 2) as 合计库存占比,
+                round(t.累销成本 / (t.累销成本 + t.合计库存成本) * 100, 2) as 成本售罄率
+            from (
+            select 
+                    风格,一级分类,二级分类,
+                    SUM(采购入库数) AS 采购入库数,
+                    sum(累计销售) as 累计销售,
+                    sum(合计库存数) as 合计库存数,
+                    sum(合计库存成本) as 合计库存成本,
+                    SUM(仓库库存) AS 仓库库存,
+                    SUM(仓库可用库存) AS 仓库可用库存,
+                    SUM(仓库库存成本) AS 仓库库存成本,
+                    SUM(收仓在途) AS 收仓在途,
+                    SUM(收仓在途成本) AS 收仓在途成本,
+                    sum(已配未发) as 已配未发,
+                    sum(最后一周销) as 最后一周销,
+                    sum(昨天销) as 昨天销,
+                    sum(累销成本) as 累销成本,
+                    sum(在途库存数量) as 在途库存数量,
+                    sum(店库存数量) as 店库存数量,
+                    sum(前四周销量) as 前四周销量,
+                    sum(前三周销量) as 前三周销量,
+                    sum(前两周销量) as 前两周销量,
+                    sum(前一周销量) as 前一周销量 
+                from spring_report 
+                where 
+                    更新日期 = '{$date}' 
+                    and  一级分类 = '合计' 
+                    and  风格 in ('引流款')
+                group by 风格,一级分类,二级分类 
+                order by 风格,一级分类,二级分类
+            ) as t
+        ";
+        $data_引流款合计 = $this->db_bi->Query($sql_引流款合计);
+        // 引流款完成
+        $data_引流款= array_merge($data_引流款, $data_引流款合计);
+
+        $sql_总计 = "
+            select 
+                t.风格,t.二级分类,t.采购入库数,t.累计销售,
+                t.累计销售 / (ifnull(t.累计销售, 0) + ifnull(t.合计库存数, 0)) as 数量售罄率,
+                t.合计库存数,t.合计库存成本,
+                case 
+                    when t.合计库存数 > 0 and t.前一周销量 > 0
+                    then round(t.合计库存数 / ((ifnull(t.前一周销量, 0) + ifnull(t.前两周销量, 0) + ifnull(t.前三周销量, 0)) / 3), 2)
+                    else 0
+                end as 周转周,
+                t.仓库库存,t.仓库可用库存,t.仓库库存成本,t.收仓在途,t.收仓在途成本,t.已配未发,t.最后一周销,
+                t.昨天销,t.累销成本,t.在途库存数量,t.店库存数量,t.前四周销量,t.前三周销量,t.前两周销量,t.前一周销量,
+                round(t.合计库存数 / {$总库存数} * 100, 2) as 合计库存占比,
+                round(t.累销成本 / (t.累销成本 + t.合计库存成本) * 100, 2) as 成本售罄率
+            from (
+            select 
+                    '汇总合计' as 风格,'合计' as 二级分类,
+                    SUM(采购入库数) AS 采购入库数,
+                    sum(累计销售) as 累计销售,
+                    sum(合计库存数) as 合计库存数,
+                    sum(合计库存成本) as 合计库存成本,
+                    SUM(仓库库存) AS 仓库库存,
+                    SUM(仓库可用库存) AS 仓库可用库存,
+                    SUM(仓库库存成本) AS 仓库库存成本,
+                    SUM(收仓在途) AS 收仓在途,
+                    SUM(收仓在途成本) AS 收仓在途成本,
+                    sum(已配未发) as 已配未发,
+                    sum(最后一周销) as 最后一周销,
+                    sum(昨天销) as 昨天销,
+                    sum(累销成本) as 累销成本,
+                    sum(在途库存数量) as 在途库存数量,
+                    sum(店库存数量) as 店库存数量,
+                    sum(前四周销量) as 前四周销量,
+                    sum(前三周销量) as 前三周销量,
+                    sum(前两周销量) as 前两周销量,
+                    sum(前一周销量) as 前一周销量 
+                from spring_report 
+                where 
+                    更新日期 = '{$date}' 
+                    and  一级分类 = '合计' 
+                    and  风格 in ('基本款', '引流款')
+                group by 一级分类,二级分类 
+            ) as t
+        ";        
+        $data_总计 = $this->db_bi->Query($sql_总计);
+
+        $data = array_merge($data_基本款,$data_引流款,$data_总计);
+
+        if ($data) {
+            $table_header = ['ID'];
+            $table_header = array_merge($table_header, array_keys($data[0]));
+            foreach ($table_header as $v => $k) {
+                $field_width[$v] = 95;
             }
 
-            $all =  arr_add_member($all,$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
-        }
-        $ls[0] = $arr[0];
+            $field_width[0] = 35;
+            $field_width[1] = 60;
+            $field_width[2] = 80;
+            $field_width[3] = 90;
+            $field_width[4] = 80;
+            $field_width[5] = 90;
+            $field_width[6] = 90;
+            $field_width[7] = 100;
+            $field_width[8] = 80;
+            $field_width[9] = 80;
+            $field_width[10] = 100;
+            $field_width[11] = 100;
+            $field_width[12] = 75;
+            $field_width[14] = 70;
+            $field_width[15] = 90;
+            $field_width[16] = 60;
+            $field_width[17] = 80;
 
-        array_splice($data,13,0,$ls);
-        $ls[0] = $arr[1];
-        $length = count($data);
-        array_splice($data,$length,0,$ls);
-        $ls[0] = $all;
-        array_splice($data,$length+1,0,$ls);
+            // $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
+            $last_year_week_today = date_to_week(date("Y-m-d", strtotime("-1 year -0 day")));
+            // $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
+            $week =  date_to_week(date("Y-m-d", strtotime("-0 day")));
+            // $the_year_week_today =  date_to_week( date("Y-m-d", strtotime("-2 year -1 day")));
+            $the_year_week_today =  date_to_week(date("Y-m-d", strtotime("-2 year -0 day")));
+            //图片左上角汇总说明数据，可为空
 
-        foreach ($data as $v=>$k){
-            $data[$v]['合计库存占比'] =number_format(round( $k['合计库存数'] / $sum,4)*100,2).'%';
-            $data[$v]['数量售罄率'] =  number_format(round( $k['累计销售'] /( $k['累计销售']  + $k['合计库存数']) ,4)*100,2).'%';
-            $data[$v]['成本售罄率'] =  number_format(round( $k['累销成本'] /( $k['累销成本']  + $k['合计库存成本']) ,4)*100,2).'%';
-            if($k['合计库存数'] > 0 &&$k['前一周销量'] >0){
-                $data[$v]['周转周'] =  number_format(round( $k['合计库存数'] /( ($k['前一周销量'] +$k['前两周销量'] +$k['前三周销量'])/3) ,4),2);
-            }else{
-                $data[$v]['周转周'] = 0;
-            }
-        }
-        $table_header = ['ID'];
-        $title = ['风格','二级分类','采购入库数','累计销售','数量售罄率','合计库存数','合计库存成本','周转周','仓库库存','仓库可用库存',
-            '仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累销成本','在途库存数量','店库存数量','前四周销量','前三周销量'
-            ,'前两周销量','前一周销量','合计库存占比','成本售罄率'];
-
-        $table_header = array_merge($table_header, $title);
-        foreach ($table_header as $v => $k) {
-            $field_width[$v] = 100;
-        }
-        $field_width[0] = 30;
-        $field_width[1] = 60;
-        $field_width[2] = 80;
-        $field_width[4] = 80;
-        $field_width[8] = 80;
-        $field_width[9] = 80;
-        $field_width[11] = 95;
-        $field_width[12] = 80;
-        $field_width[14] = 80;
-        $field_width[15] = 90;
-        $field_width[16] = 60;
-        $field_width[17] = 70;
-        $last_year_week_today =date_to_week(date("Y-m-d", strtotime("-1 year -1 day")));
-        $week =  date_to_week( date("Y-m-d", strtotime("-1 day")));
-        $table_data= [];
-        foreach ($data as $V=>$k){
-            $new = [
-                '风格'=>$k['风格'],
-                '二级分类'=>$k['二级分类'],
-                '采购入库数'=>$k['采购入库数'],
-                '累计销售'=>$k['累计销售'],
-                '数量售罄率'=>$k['数量售罄率'],
-                '合计库存数'=>$k['合计库存数'],
-                '合计库存成本'=>$k['合计库存成本'],
-                '周转周'=>$k['周转周'],
-                '仓库库存'=>$k['仓库库存'],
-                '仓库可用库存'=>$k['仓库可用库存'],
-                '仓库库存成本'=>$k['仓库库存成本'],
-                '收仓在途'=>$k['收仓在途'],
-                '收仓在途成本'=>$k['收仓在途成本'],
-                '已配未发'=>$k['已配未发'],
-                '最后一周销'=>$k['最后一周销'],
-                '昨天销'=>$k['昨天销'],
-                '累销成本'=>$k['累销成本'],
-                '在途库存数量'=>$k['在途库存数量'],
-                '店库存数量'=>$k['店库存数量'],
-                '前四周销量'=>$k['前四周销量'],
-                '前三周销量'=>$k['前三周销量'],
-                '前两周销量'=>$k['前两周销量'],
-                '前一周销量'=>$k['前一周销量'],
-                '合计库存占比'=>$k['合计库存占比'],
-                '成本售罄率'=>$k['成本售罄率'],
+            $table_explain = [
+                0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today."  .  前年昨日:".$the_year_week_today,
+                // 0 => " ",
             ];
-
-            $table_data[]=$new;
-
+            //参数
+            $params = [
+                'code' => $code,
+                'row' => count($data),          //数据的行数
+                // 'file_name' =>  $code . $dingName . '.jpg',      //保存的文件名
+                'file_name' =>  $code . '.jpg',      //保存的文件名
+                'title' => "2024 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+                'table_time' => date("Y-m-d H:i:s"),
+                'data' => $data,
+                'table_explain' => $table_explain,
+                'table_header' => $table_header,
+                'field_width' => $field_width,
+                'banben' => '  图片报表编号: ' . $code,
+                'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
+            ];
+            // 生成图片
+            $this->create_image($params);
         }
-
-
-        // cwl
-        $data_handle = [];
-        // 新数组装最终结果
-        $data_new_cwl = [];
-        foreach ($table_data as $key => $val) {
-            if ($val['风格'] == '基本款' && $val['二级分类'] == '合计') {
-                $data_handle['基本款合计'] = $table_data[$key];
-                // 删
-                unset($table_data[$key]);
-            }
-            if ($val['风格'] == '引流款' && $val['二级分类'] == '合计') {
-                $data_handle['引流款合计'] = $table_data[$key];
-                // 删
-                unset($table_data[$key]);
-            }
-            if ($val['风格'] == '汇总合计' && $val['二级分类'] == '合计') {
-                $data_handle['汇总合计'] = $table_data[$key];
-                // 删
-                unset($table_data[$key]);
-            }
-        }
-        // dump($data_handle);
-        // echo '<pre>';
-        // print_r($table_data); 
-        
-        foreach ($table_data as $key => $val) {
-            $base = $table_data[0]['风格'];
-            if ($val['风格'] == $base) {
-                // $data_new_cwl[$key] = $table_data[$key];
-                array_push($data_new_cwl, $table_data[$key]);
-            } elseif ($val['风格'] != $base && $table_data[$key - 1]['风格'] == $base) {
-                // $data_new_cwl[$key] = $data_handle['基本款合计'];
-                array_push($data_new_cwl, $data_handle['基本款合计']);
-            } else {
-                // $data_new_cwl[$key] = $table_data[$key-1];
-                array_push($data_new_cwl, $table_data[$key-1]);
-            }
-        }
-        array_push($data_new_cwl, $table_data[count($table_data)]);
-        array_push($data_new_cwl, $data_handle['引流款合计']);
-        array_push($data_new_cwl, $data_handle['汇总合计']);
-
-        $table_explain = [
-            0 => "昨天:".$week. "  .  去年昨天:".$last_year_week_today,
-        ];
-
-        $params = [
-            'code' => $code,
-            'row' => count($data_new_cwl),          //数据的行数
-            'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2024 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
-            'table_time' => date("Y-m-d H:i:s"),
-            'data' => $data_new_cwl,
-            'table_explain' => $table_explain,
-            'table_header' => $table_header,
-            'field_width' => $field_width,
-            'col' => '二级分类',
-            'color'=>16711877,
-            'field' => '合计',
-            'banben' => '           编号: '.$code,
-            'file_path' => "./img/".date('Ymd').'/'  //文件保存路径
-        ];
-
-
-        $this->create_image($params);
     }
 //     //2022 夏季货品销售报表
 //     public function create_table_s014()
@@ -931,6 +1274,7 @@ class ReportFormsService
             }
             $all =  arr_add_member($all,$k,['采购入库数','仓库库存','仓库可用库存','仓库库存成本','收仓在途','收仓在途成本','已配未发','最后一周销','昨天销','累计销售','累销成本','在途库存数量','店库存数量','合计库存数','合计库存成本','前四周销量','前三周销量','前两周销量','前一周销量']);
         }
+
         $ls[0] = $arr[0];
 
         array_splice($data,13,0,$ls);
@@ -939,6 +1283,9 @@ class ReportFormsService
         array_splice($data,$length,0,$ls);
         $ls[0] = $all;
         array_splice($data,$length+1,0,$ls);
+
+        // echo '<pre>';
+        // print_r($data); die;
 
         foreach ($data as $v=>$k){
             $data[$v]['合计库存占比'] =number_format(round( $k['合计库存数'] / $sum,4)*100,2).'%';
