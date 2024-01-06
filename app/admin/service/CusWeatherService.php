@@ -73,14 +73,24 @@ class CusWeatherService
 
         $where = [];
         $where[] = ['cwb.weather_prefix', '<>', ''];
-        if ($customer_name) {
+        if ($customer_name && !$customer_批量) {
             $where[] = ['cwb.customer_name', 'in', $customer_name];
         }
         // cwl修改
         if ($customer_批量) {
-            echo $customer_批量;die;
-            $where[] = ['cwb.customer_name', 'in', $customer_name];
+            $customer_批量;
+            
+            $exploadDate = explode(' ', $customer_批量);
+            // dump($exploadDate);die;
+            $map = "";
+            foreach ($exploadDate as $key => $val) {
+                $map .=  $val . ",";
+            }
+
+            $where[] = ['cwb.customer_name', 'in', $map];
         } 
+        // echo '<pre>';
+        // print_r($where);
         if ($province) {
             $where[] = ['cwb.province', 'in', $province];
         }
