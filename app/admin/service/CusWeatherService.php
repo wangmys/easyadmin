@@ -34,9 +34,7 @@ class CusWeatherService
                 'data'  => [],
                 'sign'  => 'other',
             ];
-
         } else {
-
             $list = CusWeatherData::field($field)->alias('cwd')->
             join('cus_weather_base cwb', 'cwd.weather_prefix=cwb.weather_prefix', 'LEFT')->where($where)->order('cwd.id asc')
             ->paginate([
@@ -59,6 +57,7 @@ class CusWeatherService
     protected function return_where($params) {
 
         $customer_name = $params['customer_name'] ?? '';
+        $customer_批量 = $params['店铺批量'] ?? '';
         $province = $params['province'] ?? '';
         $city = $params['city'] ?? '';
         $area = $params['area'] ?? '';
@@ -74,8 +73,17 @@ class CusWeatherService
 
         $where = [];
         $where[] = ['cwb.weather_prefix', '<>', ''];
+        // if ($customer_name) {
+        //     $where[] = ['cwb.customer_name', 'in', $customer_name];
+        // }
+        // cwl修改
         if ($customer_name) {
-            $where[] = ['cwb.customer_name', 'in', $customer_name];
+            if ($customer_批量) {
+                echo $customer_批量;die;
+            } else {
+                $where[] = ['cwb.customer_name', 'in', $customer_name];
+            }
+            
         }
         if ($province) {
             $where[] = ['cwb.province', 'in', $province];

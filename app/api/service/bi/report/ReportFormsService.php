@@ -130,7 +130,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($table_data),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 春季货品销售报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'title' => "2024 春季货品销售报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $table_data,
             'table_explain' => $table_explain,
@@ -221,7 +221,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($table_data),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 夏季货品销售报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'title' => "2024 夏季货品销售报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $table_data,
             'table_explain' => $table_explain,
@@ -293,7 +293,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($data),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 秋季货品销售报表 [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'title' => "2024 秋季货品销售报表 [" . date("Y-m-d", strtotime("-1 day")) . "]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data,
             'table_explain' => $table_explain,
@@ -376,7 +376,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($data),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 冬季货品销售报表  [" . date("Y-m-d", strtotime("-1 day")) . "]",
+            'title' => "2024 冬季货品销售报表  [" . date("Y-m-d", strtotime("-1 day")) . "]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data,
             'table_explain' => $table_explain,
@@ -756,7 +756,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($data_new_cwl),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'title' => "2024 春季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data_new_cwl,
             'table_explain' => $table_explain,
@@ -1057,7 +1057,7 @@ class ReportFormsService
             'code' => $code,
             'row' => count($data_new_cwl),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "2023 夏季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'title' => "2024 夏季货品零售汇总报表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
             'data' => $data_new_cwl,
             'table_explain' => $table_explain,
@@ -1227,7 +1227,7 @@ class ReportFormsService
             // 'row' => count($table_data),          //数据的行数
             'row' => count($new_arr),          //数据的行数
             'file_name' =>$code.'.jpg',      //保存的文件名
-            'title' => "商品部-2023秋季货品零售汇总表 [". date("Y-m-d", strtotime("-1 day")) ."]",
+            'title' => "商品部-2024秋季货品零售汇总表 [". date("Y-m-d", strtotime("-1 day")) ."]",
             'table_time' => date("Y-m-d H:i:s"),
             // 'data' => $table_data,
             'data' => $new_arr,
