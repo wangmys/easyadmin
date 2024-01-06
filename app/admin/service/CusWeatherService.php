@@ -73,18 +73,14 @@ class CusWeatherService
 
         $where = [];
         $where[] = ['cwb.weather_prefix', '<>', ''];
-        // if ($customer_name) {
-        //     $where[] = ['cwb.customer_name', 'in', $customer_name];
-        // }
-        // cwl修改
         if ($customer_name) {
-            if ($customer_批量) {
-                echo $customer_批量;die;
-            } else {
-                $where[] = ['cwb.customer_name', 'in', $customer_name];
-            }
-            
+            $where[] = ['cwb.customer_name', 'in', $customer_name];
         }
+        // cwl修改
+        if ($customer_批量) {
+            echo $customer_批量;die;
+            $where[] = ['cwb.customer_name', 'in', $customer_name];
+        } 
         if ($province) {
             $where[] = ['cwb.province', 'in', $province];
         }

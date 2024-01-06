@@ -1008,7 +1008,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 春季货品销售报表 表号:S007',
+                'title' => '2024 春季货品销售报表 表号:S007',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S007.jpg?v=" . time()
             ];
 
@@ -1045,7 +1045,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 夏季货品销售报表 表号:S008',
+                'title' => '2024 夏季货品销售报表 表号:S008',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S008.jpg?v=" . time()
             ];
 
@@ -1082,7 +1082,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '商品部-2023秋季货品销售报表 表号:S009',
+                'title' => '商品部-2024秋季货品销售报表 表号:S009',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S009.jpg?v=" . time()
             ];
 
@@ -1115,7 +1115,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 冬季货品销售报表 表号:S010',
+                'title' => '2024 冬季货品销售报表 表号:S010',
                 'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd')."/S010.jpg?v=" . time()
             ];
 
@@ -1188,7 +1188,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 春季货品零售汇总报表 表号:S013',
+                'title' => '2024 春季货品零售汇总报表 表号:S013',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S013.jpg?v=" . time()
             ];
 
@@ -1225,7 +1225,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 夏季货品零售汇总报表 表号:S014',
+                'title' => '2024 夏季货品零售汇总报表 表号:S014',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S014.jpg?v=" . time()
             ];
 
@@ -1262,7 +1262,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '商品部-2023秋季货品零售汇总表 表号:S015',
+                'title' => '商品部-2024秋季货品零售汇总表 表号:S015',
                 'jpg_url' => $this->request->domain()."./img/".date('Ymd')."/S015.jpg?v=" . time()
             ];
 
@@ -1665,7 +1665,7 @@ class SendReport extends BaseController
             $model = new $name;
 
             $send_data = [
-                'title' => '2023 冬季货品零售汇总报表 表号:S032',
+                'title' => '2024 冬季货品零售汇总报表 表号:S032',
                 'jpg_url' => $this->request->domain()."./img/cwl/".date('Ymd')."/S032.jpg?v=" . time()
             ];
 
@@ -2133,7 +2133,7 @@ class SendReport extends BaseController
     }
 
     public function test() {
-        $this->servicePro->create_table_s110B('2023-10-07');
+        $this->servicePro->create_table_s110B('2024-10-07');
     }
 
     // s110a
