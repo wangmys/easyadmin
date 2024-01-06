@@ -98,7 +98,7 @@ class Skauto extends BaseController
             LEFT JOIN sp_ww_budongxiao_detail as bu ON sk.省份=bu.省份 AND sk.店铺名称=bu.店铺名称 AND sk.一级分类=bu.大类 AND sk.二级分类=bu.中类 AND sk.分类=bu.小类 AND sk.货号 = bu.货号
             WHERE 1
                 AND c.Region <> '闭店区'
-                AND sk.年份 = {$year}
+                AND sk.年份 in (2023,2024)
             GROUP BY 
             sk.店铺名称, 
             sk.货号
@@ -147,7 +147,7 @@ class Skauto extends BaseController
                 AND EC.ShutOut = 0	
                 AND EC.RegionId <> 55
                 AND EBC.Mathod IN ('直营', '加盟')
-                AND EG.TimeCategoryName1 = 2023
+                AND EG.TimeCategoryName1 in (2023, 2024)
         --        AND EG.TimeCategoryName2 in ( {$this->seasionStr} )
                 AND EG.CategoryName1 IN ('外套', '内搭','鞋履', '下装')
         -- 			AND EC.CustomerName in ('东至一店')
