@@ -204,7 +204,8 @@ class Weather extends AdminController
             $str = 'md';
         }
         // 开始日期
-        $start_date = date('Ymd',strtotime(date('Ymd').'-3day'));
+//        $start_date = date('Ymd',strtotime(date('Ymd').'-3day'));
+        $start_date = date('Ymd',strtotime(date('Ymd')));
         // 日期列表
         $date_list = [];
         for ($i = 0;$i <= 23;$i++){
