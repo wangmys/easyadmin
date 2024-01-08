@@ -81,7 +81,7 @@ class MqxWeatherService
                 $now = date('Ymd');
                 $oldData = $this->mysql->table('mqx_weather')->where('code', '=', $code_v['code'])->where('date', '>=', $now)->column('date');
                 foreach ($newData as $item) {
-                    if ($item['date'] >= $now) {
+//                    if ($item['date'] >= $now) {
                         $dbData = [
                             'code' => $code_v['code'],
                             'date' => $item['date'],
@@ -97,7 +97,7 @@ class MqxWeatherService
                             $dbData['update_time'] = date('Y-m-d H:i:s');
                             $insertAll[] = $dbData;
                         }
-                    }
+//                    }
                 }
                 if (!empty($insertAll)) {
                     $this->mysql->table('mqx_weather')->insertAll($insertAll);
