@@ -734,3 +734,46 @@ function importExcel_m($file_path = '/', $read_column = array(), $start_row = 2)
     return $return;
 
 }
+
+/**
+ * @desc curl请求 (支持GET和POST)
+ * @param $url string 请求链接
+ * @param $data array|string 请求参数
+ * @return mixed
+ * @author wangjinshan
+ * @time 2023/10/26
+ */
+function mqx_curl($url, $data = '', $data_is_json = false, $header_data = [], $is_decode = true)
+{
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+    if (!empty($data)) {
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        if ($data_is_json) {
+            // 发送JSON数据
+            curl_setopt($curl, CURLOPT_HEADER, 0);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json; charset=utf-8',
+                'Content-Length:' . strlen($data)
+            ]);
+        }
+    }
+    // 设置请求头
+    if (!empty($header_data)) {
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header_data);
+    }
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    $output = curl_exec($curl);
+    curl_close($curl);
+    if ($is_decode) {
+        // 强制转换成数组返回
+        $re_data = json_decode($output, true);
+        return $re_data;
+    } else {
+        return $output;
+    }
+}
