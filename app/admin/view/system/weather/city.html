@@ -1,14 +1,14 @@
 <div class="layuimini-container">
     <form class="layui-form layuimini-form" lay-filter="app-form">
 
+        <input type="hidden" value="">
         <div class="layui-form-item">
-            <label class="layui-form-label required">绑定城市</label>
-            <div class="layui-input-block">
-                <select name="city" lay-verify="" lay-search="">
-                    {foreach $city_list as $vo}
-                    <option value="{$vo.cid}" {if $cid == $vo.cid}selected=""{/if}>{$vo.city|raw}</option>
-                    {/foreach}
-                </select>
+            <div class="layui-block">
+                <label class="layui-form-label">绑定城市</label>
+                <div class="layui-input-block">
+                    <div id="xm-CustomerName" class="xm-select"></div>
+                </div>
+
             </div>
         </div>
         <div class="layui-form-item text-center">
@@ -17,3 +17,67 @@
 
     </form>
 </div>
+<script src="__STATIC__/plugs/lay-module/xmSelect/xm-select.js" charset="utf-8"></script>
+<script>
+
+    layui.use(['util', 'layer', 'form', 'table'], function () {
+        var
+            util = layui.util
+            , layer = layui.layer
+            , table = layui.table
+            , form = layui.form
+            , $ = layui.jquery
+            , xm
+
+
+
+        //提交事件
+        form.on('submit(sub)', function (data) {
+            let field = data.field
+
+
+
+            $.post('set_revise', data.field, function (res) {
+                if (res.code == 1) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                    parent.layui.table.reload('table')
+                    // parent.layer.close(index);
+                    // parent.location.reload();
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 2000})
+
+                }
+
+            })
+            return false;
+        });
+
+        let int_data = function () {
+                xm = xmSelect.render({
+                    el: '#xm-CustomerName',
+                    icon: 'show',
+                    tips: '请选择',
+                    radio: true,
+                    toolbar: {
+                        show: true,
+                    },
+                    height: '320px',
+                    direction: 'auto',
+                    empty: '呀, 没有数据呢',
+                    filterable: true,
+                    tree: {
+                        show: true,
+                    },
+                    theme: {
+                        color: '#0081ff',
+                    },
+                    name: 'code',
+                    data: JSON.parse('{$city_list|raw}')
+                });
+                layui.form.render("select");
+
+        }
+        int_data();
+    })
+</script>
