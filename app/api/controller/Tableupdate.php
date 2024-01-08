@@ -28,6 +28,7 @@ class Tableupdate extends BaseController
     protected $db_bi = '';
     protected $db_binew = '';
     protected $db_sqlsrv = '';
+    protected $db_tianqi = '';
     // 随机数
     protected $rand_code = '';
     // 创建时间
@@ -39,6 +40,7 @@ class Tableupdate extends BaseController
         $this->db_bi = Db::connect('mysql2');
         $this->db_binew = Db::connect('bi_new');
         $this->db_sqlsrv = Db::connect('sqlsrv');
+        $this->db_tianqi = Db::connect('tianqi');
     }
 
     // // sk新增领型字段
@@ -1054,11 +1056,13 @@ class Tableupdate extends BaseController
         // $this->db_bi->getLastSql();
         if ($select) {
             $this->db_easyA->table('customer_pro')->where(1)->delete();
+            $this->db_tianqi->table('customer_pro')->where(1)->delete();
 
             $select_customer = array_chunk($select, 500);
     
             foreach($select_customer as $key => $val) {
-                $insert = $this->db_easyA->table('customer_pro')->strict(false)->insertAll($val);
+                $this->db_easyA->table('customer_pro')->strict(false)->insertAll($val);
+                $this->db_tianqi->table('customer_pro')->strict(false)->insertAll($val);
             }
 
             // 补丁修复首单日期
@@ -1081,7 +1085,28 @@ class Tableupdate extends BaseController
             $this->db_easyA->table('customer_pro')->where(['CustomerName' => '阳春一店'])->update(['首单日期' => '2020-12-11']);
             $this->db_easyA->table('customer_pro')->where(['CustomerName' => '英德一店'])->update(['首单日期' => '2021-09-15']);
             $this->db_easyA->table('customer_pro')->where(['CustomerName' => '十堰二店'])->update(['首单日期' => '2021-11-07']);
-    
+
+            // 补丁修复首单日期
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '德庆一店'])->update(['首单日期' => '2021-04-10']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '丰顺一店'])->update(['首单日期' => '2020-12-30']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '河源二店'])->update(['首单日期' => '2021-07-09']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '河源一店'])->update(['首单日期' => '2021-03-18']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '厚街一店'])->update(['首单日期' => '2020-12-01']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '惠东一店'])->update(['首单日期' => '2020-12-16']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '开平一店'])->update(['首单日期' => '2021-05-01']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '龙川一店'])->update(['首单日期' => '2021-06-30']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '龙岗一店'])->update(['首单日期' => '2021-03-20']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '水口一店'])->update(['首单日期' => '2020-12-22']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '顺德一店'])->update(['首单日期' => '2020-12-19']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '太和一店'])->update(['首单日期' => '2021-07-30']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '塘厦一店'])->update(['首单日期' => '2021-04-15']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '西樵一店'])->update(['首单日期' => '2020-12-23']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '西乡一店'])->update(['首单日期' => '2021-06-18']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '兴宁一店'])->update(['首单日期' => '2021-06-26']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '阳春一店'])->update(['首单日期' => '2020-12-11']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '英德一店'])->update(['首单日期' => '2021-09-15']);
+            $this->db_tianqi->table('customer_pro')->where(['CustomerName' => '十堰二店'])->update(['首单日期' => '2021-11-07']);
+
             if ($select_customer) {
                 // $this->db_bi->commit();    
                 return json([
@@ -1097,6 +1122,38 @@ class Tableupdate extends BaseController
                     'content' => 'easyadmin2 customer_pro 更新失败！'
                 ]);
             }   
+        }
+    }
+
+    // 历史店铺电器 秋冬季 春夏季云仓数据源更新
+    public function cus_weather_yc() {
+        $sql_店铺名称 = "
+            select customer_name from cus_weather_base
+        ";
+        $select_店铺名称 = $this->db_tianqi->query($sql_店铺名称);
+        $map_店铺 = "";
+        foreach ($select_店铺名称 as $key => $val) {
+            if ($key + 1 < count($select_店铺名称)) {
+                $map_店铺 .= "'{$val['customer_name']}',";
+            } else {
+                $map_店铺 .= "'{$val['customer_name']}'";
+            }
+        }
+
+        $sql_康雷 = "
+            SELECT CustomerName,CustomItem65,CustomItem66 FROM ErpCustomer WHERE CustomerName IN ({$map_店铺})
+        ";
+
+        $select_康雷 = $this->db_sqlsrv->query($sql_康雷);
+        if ($select_康雷) {
+            foreach ($select_康雷 as $key => $val) {
+                $this->db_tianqi->table('cus_weather_base')->where([
+                    ['customer_name', '=', $val['CustomerName']]
+                ])->update([
+                    'CustomItem65' => $val['CustomItem65'],
+                    'CustomItem66' => $val['CustomItem66'],
+                ]);
+            }
         }
     }
 

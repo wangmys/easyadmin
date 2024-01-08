@@ -160,10 +160,13 @@ class CusWeatherService
 
         $list = CusWeatherData::field($field)->alias('cwd')->
         join('cus_weather_base cwb', 'cwd.weather_prefix=cwb.weather_prefix', 'LEFT')->where($where)->order('cwd.id asc')
+        // ->fetchSql(1)
         ->paginate([
             'list_rows'=> $pageLimit,
             'page' => $page,
         ]);
+        // echo CusWeatherData::getLastSql();die;
+        // echo $list;die;
         $list = $list ? $list->toArray() : [];
         $data = [
             'count' => $list ? $list['total'] : 0,
