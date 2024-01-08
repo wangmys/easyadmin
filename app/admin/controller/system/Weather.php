@@ -222,7 +222,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable,Mathod,CustomerGrade');
+        $info_list = $this->customers->where('ShutOut','=',0)->column('State,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -234,8 +234,6 @@ class Weather extends AdminController
         $mathod = [];
         // 分别取出,省列表,区域列表,城市列表用作筛选条件
         if(!empty($info_list)){
-            $area_list_temp = array_unique(array_column($info_list,'RegionId'));
-            $area_list = Region::whereIn('RegionId',$area_list_temp)->column('Region','RegionId');
             $province_list_temp = array_unique(array_column($info_list,'State'));
             $province_list = array_combine($province_list_temp,$province_list_temp);
             $city_list_temp = array_unique(array_column($info_list,'City'));
