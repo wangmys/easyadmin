@@ -3,9 +3,12 @@
 
 namespace app\admin\controller\system;
 
+use app\admin\model\CustomerModel;
 use app\admin\model\weather\Weather as WeatherM;
 use app\admin\model\weather\Weather2345Model;
-use app\admin\model\weather\Customers as CustomersM;
+use app\common\model\MqxWeatherCustomer;
+use app\common\model\MqxWeatherCode;
+use app\common\model\MqxWeather;
 use app\admin\model\weather\CityUrl;
 use app\admin\model\weather\WeatherUpdateStatus2345Model;
 use app\admin\service\TriggerService;
@@ -36,8 +39,8 @@ class Weather extends AdminController
     public function __construct(App $app)
     {
         parent::__construct($app);
-        $this->model = new Weather2345Model;
-        $this->customers = new CustomersM;
+        $this->model = new MqxWeather;
+        $this->customers = new CustomerModel();
     }
 
     /**
@@ -52,92 +55,50 @@ class Weather extends AdminController
             }
             list($page, $limit, $params) = $this->buildTableParames();
             $where = $this->getParms();
-            
-            // print_r(input()); die;
-            $count = $this->customers
-            ->alias('c')
-            ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
-            ->leftJoin('city_url cu','cu.cid = c.cid')
-            ->where(function ($query) use ($where) {
-                if (!empty($where['CustomerName'])) $query->where('c.CustomerName','in', $where['CustomerName']);
-                if (!empty($where['State'])) $query->where('c.State', $where['State']);
-                if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
-                if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
-                if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
-                if (!empty($where['City'])) $query->where('c.City', $where['City']);
-                if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
-                if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
-                if (!empty(input('店铺名称'))) $query->whereIn('c.CustomerName', input('店铺名称'));
-                if (!empty(input('温区'))) $query->whereIn('c.CustomItem36', input('温区'));
-                if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
-                if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
-                if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
-                if (!empty($where['url_2345_cid'])) {
-                    if ($where['url_2345_cid'] == '已绑') {
-                        $query->where('c.url_2345_cid', '>', 0);
-                    } else {
-                        $query->where('c.url_2345_cid', 0);
-                    }
-                }    
-                $query->where(1);
-            })
-            ->where(['c.ShutOut' => 0])
-            ->where('c.RegionId','<>',55)->count();
 
-            $list = $this->customers
-            ->field('c.CustomerId,c.CustomerName,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,cr.Region,c.dudao,c.cid,c.liable,c.Mathod,c.url_2345_cid')
-            ->field(['cu.City'=>'BdCity'])
-            ->alias('c')
-            ->leftJoin('customers_region cr','c.RegionId = cr.RegionId')
-            ->leftJoin('city_url cu','cu.cid = c.cid')
-            ->where(function ($query) use ($where) {
-                if (!empty($where['CustomerName'])) $query->where('c.CustomerName','in', $where['CustomerName']);
-                if (!empty($where['State'])) $query->where('c.State', $where['State']);
-                if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
-                if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
-                if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
-                if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
-                if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
-                if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
-                if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
-                if (!empty(input('店铺名称'))) $query->whereIn('c.CustomerName', input('店铺名称'));
-                if (!empty(input('温区'))) $query->whereIn('c.CustomItem36', input('温区'));
-                if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
-                if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
-                if (!empty($where['url_2345_cid'])) {
-                    if ($where['url_2345_cid'] == '已绑') {
-                        $query->where('c.url_2345_cid', '>', 0);
-                    } else {
-                        $query->where('c.url_2345_cid', 0);
-                    }
-                }
-                $query->where(1);
-            })
-            ->where(['c.ShutOut' => 0])
-            ->where('c.RegionId','<>',55)
-            ->order('c.State asc,c.CustomItem30 asc,c.CustomItem36 asc,c.CustomerName asc,c.CustomerCode asc')
-            ->page($page, $limit)
-            ->select();
+            $query = $this->customers
+                ->field('c.CustomerId,c.CustomerName,c.CustomItem17,c.State,c.CustomItem30,c.CustomItem36,c.City,c.SendGoodsGroup,c.Mathod,wc1.area as BdCity,wc.code as weather_code')
+                ->alias('c')
+                ->leftJoin('easyadmin2.mqx_weather_customer wc', 'wc.CustomerId = c.CustomerId')
+                ->leftJoin('easyadmin2.mqx_weather_code wc1', 'wc1.code = wc.code')
+                ->where(function ($query) use ($where) {
+                    if (!empty($where['CustomerName'])) $query->where('c.CustomerName', 'in', $where['CustomerName']);
+                    if (!empty($where['State'])) $query->where('c.State', $where['State']);
+                    if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
+                    if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
+                    if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
+                    if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
+                    if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
+                    if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
+                    if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
+                    if (!empty(input('店铺名称'))) $query->whereIn('c.CustomerName', input('店铺名称'));
+                    if (!empty(input('温区'))) $query->whereIn('c.CustomItem36', input('温区'));
+                    if (!empty($where['Mathod'])) $query->whereIn('c.Mathod', $where['Mathod']);
+                    if (!empty($where['CustomerGrade'])) $query->whereIn('c.CustomerGrade', $where['CustomerGrade']);
+                    $query->where(1);
+                })
+                ->where(['c.ShutOut' => 0])
+                ->order('c.State asc,c.CustomItem30 asc,c.CustomItem36 asc,c.CustomerName asc,c.CustomerCode asc');
 
-
+            $count = $query->count();
+            $list = $query->page($page, $limit)->select();
             // 获取日期列表
-            $dateList = $this->getDateList(1);
+            $dateList = $this->getDateListM(1);
             $list = $list->toArray();
+
             if(!empty($list)){
-                foreach ($list as &$v_list) {
-                    $v_list['State'] = mb_substr($v_list['State'], 0, 2);
-                    $v_list['cid'] = $v_list['url_2345_cid'] ?: $v_list['cid']; 
-                }
-                $cid_list = array_column($list,'cid');
+
+                $weather_code = array_column($list,'weather_code');
                 // 查询天气
-                $weather_list = $this->model->field('cid,id,min_c,max_c,weather_time,temperature')->whereIn('cid',$cid_list)->where('weather_time','in',array_values($dateList))->select();
+                $weather_list = $this->model->field('*')->whereIn('code',$weather_code)->where('date','in',array_values($dateList))->select()->toArray();
+
                 foreach ($weather_list as $kk => $vv){
                     foreach ($list as $k => $v){
-                        if($vv['cid'] == $v['cid']){
-                            $key = date('m-d',strtotime($vv['weather_time']));
+                        if($vv['code'] == $v['weather_code']){
+                            $key = date('m-d',strtotime($vv['date']));
 
                             // 使用最高温
-                            if(in_array(date('m',strtotime($vv['weather_time'])),[2,3,4,5,6,7])){
+                            if(in_array(date('m',strtotime($vv['date'])),[2,3,4,5,6,7])){
                                 $value_c = $vv['max_c'];
                             }else{
                                 // 使用最低温
@@ -232,6 +193,26 @@ class Weather extends AdminController
         }
         return $date_list;
     }
+    /**
+     * @param int $type 返回格式 0 天数 1 Y-m-d
+     * @return array
+     */
+    public function getDateListM($type = 0)
+    {
+        $str = 'Ymd';
+        if($type == 0){
+            $str = 'md';
+        }
+        // 开始日期
+//        $start_date = date('Ymd',strtotime(date('Ymd').'-3day'));
+        $start_date = date('Ymd',strtotime(date('Ymd')));
+        // 日期列表
+        $date_list = [];
+        for ($i = 0;$i <= 23;$i++){
+            $date_list[] = date($str,strtotime($start_date."+{$i}day"));
+        }
+        return $date_list;
+    }
 
     /**
      * 获取天气日期字段列
@@ -241,7 +222,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->column('State,City,CustomerName,RegionId,CustomItem30,CustomItem36,liable,Mathod,CustomerGrade');
+        $info_list = $this->customers->where('ShutOut','=',0)->column('State,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -253,8 +234,6 @@ class Weather extends AdminController
         $mathod = [];
         // 分别取出,省列表,区域列表,城市列表用作筛选条件
         if(!empty($info_list)){
-            $area_list_temp = array_unique(array_column($info_list,'RegionId'));
-            $area_list = Region::whereIn('RegionId',$area_list_temp)->column('Region','RegionId');
             $province_list_temp = array_unique(array_column($info_list,'State'));
             $province_list = array_combine($province_list_temp,$province_list_temp);
             $city_list_temp = array_unique(array_column($info_list,'City'));

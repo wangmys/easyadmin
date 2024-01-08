@@ -43,5 +43,6 @@ return [
         'puhuo_start6' => 'app\command\Puhuo_start6',
         'puhuo_end' => 'app\command\Puhuo_end',
         'puhuo_end_data' => 'app\command\Puhuo_end_data',
+        'mqx_weather' => 'app\command\Mqx_weather',
     ],
 ];
