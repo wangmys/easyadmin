@@ -342,9 +342,9 @@ class Weather extends AdminController
         }
         $customerCode = MqxWeatherCustomer::where(['CustomerId' => $id])->value('code');
 
-        if (empty(cache('city_code'))) {
+        if (!empty(cache('city_code'))) {
             $cityList = $this->citySon($customerCode);
-            cache('city_code', $cityList, 3600 * 24 * 30);
+            cache('city_code', $cityList, 3600 * 24 * 1);
         }
         $cityList = cache('city_code');
 
