@@ -328,7 +328,7 @@ class Weather extends AdminController
             try {
                 (new MqxWeatherService)->update_weather($post['code']);
             } catch (Exception $e) {
-                $this->error('获取失败');
+//                $this->error('获取失败');
             }
 
             $this->success('绑定成功');
