@@ -344,7 +344,7 @@ class Weather extends AdminController
 
         if (empty(cache('city_code'))) {
             $cityList = $this->citySon($customerCode);
-            cache('city_code', $cityList, 3600 * 24 * 365);
+            cache('city_code', $cityList, 3600 * 24 * 30);
         }
         $cityList = cache('city_code');
 
