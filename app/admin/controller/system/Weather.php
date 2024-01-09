@@ -14,10 +14,12 @@ use app\admin\model\weather\WeatherUpdateStatus2345Model;
 use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
+use app\common\service\command\MqxWeatherService;
 use app\common\service\WeatherService;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
+use think\Exception;
 use think\facade\Db;
 use voku\helper\HtmlDomParser;
 use think\cache\driver\Redis;
@@ -32,7 +34,7 @@ class Weather extends AdminController
 {
     protected $sort = [
         'sort' => 'desc',
-        'id'   => 'desc',
+        'id' => 'desc',
     ];
     const ProductMemberAuth = 7;
 
@@ -86,34 +88,34 @@ class Weather extends AdminController
             $dateList = $this->getDateListM(1);
             $list = $list->toArray();
 
-            if(!empty($list)){
+            if (!empty($list)) {
 
-                $weather_code = array_column($list,'weather_code');
+                $weather_code = array_column($list, 'weather_code');
                 // 查询天气
-                $weather_list = $this->model->field('*')->whereIn('code',$weather_code)->where('date','in',array_values($dateList))->select()->toArray();
+                $weather_list = $this->model->field('*')->whereIn('code', $weather_code)->where('date', 'in', array_values($dateList))->select()->toArray();
 
-                foreach ($weather_list as $kk => $vv){
-                    foreach ($list as $k => $v){
-                        if($vv['code'] == $v['weather_code']){
-                            $key = date('m-d',strtotime($vv['date']));
+                foreach ($weather_list as $kk => $vv) {
+                    foreach ($list as $k => $v) {
+                        if ($vv['code'] == $v['weather_code']) {
+                            $key = date('m-d', strtotime($vv['date']));
 
                             // 使用最高温
-                            if(in_array(date('m',strtotime($vv['date'])),[2,3,4,5,6,7])){
+                            if (in_array(date('m', strtotime($vv['date'])), [2, 3, 4, 5, 6, 7])) {
                                 $value_c = $vv['max_c'];
-                            }else{
+                            } else {
                                 // 使用最低温
                                 // $value_c = $vv['min_c'];
-                                $diff = $vv['max_c']-$vv['min_c'];
+                                $diff = $vv['max_c'] - $vv['min_c'];
                                 if ($vv['max_c'] > 30) {
                                     $value_c = $vv['max_c'];
-                                // } elseif ($diff <= 5) {
+                                    // } elseif ($diff <= 5) {
                                 } elseif ($diff <= 5 || $vv['max_c'] <= 18) { // 新增的 $vv['max_c'] <= 18
-                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 );
+                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0);
                                 } elseif ($diff > 5 && $diff <= 10) {
-                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 2;
+                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 2;
                                 } elseif ($diff > 10) {
                                     // $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
-                                    $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 3;
+                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 3;
                                 }
 
                             }
@@ -125,25 +127,25 @@ class Weather extends AdminController
                             } else if ($value_c <= 18) {
                                 $bgCol = 'rgb(163,200,232)';
                                 $fontCol = '#000000';
-                            } else if ( $value_c <= 22) {
+                            } else if ($value_c <= 22) {
                                 $bgCol = 'rgb(254,250,186)';
-                                $fontCol = '#000000';  
-                            } else if ( $value_c <= 26) {
+                                $fontCol = '#000000';
+                            } else if ($value_c <= 26) {
                                 $bgCol = 'rgb(252,216,84)';
-                                $fontCol = '#000000';  
-                            } else if ($value_c  <= 30) {
+                                $fontCol = '#000000';
+                            } else if ($value_c <= 30) {
                                 $bgCol = 'rgb(251,184,5)';
                                 $fontCol = '#000000';
                             } else if ($value_c >= 30) {
                                 $bgCol = 'rgb(239,33,33)';
                                 $fontCol = '#000000';
-                            } else{
+                            } else {
                                 $bgCol = '#fecc51';
                                 $fontCol = '#000000';
                             }
 //                             $list[$k][$key] = $vv['min_c'].' ~ '.$vv['max_c'].'℃';
 //                             $list[$k]['_'.$key] = $bgCol;
-                            $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'].'~'.$vv['max_c'] . "</span>";
+                            $list[$k][$key] = "<span style='width: 100%;display: block; background:{$bgCol}; color:{$fontCol}' >" . $vv['min_c'] . '~' . $vv['max_c'] . "</span>";
 
 
                             // $list[$k][$key] = [
@@ -155,11 +157,11 @@ class Weather extends AdminController
                 }
             }
             $data = [
-                'code'  => 0,
-                'msg'   => '',
-                'today_date'   => date('m-d'),
+                'code' => 0,
+                'msg' => '',
+                'today_date' => date('m-d'),
                 'count' => $count,
-                'data'  => $list
+                'data' => $list
             ];
             return json($data);
         }
@@ -171,7 +173,7 @@ class Weather extends AdminController
             return $this->fetch();
             // return $this->fetch('index_mobile2');
         }
-        
+
     }
 
     /**
@@ -181,18 +183,19 @@ class Weather extends AdminController
     public function getDateList($type = 0)
     {
         $str = 'Y-m-d';
-        if($type == 0){
+        if ($type == 0) {
             $str = 'm-d';
         }
         // 开始日期
-        $start_date = date('Y-m-d',strtotime(date('Y-m-d').'-3day'));
+        $start_date = date('Y-m-d', strtotime(date('Y-m-d') . '-3day'));
         // 日期列表
         $date_list = [];
-        for ($i = 0;$i <= 23;$i++){
-            $date_list[] = date($str,strtotime($start_date."+{$i}day"));
+        for ($i = 0; $i <= 23; $i++) {
+            $date_list[] = date($str, strtotime($start_date . "+{$i}day"));
         }
         return $date_list;
     }
+
     /**
      * @param int $type 返回格式 0 天数 1 Y-m-d
      * @return array
@@ -200,16 +203,15 @@ class Weather extends AdminController
     public function getDateListM($type = 0)
     {
         $str = 'Ymd';
-        if($type == 0){
+        if ($type == 0) {
             $str = 'md';
         }
         // 开始日期
-//        $start_date = date('Ymd',strtotime(date('Ymd').'-3day'));
-        $start_date = date('Ymd',strtotime(date('Ymd')));
+        $start_date = date('Ymd',strtotime(date('Ymd').'-3day'));
         // 日期列表
         $date_list = [];
-        for ($i = 0;$i <= 23;$i++){
-            $date_list[] = date($str,strtotime($start_date."+{$i}day"));
+        for ($i = 0; $i <= 23; $i++) {
+            $date_list[] = date($str, strtotime($start_date . "+{$i}day"));
         }
         return $date_list;
     }
@@ -222,7 +224,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('ShutOut','=',0)->column('State,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
+        $info_list = $this->customers->where('ShutOut', '=', 0)->column('State,CustomItem17,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -233,28 +235,30 @@ class Weather extends AdminController
         $city_list = [];
         $mathod = [];
         // 分别取出,省列表,区域列表,城市列表用作筛选条件
-        if(!empty($info_list)){
-            $province_list_temp = array_unique(array_column($info_list,'State'));
-            $province_list = array_combine($province_list_temp,$province_list_temp);
-            $city_list_temp = array_unique(array_column($info_list,'City'));
-            $city_list = array_combine($city_list_temp,$city_list_temp);
-            $store_list_temp = array_unique(array_column($info_list,'CustomerName'));
-            $store_list = array_combine($store_list_temp,$store_list_temp);
+        if (!empty($info_list)) {
+            $province_list_temp = array_unique(array_column($info_list, 'State'));
+            $province_list = array_combine($province_list_temp, $province_list_temp);
+            $city_list_temp = array_unique(array_column($info_list, 'City'));
+            $city_list = array_combine($city_list_temp, $city_list_temp);
+            $store_list_temp = array_unique(array_column($info_list, 'CustomerName'));
+            $store_list = array_combine($store_list_temp, $store_list_temp);
             // 温带
-            $wendai_list_temp = array_unique(array_column($info_list,'CustomItem30'));
-            $wendai_list = array_combine($wendai_list_temp,$wendai_list_temp);
+            $wendai_list_temp = array_unique(array_column($info_list, 'CustomItem30'));
+            $wendai_list = array_combine($wendai_list_temp, $wendai_list_temp);
             // 气温区域
-            $wenqu_list_temp = array_unique(array_column($info_list,'CustomItem36'));
-            $wenqu_list = array_combine($wenqu_list_temp,$wenqu_list_temp);
+            $wenqu_list_temp = array_unique(array_column($info_list, 'CustomItem36'));
+            $wenqu_list = array_combine($wenqu_list_temp, $wenqu_list_temp);
             // 商品负责人
-            $liable_list_temp = array_unique(array_column($info_list,'liable'));
-            $liable_list = array_combine($liable_list_temp,$liable_list_temp);
-            $liable_list = array_filter($liable_list, function($value) {return !is_null($value) && !empty($value);});
+            $liable_list_temp = array_unique(array_column($info_list, 'CustomItem17'));
+            $liable_list = array_combine($liable_list_temp, $liable_list_temp);
+            $liable_list = array_filter($liable_list, function ($value) {
+                return !is_null($value) && !empty($value);
+            });
             //经营模式
-            $mathod = array_filter(array_unique(array_column($info_list,'Mathod')));
+            $mathod = array_filter(array_unique(array_column($info_list, 'Mathod')));
             $mathod = array_combine($mathod, $mathod);
             //店铺等级
-            $CustomerGrade = array_filter(array_unique(array_column($info_list,'CustomerGrade')));
+            $CustomerGrade = array_filter(array_unique(array_column($info_list, 'CustomerGrade')));
             $CustomerGrade = array_combine($CustomerGrade, $CustomerGrade);
         }
 
@@ -270,27 +274,27 @@ class Weather extends AdminController
         $last_update_time = WeatherUpdateStatus2345Model::where([])->field('update_time')->order('update_time desc')->find();
 
         //是否已绑网址
-        $bang_url_list = ['已绑'=>'已绑', '未绑'=>'未绑'];
+        $bang_url_list = ['已绑' => '已绑', '未绑' => '未绑'];
 
         // 省列表
         // 区域列表
         $data = [
-                'code'  => 1,
-                'msg'   => '',
-                'province_list'  => $province_list,
+            'code' => 1,
+            'msg' => '',
+            'province_list' => $province_list,
 //                'area_list'  => $area_list,
-                'store_list'  => $store_list,
-               'city_list'  => $city_list,
-                'wendai_list'  => $wendai_list,
-                'wenqu_list'  => $wenqu_list,
-                'liable_list'  => $liable_list,
-                'if_can_see'  => $if_can_see,
-                'mathod'  => $mathod,
-                'CustomerGrade'  => $CustomerGrade,
-                'last_update_time'  => $last_update_time ? $last_update_time['update_time'] : '',
-                'bang_url_list'  => $bang_url_list,
-                'data'  => $list
-            ];
+            'store_list' => $store_list,
+            'city_list' => $city_list,
+            'wendai_list' => $wendai_list,
+            'wenqu_list' => $wenqu_list,
+            'liable_list' => $liable_list,
+            'if_can_see' => $if_can_see,
+            'mathod' => $mathod,
+            'CustomerGrade' => $CustomerGrade,
+            'last_update_time' => $last_update_time ? $last_update_time['update_time'] : '',
+            'bang_url_list' => $bang_url_list,
+            'data' => $list
+        ];
         return json($data);
     }
 
@@ -309,66 +313,100 @@ class Weather extends AdminController
         if ($this->request->isAjax()) {
 
             $post = $this->request->post();
-            $city_id = $post['city']??0;
-            if(empty($city_id)){
-                $this->error('请选择绑定城市');
+
+            $wc=explode(',',$post['code']);
+            if(count($wc)>1){
+                $this->error('只能选一个地区');
             }
-            // 查询城市
-            $city_cid = $city_model->where(['cid' => $city_id])->value('cid');
-            if(empty($city_cid)){
-                $this->error('城市不存在');
+
+            $CustomerName = Db::connect('mysql')->table('customer')->where(['CustomerId' => $id])->value('CustomerName');
+            $cc = Db::connect('mysql')->table('mqx_weather_customer')->where(['CustomerId' => $id])->find();
+            $arr = [
+                'CustomerId' => $id,
+                'CustomerName' => $CustomerName,
+                'code' => $post['code']
+            ];
+            if (empty($cc)) {
+                 Db::connect('mysql')->table('mqx_weather_customer')->insert($arr);
+            } else {
+                 Db::connect('mysql')->table('mqx_weather_customer')->where(['CustomerId' => $id])->update($arr);
             }
-            // 执行绑定
-            $res = $this->customers->where([
-                'CustomerId' => $id
-            ])->update(['cid' => $city_cid]);
-            // 绑定城市后,更新该城市的天气数据
-            (new WeatherService)->updateCityWeather2345($city_id);
-            // if($res){
-                // 绑定城市
-                $this->success('绑定成功');
-            // }
-            // $this->error('绑定失败');
+            try {
+                (new MqxWeatherService)->update_weather($post['code']);
+            } catch (Exception $e) {
+                $this->error($e->getMessage());
+            }
+
+            $this->success('绑定成功');
+
+        }
+        $customerCode = MqxWeatherCustomer::where(['CustomerId' => $id])->value('code');
+
+        if (empty(cache('city_code'))) {
+            $cityList = $this->citySon($customerCode);
+            cache('city_code', $cityList, 3600 * 24 * 100);
+        }
+        $cityList = cache('city_code');
+
+        foreach ($cityList as &$item) {
+            foreach ($item['children'] as &$item_1) {
+                foreach ($item_1['children'] as &$item_2) {
+                    if ($item_2['value'] == $customerCode) {
+                        $item_2['selected'] = true;
+                    }
+
+                }
+            }
         }
 
-        // 查询店铺记录
-        $customer = $this->customers->field('CustomerName,State,City,cid')->where(['CustomerId' => $id])->find();
-        if(empty($customer)){
-            $this->error('记录不存在');
-        }
-        // 提取店铺城市关键字
-        $keywords = [];
-        foreach (['CustomerName','City'] as $k=>$v){
-            if(empty($customer[$v])) continue;
-            switch ($v){
-                case 'CustomerName':
-                    $keywords[$v] = mb_substr($customer[$v],0,-2).'%';
-                    break;
-                case 'City':
-                    $keywords[$v] = mb_substr($customer[$v],0,2).'%';
-                    break;
-            }
-        }
-        //cid对应的县/市名：
-        $cid_city_name = $city_model->where([['cid', '=', $customer['cid']]])->field('city')->find();
-        if ($cid_city_name) {
-            $keywords['cid_name'] = $cid_city_name['city'].'%';
-        }
-        // 查询匹配店铺的城市列表
-        $city_list = $city_model->where(function ($q)use($keywords){
-            if(!empty($keywords)) $q->where('city', 'like',$keywords,'OR');
-        })->order('cid','desc')->column('cid,city,province');
-        // 给城市加上省前缀
-        foreach ($city_list as $kk => $vv){
-            $prefix = mb_substr($vv['province'],0,-7);
-            $city_list[$kk]['city'] = $prefix.'---'.$city_list[$kk]['city'];
-        }
+
         $this->assign([
-            'city_list' => $city_list,
-            'cid' => $customer['cid'] ?? 0
+            'city_list' => json_encode($cityList),
         ]);
         return $this->fetch();
     }
+
+
+    public function citySon()
+    {
+
+        $cityList = MqxWeatherCode::where(1)->select()->toArray();
+        $province = array_values(array_unique(array_column($cityList, 'province')));
+        $res = [];
+        foreach ($province as $key => $value) {
+            $citys = MqxWeatherCode::where('province', $value)->group('city')->select()->toArray();
+            $arr = [
+                'name' => $value,
+                'value' => $value,
+            ];
+            foreach ($citys as $city_v) {
+                $cityA = [
+                    'name' => $city_v['city'],
+                    'value' => $city_v['code']
+                ];
+                $area = MqxWeatherCode::where(['city' => $city_v, 'province' => $value])->select()->toArray();
+                foreach ($area as $area_v) {
+                    $cityA['children'][] = [
+                        'name' => $area_v['area'],
+                        'value' => $area_v['code'],
+                        'selected' => false
+                    ];
+
+                }
+                $arr['children'][] = $cityA;
+
+            }
+
+
+            $res[] = $arr;
+
+
+        }
+
+
+        return $res;
+    }
+
 
     /**
      * 店铺绑定天气网址链接
@@ -396,19 +434,19 @@ class Weather extends AdminController
 
                     $res = $this->customers->where([
                         'CustomerId' => $id
-                    ])->update(['url_2345' => $url_2345, 'url_2345_cid'=>$res['cid']]);
+                    ])->update(['url_2345' => $url_2345, 'url_2345_cid' => $res['cid']]);
 
                 } else {
 
                     $this->error('绑定失败，请检查天气链接网址,必须使用2345天气网15天天气页面url');
 
-                }   
-                
+                }
+
             } else {
 
                 $res = $this->customers->where([
                     'CustomerId' => $id
-                ])->update(['url_2345' => '', 'url_2345_cid'=>0]);
+                ])->update(['url_2345' => '', 'url_2345_cid' => 0]);
 
             }
 
@@ -428,12 +466,13 @@ class Weather extends AdminController
      * 根据温带获取温区
      * @return void
      */
-    public function get_wenqu() {
+    public function get_wenqu()
+    {
 
         $wendai = input('wendai');
         $sql = "select distinct CustomItem36 from customers where CustomItem30='{$wendai}'";
         $res = Db::connect('tianqi')->query($sql);
-        return json(["code" => "0", "msg" => "",  "data" => $res]);
+        return json(["code" => "0", "msg" => "", "data" => $res]);
 
     }
 
@@ -441,14 +480,15 @@ class Weather extends AdminController
      * 根据省份获取温带
      * @return void
      */
-    public function get_wendai() {
+    public function get_wendai()
+    {
 
         $province = input('province');
         $sql = "select distinct CustomItem30 from customers where State='{$province}' and CustomItem30!=''";
         $res = Db::connect('tianqi')->query($sql);
-        $citys = $this->customers->where('RegionId','<>',55)->where('ShutOut','=',0)->where('State','=',$province)->distinct(true)->column('City');
+        $citys = $this->customers->where('RegionId', '<>', 55)->where('ShutOut', '=', 0)->where('State', '=', $province)->distinct(true)->column('City');
 
-        return json(["code" => "0", "msg" => "",  "data" => $res, 'citys'=>$citys]);
+        return json(["code" => "0", "msg" => "", "data" => $res, 'citys' => $citys]);
 
     }
 
