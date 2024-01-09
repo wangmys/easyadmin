@@ -518,7 +518,7 @@ class Threeyearcwl extends AdminController
             // print_r($select);
             $res = $this->dataHandle($select);
             // $count = count($select);
-            return json(["code" => "0", "msg" => "", "count" => count($res), "data" => $res]);
+            return json(["code" => "0", "msg" => "", "count" => count($res), "data" => $res, 'sql' => $执行sql]);
         } else {
 
             return View('system/threeyearcwl/index', [
