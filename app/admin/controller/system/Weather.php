@@ -67,9 +67,9 @@ class Weather extends AdminController
                     if (!empty($where['CustomerName'])) $query->where('c.CustomerName', 'in', $where['CustomerName']);
                     if (!empty($where['State'])) $query->where('c.State', $where['State']);
                     if (!empty($where['Region'])) $query->where('c.RegionId', $where['Region']);
+                    if (!empty($where['CustomItem17'])) $query->where('c.CustomItem17', $where['CustomItem17']);
                     if (!empty($where['CustomItem30'])) $query->where('c.CustomItem30', $where['CustomItem30']);
                     if (!empty($where['CustomItem36'])) $query->where('c.CustomItem36', $where['CustomItem36']);
-                    if (!empty($where['City'])) $query->whereIn('c.City', $where['City']);
                     if (!empty($where['liable'])) $query->whereIn('c.liable', $where['liable']);
                     if (!empty(input('商品专员'))) $query->whereIn('c.liable', input('商品专员'));
                     if (!empty(input('省份'))) $query->whereIn('c.State', input('省份'));
@@ -98,11 +98,10 @@ class Weather extends AdminController
                     foreach ($list as $k => $v) {
                         if ($vv['code'] == $v['weather_code']) {
                             $key = date('m-d', strtotime($vv['date']));
-
                             // 使用最高温
-                            if (in_array(date('m', strtotime($vv['date'])), [2, 3, 4, 5, 6, 7])) {
-                                $value_c = $vv['max_c'];
-                            } else {
+//                            if (in_array(date('m', strtotime($vv['date'])), [2, 3, 4, 5, 6, 7])) {
+//                                $value_c = $vv['max_c'];
+//                            } else {
                                 // 使用最低温
                                 // $value_c = $vv['min_c'];
                                 $diff = $vv['max_c'] - $vv['min_c'];
@@ -114,29 +113,29 @@ class Weather extends AdminController
                                 } elseif ($diff > 5 && $diff <= 10) {
                                     $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 2;
                                 } elseif ($diff > 10) {
-                                    // $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
-                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 3;
+                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
+//                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 3;
                                 }
 
-                            }
+//                            }
 
 
-                            if ($value_c <= 10) {
+                            if ($value_c < 10) {
                                 $bgCol = 'rgb(47,117,181)';
                                 $fontCol = '#000000';
-                            } else if ($value_c <= 18) {
+                            } else if ($value_c < 18) {
                                 $bgCol = 'rgb(163,200,232)';
                                 $fontCol = '#000000';
-                            } else if ($value_c <= 22) {
+                            } else if ($value_c < 22) {
                                 $bgCol = 'rgb(254,250,186)';
                                 $fontCol = '#000000';
-                            } else if ($value_c <= 26) {
+                            } else if ($value_c < 26) {
                                 $bgCol = 'rgb(252,216,84)';
                                 $fontCol = '#000000';
                             } else if ($value_c <= 30) {
                                 $bgCol = 'rgb(251,184,5)';
                                 $fontCol = '#000000';
-                            } else if ($value_c >= 30) {
+                            } else if ($value_c > 30) {
                                 $bgCol = 'rgb(239,33,33)';
                                 $fontCol = '#000000';
                             } else {
