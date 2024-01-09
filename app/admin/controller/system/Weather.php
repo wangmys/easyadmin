@@ -111,11 +111,11 @@ class Weather extends AdminController
                                     $value_c = $vv['max_c'];
                                     // } elseif ($diff <= 5) {
                                 } elseif ($diff <= 5 || $vv['max_c'] <= 18) { // 新增的 $vv['max_c'] <= 18
-                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0);
+                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 1);
                                 } elseif ($diff > 5 && $diff <= 10) {
-                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 2;
+                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 1) + 2;
                                 } elseif ($diff > 10) {
-                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 0 ) + 4;
+                                     $value_c = round( ($vv['max_c']+$vv['min_c'])/2, 1 ) + 4;
 //                                    $value_c = round(($vv['max_c'] + $vv['min_c']) / 2, 0) + 3;
                                 }
 
