@@ -31,10 +31,8 @@ class MqxWeatherService
         $codeArr = $this->mysql->table('mqx_weather_code')->column('code', 'area');
         $arr = [];
         foreach ($customer as $item) {
-            if ($item['City']) {
-                $newCity = mb_substr($item['City'], 0, 2);
+                $newCity = mb_substr($item['CustomerName'], 0, 2);
                 $code = $codeArr[$newCity] ?? '';
-
                 if ($code) {
                     $arr[] = [
                         'CustomerId' => $item['CustomerId'],
@@ -42,7 +40,6 @@ class MqxWeatherService
                         'code' => $code,
                     ];
                 }
-            }
         }
         $this->mysql->table('mqx_weather_customer')->insertAll($arr);
 

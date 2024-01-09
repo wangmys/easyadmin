@@ -31,6 +31,7 @@ class Mqx_weather extends Command
     {
         ini_set('memory_limit', '512M');
         try {
+//            (new MqxWeatherService())->test();
             (new MqxWeatherService())->update_weather();
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());
