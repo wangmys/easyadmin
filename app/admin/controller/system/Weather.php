@@ -14,10 +14,12 @@ use app\admin\model\weather\WeatherUpdateStatus2345Model;
 use app\admin\service\TriggerService;
 use app\common\constants\AdminConstant;
 use app\common\controller\AdminController;
+use app\common\service\command\MqxWeatherService;
 use app\common\service\WeatherService;
 use EasyAdmin\annotation\ControllerAnnotation;
 use EasyAdmin\annotation\NodeAnotation;
 use think\App;
+use think\Exception;
 use think\facade\Db;
 use voku\helper\HtmlDomParser;
 use think\cache\driver\Redis;
@@ -222,7 +224,7 @@ class Weather extends AdminController
         // 日期列表
         $list = $this->getDateList(0);
         // 店铺信息列表
-        $info_list = $this->customers->where('ShutOut', '=', 0)->column('State,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
+        $info_list = $this->customers->where('ShutOut', '=', 0)->column('State,CustomItem17,City,CustomerName,CustomItem30,CustomItem36,Mathod,CustomerGrade');
         // 区域列表
         $area_list = [];
         // 省列表
@@ -247,7 +249,7 @@ class Weather extends AdminController
             $wenqu_list_temp = array_unique(array_column($info_list, 'CustomItem36'));
             $wenqu_list = array_combine($wenqu_list_temp, $wenqu_list_temp);
             // 商品负责人
-            $liable_list_temp = array_unique(array_column($info_list, 'liable'));
+            $liable_list_temp = array_unique(array_column($info_list, 'CustomItem17'));
             $liable_list = array_combine($liable_list_temp, $liable_list_temp);
             $liable_list = array_filter($liable_list, function ($value) {
                 return !is_null($value) && !empty($value);
@@ -311,7 +313,6 @@ class Weather extends AdminController
         if ($this->request->isAjax()) {
 
             $post = $this->request->post();
-
             $CustomerName = Db::connect('mysql')->table('customer')->where(['CustomerId' => $id])->value('CustomerName');
             $cc = Db::connect('mysql')->table('mqx_weather_customer')->where(['CustomerId' => $id])->find();
             $arr = [
@@ -323,6 +324,11 @@ class Weather extends AdminController
                  Db::connect('mysql')->table('mqx_weather_customer')->insert($arr);
             } else {
                  Db::connect('mysql')->table('mqx_weather_customer')->where(['CustomerId' => $id])->update($arr);
+            }
+            try {
+                (new MqxWeatherService)->update_weather($post['code']);
+            } catch (Exception $e) {
+                $this->error('获取失败');
             }
 
             $this->success('绑定成功');

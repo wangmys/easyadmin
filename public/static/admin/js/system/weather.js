@@ -47,7 +47,7 @@ define(["jquery", "easy-admin2"], function ($, ea) {
                     {field: 'CustomItem30', width: 70, title: '温带',fixed:'left',search: false,search: 'select',selectList:wendai_list},
                     {field: 'CustomItem36', width: 70, title: '温区',fixed:'left',search: false,search: 'select',selectList:wenqu_list},
                     {field: 'CustomerName', width: 90, title: '店铺',fixed:'left',search: 'xmSelect',selectList:store_list,laySearch:true},
-                    {field: 'CustomItem17', width: 100, title: '商品负责人',fixed:'left',search: 'xmSelect',selectList:liable_list},
+                    {field: 'CustomItem17', width: 100, title: '商品负责人',search: 'xmSelect',fixed:'left',search: 'xmSelect',selectList:liable_list},
                     {hide:true, field: 'Mathod', width: 50, title: '经营模式',fixed:'left',search: 'xmSelect',selectList:mathod},
                     {hide:true, field: 'CustomerGrade', width: 50, title: '店铺等级',fixed:'left',search: 'xmSelect',selectList:CustomerGrade,laySearch:true},
                     // {field: 'City', width: 100, title: '地级市',fixed:'left',search: 'select',selectList:city_list,laySearch:true},

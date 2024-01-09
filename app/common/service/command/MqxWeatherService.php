@@ -50,7 +50,7 @@ class MqxWeatherService
     }
 
 
-    public function update_weather($date_Ym = '')
+    public function update_weather($weather_code,$date_Ym = '')
     {
 
         if (empty($date_Ym)) {
@@ -65,7 +65,7 @@ class MqxWeatherService
             "User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36"
         ];
 
-        $code = $this->mysql->table('mqx_weather_customer')->group('code')->select()->toArray();
+        $code = $this->mysql->table('mqx_weather_customer')->where(['weather_code'=>$weather_code])->group('code')->select()->toArray();
 
         foreach ($code as $code_v) {
 
