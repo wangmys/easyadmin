@@ -326,7 +326,7 @@ class Shangguitips extends BaseController
                         AND ER.RetailDate < DATEADD(DAY, 0, CAST(GETDATE() AS DATE))
                         AND EC.RegionId NOT IN ('40', '55', '84', '85',  '97')
                         AND EG.TimeCategoryName2 NOT IN ('通季', '畅销季')
-                        AND EG.TimeCategoryName1 IN ('2023')
+                        AND EG.TimeCategoryName1 IN ('2023', '2024')
                         AND EG.CategoryName1 IN ('内搭', '外套','下装', '鞋履')
                         AND EBC.Mathod IN ('直营', '加盟')
                 GROUP BY 

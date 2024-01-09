@@ -360,6 +360,7 @@
             },
             data: [
                 {name: "2023", value: "2023", selected: true},
+                {name: "2024", value: "2024", selected: true},
             ]
         })
         // 一级分类
@@ -612,7 +613,7 @@
                 , limits: [500, 1000, 5000, 10000, 20000]
                 , height: height
                 , cellMinWidth: 60 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , where: {'季节归集': '秋季,冬季', '上柜提醒': '请上柜,重点上柜' }
+                , where: {'季节归集': '秋季,冬季', '上柜提醒': '请上柜,重点上柜', '年份':'2023,2024' }
                 , cols: [
                     [
                         { field: '货号', title: '<a style="color:blue; font-weight:bold;">货号</a>', fixed: 'left' ,align: 'center' , width: 75, rowspan: 2, templet:

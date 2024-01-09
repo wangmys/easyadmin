@@ -541,7 +541,14 @@ class Shangguitips extends AdminController
             } else {
                 $map10 = "";
             }
-            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}";
+            if (!empty($input['年份'])) {
+                // echo $input['商品负责人'];
+                $map11Str = xmSelectInput($input['年份']);
+                $map11 = " AND p.年份 IN ({$map11Str})";
+            } else {
+                $map11 = "";
+            }
+            $map = "{$map1}{$map2}{$map3}{$map4}{$map5}{$map6}{$map7}{$map8}{$map9}{$map10}{$map11}";
             $code = rand_code(6);
             cache($code, $map, 3600);
             return json([
@@ -814,6 +821,14 @@ class Shangguitips extends AdminController
             } else {
                 $map10 = "";
             }
+
+            if (!empty($input['年份'])) {
+                // echo $input['商品负责人'];
+                $map11Str = xmSelectInput($input['年份']);
+                $map11 = " AND p.年份 IN ({$map11Str})";
+            } else {
+                $map11 = "";
+            }
             // echo  $map8;die;
             $sql = "
                 select
@@ -871,6 +886,7 @@ class Shangguitips extends AdminController
                     {$map8}
                     {$map9}
                     {$map10}
+                    {$map11}
                 ORDER BY
                     季节归集 ASC,上市波段 ASC
                 LIMIT {$pageParams1}, {$pageParams2}  
@@ -904,6 +920,7 @@ class Shangguitips extends AdminController
                     {$map8}
                     {$map9}
                     {$map10}
+                    {$map11}
             ";
             $count = $this->db_easyA->query($sql2);
             return json(["code" => "0", "msg" => "", "count" => $count[0]['total'], "data" => $select, 'create_time' => $find_config['更新日期']]);
