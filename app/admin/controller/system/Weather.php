@@ -95,7 +95,9 @@ class Weather extends AdminController
                 $weather_list = $this->model->field('*')->whereIn('code', $weather_code)->where('date', 'in', array_values($dateList))->select()->toArray();
 
                 foreach ($weather_list as $kk => $vv) {
-                    foreach ($list as $k => $v) {
+                    foreach ($list as $k => &$v) {
+
+                        $v['State']=mb_substr($v['State'],0,2);
                         if ($vv['code'] == $v['weather_code']) {
                             $key = date('m-d', strtotime($vv['date']));
                             // 使用最高温
