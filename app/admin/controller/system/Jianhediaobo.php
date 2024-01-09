@@ -105,8 +105,8 @@ class Jianhediaobo extends AdminController
      * 渠道调拨申请单的excel 
      */
     public function qudaodiaobo() {
-        if (request()->isAjax()) {
-        // if (1) {
+        // if (request()->isAjax()) {
+        if (1) {
         //     echo 111;die;
         //     die;
             // 筛选条件
