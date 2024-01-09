@@ -31,15 +31,15 @@ class MqxWeatherService
         $codeArr = $this->mysql->table('mqx_weather_code')->column('code', 'area');
         $arr = [];
         foreach ($customer as $item) {
-                $newCity = mb_substr($item['CustomerName'], 0, 2);
-                $code = $codeArr[$newCity] ?? '';
-                if ($code) {
-                    $arr[] = [
-                        'CustomerId' => $item['CustomerId'],
-                        'CustomerName' => $item['CustomerName'],
-                        'code' => $code,
-                    ];
-                }
+            $newCity = mb_substr($item['CustomerName'], 0, 2);
+            $code = $codeArr[$newCity] ?? '';
+            if ($code) {
+                $arr[] = [
+                    'CustomerId' => $item['CustomerId'],
+                    'CustomerName' => $item['CustomerName'],
+                    'code' => $code,
+                ];
+            }
         }
         $this->mysql->table('mqx_weather_customer')->insertAll($arr);
 
@@ -47,7 +47,7 @@ class MqxWeatherService
     }
 
 
-    public function update_weather($weather_code='',$date_Ym = '')
+    public function update_weather($weather_code = '', $date_Ym = '')
     {
 
         if (empty($date_Ym)) {
@@ -62,7 +62,11 @@ class MqxWeatherService
             "User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36"
         ];
 
-        $code = $this->mysql->table('mqx_weather_customer')->where(['code'=>$weather_code])->group('code')->select()->toArray();
+        $where = [];
+        if (!empty($weather_code)) {
+            $where = ['code' => $weather_code];
+        }
+        $code = $this->mysql->table('mqx_weather_customer')->where($where)->group('code')->select()->toArray();
 
         foreach ($code as $code_v) {
 
@@ -79,21 +83,21 @@ class MqxWeatherService
                 $oldData = $this->mysql->table('mqx_weather')->where('code', '=', $code_v['code'])->where('date', '>=', $now)->column('date');
                 foreach ($newData as $item) {
 //                    if ($item['date'] >= $now) {
-                        $dbData = [
-                            'code' => $code_v['code'],
-                            'date' => $item['date'],
-                            'max_c' => $item['max'] ?: ($item['maxobs'] ?: $item['hmax']),
-                            'min_c' => $item['min'] ?: ($item['minobs'] ?: $item['hmin']),
-                            'desc' => $item['w1']
-                        ];
-                        if (in_array($item['date'], $oldData)) { //修改
-                            $dbData['update_time'] = date('Y-m-d H:i:s');
-                            $this->mysql->table('mqx_weather')->where('code', '=', $code_v['code'])->where('date', '=', $item['date'])->update($dbData);
-                        } else {
-                            $dbData['create_time'] = date('Y-m-d H:i:s');
-                            $dbData['update_time'] = date('Y-m-d H:i:s');
-                            $insertAll[] = $dbData;
-                        }
+                    $dbData = [
+                        'code' => $code_v['code'],
+                        'date' => $item['date'],
+                        'max_c' => $item['max'] ?: ($item['maxobs'] ?: $item['hmax']),
+                        'min_c' => $item['min'] ?: ($item['minobs'] ?: $item['hmin']),
+                        'desc' => $item['w1']
+                    ];
+                    if (in_array($item['date'], $oldData)) { //修改
+                        $dbData['update_time'] = date('Y-m-d H:i:s');
+                        $this->mysql->table('mqx_weather')->where('code', '=', $code_v['code'])->where('date', '=', $item['date'])->update($dbData);
+                    } else {
+                        $dbData['create_time'] = date('Y-m-d H:i:s');
+                        $dbData['update_time'] = date('Y-m-d H:i:s');
+                        $insertAll[] = $dbData;
+                    }
 //                    }
                 }
                 if (!empty($insertAll)) {
