@@ -105,23 +105,26 @@ class Jianhediaobo extends AdminController
      * 渠道调拨申请单的excel 
      */
     public function qudaodiaobo() {
-        // if (request()->isAjax()) {
-        if (1) {
+        if (request()->isAjax()) {
+        // if (1) {
         //     echo 111;die;
         //     die;
             // 筛选条件
-            $data = $this->qudaodiaobo_group();
-            // 错误提醒
-            if ($data) {
-                $time = date('Y-m-d H:i:s');
-                // $select = array_chunk($data, 500);
-                foreach($data as $key => $val) {
-                    // 一条一条插入，因为字段数量不一样
-                    $val['更新时间'] = $time;
-                    $insert = $this->db_easyA->table('cwl_qudaodiaobo_history')->strict(false)->insert($val);
-                }
-                // print_r($data);
-            }
+            // $data = $this->qudaodiaobo_group();
+            // // 错误提醒
+            // if ($data) {
+            //     $time = date('Y-m-d H:i:s');
+            //     // $select = array_chunk($data, 500);
+            //     foreach($data as $key => $val) {
+            //         // 一条一条插入，因为字段数量不一样
+            //         $val['更新时间'] = $time;
+            //         $insert = $this->db_easyA->table('cwl_qudaodiaobo_history')->strict(false)->insert($val);
+            //     }
+            //     // print_r($data);
+            // }
+            $data = [
+                'name' => 'cwl'
+            ];
             return json(["code" => "0", "msg" => "", "data" => $data, "count" => count($data), 'create_time' => $this->create_time]);
         } else {
             $find_qudaodiaobo = $this->db_easyA->table('cwl_qudaodiaobo_2')->where([
