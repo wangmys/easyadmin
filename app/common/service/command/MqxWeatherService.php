@@ -41,7 +41,7 @@ class MqxWeatherService
                 ];
             }
         }
-        $this->mysql->table('mqx_weather_customer')->insertAll($arr);
+//        $this->mysql->table('mqx_weather_customer')->insertAll($arr);
 
 
     }
