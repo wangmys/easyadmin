@@ -313,6 +313,12 @@ class Weather extends AdminController
         if ($this->request->isAjax()) {
 
             $post = $this->request->post();
+
+            $wc=explode(',',$post['code']);
+            if(count($wc)>1){
+                $this->error('只能选一个地区');
+            }
+
             $CustomerName = Db::connect('mysql')->table('customer')->where(['CustomerId' => $id])->value('CustomerName');
             $cc = Db::connect('mysql')->table('mqx_weather_customer')->where(['CustomerId' => $id])->find();
             $arr = [
